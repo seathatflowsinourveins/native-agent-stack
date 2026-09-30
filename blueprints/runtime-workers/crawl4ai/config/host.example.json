@@ -1,0 +1,10 @@
+{
+  "docker": "${HOME}/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin/docker",
+  "docker_context": "rootless",
+  "python": "/usr/bin/python3.12",
+  "api_port": 3730,
+  "fixture_port": 3731,
+  "mirror_port": 3732,
+  "e2e_api_port": 3734,
+  "working_directory": "${HOME}/.local/state/native-agent-stack/runtime-workers/crawl4ai/work"
+}

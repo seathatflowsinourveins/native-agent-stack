@@ -1,0 +1,45 @@
+{
+  "direct_servers_enabled": false,
+  "enforcement": "FastMCP 4.0.10 stdio proxy; list and call middleware; no direct GPT Researcher tool filtering",
+  "launch_sources": ["adoption/templates/codex.config.template.toml", "adoption/templates/codex.stack-worker.config.toml"],
+  "servers": {
+    "context-mode": {
+      "active": true,
+      "command": "${ECO_ROOT}/bin/node",
+      "args": ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"],
+      "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": "${ECO_ROOT}/bin:${HOST_PATH}", "CONTEXT_MODE_PLATFORM": "codex", "CONTEXT_MODE_PROJECT_DIR": "${WORKER_SCRATCH}", "CONTEXT_MODE_DIR": "${WORKER_STATE}/context-mode"},
+      "cwd": "${WORKER_SCRATCH}",
+      "disabled_tools": ["ctx_upgrade", "ctx_purge", "ctx_execute", "ctx_execute_file", "ctx_batch_execute", "ctx_fetch_and_index"],
+      "enabled_tools": ["ctx_search", "ctx_index"]
+    },
+    "qmd": {
+      "active": true,
+      "command": "${ECO_ROOT}/bin/qmd",
+      "args": ["--index", "native-agent-stack-catalog", "mcp"],
+      "env": {"QMD_CONFIG_DIR": "${QMD_CONFIG_DIR}", "INDEX_PATH": "${QMD_INDEX_PATH}", "PATH": "${ECO_ROOT}/bin:${HOST_PATH}"},
+      "enabled_tools": ["query", "get"],
+      "collections": ["foundation-docs", "foundation-adoption", "us-equities-foundation", "us-equities-catalog"],
+      "query_mode": "lexical only; rerank false; bounded explicit collections"
+    },
+    "ai-memory": {
+      "active": true,
+      "url": "http://${AI_MEMORY_URL}/mcp",
+      "enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"]
+    },
+    "socraticode": {
+      "active": false,
+      "reason": "Coding search omitted for this research role",
+      "command": "${ECO_ROOT}/bin/node",
+      "args": ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"],
+      "enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
+      "env": {"SOCRATICODE_WATCHER": "manual"}
+    },
+    "headroom": {
+      "active": false,
+      "reason": "Native BM25 and tool output bounds selected; no demonstrated offload gap",
+      "command": "${ECO_ROOT}/bin/headroom",
+      "args": ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"],
+      "enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"]
+    }
+  }
+}

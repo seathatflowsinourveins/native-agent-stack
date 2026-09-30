@@ -1,0 +1,28 @@
+argv: ["rtk", "proxy", "python3", "-c", "import re,sys,json,hashlib\nfrom pathlib import Path\np=Path(sys.argv[1])\nbefore=(p/'baseline.lock').read_text();after=(p/'candidate.lock').read_text()\npattern=r'(?m)^urllib3==[^\\n]*(?:\\n[ \\t]+[^\\n]*)*'\noldblock=re.search(pattern,before).group(0);newblock=re.search(pattern,after).group(0)\nassert after==before.replace(oldblock,newblock,1),'bytes changed outside urllib3 block'\ndef declarations(s):\n out={}\n for name,kind,value in re.findall(r'(?m)^([a-zA-Z0-9_.-]+)(==| @ )([^\\n]+)',s):\n  normalized=re.sub(r'[-_.]+','-',name).lower();out[normalized]=value.rstrip(' \\\\')\n return out\nold=declarations(before);new=declarations(after)\nadded=sorted(set(new)-set(old));removed=sorted(set(old)-set(new))\nchanged=[{'name':n,'before':old[n],'after':new[n]} for n in old.keys() & new.keys() if old[n]!=new[n]]\nassert len(old)==len(new)==176\nassert not added and not removed\nassert changed==[{'name':'urllib3','before':'2.7.0','after':'2.8.0'}]\nexpected=json.loads((p/'urllib3-artifacts.json').read_text())\nhashes=re.findall(r'--hash=sha256:([a-f0-9]+)',newblock)\nassert sorted(hashes)==sorted(a['sha256'] for a in expected)\nresult={'before_sha256':hashlib.sha256(before.encode()).hexdigest(),'after_sha256':hashlib.sha256(after.encode()).hexdigest(),'before_requirements':len(old),'after_requirements':len(new),'unchanged_declarations':175,'changed':changed,'added':added,'removed':removed,'only_urllib3_block_changed':True,'urllib3_hashes_match_official_pypi':True,'urllib3_block':newblock}\nprint(json.dumps(result,indent=2))\n", "<PRIVATE_RESEARCH>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:49:28.413021+00:00
+ended_utc: 2026-09-30T15:49:28.476603+00:00
+exit_code: 0
+
+stdout:
+{
+  "before_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  "after_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+  "before_requirements": 176,
+  "after_requirements": 176,
+  "unchanged_declarations": 175,
+  "changed": [
+    {
+      "name": "urllib3",
+      "before": "2.7.0",
+      "after": "2.8.0"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "only_urllib3_block_changed": true,
+  "urllib3_hashes_match_official_pypi": true,
+  "urllib3_block": "urllib3==2.8.0 \\\n    --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \\\n    --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63"
+}
+
+stderr:

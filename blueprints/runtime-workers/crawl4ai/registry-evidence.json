@@ -1,0 +1,12 @@
+{
+  "observed_on": "2026-09-27",
+  "evidence_class": "read-only upstream registry metadata and byte hashes; no image pull/runtime",
+  "tag": "0.9.4",
+  "index": "sha256:9021b3cb5c6f12570bbcd5395638495e0a06969b3148e377b953d174af2ebc9b",
+  "linux_amd64_manifest": "sha256:048848e548fad60c670bd656cbb3eb204fd999709a30365d3697c411ce50796d",
+  "config": "sha256:e051a8fb924de84ddbb89abb8728062e68ba920ad2eff26b13783986b8d647b1",
+  "image_user": "appuser",
+  "version_label": "0.9.4",
+  "provenance_blob": "sha256:2b95a7c52886c9b195ac9a908781f08e2ac063a00da048482ff171eeaf59445a",
+  "provenance_revision": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb"
+}

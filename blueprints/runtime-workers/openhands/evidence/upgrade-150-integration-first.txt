@@ -1,0 +1,49 @@
+.........E.........................................................F..........F..........................................
+======================================================================
+ERROR: test_preload_installs_dynamic_call_adapter_through_upstream_hook (test_runtime_worker_openhands.OpenHandsDispatchTests.test_preload_installs_dynamic_call_adapter_through_upstream_hook)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 3109, in test_preload_installs_dynamic_call_adapter_through_upstream_hook
+    load_recipe_module("server_transport.py")
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 46, in load_recipe_module
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "<RECIPE>/blueprints/runtime-workers/openhands/server_transport.py", line 12, in <module>
+    from worker import capture_correlation, gateway_transport, register_worker_agents
+ImportError: cannot import name 'register_worker_agents' from '<unknown module name>' (unknown location)
+
+======================================================================
+FAIL: test_agent_server_image_scan_receipt_matches_the_pinned_digest (test_runtime_worker_openhands.OpenHandsRecipeTests.test_agent_server_image_scan_receipt_matches_the_pinned_digest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 518, in test_agent_server_image_scan_receipt_matches_the_pinned_digest
+    self.assertEqual({k: receipt["image"][k] for k in keys}, {k: pins[k] for k in keys})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'ref[37 chars]a256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c50[219 chars]96f'} != {'ref[37 chars]a256:6d91a74fd2b556107e4e15476680d1d8116eeadfc[219 chars]1ee'}
+- {'config_sha256': '39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f',
+-  'manifest_sha256': 'ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12',
++ {'config_sha256': '6b11dbc497b336e0bf02aeed538dc21d87e4eabe66cac21d1b289dadb86eb1ee',
++  'manifest_sha256': 'd322c0fa5bc0f95d36de0b1a3e9aeab1230e2daf44d66cc94e42aa4ad23129c7',
+   'platform': 'linux/amd64',
+-  'ref': 'ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37'}
++  'ref': 'ghcr.io/openhands/agent-server@sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc'}
+
+======================================================================
+FAIL: test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 237, in test_immutable_artifacts
+    self.assertEqual(pins["version"], "1.49.6")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '1.50.0' != '1.49.6'
+- 1.50.0
++ 1.49.6
+
+
+----------------------------------------------------------------------
+Ran 121 tests in 8.757s
+
+FAILED (failures=2, errors=1)

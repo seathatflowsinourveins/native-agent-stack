@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "frozen_before_compile_utc": "2026-09-30T15:47:23.463430+00:00",
+  "base_commit": "00aa6c25fe6f27e9f5974e9f6a5592aa31683479",
+  "allowed_paths": [
+    "blueprints/runtime-workers/openhands/requirements.lock",
+    "blueprints/runtime-workers/openhands/pins.json",
+    "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-*"
+  ],
+  "upstream_sdk_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+  "upstream_urllib3_commit": "b1d30ab61fe0db8f11092805e8c5ac43e091064a",
+  "toolchain": {
+    "uv": "0.12.17",
+    "osv-scanner": "2.6.0",
+    "python": "3.13.15",
+    "platform": "Linux x86_64"
+  },
+  "expected_baseline_lock_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  "requirement_input_sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+  "constraints_sha256": "935e34547853b50ebe901a18bc054df02c3f0a6734b3dafbe6e3c654117cb21b",
+  "original_constraints_sha256": "b4e06f725855214b283cbcd92068cbb45dd3d272114079f1696a7542ab9a94dd",
+  "ci_config_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+  "oracles": {
+    "selected_requirements": 176,
+    "changed_packages": [
+      {
+        "name": "urllib3",
+        "before": "2.7.0",
+        "after": "2.8.0"
+      }
+    ],
+    "unchanged_candidate_versions": 175,
+    "additions": [],
+    "removals": [],
+    "control_byte_identical": true,
+    "new_fresh_extraction_byte_identical": true,
+    "hash_install_exit_code": 0,
+    "pip_check_exit_code": 0,
+    "sdk_tools_version": "1.50.0",
+    "actual_sdk_fixture_tests": 12,
+    "actual_sdk_fixture_skips": 0,
+    "baseline_ci_config_osv_exit_code": 1,
+    "baseline_ci_config_osv_ids": [
+      "GHSA-8988-9cw3-xx77",
+      "GHSA-gh4c-6fx4-qh6g",
+      "GHSA-vxq7-64xx-v4gw"
+    ],
+    "candidate_ci_config_osv_exit_code": 0,
+    "candidate_ci_config_osv_ids": [],
+    "candidate_empty_config_osv_exit_code": 1,
+    "candidate_empty_config_osv_ids": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ]
+  },
+  "boundary": {
+    "model_requests": 0,
+    "provider_acceptance": false,
+    "image_builds": 0,
+    "service_starts": 0,
+    "global_configuration_changes": 0,
+    "ignore_changes": 0,
+    "shared_manifests_changes": 0
+  }
+}

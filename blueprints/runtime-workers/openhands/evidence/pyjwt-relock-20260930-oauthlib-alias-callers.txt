@@ -1,0 +1,486 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages", "<WORKTREE>/blueprints/runtime-workers/openhands"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:14:52.866701+00:00
+ended_utc: 2026-09-30T17:15:28.848200+00:00
+exit_code: 0
+
+stdout:
+# installed closure excluding OAuthlib itself and installer tooling: 10811 Python sources searched; parse errors: 0
+REVIEWED TEXT ONLY func_timeout/py2_raise.py:5: invalid syntax; sha256 19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77
+
+
+# Python2 allows specifying an alternate traceback.
+def raise_exception(exception):
+    raise exception[0] , None , exception[0].__traceback__
+
+## OAuthlib literal importers with aliases, from-imports and bound call sites
+requests_oauthlib files: 6
+requests_oauthlib/compliance_fixes/instagram.py
+  3: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  call 19: oauthlib.common.add_params_to_uri
+requests_oauthlib/compliance_fixes/slack.py
+  3: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  call 30: oauthlib.common.add_params_to_uri
+requests_oauthlib/oauth1_auth.py
+  4: oauthlib.common.extract_params bound as extract_params
+  5: oauthlib.oauth1.Client bound as Client
+  5: oauthlib.oauth1.SIGNATURE_HMAC bound as SIGNATURE_HMAC
+  5: oauthlib.oauth1.SIGNATURE_TYPE_AUTH_HEADER bound as SIGNATURE_TYPE_AUTH_HEADER
+  6: oauthlib.oauth1.SIGNATURE_TYPE_BODY bound as SIGNATURE_TYPE_BODY
+  call 77: oauthlib.common.extract_params
+requests_oauthlib/oauth1_session.py
+  5: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  6: oauthlib.common.urldecode bound as _urldecode
+  7: oauthlib.oauth1.SIGNATURE_HMAC bound as SIGNATURE_HMAC
+  7: oauthlib.oauth1.SIGNATURE_RSA bound as SIGNATURE_RSA
+  7: oauthlib.oauth1.SIGNATURE_TYPE_AUTH_HEADER bound as SIGNATURE_TYPE_AUTH_HEADER
+  call 19: oauthlib.common.urldecode
+  call 253: oauthlib.common.add_params_to_uri
+requests_oauthlib/oauth2_auth.py
+  1: oauthlib.oauth2.WebApplicationClient bound as WebApplicationClient
+  1: oauthlib.oauth2.InsecureTransportError bound as InsecureTransportError
+  2: oauthlib.oauth2.is_secure_transport bound as is_secure_transport
+  call 19: oauthlib.oauth2.WebApplicationClient
+  call 31: oauthlib.oauth2.is_secure_transport
+  call 32: oauthlib.oauth2.InsecureTransportError
+requests_oauthlib/oauth2_session.py
+  3: oauthlib.common.generate_token bound as generate_token
+  3: oauthlib.common.urldecode bound as urldecode
+  4: oauthlib.oauth2.WebApplicationClient bound as WebApplicationClient
+  4: oauthlib.oauth2.InsecureTransportError bound as InsecureTransportError
+  5: oauthlib.oauth2.LegacyApplicationClient bound as LegacyApplicationClient
+  6: oauthlib.oauth2.TokenExpiredError bound as TokenExpiredError
+  6: oauthlib.oauth2.is_secure_transport bound as is_secure_transport
+  call 78: oauthlib.oauth2.WebApplicationClient
+  call 267: oauthlib.oauth2.is_secure_transport
+  call 268: oauthlib.oauth2.InsecureTransportError
+  call 368: oauthlib.common.urldecode
+  call 371: oauthlib.common.urldecode
+  call 452: oauthlib.oauth2.is_secure_transport
+  call 453: oauthlib.oauth2.InsecureTransportError
+  call 478: oauthlib.common.urldecode
+  call 515: oauthlib.oauth2.is_secure_transport
+  call 516: oauthlib.oauth2.InsecureTransportError
+## Advisory-related source references outside OAuthlib
+authlib reference lines: 32
+  authlib/integrations/django_oauth2/__init__.py:4: from .endpoints import RevocationEndpoint
+  authlib/integrations/django_oauth2/endpoints.py:1: from authlib.oauth2.rfc7009 import RevocationEndpoint as _RevocationEndpoint
+  authlib/integrations/django_oauth2/endpoints.py:4: class RevocationEndpoint(_RevocationEndpoint):
+  authlib/integrations/django_oauth2/endpoints.py:15: server.register_endpoint(RevocationEndpoint)
+  authlib/integrations/django_oauth2/endpoints.py:21: RevocationEndpoint.ENDPOINT_NAME, request
+  authlib/integrations/sqla_oauth2/functions.py:70: from authlib.oauth2.rfc7009 import RevocationEndpoint
+  authlib/integrations/sqla_oauth2/functions.py:74: class _RevocationEndpoint(RevocationEndpoint):
+  authlib/oauth2/rfc6749/__init__.py:28: from .grants import AuthorizationCodeGrant
+  authlib/oauth2/rfc6749/__init__.py:83: "AuthorizationCodeGrant",
+  authlib/oauth2/rfc6749/authorization_server.py:203: class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
+  authlib/oauth2/rfc6749/authorization_server.py:207: authorization_server.register_grant(AuthorizationCodeGrant)
+  authlib/oauth2/rfc6749/authorization_server.py:219: RevocationEndpoint::
+  authlib/oauth2/rfc6749/authorization_server.py:221: authorization_server.register_endpoint(RevocationEndpoint)
+  authlib/oauth2/rfc6749/grants/__init__.py:23: from .authorization_code import AuthorizationCodeGrant
+  authlib/oauth2/rfc6749/grants/__init__.py:36: "AuthorizationCodeGrant",
+  authlib/oauth2/rfc6749/grants/authorization_code.py:20: class AuthorizationCodeGrant(BaseGrant, AuthorizationEndpointMixin, TokenEndpointMixin):
+  authlib/oauth2/rfc6749/grants/authorization_code.py:296: class MyAuthorizationCodeGrant(AuthorizationCodeGrant):
+  authlib/oauth2/rfc7009/__init__.py:11: from .revocation import RevocationEndpoint
+  authlib/oauth2/rfc7009/__init__.py:13: __all__ = ["prepare_revoke_token_request", "RevocationEndpoint"]
+  authlib/oauth2/rfc7009/revocation.py:9: class RevocationEndpoint(TokenEndpoint):
+  authlib/oauth2/rfc7636/challenge.py:39: The AuthorizationCodeGrant SHOULD save the ``code_challenge`` and
+  authlib/oauth2/rfc7636/challenge.py:43: server.register_grant(AuthorizationCodeGrant, [CodeChallenge(required=True)])
+  authlib/oauth2/rfc7636/challenge.py:62: self.validate_code_challenge,
+  authlib/oauth2/rfc7636/challenge.py:69: def validate_code_challenge(self, grant, redirect_uri):
+  authlib/oauth2/rfc9068/revocation.py:6: from ..rfc7009 import RevocationEndpoint
+  authlib/oauth2/rfc9068/revocation.py:9: class JWTRevocationEndpoint(RevocationEndpoint):
+  authlib/oauth2/rfc9068/revocation.py:11: :class:`~authlib.oauth2.rfc7009.RevocationEndpoint`.
+  authlib/oauth2/rfc9068/revocation.py:20: :class:`~authlib.oauth2.rfc7009.RevocationEndpoint`.
+  authlib/oidc/core/grants/code.py:41: :param grant: AuthorizationCodeGrant instance
+  authlib/oidc/core/grants/code.py:136: The register this extension with AuthorizationCodeGrant::
+  authlib/oidc/core/grants/code.py:139: AuthorizationCodeGrant, extensions=[MyOpenIDCode()]
+  authlib/oidc/core/grants/hybrid.py:28: class MyAuthorizationCodeGrant(AuthorizationCodeGrant):
+# recipe: 12 Python sources searched; parse errors: 0
+## OAuthlib literal importers with aliases, from-imports and bound call sites
+## Advisory-related source references outside OAuthlib
+# Entered namespaces and advisory implementation: file hashes and source lines
+oauthlib/__init__.py sha256 ccbf8a40b750b21931f842b1b416e0bb5cb24e97f54d127b42d7da38eb1d5dc4
+oauthlib/__init__.py:1: """
+oauthlib/__init__.py:2:     oauthlib
+oauthlib/__init__.py:3:     ~~~~~~~~
+oauthlib/__init__.py:4: 
+oauthlib/__init__.py:5:     A generic, spec-compliant, thorough implementation of the OAuth
+oauthlib/__init__.py:6:     request-signing logic.
+oauthlib/__init__.py:7: 
+oauthlib/__init__.py:8:     :copyright: (c) The OAuthlib Community
+oauthlib/__init__.py:9:     :license: BSD-3-Clause, see LICENSE for details.
+oauthlib/__init__.py:10: """
+oauthlib/__init__.py:11: import logging
+oauthlib/__init__.py:12: from logging import NullHandler
+oauthlib/__init__.py:13: 
+oauthlib/__init__.py:14: __author__ = 'The OAuthlib Community'
+oauthlib/__init__.py:15: __version__ = '3.3.1'
+oauthlib/__init__.py:16: 
+oauthlib/__init__.py:17: logging.getLogger('oauthlib').addHandler(NullHandler())
+oauthlib/__init__.py:18: 
+oauthlib/__init__.py:19: _DEBUG = False
+oauthlib/__init__.py:20: 
+oauthlib/__init__.py:21: def set_debug(debug_val):
+oauthlib/__init__.py:22:     """Set value of debug flag
+oauthlib/__init__.py:23: 
+oauthlib/__init__.py:24:     :param debug_val: Value to set. Must be a bool value.
+oauthlib/__init__.py:25:     """
+oauthlib/__init__.py:26:     global _DEBUG  # noqa: PLW0603
+oauthlib/__init__.py:27:     _DEBUG = debug_val
+oauthlib/__init__.py:28: 
+oauthlib/__init__.py:29: def get_debug():
+oauthlib/__init__.py:30:     """Get debug mode value.
+oauthlib/__init__.py:31: 
+oauthlib/__init__.py:32:     :return: `True` if debug mode is on, `False` otherwise
+oauthlib/__init__.py:33:     """
+oauthlib/__init__.py:34:     return _DEBUG
+oauthlib/oauth1/__init__.py sha256 e3b84443bb3f1595cbc94b7a5d513e0cf0bcbd4315b0997bffe1c290d3362253
+oauthlib/oauth1/__init__.py:1: """
+oauthlib/oauth1/__init__.py:2: oauthlib.oauth1
+oauthlib/oauth1/__init__.py:3: ~~~~~~~~~~~~~~
+oauthlib/oauth1/__init__.py:4: 
+oauthlib/oauth1/__init__.py:5: This module is a wrapper for the most recent implementation of OAuth 1.0 Client
+oauthlib/oauth1/__init__.py:6: and Server classes.
+oauthlib/oauth1/__init__.py:7: """
+oauthlib/oauth1/__init__.py:8: from .rfc5849 import (
+oauthlib/oauth1/__init__.py:9:     SIGNATURE_HMAC, SIGNATURE_HMAC_SHA1, SIGNATURE_HMAC_SHA256,
+oauthlib/oauth1/__init__.py:10:     SIGNATURE_HMAC_SHA512, SIGNATURE_PLAINTEXT, SIGNATURE_RSA,
+oauthlib/oauth1/__init__.py:11:     SIGNATURE_RSA_SHA1, SIGNATURE_RSA_SHA256, SIGNATURE_RSA_SHA512,
+oauthlib/oauth1/__init__.py:12:     SIGNATURE_TYPE_AUTH_HEADER, SIGNATURE_TYPE_BODY, SIGNATURE_TYPE_QUERY,
+oauthlib/oauth1/__init__.py:13:     Client,
+oauthlib/oauth1/__init__.py:14: )
+oauthlib/oauth1/__init__.py:15: from .rfc5849.endpoints import (
+oauthlib/oauth1/__init__.py:16:     AccessTokenEndpoint, AuthorizationEndpoint, RequestTokenEndpoint,
+oauthlib/oauth1/__init__.py:17:     ResourceEndpoint, SignatureOnlyEndpoint, WebApplicationServer,
+oauthlib/oauth1/__init__.py:18: )
+oauthlib/oauth1/__init__.py:19: from .rfc5849.errors import (
+oauthlib/oauth1/__init__.py:20:     InsecureTransportError, InvalidClientError, InvalidRequestError,
+oauthlib/oauth1/__init__.py:21:     InvalidSignatureMethodError, OAuth1Error,
+oauthlib/oauth1/__init__.py:22: )
+oauthlib/oauth1/__init__.py:23: from .rfc5849.request_validator import RequestValidator
+oauthlib/oauth2/__init__.py sha256 2bb207c3f04d0992d24d0a807d0aac2cad0ad3303afcaad00c2cdce12fb7de24
+oauthlib/oauth2/__init__.py:1: """
+oauthlib/oauth2/__init__.py:2: oauthlib.oauth2
+oauthlib/oauth2/__init__.py:3: ~~~~~~~~~~~~~~
+oauthlib/oauth2/__init__.py:4: 
+oauthlib/oauth2/__init__.py:5: This module is a wrapper for the most recent implementation of OAuth 2.0 Client
+oauthlib/oauth2/__init__.py:6: and Server classes.
+oauthlib/oauth2/__init__.py:7: """
+oauthlib/oauth2/__init__.py:8: 
+oauthlib/oauth2/__init__.py:9: from .rfc6749.clients import (
+oauthlib/oauth2/__init__.py:10:     BackendApplicationClient,
+oauthlib/oauth2/__init__.py:11:     Client,
+oauthlib/oauth2/__init__.py:12:     LegacyApplicationClient,
+oauthlib/oauth2/__init__.py:13:     MobileApplicationClient,
+oauthlib/oauth2/__init__.py:14:     ServiceApplicationClient,
+oauthlib/oauth2/__init__.py:15:     WebApplicationClient,
+oauthlib/oauth2/__init__.py:16: )
+oauthlib/oauth2/__init__.py:17: from .rfc6749.endpoints import (
+oauthlib/oauth2/__init__.py:18:     AuthorizationEndpoint,
+oauthlib/oauth2/__init__.py:19:     BackendApplicationServer,
+oauthlib/oauth2/__init__.py:20:     IntrospectEndpoint,
+oauthlib/oauth2/__init__.py:21:     LegacyApplicationServer,
+oauthlib/oauth2/__init__.py:22:     MetadataEndpoint,
+oauthlib/oauth2/__init__.py:23:     MobileApplicationServer,
+oauthlib/oauth2/__init__.py:24:     ResourceEndpoint,
+oauthlib/oauth2/__init__.py:25:     RevocationEndpoint,
+oauthlib/oauth2/__init__.py:26:     Server,
+oauthlib/oauth2/__init__.py:27:     TokenEndpoint,
+oauthlib/oauth2/__init__.py:28:     WebApplicationServer,
+oauthlib/oauth2/__init__.py:29: )
+oauthlib/oauth2/__init__.py:30: from .rfc6749.errors import (
+oauthlib/oauth2/__init__.py:31:     AccessDeniedError,
+oauthlib/oauth2/__init__.py:32:     FatalClientError,
+oauthlib/oauth2/__init__.py:33:     InsecureTransportError,
+oauthlib/oauth2/__init__.py:34:     InvalidClientError,
+oauthlib/oauth2/__init__.py:35:     InvalidClientIdError,
+oauthlib/oauth2/__init__.py:36:     InvalidGrantError,
+oauthlib/oauth2/__init__.py:37:     InvalidRedirectURIError,
+oauthlib/oauth2/__init__.py:38:     InvalidRequestError,
+oauthlib/oauth2/__init__.py:39:     InvalidRequestFatalError,
+oauthlib/oauth2/__init__.py:40:     InvalidScopeError,
+oauthlib/oauth2/__init__.py:41:     MismatchingRedirectURIError,
+oauthlib/oauth2/__init__.py:42:     MismatchingStateError,
+oauthlib/oauth2/__init__.py:43:     MissingClientIdError,
+oauthlib/oauth2/__init__.py:44:     MissingCodeError,
+oauthlib/oauth2/__init__.py:45:     MissingRedirectURIError,
+oauthlib/oauth2/__init__.py:46:     MissingResponseTypeError,
+oauthlib/oauth2/__init__.py:47:     MissingTokenError,
+oauthlib/oauth2/__init__.py:48:     MissingTokenTypeError,
+oauthlib/oauth2/__init__.py:49:     OAuth2Error,
+oauthlib/oauth2/__init__.py:50:     ServerError,
+oauthlib/oauth2/__init__.py:51:     TemporarilyUnavailableError,
+oauthlib/oauth2/__init__.py:52:     TokenExpiredError,
+oauthlib/oauth2/__init__.py:53:     UnauthorizedClientError,
+oauthlib/oauth2/__init__.py:54:     UnsupportedGrantTypeError,
+oauthlib/oauth2/__init__.py:55:     UnsupportedResponseTypeError,
+oauthlib/oauth2/__init__.py:56:     UnsupportedTokenTypeError,
+oauthlib/oauth2/__init__.py:57: )
+oauthlib/oauth2/__init__.py:58: from .rfc6749.grant_types import (
+oauthlib/oauth2/__init__.py:59:     AuthorizationCodeGrant,
+oauthlib/oauth2/__init__.py:60:     ClientCredentialsGrant,
+oauthlib/oauth2/__init__.py:61:     ImplicitGrant,
+oauthlib/oauth2/__init__.py:62:     RefreshTokenGrant,
+oauthlib/oauth2/__init__.py:63:     ResourceOwnerPasswordCredentialsGrant,
+oauthlib/oauth2/__init__.py:64: )
+oauthlib/oauth2/__init__.py:65: from .rfc6749.request_validator import RequestValidator
+oauthlib/oauth2/__init__.py:66: from .rfc6749.tokens import BearerToken, OAuth2Token
+oauthlib/oauth2/__init__.py:67: from .rfc6749.utils import is_secure_transport
+oauthlib/oauth2/__init__.py:68: from .rfc8628.clients import DeviceClient
+oauthlib/oauth2/__init__.py:69: from oauthlib.oauth2.rfc8628.endpoints import DeviceAuthorizationEndpoint, DeviceApplicationServer
+oauthlib/oauth2/__init__.py:70: from oauthlib.oauth2.rfc8628.grant_types import DeviceCodeGrant
+oauthlib/common.py sha256 39e686f928b00d7004b0ad5f921e4669b8123c68c6e0072ec2eab007986b1bf0
+oauthlib/common.py:185:     return str(int(time.time()))
+oauthlib/common.py:186: 
+oauthlib/common.py:187: 
+oauthlib/common.py:188: def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
+oauthlib/common.py:189:     """Generates a non-guessable OAuth token
+oauthlib/common.py:190: 
+oauthlib/common.py:191:     OAuth (1 and 2) does not specify the format of tokens except that they
+oauthlib/common.py:192:     should be strings of random characters. Tokens should not be guessable
+oauthlib/common.py:193:     and entropy when generating the random characters is important. Which is
+oauthlib/common.py:194:     why SystemRandom is used instead of the default random.choice method.
+oauthlib/common.py:195:     """
+oauthlib/common.py:196:     rand = SystemRandom()
+oauthlib/common.py:197:     return ''.join(rand.choice(chars) for x in range(length))
+oauthlib/common.py:198: 
+oauthlib/common.py:199: 
+oauthlib/common.py:200: def generate_signed_token(private_pem, request):
+oauthlib/common.py:201:     import jwt  # noqa: PLC0415
+oauthlib/common.py:202: 
+oauthlib/common.py:203:     now = datetime.datetime.utcnow()
+oauthlib/common.py:204: 
+oauthlib/common.py:205:     claims = {
+oauthlib/common.py:206:         'scope': request.scope,
+oauthlib/common.py:207:         'exp': now + datetime.timedelta(seconds=request.expires_in)
+oauthlib/common.py:208:     }
+oauthlib/common.py:209: 
+oauthlib/common.py:210:     claims.update(request.claims)
+oauthlib/common.py:211: 
+oauthlib/common.py:212:     token = jwt.encode(claims, private_pem, 'RS256')
+oauthlib/common.py:213:     token = to_unicode(token, "UTF-8")
+oauthlib/common.py:214: 
+oauthlib/common.py:215:     return token
+oauthlib/common.py:216: 
+oauthlib/common.py:217: 
+oauthlib/common.py:218: def verify_signed_token(public_pem, token):
+oauthlib/common.py:219:     import jwt  # noqa: PLC0415
+oauthlib/common.py:220: 
+oauthlib/common.py:221:     return jwt.decode(token, public_pem, algorithms=['RS256'])
+oauthlib/common.py:222: 
+oauthlib/common.py:223: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py sha256 ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:1: """
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:2: oauthlib.oauth2.rfc6749.endpoint.revocation
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:3: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:4: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:5: An implementation of the OAuth 2 `Token Revocation`_ spec (draft 11).
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:6: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:7: .. _`Token Revocation`: https://tools.ietf.org/html/draft-ietf-oauth-revocation-11
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:8: """
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:9: import logging
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:10: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:11: from oauthlib.common import Request
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:12: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:13: from ..errors import OAuth2Error
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:14: from .base import BaseEndpoint, catch_errors_and_unavailability
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:15: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:16: log = logging.getLogger(__name__)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:17: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:18: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:19: class RevocationEndpoint(BaseEndpoint):
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:20: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:21:     """Token revocation endpoint.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:22: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:23:     Endpoint used by authenticated clients to revoke access and refresh tokens.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:24:     Commonly this will be part of the Authorization Endpoint.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:25:     """
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:26: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:27:     valid_token_types = ('access_token', 'refresh_token')
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:28:     valid_request_methods = ('POST',)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:29: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:30:     def __init__(self, request_validator, supported_token_types=None,
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:31:             enable_jsonp=False):
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:32:         BaseEndpoint.__init__(self)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:33:         self.request_validator = request_validator
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:34:         self.supported_token_types = (
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:35:             supported_token_types or self.valid_token_types)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:36:         self.enable_jsonp = enable_jsonp
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:37: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:38:     @catch_errors_and_unavailability
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:39:     def create_revocation_response(self, uri, http_method='POST', body=None,
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:40:                                    headers=None):
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:41:         """Revoke supplied access or refresh token.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:42: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:43: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:44:         The authorization server responds with HTTP status code 200 if the
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:45:         token has been revoked successfully or if the client submitted an
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:46:         invalid token.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:47: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:48:         Note: invalid tokens do not cause an error response since the client
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:49:         cannot handle such an error in a reasonable way.  Moreover, the purpose
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:50:         of the revocation request, invalidating the particular token, is
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:51:         already achieved.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:52: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:53:         The content of the response body is ignored by the client as all
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:54:         necessary information is conveyed in the response code.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:55: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:56:         An invalid token type hint value is ignored by the authorization server
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:57:         and does not influence the revocation response.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:58:         """
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:59:         resp_headers = {
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:60:             'Content-Type': 'application/json',
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:61:             'Cache-Control': 'no-store',
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:62:             'Pragma': 'no-cache',
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:63:         }
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:64:         request = Request(
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:65:             uri, http_method=http_method, body=body, headers=headers)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:66:         try:
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:67:             self.validate_revocation_request(request)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:68:             log.debug('Token revocation valid for %r.', request)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:69:         except OAuth2Error as e:
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:70:             log.debug('Client error during validation of %r. %r.', request, e)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:71:             response_body = e.json
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:72:             if self.enable_jsonp and request.callback:
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:73:                 response_body = '{}({});'.format(request.callback, response_body)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:74:             resp_headers.update(e.headers)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:75:             return resp_headers, response_body, e.status_code
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:76: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:77:         self.request_validator.revoke_token(request.token,
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:78:                                             request.token_type_hint, request)
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:79: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:80:         response_body = ''
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:81:         if self.enable_jsonp and request.callback:
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:82:             response_body = request.callback + '();'
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:83:         return {}, response_body, 200
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:84: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:85:     def validate_revocation_request(self, request):
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:86:         """Ensure the request is valid.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:87: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:88:         The client constructs the request by including the following parameters
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:89:         using the "application/x-www-form-urlencoded" format in the HTTP
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:90:         request entity-body:
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:91: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:92:         token (REQUIRED).  The token that the client wants to get revoked.
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:93: 
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:94:         token_type_hint (OPTIONAL).  A hint about the type of the token
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:95:         submitted for revocation.  Clients MAY pass this parameter in order to
+oauthlib/oauth2/rfc6749/endpoints/revocation.py:96:         help the authorization server to optimize the token lookup.  If the
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py sha256 0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:18: def code_challenge_method_s256(verifier, challenge):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:19:     """
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:20:     If the "code_challenge_method" from `Section 4.3`_ was "S256", the
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:21:     received "code_verifier" is hashed by SHA-256, base64url-encoded, and
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:22:     then compared to the "code_challenge", i.e.:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:23: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:24:     BASE64URL-ENCODE(SHA256(ASCII(code_verifier))) == code_challenge
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:25: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:26:     How to implement a base64url-encoding
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:27:     function without padding, based upon the standard base64-encoding
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:28:     function that uses padding.
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:29: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:30:     To be concrete, example C# code implementing these functions is shown
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:31:     below.  Similar code could be used in other languages.
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:32: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:33:     static string base64urlencode(byte [] arg)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:34:     {
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:35:         string s = Convert.ToBase64String(arg); // Regular base64 encoder
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:36:         s = s.Split('=')[0]; // Remove any trailing '='s
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:37:         s = s.Replace('+', '-'); // 62nd char of encoding
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:38:         s = s.Replace('/', '_'); // 63rd char of encoding
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:39:         return s;
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:40:     }
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:41: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:42:     In python urlsafe_b64encode is already replacing '+' and '/', but preserve
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:43:     the trailing '='. So we have to remove it.
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:44: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:45:     .. _`Section 4.3`: https://tools.ietf.org/html/rfc7636#section-4.3
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:46:     """
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:47:     return base64.urlsafe_b64encode(
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:48:         hashlib.sha256(verifier.encode()).digest()
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:49:     ).decode().rstrip('=') == challenge
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:50: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:51: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:52: def code_challenge_method_plain(verifier, challenge):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:53:     """
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:54:     If the "code_challenge_method" from `Section 4.3`_ was "plain", they are
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:55:     compared directly, i.e.:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:56: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:57:     code_verifier == code_challenge.
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:58: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:59:     .. _`Section 4.3`: https://tools.ietf.org/html/rfc7636#section-4.3
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:60:     """
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:61:     return verifier == challenge
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:62: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:63: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:64: class AuthorizationCodeGrant(GrantTypeBase):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:65: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:490:         challenge = self.request_validator.get_code_challenge(request.code, request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:491: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:492:         if challenge is not None:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:493:             if request.code_verifier is None:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:494:                 raise errors.MissingCodeVerifierError(request=request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:495: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:496:             challenge_method = self.request_validator.get_code_challenge_method(request.code, request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:497:             if challenge_method is None:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:498:                 raise errors.InvalidGrantError(request=request, description="Challenge method not found")
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:499: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:500:             if challenge_method not in self._code_challenge_methods:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:501:                 raise errors.ServerError(
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:502:                     description="code_challenge_method {} is not supported.".format(challenge_method),
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:503:                     request=request
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:504:                 )
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:505: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:506:             if not self.validate_code_challenge(challenge,
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:507:                                                 challenge_method,
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:508:                                                 request.code_verifier):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:509:                 log.debug('request provided a invalid code_verifier.')
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:510:                 raise errors.InvalidGrantError(request=request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:511:         elif self.request_validator.is_pkce_required(request.client_id, request) is True:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:512:             if request.code_verifier is None:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:513:                 raise errors.MissingCodeVerifierError(request=request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:531:             request.using_default_redirect_uri = False
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:532:             log.debug('Using provided redirect_uri %s', request.redirect_uri)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:533: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:534:         if not self.request_validator.confirm_redirect_uri(request.client_id, request.code,
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:535:                                                            request.redirect_uri, request.client,
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:536:                                                            request):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:537:             log.debug('Redirect_uri (%r) invalid for client %r (%r).',
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:538:                       request.redirect_uri, request.client_id, request.client)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:539:             raise errors.MismatchingRedirectURIError(request=request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:540: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:541:         for validator in self.custom_validators.post_token:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:542:             validator(request)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:543: 
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:544:     def validate_code_challenge(self, challenge, challenge_method, verifier):
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:545:         if challenge_method in self._code_challenge_methods:
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:546:             return self._code_challenge_methods[challenge_method](verifier, challenge)
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:547:         raise NotImplementedError('Unknown challenge_method %s' % challenge_method)
+# RevocationEndpoint construction in OAuthlib's own preconfigured servers
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py sha256 6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:92:         RevocationEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:93:         IntrospectEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:94: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:95: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:145:         RevocationEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:146:         IntrospectEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:147: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:148: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:188:         RevocationEndpoint.__init__(
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:189:             self, request_validator, supported_token_types=["access_token"]
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:190:         )
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:191:         IntrospectEndpoint.__init__(
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:239:         RevocationEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:240:         IntrospectEndpoint.__init__(self, request_validator)
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:241: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:242: 
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:282:         RevocationEndpoint.__init__(
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:283:             self, request_validator, supported_token_types=["access_token"]
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:284:         )
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:285:         IntrospectEndpoint.__init__(
+oauthlib/openid/connect/core/endpoints/pre_configured.py sha256 bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee
+oauthlib/openid/connect/core/endpoints/pre_configured.py:137:         RevocationEndpoint.__init__(self, request_validator)
+oauthlib/openid/connect/core/endpoints/pre_configured.py:138:         IntrospectEndpoint.__init__(self, request_validator)
+oauthlib/openid/connect/core/endpoints/pre_configured.py:139:         UserInfoEndpoint.__init__(self, request_validator)
+
+stderr:

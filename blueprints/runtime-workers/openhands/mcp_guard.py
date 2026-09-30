@@ -5,11 +5,18 @@ The four-collection index itself is created by native QMD collection commands.
 """
 
 import json
+import os
 from pathlib import Path
 import sys
+from recipe import task_profile
 
 
 def permitted(event):
+    if event.get("tool_name") == "task":
+        profile = task_profile(os.environ)[1]
+        args = event.get("tool_input", {})
+        return isinstance(args, dict) and args.get("subagent_type") in {
+            "worker-" + name for name in profile["children"]}
     if event.get("tool_name") != "qmd_query":
         return True
     args = event.get("tool_input", {})
@@ -29,7 +36,7 @@ def permitted(event):
 
 def main():
     if not permitted(json.load(sys.stdin)):
-        print(json.dumps({"decision": "deny", "reason": "Use explicit allowed collections, lex searches and rerank:false."}))
+        print(json.dumps({"decision": "deny", "reason": "Use scoped lexical QMD queries or a registered bounded worker profile."}))
         return 2
     return 0
 

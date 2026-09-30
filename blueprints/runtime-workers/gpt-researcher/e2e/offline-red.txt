@@ -1,0 +1,17 @@
+command: python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v
+exit_code: 1
+test_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... FAIL
+
+======================================================================
+FAIL: test_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 24, in test_recipe_contract_and_empty_result
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : README.md
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

@@ -1,0 +1,24 @@
+$ ["rtk", "rg", "-n", "requirements.lock|UV_PYTHON_DOWNLOADS|UV_NO_CONFIG|/usr/local/bin/python|uv sync|--platform|install-container.sh|host.py install", "<WORKTREE>/blueprints/runtime-workers/openhands/host.py", "<WORKTREE>/blueprints/runtime-workers/openhands/install.sh", "<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh", "<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh"]
+<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh:2:# OpenHands/benchmarks@405bae7 Makefile:33-42 native uv sync; locked adaptation.
+<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh:11:export UV_PYTHON_DOWNLOADS=never
+<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh:12:export UV_NO_CONFIG=1
+<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh:34:  --only-binary :all: -r "$recipe_dir/build-requirements.lock"
+<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh:37:uv sync --project "$grader_dir" --python "$grader_dir/.venv/bin/python" --locked --dev --no-build-isolation --inexact
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:324:    if digest(HERE / "requirements.lock") != pins["requirements_sha256"]:
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:326:    if digest(HERE / "build-requirements.lock") != pins["build_requirements_sha256"]:
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:434:        "run", "--rm", "--pull=never", "--name", name, "--platform", pins["image"]["platform"],
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:440:        "--env", "PYTHONDONTWRITEBYTECODE=1", "--env", "UV_PYTHON_DOWNLOADS=never",
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:605:    Descriptor, or the platform manifest when --platform is given. Classic
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:618:    for extra in ([], ["--platform", platform]):
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:656:        subprocess.run(DOCKER + ["pull", "--platform", pins[key]["platform"], pins[key]["ref"]], check=True)
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:666:    args += ["--entrypoint", "/bin/bash", pins["image"]["ref"], "/recipe/install-container.sh", str(prefix)]
+<WORKTREE>/blueprints/runtime-workers/openhands/host.py:818:        "create", "--pull=never", "--name", name, "--platform", image["platform"], "--label", OWNER_LABEL,
+<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh:7:export UV_PYTHON_DOWNLOADS=never
+<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh:8:export UV_NO_CONFIG=1
+<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh:11:  /bin/uv venv --python /usr/local/bin/python "$prefix/venv"
+<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh:17:  -r /recipe/build-requirements.lock
+<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh:19:  --no-build-isolation --index-url https://pypi.org/simple -r /recipe/requirements.lock
+
+[stderr]
+
+exit_code=0

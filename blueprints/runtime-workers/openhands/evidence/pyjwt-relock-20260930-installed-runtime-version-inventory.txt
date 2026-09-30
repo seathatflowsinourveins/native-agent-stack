@@ -1,0 +1,20 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-c", "import sys,re,json,importlib.metadata as m\nfrom pathlib import Path\np=Path(sys.argv[1]);expected={}\nfor n,v in re.findall(r'(?m)^([a-zA-Z0-9_.-]+)==([^\\n]+)',(p/'candidate.lock').read_text()):expected[re.sub(r'[-_.]+','-',n).lower()]=v.rstrip(' \\\\')\nexpected['openhands-sdk']=expected['openhands-tools']='1.50.0';mismatches=[{'name':n,'expected':v,'actual':m.version(n)} for n,v in expected.items() if m.version(n)!=v]\nprint(json.dumps({'checked_runtime_declarations':len(expected),'installed_distributions_after_test_tools':len(list(m.distributions())),'mismatches':mismatches,'test_tools':{n:m.version(n) for n in ['pytest','coverage','pluggy','iniconfig']}},indent=2))\nassert len(expected)==176 and not mismatches\n", "<PRIVATE_RESEARCH>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:17:47.846698+00:00
+ended_utc: 2026-09-30T17:17:48.020959+00:00
+exit_code: 0
+
+stdout:
+{
+  "checked_runtime_declarations": 176,
+  "installed_distributions_after_test_tools": 182,
+  "mismatches": [],
+  "test_tools": {
+    "pytest": "8.4.2",
+    "coverage": "7.10.7",
+    "pluggy": "1.6.0",
+    "iniconfig": "2.3.0"
+  }
+}
+
+stderr:

@@ -61,13 +61,33 @@ IGNORE_SCOPES = {
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock, relocked onto PyJWT 2.14.0 and then, on 2026-09-30, onto urllib3 2.8.0 and PyJWT 2.15.0. Its receipt carries
-    # the 2026-09-29 oauthlib review forward at this sha256 (those relocks change only the urllib3 and PyJWT entries); the relock onto
-    # oauthlib 4.0.0 deletes this entry in the same change.
+    # Exact source-reviewed tokenization/corpus-only closures. The 2026-09-30
+    # receipt independently rechecks installed callers and current recipes;
+    # dynamic/new model-artifact operations invalidate this bounded scope.
+    "blueprints/runtime-workers/gpt-researcher/requirements.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp"],
+        "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+        "evidence": "evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json",
+    },
+    "blueprints/runtime-workers/crawl4ai/requirements.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp"],
+        "sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+        "evidence": "evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json",
+    },
+    # Candidate 1.50.0 Linux x86_64 / CPython 3.13.15 closure ONLY; fresh
+    # alias/from-import-aware source review binds both OAuthlib advisories to
+    # these exact artifacts. The recipe consumes this lock inside its pinned
+    # linux/amd64 image (Dockerfile CPython 3.13.15), not a native macOS venv.
+    # Other platforms/interpreters or changed source require a new review.
+    # Native urllib3/PyJWT relocks retain the reviewed OAuthlib wheel/caller
+    # identities. A fresh artifact-only independent review of this new lock
+    # remains pending; PR #537 covered the historical 383ccc closure only.
+    # The joint oauthlib 4.0.0 relock removes this entry; it grants no image,
+    # arbitrary worker-code acceptance, merge approval or promotion.
     "blueprints/runtime-workers/openhands/requirements.lock": {
         "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
-        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
+        "sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+        "evidence": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json",
     },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.

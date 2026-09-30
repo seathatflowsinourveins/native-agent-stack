@@ -1,0 +1,43 @@
+{
+  "role": "mcp-server",
+  "loaded_servers": [],
+  "limitation": "No external MCP client or SKILL.md loader found in the reviewed v0.9.4 sources; native client verification pending. These are consumer requirements, not loaded Crawl4AI configuration.",
+  "sources": ["adoption/templates/codex.config.template.toml", "adoption/templates/codex.stack-worker.config.toml", "adoption/skills/manifest.json"],
+  "consumer_limits": {
+    "context-mode": {
+      "command": "${ECO_ROOT}/bin/node",
+      "args": ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"],
+      "disabled_tools": ["ctx_upgrade", "ctx_purge"],
+      "project": "consumer worker working directory; bind CONTEXT_MODE_PROJECT_DIR there"
+    },
+    "ai-memory": {
+      "url": "http://${AI_MEMORY_URL}/mcp",
+      "enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"]
+    },
+    "socraticode": {
+      "command": "${ECO_ROOT}/bin/node",
+      "args": ["${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"],
+      "enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
+      "env": {"SOCRATICODE_WATCHER": "manual"}
+    },
+    "qmd": {
+      "command": "${ECO_ROOT}/bin/qmd",
+      "args": ["--index", "native-agent-stack-catalog", "mcp"],
+      "collections": ["foundation-docs", "foundation-adoption", "us-equities-foundation", "us-equities-catalog"],
+      "scope": "consumer supplies explicit collection filters; this template does not configure a server-side ACL"
+    },
+    "headroom": {
+      "command": "${ECO_ROOT}/bin/headroom",
+      "args": ["mcp", "serve", "--proxy-url", "http://127.0.0.1:1"],
+      "enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"],
+      "condition": "only consumers with large outputs not already contained by fit_markdown"
+    },
+    "serena": {"condition": "coding consumers only; not loaded by this crawler"},
+    "jcodemunch": {"condition": "coding consumers only; no launch entry in the two specified templates; do not invent one"}
+  },
+  "offered_endpoints": ["/mcp/sse", "/mcp/ws"],
+  "recommended_consumer_tools": ["md", "crawl"],
+  "container_llm_contract": "not qualified: untrusted /crawl bodies reject LLM strategies; built-in /llm and md:f=llm do not expose extra_args for the required temperature omission and per-call headers",
+  "consumer_request_constraints": {"md": {"f": ["fit", "raw", "bm25"]}, "crawl": "non-LLM extraction only"},
+  "authentication": "Authorization: Bearer read privately from the installed secrets/api_token file; never put it in a URL or committed config"
+}

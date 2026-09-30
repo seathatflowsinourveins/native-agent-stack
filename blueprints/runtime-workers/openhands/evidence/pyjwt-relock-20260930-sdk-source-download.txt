@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/dcf401af7a9a302ef92cb7d092e1df9bb659daa5", "--output", "<PRIVATE_RESEARCH>/sdk-source.tar.gz"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:01:26.017123+00:00
+ended_utc: 2026-09-30T17:01:26.739979+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

@@ -164,10 +164,10 @@
       "id": "agent-sdks",
       "title": "Agent SDKs and runtime workers",
       "purpose": "Select the programmatic SDK or runtime that gives a worker structured events, custom tools or session control beyond the native CLI.",
-      "selection": "Retain the existing Codex CLI/SDK integration (component codex) for supported start/run/resume workflows; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unselected alternatives.",
+      "selection": "Retain the existing Codex CLI/SDK integration (component codex) for supported start/run/resume workflows. OpenHands 1.50.0 and the research roster have bounded candidate recipes, not default promotion; Claude Agent SDK, Temporal and LangGraph remain unselected alternatives.",
       "activation": "Use the native CLI for ordinary work; reach for an official SDK only when an application needs structured events, custom tools or programmatic session control.",
-      "lifecycle_scope": "Codex CLI/SDK use is accepted within its recorded tests; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph have no adoption lifecycle here, only source-reviewed version pins.",
-      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting a deferred alternative."
+      "lifecycle_scope": "Codex CLI/SDK use retains its recorded scope. The 2026-09-30 isolated candidate work adds native source/wheel installation, selected unchanged tests and a model-free Crawl4AI job. OpenHands full-image acceptance, trusted observer and research/review task-quality gates remain open; no blanket runtime acceptance follows.",
+      "next_gap": "Follow blueprints/runtime-workers/README.md and evidence/artifacts/runtime-roster-20260930/README.md for source pins, exact commands and remaining gates. Codex 0.159.2 configured-route tool/resume evidence is a separate shared-lane follow-up after the Claude owner's pin promotion."
     },
     {
       "id": "mcp-surfaces",
@@ -236,15 +236,17 @@
   ],
   "top_gaps": [
     {
-      "id": "catalog-capability-separation",
+      "id": "runtime-worker-quality-and-image",
       "priority": 1,
-      "status": "addressed_in_catalog",
-      "scope": "General foundation capabilities now have an explicit home and scoped claims; the broad research union keeps its existing path.",
-      "next_action": "Maintain these capability joins when a decision changes; do not migrate or adopt every discovery by directory placement.",
+      "status": "open",
+      "scope": "2026-09-30 source-pinned runtime candidates have bounded native install/test evidence. OpenHands full-image scanner matches, independent observer, frozen coding/research/review/GitHub quality tasks, compression comparison and complete provider accounting remain unresolved. Owner: foundation runtime coordinator. The previously addressed catalog-separation gap retains its historical record and boundary.",
+      "next_action": "Qualify maintained full-image remediation and the trusted host-owned observer, then execute capability-specific frozen tasks with discriminating controls and complete attempt/judge usage. Keep native selected-test and operation scopes separate; no default SDK promotion or optional-service activation from catalog inclusion.",
       "source_paths": [
-        "catalogs/foundation/manifest.json",
-        "catalogs/foundation/decisions.json",
-        "catalogs/us-equities/decision-index.json"
+        "blueprints/runtime-workers/README.md",
+        "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json",
+        "blueprints/runtime-workers/openhands/evidence/upgrade-150-commands.json",
+        "evidence/artifacts/runtime-roster-20260930/README.md",
+        "docs/decisions/2026-09-30-runtime-worker-coordination.md"
       ]
     },
     {
@@ -284,6 +286,10 @@
     {
       "id": "claude-code-sandbox-profile",
       "gap_id": "claude-code-sandbox-profile"
+    },
+    {
+      "id": "runtime-worker-quality-and-image",
+      "gap_id": "runtime-worker-quality-and-image"
     }
   ]
 }

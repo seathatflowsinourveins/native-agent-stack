@@ -1,0 +1,179 @@
+{
+  "schema": "runtime-worker-nltk-reachability/1",
+  "date": "2026-09-27",
+  "recipe": "blueprints/runtime-workers/gpt-researcher",
+  "question": "Do the worker's locked artifacts, its pinned GPT Researcher source or the recipe's own Python call the model import/export APIs named by GHSA-8mgp-746c-j5xp?",
+  "advisory": {
+    "id": "GHSA-8mgp-746c-j5xp",
+    "aliases": ["CVE-2026-81726", "PYSEC-2026-3740"],
+    "published": "2026-09-02T14:35:04Z",
+    "modified": "2026-09-02T14:45:06.878867805Z",
+    "summary": "NLTK: Model-artifact APIs bypass pathsec and touch files outside allowed roots",
+    "source": "https://api.osv.dev/v1/vulns/GHSA-8mgp-746c-j5xp",
+    "fetched_utc": "2026-09-27T21:59:19Z",
+    "response": {"http_status": 200, "bytes": 4877, "sha256": "c489d359f203d5ecd90148e59601c63f4b057fe838604b68e607a3e3f1026a10"},
+    "package": "PyPI nltk",
+    "range": {"introduced": "0", "last_affected": "3.10.3"},
+    "locked_version_in_affected_versions": true,
+    "affected_functions": [
+      "TransitionParser.train",
+      "TransitionParser.parse",
+      "AveragedPerceptron.save",
+      "AveragedPerceptron.load",
+      "PerceptronTagger.save_to_json",
+      "save_maxent_params"
+    ],
+    "affected_functions_source": "details text, 'Affected component'; affected[0].ecosystem_specific is null, so the record has no structured function list",
+    "negative_controls": ["pathsec.open()", "PerceptronTagger.load_from_json()", "load_maxent_params()"],
+    "precondition": "The application enables pathsec enforcement and lets untrusted workflows choose model import or export paths.",
+    "patched_versions": "details text: 'Not yet patched'; the range has no fixed event",
+    "severity": "HIGH (database_specific); CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L",
+    "cwe_ids": ["CWE-22", "CWE-59", "CWE-73"],
+    "referenced_pull_requests": [
+      {"number": 3757, "title": "Harden untrusted-model pickle allowlist (exact globals + numpy.lib denylist)", "base": "develop", "merged_at": "2026-08-20T03:10:12Z", "merge_commit": "628ebd2fa1b8", "in_tag_v3.10.3": false},
+      {"number": 3759, "title": "Harden maxent / named-entity model-artifact saves against shared-tmp planting", "base": "develop", "merged_at": "2026-08-18T14:12:44Z", "merge_commit": "a167e94bca80", "in_tag_v3.10.3": false},
+      {"number": 3813, "title": "Harden tagger model loads and tool paths (perceptron/crf/hunpos/stanford)", "base": "develop", "merged_at": "2026-08-28T12:52:32Z", "merge_commit": "574270e2ad36", "in_tag_v3.10.3": false}
+    ],
+    "referenced_commits": {"commits": ["2a92b71827d7", "a44a7af69bca", "cbc98458b43d"], "in_develop": true, "in_tag_v3.10.3": false},
+    "github_check": "gh api repos/nltk/nltk/pulls/{3757,3759,3813} (exit 0); gh api compare COMMIT...develop gave behind_by 0 for the three referenced commits, and compare v3.10.3...COMMIT gave status ahead, behind_by 0 for all six commits, so none is contained in the v3.10.3 tag; newest tag v3.10.3",
+    "pypi_release_state": {"source": "https://pypi.org/pypi/nltk/json", "fetched_utc": "2026-09-27T22:03:25Z", "latest": "3.10.3", "latest_first_upload": "2026-08-12T23:44:13Z", "yanked": false, "releases_after_3.10.3": []},
+    "review_claims": [
+      {"claim": "Affected: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and save_maxent_params", "result": "confirmed", "source": "OSV details, 'Affected component'"},
+      {"claim": "Only when pathsec is on and untrusted input chooses model import or export paths", "result": "confirmed", "source": "OSV details, PoC preconditions"},
+      {"claim": "load_from_json is the safe comparison case", "result": "confirmed; OSV lists PerceptronTagger.load_from_json() with pathsec.open() and load_maxent_params() as guarded negative controls", "source": "OSV details, PoC step 3"},
+      {"claim": "nltk 3.10.3 ships pathsec on (nltk/pathsec.py:26-28, ENFORCE = True)", "result": "confirmed", "source": "hash-verified nltk-3.10.3-py3-none-any.whl, nltk/pathsec.py:26-28"},
+      {"claim": "No patched release is on PyPI as of 2026-09-27", "result": "confirmed", "source": "PyPI JSON (latest 3.10.3, nothing later); OSV range last_affected 3.10.3"},
+      {"claim": "The fixes merged on develop are #3757, #3759 and #3813", "result": "confirmed as merged to develop after v3.10.3 and referenced by the OSV record; OSV itself calls the package not yet patched, and #3757's title concerns the pickle allowlist", "source": "OSV references; gh api pulls and compare"}
+    ]
+  },
+  "lock": {
+    "path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
+    "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+    "sha256_matches_pins_json": true,
+    "generation": "uv 0.12.17 pip compile --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes (research.md)",
+    "pins": 197,
+    "hashes": 4337,
+    "environment_markers": 0,
+    "nltk_pin": {
+      "line": 2139,
+      "requirement": "nltk==3.10.3",
+      "hashes": [
+        {"sha256": "ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c", "file": "nltk-3.10.3-py3-none-any.whl"},
+        {"sha256": "bb9327a461c3811c2fa4900e03840401f2126adfb30c0072827c433bd2444ea4", "file": "nltk-3.10.3.tar.gz"}
+      ]
+    },
+    "side_locks": [
+      {"path": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock", "sha256": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f", "nltk_lines": 0},
+      {"path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock", "sha256": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754", "nltk_lines": 0}
+    ],
+    "side_locks_nltk_free": true,
+    "requirements_in": {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
+      "line": 80,
+      "requirement": "nltk>=3.9.1",
+      "osv_scanning": "not scanned itself: .github/osv-scanner-lockfiles.json lists it under covered_by_lockfile with lockfile blueprints/runtime-workers/gpt-researcher/requirements.lock"
+    },
+    "grader_lock": {
+      "source": "DeepResearch-Bench-II b38f360603db9531b102aef8c166cedb8509b6f6 uv.lock (installed by install.sh:34), fetched with gh api contents (exit 0)",
+      "sha256": "3c193d03d6c9be174312f74d73188e9fa24a7f46a30749fa6cf06934dc2860c8",
+      "sha256_matches_pins_json": true,
+      "nltk_mentions": 0
+    }
+  },
+  "artifacts": {
+    "method": "pip download (nothing installed), then unpack with Python zipfile (wheels) or tarfile filter='data' (sdists); no code from any artifact was imported or executed",
+    "tools": {"pip": "26.2.1", "host_python": "3.13.15", "ripgrep": "14.1.0", "gh": "2.101.0"},
+    "tag_adjustment": "--python-version 3.12 instead of 3.13, because the lock target is CPython 3.12 (pins.json python_target, install.sh:10 assertion, research.md compile command). Platforms unchanged (manylinux2014_x86_64, manylinux_2_17_x86_64, manylinux_2_28_x86_64); uv 0.12.17 help defines x86_64-unknown-linux-gnu as x86_64-manylinux_2_28. Added --isolated (ignore user pip configuration) and --no-cache-dir. The lock has no environment markers, so evaluating markers against the host interpreter changes nothing.",
+    "runs": [
+      {
+        "command": "python3 -m pip --isolated download --no-cache-dir --disable-pip-version-check --require-hashes --only-binary=:all: --no-deps --python-version 3.12 --platform manylinux2014_x86_64 --platform manylinux_2_17_x86_64 --platform manylinux_2_28_x86_64 --implementation cp -d <scratch>/wheels -r blueprints/runtime-workers/gpt-researcher/requirements.lock",
+        "exit": 1,
+        "saved": 0,
+        "output": "ERROR: Could not find a version that satisfies the requirement docopt==0.6.2 (from versions: none) / ERROR: No matching distribution found for docopt==0.6.2"
+      },
+      {
+        "command": "the same flags with -r <scratch>/wheel-pins.lock (requirements.lock without the docopt, langdetect and sgmllib3k entries)",
+        "exit": 0,
+        "saved": 194,
+        "output": "Successfully downloaded (194 names); 194 Saved lines; no ERROR or WARNING lines"
+      }
+    ],
+    "sdist_only_pins": {
+      "how_identified": "PyPI JSON for all 197 pins (0 fetch errors): each of the 4,337 lock hashes matched a file of the pinned version, and pip's own compatibility tags for the target (cp312 and the three platforms, 150 tags) found no locked wheel for three pins",
+      "fetch": "direct PyPI file URL; sha256 checked against the lock by our script, not by pip --require-hashes",
+      "files": [
+        {"file": "docopt-0.6.2.tar.gz", "sha256": "49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491", "in_lock": true},
+        {"file": "langdetect-1.0.9.tar.gz", "sha256": "cbc1fef89f8d062739774bd51eda3da3274006b3661d199c2655f6b3f6d605a0", "in_lock": true},
+        {"file": "sgmllib3k-1.0.0.tar.gz", "sha256": "7868fb1c8bfa764c1ac563d3cf369c381d1325d36124933a726f29fcdaa812e9", "in_lock": true}
+      ]
+    },
+    "counts": {
+      "pins": 197,
+      "artifacts": 197,
+      "wheels": 194,
+      "sdists": 3,
+      "artifact_sha256_rechecked_in_lock": 197,
+      "unpacked_files": 20706,
+      "unpacked_py_files": 14774,
+      "lock_hashes_not_downloaded": 4140
+    },
+    "nltk_artifact": {"file": "nltk-3.10.3-py3-none-any.whl", "sha256": "ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c", "py_files": 444}
+  },
+  "upstream_source": {
+    "repository": "https://github.com/assafelovic/gpt-researcher",
+    "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+    "release": "v3.7.0",
+    "commit_date": "2026-09-26T16:56:07Z",
+    "fetch": "gh api repos/assafelovic/gpt-researcher/tarball/0957c301ed06c2a5857b834358c7227c739041d4 (exit 0): GitHub legacy archive, top directory assafelovic-gpt-researcher-0957c30",
+    "archive": {"bytes": 14489543, "sha256": "b607a253e983b685dfd6d378cc275516295378d3fa99af9b45def8c302107497"},
+    "identity_check": "the legacy archive's bytes differ from the codeload tar.gz hash in pins.json (different archive prefix); 6 of 6 pins.json upstream_files sha256 values match the extracted files",
+    "files": 839,
+    "py_files": 364,
+    "nltk_references": 0,
+    "scan": "rg -i 'nltk' over the .py files: exit 1. Import forms (import, from, importlib.import_module, __import__) over all files: exit 1. The five affected-API symbols and the lock's nltk-caller classes (NLTKTextSplitter, HTMLSemanticPreservingSplitter, NGramOverlapExampleSelector) over all files: exit 1. requirements.txt: no nltk (rg exit 1).",
+    "non_python_mentions": [
+      {"file": "pyproject.toml", "line": 111, "text": "\"nltk>=3.9.1\",", "kind": "declared [project] dependency"},
+      {"file": "evals/hallucination_eval/results/aggregate_results.json", "kind": "stored evaluation output text ('NLTK Book')"},
+      {"file": "evals/hallucination_eval/results/evaluation_records.jsonl", "kind": "stored evaluation output text ('NLTK Book')"}
+    ],
+    "import_chain": "gpt_researcher/vector_store/vector_store.py:8, context/compression.py:27, context/lexical.py:14 and context/jev_filter.py:25 import langchain_text_splitters.RecursiveCharacterTextSplitter. langchain_text_splitters/__init__.py:20 and :37 import its html and nltk modules, whose module-level try blocks (html.py:30, nltk.py:12) run import nltk. nltk is therefore loaded in the worker process; loading defines the affected classes and functions without calling them."
+  },
+  "callers": [
+    {"package": "langchain-text-splitters", "version": "1.1.2", "file": "langchain_text_splitters/nltk.py", "line": 12, "symbol": "NLTKTextSplitter", "calls_affected_api": false, "note": "module-level import nltk in try/except; the class calls nltk.tokenize.sent_tokenize (line 55) or nltk.tokenize._get_punkt_tokenizer (line 53): Punkt sentence splitting"},
+    {"package": "langchain-text-splitters", "version": "1.1.2", "file": "langchain_text_splitters/html.py", "line": 30, "symbol": "HTMLSemanticPreservingSplitter", "calls_affected_api": false, "note": "module-level import nltk in try/except; only stopword_removal=True (default False, line 627) makes __init__ call nltk.download(\"stopwords\") (line 727) and nltk.corpus.stopwords.words (line 728)"},
+    {"package": "langchain-community", "version": "0.4.2", "file": "langchain_community/example_selectors/ngram_overlap.py", "line": 26, "symbol": "ngram_overlap_score", "calls_affected_api": false, "note": "function-local import of SmoothingFunction and sentence_bleu from nltk.translate.bleu_score (BLEU scoring); called by NGramOverlapExampleSelector.select_examples (line 104)"},
+    {"package": "langchain-community", "version": "0.4.2", "file": "langchain_community/example_selectors/ngram_overlap.py", "line": 75, "symbol": "NGramOverlapExampleSelector.check_dependencies", "calls_affected_api": false, "note": "function-local availability check of the same bleu_score names (validator defined at line 72)"},
+    {"package": "langchain-classic", "version": "1.0.8", "file": "langchain_classic/text_splitter.py", "line": 22, "symbol": "NLTKTextSplitter", "calls_affected_api": false, "note": "re-exports langchain_text_splitters.nltk.NLTKTextSplitter; no nltk import of its own"}
+  ],
+  "caller_scan": {
+    "import_forms": "rg for import ... nltk, from nltk, importlib.import_module('nltk...') and __import__('nltk...') over every file of the 196 artifacts other than nltk: 4 hits, the four import lines of the first four callers",
+    "affected_symbols_outside_nltk": "rg -w TransitionParser|AveragedPerceptron|save_to_json|save_maxent_params|PerceptronTagger over the same files, in default and binary (-a) mode: exit 1",
+    "nltk_mentions_outside_nltk": "rg -a -i 'nltk' matched 11 files: the four caller files, langchain_text_splitters __init__.py (line 37 imports its nltk module) and its dist-info RECORD, plus non-references: pytest _pytest/doctest.py:579-580 comments, spacy lang/nl/syntax_iterators.py:11 docstring URL, a token in litellm's anthropic_tokenizer.json vocabulary, and base64 coincidences in pymupdf libmupdf.so.28.2 and certifi cacert.pem:2512",
+    "unstructured": "unstructured 0.27.9 and unstructured-client 0.46.2: no case-insensitive 'nltk' in any file (rg exit 1); unstructured/nlp/tokenize.py imports spacy",
+    "nltk_internal_paths": "The nltk modules these callers enter (nltk/tokenize, nltk/corpus, nltk/translate, nltk/downloader.py, nltk/data.py) reference none of the five affected symbols (rg exit 1). Inside the nltk wheel the symbols occur only in tag/perceptron.py, tag/__init__.py, tag/api.py, parse/transitionparser.py, parse/__init__.py, classify/maxent.py, chunk/named_entity.py and nltk/test.",
+    "affected_api_locations": "nltk 3.10.3 wheel: AveragedPerceptron.save/load at tag/perceptron.py:176-184 (builtin open()); PerceptronTagger.save_to_json at tag/perceptron.py:332 (called by PerceptronTagger.train when save_loc is given, line 330); TransitionParser.train/parse at parse/transitionparser.py:524 and 568 (builtin open() at 564 and 583); save_maxent_params at classify/maxent.py:1583 (builtin open() on the caller's tab_dir). load_maxent_params (maxent.py:1560) reads through nltk.data.open_datafile."
+  },
+  "pathsec_default": {
+    "artifact": "nltk-3.10.3-py3-none-any.whl",
+    "file": "nltk/pathsec.py",
+    "lines": "26-28",
+    "value": "ENFORCE = True",
+    "note": "Module constant; line 27 is the commented-out '# ENFORCE = False'. pathsec.py reads NLTK_DATA (line 88, allowed data roots) and NLTK_ALLOW_PROXIED_URLOPEN (line 533) from the environment; no variable overrides ENFORCE. The advisory's first precondition therefore holds by default; its second (untrusted input choosing model import or export paths through the affected APIs) has no caller in the scanned code."
+  },
+  "recipe_code_scope": "blueprints/runtime-workers/gpt-researcher/*.py (cli_runner.py, dispatch.py, gateway.py, install_support.py, mcp_proxy.py) and, additionally, e2e/*.py (check.py, grader.py, receipt.py, run.py): import forms 0; affected symbols and nltk-caller class names 0 (rg exit 1); case-insensitive 'nltk' 1 hit in the top-level files, 0 in e2e (rg exit 1)",
+  "recipe_code_hits": [
+    {"file": "blueprints/runtime-workers/gpt-researcher/dispatch.py", "line": 108, "text": "\"NLTK_DATA\": str(run_dir / \"cache/nltk\")", "kind": "child_environment() points the worker's NLTK data path at a run-scoped cache; not an import or API call. pathsec treats NLTK_DATA entries as allowed roots (pathsec.py:88)."}
+  ],
+  "conclusion": "Static scan: no file of the 196 hash-verified locked artifacts other than nltk, none of GPT Researcher 0957c301's 364 .py files and none of the recipe's Python references TransitionParser, AveragedPerceptron, PerceptronTagger, save_to_json or save_maxent_params, so GHSA-8mgp-746c-j5xp's affected model import/export APIs are not statically referenced from the worker's code. The lock's only nltk callers are langchain-text-splitters 1.1.2 (Punkt sentence splitting; the stopwords corpus only with stopword_removal=True) and langchain-community 0.4.2 (BLEU scoring), and GPT Researcher references none of those classes. nltk 3.10.3 stays installed (GPT Researcher declares it at pyproject.toml:111) and is loaded at import through langchain_text_splitters; OSV lists it as affected with no patched release, and pathsec is on by default. The pin remains an affected version; this receipt supports the scoped allowance for this lock in tests/test_osv_lockfile_coverage.py:50-55, not a claim that nltk 3.10.3 is safe.",
+  "limits": [
+    "Static text scan only: nothing was installed, imported or executed. Dynamic dispatch that never names nltk or the affected symbols (computed getattr, plugin entry points, deserialized objects) would not appear.",
+    "One artifact per pin: the wheel pip selected for cp312 with the manylinux2014/2_17/2_28 x86_64 tags, or the sdist for docopt, langdetect and sgmllib3k. The lock's other 4,140 hashed distributions (other platforms or Python versions) were not scanned; a host that installs a different wheel of the same version needs its own check.",
+    "The three sdists were scanned as source; their build output was not produced or examined, and their hashes were checked by our script rather than pip --require-hashes.",
+    "GPT Researcher was scanned from GitHub's legacy tarball; identity with the pins.json codeload archive rests on six per-file sha256 matches, not the archive hash.",
+    "Runtime inputs (research prompts, retrieved documents, MCP tool results) were not exercised; the claim concerns code references.",
+    "Advisory state is the OSV record fetched 2026-09-27T21:59:19Z (modified 2026-09-02T14:45:06Z) and PyPI at 2026-09-27T22:03:25Z; a later OSV modification or nltk release needs a new check.",
+    "The build and proxy locks were checked only for an nltk pin (0 lines each), and the grader's upstream uv.lock only for an nltk mention (0); none of their artifacts was scanned.",
+    "This is not an osv-scanner run; .github/osv-scanner.toml's GHSA-8mgp-746c-j5xp ignore reason cites only the Lumibot evaluation lock at this base."
+  ],
+  "evidence_class": "local static scan of hash-verified locked artifacts and pinned source (no install, no execution)"
+}

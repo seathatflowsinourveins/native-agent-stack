@@ -1,0 +1,31 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/tox-driver/bin/python", "-m", "tox", "-e", "py313-crypto", "--workdir", "<PRIVATE_RESEARCH>/tox", "--", "tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error", "tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error"]
+cwd: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+started_utc: 2026-09-30T17:08:37.109674+00:00
+ended_utc: 2026-09-30T17:08:46.434505+00:00
+exit_code: 0
+
+stdout:
+ROOT: tox-gh-actions won't override envlist because tox is not running in GitHub Actions
+py313-crypto: install_dependency-groups> python -I -m pip install 'coverage[toml]==7.10.7' 'pytest<9.0.0,>=8.4.2'
+build_wheel: install_requires> python -I -m pip install 'setuptools>=77.0.3'
+build_wheel: _optional_hooks> python <PRIVATE_RESEARCH>/tox-driver/lib/python3.13/site-packages/pyproject_api/_backend.py True setuptools.build_meta
+build_wheel: get_requires_for_build_wheel> python <PRIVATE_RESEARCH>/tox-driver/lib/python3.13/site-packages/pyproject_api/_backend.py True setuptools.build_meta
+build_wheel: build_wheel> python <PRIVATE_RESEARCH>/tox-driver/lib/python3.13/site-packages/pyproject_api/_backend.py True setuptools.build_meta
+py313-crypto: install_package_deps> python -I -m pip install 'cryptography>=3.4.0' 'typing_extensions>=4.0; python_version < "3.11"'
+py313-crypto: install_package> python -I -m pip install --force-reinstall --no-deps <PRIVATE_RESEARCH>/tox/.tmp/package/1/pyjwt-2.15.0-py3-none-any.whl
+py313-crypto: commands[0]> <PRIVATE_RESEARCH>/tox/py313-crypto/bin/python -b -m coverage run -m pytest tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-8.4.2, pluggy-1.6.0
+cachedir: <PRIVATE_RESEARCH>/tox/py313-crypto/.pytest_cache
+rootdir: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+configfile: pyproject.toml
+collected 2 items
+
+tests/test_api_jwt.py .                                                  [ 50%]
+tests/test_jwks_client.py .                                              [100%]
+
+============================== 2 passed in 0.19s ===============================
+  py313-crypto: OK (8.96=setup[8.34]+cmd[0.62] seconds)
+  congratulations :) (9.04 seconds)
+
+stderr:

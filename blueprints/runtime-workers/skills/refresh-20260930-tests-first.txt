@@ -1,0 +1,40 @@
+test_cli_version_and_ref_come_from_the_manifest_pin (tests.test_runtime_worker_skills.FreshnessComparisonTests.test_cli_version_and_ref_come_from_the_manifest_pin) ... ok
+test_fetch_failure_stays_unknown_not_current (tests.test_runtime_worker_skills.FreshnessComparisonTests.test_fetch_failure_stays_unknown_not_current) ... ok
+test_head_movement_is_distinct_from_skill_change_and_native_check (tests.test_runtime_worker_skills.FreshnessComparisonTests.test_head_movement_is_distinct_from_skill_change_and_native_check) ... ok
+test_truncated_tree_is_rejected (tests.test_runtime_worker_skills.FreshnessComparisonTests.test_truncated_tree_is_rejected) ... ok
+test_budget_is_catalog_metadata_and_native_tokens_remain_unknown (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_budget_is_catalog_metadata_and_native_tokens_remain_unknown) ... ok
+test_contract_rejects_a_future_main_skill_in_neither_set (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set) ... ok
+test_contract_rejects_double_claims_restated_gates_and_bare_exclusions (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_rejects_double_claims_restated_gates_and_bare_exclusions) ... ok
+test_contract_survives_main_reordering_its_skills (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_contract_survives_main_reordering_its_skills) ... ok
+test_every_adoption_skill_is_reused_or_explicitly_excluded (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded) ... ok
+test_every_scenario_role_cell_has_real_skills_or_explicit_gap (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_every_scenario_role_cell_has_real_skills_or_explicit_gap) ... ok
+test_freshness_workflow_is_report_only_and_actions_are_sha_pinned (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_freshness_workflow_is_report_only_and_actions_are_sha_pinned) ... ok
+test_no_duplicate_names_and_each_role_has_skills (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_no_duplicate_names_and_each_role_has_skills) ... ok
+test_openhands_inventory_has_a_decision_for_every_skill (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_openhands_inventory_has_a_decision_for_every_skill) ... ok
+test_print_codex_config_disables_every_reused_skill_main_disables (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_print_codex_config_disables_every_reused_skill_main_disables) ... ok
+test_prune_contract_records_claude_listing_budget_and_unknown_visibility (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_prune_contract_records_claude_listing_budget_and_unknown_visibility) ... ok
+test_readme_matrix_matches_manifest_including_empty_cells (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_readme_matrix_matches_manifest_including_empty_cells) ... ok
+test_schema_and_pins_are_well_formed (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_schema_and_pins_are_well_formed) ... ok
+test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it) ... ok
+test_source_counts_match_the_selected_skills_and_the_research_table (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_source_counts_match_the_selected_skills_and_the_research_table) ... ok
+test_superpowers_lifecycle_and_collisions_are_explicit (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_superpowers_lifecycle_and_collisions_are_explicit) ... FAIL
+test_verification_before_completion_stays_excluded_until_main_readmits_it (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_verification_before_completion_stays_excluded_until_main_readmits_it) ... ok
+test_worker_installation_uses_extended_installer_without_hand_copy (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_worker_installation_uses_extended_installer_without_hand_copy) ... ok
+
+======================================================================
+FAIL: test_superpowers_lifecycle_and_collisions_are_explicit (tests.test_runtime_worker_skills.RuntimeWorkerManifestTests.test_superpowers_lifecycle_and_collisions_are_explicit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_runtime_worker_skills.py", line 244, in test_superpowers_lifecycle_and_collisions_are_explicit
+    self.assertEqual(collision["selected"], {key: winner[key] for key in ("source", "ref", "path")})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'sou[33 chars]f': 'bea7a20c59c44ec4dacddac3fc0efe58b9c73880'[26 chars]iew'} != {'sou[33 chars]f': '9495f4c59dd5fea2cee9e87ab37a6abda649627b'[26 chars]iew'}
+  {'path': 'skills/code-review',
+-  'ref': 'bea7a20c59c44ec4dacddac3fc0efe58b9c73880',
++  'ref': '9495f4c59dd5fea2cee9e87ab37a6abda649627b',
+   'source': 'OpenHands/extensions'}
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.078s
+
+FAILED (failures=1)

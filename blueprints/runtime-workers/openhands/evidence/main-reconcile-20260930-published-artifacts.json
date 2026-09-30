@@ -1,0 +1,100 @@
+[
+  {
+    "name": "oauthlib",
+    "version": "3.3.1",
+    "url": "https://files.pythonhosted.org/packages/be/9c/92789c596b8df838baa98fa71844d84283302f7604ed565dafe5a6b5041a/oauthlib-3.3.1-py3-none-any.whl",
+    "filename": "oauthlib-3.3.1-py3-none-any.whl",
+    "sha256": "88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1",
+    "metadata_url": "https://pypi.org/pypi/oauthlib/3.3.1/json",
+    "descriptor_source": "evidence/wheel-relock-20260930-sources.json (historical metadata descriptor)",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "requests-oauthlib",
+    "version": "2.0.0",
+    "url": "https://files.pythonhosted.org/packages/3b/5d/63d4ae3b9daea098d5d6f5da83984853c1bbacd5dc826764b249fe119d24/requests_oauthlib-2.0.0-py2.py3-none-any.whl",
+    "filename": "requests_oauthlib-2.0.0-py2.py3-none-any.whl",
+    "sha256": "7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36",
+    "metadata_url": "https://pypi.org/pypi/requests-oauthlib/2.0.0/json",
+    "descriptor_source": "evidence/wheel-relock-20260930-sources.json (historical metadata descriptor)",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "google-auth-oauthlib",
+    "version": "1.2.2",
+    "url": "https://files.pythonhosted.org/packages/ac/84/40ee070be95771acd2f4418981edb834979424565c3eec3cd88b6aa09d24/google_auth_oauthlib-1.2.2-py3-none-any.whl",
+    "filename": "google_auth_oauthlib-1.2.2-py3-none-any.whl",
+    "sha256": "fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2",
+    "metadata_url": "https://pypi.org/pypi/google-auth-oauthlib/1.2.2/json",
+    "descriptor_source": "evidence/wheel-relock-20260930-sources.json (historical metadata descriptor)",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "func-timeout",
+    "version": "4.3.5",
+    "url": "https://files.pythonhosted.org/packages/b3/0d/bf0567477f7281d9a3926c582bfef21bff7498fc0ffd3e9de21811896a0b/func_timeout-4.3.5.tar.gz",
+    "filename": "func_timeout-4.3.5.tar.gz",
+    "sha256": "74cd3c428ec94f4edfba81f9b2f14904846d5ffccc27c92433b8b5939b5575dd",
+    "metadata_url": "https://pypi.org/pypi/func-timeout/4.3.5/json",
+    "descriptor_source": "evidence/wheel-relock-20260930-sources.json (historical metadata descriptor)",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "PyJWT",
+    "version": "2.14.0",
+    "url": "https://files.pythonhosted.org/packages/9c/97/672cb32ce0dfea44b740cb7b4f97038463b9cf7c0ead1aacf595572851d6/pyjwt-2.14.0-py3-none-any.whl",
+    "filename": "pyjwt-2.14.0-py3-none-any.whl",
+    "sha256": "ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc",
+    "metadata_url": "https://pypi.org/pypi/PyJWT/2.14.0/json",
+    "descriptor_source": "fresh exact-version PyPI metadata",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "click",
+    "version": "8.5.0",
+    "url": "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl",
+    "filename": "click-8.5.0-py3-none-any.whl",
+    "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+    "metadata_url": "https://pypi.org/pypi/click/8.5.0/json",
+    "descriptor_source": "fresh exact-version PyPI metadata",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "pypdf",
+    "version": "6.19.0",
+    "url": "https://files.pythonhosted.org/packages/3c/2c/c43c03eaf630435f023f1dc61ec4a4a78951ad5530a62c71cc89bde307b7/pypdf-6.19.0-py3-none-any.whl",
+    "filename": "pypdf-6.19.0-py3-none-any.whl",
+    "sha256": "7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14",
+    "metadata_url": "https://pypi.org/pypi/pypdf/6.19.0/json",
+    "descriptor_source": "fresh exact-version PyPI metadata",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "name": "soupsieve",
+    "version": "2.9.2",
+    "url": "https://files.pythonhosted.org/packages/eb/dc/ad025c1ee131eba60c69f4dd5779b18fcf1e6b21a343e2162a84d5d133c7/soupsieve-2.9.2-py3-none-any.whl",
+    "filename": "soupsieve-2.9.2-py3-none-any.whl",
+    "sha256": "8089a26fd974ca7a1f30276d3d8492ab266ab15af581642dfe8aa162e0c1c823",
+    "metadata_url": "https://pypi.org/pypi/soupsieve/2.9.2/json",
+    "descriptor_source": "fresh exact-version PyPI metadata",
+    "artifact_download": "fresh official artifact; SHA256 verified against descriptor and reconciled lock"
+  },
+  {
+    "url": "https://files.pythonhosted.org/packages/eb/5a/359d6a4b892fccd4915879d3145d77735b0e5614eee7db7b2a11ae99a843/openhands_sdk-1.50.0-py3-none-any.whl",
+    "filename": "openhands_sdk-1.50.0-py3-none-any.whl",
+    "sha256": "441ea190fb0af2253bf431650f209fedfbb9eb7c41cf35440a0548296d4b0faa",
+    "name": "openhands-sdk",
+    "version": "1.50.0",
+    "descriptor_source": "pins.json (unchanged published wheel pin)",
+    "artifact_download": "fresh official artifact; SHA256 verified against pin and reconciled lock"
+  },
+  {
+    "url": "https://files.pythonhosted.org/packages/97/b2/61c9b0029d46de429890527f47c1809f6badc1c386bfcb4dd17286166108/openhands_tools-1.50.0-py3-none-any.whl",
+    "filename": "openhands_tools-1.50.0-py3-none-any.whl",
+    "sha256": "b237043c892111624fdc1fe98e0d29f772ae1f614b487866d926775167c9635e",
+    "name": "openhands-tools",
+    "version": "1.50.0",
+    "descriptor_source": "pins.json (unchanged published wheel pin)",
+    "artifact_download": "fresh official artifact; SHA256 verified against pin and reconciled lock"
+  }
+]

@@ -1,0 +1,36 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-m", "unittest", "tests.test_openhands_150", "-v"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:50:51.936681+00:00
+ended_utc: 2026-09-30T15:50:59.460009+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+test_native_task_hook_refuses_ambient_and_recursive_agents (tests.test_openhands_150.OpenHands150Profiles.test_native_task_hook_refuses_ambient_and_recursive_agents) ... ok
+test_profiles_are_bounded_and_services_are_task_scoped (tests.test_openhands_150.OpenHands150Profiles.test_profiles_are_bounded_and_services_are_task_scoped) ... ok
+test_sampling_is_rejected_before_any_request (tests.test_openhands_150.OpenHands150Profiles.test_sampling_is_rejected_before_any_request) ... ok
+test_skill_objects_are_role_selected_and_github_descriptions_are_scoped (tests.test_openhands_150.OpenHands150Profiles.test_skill_objects_are_role_selected_and_github_descriptions_are_scoped) ... ok
+test_goal_status_is_lifecycle_output_and_preserves_active_judge_round (tests.test_openhands_150.OpenHands150Recovery.test_goal_status_is_lifecycle_output_and_preserves_active_judge_round) ... ok
+test_independent_observer_rejects_fixture_and_model_store_sources (tests.test_openhands_150.OpenHands150Recovery.test_independent_observer_rejects_fixture_and_model_store_sources) ... ok
+test_interrupt_resume_preserves_native_conversation_deadline_and_reservation (tests.test_openhands_150.OpenHands150Recovery.test_interrupt_resume_preserves_native_conversation_deadline_and_reservation) ... ok
+test_actual_native_profiles_and_children_keep_explicit_route_tools_skills (tests.test_openhands_150.OpenHands150Transport.test_actual_native_profiles_and_children_keep_explicit_route_tools_skills) ... +----------------------------------------------------------------------+
+|  OpenHands SDK v1.50.0                                               |
+|                                                                      |
+|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |
+|  Get help: openhands.dev/joinslack                                   |
+|  Scale up: openhands.dev/product/sdk                                 |
+|                                                                      |
+|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |
++----------------------------------------------------------------------+
+
+ok
+test_actual_native_sdk_completion_uses_responses_dispatch (tests.test_openhands_150.OpenHands150Transport.test_actual_native_sdk_completion_uses_responses_dispatch) ... ok
+test_completion_bridge_preserves_native_contract_and_restores_methods (tests.test_openhands_150.OpenHands150Transport.test_completion_bridge_preserves_native_contract_and_restores_methods) ... ok
+test_goal_adapter_keeps_native_loop_and_separate_judge_metrics (tests.test_openhands_150.OpenHands150Transport.test_goal_adapter_keeps_native_loop_and_separate_judge_metrics) ... ok
+test_p3_native_tool_replay_and_query_denial_are_fixture_only (tests.test_openhands_150.OpenHands150Transport.test_p3_native_tool_replay_and_query_denial_are_fixture_only) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 6.289s
+
+OK

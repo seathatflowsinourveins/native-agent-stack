@@ -1,0 +1,1087 @@
+{
+  "schema_version": 1,
+  "record": "openhands-sdk-150-pyjwt-215-post-cutoff-linux-relock",
+  "observed_utc": "2026-09-30T17:23:50.486587+00:00",
+  "evidence_class": "local_integration",
+  "status": "bounded_source_checks_passed; shared_registration_and_exact_lock_acceptance_pending",
+  "scope": "OpenHands SDK/tools 1.50.0 Linux x86_64 / CPython 3.13.15 recipe source qualification. Only PyJWT changes from the bd1 urllib3 intermediate; no deployment or image/provider acceptance.",
+  "baselines": {
+    "parent_commit": "6ca5863516d0b07748f41be2a2635fbe0211d1c3",
+    "base_lock_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+    "original_candidate_commit": "00aa6c25fe6f27e9f5974e9f6a5592aa31683479",
+    "original_candidate_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+    "retained_intermediate_receipt": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930.json",
+    "retained_failed_intermediate_rescan": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.json",
+    "preservation": "All original 00aa/main-reconcile and bd1/urllib3 receipt, input and returned-output bytes remain unchanged; source controls and new qualification are separate dated artifacts."
+  },
+  "cutoff_and_owner_boundary": {
+    "coordinator_authorized_observation_utc": "2026-09-30T16:57:15Z",
+    "conservative_cutoff_utc": "2026-09-30T16:57:00Z",
+    "native_worker_clock_check_utc": "2026-09-30T17:01:25Z",
+    "latest_pyjwt_215_artifact_upload_utc": "2026-09-23T16:56:00.689307Z",
+    "full_relative_exclude_newer": "7 days",
+    "absolute_cutoff_override": false,
+    "owner_handoff": "Coordinator explicitly authorized this bounded candidate relock after receiving the BC source handoff. Main/macOS adoption and issue #518 coordination remain separate ownership."
+  },
+  "research": {
+    "selected_native_tools": [
+      "uv 0.12.17 compile/install/check through the previously selected source method",
+      "OSV Scanner 2.6.0 byte-identical pinned binary in isolated task scratch",
+      "Official PyJWT source CI installation plus tox 4.64.5 / tox-gh-actions 3.5.0 in an isolated driver; upstream tests group pytest 8.4.2 and coverage 7.10.7"
+    ],
+    "source_pin": {
+      "repository": "https://github.com/jpadilla/pyjwt",
+      "tag": "2.15.0",
+      "commit": "1d41a6478e1562e68ff667fcd703356acf085f68",
+      "source_archive_sha256": "9a504f00c4800fd85bb64aaf768d21d66c648d6f79ddfcbbb5209e44455c9261",
+      "fixed_advisory": "GHSA-42vr-xj54-vc7v",
+      "requires_python": ">=3.9",
+      "optional_crypto_requirement": "cryptography>=3.4.0",
+      "published_artifacts": [
+        {
+          "filename": "pyjwt-2.15.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/e8/55/40e45bf052ee8ee12a4dfd785519660f8effa7b065442b91646ec6828619/pyjwt-2.15.0-py3-none-any.whl",
+          "sha256": "7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8",
+          "uploaded_utc": "2026-09-23T16:55:59.241512Z",
+          "yanked": false
+        },
+        {
+          "filename": "pyjwt-2.15.0.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/02/a5/5197bfd06417837ac079921c66fa6393f1dea3557272a263cebfef69e432/pyjwt-2.15.0.tar.gz",
+          "sha256": "b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4",
+          "uploaded_utc": "2026-09-23T16:56:00.689307Z",
+          "yanked": false
+        }
+      ]
+    },
+    "source_correction_from_research": "The initial fix commit used deeply-nested-payload test names. Tag 2.15.0 includes its later unchanged deterministic RecursionError regressions; the executed node names and whole-file hashes are bound here. The official CI workflow is .github/workflows/main.yml, as verified through its directory listing and pinned file."
+  },
+  "resolution": {
+    "upstream_sdk_repository": "https://github.com/OpenHands/software-agent-sdk",
+    "upstream_sdk_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "sdk_tools_versions": "1.50.0",
+    "sdk_archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+    "sdk_upstream_uv_lock_sha256": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801",
+    "tool": "uv 0.12.17",
+    "target": {
+      "implementation": "CPython",
+      "python": "3.13.15",
+      "platform": "Linux x86_64"
+    },
+    "policy": {
+      "exclude_newer": "7 days",
+      "litellm": "2026-07-20T00:00:00Z",
+      "lmnr": "2026-08-23T00:00:00Z"
+    },
+    "constraint_origin": "Byte copy of bd1 urllib3-relock-20260930-constraints.txt; exactly one pyjwt 2.14.0 to 2.15.0 replacement, retaining all markers and 175 other candidate declarations. Two published SDK/tools wheel inputs are byte-identical to bd1.",
+    "predicted_digest_comparison": "Compared only after native compilation; native output exactly matches the coordinator prediction.",
+    "requirements_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+    "native_line_count": 3054,
+    "requirements_count": 176,
+    "unchanged_from_bd1": 175,
+    "unchanged_from_original_00aa": 174,
+    "changes_from_bd1": [
+      {
+        "name": "pyjwt",
+        "before": "2.14.0",
+        "after": "2.15.0"
+      }
+    ],
+    "changes_from_original_00aa": [
+      "urllib3 2.7.0 -> 2.8.0",
+      "PyJWT 2.14.0 -> 2.15.0"
+    ],
+    "added": [],
+    "removed": [],
+    "only_pyjwt_version_and_two_hashes_changed_from_bd1": true,
+    "retained_versions": {
+      "urllib3": "2.8.0",
+      "oauthlib": "3.3.1",
+      "anyio": "4.14.2",
+      "click": "8.5.0",
+      "pypdf": "6.19.0",
+      "soupsieve": "2.9.2"
+    },
+    "native_control_reproduced_bd1_byte_identically": true,
+    "native_fresh_extraction_reproduction_byte_identical": true,
+    "pristine_archive_checks": [
+      {
+        "archive": "sdk-source.tar.gz",
+        "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+        "extraction": "source",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      },
+      {
+        "archive": "sdk-source.tar.gz",
+        "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+        "extraction": "source-repro",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      },
+      {
+        "archive": "pyjwt-source.tar.gz",
+        "archive_sha256": "9a504f00c4800fd85bb64aaf768d21d66c648d6f79ddfcbbb5209e44455c9261",
+        "extraction": "pyjwt-source",
+        "original_regular_files_compared": 92,
+        "mismatches": []
+      },
+      {
+        "artifact": "pyjwt-2.15.0-py3-none-any.whl",
+        "sha256": "7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8",
+        "installed_python_sources_compared": 12,
+        "mismatches": []
+      }
+    ],
+    "relative_cutoff_limit": "These dated compiles retain the full relative seven-day policy. A future replay is a new dated observation, not a replayed acceptance claim."
+  },
+  "native_install": {
+    "owned_fresh_venv": true,
+    "hashed_build_install_exit_code": 0,
+    "hashed_runtime_install_exit_code": 0,
+    "pip_check_before_and_after_test_tools_exit_code": 0,
+    "native_import_exit_code": 0,
+    "runtime_distributions_before_test_tools": 178,
+    "installed_runtime_declarations_checked": 176,
+    "runtime_version_mismatches": [],
+    "qualification_tool_install": "Upstream PyJWT tests dependency group added coverage/pytest/iniconfig/pluggy only under version constraints. These four extra test distributions are outside the 176 runtime declaration comparison.",
+    "qualification_tools": {
+      "pytest": "8.4.2",
+      "coverage": "7.10.7",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.0"
+    },
+    "total_distributions_after_test_tools": 182,
+    "sdk_fixture_result": {
+      "command": "python -m unittest tests.test_openhands_150 -v",
+      "tests": 12,
+      "skips": 0,
+      "exit_code": 0,
+      "sha256": "52e1beefe24bfe03c298ae4d10a17d56388626503bc39c7f7b09a5ffbd840270"
+    },
+    "sdk_fixture_limit": "Unchanged local tests use real SDK objects with patched model calls; they are not official upstream SDK tests or provider/server/task-quality acceptance."
+  },
+  "unchanged_pyjwt_regressions": {
+    "repository": "https://github.com/jpadilla/pyjwt",
+    "commit": "1d41a6478e1562e68ff667fcd703356acf085f68",
+    "nodes": [
+      "tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error",
+      "tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error"
+    ],
+    "source_test_and_config_inputs": [
+      {
+        "path": "tests/test_api_jwt.py",
+        "sha256": "8331ec496b0df6f770409d3b0bf2fa470b01222122270284fdca3b905ec77457",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tests/test_jwks_client.py",
+        "sha256": "f1f5e0076061c3931ecce432f7fa74986bc2febd820c8e1fb6a3035a3703d708",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tests/utils.py",
+        "sha256": "b5b937a60999a63d0515491c7f23f5b39bf534d036c1050deb1094eddf712f14",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tox.ini",
+        "sha256": "1674dc3f7b5747e1d4aaf2641b93b1fe8d461da1b1209dcb55c7d1d74995df4d",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "pyproject.toml",
+        "sha256": "a89f0097abe7a485da60f4ef152c9e3ef4909ae5d5c0aef86b5178d9ee12b769",
+        "tag_sdist_byte_identical": true
+      }
+    ],
+    "native_upstream_tox": {
+      "driver_version": "4.64.5",
+      "environment": "py313-crypto",
+      "command_origin": ".github/workflows/main.yml:44-52 and tox.ini:34-47",
+      "exit_code": 0,
+      "tests": 2,
+      "skips": 0,
+      "class": "unchanged official upstream selected tests via the supported native tox recipe"
+    },
+    "installed_wheel_control": {
+      "version": "2.14.0",
+      "exit_code": 1,
+      "failed": 2,
+      "cause": "Raw RecursionError escapes the original decode/JWKS payload path; the expected DecodeError assertions fail."
+    },
+    "installed_candidate_wheel": {
+      "version": "2.15.0",
+      "exit_code": 0,
+      "passed": 2,
+      "skips": 0,
+      "mechanism": "Supported pytest.main with append import mode from neutral cwd. The installed target is imported before collection; jwt.__file__ is printed and asserted inside the actual test process before and after execution. Tagged source is not installed into the candidate environment.",
+      "class": "local integration selection/oracle around unchanged official tests"
+    },
+    "assertions": "Both unmodified tests inject RecursionError into the real JSON payload decode path and assert DecodeError retains the cause. The JWKS test also asserts its urlopen mock was never called.",
+    "limits": "This selected upstream fault-injection regression verifies exception normalization. It is not a full suite, deeply-nested-input performance measurement, or demonstration of worker/process crash or provider operation."
+  },
+  "osv": {
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "binary_source": ".github/workflows/security-scan.yml; google/osv-scanner v2.6.0",
+    "configuration_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+    "configuration_source": "Byte-identical .github/osv-scanner.toml at frozen 6ca branch base. No ignore ID, expiry, guard or configuration changes.",
+    "parser": "requirements.txt",
+    "no_resolve": true,
+    "scanner_recognized_packages": 174,
+    "recognition_limit": "176 runtime declarations include two direct SDK/tools wheel URLs; preserve the scanner-reported 174 count instead of claiming it recognized all identities.",
+    "bd1_current_config_control_exit_code": 1,
+    "bd1_current_config_control_findings": [
+      {
+        "package": "pyjwt",
+        "version": "2.14.0",
+        "ids": [
+          "GHSA-42vr-xj54-vc7v"
+        ]
+      }
+    ],
+    "bd1_empty_config_control_exit_code": 1,
+    "bd1_empty_config_control_ids": [
+      "GHSA-42vr-xj54-vc7v",
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "candidate_current_config_exit_code": 0,
+    "candidate_current_config_findings": [],
+    "candidate_empty_config_exit_code": 1,
+    "candidate_empty_config_findings": [
+      {
+        "package": "oauthlib",
+        "version": "3.3.1",
+        "ids": [
+          "GHSA-hj66-6f7g-4r5v",
+          "GHSA-xpv3-w29h-x7cv"
+        ]
+      }
+    ],
+    "dated_scope": "The candidate current-config and empty-config native returns occurred at 17:15:28-30Z and are source-only observations. Repository-wide/integrated security gates remain separate."
+  },
+  "oauthlib_exact_target_review": {
+    "requirements_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+    "target": "Linux x86_64 CPython 3.13.15 only",
+    "retained_version": "3.3.1",
+    "maintained_method": {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
+      "sha256": "d4eb55d798102e5a6d64d4d629a3a994acfadff74daa971195b73592c2a77cff",
+      "bytes": 5704
+    },
+    "alias_method": {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+      "sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960",
+      "bytes": 7145
+    },
+    "fresh_runs": "Both unchanged scripts reran against the exact candidate environment, including the four explicit qualification-tool distributions.",
+    "installed_python_sources_scanned": 10811,
+    "recipe_sources": 12,
+    "unhandled_parse_errors": 0,
+    "hash_bound_review_files_unchanged_from_bd1": 9,
+    "reviewed_text_only_exception": {
+      "path": "func_timeout/py2_raise.py",
+      "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77",
+      "classification": "Unchanged Python 2-only helper is text reviewed; Python 3 selects the separate py3_raise helper."
+    },
+    "literal_importers": "Six requests_oauthlib files select client classes, token errors and common helpers; no OAuthlib import/advisory-path literal references were reported in recipe sources. Authlib hits are its own implementation.",
+    "reexports": "OAuthlib oauth2 re-exports server/endpoints/grants, so those definitions can load with client namespace imports. Definition loading is not an invocation trace. Inspected RevocationEndpoint defaults enable_jsonp=False and preconfigured servers omit that flag; authorization-code/PKCE remains a separate server-grant path.",
+    "pyjwt_delta": "The installed 2.15.0 jwt/api_jwt.py has the official payload exception normalization. The selected regression discriminates against installed 2.14.0. Other tagged 2.15 cache/JWK changes are upstream release behavior, not local test patches.",
+    "limits": [
+      "Literal imports and decode-style/name/call sweeps are bounded static evidence, not whole-program semantic reachability.",
+      "The alias helper handles literal aliases/from imports but only ast.Call for bound calls; class bases and bare attributes are not reported as calls.",
+      "Dynamic imports, runtime-assembled names, external/non-Python callers and OAuth authorization-server runtime behavior remain unknown.",
+      "No endpoint/provider was invoked; macOS and image-binary target qualification remain separate."
+    ],
+    "conclusion": "Fresh exact-target source review supports review of the unchanged two OAuthlib exceptions within these explicit limits. Coordinator independent exact-lock guard acceptance remains required."
+  },
+  "evidence_classes_by_claim": {
+    "source_resolution_install_check_import_and_osv": "local_integration through supported pinned native operations",
+    "native_tox_selected_pyjwt_tests": "unchanged official upstream tests at the exact source tag; 2 selected only",
+    "installed_wheel_selected_pyjwt_tests": "local integration invocation/oracle using untouched upstream files; paired failing/passing control",
+    "sdk_fixtures": "unchanged local fixtures with real SDK objects and patched calls",
+    "source_identities_and_static_delta": "source review and independent artifact observation",
+    "manifest_and_publication_validation": "structural scope checks only; shared registrations owned by coordinator"
+  },
+  "remaining_gates": [
+    "Coordinator must register changed lock/pins hashes and all new dated input/evidence artifacts.",
+    "Coordinator must rebind and independently validate the existing OAuthlib exact-target guard at the new digest.",
+    "The integrated repository-wide security result must include the separately owned main/macOS/Next work, then receive its own native/hosted observation.",
+    "Image/package-binary, trusted observer/isolation/provider and task-quality acceptance remain ungranted and open. No model or image result is claimed."
+  ],
+  "execution_boundary": {
+    "new_model_requests": 0,
+    "host_service_or_container_starts": 0,
+    "image_builds": 0,
+    "global_configuration_changes": 0,
+    "shared_or_github_configuration_changes": 0,
+    "provider_usage": null,
+    "usage_note": "These package/source/test checks make no model/provider request. Coordinator/worker token usage was not collected and remains unknown."
+  },
+  "raw_output_policy": {
+    "private": "Original native stdout/stderr bytes remain in task scratch with raw hashes in the ledger; source/test archives remain private and unmodified.",
+    "public": "Returned output copies apply declared host/task path substitutions, generic source/session identifier masking and public JWT example masking. Test execution always uses untouched original source; public output masking is never a test-source change.",
+    "placeholders": [
+      "<WORKTREE>",
+      "<PRIVATE_RESEARCH>",
+      "<PRIOR_PRIVATE_RESEARCH>",
+      "<HOME>",
+      "<UPSTREAM_OR_NATIVE_HOST_PREFIX>",
+      "<SOURCE_IDENTIFIER_REDACTED>",
+      "<SOURCE_JWT_EXAMPLE_REDACTED>"
+    ],
+    "classification": "Sanitized copies of actual native returns; command-level private raw and public sanitized hashes remain separate."
+  },
+  "checks": [
+    {
+      "id": "clock-cutoff-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-clock-cutoff-check.txt",
+      "returned_output_sha256": "91392e5648d2ac348f910ed4bf3de46ddf5b19f213ee61ab623dad3b7341f394"
+    },
+    {
+      "id": "uv-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-uv-version.txt",
+      "returned_output_sha256": "a6bd49a719d9038dd76f1ba7f2ba806145fd613e5e518f71080ff0fac74b5bbc"
+    },
+    {
+      "id": "pyjwt-pypi",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-pypi.txt",
+      "returned_output_sha256": "ceb456b980d874d3af84c01749e77ce8a47c3edfec26da57a57ca6d8948ef880"
+    },
+    {
+      "id": "sdk-source-download",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-download.txt",
+      "returned_output_sha256": "d0eef999df6805ca32d4cdecf335457d789cd2177db193d3a9dcb56b563fa697"
+    },
+    {
+      "id": "sdk-source-extract",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-extract.txt",
+      "returned_output_sha256": "77321232e78b83b2b1d4ad3500df609400f60da4b35e51a47337eea92c383e59"
+    },
+    {
+      "id": "sdk-source-repro-extract",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-repro-extract.txt",
+      "returned_output_sha256": "67632310e39072065210809179b3c7b1318bd44be2e11360c4dc629e8971c47d"
+    },
+    {
+      "id": "baseline-osv-current-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-current-config.txt",
+      "returned_output_sha256": "ce799e56e98ac45f51b1c2536282dc921dfcec14fbcc04af6035e3f26615a640"
+    },
+    {
+      "id": "baseline-osv-empty-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-empty-config.txt",
+      "returned_output_sha256": "77f9b9a07f51f9000c737006c19ade784dbb35c697e8853f3e6be66116424ffa"
+    },
+    {
+      "id": "native-bd1-control-compile",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-bd1-control-compile.txt",
+      "returned_output_sha256": "28e67cda0191d8ec008e44cc14585ebd13f578d40d67a1829446081e3e7d41dd"
+    },
+    {
+      "id": "native-pyjwt-candidate-compile",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pyjwt-candidate-compile.txt",
+      "returned_output_sha256": "fbca2580f1026ae7403e289361f558d98a6b3ae6bd74e508708fbeaf82dfe9ee"
+    },
+    {
+      "id": "native-pristine-reproduction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pristine-reproduction.txt",
+      "returned_output_sha256": "ed94035165ae012bf277c5dc11ff04274242c070e875c8213a63cdde77165865"
+    },
+    {
+      "id": "osv-scanner-copy",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-scanner-copy.txt",
+      "returned_output_sha256": "e3eb88d9a28aa78000124b11ab613eb64ebd9f8a03fe7ce59ee5dc89bcab6b32"
+    },
+    {
+      "id": "pyjwt-file-pyjwt-2.15.0-py3-none-any.whl",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0-py3-none-any.whl.txt",
+      "returned_output_sha256": "8a5ea31cca7a21c9c96bf1068aa39a005c32d61acfea532b5455cf249c054e93"
+    },
+    {
+      "id": "pyjwt-file-pyjwt-2.15.0.tar.gz",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0.tar.gz.txt",
+      "returned_output_sha256": "540b3b8ed46e115f9927070df9c4492a0e8b3824853c29645c0697b50b1c99a8"
+    },
+    {
+      "id": "exact-lock-delta",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-lock-delta.txt",
+      "returned_output_sha256": "7c8aefeb5429ebf15c4e54efafe083c59bde3f9b6a244b4f9328b5544e500573"
+    },
+    {
+      "id": "fresh-venv",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-fresh-venv.txt",
+      "returned_output_sha256": "e29d9fd8ddf54224ea0c7c8347b3951f528f2616f4e7b399b74bb537433ac275"
+    },
+    {
+      "id": "build-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-build-hash-install.txt",
+      "returned_output_sha256": "1a6a32e0927dc554a81fd1920756f2a67fe378f44fba225b69f187a81fb8ecca"
+    },
+    {
+      "id": "runtime-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-runtime-hash-install.txt",
+      "returned_output_sha256": "5910f0b0cb4876ca4358ea444e6be0fd3c8e76dc8da7f0fbfb7f8acd10e15194"
+    },
+    {
+      "id": "native-pip-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check.txt",
+      "returned_output_sha256": "066424201c71fcc7cd0f003da5a8758a4a1693936531aab0fd6f728793e5a3b9"
+    },
+    {
+      "id": "native-imports",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-imports.txt",
+      "returned_output_sha256": "65ae38c5d5b78a9d49db1a9722d07680fe32934efd7cf8d47d4ea72f4e4f3ef8"
+    },
+    {
+      "id": "pyjwt-source-download",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-download.txt",
+      "returned_output_sha256": "1ab4c361d45b723a1709a58777e9f32c9de80429936c983c827094eb65738385"
+    },
+    {
+      "id": "pyjwt-tag-object",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-tag-object.txt",
+      "returned_output_sha256": "bfeb9cf9d69bfb4090e650c6d32994b4f8fe33dc2aea7a21a0997a71d1edbe42"
+    },
+    {
+      "id": "pyjwt-release",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-release.txt",
+      "returned_output_sha256": "d4953c46b722691311d15842c8c9ac3f16e1ce4f0d3f3f0f240d71dac6ed2749"
+    },
+    {
+      "id": "osv-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-version.txt",
+      "returned_output_sha256": "d99dc4aaa9ee2e777c40037e37ee43d8c9e70402b86da61753a46c36d6b7437f"
+    },
+    {
+      "id": "tox-pypi-tool-source",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-pypi-tool-source.txt",
+      "returned_output_sha256": "71cbf8472151c7bd841b891003e29829749d350c919907ac1773d4c9cdf28726"
+    },
+    {
+      "id": "pyjwt-source-extract",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-extract.txt",
+      "returned_output_sha256": "acbaefe984ad11d1594074b01c826673b78b1b92c3fd4538d16332fdad71adda"
+    },
+    {
+      "id": "pyjwt-sdist-extract",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-sdist-extract.txt",
+      "returned_output_sha256": "cc5f1fd77eac2cbe1bf60cab5b417c813413ba53261eff93d242388454f4c3af"
+    },
+    {
+      "id": "pyjwt-native-test-config",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-native-test-config.txt",
+      "returned_output_sha256": "5522835655990357c7d10c209441f95b82271bbcbfd86d8eb56c4360837b9ebc"
+    },
+    {
+      "id": "native-tox-driver-venv",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-driver-venv.txt",
+      "returned_output_sha256": "9145a80b90bfd6a0e9f540022f3e8967985cf8be8624b168412f8c32d517d7d0"
+    },
+    {
+      "id": "upstream-ci-tox-prerequisites",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-ci-tox-prerequisites.txt",
+      "returned_output_sha256": "e2298547f6fdc7c5495eb67aa06eb5495780345b2374ab2dc477dc34e68629de"
+    },
+    {
+      "id": "native-tox-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-version.txt",
+      "returned_output_sha256": "b07c39e550def4290546d5b61054772b5f1f980ee09e1d9af040fe53d6ea2451"
+    },
+    {
+      "id": "native-tox-run-help",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-run-help.txt",
+      "returned_output_sha256": "d8df693a45f7f2a6da323c67f956472a41e052bb525566ac584411ff4893d68d"
+    },
+    {
+      "id": "unchanged-upstream-tox-regressions",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-unchanged-upstream-tox-regressions.txt",
+      "returned_output_sha256": "d75d11056968ffb160194f8f9d1d318ceffb58e6e220215a71d81a4a2e24d40e"
+    },
+    {
+      "id": "upstream-selected-file-hashes",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-selected-file-hashes.txt",
+      "returned_output_sha256": "a79d7e59d80e4b247a76031e5704ebae8128fff34fdffb25e0a8a73f299857df"
+    },
+    {
+      "id": "candidate-upstream-test-tools",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-upstream-test-tools.txt",
+      "returned_output_sha256": "b3e831ea6e1d1cc32ef492ee6bc5405e00c7345d1e65684672a41eaf30a42b12"
+    },
+    {
+      "id": "bd1-control-upstream-test-tools",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-bd1-control-upstream-test-tools.txt",
+      "returned_output_sha256": "569b4604483c76a31e210dcc97cd2762bc6a63b54df00762d0e68faab3902511"
+    },
+    {
+      "id": "candidate-native-pytest-help",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-native-pytest-help.txt",
+      "returned_output_sha256": "23b64656768de639ea6b8bc26b7118a9c7f853ec40f20d23fcd87eddaf995839"
+    },
+    {
+      "id": "installed-bd1-unchanged-regression-control",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-bd1-unchanged-regression-control.txt",
+      "returned_output_sha256": "b1f890f09595dfb43f32ace636f378bc845f0c85e091f7050e03f22e86f5ff94"
+    },
+    {
+      "id": "installed-candidate-unchanged-regressions",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-candidate-unchanged-regressions.txt",
+      "returned_output_sha256": "927a12279ff97ecd9277dd408f5733c3238f80622cbdcd5ce4525f9fc5ec0e42"
+    },
+    {
+      "id": "actual-sdk-fixtures",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-actual-sdk-fixtures.txt",
+      "returned_output_sha256": "891d87ad2c8423f2b74ce8d3f1a63dcfe25294f13dd21fa7bbc5de66893cf6a3"
+    },
+    {
+      "id": "maintained-jwt-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-maintained-jwt-callers.txt",
+      "returned_output_sha256": "ccfd1d7c537d400b7f430678043dda2b49b57a5bfb2adf09aedca37e2f1ae488"
+    },
+    {
+      "id": "oauthlib-alias-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-oauthlib-alias-callers.txt",
+      "returned_output_sha256": "32d23e1d2b4b6327b44e5fb4fbbfccc94c33133c296b911b5399844684de67d6"
+    },
+    {
+      "id": "candidate-osv-current-config",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-current-config.txt",
+      "returned_output_sha256": "d98cab16adc610ef89904863dcf0242202ebfb70c1d2a12a23b2459b3999f038"
+    },
+    {
+      "id": "candidate-osv-empty-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-empty-config.txt",
+      "returned_output_sha256": "040d82f1a91b191c0623252b9dc95a575a24658ca1843e5fd5548075a3d54ec3"
+    },
+    {
+      "id": "pristine-and-published-source-identities",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pristine-and-published-source-identities.txt",
+      "returned_output_sha256": "108f4bfb77b3100e53cf6bdb03d080556267f98f58432d1f13e7427e03e40848"
+    },
+    {
+      "id": "installed-runtime-version-inventory",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-runtime-version-inventory.txt",
+      "returned_output_sha256": "8f312d726e1d7bfb76c38c350da2cc9ae529477124ddc816c381e97b06b37709"
+    },
+    {
+      "id": "native-pip-check-after-test-tools",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check-after-test-tools.txt",
+      "returned_output_sha256": "5c255a24a423064be19e755f7dfafe0d18423467f13ad7d2a04caa04b047e3ed"
+    },
+    {
+      "id": "exact-caller-and-pyjwt-static-delta",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-caller-and-pyjwt-static-delta.txt",
+      "returned_output_sha256": "fc84c818132d1fab9531e0114177c3a7154960782b8eee59c80faae5364195bc"
+    },
+    {
+      "id": "tox-official-release",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-official-release.txt",
+      "returned_output_sha256": "5e1e5defdbfd7d2cfc61863f0349fefa2d7d27d64c20362105549d4521281fc5"
+    },
+    {
+      "id": "source-policy-and-compatibility",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-source-policy-and-compatibility.txt",
+      "returned_output_sha256": "a7c5c8fe6c4ae9a92d3f1aefef7702bb52de6685bf90feddfe77a1387742a2df"
+    },
+    {
+      "id": "owned-diff-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-diff-check.txt",
+      "returned_output_sha256": "d60bd830527dd82244afeae14cda196ce4cd07d9826e1a762aa8fd7fbc48486a"
+    },
+    {
+      "id": "owned-file-publication-scan",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-file-publication-scan.txt",
+      "returned_output_sha256": "4a3e416fe09a7424d47dc7f9b13905b2910bcbf752037618b411722ef14691c8"
+    },
+    {
+      "id": "repository-validation-before-integration",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-repository-validation-before-integration.txt",
+      "returned_output_sha256": "72a447135220f2e4e578cb81c327c7773a1c6bd6f85cfdc0f56473aa9d66784b"
+    }
+  ],
+  "bound_files": [
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+      "bytes": 248359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "sha256": "a8af5f14f9cffadb25d39569e1a8e19a41f480d16482a665158b62641484abef",
+      "bytes": 4460
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+      "sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
+      "bytes": 286
+    },
+    {
+      "path": "tests/test_openhands_150.py",
+      "sha256": "52e1beefe24bfe03c298ae4d10a17d56388626503bc39c7f7b09a5ffbd840270",
+      "bytes": 17216
+    },
+    {
+      "path": ".github/osv-scanner.toml",
+      "sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+      "bytes": 7630
+    },
+    {
+      "path": ".github/workflows/security-scan.yml",
+      "sha256": "88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14",
+      "bytes": 9268
+    }
+  ],
+  "source_archive_and_test_bindings": {
+    "archive_and_installed_checks": [
+      {
+        "archive": "sdk-source.tar.gz",
+        "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+        "extraction": "source",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      },
+      {
+        "archive": "sdk-source.tar.gz",
+        "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+        "extraction": "source-repro",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      },
+      {
+        "archive": "pyjwt-source.tar.gz",
+        "archive_sha256": "9a504f00c4800fd85bb64aaf768d21d66c648d6f79ddfcbbb5209e44455c9261",
+        "extraction": "pyjwt-source",
+        "original_regular_files_compared": 92,
+        "mismatches": []
+      },
+      {
+        "artifact": "pyjwt-2.15.0-py3-none-any.whl",
+        "sha256": "7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8",
+        "installed_python_sources_compared": 12,
+        "mismatches": []
+      }
+    ],
+    "tag_sdist_selected_test_inputs": [
+      {
+        "path": "tests/test_api_jwt.py",
+        "sha256": "8331ec496b0df6f770409d3b0bf2fa470b01222122270284fdca3b905ec77457",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tests/test_jwks_client.py",
+        "sha256": "f1f5e0076061c3931ecce432f7fa74986bc2febd820c8e1fb6a3035a3703d708",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tests/utils.py",
+        "sha256": "b5b937a60999a63d0515491c7f23f5b39bf534d036c1050deb1094eddf712f14",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "tox.ini",
+        "sha256": "1674dc3f7b5747e1d4aaf2641b93b1fe8d461da1b1209dcb55c7d1d74995df4d",
+        "tag_sdist_byte_identical": true
+      },
+      {
+        "path": "pyproject.toml",
+        "sha256": "a89f0097abe7a485da60f4ef152c9e3ef4909ae5d5c0aef86b5178d9ee12b769",
+        "tag_sdist_byte_identical": true
+      }
+    ]
+  },
+  "sources": [
+    "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml#L7",
+    "https://github.com/jpadilla/pyjwt/tree/1d41a6478e1562e68ff667fcd703356acf085f68",
+    "https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tox.ini#L34",
+    "https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/.github/workflows/main.yml#L44",
+    "https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py#L182",
+    "https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py#L329",
+    "https://github.com/advisories/GHSA-42vr-xj54-vc7v",
+    "https://pypi.org/project/PyJWT/2.15.0/",
+    "https://github.com/tox-dev/tox/releases/tag/4.64.5",
+    "https://docs.pytest.org/en/stable/how-to/usage.html#calling-pytest-from-python-code",
+    "https://docs.pytest.org/en/stable/explanation/pythonpath.html",
+    "https://docs.astral.sh/uv/reference/cli/#uv-pip-compile",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0"
+  ],
+  "command_ledger": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-commands.json",
+  "artifacts": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-actual-sdk-fixtures.txt",
+      "sha256": "891d87ad2c8423f2b74ce8d3f1a63dcfe25294f13dd21fa7bbc5de66893cf6a3",
+      "bytes": 3212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-current-config.json",
+      "sha256": "fa640deeb033c5478b03f14ce6e439333656279405e5db055ab8281a430ad200",
+      "bytes": 14545
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-current-config.txt",
+      "sha256": "ce799e56e98ac45f51b1c2536282dc921dfcec14fbcc04af6035e3f26615a640",
+      "bytes": 18803
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-empty-config.json",
+      "sha256": "a3471eeaef017e913a4035e402a111943673a181fa2c245e9ea11bad57b6076b",
+      "bytes": 34242
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-empty-config.txt",
+      "sha256": "77f9b9a07f51f9000c737006c19ade784dbb35c697e8853f3e6be66116424ffa",
+      "bytes": 35086
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-bd1-control-upstream-test-tools.txt",
+      "sha256": "569b4604483c76a31e210dcc97cd2762bc6a63b54df00762d0e68faab3902511",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-build-hash-install.txt",
+      "sha256": "1a6a32e0927dc554a81fd1920756f2a67fe378f44fba225b69f187a81fb8ecca",
+      "bytes": 592
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-native-pytest-help.txt",
+      "sha256": "23b64656768de639ea6b8bc26b7118a9c7f853ec40f20d23fcd87eddaf995839",
+      "bytes": 19013
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-current-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-current-config.txt",
+      "sha256": "d98cab16adc610ef89904863dcf0242202ebfb70c1d2a12a23b2459b3999f038",
+      "bytes": 4380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-empty-config.txt",
+      "sha256": "040d82f1a91b191c0623252b9dc95a575a24658ca1843e5fd5548075a3d54ec3",
+      "bytes": 20808
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-upstream-test-tools.txt",
+      "sha256": "b3e831ea6e1d1cc32ef492ee6bc5405e00c7345d1e65684672a41eaf30a42b12",
+      "bytes": 639
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-clock-cutoff-check.txt",
+      "sha256": "91392e5648d2ac348f910ed4bf3de46ddf5b19f213ee61ab623dad3b7341f394",
+      "bytes": 218
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-constraints.txt",
+      "sha256": "9be46e2d3628a47ece04c39048423874badadd13e379096f6303bfefebc8f041",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-dependency-comparison.json",
+      "sha256": "ec02602c7159345da3b0bb113e3b06cb13f66b9accb4bba733d60b2a82d3c631",
+      "bytes": 868
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-caller-and-pyjwt-static-delta.txt",
+      "sha256": "fc84c818132d1fab9531e0114177c3a7154960782b8eee59c80faae5364195bc",
+      "bytes": 13061
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-lock-delta.txt",
+      "sha256": "7c8aefeb5429ebf15c4e54efafe083c59bde3f9b6a244b4f9328b5544e500573",
+      "bytes": 2666
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-fresh-venv.txt",
+      "sha256": "e29d9fd8ddf54224ea0c7c8347b3951f528f2616f4e7b399b74bb537433ac275",
+      "bytes": 551
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-frozen-inputs.json",
+      "sha256": "c475106cf7ce5a5de0a5db62a8b6938fd7c0d3dcad8bcfa5ffc9e1184417aa45",
+      "bytes": 2268
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-bd1-unchanged-regression-control.txt",
+      "sha256": "b1f890f09595dfb43f32ace636f378bc845f0c85e091f7050e03f22e86f5ff94",
+      "bytes": 8517
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-candidate-unchanged-regressions.txt",
+      "sha256": "927a12279ff97ecd9277dd408f5733c3238f80622cbdcd5ce4525f9fc5ec0e42",
+      "bytes": 2398
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-runtime-version-inventory.txt",
+      "sha256": "8f312d726e1d7bfb76c38c350da2cc9ae529477124ddc816c381e97b06b37709",
+      "bytes": 1190
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-maintained-jwt-callers.txt",
+      "sha256": "ccfd1d7c537d400b7f430678043dda2b49b57a5bfb2adf09aedca37e2f1ae488",
+      "bytes": 3328
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-bd1-control-compile.txt",
+      "sha256": "28e67cda0191d8ec008e44cc14585ebd13f578d40d67a1829446081e3e7d41dd",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-imports.txt",
+      "sha256": "65ae38c5d5b78a9d49db1a9722d07680fe32934efd7cf8d47d4ea72f4e4f3ef8",
+      "bytes": 1982
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check-after-test-tools.txt",
+      "sha256": "5c255a24a423064be19e755f7dfafe0d18423467f13ad7d2a04caa04b047e3ed",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check.txt",
+      "sha256": "066424201c71fcc7cd0f003da5a8758a4a1693936531aab0fd6f728793e5a3b9",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pristine-reproduction.txt",
+      "sha256": "ed94035165ae012bf277c5dc11ff04274242c070e875c8213a63cdde77165865",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pyjwt-candidate-compile.txt",
+      "sha256": "fbca2580f1026ae7403e289361f558d98a6b3ae6bd74e508708fbeaf82dfe9ee",
+      "bytes": 249114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-driver-venv.txt",
+      "sha256": "9145a80b90bfd6a0e9f540022f3e8967985cf8be8624b168412f8c32d517d7d0",
+      "bytes": 613
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-run-help.txt",
+      "sha256": "d8df693a45f7f2a6da323c67f956472a41e052bb525566ac584411ff4893d68d",
+      "bytes": 5387
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-version.txt",
+      "sha256": "b07c39e550def4290546d5b61054772b5f1f980ee09e1d9af040fe53d6ea2451",
+      "bytes": 517
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-oauthlib-alias-callers.txt",
+      "sha256": "32d23e1d2b4b6327b44e5fb4fbbfccc94c33133c296b911b5399844684de67d6",
+      "bytes": 37489
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-scanner-copy.txt",
+      "sha256": "e3eb88d9a28aa78000124b11ab613eb64ebd9f8a03fe7ce59ee5dc89bcab6b32",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-version.txt",
+      "sha256": "d99dc4aaa9ee2e777c40037e37ee43d8c9e70402b86da61753a46c36d6b7437f",
+      "bytes": 341
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-diff-check.txt",
+      "sha256": "d60bd830527dd82244afeae14cda196ce4cd07d9826e1a762aa8fd7fbc48486a",
+      "bytes": 186
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-file-publication-scan.txt",
+      "sha256": "4a3e416fe09a7424d47dc7f9b13905b2910bcbf752037618b411722ef14691c8",
+      "bytes": 8127
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pristine-and-published-source-identities.txt",
+      "sha256": "108f4bfb77b3100e53cf6bdb03d080556267f98f58432d1f13e7427e03e40848",
+      "bytes": 4016
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0-py3-none-any.whl.txt",
+      "sha256": "8a5ea31cca7a21c9c96bf1068aa39a005c32d61acfea532b5455cf249c054e93",
+      "bytes": 424
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0.tar.gz.txt",
+      "sha256": "540b3b8ed46e115f9927070df9c4492a0e8b3824853c29645c0697b50b1c99a8",
+      "bytes": 404
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-native-test-config.txt",
+      "sha256": "5522835655990357c7d10c209441f95b82271bbcbfd86d8eb56c4360837b9ebc",
+      "bytes": 1485
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-pypi.txt",
+      "sha256": "ceb456b980d874d3af84c01749e77ce8a47c3edfec26da57a57ca6d8948ef880",
+      "bytes": 5717
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-release.txt",
+      "sha256": "d4953c46b722691311d15842c8c9ac3f16e1ce4f0d3f3f0f240d71dac6ed2749",
+      "bytes": 521
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-sdist-extract.txt",
+      "sha256": "cc5f1fd77eac2cbe1bf60cab5b417c813413ba53261eff93d242388454f4c3af",
+      "bytes": 257
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-download.txt",
+      "sha256": "1ab4c361d45b723a1709a58777e9f32c9de80429936c983c827094eb65738385",
+      "bytes": 368
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-extract.txt",
+      "sha256": "acbaefe984ad11d1594074b01c826673b78b1b92c3fd4538d16332fdad71adda",
+      "bytes": 258
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-tag-object.txt",
+      "sha256": "bfeb9cf9d69bfb4090e650c6d32994b4f8fe33dc2aea7a21a0997a71d1edbe42",
+      "bytes": 920
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-repository-validation-before-integration.txt",
+      "sha256": "72a447135220f2e4e578cb81c327c7773a1c6bd6f85cfdc0f56473aa9d66784b",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-runtime-hash-install.txt",
+      "sha256": "5910f0b0cb4876ca4358ea444e6be0fd3c8e76dc8da7f0fbfb7f8acd10e15194",
+      "bytes": 4763
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-download.txt",
+      "sha256": "d0eef999df6805ca32d4cdecf335457d789cd2177db193d3a9dcb56b563fa697",
+      "bytes": 380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-extract.txt",
+      "sha256": "77321232e78b83b2b1d4ad3500df609400f60da4b35e51a47337eea92c383e59",
+      "bytes": 250
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-repro-extract.txt",
+      "sha256": "67632310e39072065210809179b3c7b1318bd44be2e11360c4dc629e8971c47d",
+      "bytes": 256
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-source-identities.json",
+      "sha256": "52569c39d4d241f9cd1cdde873d2f802a824213716d4e013ecb1371ba46980ea",
+      "bytes": 1895
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-source-policy-and-compatibility.txt",
+      "sha256": "a7c5c8fe6c4ae9a92d3f1aefef7702bb52de6685bf90feddfe77a1387742a2df",
+      "bytes": 2705
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-official-release.txt",
+      "sha256": "5e1e5defdbfd7d2cfc61863f0349fefa2d7d27d64c20362105549d4521281fc5",
+      "bytes": 918
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-pypi-tool-source.txt",
+      "sha256": "71cbf8472151c7bd841b891003e29829749d350c919907ac1773d4c9cdf28726",
+      "bytes": 472562
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-unchanged-upstream-tox-regressions.txt",
+      "sha256": "d75d11056968ffb160194f8f9d1d318ceffb58e6e220215a71d81a4a2e24d40e",
+      "bytes": 2540
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-ci-tox-prerequisites.txt",
+      "sha256": "e2298547f6fdc7c5495eb67aa06eb5495780345b2374ab2dc477dc34e68629de",
+      "bytes": 3347
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-selected-file-hashes.txt",
+      "sha256": "a79d7e59d80e4b247a76031e5704ebae8128fff34fdffb25e0a8a73f299857df",
+      "bytes": 1908
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-uv-version.txt",
+      "sha256": "a6bd49a719d9038dd76f1ba7f2ba806145fd613e5e518f71080ff0fac74b5bbc",
+      "bytes": 217
+    }
+  ],
+  "structural_validation": {
+    "full_repository_validation_exit_code": 1,
+    "expected_coordinator_owned_registration_errors": [
+      "blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch",
+      "blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch"
+    ],
+    "scope": "Full native publication validation returned only the two stale shared hash registrations. Supported --scan-file independently passes owned-publication hygiene; coordinator registers the shared hashes and reruns the integrated head.",
+    "owned_file_publication_scan_exit_code": 0,
+    "owned_file_publication_scanned_count": 64,
+    "owned_diff_check_exit_code": 0,
+    "commit_gate": "Normal installed pre-commit gitleaks hook; no bypass or ignore changes."
+  }
+}

@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "gh", "api", "repos/urllib3/urllib3/git/ref/tags/2.8.0"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:44:07.165596+00:00
+ended_utc: 2026-09-30T15:44:07.499490+00:00
+exit_code: 0
+
+stdout:
+{"ref":"refs/tags/2.8.0","node_id":"MDM6UmVmMjQxMDY3NjpyZWZzL3RhZ3MvMi44LjA=","url":"https://api.github.com/repos/urllib3/urllib3/git/refs/tags/2.8.0","object":{"sha":"2f980b433a89399ad5efd72e7f6da04e667ea287","type":"tag","url":"https://api.github.com/repos/urllib3/urllib3/git/tags/2f980b433a89399ad5efd72e7f6da04e667ea287"}}
+stderr:

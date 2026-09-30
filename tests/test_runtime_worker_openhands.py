@@ -234,7 +234,7 @@ class OpenHandsRecipeTests(unittest.TestCase):
 
     def test_immutable_artifacts(self):
         pins = self.read_json("pins.json")
-        self.assertEqual(pins["version"], "1.49.6")
+        self.assertEqual(pins["version"], "1.50.0")
         self.assertRegex(pins["commit"], r"^[0-9a-f]{40}$")
         for name in ("source_archive", "uv_lock"):
             self.assertRegex(pins[name]["sha256"], r"^[0-9a-f]{64}$")
@@ -511,7 +511,9 @@ class OpenHandsRecipeTests(unittest.TestCase):
         # is built from upstream's unchanged uv.lock, so the digest is scanned.
         from scripts.validate import PRIVATE_CONTENT
         name = "evidence/agent-server-image-grype-20260928.json"
-        all_pins = self.read_json("pins.json")
+        # Historical scan is retained against its original immutable input;
+        # it is not acceptance of the new 1.50.0 image.
+        all_pins = self.read_json("evidence/pins-1.49.6.json")
         pins = all_pins["image"]
         receipt = self.read_json(name)
         keys = ("ref", "platform", "manifest_sha256", "config_sha256")
@@ -1620,9 +1622,10 @@ class OpenHandsProbeTests(unittest.TestCase):
         # RFC 1035 section 4.1.1-4.1.2: one recursive A/IN question for example.com.
         self.assertEqual(netprobe.DNS_QUERY[2:12], bytes.fromhex("01000001000000000000"))
         self.assertEqual(netprobe.DNS_QUERY[12:], b"\x07example\x03com\x00\x00\x01\x00\x01")
-        # P3 is a documented skeleton; it is never run in phase 2.
-        with self.assertRaises(NotImplementedError):
-            netprobe.p3_control_call()
+        # P3 is implemented but only runs in the explicitly owned container;
+        # fixture/import checks never make live model calls or certify P3.
+        with self.assertRaises(ValueError):
+            netprobe.p3_control_call({}, "rw-openhands-fixture")
 
     def test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies(self):
         netprobe = load_recipe_module("e2e/netprobe.py")
@@ -2826,7 +2829,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
                         **window, "base_url": "http://gw:8081/v1",
                         "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
                     receipt = module.create_receipt(result, database=result / "absent.sqlite")
-                    self.assertEqual(receipt["schema_version"], 6)
+                    self.assertEqual(receipt["schema_version"], 7)
                     self.assertEqual(receipt["base_url"], "http://gw:8081/v1")
                     self.assertEqual(receipt["gateway_upstream"], f"http://10.0.2.2:{port}/v1")
                     self.assertEqual(receipt["compression_combo"], combo)
@@ -3102,14 +3105,22 @@ class OpenHandsDispatchTests(unittest.TestCase):
         from unittest.mock import MagicMock
         context = MagicMock()
         factory = MagicMock(return_value=context)
+        class NativeService:
+            async def start_goal_loop(self, *args, **kwargs):
+                return kwargs
+            async def resume_goal_loop(self, *args, **kwargs):
+                return kwargs
         modules = {"openhands.sdk": SimpleNamespace(LLM="native-llm"),
-                   "worker": SimpleNamespace(gateway_transport=factory, capture_correlation="callback")}
-        with patch.dict(sys.modules, modules), patch.dict(os.environ, {"OPENHANDS_OWNED_CONTAINER": "1"}), \
+                   "openhands.agent_server.event_service": SimpleNamespace(EventService=NativeService),
+                   "worker": SimpleNamespace(gateway_transport=factory, capture_correlation="callback",
+                                             register_worker_agents=MagicMock())}
+        with patch.dict(sys.modules, modules), patch.dict(os.environ, {
+                    "OPENHANDS_OWNED_CONTAINER": "1", "OPENHANDS_RUN_ID": "rw-openhands-fixture"}), \
                 patch("atexit.register") as register:
             load_recipe_module("server_transport.py")
         factory.assert_called_once_with("native-llm", correlation_callback="callback")
         context.__enter__.assert_called_once()
-        register.assert_called_once()
+        self.assertEqual(register.call_count, 2)
 
     def test_duplicate_start_keeps_running_status_and_serial_lock(self):
         dispatch = load_recipe_module("dispatch.py")

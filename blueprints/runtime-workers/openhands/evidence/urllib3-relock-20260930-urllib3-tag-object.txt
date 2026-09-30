@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "gh", "api", "repos/urllib3/urllib3/git/tags/2f980b433a89399ad5efd72e7f6da04e667ea287"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:04.090897+00:00
+ended_utc: 2026-09-30T15:46:04.426794+00:00
+exit_code: 0
+
+stdout:
+{"node_id":"TA_kwDOACTItNoAKDJmOTgwYjQzM2E4OTM5OWFkNWVmZDcyZTdmNmRhMDRlNjY3ZWEyODc","sha":"2f980b433a89399ad5efd72e7f6da04e667ea287","url":"https://api.github.com/repos/urllib3/urllib3/git/tags/2f980b433a89399ad5efd72e7f6da04e667ea287","tagger":{"name":"Illia Volochii","email":"illia.volochii@gmail.com","date":"2026-09-15T19:19:34Z"},"object":{"sha":"b1d30ab61fe0db8f11092805e8c5ac43e091064a","type":"commit","url":"https://api.github.com/repos/urllib3/urllib3/git/commits/b1d30ab61fe0db8f11092805e8c5ac43e091064a"},"tag":"2.8.0","message":"Release: 2.8.0\n-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgiigTZzMdp4pM2rKiIz0PJI1AYi\n++6gp/9ILUNhbncdUAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQAqSPR82mjBBvVKIB+p+AFPnAbERN0NiG7s7e+2fx1YJfG6pPl2qcnLmRNuGtd/u/E\njWitOGMsdM9PVp3vkckgs=\n-----END SSH SIGNATURE-----\n","verification":{"verified":true,"reason":"valid","signature":"-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgiigTZzMdp4pM2rKiIz0PJI1AYi\n++6gp/9ILUNhbncdUAAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5\nAAAAQAqSPR82mjBBvVKIB+p+AFPnAbERN0NiG7s7e+2fx1YJfG6pPl2qcnLmRNuGtd/u/E\njWitOGMsdM9PVp3vkckgs=\n-----END SSH SIGNATURE-----\n","payload":"object b1d30ab61fe0db8f11092805e8c5ac43e091064a\ntype commit\ntag 2.8.0\ntagger Illia Volochii <illia.volochii@gmail.com> 1789499974 +0300\n\nRelease: 2.8.0\n","verified_at":"2026-09-15T19:21:15Z"}}
+stderr:

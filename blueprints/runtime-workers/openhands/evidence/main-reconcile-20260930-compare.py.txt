@@ -1,0 +1,142 @@
+"""Local evidence check using Packaging's public requirement/marker APIs.
+
+Sources: https://packaging.pypa.io/en/stable/requirements.html and
+https://packaging.pypa.io/en/stable/markers.html. This compares selected pins;
+uv remains the resolver. It is not an upstream acceptance test.
+"""
+
+import hashlib
+import importlib.metadata
+import json
+from pathlib import Path
+import platform
+import sys
+import tarfile
+from urllib.parse import urlparse
+
+from packaging.markers import default_environment
+from packaging.requirements import Requirement
+from packaging.utils import canonicalize_name, parse_wheel_filename
+
+
+private = Path(sys.argv[1])
+environment = default_environment()
+assert sys.implementation.name == "cpython"
+assert platform.python_version() == "3.13.15"
+assert platform.system() == "Linux" and platform.machine() == "x86_64"
+target = {
+    key: environment[key]
+    for key in (
+        "implementation_name", "implementation_version", "os_name",
+        "platform_machine", "platform_python_implementation", "platform_system",
+        "python_full_version", "python_version", "sys_platform",
+    )
+}
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def selected(path):
+    result = {}
+    excluded = []
+    total = 0
+    for line in path.read_text().splitlines():
+        if not line or not line[0].isalnum():
+            continue
+        requirement = Requirement(line.rstrip().removesuffix(" \\"))
+        total += 1
+        name = canonicalize_name(requirement.name)
+        if requirement.marker and not requirement.marker.evaluate(environment):
+            excluded.append({"name": name, "marker": str(requirement.marker)})
+            continue
+        if requirement.url:
+            wheel_name, version, _, _ = parse_wheel_filename(
+                Path(urlparse(requirement.url).path).name
+            )
+            assert wheel_name == name
+            version = str(version)
+        else:
+            specifiers = list(requirement.specifier)
+            assert len(specifiers) == 1 and specifiers[0].operator == "=="
+            version = specifiers[0].version
+        assert name not in result, (path.name, name)
+        result[name] = version
+    return result, {"requirements": total, "selected": len(result), "excluded": excluded}
+
+
+paths = [private / name for name in (
+    "reviewed-main.lock", "candidate-before.lock", "candidate.lock"
+)]
+parsed = [selected(path) for path in paths]
+main, candidate, proposed = [item[0] for item in parsed]
+assert main.keys() == proposed.keys(), (main.keys() - proposed.keys(), proposed.keys() - main.keys())
+changes = {
+    name: (main[name], proposed[name])
+    for name in sorted(main) if main[name] != proposed[name]
+}
+assert changes == {
+    "openhands-sdk": ("1.49.6", "1.50.0"),
+    "openhands-tools": ("1.49.6", "1.50.0"),
+}, changes
+for name in ("click", "pypdf", "soupsieve"):
+    assert main[name] == proposed[name] and candidate[name] != proposed[name]
+installed_mismatches = []
+for name, version in proposed.items():
+    actual = importlib.metadata.version(name)
+    if actual != version:
+        installed_mismatches.append({"name": name, "selected": version, "installed": actual})
+assert not installed_mismatches, installed_mismatches
+assert (private / "candidate.lock").read_bytes() == (private / "reproduced.lock").read_bytes()
+
+extraction_checks = []
+with tarfile.open(private / "source.tar.gz", "r:gz") as archive:
+    for directory in ("source", "source-repro"):
+        mismatches = []
+        count = 0
+        for member in archive.getmembers():
+            if not member.isfile():
+                continue
+            count += 1
+            extracted = private / directory / member.name
+            original = archive.extractfile(member).read()
+            if not extracted.is_file() or extracted.read_bytes() != original:
+                mismatches.append(member.name)
+        assert not mismatches, (directory, mismatches)
+        extraction_checks.append({
+            "extraction": directory, "original_regular_files_compared": count,
+            "mismatches": mismatches,
+        })
+
+result = {
+    "schema_version": 1,
+    "evidence_class": "local_integration",
+    "scope": "Selected Linux x86_64 dependencies on CPython 3.13.15; source-byte comparison.",
+    "target": target,
+    "parser": {"name": "packaging", "version": importlib.metadata.version("packaging")},
+    "files": [
+        {"role": role, "path": "blueprints/runtime-workers/openhands/requirements.lock",
+         "revision": revision, "sha256": sha(path)}
+        for role, revision, path in zip(
+            ("reviewed_main", "candidate_input", "reconciled"),
+            ("f03f41c7", "bb3d00dc1ed493726481d0d3d746f6b0b46ed8bd", "working_tree"), paths
+        )
+    ],
+    "selection": [dict(role=role, **item[1]) for role, item in zip(
+        ("reviewed_main", "candidate_input", "reconciled"), parsed
+    )],
+    "dependencies": [
+        {"name": name, "reviewed_main": main[name], "candidate_input": candidate.get(name),
+         "reconciled": proposed[name],
+         "main_change": "sdk_upgrade" if name in changes else "unchanged"}
+        for name in sorted(main)
+    ],
+    "main_selected_additions": [], "main_selected_removals": [],
+    "main_selected_downgrades": [], "installed_version_mismatches": installed_mismatches,
+    "source_required_downgrades": [],
+    "fresh_extraction_checks": extraction_checks,
+    "native_compile_reproduction_byte_identical": True,
+    "reproduced_lock_sha256": sha(private / "reproduced.lock"),
+}
+print(json.dumps(result, indent=2))

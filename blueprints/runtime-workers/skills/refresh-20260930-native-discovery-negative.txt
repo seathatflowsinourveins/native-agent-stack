@@ -1,0 +1,2 @@
+control: native project loader returned 0 skills
+qualification rejected: expected 77 skills, discovered 0

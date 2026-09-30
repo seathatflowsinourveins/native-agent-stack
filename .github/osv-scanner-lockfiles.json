@@ -1,6 +1,13 @@
 {
-  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the three lists.",
+  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path. Permitted exclusions are deliberately vulnerable test fixtures and captured native resolver or probe inputs retained with original hash/command evidence that no shipped installation recipe consumes. Captured inputs may retain unused platform or historical dependency branches; they do not qualify a runtime or grant an advisory exception. Every active installation lock and frozen application lock remains scanned. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the three lists.",
   "lockfiles": [
+    {"path": "blueprints/runtime-workers/crawl4ai/requirements.lock", "parser": "requirements.txt"},
+    {"path": "blueprints/runtime-workers/crawl4ai/test-requirements.lock", "parser": "requirements.txt"},
+    {"path": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/requirements.lock", "parser": "requirements.txt"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock", "parser": "requirements.txt"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock", "parser": "requirements.txt"},
+    {"path": "blueprints/runtime-workers/deerflow/e2e/requirements.lock", "parser": "requirements.txt"},
     {
       "path": ".github/requirements-ci.txt",
       "parser": "requirements.txt"
@@ -172,6 +179,12 @@
     }
   ],
   "covered_by_lockfile": [
+    {"path": "blueprints/runtime-workers/crawl4ai/requirements.in", "lockfile": "blueprints/runtime-workers/crawl4ai/requirements.lock"},
+    {"path": "blueprints/runtime-workers/crawl4ai/grader/package.json", "lockfile": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/requirements.in", "lockfile": "blueprints/runtime-workers/gpt-researcher/requirements.lock"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/build-requirements.in", "lockfile": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock"},
+    {"path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.in", "lockfile": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock"},
+    {"path": "blueprints/runtime-workers/deerflow/e2e/requirements.txt", "lockfile": "blueprints/runtime-workers/deerflow/e2e/requirements.lock"},
     {
       "path": "blueprints/convergence-practice/application-delivery/package.json",
       "lockfile": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml"
@@ -210,6 +223,26 @@
     }
   ],
   "excluded": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-constraints.txt",
+      "reason": "Frozen native compile-input reproducibility fixture for the PyJWT 2.15.0 relock, retaining original bytes, command and target-specific selection in its receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes it. The selected Linux x86_64/CPython 3.13.15 closure remains blueprints/runtime-workers/openhands/requirements.lock, which is natively scanned and SHA-bound by the ignore guard. Active runtime locks remain scanned; this fixture exclusion grants no advisory ignore or runtime acceptance.",
+      "evidence": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-constraints.txt",
+      "reason": "Frozen native compile-input reproducibility fixture for the intermediate urllib3 2.8.0 relock, retaining original bytes, command and target-specific selection in its receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes it. The selected Linux x86_64/CPython 3.13.15 closure remains blueprints/runtime-workers/openhands/requirements.lock, which is natively scanned and SHA-bound by the ignore guard. Active runtime locks remain scanned; this fixture exclusion grants no advisory ignore or runtime acceptance.",
+      "evidence": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930.json"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-constraints.txt",
+      "reason": "Frozen native compile-input reproducibility fixture copied from the reviewed main lock, with original bytes, baseline SHA, command and target-specific selection retained in the reconciliation receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes this captured evidence fixture. The selected Linux x86_64/CPython 3.13.15 closure remains blueprints/runtime-workers/openhands/requirements.lock, which is natively scanned and SHA-bound by the independent ignore guard. All nine active runtime install locks remain scanned; this fixture exclusion grants no advisory ignore or runtime acceptance.",
+      "evidence": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-commands.json"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-constraints.txt",
+      "reason": "Frozen native compile-input reproducibility fixture, retained with its original hash and command in the relock receipt. It constrains the qualification resolver and includes unused Windows/macOS branches from the prior multi-platform export; it is not an installable runtime closure. No recipe installer consumes this captured evidence fixture. The selected Linux/Python 3.13.15 closure is blueprints/runtime-workers/openhands/requirements.lock, whose exact bytes are natively scanned and SHA-bound by the independent ignore guard. Both active OpenHands install locks and every other runtime install lock remain scanned; this exclusion grants no advisory ignore or runtime acceptance.",
+      "evidence": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930.json"
+    },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc-fixround3/repo-git__dvc.lock",
       "reason": "Gap-wave-2 captured evidence fixture for layer us-equities__identity-provenance (catalog PR: gap-wave2 agent-lab-17): the dependency list a gap check installed into an isolated cache prefix, or a copy of a probe repository's lock, retained so the receipt is reproducible. Nothing in the catalog installs it, and scanning it would report advisories for a probe environment rather than for a shipped dependency.",

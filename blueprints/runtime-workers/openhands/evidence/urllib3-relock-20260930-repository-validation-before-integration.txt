@@ -1,0 +1,13 @@
+argv: ["rtk", "proxy", "python3", "scripts/validate.py"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:54:54.622376+00:00
+ended_utc: 2026-09-30T15:55:14.257478+00:00
+exit_code: 1
+
+stdout:
+Publication validation failed:
+blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch
+blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch
+blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-hosted-failure-36737133691.txt: contains possible personal home path
+
+stderr:

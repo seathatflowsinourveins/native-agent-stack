@@ -1,0 +1,65 @@
+# Sources: upstream v0.9.4 Dockerfile, entrypoint.sh, supervisord.conf, config.yml.
+services:
+  crawl4ai:
+    container_name: rw-crawl4ai-${NAS_CRAWL4AI_STORE:?}
+    labels:
+      com.native-agent-stack.owner: gpt6-omniroute-framework-integration
+    image: unclecode/crawl4ai@sha256:048848e548fad60c670bd656cbb3eb204fd999709a30365d3697c411ce50796d
+    platform: linux/amd64
+    # Container root maps to the unprivileged host user. Native supervisor drops
+    # Redis/Gunicorn to appuser after reading host-owned 0600 secret mounts.
+    user: "0:0"
+    cap_drop: [ALL]
+    # Only bootstrap ownership and supervisor's native appuser transition.
+    cap_add: [CHOWN, DAC_OVERRIDE, SETUID, SETGID]
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,mode=1777
+    pull_policy: never
+    init: true
+    restart: "no"
+    shm_size: "1gb"
+    mem_limit: "3g"
+    cpus: 2
+    pids_limit: 512
+    ports:
+      - "127.0.0.1:${NAS_CRAWL4AI_PORT:?private host port required}:11235"
+    environment:
+      LLM_PROVIDER: "openai/${CRAWL4AI_MODEL:?model supplied by config}"
+      LLM_API_KEY: "local-loopback"
+      OPENAI_BASE_URL: "${CRAWL4AI_CONTAINER_BASE_URL:?validated selected arm}"
+      LLM_BASE_URL: "${CRAWL4AI_CONTAINER_BASE_URL:?validated selected arm}"
+      PYTHONDONTWRITEBYTECODE: "1"
+      CRAWL4AI_HOOKS_ENABLED: "false"
+      CRAWL4AI_ALLOW_INTERNAL_URLS: "${NAS_CRAWL4AI_INTERNAL_URLS:-false}"
+      CRAWL4_AI_BASE_DIRECTORY: "/var/lib/crawl4ai"
+      XDG_CACHE_HOME: "/var/cache/crawl4ai"
+      TMPDIR: "/var/cache/crawl4ai/tmp"
+      NLTK_DATA: "/var/cache/crawl4ai/nltk"
+      HF_HOME: "/var/cache/crawl4ai/huggingface"
+      TIKTOKEN_CACHE_DIR: "/var/cache/crawl4ai/tiktoken"
+      LITELLM_LOCAL_MODEL_COST_MAP: "true"
+      DO_NOT_TRACK: "1"
+    entrypoint: ["/bin/bash", "/app/recipe-entrypoint.sh"]
+    volumes:
+      - "${NAS_CRAWL4AI_PREFIX:?}/recipe/container-entrypoint.sh:/app/recipe-entrypoint.sh:ro"
+      - "${NAS_CRAWL4AI_PREFIX:?}/recipe/config/supervisord.conf:/app/supervisord.conf:ro"
+      - "${NAS_CRAWL4AI_PREFIX:?}/recipe/config/server.yml:/app/config.yml:ro"
+      - "${NAS_CRAWL4AI_PREFIX:?}/recipe/config/logging.ini:/app/recipe-logging.ini:ro"
+      - "${NAS_CRAWL4AI_STATE:?}/secrets/api_token:/run/secrets/api_token:ro"
+      - "${NAS_CRAWL4AI_STATE:?}/secrets/secret_key:/run/secrets/secret_key:ro"
+      - "${NAS_CRAWL4AI_STATE:?}/secrets/redis_password:/run/secrets/redis_password:ro"
+      - "${NAS_CRAWL4AI_STATE:?}/containers/${NAS_CRAWL4AI_STORE:?}/crawl:/var/lib/crawl4ai"
+      - "${NAS_CRAWL4AI_STATE:?}/containers/${NAS_CRAWL4AI_STORE:?}/cache:/var/cache/crawl4ai"
+      - "${NAS_CRAWL4AI_STATE:?}/containers/${NAS_CRAWL4AI_STORE:?}/redis:/var/lib/redis"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"
+networks:
+  default:
+    name: rw-crawl4ai-${NAS_CRAWL4AI_STORE:?}-net
+    labels:
+      com.native-agent-stack.owner: gpt6-omniroute-framework-integration

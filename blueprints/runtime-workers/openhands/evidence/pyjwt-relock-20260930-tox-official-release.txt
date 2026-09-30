@@ -1,0 +1,10 @@
+argv: ["rtk", "proxy", "gh", "api", "repos/tox-dev/tox/releases/tags/4.64.5", "--jq", "{tag_name,published_at,html_url,body}"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:19:27.429633+00:00
+ended_utc: 2026-09-30T17:19:27.860325+00:00
+exit_code: 0
+
+stdout:
+{"body":"\u003c!-- Release notes generated using configuration in .github/release.yaml at 4.64.5 --\u003e\n\n## What's Changed\n* fix(github): restore issue template metadata by @gaborbernat in https://github.com/tox-dev/tox/pull/4100\n* fix(config): fail on an invalid platform regex by @00200200 in https://github.com/tox-dev/tox/pull/4104\n\n## New Contributors\n* @00200200 made their first contribution in https://github.com/tox-dev/tox/pull/4104\n\n**Full Changelog**: https://github.com/tox-dev/tox/compare/4.64.4...4.64.5","html_url":"https://github.com/tox-dev/tox/releases/tag/4.64.5","published_at":"2026-09-29T16:37:45Z","tag_name":"4.64.5"}
+
+stderr:

@@ -1,0 +1,13 @@
+argv: ["rtk", "proxy", "rg", "-n", "exclude-newer|litellm =|lmnr =|urllib3|FROM python:3.13.15", "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml", "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/pyproject.toml", "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/Dockerfile"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:06.485841+00:00
+ended_utc: 2026-09-30T15:46:06.510820+00:00
+exit_code: 0
+
+stdout:
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:7:exclude-newer = "7 days"  # Avoid packages uploaded in the last 7 days.
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:8:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:12:    "urllib3>=2.6.3",  # CVE-2026-21441, CVE-2025-66471, CVE-2025-66418
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/Dockerfile:39:FROM python:3.13.15-slim-trixie AS python-runtime
+
+stderr:

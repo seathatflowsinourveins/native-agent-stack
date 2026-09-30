@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_qualification",
+  "component_id": "gpt-researcher",
+  "date": "2026-09-30",
+  "lane": "foundation",
+  "status": "partial_native_qualification",
+  "source": {
+    "repository": "https://github.com/assafelovic/gpt-researcher",
+    "release": "v3.7.0",
+    "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+    "package_version": "0.16.0",
+    "archive": {
+      "url": "https://codeload.github.com/assafelovic/gpt-researcher/tar.gz/0957c301ed06c2a5857b834358c7227c739041d4",
+      "sha256": "0363b2e46629ee3add884212d09e6a56d9f7602c2adadff506910191b4c84c5c",
+      "hash_origin": "SHA256 of actual codeload bytes, independently repeated by coordinator worker; no upstream signature"
+    }
+  },
+  "runs": [
+    {
+      "id": "gptr-venv-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<GPTR_PREFIX>/venv/bin/python"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:41:51.473815+00:00",
+      "finished_at_utc": "2026-09-30T06:41:51.602377+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.12.3 environment at: <GPTR_PREFIX>/venv\nChecked 198 packages in 74ms\nAll installed packages are compatible\n",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "6d968e74072cf66e556d331c5cf377aaaffdbda65de7e7d48fd1baeb763f7858"
+      }
+    },
+    {
+      "id": "gptr-proxy-venv-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<GPTR_PREFIX>/proxy-venv/bin/python"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:41:51.602845+00:00",
+      "finished_at_utc": "2026-09-30T06:41:51.706864+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.12.3 environment at: <GPTR_PREFIX>/proxy-venv\nChecked 68 packages in 57ms\nAll installed packages are compatible\n",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "5b45a93e5f6600b7edc6f3a86ef3e441adcf36412c7bc69e435a62171069ba1c"
+      }
+    },
+    {
+      "id": "gptr-grader-venv-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<GPTR_PREFIX>/grader-venv/bin/python"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:41:51.707281+00:00",
+      "finished_at_utc": "2026-09-30T06:41:51.795439+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.12.3 environment at: <GPTR_PREFIX>/grader-venv\nChecked 8 packages in 47ms\nAll installed packages are compatible\n",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "ee0fa41f23f56cf7bceb5eb47e6ba37d6e4926bb00ac4858db3462e1ee3dfa18"
+      }
+    },
+    {
+      "id": "selected-unchanged-upstream-tests",
+      "argv": [
+        "rtk",
+        "env",
+        "GPTR_PREFIX=<GPTR_PREFIX>",
+        "GPTR_STATE_ROOT=<QUALIFICATION_STATE>/gpt-researcher",
+        "bash",
+        "blueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh"
+      ],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "started_at_utc": null,
+      "finished_at_utc": "2026-09-30T05:53:15.530003+00:00",
+      "timestamp_scope": "private retained file mtime; start not retained",
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0\nrootdir: <GPTR_PREFIX>/source/gpt-researcher-0957c301ed06c2a5857b834358c7227c739041d4\nconfigfile: pyproject.toml\nplugins: asyncio-1.4.0, langsmith-0.14.1, anyio-4.15.1\nasyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollected 24 items\n\ntests/test_lexical_context_filter.py ........                            [ 33%]\ntests/test_llm_kwargs_override.py ....                                   [ 50%]\ntests/test_llm_max_tokens.py ..                                          [ 58%]\ntests/test_mcp_client_config.py ...                                      [ 70%]\ntests/test_mcp_client_non_dict_config.py .                               [ 75%]\ntests/test_mcp_client_uppercase_url_schemes.py ......                    [100%]\n\n=============================== warnings summary ===============================\n../../venv/lib/python3.12/site-packages/_pytest/config/__init__.py:1464\n  <GPTR_PREFIX>/venv/lib/python3.12/site-packages/_pytest/config/__init__.py:1464: PytestConfigWarning: Unknown config option: asyncio_fixture_loop_scope\n  \n    self._warn_or_fail_if_strict(f\"Unknown config option: {key}\\n\")\n\ngpt_researcher/scraper/pymupdf/pymupdf.py:5\n  <GPTR_PREFIX>/source/gpt-researcher-0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/scraper/pymupdf/pymupdf.py:5: DeprecationWarning: `langchain-community` is being sunset and is no longer actively maintained. See https://github.com/langchain-ai/langchain-community/issues/674 for details and migration guidance toward standalone integration packages.\n    from langchain_community.document_loaders import PyMuPDFLoader\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 24 passed, 2 warnings in 3.40s ========================\nupstream pytest exit code: 0\n",
+      "stderr": "Merged into the retained upstream output by the recipe.",
+      "original_output_sha256": "d9c95ab0854b3ddcd9d3c5a0a7fcac5a3cc87f0e43be4d202f275b12477fec08",
+      "upstream_test_sha256": [
+        {"path": "tests/test_lexical_context_filter.py", "sha256": "a26afb777ceebdf35b3099441ca79d5b8db415ed1deebdc62fa58f3008d24a4c"},
+        {"path": "tests/test_llm_kwargs_override.py", "sha256": "743c317edb050d63346952208bb32535131b5f291e120e591b0580e0e29d5bca"},
+        {"path": "tests/test_llm_max_tokens.py", "sha256": "5eaf8fd813a45dda3b561a184e1e8dfa9103b583aaba703b1d00b819411e0d4c"},
+        {"path": "tests/test_mcp_client_config.py", "sha256": "bbb40b43bb5d1bc8955b71c76518baf067d745e2caad9daff7b83c59323d91f2"},
+        {"path": "tests/test_mcp_client_non_dict_config.py", "sha256": "2d405db13f2de0012105ae7a9f562163a573e0308e61912182f980e9469ecd72"},
+        {"path": "tests/test_mcp_client_uppercase_url_schemes.py", "sha256": "6f82725bb27a5859b585edfbd17e8507dc36a534388b9fb80d549040cdf16db8"}
+      ]
+    }
+  ],
+  "install_observation": {
+    "exit_code": 0,
+    "runtime_distributions": 198,
+    "proxy_distributions": 68,
+    "grader_distributions": 8,
+    "evidence_scope": "Native installer returned output in the session; no complete persistent install stdout was retained. Installation is independently checked by the native compatibility commands above."
+  },
+  "qualification_boundaries": [
+    "Only the six named unchanged upstream non-network test files were selected.",
+    "No GPT Researcher model call or citation-quality benchmark was run.",
+    "Local dispatch, MCP policy and keyword-filter fixtures are separate integration evidence.",
+    "Python target is CPython 3.12/Linux x86_64; this does not qualify another host.",
+    "The codeload source package version is 0.16.0; release v3.7.0 is not the PyPI package version.",
+    "Unadvertised historical engines-on aliases need fresh discovery and acceptance before a trial."
+  ],
+  "usage": {
+    "status": "unknown_for_enclosing_task",
+    "provider_usage": null,
+    "token_savings": null
+  },
+  "sanitization": [
+    "Owned prefix/checkouts and home path replaced with placeholders.",
+    "No native account, credential or conversation store was read."
+  ]
+}

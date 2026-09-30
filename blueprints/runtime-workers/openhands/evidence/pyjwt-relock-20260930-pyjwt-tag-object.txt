@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "gh", "api", "repos/jpadilla/pyjwt/git/tags/bd03a98b72aa7105b7920b9d0e7818369ac76abe"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:07:02.915832+00:00
+ended_utc: 2026-09-30T17:07:03.231956+00:00
+exit_code: 0
+
+stdout:
+{"node_id":"TA_kwDOABV8otoAKGJkMDNhOThiNzJhYTcxMDViNzkyMGI5ZDBlNzgxODM2OWFjNzZhYmU","sha":"bd03a98b72aa7105b7920b9d0e7818369ac76abe","url":"https://api.github.com/repos/jpadilla/pyjwt/git/tags/bd03a98b72aa7105b7920b9d0e7818369ac76abe","tagger":{"name":"José Padilla","email":"jpadilla@users.noreply.github.com","date":"2026-09-23T16:09:10Z"},"object":{"sha":"1d41a6478e1562e68ff667fcd703356acf085f68","type":"commit","url":"https://api.github.com/repos/jpadilla/pyjwt/git/commits/1d41a6478e1562e68ff667fcd703356acf085f68"},"tag":"2.15.0","message":"Release 2.15.0\n","verification":{"verified":false,"reason":"unsigned","signature":null,"payload":null,"verified_at":null}}
+stderr:

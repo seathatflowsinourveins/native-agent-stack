@@ -1,0 +1,20 @@
+test_literal_cleanup_continues_after_already_absent_resource (__main__.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource) ... ERROR
+
+======================================================================
+ERROR: test_literal_cleanup_continues_after_already_absent_resource (__main__.DeerFlowRecipeTests.test_literal_cleanup_continues_after_already_absent_resource)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>/tests/test_runtime_worker_deerflow.py", line 66, in test_literal_cleanup_continues_after_already_absent_resource
+    renderer.lifecycle("down")
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<REPO>/blueprints/runtime-workers/deerflow/recipe.py", line 290, in lifecycle
+    docker(settings, "rm", "--force", "rw-deerflow-" + name)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<REPO>/tests/test_runtime_worker_deerflow.py", line 62, in docker
+    raise subprocess.CalledProcessError(1, args, stderr="Error: No such container or network")
+subprocess.CalledProcessError: Command '('rm', '--force', 'rw-deerflow-nginx')' returned non-zero exit status 1.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.015s
+
+FAILED (errors=1)

@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "planned",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "The unchanged v1.50.0 published full image has a retained native report, exit 0, with 56 fixable high/critical matches that leave image acceptance pending. Trial the supported browser capability composition without claiming that it repairs both Python interpreters or qualifies runtime workers.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/OpenHands/software-agent-sdk/tree/dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+      "revision": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5"
+    },
+    {
+      "url": "https://github.com/python/cpython/commit/b8f23e307097552eaea2604383a12ab280520d0d",
+      "revision": "b8f23e307097552eaea2604383a12ab280520d0d"
+    },
+    {
+      "url": "https://github.com/OpenHands/benchmarks/tree/405bae7140d7e961a75f4910a0b2e7069731db96",
+      "revision": "405bae7140d7e961a75f4910a0b2e7069731db96"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed native builder/server and Grype help, immutable v1.50.0 builder/Dockerfile source, published image manifest identity and official release/source comparison were inspected before declaring this plan.",
+    "Astra/Max source research was used for consequential image/observer architecture. A native pure tag calculation corrected the initially proposed bare custom tag; no image build, scan, browser run or service was executed.",
+    "Direct native Claude owner replies permit source-only planning and keep actual resource execution behind the measurement/gateway preflight. Peers' statements are coordination leads; source capability claims use pinned upstream files."
+  ],
+  "license_and_compatibility": "Pinned OpenHands SDK repository is MIT-licensed and SDK/tools/server require Python >=3.12. Third-party image licenses and runtime contracts remain separate. The native local load path requires an independently verified Linux/amd64 rootless builder; --arch labels the tag. The benchmark revision uses a different SDK submodule and is not qualified against v1.50.0 by this plan.",
+  "baseline_and_candidate": {
+    "baseline": "Published full v1.50.0 image sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc with retained native report, exit 0; 56 fixable high/critical matches leave image acceptance pending.",
+    "candidate": "Pinned v1.50.0 native binary builder with browser capability only and unchanged default ACP providers; one owned Linux/amd64 rootless image, not built or accepted yet."
+  },
+  "frozen_inputs": {
+    "base_revision": "8fc86119eacfd5be9b8a139e1ed167d85748091b",
+    "tasks": [
+      "build-browser-image",
+      "scan-browser-image",
+      "check-native-browser"
+    ],
+    "roles": [
+      "qualification-coordinator"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/runtime-workers/openhands/pins.json",
+        "sha256": "a8af5f14f9cffadb25d39569e1a8e19a41f480d16482a665158b62641484abef"
+      },
+      {
+        "path": "blueprints/convergence-practice/contract-reference.md",
+        "sha256": "fe2fe90486c16f93daa9ed3b9855b02f8acdcd6737f484015e92436499cef19e"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/runtime-workers/openhands/config/profiles.json",
+        "sha256": "7d5327765d5680df3038e3745cce8f57312198aa88e1aeca22e52a6b6ea754b7"
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json",
+        "sha256": "a5e9a112706a8822ca23e0f82199b3cbc3164982db80c8720b087c98335285d1"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/runtime-image-browser-20260930/README.md",
+        "sha256": "3ccbeb353a113cc50679761d4a93cba3f2ac27f8b9fdf06c435b35beedb0cdeb"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Preserve every attempt, native output and image/base/snapshot/database identities. Native Grype --only-fixed --fail-on high must exit 0 with zero fixable high/critical findings, and the image's native --check-browser must exit 0. Selected tool contracts, recovery and cleanup still need their own native evidence before image acceptance. No provider, observer, task-quality or Gate A/P3 promotion follows.",
+    "usage_rule": "No usage or savings claim. Provider and whole-task usage stay unknown; missing counters do not become zero. Historical cumulative receipts remain non-additive."
+  },
+  "runtime_and_platform": {
+    "platform": "Planned Linux/amd64 qualification using the existing rootless Docker context; host resources and native version checks remain preflight, not observed acceptance.",
+    "tools": [
+      {
+        "name": "OpenHands software-agent-sdk native image builder and server",
+        "version": "1.50.0 / dcf401af7a9a302ef92cb7d092e1df9bb659daa5"
+      },
+      {
+        "name": "Grype",
+        "version": "0.119.0"
+      }
+    ],
+    "isolation": "Separate pinned source checkout, one owned image/build path and existing rootless Linux/amd64 container context. No global settings/accounts/launcher/gateway/Collector deployment. No build/run before measurement-owner host-load agreement, native capacity and gateway-owner preflight/notices; no work inside sealed windows."
+  },
+  "commands": [
+    "rtk uv run --frozen python -m openhands.agent_server.docker.build --base-image python-node-runtime --image localhost/nas-openhands-trial --image-flavor default --target binary --custom-tags v1.50.0-browser --install-capabilities browser --install-acp-providers claude-code,codex,gemini-cli --arch amd64 --load",
+    "rtk grype docker:localhost/nas-openhands-trial:dcf401a-v1.50.0-browser-amd64 --platform linux/amd64 --only-fixed --fail-on high --output json",
+    "rtk docker run --rm --platform linux/amd64 localhost/nas-openhands-trial:dcf401a-v1.50.0-browser-amd64 --check-browser"
+  ],
+  "observations": [],
+  "failures_and_skips": [],
+  "limitations": [
+    "Planned only: no image build/pull, fresh scan, browser execution, model trial or privileged observer was performed.",
+    "The unchanged full-image gate and both Python-interpreter remedy requirements remain open. A future release schedule or base-only override is not acceptance.",
+    "Native image composition is source-supported, but runtime preservation of the selected terminal/file-editor/planner/browser/delegation tool stack remains unverified.",
+    "Observer ownership, benchmark compatibility, frozen tasks and complete attempt/judge accounting remain separate qualifications. GAIA stored-score aggregation is not independent grading.",
+    "The offline convergence checker verifies declared structure, hashes and consistency only; it neither certifies upstream authenticity nor executes this plan."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Planned bounded model-free browser-capability image qualification only; retain current selections and all unresolved runtime acceptance gates.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Retain current accepted defaults and failed full-image gate. After a permitted trial, remove only owned image/build artifacts through the native lifecycle; do not mutate a shared service, gateway, account or deployed Collector.",
+  "next_decision_changing_test": "After the owners' resource/window preflight, execute one native pinned browser-only build and retain the exact scan/browser results, all identities and cleanup. A remaining Python finding keeps the gate failed; an available upstream remedy requires a separately frozen follow-up.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

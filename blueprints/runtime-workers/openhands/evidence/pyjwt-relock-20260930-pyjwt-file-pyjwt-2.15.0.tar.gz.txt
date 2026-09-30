@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://files.pythonhosted.org/packages/02/a5/5197bfd06417837ac079921c66fa6393f1dea3557272a263cebfef69e432/pyjwt-2.15.0.tar.gz", "--output", "<PRIVATE_RESEARCH>/pyjwt-2.15.0.tar.gz"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:35.667657+00:00
+ended_utc: 2026-09-30T17:04:35.753798+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

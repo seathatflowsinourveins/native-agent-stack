@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "scope": "OpenHands 1.50.0 owned source/docs/returned artifacts; byte identity only, not runtime acceptance",
+  "source_commit": "4c544d1defcb2ec7baf9f637ed91b67b5074395c",
+  "root": "blueprints/runtime-workers/openhands",
+  "test_paths_are_repository_relative": true,
+  "files": {
+    "config/profiles.json": {
+      "bytes": 1463,
+      "sha256": "7d5327765d5680df3038e3745cce8f57312198aa88e1aeca22e52a6b6ea754b7"
+    },
+    "dispatch.py": {
+      "bytes": 22982,
+      "sha256": "5d42ef710dd9c40d43c7b52bb019b86e96635a6deac603bc1624daf8650a277a"
+    },
+    "e2e/netprobe.py": {
+      "bytes": 26506,
+      "sha256": "93cf45d663870ea326c098799ee03965739bdcd2ee7b90566e4bd34dbee39c8f"
+    },
+    "evidence/pins-1.49.6.json": {
+      "bytes": 4460,
+      "sha256": "c857efa5c006c709dd99cc7d5f480f9dcef649248dde89f50f8265ca80008e9d"
+    },
+    "evidence/upgrade-150-build-prerequisites.txt": {
+      "bytes": 176,
+      "sha256": "5b361c470e75522f982b4d09d44f186a69bb887ae0c92ec0b115233cfda181e2"
+    },
+    "evidence/upgrade-150-build.txt": {
+      "bytes": 7760,
+      "sha256": "ca78b9132efc29e416bc87029698f00ac766a1051a2df9f678c3af4c37a43b19"
+    },
+    "evidence/upgrade-150-commands.json": {
+      "bytes": 8184,
+      "sha256": "3e928781af62f6e8b3af0257bbeca958f73bde5b2aa52f0911f6af24ecb937f4"
+    },
+    "evidence/upgrade-150-integration-first.txt": {
+      "bytes": 3453,
+      "sha256": "b36adb4cbaf5eee6f8cff2343cac6cef78cd2320479d3742500629f1bc92c8d3"
+    },
+    "evidence/upgrade-150-integration-second.txt": {
+      "bytes": 2941,
+      "sha256": "fc945989350d2b9eb8fd63f6836bf1c97ead5faba516c0962c979b6a93e0d01e"
+    },
+    "evidence/upgrade-150-integration-tests.txt": {
+      "bytes": 245,
+      "sha256": "f2c6ae6e677838cd51300171aa6631841e38faeb7c1e53588744e85d68871fd3"
+    },
+    "evidence/upgrade-150-native-integration-tests.txt": {
+      "bytes": 769,
+      "sha256": "62be69533efcffb6dc5db2249c3bf116d78b43ffb68d1d332e08b744575aec30"
+    },
+    "evidence/upgrade-150-native-p3-first.txt": {
+      "bytes": 2359,
+      "sha256": "ac16482bbce9a4b9542d27f310e722d2597fd341e678fd6653042391bc56cdd9"
+    },
+    "evidence/upgrade-150-native-profile-first.txt": {
+      "bytes": 1639,
+      "sha256": "e0046aee002ef02746fc9c3ae5307ebe846a16c5d59419ec2cba61192482d276"
+    },
+    "evidence/upgrade-150-profile-first.txt": {
+      "bytes": 992,
+      "sha256": "9b282f4dfc81a8e0233af6f28dbaf3f50e5d50931687a2db01d697ed6a0f7724"
+    },
+    "evidence/upgrade-150-publication-first.txt": {
+      "bytes": 1746,
+      "sha256": "739e94ff5999e74fd8938b4792da68a9318657a9f26e5be84289c242ecfcdfb5"
+    },
+    "evidence/upgrade-150-upstream-tests.txt": {
+      "bytes": 4557,
+      "sha256": "99e1e2a7af20af37627b7d874533a61ed740bb03ec9a45f38b732f40554d7525"
+    },
+    "evidence/upgrade-150-wheel-check.txt": {
+      "bytes": 127,
+      "sha256": "f1448b41f5b0d8460ab7363b70166d37b2cceeebd70559e11c2fd354d136c012"
+    },
+    "evidence/upgrade-150-wheel-imports.txt": {
+      "bytes": 732,
+      "sha256": "8af76c229b8bb3dab63b7a095985de90fd297236e29bbdffcc16c0a2d6aaad3d"
+    },
+    "evidence/upgrade-150-wheel-install.txt": {
+      "bytes": 4469,
+      "sha256": "db9db31f6adeccbff628352ba9d4fec94743fe21c08539bec78b4e8806c6b2f0"
+    },
+    "host.py": {
+      "bytes": 84582,
+      "sha256": "00551430ef463323706866f65a91a3086af12299259cb6a619e651419e982e3f"
+    },
+    "install-container.sh": {
+      "bytes": 1291,
+      "sha256": "3824f5dbcfe4751884bcb1699faff3c994a6e17a77b81c5866d49b6565595051"
+    },
+    "install.sh": {
+      "bytes": 690,
+      "sha256": "4163d3e0d8eda0d61d2e832d6ffd1690348f71ddf03d1a3c99651635b3b53815"
+    },
+    "mcp_guard.py": {
+      "bytes": 1639,
+      "sha256": "a06d465736789ce9bace5197569ec76c7af20000d45eb8ca89e566f540634ba0"
+    },
+    "pins.json": {
+      "bytes": 4460,
+      "sha256": "5807df92613841d8ba8da23bd1b03cc3f23a19de009da6d8e75b10048e8cd7cb"
+    },
+    "README.md": {
+      "bytes": 77504,
+      "sha256": "04db8559cf70cead718479f9fb1a15335fb2d2be80929594337f5029709d9b96"
+    },
+    "receipt.py": {
+      "bytes": 23331,
+      "sha256": "08224a7df50ff1593af6d67ba8f94eb236d9716e88907150a9f87750a9805d8d"
+    },
+    "recipe.py": {
+      "bytes": 8038,
+      "sha256": "5837fe89b18c969d1e8fb83bd73fd078d287962ed9cbf729a02cc0d25ebeda9c"
+    },
+    "requirements.lock": {
+      "bytes": 247364,
+      "sha256": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16"
+    },
+    "research.md": {
+      "bytes": 71472,
+      "sha256": "31f0a3ca42fbca71bf7c1d511f4cd6f42f982fa0f3c5176792c61b839b32beb8"
+    },
+    "run-e2e.sh": {
+      "bytes": 442,
+      "sha256": "5a09ca401ae4719696a7e28e995f4e58f33451308d486e93aa840486ca8eff04"
+    },
+    "server_transport.py": {
+      "bytes": 2552,
+      "sha256": "3c56eff0bb52f899e96ccb0edb09d19b2ace55169484939b962b644325a84eac"
+    },
+    "tests/test_openhands_150.py": {
+      "bytes": 17206,
+      "sha256": "920cbacf71beeb1fe470f3386c11ffa6401ddd73dbfd4d91455661edf81fffd3"
+    },
+    "tests/test_runtime_worker_openhands.py": {
+      "bytes": 221049,
+      "sha256": "7a5b9ba6b3f95488a9cbb866515033d279a3195910bd5138d6d9916796751023"
+    },
+    "worker.py": {
+      "bytes": 17490,
+      "sha256": "210301d91808ed3bd6b81fdafcafa66bd2b9c2052c42fc2a382fef8e3a665808"
+    }
+  }
+}

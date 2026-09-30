@@ -1,0 +1,29 @@
+test_transport_runs_owned_container_and_retains_failed_attempts (__main__.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts) ... ERROR
+
+======================================================================
+ERROR: test_transport_runs_owned_container_and_retains_failed_attempts (__main__.DeerFlowRecipeTests.test_transport_runs_owned_container_and_retains_failed_attempts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<REPO>/blueprints/runtime-workers/deerflow/e2e/run.py", line 94, in run_worker
+    completion = read_completion(run / "framework-events.jsonl")
+  File "<REPO>/blueprints/runtime-workers/deerflow/e2e/check.py", line 28, in read_completion
+    raise ValueError("malformed native event")
+ValueError: malformed native event
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<REPO>/tests/test_runtime_worker_deerflow.py", line 250, in test_transport_runs_owned_container_and_retains_failed_attempts
+    runner.run_worker("unchanged question", "frozen", 3)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<REPO>/blueprints/runtime-workers/deerflow/e2e/run.py", line 98, in run_worker
+    receipt = build_receipt(run, Path.home() / ".local/share/omniroute/storage.sqlite", pins)
+  File "<REPO>/blueprints/runtime-workers/deerflow/e2e/receipt.py", line 160, in build_receipt
+    candidate = record.get("data", {}).get("framework_version")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.030s
+
+FAILED (errors=1)

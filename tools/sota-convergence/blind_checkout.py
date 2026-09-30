@@ -238,6 +238,8 @@ LABEL_VALUES = frozenset({
 # value under these keys in this repository's blueprints/ that is neither a label by
 # rule nor listed here, so a new value is classified when it appears.
 LABEL_TEXT_SHA256 = frozenset({
+    # DeerFlow round2-research.json selects the GAIA scorer over attachments.
+    "10d87d528fb095d26836485bb14032a72b9a610098570a2951eefb833ba47d82",
     "557291dc290010e2e286e4de20b4e72ac1f8f5583719cbb3e9364d79b0477186",
     "6b8d0f36c12c9163c12a5b05fe32d5175e12e656e7a526063ed32c701d6f49d6",
     "6bef11d967221994271c977a708462542dd9ad5ff330f913c28ac6dde824b7e9",
@@ -246,6 +248,10 @@ LABEL_TEXT_SHA256 = frozenset({
 })
 DATA_VALUES = frozenset({"all_events", "top_20"})
 DATA_VALUE_SHA256 = frozenset({
+    # Runtime native approval response "declined" is recorded request data.
+    "a8bfacf3bcd75164698d9d70aacd2ce5a5bb0993f5a9badf2e37b396fe5986d9",
+    # skills/profiles.json specifies scenario/role intersection procedure.
+    "78f3ed373de08aa0905d3c62047747fbc154971eef22247c6429748b6222cd91",
     "012c690424af3c14cb13030a4c2194070e0fb677fe9907532fbe49e07bc6b3e5",
     "02459061751691ce72c0ed507442bdae0dcb8e4c650c617bbf617a4f29a98b77",
     "030a370a1ba75ca7f9c8a49c076d9b9aed94f5b5225a54826d4d2ecf926729bc",

@@ -588,3 +588,69 @@ Open after the repair round:
 - **G5's limits:** it cannot see a Codex connection's app-server opt-in
   (`open-sse/executors/codex.ts:415-439`). It counts inactive rows as served. Its
   provider lists are tied to the two builds read.
+# SDK 1.50.0 qualification candidate (2026-09-30)
+
+Checked in installed/native order: the prior recipe prefix was not present at
+its default location; `uv --version` returned 0.12.17. The GitHub release API for
+[`v1.50.0`](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.0)
+returned publication 2026-09-29T20:09:53Z and call-context/budget-denial fixes.
+An isolated supported `git clone --depth 1 --branch v1.50.0` resolved to exact
+`dcf401af7a9a302ef92cb7d092e1df9bb659daa5`. `make build` passed; the before/after
+upstream `uv.lock` SHA256 remained
+`9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801`.
+
+The published wheels were selected from PyPI 1.50.0 metadata. Anonymous official
+GHCR reads verified index, linux/amd64 manifest and config byte digests; config
+`OPENHANDS_BUILD_GIT_SHA` and `OPENHANDS_BUILD_GIT_REF` matched the same source/tag.
+The hashes are in `pins.json`. Installation uses native `uv export --locked
+--no-dev --package openhands-tools --no-emit-workspace --no-annotate --no-header`
+plus the two published wheel requirements, retaining upstream dependency versions
+and hashes. The previous PyJWT fix is preserved: this upstream lock uses 2.13.0.
+Hashed wheel install and `uv pip check` passed in an isolated Python 3.13 prefix.
+
+Capability sources at this exact revision:
+
+- [Native planning preset](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-tools/openhands/tools/preset/planning.py),
+  [delegation example](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/examples/01_standalone_sdk/25_agent_delegation.py),
+  [TaskManager](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-tools/openhands/tools/task/manager.py),
+  [AgentDefinition](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/subagent/schema.py).
+- [Browser toolset](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-tools/openhands/tools/browser_use/definition.py),
+  [goal example](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/examples/01_standalone_sdk/54_goal_completion_loop.py),
+  [native server lifecycle/goal routes](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/conversation_router.py),
+  [EventService](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/event_service.py).
+- [Conversation-owned call context](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/llm/call_context.py),
+  [LLM dispatch and native kwargs](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/llm/llm.py),
+  [Responses replay](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/llm/message.py).
+
+Corrections discovered during this implementation:
+
+- Native goal review does not automatically honor `api_mode` through its
+  `completion` call. Verification: `conversation/goal/judge.py:70-75` calls
+  `completion`; `llm.py:1645-1773` explicitly takes Chat Completion transport;
+  `generate:1577-1607` and `agenerate:1609-1639` dispatch by API mode. The existing
+  owned transport now adapts these public methods for Responses LLMs. Patched
+  actual-SDK integration checks verify sync/async kwargs, return object and exact
+  native LLM type; this remains an integration adaptation, not upstream coverage.
+- `get_agent_factory` raises for absence instead of returning None. Verification:
+  pinned `subagent/registry.py`; use its supported `register_agent_if_absent`
+  rather than inferring registry state. `TaskAction.max_turns` is deprecated and
+  ignored; native caps come from `AgentDefinition.max_iteration_per_run`.
+- Initial transport source line comments used stale offsets. AST inspection of
+  the immutable source verified the line ranges above; the comments were fixed.
+- Initial local checks caught historical-image pin comparisons, a stale P3
+  skeleton assertion, a delayed test-only import, and an incorrect indentation
+  while updating the receipt-schema assertion. Failures are retained separately
+  from the passing checks; none was a live provider result.
+- Actual-SDK P3 fixtures caught a Chat Completion-shaped tool-call assumption.
+  Verification: `llm/message.py:25-42` defines native MessageToolCall as canonical
+  `id/name/arguments/origin`, not nested `function`. P3 now reads the native
+  transport-agnostic model and preserves its canonical ID when replaying.
+
+The unchanged upstream test command passed **1,208 tests**, 52 warnings, in
+94.92 seconds. The isolated native construction checks cover all eight profiles,
+explicit child route/tools/skills and bounded definitions. Existing integration
+fixtures remain separate. No new image scan, server start, provider call, P3,
+browser interaction, cold crash recovery, official grading or token-saving trial
+ran in this worktree. Observer ingestion is an interface for the coordinator's
+external recorder, not a qualified recorder. See the upgrade command receipt and
+returned logs under `evidence/` for actual output and scope.

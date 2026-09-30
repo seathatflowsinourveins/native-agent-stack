@@ -1,0 +1,24 @@
+argv: ["rtk", "proxy", "rg", "-n", "exclude-newer|urllib3>=|cryptography<49|requires-python|pytest>=|coverage\\[toml\\]|crypto", "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml", "<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:19:27.861837+00:00
+ended_utc: 2026-09-30T17:19:27.909627+00:00
+exit_code: 0
+
+stdout:
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:7:exclude-newer = "7 days"  # Avoid packages uploaded in the last 7 days.
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:8:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:12:    "urllib3>=2.6.3",  # CVE-2026-21441, CVE-2025-66471, CVE-2025-66418
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:18:    "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",  # 49.0.0 dropped x86_64 macOS wheels; release-binaries.yml still builds on macos-15-intel
+<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml:37:    "pytest>=9.0.3",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:9:    "coverage[toml]==7.10.7",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:10:    "cryptography>=3.4.0",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:12:    "pytest>=8.4.2,<9.0.0",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:23:    "coverage[toml]==7.10.7",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:24:    "pytest>=8.4.2,<9.0.0",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:64:requires-python = ">=3.9"
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:67:crypto = [
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:68:    "cryptography>=3.4.0",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:111:    "cryptography",
+<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/pyproject.toml:112:    "cryptography.*",
+
+stderr:

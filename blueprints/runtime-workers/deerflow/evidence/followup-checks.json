@@ -1,0 +1,32 @@
+[
+  {
+    "name": "trace_fail",
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -k native_trace -v",
+    "exit_code": 1,
+    "returned_output": "test_native_trace_does_not_count_failed_children_as_completed (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... FAIL\n\n======================================================================\nFAIL: test_native_trace_does_not_count_failed_children_as_completed (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 140, in test_native_trace_does_not_count_failed_children_as_completed\n    self.assertEqual(found[\"failed_tasks_observed\"], 3)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 3\n\n----------------------------------------------------------------------\nRan 1 test in 0.005s\n\nFAILED (failures=1)\n"
+  },
+  {
+    "name": "trace_pass",
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -k native_trace -v",
+    "exit_code": 0,
+    "returned_output": "test_native_trace_does_not_count_failed_children_as_completed (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_native_trace_does_not_count_failed_children_as_completed) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.011s\n\nOK\n"
+  },
+  {
+    "name": "timestamp_fail",
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -k gateway_reader -v",
+    "exit_code": 1,
+    "returned_output": "test_gateway_reader_is_read_only_and_uses_only_approved_columns (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... FAIL\n\n======================================================================\nFAIL: test_gateway_reader_is_read_only_and_uses_only_approved_columns (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<WORKTREE>/tests/test_runtime_worker_deerflow.py\", line 111, in test_gateway_reader_is_read_only_and_uses_only_approved_columns\n    self.assertEqual(len(rows), 4)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\nAssertionError: 2 != 4\n\n----------------------------------------------------------------------\nRan 1 test in 0.044s\n\nFAILED (failures=1)\n"
+  },
+  {
+    "name": "timestamp_pass",
+    "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -k gateway_reader -v",
+    "exit_code": 0,
+    "returned_output": "test_gateway_reader_is_read_only_and_uses_only_approved_columns (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_reader_is_read_only_and_uses_only_approved_columns) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.050s\n\nOK\n"
+  },
+  {
+    "name": "syntax_log_whitespace",
+    "command": "python3 - <<'PY'\nimport json, subprocess\nfrom pathlib import Path\nroot=Path('blueprints/runtime-workers/deerflow')\nfiles=[p for p in root.rglob('*') if p.is_file() and '.research' not in p.parts and '__pycache__' not in p.parts]\ncounts={'python':0,'shell':0,'json':0}\nfor path in [*files, Path('tests/test_runtime_worker_deerflow.py')]:\n    if path.suffix == '.py':\n        compile(path.read_text(), str(path), 'exec'); counts['python']+=1\n    elif path.suffix == '.sh':\n        shell='bash' if path.parent==root else 'sh'\n        subprocess.run([shell,'-n',str(path)],check=True); counts['shell']+=1\n    elif path.suffix in ('.json','.template','.example'):\n        json.loads(path.read_text()); counts['json']+=1\n    if path.suffix != '.pyc':\n        assert all(line.rstrip()==line for line in path.read_text().splitlines()), path.name\nprint(json.dumps({'status':'passed','syntax_files':counts,'whitespace':'checked all delivered files, including untracked files'}))\nPY",
+    "exit_code": 1,
+    "returned_output": "Traceback (most recent call last):\n  File \"<stdin>\", line 15, in <module>\nAssertionError: fail-first.txt\n"
+  }
+]
