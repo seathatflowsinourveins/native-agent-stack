@@ -3942,8 +3942,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "bb3a4fa8e7bb400e38c8a2bbf283ebcae2b5ce6892379bb9952bc691bcb63513",
-      "bytes": 18093
+      "sha256": "39dfb95ae7442fa06029ba75629ddd136e967220f1824aaed751f2316799e324",
+      "bytes": 18178
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -4107,8 +4107,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "113c8bc343489c5771451c9977fb34d0fac7c280c0f800263806b3b73cce6946",
-      "bytes": 19388
+      "sha256": "10a90b3ee1f06f6f63be01bf720ed07f50215050340770a9255eb362db8be35a",
+      "bytes": 19396
     },
     {
       "path": "adoption/paired/README.md",
@@ -15018,8 +15018,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-token-profile-completion.md",
-      "sha256": "de87bbb07042a870e33df7c7487e958f6d962b7ef2c23a5ebe746b1a37669880",
-      "bytes": 10431
+      "sha256": "30258d52c89d115c487cd89fd43cdf53218b36bb788e5c224c20467b5468f450",
+      "bytes": 10524
     },
     {
       "path": "docs/direct-results.md",
@@ -44573,8 +44573,8 @@
     },
     {
       "path": "evidence/receipts/token-profile-completion-20260930.json",
-      "sha256": "6ea7f0e10de32e5765349259675e966260aee234f56866a16e3cdb97323255d5",
-      "bytes": 5884
+      "sha256": "326012bb0829a64753e70853743f8fa51665ccfc77da64b3aa916be9200f2de3",
+      "bytes": 6198
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
@@ -45158,8 +45158,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "1c2f3654a13bfba4edd18432e03ae769ce6a8c70ddeff214891a409e544d90f9",
-      "bytes": 18760
+      "sha256": "d176f5e614f4338b3bc10162550eced81e7529d17166662bd101b88ab3b2a45f",
+      "bytes": 18812
     },
     {
       "path": "observability/memory-scheduled-20260923.json",

@@ -380,7 +380,7 @@
     },
     {
       "id": "token-efficiency",
-      "label": "Source-host native qualification complete; PR recording pending: selected token practice and both native clients",
+      "label": "Accepted on source host through dated native evidence; draft PR561 review pending; other hosts need their own acceptance",
       "required_commands": [
         "codex",
         "claude",

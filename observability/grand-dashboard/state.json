@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-30T20:25:00Z",
+  "recorded_at_utc": "2026-09-30T20:45:21Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -93,7 +93,7 @@
       "kind": "gate",
       "id": "token-efficiency-wiring",
       "title": "Token-efficiency wiring for every session",
-      "state": "source-host wiring complete / seven Codex memory hooks natively trusted / twelve exec pins match / two package probes deliberately unchecked and separately qualified / PR recording pending",
+      "state": "source-host wiring complete / seven Codex memory hooks natively trusted / twelve exec pins match / two package probes deliberately unchecked and separately qualified / recorded in draft PR561 / source-host accepted / other hosts unqualified",
       "evidence_ref": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json"
     },
     {

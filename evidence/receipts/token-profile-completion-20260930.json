@@ -3,7 +3,7 @@
   "id": "token-profile-completion-20260930",
   "kind": "native_model_e2e",
   "recorded_date": "2026-09-30",
-  "status": "qualified_host_scope_pending_pr_record",
+  "status": "accepted_with_explicit_scope",
   "decision": "docs/decisions/2026-09-30-token-profile-completion.md",
   "evidence_directory": "evidence/artifacts/token-profile-completion-20260930",
   "component_ids": [
@@ -92,5 +92,15 @@
   ],
   "native_wiring": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json",
   "native_hook_trust": "evidence/artifacts/token-profile-completion-20260930/codex-native-hook-trust.json",
-  "dated_tool_mapping": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json"
+  "dated_tool_mapping": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
+  "publication": {
+    "kind": "draft_pull_request",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/561",
+    "number": 561,
+    "lane": "lane:foundation",
+    "native_gh_create_exit_code": 0,
+    "recorded_at_utc": "2026-09-30T20:45:21Z",
+    "review_pending": true,
+    "merged": false
+  }
 }

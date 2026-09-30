@@ -11,7 +11,7 @@ The detailed records are [profile acceptance](../../evidence/receipts/token-prof
 [Claude returns and counter scopes](../../evidence/artifacts/token-profile-completion-20260930/claude-native.json),
 [the per-tool dated mapping](../../evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json),
 and [the earlier native lifecycle qualification](2026-09-30-token-lifecycle-resolution.md).
-The PR records these artifacts and their hashes; merging is separate.
+[Draft PR561](https://github.com/seathatflowsinourveins/native-agent-stack/pull/561) records these artifacts and their hashes; review and merging remain separate.
 
 | Layer | Selected upstream | Qualified use |
 | --- | --- | --- |
