@@ -1,0 +1,150 @@
+# OpenHands recipe runtime lock: PyJWT 2.14.0 relock (2026-09-30)
+# Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and
+# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. Host paths appear as <scratch> and <worktree>;
+# nothing else was edited.
+
+## A. The failure this relock answers (CI run 36657687493, pull_request, required check osv-scanner)
+$ gh run view 36657687493 --log-failed   (result lines only)
+Filtered 8 vulnerabilities from output
+Total 1 package affected by 9 known vulnerabilities (1 Critical, 5 High, 3 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+9 vulnerabilities can be fixed.
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                                                 |
+| https://osv.dev/GHSA-2gx3-rcp4-g85q | 5.3  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-8wjv-2p76-3863 | 5.3  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-9j54-fg26-wv3r | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-9v7f-9g4p-ffgj | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-ffc3-869f-jxw9 | 9.1  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-hxm8-2xgr-2p9m | 4.8  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-p4g4-x82p-q773 | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-r6x4-923q-g947 | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+| https://osv.dev/GHSA-w2cx-738m-mc7w | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | blueprints/runtime-workers/openhands/requirements.lock |
+##[error]Process completed with exit code 1.
+
+## B. Source digests (a fresh extraction of pins.json source_archive)
+$ sha256sum sdk-fcc102a.tar.gz     # pins.json source_archive.sha256 = 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8
+2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  <scratch>/sdk-fcc102a.tar.gz
+$ sha256sum uv.lock                # pins.json uv_lock.sha256 = d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910
+d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910  -
+$ tar -xzOf sdk-fcc102a.tar.gz .../uv.lock | grep -A1 "^name = \"pyjwt\""   # the image build's lock, unchanged by this relock
+name = "pyjwt"
+version = "2.13.0"
+
+## C. Relock (uv 0.12.17, run without UV_NO_CONFIG, in the extracted workspace whose [tool.uv] table gained the one
+##    environments line of research.md; all five upgrades in one command)
+$ uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0
+Using CPython 3.13.15
+Resolved 412 packages in 190ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Removed cython v3.1.4
+Removed macholib v1.16.3
+Removed pefile v2023.2.7
+Updated pyjwt v2.13.0 -> v2.14.0
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+$ sha256sum uv.lock                # 09-27 reproduction: 30e608b1fdb091db1609e8261a787020df12e0350911079cc2177c772a9ccffd
+1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a9cc3427a77e8f6  <scratch>/final/uv.lock
+$ diff uv.lock(09-27 reproduction) uv.lock(this relock)   # only the pyjwt package entry differs
+2692c2692
+< version = "2.13.0"
+---
+> version = "2.14.0"
+2694c2694
+< sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "
+---
+> sdist = { url = "https://files.pythonhosted.org/packages/af/c3/8a3b59c25070cc61dc517fbdfa5dc0904670c96f605cc69759dc09166b99/pyjwt-2.14.0.tar.gz", hash = "sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86", size = 113177, upload-time = "
+2696c2696
+<     { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-tim
+---
+>     { url = "https://files.pythonhosted.org/packages/9c/97/672cb32ce0dfea44b740cb7b4f97038463b9cf7c0ead1aacf595572851d6/pyjwt-2.14.0-py3-none-any.whl", hash = "sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc", size = 32896, upload-tim
+$ uv lock --check
+Using CPython 3.13.15
+Resolved 412 packages in 6ms
+$ uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace   # then the two wheel entries of pins.json, in file order
+export lines: 1129; wheel entries appended: 4 lines; requirements.lock lines: 1133
+$ sha256sum requirements.lock.repro requirements.lock
+14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64  <scratch>/final/requirements.lock.repro
+14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64  <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+$ diff <previous requirements.lock> requirements.lock
+530,532c530,532
+< pyjwt==2.13.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+<     --hash=sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423 \
+<     --hash=sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728
+---
+> pyjwt==2.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+>     --hash=sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 \
+>     --hash=sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
+
+## D. The new PyJWT hashes against PyPI (JSON API https://pypi.org/pypi/pyjwt/2.14.0/json)
+pypi pyjwt 2.14.0: pyjwt-2.14.0-py3-none-any.whl ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc 2026-09-11T13:11:53.409243Z not-yanked
+pypi pyjwt 2.14.0: pyjwt-2.14.0.tar.gz 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 2026-09-11T13:11:54.638995Z not-yanked
+$ grep -n -A2 "^pyjwt==" requirements.lock
+530:pyjwt==2.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+531-    --hash=sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 \
+532-    --hash=sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
+
+## E. OSV-Scanner 2.6.0 (binary sha256 checked against OSV_SCANNER_SHA256 in .github/workflows/security-scan.yml)
+$ sha256sum osv-scanner
+ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  <scratch>/osv/osv-scanner
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2
+commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6
+
+### E1. Control: the previous lock (sha256 02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394) with the repository config
+$ osv-scanner scan source --config <worktree>/.github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:old-requirements.lock
+exit: 1
+Filtered 2 vulnerabilities from output
+Total 1 package affected by 10 known vulnerabilities (1 Critical, 5 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+10 vulnerabilities can be fixed.
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE | VERSION | FIXED VERSION | SOURCE                |
+| https://osv.dev/GHSA-2gx3-rcp4-g85q | 5.3  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-8wjv-2p76-3863 | 5.3  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-9j54-fg26-wv3r | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-9v7f-9g4p-ffgj | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-ffc3-869f-jxw9 | 9.1  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-hxm8-2xgr-2p9m | 4.8  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-p4g4-x82p-q773 | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-r6x4-923q-g947 | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-w2cx-738m-mc7w | 7.4  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+| https://osv.dev/GHSA-w6j9-cwv2-h6wq | 5.9  | PyPI      | pyjwt   | 2.13.0  | 2.14.0        | old-requirements.lock |
+
+### E2. The CI command over the inventory, on this tree (no PyJWT ignore remains in .github/osv-scanner.toml)
+$ osv-scanner scan source --config .github/osv-scanner.toml --no-resolve <49 inventory lockfiles>
+observed_utc: 2026-09-30T02:40:22Z
+exit: 0
+Filtered 175 local/unscannable package/s from the scan.
+Filtered 7 vulnerabilities from output
+No issues found
+filtered by an ignore: 1x GHSA-8mgp-746c-j5xp
+filtered by an ignore: 1x GHSA-h35f-9h28-mq5c
+filtered by an ignore: 2x GHSA-hj66-6f7g-4r5v
+filtered by an ignore: 2x GHSA-xpv3-w29h-x7cv
+
+## F. The recipe's install sequence (install-container.sh, UV_NO_CONFIG=1) on the new lock, in a scratch CPython 3.13.15 venv
+venv exit: 0
+Installed 3 packages in 37ms
+build-requirements install exit: 0
+Installed 175 packages in 555ms
+runtime lock install exit: 0
+Checked 178 packages in 5ms
+All installed packages are compatible
+uv pip check exit: 0
+SDK/tools 1.49.6 imports passed; no model request
+import check exit: 0
+pyjwt 2.14.0 | cryptography 50.0.0 | oauthlib 3.3.1
+ + anyio==4.14.2
+ + click==8.5.0
+ + cryptography==50.0.0
+ + oauthlib==3.3.1
+ + pyjwt==2.14.0
+ + pypdf==6.19.0
+ + soupsieve==2.9.2
+
+## G. PyJWT 2.14.0 sdist (sha256 verified against the lock's sdist hash)
+sha256 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86
+oauthlib mentions in the sdist: 0
+CHANGELOG.rst v2.14.0 Security section, GHSA ids: GHSA-2gx3-rcp4-g85q GHSA-8wjv-2p76-3863 GHSA-9v7f-9g4p-ffgj GHSA-ffc3-869f-jxw9 GHSA-hxm8-2xgr-2p9m GHSA-mvj7-wp6q-v59j GHSA-p4g4-x82p-q773 GHSA-pxh4-856f-4h89 GHSA-r6x4-923q-g947 GHSA-w2cx-738m-mc7w GHSA-w6j9-cwv2-h6wq 

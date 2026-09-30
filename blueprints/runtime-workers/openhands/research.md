@@ -358,6 +358,42 @@ arm64 image.
 | In the universal resolution, `--upgrade-package cryptography` collapsed the marker-split fork to the constrained 48.0.1. | Read every `Updated` and `Removed` line before accepting a relock. Resolve only the recipe's install environment with `environments` instead of deleting an upstream constraint, and classify every removed or re-marked line. |
 | The coordinator's decision to keep cryptography at 50.0.0 reached the relock builder after it had relocked five packages from an earlier instruction (evidence section C). | A decision that changes a brief goes out as one message naming what it replaces. The final lock was reproduced from the unchanged workspace before commit (evidence section F). |
 
+## Runtime lock PyJWT relock (2026-09-30)
+
+requirements.lock moved from PyJWT 2.13.0 to 2.14.0 and nothing else changed: three lines (530-532), SHA256
+14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64, previously 02d0a7f058d0. Ten PyJWT advisories published
+2026-09-29 affect 2.13.0 (one Critical, five High, four Medium). Nine failed the required osv-scanner check (CI run
+36657687493) and GHSA-w6j9-cwv2-h6wq had been ignored until 2026-10-13; 2.14.0 fixes all ten. The ignore, its
+`IGNORE_SCOPES` entry and the PyJWT half of the lock's `IGNORE_ALLOWED_LOCKS` entry are gone. Record:
+[osv-openhands-pyjwt-relock-20260930.json](../../../evidence/receipts/osv-openhands-pyjwt-relock-20260930.json);
+returned outputs: [evidence/relock-2026-09-30.txt](evidence/relock-2026-09-30.txt).
+
+The method is the 2026-09-27 one with a fifth version-pinned upgrade, from a fresh extraction of the pinned archive
+with the same one-line `environments` edit (uv 0.12.17, without UV_NO_CONFIG):
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.14.0
+
+The resulting uv.lock (SHA256 1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a9cc3427a77e8f6) differs from the
+2026-09-27 reproduction (30e608b1...) only in the pyjwt package entry, `uv lock --check` exits 0, and the export plus the
+pins.json wheel entries give the new lock byte for byte; an earlier scratch pair produced the same files.
+
+- **Choice.** 2.14.0 is the first release OSV lists as fixed for all ten and the newest one older than the 7-day window
+  the upstream workspace's `exclude-newer` applies (2.15.0, 2026-09-23T16:56Z, and 2.15.1, 2026-09-28T18:40Z, are
+  inside it). Its two hashes equal PyPI's.
+- **Checks.** The pinned OSV-Scanner 2.6.0 over the 49 inventory lockfiles exits 0 with no PyJWT ignore left, and the
+  previous lock under the same config exits 1 with the ten advisories. The install-container.sh sequence in a scratch
+  CPython 3.13.15 venv installed 175 packages, `uv pip check` exited 0 and the import check printed `SDK/tools 1.49.6
+  imports passed; no model request`. No OpenHands task ran with the relocked venv, and the image's server binary
+  (upstream's uv.lock, PyJWT 2.13.0) is unchanged; the 2026-09-28 grype record of that image predates these advisories.
+- **oauthlib stays at 3.3.1.** 4.0.0 was published 2026-09-28T06:01Z, inside the same window, and its two advisories stay
+  covered by the 2026-09-29 reviews, which the record carries forward at the new digest. The relock onto it follows after
+  2026-10-05T06:01Z and deletes the lock's `IGNORE_ALLOWED_LOCKS` entry.
+
+Overturn conditions: an advisory that only a release after 2.14.0 fixes; an OpenHands run that fails with 2.14.0;
+oauthlib 4.0.0 clearing the window and its compatibility check.
+
 ## Takeover phase 1 corrections (2026-09-28)
 
 These are offline repairs on the round-3 head 45d40f6c. The network and

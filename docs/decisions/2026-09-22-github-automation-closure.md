@@ -297,6 +297,21 @@ locally with `GH_TOKEN` set and no `--offline`, using
   delete the lock. The Lumibot entry now names the new record as its
   evidence; that record carries forward the 2026-09-26 nltk and setuptools
   review at the same sha256. Evidence: `evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json`.
+  **PyJWT relock (2026-09-30).** Nine more PyJWT advisories, all published on 2026-09-29 between 23:11Z and 23:43Z
+  and all fixed in 2.14.0 (one Critical at CVSS 9.1, five High, three Medium), failed the required check on the
+  OpenHands recipe lock from run 36657687493, and the three main push runs after them concluded failure. The lock was
+  relocked onto PyJWT 2.14.0 with the recipe's own method, and this entry's Expiry sentence above is superseded for that
+  lock: the GHSA-w6j9-cwv2-h6wq ignore and its `IGNORE_SCOPES` entry are deleted, and the lock's `IGNORE_ALLOWED_LOCKS`
+  entry keeps the two oauthlib advisories at the relocked sha256, with the new record as its evidence, which carries
+  the 2026-09-29 review forward (the lock diff is the three PyJWT lines). oauthlib stays at 3.3.1: 4.0.0 was
+  published 2026-09-28T06:01Z, inside the 7-day window the upstream workspace applies, and its two advisories are
+  ignored until 2026-10-13. **Alternatives considered:** PyJWT 2.15.1 or 2.15.0 (inside the same window, and the scan is
+  clean at 2.14.0); relocking oauthlib 4.0.0 now; extending the ignores to the nine (rejected: one is Critical and a
+  fixed release exists). **Result:** the workflow's command over the 49 lockfiles exits 0 with no PyJWT ignore, and
+  the previous lock under the same config exits 1. **Expiry:** relock onto oauthlib 4.0.0 after 2026-10-05T06:01Z and
+  delete the OpenHands entry in the same change; on 2026-10-13 renew the oauthlib ignores for the Lumibot lock alone
+  or delete that lock. **Overturn:** an advisory only a later PyJWT release fixes, or an OpenHands run that fails with
+  2.14.0. Evidence: `evidence/receipts/osv-openhands-pyjwt-relock-20260930.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day

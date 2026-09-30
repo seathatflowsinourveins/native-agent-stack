@@ -56,9 +56,10 @@ image, with network disabled. [pins.json](pins.json) preserves the image, wheel
 and runtime lock hashes. No framework version changed in round 3.
 
 **The runtime-lock relock covers only the recipe venv.** requirements.lock is a
-linux/amd64 security relock of the upstream export with four dependency
+linux/amd64 security relock of the upstream export with five dependency
 upgrades, reproduced from the unchanged upstream workspace
-([research.md](research.md#runtime-lock-security-relock-2026-09-27)). It builds
+([research.md](research.md#runtime-lock-security-relock-2026-09-27); PyJWT 2.14.0 is the
+fifth, added on 2026-09-30: [research.md](research.md#runtime-lock-pyjwt-relock-2026-09-30)). It builds
 the venv under the install prefix. That venv serializes the request, runs the
 `mcp_guard.py` hook and comes first on the server container's PATH. The server
 process itself is the image's PyInstaller binary
@@ -66,7 +67,7 @@ process itself is the image's PyInstaller binary
 uv.lock with `uv sync --frozen` (SDK@fcc102a
 `openhands-agent-server/openhands/agent_server/docker/Dockerfile:129,139,146-158,583-590`).
 That lock, whose SHA256 is pins.json `uv_lock`, still pins anyio 4.11.0, click 8.1.8,
-pypdf 6.14.2 and soupsieve 2.8.4, the four versions the relock replaces.
+pypdf 6.14.2, soupsieve 2.8.4 and PyJWT 2.13.0, the five versions the relock replaces.
 
 [agent-server-image-grype-20260928.json](evidence/agent-server-image-grype-20260928.json)
 records a grype 0.119.0 scan of the pinned linux/amd64 digest, with a database
