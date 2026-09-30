@@ -2,17 +2,18 @@
 # Published copy of the script as it ran on 2026-09-30 (it takes its host paths as arguments). It builds relock-2026-09-30-litellm.txt: it runs each command of the sections below from
 # the published copies of the other scripts of this directory, prints the command as run, its output and its exit code, and masks host paths. It is documentation of what ran, not a supported tool.
 # usage: builder.sh <scratch-relock> <worktree> <main-checkout> <osv-scanner binary> <out-file>
-#   <scratch-relock> holds sdk-fcc102a.tar.gz (pins.json source_archive), uv-cache/, u3/ and the OSV binary's directory; <worktree> is a checkout of this repository on origin/main 29458b43
-#   with this change applied; <main-checkout> is a read-only checkout of origin/main 29458b43.
+#   <scratch-relock> holds sdk-fcc102a.tar.gz (pins.json source_archive), uv-cache/, u3/ and the OSV binary's directory; <worktree> is a checkout of this repository at this change's head (its base is origin/main 29458b43);
+#   <main-checkout> is a read-only checkout of origin/main 29458b43.
 set -u
 R=$1; W=$2; MAIN=$3; OSV=$4; OUT=$5
 E=$W/blueprints/runtime-workers/openhands/evidence
 OH=blueprints/runtime-workers/openhands
+BASE=29458b43   # the base of this change: origin/main when the lock was relocked
 SRC=$R/litellm-src
 V=$R/u3/venv
-export R W MAIN OSV E OH SRC V
+export R W MAIN OSV E OH SRC V BASE
 mkdir -p "$R/tmp"
-mask() { sed -e "s#$E#<evidence-dir>#g" -e "s#$W#<worktree>#g" -e "s#$MAIN#<main-checkout>#g" -e "s#$OSV#<osv-bin>#g" -e "s#$SRC#<litellm-src>#g" -e "s#$R/sdk-main#<sdk-main>#g" -e "s#$R#<scratch-relock>#g" -e "s#$HOME#~#g"; }
+mask() { sed -e "s#$E#<evidence-dir>#g" -e "s#$W#<worktree>#g" -e "s#$MAIN#<main-checkout>#g" -e "s#$OSV#<osv-bin>#g" -e "s#$SRC#<litellm-src>#g" -e "s#$R/sdk-main#<sdk-main>#g" -e "s#$R#<scratch-relock>#g" -e "s#$HOME#~#g" -e 's/[[:space:]]*$//'; }
 show() { printf '%s' "$1" | sed -e 's#"\$E"#<evidence-dir>#g; s#\$E#<evidence-dir>#g; s#"\$W"#<worktree>#g; s#\$W#<worktree>#g; s#"\$MAIN"#<main-checkout>#g; s#\$MAIN#<main-checkout>#g; s#"\$OSV"#<osv-bin>#g; s#\$OSV#<osv-bin>#g; s#"\$SRC"#<litellm-src>#g; s#\$SRC#<litellm-src>#g; s#"\$V"#<scratch-relock>/u3/venv#g; s#\$V#<scratch-relock>/u3/venv#g; s#"\$R"#<scratch-relock>#g; s#\$R#<scratch-relock>#g; s#\$OH#blueprints/runtime-workers/openhands#g'; }
 # run '<command text, variables left unexpanded>' [note]: prints "$ <command with placeholders>   # <UTC time>   [note]", the output as printed, then the exit code.
 run() {
@@ -25,8 +26,8 @@ cat <<'HDR'
 # OpenHands recipe runtime lock: litellm 1.93.2 relock (GHSA-3cv6-jpf6-8222), 2026-09-30
 # Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and evidence/receipts/osv-openhands-litellm-relock-20260930.json cite.
 # A line that starts with '$ ' is a command as run (the time after '#' is when it ran; a script is run from its published copy in this directory); the lines under it are its output as printed,
-# then its exit code. Exceptions: the relock script abbreviates hashes in the diff of section B; host paths are masked: <worktree> (a checkout of this repository on origin/main 29458b43 with this change
-# applied), <main-checkout> (a read-only checkout of origin/main 29458b43), <scratch-relock>, <osv-bin>, <litellm-src>, <evidence-dir> (this directory) and the home directory as ~; the scan step masks its scan
+# then its exit code. Exceptions: the relock script abbreviates hashes in the diff of section B; trailing whitespace is stripped from every output line; host paths are masked: <worktree> (a checkout of this repository at this change's head; its base is origin/main 29458b43),
+# <main-checkout> (a read-only checkout of origin/main 29458b43), <scratch-relock>, <osv-bin>, <litellm-src>, <evidence-dir> (this directory) and the home directory as ~; the scan step masks its scan
 # root as <scan-root> in the retained scanner outputs; a command's text shows the same placeholders in place of the variables it was run with. All sections were produced by one run of
 # relock-2026-09-30-litellm.builder.sh.txt, in this order, from the published copies of the other scripts (a section's own time stamps are its commands' start times).
 # Retained beside this file: the published scripts (relock-2026-09-30-litellm.*.sh.txt and *.py.txt) and the four scanner outputs of section F (relock-2026-09-30-litellm.osv-{before,after}.{ordinary,frozen}.txt).
@@ -50,9 +51,9 @@ echo "## D. The recipe's hashed install sequence on the new lock (scratch venv),
 run 'bash "$E/relock-2026-09-30-litellm.install-check.sh.txt" "$R" "$W"'
 echo
 echo "## E. The lock differs in the litellm entry only"
-run 'diff <(git -C "$W" show HEAD:$OH/requirements.lock | grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" | sed "s/ \\\\$//") <(grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" "$W/$OH/requirements.lock" | sed "s/ \\\\$//")' 'the requirement lines of origin/main 29458b43 and of this change; exit 1 = the inputs differ, here in one line'
-run 'git -C "$W" diff --numstat HEAD -- $OH/requirements.lock' 'lines added, lines deleted'
-run 'echo "hash lines on origin/main: $(git -C "$W" show HEAD:$OH/requirements.lock | grep -c -e "--hash=sha256:"); in this change: $(grep -c -e "--hash=sha256:" "$W/$OH/requirements.lock")"'
+run 'diff <(git -C "$W" show $BASE:$OH/requirements.lock | grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" | sed "s/ \\\\$//") <(grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" "$W/$OH/requirements.lock" | sed "s/ \\\\$//")' 'the requirement lines of origin/main 29458b43 and of this change; exit 1 = the inputs differ, here in one line'
+run 'git -C "$W" diff --numstat $BASE -- $OH/requirements.lock' 'lines added, lines deleted'
+run 'echo "hash lines on origin/main: $(git -C "$W" show $BASE:$OH/requirements.lock | grep -c -e "--hash=sha256:"); in this change: $(grep -c -e "--hash=sha256:" "$W/$OH/requirements.lock")"'
 echo
 echo "## F. OSV-Scanner 2.6.0 (the CI pin): the workflow's two scans over the inventory on origin/main 29458b43 (before) and on this change (after)"
 run '"$OSV" --version'
@@ -64,12 +65,12 @@ echo
 echo "## G. The lock file's digest and the digest recorded for it"
 run 'sha256sum "$W/$OH/requirements.lock"' 'the new lock; the previous one is 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c'
 run 'jq -r .requirements_sha256 "$W/$OH/pins.json"' 'pins.json of this change'
-run 'git -C "$W" show HEAD:$OH/pins.json | jq -r .requirements_sha256' 'pins.json of origin/main 29458b43'
+run 'git -C "$W" show $BASE:$OH/pins.json | jq -r .requirements_sha256' 'pins.json of origin/main 29458b43'
 echo
-echo "## H. Where litellm is used in the installed recipe venv (static text search of the installed .py files; context for the advisory, not the basis of the decision)"
-run 'grep -rl --include="*.py" -E "^[[:space:]]*(from|import)[[:space:]]+litellm\.proxy|^[[:space:]]*from[[:space:]]+litellm[[:space:]]+import[[:space:]]+proxy" "$V/lib/python3.13/site-packages" | grep -v "/site-packages/litellm/" | wc -l' 'files outside the litellm package that import litellm.proxy'
+echo "## H. Where litellm is used in the installed recipe venv (a static search of the installed .py files, by syntax tree and by text; context for the advisory, not the basis of the decision)"
+run 'python3 "$E/relock-2026-09-30-litellm.proxy-refs.py.txt" "$V/lib/python3.13/site-packages"' 'references to litellm.proxy outside the litellm package, by syntax tree'
 run 'grep -rn --include="*.py" -E "^[[:space:]]*(from|import)[[:space:]]+litellm" "$V/lib/python3.13/site-packages/openhands" | sed -E "s#^.*/site-packages/##" | cut -c1-160' 'the imports of litellm in the installed openhands packages'
-run 'grep -n -i -E "litellm" "$W/$OH/recipe.py" "$W/$OH/worker.py" | cut -c1-200' 'the recipe code that names litellm'
+run 'cd "$W/$OH" && grep -n -i litellm recipe.py worker.py | cut -c1-200' 'the recipe code that names litellm'
 echo
 echo "## I. The litellm hash lines against PyPI, and the carried-forward oauthlib review's premise for litellm"
 run 'python3 "$E/relock-2026-09-30-litellm.hash-check.py.txt" "$R/u3/base.lock"' 'the lock of origin/main 29458b43 (litellm 1.93.0)'
@@ -77,7 +78,22 @@ run 'python3 "$E/relock-2026-09-30-litellm.hash-check.py.txt" "$W/$OH/requiremen
 run 'echo "files of the installed litellm 1.93.2 that mention oauthlib: $(grep -rli oauthlib "$V/lib/python3.13/site-packages/litellm" | wc -l)"'
 run 'echo "lines of the v1.93.0 to v1.93.2 source diff that mention oauthlib: $(git -C "$SRC" diff v1.93.0 v1.93.2 | grep -c -i oauthlib)"'
 echo
-echo "## J. The unit tests of the coverage guard, of the workflow hardening and of the recipe, from the worktree root"
-run 'cd "$W" && TMPDIR="$R/tmp" python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_runtime_worker_openhands 2>&1 | tail -4'
+echo "## J. The CI record of the failure (GitHub API, read-only): the runs of the scan workflow around the advisory's publication, and the failing job's summary lines"
+run 'gh run list --repo seathatflowsinourveins/native-agent-stack --workflow security-scan.yml --limit 16 --json databaseId,event,headBranch,headSha,conclusion,createdAt -q ".[] | \"\(.databaseId) \(.event) \(.headBranch) \(.headSha[0:8]) \(.conclusion) \(.createdAt)\""' 'newest first; the OSV record was published 2026-09-30T21:11:25Z (section A)'
+run 'gh run view 36786110610 --repo seathatflowsinourveins/native-agent-stack --job 110127776899 --log | grep -E "Total [0-9]+ package|osv.dev/GHSA|Process completed" | sed -E "s/^[^\t]*\t[^\t]*\t//" | cut -c1-260' 'the osv-scanner job of run 36786110610 (pull request #557, head f29f6ba8)'
+echo
+echo "## K. The open pull requests that change the same files: their heads, the files they change among the ones this change touches, #535's lock pins, and a dry-run merge with this change's head"
+run 'git -C "$W" fetch origin +pull/535/head:refs/remotes/origin/pr535 +pull/551/head:refs/remotes/origin/pr551 +pull/555/head:refs/remotes/origin/pr555 && for n in 535 551 555; do echo "#$n $(git -C "$W" rev-parse origin/pr$n)"; done' 'heads fetched now (git fetch of refs/pull/<n>/head)'
+run 'for n in 535 551 555; do echo "== #$n"; git -C "$W" diff --name-only origin/main origin/pr$n | grep -E "^[.]github/osv-scanner|^blueprints/runtime-workers/openhands/(requirements[.]lock|pins[.]json)$|^tests/test_osv_lockfile_coverage[.]py$|^docs/decisions/2026-09-22-github-automation-closure[.]md$|^manifests/evidence[.]json$"; done'
+run 'git -C "$W" show origin/pr535:$OH/requirements.lock | grep -E "^(litellm|urllib3|pyjwt|oauthlib)==" | cut -d" " -f1; git -C "$W" show origin/pr535:$OH/pins.json | jq -r ".source_archive.url, .requirements_sha256"' 'the lock #535 would land, and the SDK archive it is built from'
+run 'for n in 535 551 555; do r=$(git -C "$W" merge-tree --write-tree --name-only origin/pr$n HEAD 2>&1); echo "== #$n merge-tree exit $?"; printf "%s\n" "$r" | sed -n "2,8p"; done' 'exit 1 = conflicts; the lines are the conflicted files and messages; HEAD is this pull request head when the script ran'
+echo
+echo "## L. Negative controls of the new test module (tests/test_openhands_lock_binding.py): it passes as it is and fails on each single-defect copy"
+run 'bash "$E/relock-2026-09-30-litellm.guard-controls.sh.txt" "$R" "$W"' 'each copy is the worktree without .git with one sed edit; the first two are the mutations no existing test noticed'
+echo
+echo "## M. The unit tests of the coverage guard, of the workflow hardening and of the recipe, from the worktree root"
+run 'set -o pipefail; cd "$W" && TMPDIR="$R/tmp" python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_openhands_lock_binding tests.test_workflow_hardening tests.test_runtime_worker_openhands 2>&1 | tail -4'
+echo
+echo "# builder finished $(date -u +%FT%TZ)"
 } > "$OUT"
 echo "wrote $OUT ($(wc -l < "$OUT") lines); host paths left: $(grep -c -E '/var/tmp|/home/|/tmp/' "$OUT")"

@@ -1,7 +1,6 @@
 """Facts of GHSA-3cv6-jpf6-8222 (litellm) from the OSV API (https://api.osv.dev/v1/vulns/<id>): the OSV record's published and modified times, the GitHub Advisory
 Database review time and NVD publication time it carries, aliases, database severity, CVSS vector, affected package, the introduced and fixed versions, its summary
-and its `details` prose in full; then the OSV query result (https://api.osv.dev/v1/query) for litellm 1.93.0, 1.93.1 and 1.93.2 and for the other PyPI pins of the
-relocked lock that changed in the 2026-09-30 relocks; then the upload times, yanked flags and sha256 of the files of litellm 1.93.0, 1.93.1 and 1.93.2 on PyPI
+and its `details` prose in full; then the OSV query result (https://api.osv.dev/v1/query) for litellm 1.93.0, 1.93.1 and 1.93.2; then the upload times, yanked flags and sha256 of the files of litellm 1.93.0, 1.93.1 and 1.93.2 on PyPI
 (https://pypi.org/pypi/litellm/<version>/json). Read-only network access, no credential. Adapted from the published
 blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-advisories.py.txt of this repository (same endpoints and fields)."""
 import json

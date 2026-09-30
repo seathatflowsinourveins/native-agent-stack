@@ -5,15 +5,17 @@
 # upgrade, litellm 1.93.0 -> 1.93.2 (GHSA-3cv6-jpf6-8222), and the two-line edit of the extracted workspace that upgrade needs: upstream's pyproject.toml pins
 # litellm==1.93.0 and caps litellm at exclude-newer-package 2026-07-20T00:00:00Z, so uv lock --upgrade-package litellm==1.93.2 alone is unsatisfiable there.
 # Control first: the six upgrades of the 2026-09-30 urllib3 relock on the unedited workspace must reproduce the committed lock byte for byte; then the new lock.
-# usage: relock_litellm.sh <scratch-relock> <worktree>
+# usage: relock_litellm.sh <scratch-relock> <worktree>; the exit status is 1 when a uv step fails or when either lock differs from the one it must reproduce.
 set -u
+rc=0
+BASE=29458b43   # the base of this change: origin/main when the lock was relocked
 R=$1; W=$2; OH=blueprints/runtime-workers/openhands; U=$R/u3
 export UV_CACHE_DIR=$R/uv-cache
 stamp() { date -u +%FT%TZ; }
 mkdir -p "$U"
-git -C "$W" show HEAD:$OH/requirements.lock > "$U/base.lock"
+git -C "$W" show $BASE:$OH/requirements.lock > "$U/base.lock"
 echo "[$(stamp)] uv $(uv --version)"
-echo "[$(stamp)] base lock (worktree HEAD $(git -C "$W" rev-parse --short HEAD)) sha256: $(sha256sum "$U/base.lock" | cut -d' ' -f1)"
+echo "[$(stamp)] base lock (commit $BASE) sha256: $(sha256sum "$U/base.lock" | cut -d' ' -f1)"
 echo "[$(stamp)] sdk archive sha256: $(sha256sum "$R/sdk-fcc102a.tar.gz" | cut -d' ' -f1) (pins.json source_archive.sha256: $(jq -r .source_archive.sha256 "$W/$OH/pins.json"))"
 for variant in control new; do
   D=$U/$variant; rm -rf "$D"; mkdir -p "$D"
@@ -24,7 +26,7 @@ for variant in control new; do
     extra="--upgrade-package litellm==1.93.2"
   fi
   echo "[$(stamp)] $variant: workspace lines naming litellm: $(grep -h -n -E 'litellm' "$D/pyproject.toml" | cut -c1-150 | tr '\n' '|')"
-  echo "[$(stamp)] $variant: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 $extra"
+  echo "[$(stamp)] $variant: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0${extra:+ $extra}"
   (cd "$D" && uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 $extra > lock.out 2>&1; echo "lock exit: $?" >> lock.out
     uv lock --check > check.out 2>&1; echo "check exit: $?" >> check.out
     uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace > export.txt 2> export.err; echo "export exit: $?" > export.rc
@@ -32,13 +34,15 @@ for variant in control new; do
     cat export.txt wheels.txt > requirements.lock.repro)
   echo "[$(stamp)] $variant: $(tail -1 "$D/lock.out") | $(tail -1 "$D/check.out") | $(cat "$D/export.rc") | lines $(wc -l < "$D/requirements.lock.repro") | sha256 $(sha256sum "$D/requirements.lock.repro" | cut -d' ' -f1)"
   grep -E "^Updated|^Resolved" "$D/lock.out" | head -20 | sed 's/^/    /'
+  grep -q "^lock exit: 0$" "$D/lock.out" && grep -q "^check exit: 0$" "$D/check.out" && grep -q "^export exit: 0$" "$D/export.rc" || { echo "FAILED: a uv step of the $variant variant did not exit 0"; rc=1; }
 done
 echo "[$(stamp)] committed (base) lock sha256: $(sha256sum "$U/base.lock" | cut -d' ' -f1)"
-cmp "$U/control/requirements.lock.repro" "$U/base.lock" && echo "control reproduces the committed lock byte for byte"
+cmp "$U/control/requirements.lock.repro" "$U/base.lock" && echo "control reproduces the committed lock byte for byte" || { echo "FAILED: the control does not reproduce the committed lock"; rc=1; }
 echo "--- diff of the extracted workspace's pyproject.toml, control vs new (the whole edit)"
 diff "$U/control/pyproject.toml" "$U/new/pyproject.toml" | cut -c1-260
 echo "--- diff base lock vs new lock (changed lines only, hashes abbreviated)"
 diff <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' "$U/base.lock") <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' "$U/new/requirements.lock.repro") | grep '^[<>]' | head -40
 echo "--- the committed new lock in the worktree: $(sha256sum "$W/$OH/requirements.lock" | cut -d' ' -f1)"
-cmp "$U/new/requirements.lock.repro" "$W/$OH/requirements.lock" && echo "new reproduces the lock of this change byte for byte"
-echo "[$(stamp)] done"
+cmp "$U/new/requirements.lock.repro" "$W/$OH/requirements.lock" && echo "new reproduces the lock of this change byte for byte" || { echo "FAILED: the new lock does not reproduce the lock of this change"; rc=1; }
+echo "[$(stamp)] done, status $rc"
+exit $rc

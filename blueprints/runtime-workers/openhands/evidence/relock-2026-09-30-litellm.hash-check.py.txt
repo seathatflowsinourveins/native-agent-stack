@@ -1,6 +1,7 @@
 """The litellm entry of a requirements lock against PyPI (https://pypi.org/pypi/litellm/<version>/json, read-only, no credential): the version the entry pins, each of its
 --hash=sha256 lines with the file of that release whose sha256 it equals (file name, upload time, yanked flag), and the files of the release for CPython 3.12-3.14 on Linux x86_64
-(manylinux or musllinux wheels) or the source distribution that the entry does not list. usage: hash_check.py <requirements lock>"""
+(manylinux or musllinux wheels) or the source distribution that the entry does not list. Exit status: 1 when a hash line matches no file of the release or a file is yanked, 2 when
+every hash matches but a file of that kind is not listed, 0 otherwise. usage: hash_check.py <requirements lock>"""
 import json
 import re
 import sys
@@ -17,9 +18,15 @@ for line in lines[start + 1:]:
 release = json.load(urllib.request.urlopen(f"https://pypi.org/pypi/litellm/{version}/json", timeout=30))
 by_hash = {f["digests"]["sha256"]: f for f in release["urls"]}
 print(f"litellm=={version}: {len(hashes)} hash lines")
+status = 0
 for digest in hashes:
     f = by_hash.get(digest)
+    if f is None or f.get("yanked"):
+        status = 1
     print(f"  {digest[:16]} -> " + (f"{f['filename']} (uploaded {f['upload_time_iso_8601']}, {'yanked' if f.get('yanked') else 'not yanked'})" if f else "NO FILE OF THIS RELEASE HAS THIS SHA256"))
 wanted = [f["filename"] for f in release["urls"] if re.search(r"-cp31[234]-cp31[234]-(manylinux|musllinux)\w*_x86_64\.whl$|\.tar\.gz$", f["filename"])]
 unlisted = sorted(name for name in wanted if by_hash[[d for d, f in by_hash.items() if f["filename"] == name][0]]["digests"]["sha256"] not in hashes)
 print("files of this release for CPython 3.12-3.14 on Linux x86_64 or the source distribution that the entry does not list:", unlisted or "none")
+if not status and unlisted:
+    status = 2
+sys.exit(status)
