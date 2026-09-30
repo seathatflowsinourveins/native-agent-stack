@@ -1104,8 +1104,12 @@ def scan(args, env) -> int:
         return report(run, [])
     runner.disable_core_dumps()
     group = "user" if args.user_run else "agent"
-    event = run.append("scan_requested", request=secrets.token_hex(6), phase=args.phase, group=group,
-                       selection="all" if args.phase == "comparison" else "changed")
+    try:
+        event = run.append("scan_requested", request=secrets.token_hex(6), phase=args.phase, group=group,
+                           selection="all" if args.phase == "comparison" else "changed")
+    except OSError:  # admission failed: no work starts and no pass is published (contract 5)
+        os.write(2, b"canary_proof: scan request not recorded; nothing ran\n")
+        return EXIT["incomplete"]
     hook("after_request")
     request, results = Request(run, event), {}
     signals = install_interrupts()
@@ -1423,6 +1427,10 @@ def classify(events: list, now_codes=(), masking=None) -> dict:
                   or set(planned["sinks"][sink]) != set(row.get("roots", []))
                   or any(item[4] not in (1, 3, 4) for item in row.get("ledger", []))):
                 found.append("inventory_unreconciled")
+                # Plan coverage names each declared check without a terminal result: root id and check number.
+                found += [f"check_not_scanned:{item[1]}:{item[0]}" if name == "final"
+                          else f"{name}_check_not_scanned:{item[1]}:{item[0]}"
+                          for item in row.get("ledger", []) if item[4] not in (1, 3, 4)]
         required_sinks = sinks_for(*key)
         if set(planned["sinks"]) != set(required_sinks):
             found.append(f"{name}_incomplete")

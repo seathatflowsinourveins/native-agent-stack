@@ -161,6 +161,10 @@ if config.get("forbid_list"):  # the store is never listed (contract 7): a listi
     os.scandir, os.listdir = guarded(real_scandir), guarded(real_listdir2)
 if config.get("core_pattern"):  # a synthetic core_pattern file for the runner's crash-collector check (C8)
     cp.runner.CORE_PATTERN_FILE = config["core_pattern"]
+if config.get("fail_fsync"):  # the run record cannot be made durable: admission must fail closed (contract 5)
+    def failing_fsync(fd):
+        raise OSError(5, "synthetic EIO")
+    os.fsync = failing_fsync
 if config.get("stdout_to"):
     _out = os.open(config["stdout_to"], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     os.dup2(_out, 1)
@@ -468,7 +472,7 @@ class Host:
 
     def tool(self, *argv, hooks=None, audit=None, unsafe=None, timeout=300, env=None, tty=False, worker=None,
              dumper=None, forbid_list=None, count_pipes=None, background=False, core_pattern=None,
-             stdout_to=None) -> subprocess.CompletedProcess:
+             stdout_to=None, fail_fsync=False) -> subprocess.CompletedProcess:
         """Run canary_proof.main(argv) in a launcher process whose module hooks and constants are set here."""
         worker_config = copy.deepcopy(self.worker)
         worker_config.update(root=str(ROOT), **(worker or {}))
@@ -484,7 +488,7 @@ class Host:
                   "forbid_list": str(forbid_list) if forbid_list else None,
                   "count_pipes": str(count_pipes) if count_pipes else None,
                   "core_pattern": str(core_pattern) if core_pattern else None,
-                  "stdout_to": str(stdout_to) if stdout_to else None}
+                  "stdout_to": str(stdout_to) if stdout_to else None, "fail_fsync": fail_fsync}
         command = [sys.executable, "-I", "-S", "-c", COORDINATOR, json.dumps(config)]
         if background:
             return subprocess.Popen(command, env=env or self.env(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -1383,6 +1387,10 @@ class RequestTests(Shared, unittest.TestCase):
                 result = self.codes(mutate(self.events, *changes), settle=1 if code == "final_too_early" else 0)
                 self.assertIn(code, result["codes"], f"R3-code {code}")
                 self.assertEqual(result["verdict"], "incomplete", f"R3-verdict {code}")
+        # A complete-looking sink row whose ledger holds a declared check without a terminal result names that check.
+        forged = self.codes(mutate(self.events, sinks(final_seq, lambda s: s["A1"]["ledger"][0].__setitem__(4, 0))))
+        self.assertTrue(any(code.startswith("check_not_scanned:") for code in forged["codes"])
+                        and "inventory_unreconciled" in forged["codes"], "R3-code check_not_scanned")
         leaky = mutate(self.events, *table["final_incomplete"], lambda ev: ev.append(dict(
             latest(ev, "scan_requested"), event="hit", seq=10**6)))
         self.assertEqual(cp.classify([dict(e, **({"sink": "A1", "subpass": 0, "root": "", "object": "", "check": 1,
@@ -1426,6 +1434,13 @@ class RequestTests(Shared, unittest.TestCase):
                 self.assertIn(self.host.verdict()[2][0] if self.host.verdict()[2] else "",
                               ("final_incomplete", "final_unfinished"), f"R2-{point}")
         self.assertEqual(order.read_text().splitlines()[0], "request", "R2-order")
+        # The request itself cannot be made durable: no work starts, nothing is planned, the old pass is not current.
+        count = len(self.host.events())
+        result = self.host.tool("scan", "--run", self.host.run_id, "--phase", "final", fail_fsync=True)
+        self.assertEqual(result.returncode, 3, "R2-append-failure")
+        self.assertFalse(any(event["event"] == "scan_planned" for event in self.host.events()[count:]),
+                         "R2-append-failure admits no work")
+        self.assertNotEqual(self.host.verdict()[1], "clean", "R2-append-failure")
         self.assertEqual(self.host.scan("final").returncode, 0)
 
 
