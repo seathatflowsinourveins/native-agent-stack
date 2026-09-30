@@ -7315,8 +7315,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "164ec3ab81aae0186481218da6583b4a0a0708f36e1ac677f2073926b8bd5902",
-      "bytes": 263824
+      "sha256": "249e9448f3331fcca470c3af38a6a26b8a6157e018495d87cfa558f5526e6573",
+      "bytes": 267215
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
@@ -7350,8 +7350,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r7/landscape-foldin-gate-20260930.json",
-      "sha256": "109295e1cb21e3d2fbf88d9cfa1ea4ba6106cc6f7c1a54819f3b378ab50b2cde",
-      "bytes": 12382
+      "sha256": "bed16fa91e45d116d0ee968bb86b5e9c7fcd503eff820b1c0a92bc33c5a4ac65",
+      "bytes": 13895
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r7/landscape-memory-20260930.json",
@@ -14895,8 +14895,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-memory-s3-r7.md",
-      "sha256": "b3a5922e75803da3c2d46ab31fc60f370ce8b510bd40236ba70507b157b7cabc",
-      "bytes": 44009
+      "sha256": "1fe95662d20072f701466b897c67cd1e6476988a945a785a849acba2e14cf4cb",
+      "bytes": 45756
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",

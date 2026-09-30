@@ -50,11 +50,13 @@
    "verdict": "ACTIVE",
    "screen": {
     "route": "primary (3.1)",
-    "basis": "official local install; Claude Code stdio registration; Codex CLI documented as a supported client",
+    "basis": "official local install; Claude Code stdio registration; actual Codex recipe uses third-party mcp-proxy, which must be pinned and pass section 1's maintenance gate if selected. Alternative: labelled adaptation with Codex 0.159.2's native streamable-HTTP MCP client (codex mcp add … --url with --bearer-token-env-var MCP_API_KEY) to the owned loopback /mcp endpoint with its Authorization: Bearer header. Either Codex path must be pinned and gated before freeze; the recipe's no-native-HTTP claim is contradicted by pinned Codex source, and its referenced examples/codex-mcp-config.json is absent at bed24ef7",
     "locators": [
      "doobidoo/mcp-memory-service@bed24ef7:README.md:111",
-     "doobidoo/mcp-memory-service@bed24ef7:README.md:252",
-     "doobidoo/mcp-memory-service@bed24ef7:docs/integration/multi-client.md:172"
+     "doobidoo/mcp-memory-service@bed24ef7:docs/integration/multi-client.md:450-477",
+     "doobidoo/mcp-memory-service@bed24ef7:docs/integration/multi-client.md:447-448",
+     "openai/codex@ff6aec96:codex-rs/cli/src/mcp_cmd.rs:145-157,343-359",
+     "openai/codex@ff6aec96:codex-rs/config/src/mcp_types.rs:640-644"
     ]
    }
   },
@@ -73,11 +75,13 @@
    },
    "verdict": "ACTIVE",
    "screen": {
-    "route": "primary (3.1), at the latest release v0.3.9; the deployment spec was read at main 899ace1a, 31 commits ahead, so its locators are re-read at 1d3e0ce2 before freeze",
-    "basis": "official local install; Claude Code MCP through .mcp.json; Codex skill installer",
+    "route": "primary (3.1), at the latest release v0.3.9; the deployment spec was read at main 899ace1a, 31 commits ahead, and its locators were re-read at 1d3e0ce2 (2026-09-30)",
+    "basis": "official local install; Claude Code MCP through .mcp.json; Codex skill from the pinned packages/skills/memmachine-memory tree or a pinned, section-1-gated installer (npx skills add / pipx run shskills install --agent codex). The skill drives mem-cli from memmachine-client, which must be pinned in the arm's SBOM; the Codex path must be pinned and gated before freeze",
     "locators": [
      "MemMachine/MemMachine@1d3e0ce2:docs/install_guide/integrate/claude_code_mcp.mdx:62",
-     "MemMachine/MemMachine@1d3e0ce2:packages/skills/README.md:22"
+     "MemMachine/MemMachine@1d3e0ce2:packages/skills/README.md:13-24",
+     "MemMachine/MemMachine@1d3e0ce2:packages/skills/memmachine-memory/SKILL.md:31-33",
+     "MemMachine/MemMachine@1d3e0ce2:packages/client/pyproject.toml:6,38"
     ]
    }
   },
@@ -323,7 +327,7 @@
    "verdict": "ACTIVE",
    "screen": {
     "route": "outside S3: a candidate for the Harbor token-tool E2E's next round; no S3 arm",
-    "basis": "local code graph with MCP for both clients (landscape report, unverified at a pin); not in the Harbor run"
+    "basis": "local code graph with MCP for both clients (landscape report, unverified at a pin); absence from the Harbor run is relayed, with no receipt in this checkout; the Harbor receipt is required before freeze; S3 has no code-retrieval tool arm"
    }
   },
   {
@@ -341,8 +345,8 @@
    },
    "verdict": "ACTIVE",
    "screen": {
-    "route": "outside S3: code-retrieval tools are measured as token tools in the separate Harbor E2E; no S3 change",
-    "basis": "the landscape listed it as a code-retrieval reserve; S3 has no code-retrieval comparison"
+    "route": "outside S3: measurement as a token tool in the separate Harbor E2E is relayed; no S3 change",
+    "basis": "the landscape listed it as a code-retrieval reserve; S3 has no code-retrieval tool arm; no receipt for the relayed Harbor run exists in this checkout, and the Harbor receipt is required before freeze"
    }
   }
  ],
@@ -355,6 +359,6 @@
    "checked_utc": "2026-09-30T17:03:07Z"
   }
  ],
- "screen_revised_utc": "2026-09-30T17:03:07Z",
- "screen_revision_note": "screen annotations corrected before first publication: reserve 7/8 order by the stated basis, HippoRAG release identity, Mem0 OpenMemory wording, Serena and GitNexus layer routes; PyPI observation added; gate data unchanged"
+ "screen_revised_utc": "2026-09-30T18:03:21Z",
+ "screen_revision_note": "screen annotations repaired after cross-family review: actual MCP Memory Service Codex recipe and native-HTTP adaptation, pending pinned/gated Codex paths for it and MemMachine, completed MemMachine release-source re-read, and relayed Serena/GitNexus Harbor facts requiring a receipt before freeze; prior screen corrections retained; captured gate data unchanged"
 }
