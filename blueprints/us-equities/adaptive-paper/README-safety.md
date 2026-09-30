@@ -278,8 +278,14 @@ formatting fractional L can include a fee from earlier within that second, which
 is also booked before baseline and deduplicated thereafter. Fees earlier engines
 absorbed into a baseline are booked at the next checkpoint; recomputing baseline
 after booking preserves cash reconciliation. Fee losses still consume the risk
-budget during recovery: a cap halt replaces `recovery_only`, while the sell-only
-restriction remains in force.
+budget during recovery. More generally, any risk cap that trips during a recovery
+(a fee, a fill, or a mark that lifts the residual above the gross-exposure cap)
+now replaces `recovery_only` with that halt reason, exactly as it would halt a
+trial. The halt is permanent for the ledger (`next_trial_cannot_clear_risk_halt`),
+the sell-only exit is not blocked, and a flat recovery still ends `finished`.
+Before this change a cap trip during recovery stayed masked as `recovery_only`:
+loss-budget crossings were still refused at the next trial
+(`next_trial_risk_budget_exhausted`), but an exposure-cap trip was cleared.
 
 **Receipts.** The mover trial receipt and the `mover_recovery_receipt` carry
 `fees_recorded` (count, total and per sub-type count and total; no activity ids).
@@ -287,10 +293,13 @@ The trial receipt's `totals.fees_recorded_usd` joins the per-symbol P&L in
 `pnl_consistent`.
 
 **Limits.** A fee posted during the checkpoint refuses that start; the next
-start retries. Fees of a lineage's last day that post after its last trial are
-never booked into that lineage: cash remains consistent because the next lineage
-absorbs them into its baseline (except any included by the whole-second cutoff,
-which are booked before baseline). A fee posted between a later snapshot's
+start retries. Fees that post after a lineage's final snapshot are booked into
+that lineage only if a later `paper` or `recover` runs on it: `recover` accepts a
+finished trial, keeps its fee window and books any new fee there (they then count
+against that lineage's budgets). A lineage that is retired and never invoked again
+never books them; cash stays consistent because the next lineage absorbs them into
+its baseline (except any included by the whole-second cutoff, which are booked
+before baseline). A fee posted between a later snapshot's
 account and fee reads can still cause a cash mismatch; reconciliation fails
 closed. Under the Regulatory Fees page's intraday-accrual hypothesis, a mover
 trial starting after an earlier trial's accrual stays blocked once the FEE posts
@@ -298,8 +307,24 @@ inside its window, until an operator re-baselines. The 2026-09-30 measured gap
 equaled the three posted activities; that observation did not establish pending
 accrual behavior. Legacy mover metadata without `fee_window_start` keeps
 `current_trial_started_at` for recovery, including the account-2 residual's
-2026-09-29T20:25:19Z window. Legacy adaptive metadata keeps `started_at`. Both
-lineages' fee windows grow with their life (more pages per snapshot, bounded by
+2026-09-29T20:25:19Z window. Legacy adaptive metadata keeps `started_at`, but its
+baseline came from a preflight account read taken before `started_at`. A fee
+created between that read and `started_at` is never listed, and one created in the
+truncated second before the read is counted twice. Either leaves that adaptive lane
+mismatched until an operator re-baselines. New adaptive lanes use the checkpoint.
+The adaptive lane's next-trial check compares the preflight's cash, which is read
+before its fee read, so a fee posted between those two reads is booked but refuses
+that start (`next_trial_cash_mismatch`); a retry then reconciles. A fee a
+checkpoint books at a start that `begin_next_trial` then refuses (for example, one
+that trips a cap) is in the ledger and its `fee_recorded` event, but in no
+receipt's `fees_recorded`. The checkpoint's window L is the local clock, while the
+broker filters on its own `created_at`. If the local clock runs ahead of the broker's
+by more than the gap between the truncated L and the account read, a fee created
+inside that gap is neither listed nor in the baseline, and it stays mismatched. The
+gap is bounded: `validate_preflight` refuses a clock drift above 0.25 s
+(`clock_drift`) just before the checkpoint. It affects only a new lineage's first
+checkpoint. Both lineages' fee
+windows grow with their life (more pages per snapshot, bounded by
 `max_snapshot_pages`). `tests/test_adaptive_paper_fees.py` covers this section
 with local synthetic fixtures (no broker request).
 

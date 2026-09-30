@@ -575,6 +575,18 @@ class FeeLedger(FeePrivacyCapture, unittest.TestCase):
         with self.assertRaisesRegex(SafetyError, "^next_trial_cannot_clear_risk_halt$"):
             ledger.begin_next_trial(self.NOW + 4, "after-fees")
 
+    def test_any_cap_trip_during_recovery_is_sticky_and_the_sell_still_completes(self):
+        # The recovery_only replacement in _refresh_risk is not fee-specific: a mark that
+        # lifts the residual above the gross-exposure cap during recovery also halts for
+        # good, exactly as it would inside a trial. The sell-only exit is not blocked.
+        ledger = self.recovery_position(RiskLimits(max_gross_exposure_usd=D("150"), max_order_notional_usd=D("150")))
+        ledger.mark_to_market([safety.Quote("SPY", "200", "200.01", self.NOW + 2)], self.NOW + 2)
+        self.assertEqual(ledger.halted_reason(), "gross_exposure_cap_exceeded")
+        self.assertEqual(ledger._get("recovery_only"), "1")
+        self.finish_recovery(ledger)
+        with self.assertRaisesRegex(SafetyError, "^next_trial_cannot_clear_risk_halt$"):
+            ledger.begin_next_trial(self.NOW + 4, "after-spike")
+
     def test_record_fees_books_cash_realized_and_loss_once_with_one_event_each(self):
         self.assertEqual(self.ledger.record_fees(measured_fees(), self.NOW), measured_fees())
         state = self.ledger.accounting()
