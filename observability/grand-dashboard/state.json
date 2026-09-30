@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T07:38:10Z",
+  "recorded_at_utc": "2026-09-30T09:14:03Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -26,6 +26,13 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "runtime-worker-quality-and-image",
+      "title": "Runtime candidate image and task-quality acceptance",
+      "state": "pending / full OpenHands image has 56 fixable High-Critical scanner matches / observer and frozen task-quality controls unqualified",
+      "evidence_ref": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json"
+    },
     {
       "kind": "gate",
       "id": "memory-scheduled-learning",
@@ -384,6 +391,20 @@
       "title": "Broad-universe builders and reviewers",
       "state": "3 builders + 3 Opus reviewers + 3 fix builders in owned worktrees / Codex foreground lane 4 passes / all findings resolved",
       "evidence_ref": "blueprints/us-equities/broad-universe/receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "foundation-runtime-candidates",
+      "title": "Native runtime worker candidates",
+      "state": "OpenHands 1208 selected upstream tests / GPT Researcher 24 / DeerFlow 309 + 8 scorer / Crawl4AI model-free job + 16 tests / image and quality gates pending",
+      "evidence_ref": "blueprints/runtime-workers/README.md"
+    },
+    {
+      "kind": "worker",
+      "id": "runtime-claude-coordination",
+      "title": "Claude runtime and SDK ownership handoff",
+      "state": "actual peer replies / separate SDK follow-up after owner pin promotion / no blanket Gate A or observer acceptance",
+      "evidence_ref": "docs/decisions/2026-09-30-runtime-worker-coordination.md"
     }
   ],
   "plan_ref": "blueprints/us-equities/catalyst-convergence/plan.json",

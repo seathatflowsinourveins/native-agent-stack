@@ -2,8 +2,8 @@
 
 Decision: retain the accepted native defaults and the unresolved runtime
 acceptance gates; finish the exact-lock citation cleanup and prepare a
-supported, bounded image trial. Source-only changes proceed while the SDK
-pin owner finishes its separate client qualification. No host deployment or
+supported, bounded image trial. Source-only changes preserve the separate
+client/SDK qualification scopes. No host deployment or
 model run is implied. This follows
 [the convergence architecture](../convergence-architecture.md), the
 [acceptance evidence policy](../acceptance-evidence-policy.md) and the
@@ -74,10 +74,12 @@ The other runtime session reports no owned files, branch, service or gate in
 this work, so there is no implementation overlap to hold. These reported
 ownership statements are coordination evidence, not upstream acceptance.
 
-The client-pin owner retains [PR #542](https://github.com/seathatflowsinourveins/native-agent-stack/pull/542)
-and its remaining model-placeholder/platform checks. The SDK follow-up stays
-at `404b821cd3af25800ea418dc6145cc5cb6fe33c5` until that PR actually merges.
-Then rebase onto current main, rebuild shared evidence last, open the separate
+The client-pin owner's [PR #542](https://github.com/seathatflowsinourveins/native-agent-stack/pull/542)
+actually merged at `2026-09-30T19:54:23Z` as
+`1f2cdce5a3cdf3f965d45196d8158d12431394d2`, independently verified through
+native GitHub metadata. The SDK source at
+`404b821cd3af25800ea418dc6145cc5cb6fe33c5` is retained unchanged while a new
+isolated publication worktree uses that merged base. Rebuild shared evidence last, open the separate
 `lane:shared` draft and obtain trading-owner acknowledgement and measurement
 owner source-scope review. Preserve the example's explicit Astra model and
 the cumulative-usage repair. Its Collector change is repository source only;
@@ -381,3 +383,28 @@ head; the original observation's baseline and receipt stay unchanged. The
 owned branch history also folds shared evidence and dashboard changes into
 its final commit, following the [hot-file protocol](../lanes.md#hot-file-protocol).
 These corrections add no execution or runtime acceptance.
+
+At 20:21 UTC, native GitHub metadata confirms the independent review is
+published in open [PR #558](https://github.com/seathatflowsinourveins/native-agent-stack/pull/558),
+head `54d09ee8810ed98059347097277fcd9f8432de36`. Its
+[receipt](https://github.com/seathatflowsinourveins/native-agent-stack/blob/54d09ee8810ed98059347097277fcd9f8432de36/evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json)
+is 12,992 bytes with SHA256
+`b0742663250afe8eff4692ad7be26b1b894d9977c80154ee3fa71e878efbe880`.
+Independent original-source inspection verifies all 32 published file hashes,
+the 832938 lock/pins and retained nine OAuth identities, 62 artifact / 53
+command bindings, hashed install/dependency/import exits 0, configured scan
+exit 0 and empty-config exit 1 for the two retained OAuth advisories. Recorded
+checks are 245 total tests, five skips, exit 0; they remain separate from this
+lane's 360/6 record. This audit replays no install, scan, model or tests.
+
+The static method's symlink/read-error exclusions and restricted name search
+retain dynamic and semantic reachability uncertainty; its exit is not separately
+retained. Public sanitized output fidelity to private originals is unverified,
+and SARIF files are summarized rather than included. The workflow evidence is
+bound to `1df67c92…` / step `bc092b63…`, not a future #555 revision. The owner's
+[public P2 closure](https://github.com/seathatflowsinourveins/native-agent-stack/pull/535#issuecomment-5918675360)
+applies at `f764a315…`; citation/comment/history changes still receive the next
+published-head check. This independently citable static evidence approves no
+merge or broader runtime qualification. The SDK follow-up is separately
+published as [draft PR #560](https://github.com/seathatflowsinourveins/native-agent-stack/pull/560)
+at `f4f0d61e…`, preserving the 404 source bytes on the actual #542 merge base.

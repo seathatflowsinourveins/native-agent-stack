@@ -47,7 +47,16 @@ The receipt and [command ledger](evidence/pyjwt-relock-20260930-commands.json)
 preserve actual native returns and distinguish upstream tests, local integration
 and fixtures.
 
-**Independent BC review of the new exact head remains pending.** The
+The [published independent BC review](https://github.com/seathatflowsinourveins/native-agent-stack/blob/54d09ee8810ed98059347097277fcd9f8432de36/evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json)
+binds the **832938** lock at reviewed head `7c0df369…`, unchanged at `f764a315…`.
+Receipt SHA256 is
+`b0742663250afe8eff4692ad7be26b1b894d9977c80154ee3fa71e878efbe880`.
+Its original outputs record a fresh hashed Linux install, dependency/import
+checks, native scanner controls and 245 repository tests with five skips.
+The bounded static caller review retains dynamic reachability limitations;
+it does not prove semantic unreachability. [PR #558](https://github.com/seathatflowsinourveins/native-agent-stack/pull/558)
+was open when cited; publication supplies no merge, image, provider, observer
+or task-quality acceptance. The
 [historical independent review](../../../evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/receipt.json)
 published through merged [PR #537](https://github.com/seathatflowsinourveins/native-agent-stack/pull/537)
 covers only `383ccc5b…`: corrected main-version comparison, Linux installation,
@@ -74,8 +83,9 @@ A later native Grype scan of the pinned image returned **56 fixable
 High/Critical package/advisory matches**. The
 [scan and primary-source triage](evidence/image-triage-20260930.json) retain
 possible identity collisions separately from bundled runtime findings.
-**Image acceptance remains pending.** The shared Next.js gate and native
-source/image scan split repair remain outstanding. Gate A/P3, provider,
+**Image acceptance remains pending.** The shared native ordinary/frozen scan
+split merged through [PR #546](https://github.com/seathatflowsinourveins/native-agent-stack/pull/546)
+as `8fc86119…`; it supplies no image qualification. Gate A/P3, provider,
 independent observer and task-quality qualification remain open; no whole-task
 savings acceptance follows from this closure. No model call, gateway change,
 new optional service or worker container was started by these relocks.

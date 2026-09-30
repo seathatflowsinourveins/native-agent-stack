@@ -80,8 +80,10 @@ IGNORE_ALLOWED_LOCKS = {
     # linux/amd64 image (Dockerfile CPython 3.13.15), not a native macOS venv.
     # Other platforms/interpreters or changed source require a new review.
     # Native urllib3/PyJWT relocks retain the reviewed OAuthlib wheel/caller
-    # identities. A fresh artifact-only independent review of this new lock
-    # remains pending; PR #537 covered the historical 383ccc closure only.
+    # identities. PR #558's public 54d09ee8 receipt independently reviews
+    # this 832938 closure; the recipe README links the exact source/hash.
+    # PR #537 covers the historical 383ccc closure only. The native relock
+    # binding below remains separate from that bounded static review.
     # The joint oauthlib 4.0.0 relock removes this entry; it grants no image,
     # arbitrary worker-code acceptance, merge approval or promotion.
     "blueprints/runtime-workers/openhands/requirements.lock": {
