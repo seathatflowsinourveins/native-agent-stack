@@ -174,7 +174,9 @@ evidence to verify, reached workers only through project instructions. Several r
 (`omitClaudeMd`), and the carrier blocks do not state the rule. This unit (branch `claude/sota-defaults-f2-20260930`,
 base `11227bfd`) states it in the three role bodies that no sealed record binds, and specifies the carrier lines
 that stay held. It also adds the session-start notice that reads the due-file the daily stack-currency timer
-writes (a separate unit, with its own record `docs/decisions/2026-09-30-session-currency-notice.md`).
+writes (a separate unit, with its own record `docs/decisions/2026-09-30-session-currency-notice.md`). This change
+requires that unit (PR #539) merged first: the hook, its test and this addendum cite `scripts/currency_due.py` and
+that record, which exist only there, and the hook reads a due-file that only its timer writes.
 
 ### Decision
 
@@ -264,10 +266,15 @@ condition goes beyond the unit brief; the due-file writer creates the file 0600.
 hook's own share over a bare interpreter start (50 ms, median of nine runs); the whole-process median is printed by
 the test, not asserted against 50 ms, and only a 1 s ceiling bounds it.
 
-First-prompt size (preregistered above): the `Skill` grant adds the Skill tool and its skill listing to every
-`stack-researcher` first prompt. The Adopt-B criterion (its median first prompt below the `general-purpose`
-median of the same run) is unchanged and now includes that listing. The size is unmeasured; the coordinator's
-headless preload probe measures it before and after the grant, and the result is recorded here.
+First-prompt size (preregistered above): the `Skill` grant is held (H3, the Gate A owner's Amendment 4), not
+applied by this change. When it lands it adds the Skill tool and its skill listing to every `stack-researcher`
+first prompt, and the Adopt-B criterion (its median first prompt below the `general-purpose` median of the same
+run), itself unchanged, then includes that listing. The size is unmeasured; the coordinator's headless preload
+probe measures it before and after the grant lands, and the result is recorded here.
+
+The Codex-native example role `examples/codex-native/agents/semantic-evidence-reviewer.toml` and the installed
+worker role of unit F4 do not carry the reviewer sentence: both are outside this unit's paths, and the Codex copies
+take the sentence in one follow-up after this change and F4 merge, so that the two Codex files change together.
 
 ### Alternatives
 
@@ -284,16 +291,17 @@ headless preload probe measures it before and after the grant, and the result is
 5. An evidence clause on the three blind bodies, with new lane-registry digests. Rejected: the sealed
    token-adoption E2E freezes `blind-judge` and `blind-lane-reviewer`, the lane registry binds
    `blind-lane-reviewer` and `blind-adjudicator` by hash, and a blind role has no way to research.
-6. An installer that appends the Codex group to the user `hooks.json`. Not added: B1 applies no Codex hook, and
-   the pre-trusted key `session_start:1:0` holds only when the group lands second, which an installer would have
-   to guarantee.
+6. An installer that appends the Codex group to the user `hooks.json`, or a pre-computed trust entry for it in
+   the config template. Neither: B1 applies no Codex hook, and a trust entry holds only for the key the group's
+   position gives it (`session_start:1:0` when hand-appended second, `session_start:2:0` after two groups), so a
+   hand-appended group stays untrusted until it is reviewed in `/hooks`, which is the reviewed path.
 
 ### Overturn condition
 
 - Remove the notice hook if the cost gate of the session currency notice record fails in a measured run: more
   than 60 tokens with the due-file, or any added tokens without it.
-- Revert the `Skill` grant if the preload probe shows the researcher's first prompt at or above the
-  `general-purpose` median.
+- Do not apply the held `Skill` grant (or revert it once applied) if the preload probe shows the researcher's
+  first prompt at or above the `general-purpose` median.
 - Drop a body sentence if a measured child run shows it adds no cited sources.
 - Give a blind body a clause only through a dated amendment to the sealed token-adoption E2E and an append-only
   lane-registry entry made together, and only if a measured blind run shows a gain.

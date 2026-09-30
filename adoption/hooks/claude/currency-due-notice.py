@@ -16,7 +16,8 @@ summary_line, details}. This hook prints only summary_line, as SessionStart addi
   applied by any installer; B1 applies no Codex hook.
 
 It prints nothing unless stdin is a SessionStart event and the due-file is a regular file of at most 1 MiB, owned
-by this user and writable by no one else (the check OpenSSH's StrictModes applies to a user's files, sshd_config(5)),
+by this user and writable by no one else (the file-level part of the check OpenSSH's StrictModes applies to a
+user's files, sshd_config(5); the directory chain above the file is not checked),
 holding a JSON object whose summary_line, stripped, is 1-160 printable characters and whose generated_at is an
 ISO 8601 time at most 8 days old and at most a day ahead (a writer's time-zone slip; a naive time reads as UTC).
 XDG_STATE_HOME follows the base directory specification 0.8: unset, empty or relative means $HOME/.local/state.
