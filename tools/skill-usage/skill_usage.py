@@ -976,11 +976,17 @@ def codex_shell_type(shell) -> str | None:
 def _posix_script(parts: list) -> str | None:
     """The script of a POSIX shell's argv: with -c among its options, the shell reads commands from the first non-option
     argument (bash(1) INVOCATION and OPTIONS; the sh -c synopsis of POSIX.1-2024 XCU sh). An option word is '-' or '+'
-    followed by ASCII letters, and each o or O in it takes the next word as its option name (-o option, -O shopt_option);
-    any other word ends the options, so a long option such as --login, or --, leaves no script. A linear scan."""
+    followed by ASCII letters, and each o or O in it takes the next word as its option name (-o option, -O shopt_option).
+    '--' or '-' ends the options and the next word is the first non-option argument (bash(1) OPTIONS: "A -- signals the
+    end of options ... An argument of - is equivalent to --"; POSIX.1-2024 XCU sh: "A single <hyphen-minus> shall be
+    treated as the first operand and then ignored"; bash 5.2.21 and dash run it so on this stack). Any other word ends the
+    options too, so a long option such as --login leaves no script. A linear scan."""
     index, run = 1, False
     while index < len(parts):
         word = parts[index]
+        if word in ("--", "-"):
+            index += 1
+            break
         letters = word[1:]
         if not (word[:1] in ("-", "+") and letters and letters.isascii() and letters.isalpha()):
             break

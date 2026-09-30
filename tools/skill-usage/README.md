@@ -264,8 +264,11 @@ review's finding that `shell_script` keeps its reading for the legacy lane count
   program directly. The program is typed by its file stem, with `/` and `\` as separators: `sh`,
   `bash`, `zsh`, `dash` and `ksh` are POSIX shells, and with `-c` among their short options the first
   non-option argument is the script (bash(1) INVOCATION: `-lc`, `-cl`, `-e -c`, and `-o pipefail -c`,
-  where each `o` or `O` takes the next word); `pwsh`, `powershell` and `cmd`, matched ASCII
-  case-insensitively as Windows resolves program names, are not.
+  where each `o` or `O` takes the next word). `--` or `-` ends the options, and the word after it is
+  the script (bash(1) OPTIONS: "An argument of - is equivalent to --"; POSIX.1-2024 XCU sh; bash 5.2.21
+  and dash run `-c -- 'script'` and `-c - 'script'` so). A long option such as `--login` leaves no
+  script. `pwsh`, `powershell` and `cmd`, matched ASCII case-insensitively as Windows resolves program
+  names, are not POSIX shells.
 - `exec_command`'s `cmd` runs in the shell its `shell` argument names, typed as Codex types it
   ([shell_detect.rs:39-59](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/shell-command/src/shell_detect.rs#L39-L59)):
   the value, else its file stem again and again, case-sensitively. `zsh`, `bash` and `sh` are POSIX
