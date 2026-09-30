@@ -14741,8 +14741,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "8a838299c548696190b86c2f109eb48c12f281c014c0a19f78eea19999671f72",
-      "bytes": 29742
+      "sha256": "dbc44da91c236850dd81efb963327a131b489f1586ba2c00c8405231a789ee9a",
+      "bytes": 31969
     },
     {
       "path": "docs/direct-results.md",
@@ -14826,8 +14826,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "43462c810e82f977f336a199ac9cf883f5b4b9400b7236573be09da90feff0e4",
-      "bytes": 38834
+      "sha256": "32631879f04b8cc5d5e26d43cbec253298d85c0d4dc7c6dfeaca7ad197d3d0b9",
+      "bytes": 39005
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -34821,8 +34821,8 @@
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/receipt.json",
-      "sha256": "a4784131b0af7ef38ddabde15108cf5a69c7a57b693ae86d9122fd4b8a7ca90b",
-      "bytes": 19108
+      "sha256": "98cb259fe6d82d674980745288f5ff16ffb083bea6c6dfa9deb2ae0172422d21",
+      "bytes": 20717
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/backup_stores.py.txt",
