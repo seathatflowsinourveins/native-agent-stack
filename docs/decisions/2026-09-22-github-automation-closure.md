@@ -351,7 +351,9 @@ locally with `GH_TOKEN` set and no `--offline`, using
   file with unparsable lines elsewhere is not rejected by them, and the scanner's own parse fails on it separately. Five
   cross-family reviews (`gpt-6-astra` at max effort as invoked, read-only) found the first reader fooled by a quoted key and blind to
   package-lock.json and yarn.lock, then to aliases, tarball entries and a backtracking regex, then to valid syntax outside its
-  assumptions, then to local-path and git dependencies; the repairs made it canonical-only and fail-closed, with their mutants
+  assumptions, then to local-path and git dependencies; an independent verifier run by the Codex root then found, with the pinned scanner, that a
+  tagged top-level `packages` key and `packages` supplied through a YAML merge key also escaped (reproduced in the returned outputs, section K), so
+  the pnpm reader now refuses any top-level line that is not a plain key. The repairs made it canonical-only and fail-closed, with their mutants
   kept as negative controls.
   **Alternatives considered:** exclusion from the inventory (rejected: `excluded` is for test
   fixtures only, by test); editing the frozen lock (its bytes are hash-bound evidence); waiting for an owner (none recorded); a

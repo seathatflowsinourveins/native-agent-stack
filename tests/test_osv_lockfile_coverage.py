@@ -192,6 +192,11 @@ PNPM_LOCKFILE_VERSION = re.compile(r"^lockfileVersion:[ \t]*['\"]?([0-9.]+)['\"]
 PNPM_ENTRY_KEY = re.compile(r"""  ('(?:[^']|'')+'|[A-Za-z0-9_.][^\s#]*):""")
 PNPM_FIELD = re.compile(r"""    ([A-Za-z_][A-Za-z0-9_]*):(?: (\S.*))?""")
 PNPM_PLAIN_SCALAR = re.compile(r"""[A-Za-z0-9_.][^#]*""")
+# A top-level key of a pnpm lock: a plain identifier. Anything else at column 0 (a tag such as `!!str packages:`, an anchor, an alias, the merge
+# key `<<:`, a quoted or complex key, a directive) is YAML through which `packages` can reach OSV's decoder in ways this reader does not model.
+PNPM_TOP_KEY = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*:(?: .*)?")
+# Line separators that Python's splitlines() honors and the YAML and line scanners of OSV's extractors may not: a file with one gives no answer.
+EXOTIC_LINE_BREAKS = re.compile("[\x0b\x0c\x1c\x1d\x1e\x85\u2028\u2029]")
 NPM_SEMVER = re.compile(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?", re.ASCII)
 NPM_TARBALL_URL = re.compile(r"https?://[^\s#?]+", re.ASCII)
 GIT_HOST_HINT = re.compile(r"git|bitbucket|codeload", re.IGNORECASE)
@@ -199,13 +204,23 @@ YARN_VERSION = re.compile(r"""^ {2}"?version"?:? "?([\w.+-]+)"?$""")
 GO_JSON_FIELDS = ("lockfileVersion", "packages", "dependencies", "name", "version", "resolved")
 
 
-def pnpm_scalar(value):
-    """A plain or single-quoted YAML scalar, unquoted; None for anything else (a comment, a flow collection, a double-quoted string)."""
+PNPM_NAME_VALUE = re.compile(r"@?[a-z0-9][a-z0-9._~-]*(?:/[a-z0-9._~-]+)?", re.ASCII)
+PNPM_VERSION_VALUE = re.compile(r"[0-9][0-9A-Za-z.+-]*", re.ASCII)
+# Plain scalars YAML resolves to null or a boolean: a string field given one of them may decode to the empty string, which OSV then replaces by the
+# name or version of the entry's key, so the value written here is not what OSV uses.
+YAML_SPECIAL_WORDS = frozenset(("null", "true", "false", "yes", "no", "on", "off", "y", "n"))
+
+
+def pnpm_scalar(value, pattern=None):
+    """A plain or single-quoted YAML scalar, unquoted; None for anything else (a comment, a flow collection, a double-quoted string, a YAML
+    null or boolean word, and, when a pattern is given, a value that does not fully match it)."""
     if len(value) >= 2 and value[0] == value[-1] == "'":
-        return value[1:-1].replace("''", "'")
-    if PNPM_PLAIN_SCALAR.fullmatch(value) and " #" not in value and not value.endswith(":"):
-        return value
-    return None
+        value = value[1:-1].replace("''", "'")
+    elif not (PNPM_PLAIN_SCALAR.fullmatch(value) and " #" not in value and not value.endswith(":")):
+        return None
+    if value.lower() in YAML_SPECIAL_WORDS or (pattern is not None and not pattern.fullmatch(value)):
+        return None
+    return value
 
 
 def pnpm_packages(text):
@@ -213,8 +228,9 @@ def pnpm_packages(text):
     spaces, plain or single-quoted, alone on their line; their `name:` and `version:` fields at four, plain or single-quoted scalars;
     anything deeper is content of a field (flow mappings, block mappings) and is skipped. OSV reads only this map. None when a line
     of the section is outside that subset: an inline record, a double-quoted key, a quoted field key, a trailing comment, a tab or an
-    odd indentation, a repeated or quoted `packages` key at the top level."""
-    entries, in_packages, seen, current = [], False, False, None
+    odd indentation, a repeated `packages` key, or a top-level line that is not a plain `key:` (a tag, an anchor, an alias, a merge
+    key `<<: *base`: YAML that can supply `packages` without spelling it)."""
+    entries, in_packages, seen, current, first_child = [], False, False, None, False
     for raw in text.splitlines():
         line = raw.rstrip()
         stripped = line.strip()
@@ -224,30 +240,36 @@ def pnpm_packages(text):
             return None
         indent = len(line) - len(line.lstrip(" "))
         if indent == 0:
+            if not PNPM_TOP_KEY.fullmatch(line):
+                return None
             if line == "packages:" or line.startswith("packages: "):
                 if seen or line != "packages:" and line != "packages: {}":
                     return None
                 in_packages, seen, current = line == "packages:", True, None
-            elif re.match(r"""['"]?packages['"]?\s*:""", line) or line.startswith("? "):
-                return None
             else:
                 in_packages, current = False, None
             continue
         if not in_packages:
             continue
+        if indent > 2 and first_child:
+            if indent != 4:
+                return None  # the fields of an entry sit at four spaces; a mapping indented otherwise would hide its name and version
+            first_child = False
+        elif indent <= 2:
+            first_child = False
         if indent == 2:
             match = PNPM_ENTRY_KEY.fullmatch(line)
             if not match:
                 return None
             key = match.group(1)
-            current = {}
+            current, first_child = {}, True
             entries.append((key[1:-1].replace("''", "'") if key.startswith("'") else key, current))
         elif indent == 4:
             match = PNPM_FIELD.fullmatch(line)
             if not match or current is None:
                 return None
             if match.group(1) in ("name", "version"):
-                value = pnpm_scalar(match.group(2) or "")
+                value = pnpm_scalar(match.group(2) or "", PNPM_NAME_VALUE if match.group(1) == "name" else PNPM_VERSION_VALUE)
                 if value is None:
                     return None
                 current[match.group(1)] = value
@@ -290,6 +312,8 @@ def pnpm_next_pins(text):
     """The versions of `next` in a pnpm-lock.yaml (any document at lockfileVersion 9; another version, or none: None), from the `packages`
     entries only, as OSV reads them (name and version from the key or the entry's own fields, so tarball, aliased and renamed entries
     count; importers, snapshots and peer declarations are not packages). None for a file outside the canonical subset (pnpm_packages)."""
+    if EXOTIC_LINE_BREAKS.search(text):
+        return None
     documents = pnpm_documents(text)
     if not documents:
         return None
@@ -418,6 +442,8 @@ def yarn_lock_next_pins(text):
     which of the form `version "x"` or `version: x` gives the version; a header naming next through an `npm:` alias counts, and the
     `__metadata:` group and the root workspace (`@workspace:.":`) are skipped. A file with neither the classic header nor
     `__metadata:`, an indented line before any header, or a next group without a version gives None."""
+    if EXOTIC_LINE_BREAKS.search(text):
+        return None
     lines = text.splitlines()
     if not any(line.startswith(("# yarn lockfile v1", "__metadata:")) for line in lines):
         return None
@@ -834,6 +860,23 @@ class AllowedLockTests(unittest.TestCase):
             ("pnpm-lock.yaml", "lockfileVersion: 9\n\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
             ("pnpm-lock.yaml", "lockfileVersion: 9.0\n\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
             ("pnpm-lock.yaml", pnpm + "packages: {}\n", []),
+            # fields the way YAML allows but pnpm never writes: children indented other than four, name or version as YAML null or boolean words
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n      name: next\n      version: 16.3.5\n", None),
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: null\n", None),
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    version: ~\n", None),
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: 'next'\n    version: '16.3.5'\n", ["16.3.5"]),
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: Next\n", None),
+            ("pnpm-lock.yaml", pnpm + "x-anchor: &base\n  foo: 1\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
+            # YAML that supplies `packages` without spelling it plainly, which OSV's decoder reads (found by the independent verifier of the first repair
+            # with the pinned scanner): a tagged key, a merge key, an anchored or aliased key, a directive, a quoted key
+            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\n!!str packages:\n  next@16.3.5:\n    resolution: {}\n", None),
+            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\nbase: &base\n  packages:\n    next@16.3.5:\n      resolution: {}\n<<: *base\n", None),
+            ("pnpm-lock.yaml", pnpm + "&k packages:\n  next@16.3.5:\n" + resolution, None),
+            ("pnpm-lock.yaml", pnpm + "*alias : x\npackages:\n\n  react@19.3.0:\n" + resolution, None),
+            ("pnpm-lock.yaml", "%YAML 1.2\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution, None),
+            ("pnpm-lock.yaml", pnpm + "\"packages\":\n\n  next@16.3.5:\n" + resolution, None),
+            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\npackages:\u2028  next@16.3.5:\n    resolution: {}\n", None),
+            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n    resolution: {}\x85\n", None),
             # pnpm 12 writes two documents (the environment lockfile, then the project lock); OSV extracts the packages of every one
             ("pnpm-lock.yaml", "---\n" + pnpm + "packages:\n\n  react@19.3.0:\n" + resolution + "\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution, ["16.3.5"]),
             ("pnpm-lock.yaml", "---\n" + pnpm + "packages:\n\n  next@16.3.6:\n" + resolution + "\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution,
@@ -917,6 +960,7 @@ class AllowedLockTests(unittest.TestCase):
             ("yarn.lock", yarn1 + "alias@npm:" * 1200 + 'next@^16.3.0:\n  version "16.3.5"\n', ["16.3.5"]),
             ("yarn.lock", yarn1 + "next@^16.3.0:\n  resolved \"https://x\"\n", None),
             ("yarn.lock", "next@^16.3.0:\n  version \"16.3.5\"\n", None),
+            ("yarn.lock", yarn1 + 'next@^16.3.0:\n  version "16.3.5"\u2028', None),
             ("yarn.lock", '# yarn lockfile v1\n  version "1.0.0"\n', None),
             # formats no reader knows
             ("bun.lock", '{"lockfileVersion": 1, "packages": {"next": ["next@16.3.5"]}}', None),

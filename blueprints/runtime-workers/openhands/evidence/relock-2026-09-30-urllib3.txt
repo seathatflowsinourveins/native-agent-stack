@@ -9,7 +9,7 @@
 # review outputs (relock-2026-09-30-urllib3.cross-family-review-N.md with the rubric it was given).
 
 ## A. The five advisories, the versions they hit, the release dates and the upstream tags (OSV API, PyPI and git, read-only)
-$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-advisories.py.txt     # 2026-09-30T17:22:47Z
+$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-advisories.py.txt     # 2026-09-30T17:30:00Z
 GHSA-8988-9cw3-xx77	osv published 2026-09-30T14:46:04Z	github_reviewed_at 2026-09-30T14:46:04Z	nvd_published_at 2026-09-29T16:17:18Z	aliases ['CVE-2026-97687']	HIGH	['CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N']	PyPI urllib3	introduced ['1.26.0'] fixed ['2.8.0']
     urllib3: HTTPS proxy TLS configuration may be ignored or overridden
 GHSA-vxq7-64xx-v4gw	osv published 2026-09-30T14:46:18Z	github_reviewed_at 2026-09-30T14:46:18Z	nvd_published_at 2026-09-29T16:17:18Z	aliases ['CVE-2026-97689']	HIGH	['CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H']	PyPI urllib3	introduced ['1.10.3'] fixed ['2.8.0']
@@ -37,22 +37,25 @@ pypi PyJWT 2.15.0 file pyjwt-2.15.0.tar.gz: uploaded 2026-09-23T16:56:00.689307Z
 pypi PyJWT 2.15.1 file pyjwt-2.15.1-py3-none-any.whl: uploaded 2026-09-28T18:40:41.429003Z, not yanked, sha256 42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193
 pypi PyJWT 2.15.1 file pyjwt-2.15.1.tar.gz: uploaded 2026-09-28T18:40:42.598678Z, not yanked, sha256 4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8
 exit: 0
-$ git ls-remote https://github.com/urllib3/urllib3 refs/tags/2.8.0 'refs/tags/2.8.0^{}'     # 2026-09-30T17:22:49Z
+$ git ls-remote https://github.com/urllib3/urllib3 refs/tags/2.8.0 'refs/tags/2.8.0^{}'     # 2026-09-30T17:30:03Z
 2f980b433a89399ad5efd72e7f6da04e667ea287	refs/tags/2.8.0
 b1d30ab61fe0db8f11092805e8c5ac43e091064a	refs/tags/2.8.0^{}
 exit: 0
-$ git ls-remote https://github.com/jpadilla/pyjwt refs/tags/2.15.0 'refs/tags/2.15.0^{}'     # 2026-09-30T17:22:50Z
+$ git ls-remote https://github.com/jpadilla/pyjwt refs/tags/2.15.0 'refs/tags/2.15.0^{}'     # 2026-09-30T17:30:03Z
 bd03a98b72aa7105b7920b9d0e7818369ac76abe	refs/tags/2.15.0
 1d41a6478e1562e68ff667fcd703356acf085f68	refs/tags/2.15.0^{}
 exit: 0
-$ sha256sum <scratch-relock>/sdk-fcc102a.tar.gz     # the pinned SDK archive of pins.json source_archive     # 2026-09-30T17:22:50Z
+$ git -C <scratch-relock>/osvscanner-src show v2.6.0:go.mod | grep -n osv-scalibr     # the scalibr commit OSV-Scanner v2.6.0 pins (a blobless clone of https://github.com/google/osv-scanner)     # 2026-09-30T17:30:03Z
+14:	github.com/google/osv-scalibr v0.5.3-0.20260911142458-3090dbb7aaa2
+exit: 0
+$ sha256sum <scratch-relock>/sdk-fcc102a.tar.gz     # the pinned SDK archive of pins.json source_archive     # 2026-09-30T17:30:03Z
 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  <scratch-relock>/sdk-fcc102a.tar.gz
 exit: 0
-$ tar -xzOf <scratch-relock>/sdk-fcc102a.tar.gz --wildcards '*/pyproject.toml' | grep -n 'exclude-newer'     # the upstream workspace's 7-day rule     # 2026-09-30T17:22:50Z
+$ tar -xzOf <scratch-relock>/sdk-fcc102a.tar.gz --wildcards '*/pyproject.toml' | grep -n 'exclude-newer'     # the upstream workspace's 7-day rule     # 2026-09-30T17:30:03Z
 197:exclude-newer = "7 days"  # Avoid packages uploaded in the last 7 days.
 198:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
 exit: 0
-$ tar -xzOf <scratch-relock>/sdk-fcc102a.tar.gz --wildcards '*/uv.lock' | grep -n 'exclude-newer'     # 2026-09-30T17:22:50Z
+$ tar -xzOf <scratch-relock>/sdk-fcc102a.tar.gz --wildcards '*/uv.lock' | grep -n 'exclude-newer'     # 2026-09-30T17:30:04Z
 14:exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 15:exclude-newer-span = "P7D"
 17:[options.exclude-newer-package]
@@ -129,10 +132,10 @@ urllib3 2.8.0 | requests 2.33.0 | httpx 0.28.1 | pyjwt 2.15.0 | oauthlib 3.3.1
 [2026-09-30T16:56:56Z] done
 
 ## D. urllib3 2.8.0 and oauthlib: no reference in the installed package; the lock differs in two entries
-$ grep -rl -i oauthlib <scratch>/venv/lib/python3.13/site-packages/urllib3 | wc -l     # 2026-09-30T17:22:50Z
+$ grep -rl -i oauthlib <scratch>/venv/lib/python3.13/site-packages/urllib3 | wc -l     # 2026-09-30T17:30:04Z
 0
 exit: 0
-$ diff <(git -C <worktree> show origin/main:blueprints/runtime-workers/openhands/requirements.lock | grep -E '^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )' | sed 's/ \\$//') <(grep -E '^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )' <worktree>/blueprints/runtime-workers/openhands/requirements.lock | sed 's/ \\$//')     # the entry lines of the base lock (origin/main) against the new lock, hashes not compared     # 2026-09-30T17:22:50Z
+$ diff <(git -C <worktree> show origin/main:blueprints/runtime-workers/openhands/requirements.lock | grep -E '^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )' | sed 's/ \\$//') <(grep -E '^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )' <worktree>/blueprints/runtime-workers/openhands/requirements.lock | sed 's/ \\$//')     # the entry lines of the base lock (origin/main) against the new lock, hashes not compared     # 2026-09-30T17:30:04Z
 126c126
 < pyjwt==2.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
 ---
@@ -144,44 +147,50 @@ $ diff <(git -C <worktree> show origin/main:blueprints/runtime-workers/openhands
 exit: 1     # 1 = the inputs differ, in these two entries only
 
 ## E. OSV-Scanner 2.6.0 (the CI pin), the workflow's command over the whole inventory (49 lockfiles), --no-resolve
-$ sha256sum <osv-bin>/osv-scanner     # CI pin ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108     # 2026-09-30T17:22:50Z
+$ sha256sum <osv-bin>/osv-scanner     # CI pin ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108     # 2026-09-30T17:30:04Z
 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  <osv-bin>/osv-scanner
 exit: 0
-$ git -C <main-checkout> rev-parse HEAD; git -C <main-checkout> status --short | wc -l     # 2026-09-30T17:22:50Z
+$ <osv-bin>/osv-scanner --version     # the binary prints its own osv-scalibr version string, which is not the pinned commit     # 2026-09-30T17:30:04Z
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2
+commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6
+built at: 2026-09-14T01:44:58Z
+exit: 0
+$ git -C <main-checkout> rev-parse HEAD; git -C <main-checkout> status --short | wc -l     # 2026-09-30T17:30:04Z
 11227bfdf25b55b0481a9e78985c3fed26052472
 0
 exit: 0
-$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-main <main-checkout> .github/osv-scanner.toml <evidence-dir> <osv-bin>/osv-scanner     # the control: origin/main at 11227bfd     # 2026-09-30T17:22:51Z
+$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-main <main-checkout> .github/osv-scanner.toml <evidence-dir> <osv-bin>/osv-scanner     # the control: origin/main at 11227bfd     # 2026-09-30T17:30:04Z
 command (49 lockfile arguments): <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:.github/requirements-ci.txt --lockfile=requirements.txt:blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock --lockfile=requirements.txt:adoption/sdk/accepted-constraints.txt --lockfile=requirements.txt:adoption/sdk/requirements-linux-x86_64-py313.lock --lockfile=:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml --lockfile=:blueprints/convergence-practice/application-delivery/uv.lock --lockfile=:blueprints/convergence-practice/wsl-retrieval/package-lock.json --lockfile=:blueprints/us-equities/adaptive-paper/requirements.txt --lockfile=requirements.txt:blueprints/us-equities/catalyst-provenance/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/data/requirements.in --lockfile=requirements.txt:blueprints/us-equities/data/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock --lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.in --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.lock --lockfile=:blueprints/us-equities/workers/requirements.txt --lockfile=requirements.txt:tools/mlx-smoke/requirements.in --lockfile=requirements.txt:tools/mlx-smoke/requirements.lock.txt --lockfile=requirements.txt:blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/data-tools/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/study/runtime-requirements.txt --lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml --lockfile=requirements.txt:evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock --format json
 scan exit: 1
 host paths left in the retained files: 0
 6e6d4c016322cff452860b1b21582d588f7295100d61f558825ec4ca1b39cc3e  relock-2026-09-30-urllib3.osv-main.json
-e764d4ceb76e5018843143575aa4a7f89be7fd7f53e02384f507a07d87cd0753  relock-2026-09-30-urllib3.osv-main.err
+a904948f16fe969d183c050821ce0479eafdb41737410c30b43fda938d873ee1  relock-2026-09-30-urllib3.osv-main.err
 exit: 0
-$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-main.json     # 2026-09-30T17:22:52Z
+$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-main.json     # 2026-09-30T17:30:06Z
 relock-2026-09-30-urllib3.osv-main.json -> {"pyjwt==2.14.0": ["GHSA-42vr-xj54-vc7v"], "urllib3==2.7.0": ["GHSA-8988-9cw3-xx77", "GHSA-gh4c-6fx4-qh6g", "GHSA-vxq7-64xx-v4gw"], "next==16.3.5": ["GHSA-vcvr-r3jv-pc5j"]}
 exit: 0
-$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-after <worktree> .github/osv-scanner.toml <evidence-dir> <osv-bin>/osv-scanner     # this change: the CI form     # 2026-09-30T17:22:52Z
+$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-after <worktree> .github/osv-scanner.toml <evidence-dir> <osv-bin>/osv-scanner     # this change: the CI form     # 2026-09-30T17:30:06Z
 command (49 lockfile arguments): <osv-bin>/osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:.github/requirements-ci.txt --lockfile=requirements.txt:blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock --lockfile=requirements.txt:adoption/sdk/accepted-constraints.txt --lockfile=requirements.txt:adoption/sdk/requirements-linux-x86_64-py313.lock --lockfile=:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml --lockfile=:blueprints/convergence-practice/application-delivery/uv.lock --lockfile=:blueprints/convergence-practice/wsl-retrieval/package-lock.json --lockfile=:blueprints/us-equities/adaptive-paper/requirements.txt --lockfile=requirements.txt:blueprints/us-equities/catalyst-provenance/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/data/requirements.in --lockfile=requirements.txt:blueprints/us-equities/data/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock --lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.in --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.lock --lockfile=:blueprints/us-equities/workers/requirements.txt --lockfile=requirements.txt:tools/mlx-smoke/requirements.in --lockfile=requirements.txt:tools/mlx-smoke/requirements.lock.txt --lockfile=requirements.txt:blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/data-tools/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/study/runtime-requirements.txt --lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml --lockfile=requirements.txt:evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock --format json
 scan exit: 0
 host paths left in the retained files: 0
 ca69bfd57904b04f30d0ddd30ffeb9ddcba914c0589e90a0cc313e397db70251  relock-2026-09-30-urllib3.osv-after.json
-23d66fef30b4863543368952ec2164bcf5a16a8fd937a8816477053d1eb0156c  relock-2026-09-30-urllib3.osv-after.err
+e855c5bf161a7dc76e0231e4a6acc503dc10a3df3b74e697ce9fbfd01d6d136c  relock-2026-09-30-urllib3.osv-after.err
 exit: 0
-$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-after.json     # 2026-09-30T17:22:54Z
+$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-after.json     # 2026-09-30T17:30:08Z
 relock-2026-09-30-urllib3.osv-after.json -> no findings
 exit: 0
-$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-after-noconfig <worktree> EMPTY <evidence-dir> <osv-bin>/osv-scanner     # this change with an EMPTY config: what the ignores hide (urllib3 must be absent: fixed, not ignored)     # 2026-09-30T17:22:54Z
+$ bash <evidence-dir>/relock-2026-09-30-urllib3.osv-scan.sh.txt relock-2026-09-30-urllib3.osv-after-noconfig <worktree> EMPTY <evidence-dir> <osv-bin>/osv-scanner     # this change with an EMPTY config: what the ignores hide (urllib3 must be absent: fixed, not ignored)     # 2026-09-30T17:30:08Z
 command (49 lockfile arguments): <osv-bin>/osv-scanner scan source --config <empty file> --no-resolve --lockfile=requirements.txt:.github/requirements-ci.txt --lockfile=requirements.txt:blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock --lockfile=requirements.txt:adoption/sdk/accepted-constraints.txt --lockfile=requirements.txt:adoption/sdk/requirements-linux-x86_64-py313.lock --lockfile=:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml --lockfile=:blueprints/convergence-practice/application-delivery/uv.lock --lockfile=:blueprints/convergence-practice/wsl-retrieval/package-lock.json --lockfile=:blueprints/us-equities/adaptive-paper/requirements.txt --lockfile=requirements.txt:blueprints/us-equities/catalyst-provenance/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/data/requirements.in --lockfile=requirements.txt:blueprints/us-equities/data/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock --lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock --lockfile=packages.lock.json:blueprints/us-equities/engine/patches/alpaca.packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json --lockfile=:blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.in --lockfile=requirements.txt:blueprints/us-equities/research-evaluation/requirements.lock --lockfile=:blueprints/us-equities/workers/requirements.txt --lockfile=requirements.txt:tools/mlx-smoke/requirements.in --lockfile=requirements.txt:tools/mlx-smoke/requirements.lock.txt --lockfile=requirements.txt:blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/data-tools/requirements.lock --lockfile=requirements.txt:blueprints/us-equities/mover-v3/study/runtime-requirements.txt --lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml --lockfile=requirements.txt:evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock --lockfile=requirements.txt:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock --format json
 scan exit: 1
 host paths left in the retained files: 0
 de83299625e0ba1cfd16b0c043a46a42d7fb31475c37a72590e810ef56f8bb45  relock-2026-09-30-urllib3.osv-after-noconfig.json
-b02c78c35df3362a4c8ad422bf0ae12939b56243ce34718e64066e820568d8ba  relock-2026-09-30-urllib3.osv-after-noconfig.err
+7cbb195ad5947612b22658badcf89d60c59e56c29a1d4a673bbf4afef17888ac  relock-2026-09-30-urllib3.osv-after-noconfig.err
 exit: 0
-$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-after-noconfig.json     # 2026-09-30T17:22:56Z
+$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-summary.py.txt <evidence-dir>/relock-2026-09-30-urllib3.osv-after-noconfig.json     # 2026-09-30T17:30:10Z
 relock-2026-09-30-urllib3.osv-after-noconfig.json -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "nltk==3.10.3": ["GHSA-8mgp-746c-j5xp"], "setuptools==80.10.2": ["GHSA-h35f-9h28-mq5c", "PYSEC-2026-3447"], "next==16.3.5": ["GHSA-vcvr-r3jv-pc5j"]}
 exit: 0
-$ grep -o -E '^(GHSA|PYSEC)-[A-Za-z0-9-]+|^Filtered [0-9]+ vulnerabilities from output' <evidence-dir>/relock-2026-09-30-urllib3.osv-after.err     # 2026-09-30T17:22:56Z
+$ grep -o -E '^(GHSA|PYSEC)-[A-Za-z0-9-]+|^Filtered [0-9]+ vulnerabilities from output' <evidence-dir>/relock-2026-09-30-urllib3.osv-after.err     # 2026-09-30T17:30:10Z
 GHSA-hj66-6f7g-4r5v
 GHSA-xpv3-w29h-x7cv
 GHSA-8mgp-746c-j5xp
@@ -193,50 +202,50 @@ Filtered 8 vulnerabilities from output
 exit: 0     # the ids the entries of .github/osv-scanner.toml filtered out (two locks carry the oauthlib pair), then the scanner's count
 
 ## F. The frozen macOS variant: what the repository keeps of it and who names it (origin/main at 11227bfd)
-$ git ls-tree -r --name-only origin/main -- evidence/artifacts/macos-application-20260924/variant     # 2026-09-30T17:22:56Z
+$ git ls-tree -r --name-only origin/main -- evidence/artifacts/macos-application-20260924/variant     # 2026-09-30T17:30:10Z
 evidence/artifacts/macos-application-20260924/variant/package.json
 evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml
 exit: 0
-$ git log --format='%h %an %ad %s' --date=short origin/main -- evidence/artifacts/macos-application-20260924/variant     # 2026-09-30T17:22:56Z
+$ git log --format='%h %an %ad %s' --date=short origin/main -- evidence/artifacts/macos-application-20260924/variant     # 2026-09-30T17:30:10Z
 67666d6e seathatflowsinourveins 2026-09-24 Record Mac (macos-m5pro-20260924) application and data use receipts and the macOS pnpm 12.6.0 re-qualification (#201)
 exit: 0
-$ git grep -l -F macos-application-20260924/variant/pnpm-lock origin/main -- . ':(exclude)evidence/artifacts/macos-application-20260924'     # 2026-09-30T17:22:56Z
+$ git grep -l -F macos-application-20260924/variant/pnpm-lock origin/main -- . ':(exclude)evidence/artifacts/macos-application-20260924'     # 2026-09-30T17:30:10Z
 origin/main:.github/osv-scanner-lockfiles.json
 origin/main:blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json
 origin/main:manifests/evidence.json
 exit: 0
-$ jq '[paths(scalars) | map(tostring) | join(".")] | map(select(test("owner|session|author|by$"; "i"))) | length' blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json     # 2026-09-30T17:22:56Z
+$ jq '[paths(scalars) | map(tostring) | join(".")] | map(select(test("owner|session|author|by$"; "i"))) | length' blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json     # 2026-09-30T17:30:10Z
 0
 exit: 0     # the number of keys of the experiment record that look like an owner, session or author
-$ git grep -n -i -E 'macos-application|variant/pnpm-lock' origin/main -- docs/lanes.md     # 2026-09-30T17:22:56Z
+$ git grep -n -i -E 'macos-application|variant/pnpm-lock' origin/main -- docs/lanes.md     # 2026-09-30T17:30:10Z
 exit: 1     # 1 = no match
-$ git grep -n -i -E 'next/og|ImageResponse|opengraph-image|twitter-image' origin/main -- evidence/artifacts/macos-application-20260924     # 2026-09-30T17:22:56Z
+$ git grep -n -i -E 'next/og|ImageResponse|opengraph-image|twitter-image' origin/main -- evidence/artifacts/macos-application-20260924     # 2026-09-30T17:30:10Z
 exit: 1     # 1 = no match
-$ git grep -n -i pnpm origin/main -- .github/workflows     # 2026-09-30T17:22:56Z
+$ git grep -n -i pnpm origin/main -- .github/workflows     # 2026-09-30T17:30:10Z
 exit: 1     # 1 = no match
-$ git show origin/main:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml | grep -n -E '^  next@'     # 2026-09-30T17:22:56Z
+$ git show origin/main:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml | grep -n -E '^  next@'     # 2026-09-30T17:30:10Z
 544:  next@16.3.5:
 925:  next@16.3.5(@playwright/test@1.63.0)(@types/node@24.13.6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
 exit: 0
-$ git show origin/main:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml | grep -n -E '^  next@'     # the live recipe's lock     # 2026-09-30T17:22:56Z
+$ git show origin/main:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml | grep -n -E '^  next@'     # the live recipe's lock     # 2026-09-30T17:30:10Z
 544:  next@16.3.6:
 925:  next@16.3.6(@playwright/test@1.63.0)(@types/node@24.13.6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
 exit: 0
-$ sha256sum evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml     # 2026-09-30T17:22:56Z
+$ sha256sum evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml     # 2026-09-30T17:30:10Z
 f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2  <worktree>/evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml
 exit: 0
 
 ## G. The lock files' digests
-$ sha256sum <worktree>/blueprints/runtime-workers/openhands/requirements.lock     # the new lock; the previous one is 14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64     # 2026-09-30T17:22:56Z
+$ sha256sum <worktree>/blueprints/runtime-workers/openhands/requirements.lock     # the new lock; the previous one is 14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64     # 2026-09-30T17:30:10Z
 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c  <worktree>/blueprints/runtime-workers/openhands/requirements.lock
 exit: 0
-$ jq -r .requirements_sha256 blueprints/runtime-workers/openhands/pins.json     # 2026-09-30T17:22:56Z
+$ jq -r .requirements_sha256 blueprints/runtime-workers/openhands/pins.json     # 2026-09-30T17:30:10Z
 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
 exit: 0
-$ git rev-parse origin/pr535     # the fetched head of draft PR 535 (git fetch origin '+pull/535/head:refs/remotes/origin/pr535')     # 2026-09-30T17:22:56Z
+$ git rev-parse origin/pr535     # the fetched head of draft PR 535 (git fetch origin '+pull/535/head:refs/remotes/origin/pr535')     # 2026-09-30T17:30:10Z
 00aa6c25fe6f27e9f5974e9f6a5592aa31683479
 exit: 0
-$ git show origin/pr535:blueprints/runtime-workers/openhands/requirements.lock | grep -E '^(urllib3|pyjwt|oauthlib)==' | cut -d' ' -f1; ... | sha256sum     # 2026-09-30T17:22:56Z
+$ git show origin/pr535:blueprints/runtime-workers/openhands/requirements.lock | grep -E '^(urllib3|pyjwt|oauthlib)==' | cut -d' ' -f1; ... | sha256sum     # 2026-09-30T17:30:10Z
 oauthlib==3.3.1
 pyjwt==2.14.0
 urllib3==2.7.0
@@ -244,7 +253,7 @@ urllib3==2.7.0
 exit: 0
 
 ## H. Negative controls for the guard changes (in-memory mutants of the test inputs, nothing on disk changes), from the worktree root
-$ python3 -B <evidence-dir>/relock-2026-09-30-urllib3.guard-mutants.py.txt     # 2026-09-30T17:22:56Z
+$ python3 -B <evidence-dir>/relock-2026-09-30-urllib3.guard-mutants.py.txt     # 2026-09-30T17:30:10Z
 PASS  unmutated: ran 18, failures 0, errors 0
 PASS  R1a a double-quoted affected key beside an unquoted fixed one (live pnpm lock): 1 failing test(s); expected rule 'cannot be read strictly' seen
 PASS  R1b a single-quoted affected key beside an unquoted fixed one (live pnpm lock): 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
@@ -255,7 +264,7 @@ PASS  R5 a yarn berry alias to next in an extra inventory lock: 1 failing test(s
 PASS  R6 a package-lock lockfileVersion 1 alias to next: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
 PASS  R7 a package-lock entry node_modules/next with an empty name: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
 PASS  R8 a package-lock entry vendor/next without a name: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
-PASS  R9 whitespace-heavy input returns in linear time: 0.003 s for 305500 bytes
+PASS  R9 whitespace-heavy input returns in linear time: 0.004 s for 305500 bytes
 PASS  R10 a canary above the fix, build metadata on the fix and a canary of the introduced release are not affected
 PASS  R11 an integer lockfileVersion is read
 PASS  R12 an inline pnpm record with its own name and version (live pnpm lock): 1 failing test(s); expected rule 'cannot be read strictly' seen
@@ -267,6 +276,11 @@ PASS  R17 deep nesting is read or refused, never an error or an empty read: ['16
 PASS  R19 a package-lock lockfileVersion 1 dependency named next installed from a local path: 1 failing test(s); expected rule 'cannot be read strictly' seen
 PASS  R20 a package-lock lockfileVersion 1 dependency named next installed from a git commit: 1 failing test(s); expected rule 'cannot be read strictly' seen
 PASS  R21 a package-lock entry for next whose resolved URL is a git commit, with a fixed-looking version: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R22 a tagged packages key (!!str packages:) in the live pnpm lock, found by the independent verifier with the pinned scanner: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R23 packages supplied through a YAML merge key (<<: *base) in the live pnpm lock, found by the independent verifier with the pinned scanner: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R24 a Unicode line separator inside a pnpm lock: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R25 the fields of a pnpm entry indented by six spaces instead of four: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R26 a pnpm entry whose name field is a YAML null word: 1 failing test(s); expected rule 'cannot be read strictly' seen
 PASS  R18 a pin in the second document of a two-document pnpm lock (live pnpm lock): 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
 PASS  M1 an entry key at the wrong indentation: 1 failing test(s); expected rule 'cannot be read strictly' seen
 PASS  M2 an old slash key in a lockfileVersion 9 file: 1 failing test(s); expected rule 'cannot be read strictly' seen
@@ -285,15 +299,15 @@ ALL MUTANTS CAUGHT AND CONTROL CLEAN
 exit: 0
 
 ## I. The unit tests of the guard and of the recipe, from the worktree root
-$ python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_runtime_worker_openhands 2>&1 | tail -4     # 2026-09-30T17:22:57Z
+$ python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_runtime_worker_openhands 2>&1 | tail -4     # 2026-09-30T17:30:11Z
 ----------------------------------------------------------------------
-Ran 157 tests in 10.529s
+Ran 157 tests in 10.965s
 
 OK
 exit: 0
 
 ## J. What imports PyJWT in the installed recipe venv, the JWKS client users, and the four oauthlib files the advisory reviews name
-$ bash <evidence-dir>/relock-2026-09-30-urllib3.pyjwt-surface.sh.txt <scratch>/venv/lib/python3.13/site-packages <scratch-relock>/pyjwt-src     # 2026-09-30T17:23:08Z
+$ bash <evidence-dir>/relock-2026-09-30-urllib3.pyjwt-surface.sh.txt <scratch>/venv/lib/python3.13/site-packages <scratch-relock>/pyjwt-src     # 2026-09-30T17:30:23Z
 --- installed: pyjwt-2.15.0.dist-info urllib3-2.8.0.dist-info 
 --- top-level packages that import jwt (import jwt / from jwt), file counts:
       7 litellm
@@ -388,4 +402,14 @@ oauthlib/openid/connect/core/endpoints/pre_configured.py: 2
    oauthlib/common.py:219 inside def verify_signed_token(public_pem, token):
    oauthlib/oauth2/rfc6749/clients/service_application.py:152 inside def prepare_request_body(self,
    oauthlib/oauth1/rfc5849/signature.py:571 inside def _get_jwt_rsa_algorithm(hash_algorithm_name: str):
+exit: 0
+
+## K. Inputs the guard must not read as no next: the pinned scanner with an empty config against the reader of the first repaired head and the current reader
+$ python3 <evidence-dir>/relock-2026-09-30-urllib3.osv-counterexamples.py.txt <osv-bin>/osv-scanner bd48d924026635dccc18d30be8f56a2dc476fa89     # 2026-09-30T17:30:23Z
+tagged packages key: scanner (empty config) exit 1 finds {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}
+    reader at bd48d924: [] | current reader: None
+packages through a YAML merge key: scanner (empty config) exit 1 finds {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}
+    reader at bd48d924: [] | current reader: None
+Unicode line separator: scanner (empty config) exit 1 finds {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}
+    reader at bd48d924: ['16.3.5'] | current reader: None
 exit: 0

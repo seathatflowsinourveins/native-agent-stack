@@ -48,5 +48,5 @@ Scanned <scan-root>/evidence/artifacts/macos-syn-e2e-20260924/requirements-macos
 Scanned <scan-root>/blueprints/us-equities/engine-trials/spy-one-zero-20260926/ml4t-backtest/lockcheck/ml4t.lock file and found 15 packages
 Scanned <scan-root>/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock file and found 264 packages
 Scanned <scan-root>/blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock file and found 4 packages
-End status: 0 dirs visited, 49 inodes visited, 49 Extract calls, 116.886596ms elapsed, 116.886656ms wall time
+End status: 0 dirs visited, 49 inodes visited, 49 Extract calls, 112.773064ms elapsed, 112.773114ms wall time
 Filtered 175 local/unscannable package/s from the scan.
