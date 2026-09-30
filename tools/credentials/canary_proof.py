@@ -77,6 +77,7 @@ ARM_RECOVERY_NS = 5 * 10**9
 # RuntimeMaxSec per phase and sink (C13): 7,200 s bounds a walking sink's scope, 900 s the journal, 60 s U4, 120 s a
 # setup child; a test launcher shortens them.
 SCOPE_SECONDS = {**{sink: 7200 for sink in wire.SINKS}, "A11": 900, "U4": 60, "setup": 120}
+PHASE_SECONDS = {phase: dict(SCOPE_SECONDS) for phase in ("baseline", "final", "comparison")}
 AGENT_SINKS = ("A1", "A2", "A3", "A4", "A9", "A10", "A11", "A12")
 USER_SINKS = tuple(f"U{number}" for number in range(1, 9))
 EXIT = {"clean": 0, "refused": 1, "usage": 2, "incomplete": 3, "invalid": 4, "leak": 5, "busy": 75}
@@ -257,6 +258,8 @@ def validate(events: list, run_id: str) -> bool:
         if any(not isinstance(event[name], kind_) or kind_ is int and isinstance(event[name], bool)
                for name, kind_ in schema.items()):
             return False
+        if not valid_fields(event):
+            return False
         if (number == 1) != (kind == "prepared"):
             return False
         if kind in ("arming", "armed", "disarmed", "hit") and event["consumer"] not in CONSUMERS:
@@ -287,6 +290,83 @@ def validate(events: list, run_id: str) -> bool:
         elif kind == "cleaned" and number != len(events):
             return False
     return True
+
+
+def valid_fields(event: dict) -> bool:
+    """Closed nested carriers: a parsed JSON object is not automatically a value-free record (§5, B8)."""
+    def hex_(value, width=32):
+        return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{" + str(width) + "}", value) is not None
+    def natural(value):
+        return type(value) is int and 0 <= value <= (1 << 48)
+    def patterns(rows):
+        return all(re.fullmatch(r"(?:" + "|".join(CONSUMERS) + r")\.[1-9][0-9]*", name)
+                   and hex_(sha, 64) for name, sha in rows.items())
+    try:
+        if not re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{6}Z", event["utc"]) or not re.fullmatch(
+                r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", event["boot_id"]):
+            return False
+        if not natural(event["seq"]) or min(event["boottime_ns"], event["realtime_ns"]) < 0:
+            return False
+        kind = event["event"]
+        if kind == "prepared":
+            return (set(event["roots"]) == set(wire.SINKS) and all(hex_(root) and type(present) is bool
+                    for pairs in event["roots"].values() for root, present in pairs)
+                    and event["transcripts"] in ("confirmed", "exclude") and not event["proxy_verified"]
+                    and set(event["tools"]) == set(TOOLS) and all(hex_(sha, 64) for sha in event["tools"].values())
+                    and set(event["executables"]) == set(EXECUTABLES)
+                    and all(not sha or hex_(sha, 64) for sha in event["executables"].values())
+                    and set(event["versions"]) == set(EXECUTABLES) | {"sqlite"}
+                    and all(natural(code) for code in event["versions"].values()) and patterns(event["patterns"])
+                    and all(hex_(event[field], 64) for field in ("policy", "exclusions", "anchor"))
+                    and hex_(event["checkout"]) and (not event["session"] or hex_(event["session"], 64)))
+        if kind in ("arming", "armed", "disarmed", "hit") and not (
+                type(event["attempt"]) is int and 1 <= event["attempt"] <= 0xFFFFFFFF):
+            return False
+        if kind == "arming":
+            return hex_(event["pattern"], 64) and (not event["root"] or hex_(event["root"]))
+        if kind == "armed":
+            return all(type(event[key]) is int and event[key] > 0 for key in ("dev", "ino", "ctime_ns"))
+        if kind.startswith("scan_") or kind == "hit":
+            if not re.fullmatch(r"[0-9a-f]{12}", event["request"]):
+                return False
+        if kind == "scan_requested":
+            return event["selection"] == ("all" if event["phase"] == "comparison" else "changed")
+        if kind == "scan_planned":
+            return (all(sink in wire.SINKS and len(ids) == len(set(ids)) and all(hex_(root) for root in ids)
+                        for sink, ids in event["sinks"].items()) and hex_(event["union"], 64)
+                    and all(c in CONSUMERS and type(a) is int and a > 0 for c, a in event["attempts"])
+                    and len(event["attempts"]) == len(set(map(tuple, event["attempts"]))))
+        if kind == "scan_inventory":
+            return event["sink"] in wire.SINKS and event["subpass"] in (0, 1) and natural(event["checks"])
+        if kind == "hit":
+            return (event["sink"] in wire.SINKS and event["subpass"] in (0, 1) and hex_(event["root"])
+                    and hex_(event["object"]) and 0 < event["count"] <= (1 << 48)
+                    and event["mode"] in wire.MODES.values() and event["view"] in wire.VIEWS.values()
+                    and event["path"] in wire.PATHS.values() and natural(event["check"]))
+        if kind == "scan_finished":
+            return (event["status"] in ("complete", "incomplete")
+                    and all(reason in wire.R or reason in CODES for reason in event["reasons"])
+                    and all(sink in wire.SINKS and row["status"] in ("complete", "incomplete")
+                            and all(reason in wire.R or reason == "inventory_unreconciled" for reason in row["reasons"])
+                            and all(natural(row[name]) for name in ("checks", "completed", "hits"))
+                            and set(row["counters"]) == set(wire.COUNTERS)
+                            and all(natural(count) for count in row["counters"].values())
+                            and all(hex_(root) for root in row["roots"] + row["absent"])
+                            and all(len(item) == 6 and natural(item[0]) and hex_(item[1])
+                                    and item[2] in wire.MODES.values() and item[3] in wire.VIEWS.values()
+                                    and item[4] in wire.STATUS.values() and item[5] < len(wire.REASONS)
+                                    for item in row["ledger"])
+                            and all(len(item) == 6 and item[0] in (2, 3, 4, 6) and item[1] in range(7)
+                                    and natural(item[2]) and item[3] in wire.PATHS.values()
+                                    and hex_(item[4]) and natural(item[5]) for item in row["observations"])
+                            for sink, row in event["sinks"].items()))
+        if kind == "integrity_failed":
+            return event["code"] in CODES
+        if kind == "cleaned":
+            return re.fullmatch(re.escape(event["run"]) + r"-[0-9]{6}", event["receipt"]) is not None
+        return True
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return False
 
 
 # ---- Canaries, patterns and the per-request union (contract 6) -------------------------------------------------------
@@ -546,12 +626,12 @@ def sink_roots(home: str, uid: int, codex: list, cursor: str) -> dict:
         "U5": [("dir", f"{h}/.config/systemd/user"), ("dir", f"{h}/.config/environment.d")],
         "U6": [("file", f"{h}/.claude/history.jsonl"), ("dir", f"{h}/.claude/paste-cache")]
         + [("file", f"{path}/history.jsonl") for path in codex],
-        "U7": [("file", f"{h}/.claude.json"), ("file", f"{h}/.claude.json.backup"), ("file", f"{h}/.claude/settings.json"),
-               ("dir", f"{h}/.claude/backups")] + [("file", f"{path}/config.toml") for path in codex]
+        "U7": [("glob", f"{h}/.claude.json*"), ("glob", f"{h}/.claude/settings.json*"),
+               ("dir", f"{h}/.claude/backups")] + [("glob", f"{path}/*.toml*") for path in codex]
         + [("file", f"{path}/log/codex-login.log") for path in codex],
         "U8": [("dir", f"{h}/.agentsview"), ("dir", f"{h}/.local/share/ai-memory"), ("dir", f"{h}/.claude/context-mode"),
                ("dir", f"{h}/.local/share/rtk"), ("dir", f"{h}/.headroom")]
-        + [("dir", f"{path}/context-mode") for path in codex],
+        + [("dir", f"{path}/context-mode") for path in codex] + [("glob", f"{path}/*.sqlite*") for path in codex],
     }
 
 
@@ -716,6 +796,8 @@ class Session:
                 or r.klass > 8 or r.path >= len(wire.PATHS) or r.status > 4 or r.reason >= len(wire.REASONS) \
                 or r.consumer > 6:
             return False
+        if max(r.check, r.observed, r.expected, r.aux) > (1 << 48) or r.subpass > 1:
+            return False
         if self.seq == 1 and (r.kind != wire.BEGIN or any(r.object)):
             return False
         if r.kind == wire.BEGIN:
@@ -728,6 +810,11 @@ class Session:
             self.checks[r.check] = (r, self.root)
         elif r.kind in (wire.HIT, wire.OBSERVATION, wire.CONTROL, wire.RESULT) and r.check:
             if r.check not in self.checks or r.check in self.completed:
+                return False
+            declared = self.checks[r.check][0]
+            if (r.sink, r.mode, r.view) != (declared.sink, declared.mode, declared.view):
+                return False
+            if r.kind != wire.CONTROL and (r.path, r.object) != (declared.path, declared.object):
                 return False
             if r.kind == wire.RESULT:
                 self.completed[r.check] = r
@@ -749,6 +836,8 @@ class Session:
             self.completed[0] = r
         elif r.kind == wire.FACT:
             if r.check not in wire.FACTS.values():
+                return False
+            if r.check in (1, 5, 7, 8, 10, 11) and r.observed > 2:
                 return False
             self.facts.append(r)
         elif r.kind == wire.COUNTER:
@@ -776,6 +865,9 @@ class Session:
         for ident, result in self.completed.items():
             if ident and result.status == wire.STATUS["incomplete"]:
                 reasons.append(wire.REASONS[result.reason])
+            if ident and result.status == wire.STATUS["complete"] and (
+                    result.exit not in (0, 1) or result.aux or result.reason or result.observed != result.expected):
+                reasons.append("protocol_error")
         summary = self.completed.get(0)
         if summary is None or summary.status != wire.STATUS["complete"]:
             reasons.append(wire.REASONS[summary.reason] if summary else "protocol_error")
@@ -783,6 +875,9 @@ class Session:
         if end is not None and seals and seals != {end.seal}:
             reasons.append("inventory_unreconciled")
         reasons += self.control_gaps()
+        declared_roots = {root for _record, root in self.checks.values() if root}
+        if self.roots - declared_roots:
+            reasons.append("protocol_error")
         reasons = list(dict.fromkeys(reason for reason in reasons if reason != "ok"))
         absent = sorted({self.checks[ident][1].hex() for ident, record in self.completed.items()
                          if ident and record.status == wire.STATUS["absent"] and self.checks[ident][1]})
@@ -790,6 +885,11 @@ class Session:
                 "completed": len(self.completed) - (0 in self.completed), "hits": self.hits,
                 "counters": {name: self.counters.get(code, 0) for name, code in wire.COUNTERS.items()},
                 "absent": absent,
+                "roots": sorted(root.hex() for root in declared_roots),
+                "ledger": [[ident, (root or bytes(16)).hex(), record.mode, record.view,
+                            self.completed[ident].status if ident in self.completed else 0,
+                            self.completed[ident].reason if ident in self.completed else wire.R["protocol_error"]]
+                           for ident, (record, root) in self.checks.items()],
                 "observations": [[r.klass, r.consumer, r.attempt, r.path, (root or bytes(16)).hex(), r.observed]
                                  for r, root in self.observations],
                 "controls": [len(self.control_reports), sum(r.observed == r.expected for r in self.control_reports)]}
@@ -928,6 +1028,8 @@ def prepare(args, env) -> int:
                 for name in [names[record.expected] if record.expected < len(names) else "sqlite"]}
     if versions.get("rg") not in wire.REVIEWED_RG:
         raise Refused("unreviewed_scanner")
+    if not fact(session, "journal_binding", observed=1):
+        raise Refused("journal_cursor_missing")
     for record in fact(session, "executable_fingerprint"):
         name = names[record.expected]
         if executables[name] and record.seal != wire.keyed(run.key, b"exe", name, executables[name][1]):
@@ -1090,9 +1192,12 @@ def scan_sink(run: Run, env, request: Request, sink: str, roots: dict, sinks: tu
             "dumper_argv": [executables["python3"][0], "-I", "-S", str(WORKER), "sqlite-dumper"]
             if DUMPER_COMMAND is None else DUMPER_COMMAND}
     result = None
+    deadline = time.monotonic() + min(SCOPE_SECONDS[sink], PHASE_SECONDS[request.phase][sink])
     for subpass in (0, 1):
         plan["subpass"] = subpass
-        session = Session(run, plan, sink, SCOPE_SECONDS[sink], request.id, [
+        seconds = max(1, int(deadline - time.monotonic()))
+        plan["budget_seconds"] = seconds
+        session = Session(run, plan, sink, seconds, request.id, [
             (CONSUMERS.index(consumer) + 1, attempt) for consumer, attempt in bound],
             controls={row[4] for row in union[2] if row[4]} | {row[1] for row in spec["m1_negative"]}
             | {row[1] for row in spec["bom_negative"]}, roots={bytes.fromhex(root["id"]) for root in roots[sink]})
@@ -1102,7 +1207,8 @@ def scan_sink(run: Run, env, request: Request, sink: str, roots: dict, sinks: tu
         run.append("scan_inventory", request=request.id, sink=sink, subpass=subpass,
                    seal=(session.end.seal.hex() if session.end else ""), checks=result["checks"],
                    counters=result["counters"])
-        if not any(reason in ("file_set_changed", "format_changed") for reason in result["reasons"]):
+        if not result["reasons"] or not set(result["reasons"]) <= {
+                "file_set_changed", "format_changed", "inventory_unreconciled"}:
             break
     result["absent_only"] = bool(result["absent"]) and len(result["absent"]) == len(roots[sink])
     return result
@@ -1310,14 +1416,24 @@ def classify(events: list, now_codes=(), masking=None) -> dict:
                           for reason in row["reasons"]]
                 if "control_missing" in row["reasons"]:
                     found.append(f"control_missing:{sink}" if name == "final" else f"{name}_control_missing")
+            elif (row["checks"] != row["completed"] or len(row.get("ledger", [])) != row["checks"]
+                  or set(planned["sinks"][sink]) != set(row.get("roots", []))
+                  or any(item[4] not in (1, 3, 4) for item in row.get("ledger", []))):
+                found.append("inventory_unreconciled")
+        required_sinks = sinks_for(*key)
+        if set(planned["sinks"]) != set(required_sinks):
+            found.append(f"{name}_incomplete")
+        for sink in required_sinks:
+            required_roots = {root for root, _present in prepared["roots"].get(sink, [])}
+            if required_roots != set(planned["sinks"].get(sink, [])):
+                found.append("baseline_scope_missing" if name == "baseline" else "inventory_unreconciled")
         if finished["status"] != "complete" or found:
             found.insert(0, f"{name}_incomplete")
         if name != "baseline":
             if any(event["seq"] > requested["seq"] for event in arm_events) \
                     or sorted(map(tuple, planned["attempts"])) != current:
                 found.append(f"{name}_stale")
-            if name != "comparison" and (last_disarm is None
-                                         or requested["boottime_ns"] - last_disarm < SETTLE_SECONDS * 10**9):
+            if last_disarm is None or requested["boottime_ns"] - last_disarm < SETTLE_SECONDS * 10**9:
                 found.append(f"{name}_too_early")
         return found, (finished if not found else None)
 
@@ -1359,6 +1475,8 @@ def classify(events: list, now_codes=(), masking=None) -> dict:
         codes.append("store_armed")
     if state["pending"]:
         codes.append("arming_unresolved")
+    if not prepared["guard_pinned"]:
+        codes.append("guard_not_pinned")
     if masking is not None and final is not None:  # only unit attempts whose tag reached the journal count
         rows = final["sinks"].get("A11", {}).get("observations", [])
         tagged = {row[2] for row in rows if row[0] == 2 and row[1] == 1}

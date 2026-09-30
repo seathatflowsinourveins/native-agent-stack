@@ -1100,6 +1100,7 @@ class Scan:
                 check.fail("file_set_changed" if stat.S_ISREG(info.st_mode) else "changed_type")
                 self.result(check)
                 return ("error", None)
+            hook("after_handoff", rel)
             head = os.pread(fd, SNIFF, 0)
             kind, fmt = classify(head, name, store)
             path_class = {"sqlite": "sqlite", "wal": "wal"}.get(kind, path_class)
@@ -1202,6 +1203,7 @@ class Walk:
 
     def names(self, data: bytes, first_end: int) -> None:
         if self.mode == "pre":
+            hook("before_m6", data)
             for pattern in self.scan.patterns.find(data, first_end):
                 self.scan.attribute(self.name_check, pattern)
 
@@ -1212,6 +1214,8 @@ class Walk:
                 self.stream_root()
             return
         path = self.path
+        if self.kind == "glob":
+            path, self.match_pattern = os.path.split(path)
         if self.kind == "git":
             path = self.git_directory()
             if path is None:
@@ -1307,8 +1311,14 @@ class Walk:
                 self.state = "file_set_changed"
             except OSError:
                 self.state = "walk_error"
-        self.items[b"d:" + rel] = ("d", info.st_dev, info.st_ino, info.st_mode)
-        self.lists[rel] = tuple((name, stat.S_IFMT(entry.st_mode), entry.st_ino) for name, entry in stats.items())
+        identity = ("d",) + tuple_of(info) + (info.st_mode,)
+        entries = tuple((name, stat.S_IFMT(entry.st_mode), entry.st_dev, entry.st_ino)
+                        for name, entry in stats.items())
+        if self.mode == "scan":
+            if self.items.get(b"d:" + rel) != identity or self.lists.get(rel) != entries:
+                self.scan.reasons.append("file_set_changed")
+        else:
+            self.items[b"d:" + rel], self.lists[rel] = identity, entries
         self.count("directories")
         # A Git directory by the pinned layout (git v2.43.0 setup.c: HEAD, objects/, refs/), wherever it sits.
         if {b"HEAD", b"objects", b"refs"} <= stats.keys() and stat.S_ISREG(stats[b"HEAD"].st_mode) \
@@ -1330,6 +1340,8 @@ class Walk:
                     self.selected.add(rel + b"/" + name if rel else name)
         for name in names:
             if name in stats:
+                if self.kind == "glob" and depth == 0 and not fnmatch.fnmatchcase(name, self.match_pattern):
+                    continue
                 family = {"path": path + b"/" + name, "main": name[:-4] in stats,
                           **{suffix.decode(): True for suffix in families.get(name, {})}}
                 self.entry(fd, name, rel + b"/" + name if rel else name, path + b"/" + name, stats[name], depth, store,
@@ -1345,14 +1357,21 @@ class Walk:
             self.count({"key": "excluded_key", "declined": "declined"}.get(excluded, "excluded_user"))
             return
         mode = info.st_mode
+        previous = self.items.get(rel)
+        current = (("l", info.st_dev, info.st_ino, os.readlink(name, dir_fd=fd)) if stat.S_ISLNK(mode)
+                   else ("s", info.st_dev, info.st_ino, stat.S_IFMT(mode)) if not (
+                       stat.S_ISDIR(mode) or stat.S_ISREG(mode)) else None)
+        if self.mode == "scan" and current is not None and previous != current:
+            self.scan.reasons.append("file_set_changed")
+            return
         if stat.S_ISLNK(mode):
             target = os.readlink(name, dir_fd=fd)
-            self.items[rel] = ("l", info.st_dev, info.st_ino, target)
+            if self.mode != "scan":
+                self.items[rel] = ("l", info.st_dev, info.st_ino, target)
             self.names(target, 0)
             if self.mode == "pre":
                 self.link(path)
         elif stat.S_ISDIR(mode):
-            self.items[b"d:" + rel] = ("d", info.st_dev, info.st_ino, mode)
             if self.kind == "tasks" and depth == 2 and name != b"tasks":
                 return
             try:
@@ -1368,7 +1387,13 @@ class Walk:
             finally:
                 os.close(child)
         elif stat.S_ISREG(mode):
-            self.items[rel] = ("f",) + tuple_of(info)
+            identity = ("f",) + tuple_of(info)
+            if self.mode == "scan":
+                if previous != identity:
+                    self.scan.reasons.append("file_set_changed")
+                    return
+            else:
+                self.items[rel] = identity
             if self.kind == "tasks" and depth < 3:
                 return
             payload = store.payload(path) if store is not None else False
@@ -1384,7 +1409,8 @@ class Walk:
             else:
                 self.routes[rel] = self.recheck(fd, name, tuple_of(info), store)
         else:
-            self.items[rel] = ("s", info.st_dev, info.st_ino, stat.S_IFMT(mode))
+            if self.mode != "scan":
+                self.items[rel] = ("s", info.st_dev, info.st_ino, stat.S_IFMT(mode))
             self.count("special")
 
     def recheck(self, fd: int, name: bytes, identity: tuple, store) -> tuple:
@@ -1469,6 +1495,9 @@ class Walk:
             self.state = after.state
         if (self.items, self.lists) != (after.items, after.lists):
             self.scan.reasons.append("file_set_changed")
+            if any(item[0] == "f" and after.items.get(rel, (None,))[0] == "s"
+                   for rel, item in self.items.items()):
+                self.state = "changed_type"
         elif any(after.routes.get(rel) != route_ for rel, route_ in self.routes.items()):
             self.scan.reasons.append("format_changed")
         if self.state != "ok":
@@ -1638,7 +1667,10 @@ def setup_prepare(scan: Scan) -> None:
                    expected=len(plan["exes"]))
     for root in plan["roots"]:
         try:
-            info = os.lstat(os.fsencode(root["path"]) + (b"/.git" if root["kind"] == "git" else b""))
+            path = os.fsencode(root["path"])
+            if root["kind"] == "glob":
+                path = os.path.dirname(path)
+            info = os.lstat(path + (b"/.git" if root["kind"] == "git" else b""))
             present = 2 if stat.S_ISLNK(info.st_mode) else 1
         except OSError:
             present = 0
@@ -1717,16 +1749,24 @@ def setup_controls(scan: Scan) -> None:
 def run_text(scan: Scan, argv: list, stdin=subprocess.DEVNULL, cwd=None, stderr=True) -> str:
     """A short contained helper's stdout (and stderr when asked, for --version texts), bounded by the setup budget."""
     child, _in, out, err = spawn(scan, argv, stdin=stdin, cwd=cwd)
-    flow, output = Flow(time.monotonic() + budget(30, cap=30)), bytearray()
-    flow.read(out, output.extend)
-    flow.read(err, output.extend if stderr else (lambda data: None))
+    flow, output, diagnostics = Flow(time.monotonic() + budget(30, cap=30)), bytearray(), bytearray()
+    def collect(data):
+        output.extend(data)
+        if len(output) > STDOUT_CAP:
+            raise Stop("output_cap")
+    flow.read(out, collect)
+    flow.read(err, collect if stderr else diagnostics.extend)
     try:
         flow.run()
-        child.finish(flow.deadline)
-    except Deadline:
+        code = child.finish(flow.deadline)
+        if code != 0 or diagnostics:
+            raise Stop("producer_stderr" if diagnostics else "producer_exit")
+    except (Deadline, Stop):
         flow.abandon()
         child.stop()
-        return ""
+        raise
+    finally:
+        flow.selector.close()
     return output.decode("ascii", "replace")
 
 
@@ -1855,7 +1895,12 @@ def main(argv: list) -> int:
     try:
         SCOPE_CHECK()
         scan = Scan(plan, wire, body)
+        if plan.get("budget_seconds"):
+            signal.signal(signal.SIGALRM, lambda *_args: (_ for _ in ()).throw(Deadline()))
+            signal.setitimer(signal.ITIMER_REAL, plan["budget_seconds"])
         scan.run()
+    except Deadline:
+        reason = "deadline"
     except Interrupted:
         reason = "interrupted"
     except Stop as stop:
@@ -1863,6 +1908,7 @@ def main(argv: list) -> int:
     except Exception:  # noqa: BLE001 - fixed enum only (contract 10.1)
         reason = "setup_failed"
     finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
         stop_all()
     if reason != "ok":
         try:
