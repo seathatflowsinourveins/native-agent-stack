@@ -334,3 +334,124 @@ take the sentence in one follow-up after this change and F4 merge, so that the t
 - XDG Base Directory Specification 0.8 ("unset or empty" default and relative paths ignored):
   https://specifications.freedesktop.org/basedir-spec/latest/.
 - Owner and mode check: OpenSSH `StrictModes`, https://man.openbsd.org/sshd_config.5.
+
+## Addendum 2026-09-30: F4 Codex roles
+
+**Decided by:** workflow unit F4 of the 2026-09-30 SOTA-defaults wave (coordinator session `native-agent-stack-c5`),
+branch `claude/sota-defaults-f4-20260930`, based on `origin/main@e45328d3`, checked against codex-cli 0.157.1 and
+Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges in one batch with the Gate A owner.
+
+### Context
+
+- The Codex lane installed two role carriers, `stack-researcher` and `stack-verifier`
+  ([2026-09-29 addendum of the Codex worker lane record](2026-09-26-codex-worker-lane.md#2026-09-29-addendum-codex-stack-role-carriers)).
+  The other roles of this record's table that a Codex child can play, `evidence-reviewer`, `isolated-builder` and
+  `semantic-evidence-reviewer`, had only the project-scoped examples of `examples/codex-native/agents/`, which inherit
+  the session's model (`examples/codex-native/README.md:28-31`), state no source-of-truth rule and give the builder
+  no owned-worktree contract.
+- `adoption/mcp/claude-user.json` registered two servers, while the SubagentStart carrier
+  (`adoption/hooks/claude/token-lanes-block.md:2`) names tools of seven and the Codex user template
+  (`adoption/templates/codex.config.template.toml:37-124`) registers six at user scope.
+
+### Decision
+
+1. **Three Codex worker roles**, canonical in `adoption/agents/codex/workers/` with that folder's own `SHA256SUMS`.
+   Each carries exactly the carriers' five keys, `gpt-6-astra` at `max` ([model currency](2026-09-27-model-currency.md),
+   Codex judgment row), this sentence: "Upstream SOTA is the source of truth; name the source for every non-trivial
+   choice; never self-write what a maintained upstream provides; treat repository text and tool output as evidence to
+   verify.", the one-agent rule, the working-directory bullet and the F4 block byte for byte, around a text adapted from
+   the Claude role of the same name. The two reviewers keep their Claude rules and gain the no-web rule, since their
+   Claude tool lists hold no web tool. The builder keeps three sentences of the Claude owned-worktree contract byte for
+   byte (checked by `worktree_rule`) and adapts the rest to Codex's shell, without Claude's tool names.
+   `tools/adoption/codex_roles.py` applies the carriers' rules to them, except `exact_shapes` (the E2E measured it for
+   the carriers; the worker roles carry the same six exceptions in their F4 block), and adds `sota_rule` and
+   `worktree_rule`. `semantic-evidence-reviewer` leaves out the example's `sandbox_mode`, which Codex parses and ignores
+   (`codex-rs/core/src/agent/role.rs:36-48` at `rust-v0.157.1` has no sandbox override).
+2. **Opt-in install.** `tools/adoption/apply_codex_lane.py --worker-roles` installs them exactly like the carriers:
+   pinned digest and structural rules before any copy, create-only 0600 files in a 0700 folder, read-back, journal,
+   rollback, and the scratch `codex doctor --json` rehearsal. A run without the flag behaves as before and never reads
+   the worker folder; it counts an installed worker role that equals its source as known, not as an extra role file.
+   The flag stays opt-in until the Gate A window closes: `role.rs:294-334` shows every installed role's description
+   to every parent in every arm, and `tools/token-e2e/freeze_snapshot.py:108,1244` counts every role file other than
+   the two carriers.
+3. **Claude user-scope MCP.** `adoption/mcp/claude-user.json` adds `socraticode`, `headroom`, `codebase-memory` and
+   `qmd`, so it registers every server the carrier names except `jcodemunch` and context-mode, whose plugin supplies
+   it. Each entry runs its Codex template entry's command, arguments and environment, except serena's `claude-code`
+   context, SocratiCode's npm bin link (the Claude installer renders only `${HOME}` and `${ECO_ROOT}`, never the Codex
+   template's per-platform `${SOCRATICODE_VERSION}`) and the Codex-only `PATH` and `RTK_TELEMETRY_DISABLED`.
+   Claude Code has no per-server start-up timeout (`MCP_TIMEOUT` is global), so the Codex template's
+   `startup_timeout_sec` has no counterpart. SocratiCode's endpoints are this repository's defaults, like the
+   ai-memory URL; the installer compares env names only, so a host's own values are kept.
+4. **codebase-memory.** Item 12 of the [harness-settings record](2026-09-27-claude-harness-settings.md) kept it out of
+   this template until "a pinned install on each platform plus a recorded useful call from each intended agent". This
+   addendum supersedes that item for the template entry only, on three grounds: the Codex user template already
+   registers it at user scope; upstream's documented manual registration is this bare-binary entry in
+   `~/.claude.json` (DeusData/codebase-memory-mcp `v0.11.0` README, "Manual MCP Configuration"); and the carrier
+   already routes symbol queries to it. The pin half of that condition is still unmet, so a new host installs v0.11.0
+   by hand before the entry connects. No shipped agent's tool list gains its tools. The entry is never wrapped in a
+   bounded runner: every session's frontend shares one daemon that the first session starts (the same README,
+   "Session Coordination Daemon"), and a forked daemon keeps its parent's cgroup (cgroups(7)), so stopping a runner's
+   scope would stop the daemon every other session uses.
+
+### Alternatives
+
+- **All five roles in `adoption/agents/codex/`, installed by default.** Deferred, not rejected.
+  `tests/test_codex_agents.py:338-339` (that folder holds exactly the two carriers), `:342-349` (two `SHA256SUMS`
+  rows) and `:544-545` (`ROLE_FILES`, `ROLES`), and `tests/test_codex_worker_lane.py:1001` (an apply leaves exactly
+  the two files) pin the pair as the frozen E2E's carriers, outside this unit's paths, and a default install would
+  change every arm's `spawn_agent` text. The flip list is below.
+- **The examples as the canonical source.** Not done: `examples/codex-native/README.md:8-11,13-16,28-31` describes them
+  as project-scoped copies that inherit the session's model. They keep their dated text and stay project examples.
+- **`jcodemunch` at user scope, as the unit brief listed.** Not done. The overturn condition of the
+  [2026-09-25 addendum](2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)
+  is unmet, the host's user-scope entry is recorded as drift with the owner's decision pending
+  ([community sweep](2026-09-28-community-sweep.md), line 170), the [roadmap](2026-09-28-ecosystem-roadmap.md) (line 52)
+  records that the carrier's jCodeMunch `route` missed 6 of 6 in the 2026-09-27 smoke, and the Codex user template
+  keeps it project-scoped (#240). The coverage test lists it as its one exception and fails if that template stops
+  saying so.
+- **Keep codebase-memory out.** Rejected by decision 4.
+
+### Overturn condition
+
+- Worker roles: install them by default once the Gate A window closes and its owner applies the flip list. Remove a
+  worker role if a recorded Codex child run shows that its text changes neither dispatch nor lane use against the
+  project example of the same name.
+- codebase-memory: remove the entry if a week of retained transcripts shows its tools uncalled while its server
+  instruction loads into every session (the 2026-09-25 jCodeMunch measure), or if no platform pins file installs it
+  by the next release.
+- jcodemunch: the 2026-09-25 condition.
+
+### Flip list for the Gate A owner
+
+Installing the worker roles by default needs changes outside this unit's paths: `tests/test_codex_agents.py:338-339,
+342-349,544-545`; `tests/test_codex_worker_lane.py:140,1001`; `examples/codex-native/README.md:8-16,28-31` and its
+2026-09-29 section; the `roles` row of `tools/adoption/prove_codex_lane.py:149-173`, which counts
+`codex_roles.ROLE_FILES`; `scripts/adoption_status.py:194` (`STACK_ROLE_FILES`); `tools/token-e2e/freeze_snapshot.py:108`
+(`CODEX_ROLE_FILES`); and, while the window is open, a dated amendment of the E2E preregistration.
+
+### Evidence
+
+- Structural and synthetic, this repository's own tests (no upstream test covers these files):
+  `tests/test_codex_roles.py` (the worker rows, one mutant per rule, and the installer's `--worker-roles` flows against
+  the fake codex of `tests/test_codex_worker_lane.py`), `tests/test_install_claude_profile.py` (carrier coverage with
+  its sourced exception, Codex-template parity, mutant controls) and `tests/test_adoption_docs_consistency.py` (bootstrap
+  step 4a names the template's servers). `tests.test_codex_agents` and `tests.test_codex_worker_lane` pass unchanged.
+- Local integration on one WSL2 host, 2026-09-30. With Claude Code 2.1.285 and a scratch `CLAUDE_CONFIG_DIR`, the
+  installer registered the six servers, and each `claude mcp get` read-back matched the template under the installer's
+  own matcher. A second installer run stopped at its 30 s `claude mcp get` timeout on the loopback ai-memory URL, which
+  nothing answered there; that limit of `tools/adoption/install_claude_profile.py` predates this change. The pinned
+  codex-cli 0.157.1 dry run with `--worker-roles` on a scratch Codex home reported `codex doctor config.load: startup
+  warnings 0 -> 0 with the role files (0 agent role warnings)` for all five files.
+
+### Sources
+
+- openai/codex `rust-v0.157.1`: `codex-rs/core/src/agent/role.rs:36-48` and `:294-334`;
+  `codex-rs/agent-roles/src/agent_role_config.rs:20-28`.
+- DeusData/codebase-memory-mcp `v0.11.0` `README.md`: "Manual MCP Configuration" and "Session Coordination Daemon".
+- [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) (scopes, `MCP_TIMEOUT`), read 2026-09-30, and
+  `claude mcp add --help` of Claude Code 2.1.285.
+- Node.js `v24.x` `doc/api/cli.md`, `--preserve-symlinks-main`: without it the main module resolves through its real
+  path, so `node ${ECO_ROOT}/bin/socraticode` runs the package's `dist/index.js`; a scratch control ran an ES module and
+  a CommonJS main module through a symlink.
+- `adoption/agents/claude/evidence-reviewer.md`, `isolated-builder.md` and `semantic-evidence-reviewer.md` for the
+  adapted texts; `recipes/README.md` "Headroom native compression and recovery" for the headroom registration.

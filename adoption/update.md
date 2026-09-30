@@ -109,7 +109,7 @@ git fetch --tags origin
 old="$(git rev-parse HEAD)"
 tag="$(git show origin/HEAD:adoption/manifest.json | python3 -c "import json,sys;print(json.load(sys.stdin)['source']['release_tag'])")"
 git diff --stat "$old" "$tag" -- adoption/pins-linux-x86_64.json adoption/pins-macos-arm64.json \
-  adoption/manifest.json adoption/templates manifests/stack.json catalogs/landscape
+  adoption/manifest.json adoption/templates adoption/mcp adoption/agents manifests/stack.json catalogs/landscape
 git checkout "$tag"
 ```
 
@@ -138,6 +138,21 @@ git checkout "$tag"
    [`receipt-staleness.yml`](../.github/workflows/receipt-staleness.yml) runs
    the same report weekly and uploads it as an artifact; it never fails on a
    flag and writes nothing to the repository.
+5. If `adoption/mcp/` or `adoption/agents/` changed, rerun the client
+   installers from the new checkout, each first as a report. On the Claude
+   side, `python3 tools/adoption/install_claude_profile.py --dry-run`, then
+   without `--dry-run`: it registers the template's servers this host lacks
+   and leaves a differing registration unchanged unless `--replace-mcp` is
+   given, so a server registered by hand is kept. Since 2026-09-30 the
+   template names `socraticode`, `headroom`, `codebase-memory` and `qmd`
+   besides `ai-memory` and `serena`; install each first
+   ([bootstrap step 4a](bootstrap.md)). On the Codex side, the dry run of
+   `python3 tools/adoption/apply_codex_lane.py` plans the role carriers, and
+   `--worker-roles` adds the three worker roles of
+   `adoption/agents/codex/workers/` once the token-adoption E2E's Gate A window
+   has closed
+   ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles));
+   apply what the dry run printed with its `--apply` form.
 
 **4. How the receipts reach the catalog.** Follow
 [the host evidence contribution guide](../docs/contributing-evidence.md): record
