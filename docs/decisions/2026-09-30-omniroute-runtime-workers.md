@@ -49,6 +49,12 @@ failed before inference; a three-second deadline requested native interruption;
 a fresh thread then passed. The cancellation result is in its private log, not
 an original-result JSON file. Remote termination remains unverified.
 
+The byte-exact executed sources are also retained in this branch's public
+[Sol source commit](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9edd76e9f9f817e818b59b7b5cfd16e329317ad0/examples/omniroute-codex-sdk/worker.py)
+and [Claude source commit](https://github.com/seathatflowsinourveins/native-agent-stack/blob/38e4ec6f69d23c663f60c44c311217f7239e448d/examples/claude-runtime-sdk/worker.py).
+Later formatting commits preserve the same AST; the receipt names original
+worker commits and full executed/final SHA-256 values.
+
 The gateway observer confirms Max effort and native ResponsesLite tool carriage
 under `input[].type=additional_tools`. The first authored oracle incorrectly
 expected top-level `tools`; original tagged source corrected that failed oracle.

@@ -14831,8 +14831,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
-      "sha256": "92ce5364d15857b4bf9392779b829f0d1fcca7621c54d3dfe64009d7a91999ca",
-      "bytes": 8079
+      "sha256": "5ed6f31d2f89ab8f9ab01f5701a93b61311205f0b376b1b90ceb4df2138c4503",
+      "bytes": 8625
     },
     {
       "path": "docs/direct-results.md",
