@@ -1,0 +1,13 @@
+Command: rtk proxy python3 -m unittest discover -s tests -p test_install_claude_profile.py
+Evidence class: local integration tests and synthetic negative controls; no provider calls
+Exit: 0
+Returned stderr (checkout paths sanitized):
+.........mcp: ai-memory is registered at another scope (Managed config); left unchanged
+mcp: serena is registered at another scope (Managed config); left unchanged
+................mcp: ai-memory is already registered with a different config; left unchanged (re-run with --replace-mcp to re-register it at user scope)
+mcp: serena is already registered with a different config; left unchanged (re-run with --replace-mcp to re-register it at user scope)
+...........................s....s....s..............
+----------------------------------------------------------------------
+Ran 77 tests in 1.365s
+
+OK (skipped=3)

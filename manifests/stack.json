@@ -81,7 +81,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -93,7 +94,7 @@
     {
       "id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.4.1",
+      "version": "2.4.2",
       "license": "MIT",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
@@ -125,14 +126,17 @@
         "claude-repository-evidence-20260921",
         "memory-lifecycle-probe-20260921",
         "ai-memory-240-qualification-20260925",
-        "ai-memory-241-qualification-20260925"
+        "ai-memory-241-qualification-20260925",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
-        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2"
       ],
-      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. Among those seven commands, the Codex PreCompact hook remains unverified after the upgrade: whether it fires correctly has not been checked; this is a recorded verification gap, not an observed defect. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+      "source_pin": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+      "freshness": "2026-09-30: official2.4.2 archive/checksum and active executable hash verified; existing native service restarted, MCP status healthy, both supported hook installers returned0. Exact isolated query/read/restart and2.4.1 ->2.4.2 ->2.4.1 binary rollback passed; store tree/migrations identical atV67. No production store/authentication copied. Fresh useful calls in both clients; production PreCompact extraction not rerun and provider-token gain unmeasured. Earlier forward-only migration receipts keep their original scope. See token-profile-completion-20260930."
     },
     {
       "id": "ast-grep",
@@ -150,7 +154,8 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
@@ -176,7 +181,9 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "ccusage-20026-qualification-20260927"
+        "ccusage-20026-qualification-20260927",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage",
@@ -232,13 +239,15 @@
         "broad-universe-research-20260921",
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
       ],
       "source_pin": null,
-      "freshness": "2.1.284 is the floor both platform pins set since 2026-09-29 (adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json, version_probe match minimum; raised from 2.1.281, the floor since 2026-09-25): the native installer verifies that build, then the launcher auto-updates on the latest channel, so a host may run a newer one (the NativeStack WSL2 host reported 2.1.284 on 2026-09-29, the latest GitHub release and the build the publisher's latest channel served; its stable channel served 2.1.277). 2.1.284 adds Claude Sonnet 5.5 as the default Sonnet model on the Anthropic API, so on the Anthropic API the sonnet alias resolves to Sonnet 5.5 from 2.1.284 and to Sonnet 5 on an older client (CHANGELOG.md 2.1.284; https://code.claude.com/docs/en/model-config); the 2.1.281 fix for a recursive rm of command-substitution output that ran unprompted in auto and --dangerously-skip-permissions mode stays included. The native floor replaced the 2.1.278 npm-wrapper pin, which set DISABLE_AUTOUPDATER=1; receipts keep the version they recorded. The landscape winner pin stays 2.1.278 until a new verdict wave; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "2026-09-30: compatibility floor remains2.1.284; actual official native2.1.285 reinstalled and binary/download manifest verified. Ultracode/experimental Workflow, saved workflow recovery, ordinary Agent handback and SubagentStart lanes observed; explicit max per call, inherited effort override unset. Eight fresh useful token operations plus four dated unchanged-pin subagent operations compose this host qualification. Native caching/compaction kept; no fresh twelve-tool provider-saving comparison. See token-lifecycle-resolution-20260930 and token-profile-completion-20260930."
     },
     {
       "id": "claude-hud",
@@ -283,7 +292,8 @@
         "native-cli-gaps",
         "component-history",
         "desktop-cli-workflows",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
@@ -294,7 +304,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.157.1",
+      "version": "0.159.2",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -335,14 +345,17 @@
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
         "claude-repository-evidence-20260921",
-        "codex-01571-qualification-20260926"
+        "codex-01571-qualification-20260926",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+        "https://github.com/openai/codex/releases/tag/rust-v0.157.1",
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
       ],
-      "source_pin": null,
-      "freshness": "0.157.1 serves bin/codex on the NativeStack WSL2 host since 2026-09-26, switched with the qualification receipt's data.switch commands after a matched comparison against 0.155.1 in a loopback sandbox (the landscape-sweep lane argv, the 429 usage-limit mapping, --search and state migration behaved the same); automatic start of the 0.157.x self-updating app-server daemon is off (daemon_auto_start false, also in adoption/templates/codex.config.template.toml). 0.155.1 is kept for rollback, the macOS pin stays 0.155.1 until its own qualification, and the landscape winner pin stays 0.155.1 until a new verdict wave."
+      "source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "freshness": "2026-09-30: installed0.159.2 and clean supported npm prefix/removal qualified. Platform dependency signature/provenance passed after correcting audit cwd; wrapper hash/integrity recorded separately. Sol/ultra coordinator and Astra/max V2 child completed; twelve fresh useful native token-tool operations completed with retained failed conditions and same-session recovery. Native JSONL usage is cumulative total, not additive per-turn. Existing native account retained. See token-lifecycle-resolution-20260930 and token-profile-completion-20260930."
     },
     {
       "id": "codex-for-claude",
@@ -388,7 +401,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-native-retained-functional-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/andrewyng/context-hub"
@@ -426,7 +440,9 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -534,7 +550,9 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/headroomlabs-ai/headroom",
@@ -585,7 +603,9 @@
         "token-practice-coverage-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "markitdown-018-qualification-20260925"
+        "markitdown-018-qualification-20260925",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
@@ -635,7 +655,9 @@
         "current-session-observation-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "mcporter-0141-qualification-20260925"
+        "mcporter-0141-qualification-20260925",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/openclaw/mcporter/tree/v0.14.1"
@@ -778,7 +800,9 @@
         "full-stack-convergence-20260921",
         "foundation-rd-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -806,7 +830,9 @@
         "foundation-native-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
@@ -842,7 +868,9 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "rtk-050-qualification-20260925"
+        "rtk-050-qualification-20260925",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
@@ -900,7 +928,9 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -984,7 +1014,8 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "socraticode-1150-qualification-20260927"
+        "socraticode-1150-qualification-20260927",
+        "token-profile-completion-20260930"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -1014,7 +1045,9 @@
         "foundation-native-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-profile-completion-20260930",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/toon-format/toon/releases/tag/v4.1.1"
@@ -1699,7 +1732,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "token-lifecycle-resolution-20260930"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",

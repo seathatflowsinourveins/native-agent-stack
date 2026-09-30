@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "kind": "independent_native_verification",
+  "role": "stack-verifier",
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "recorded_date": "2026-09-30",
+  "scope": "Original source and actual native returned output; no provider runs, recompression or implementation fixes.",
+  "checks": [
+    {
+      "claim": "ccusage exact public fixture daily totals",
+      "command": "env CLAUDE_CONFIG_DIR=<PUBLIC_FIXTURE> ccusage claude daily --json --offline --timezone UTC",
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "stdout_bytes": 1292,
+      "stdout_sha256": "4149ab4ae06492c78e922387c9581280aa89f463f27d8dc376b766725b69c47d",
+      "actual": {
+        "rows": 2,
+        "input": 1900,
+        "output": 380,
+        "cache_creation": 100,
+        "cache_read": 50,
+        "total": 2430
+      },
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Headroom persisted original recovered in separate process",
+      "command": "mcporter call --stdio 'headroom mcp serve --proxy-url http://127.0.0.1:1' headroom_retrieve hash=fdf314394a9854039da18b2f --config <OWNED_EMPTY_CONFIG>",
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "stdout_bytes": 3620,
+      "stdout_sha256": "ba1be02de6e76dbb10a4af0252d2beb2c67a605d651f70dee1323e49d7500236",
+      "actual": {
+        "original_bytes": 2969,
+        "original_sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+        "records": 24,
+        "service": "native-ci-fixture",
+        "region": "us-east-1"
+      },
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Headroom negative retrieval returns semantic error despite process exit0",
+      "command": "mcporter call --stdio 'headroom mcp serve --proxy-url http://127.0.0.1:1' headroom_retrieve hash=000000000000000000000000 --config <OWNED_EMPTY_CONFIG>",
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "stdout_bytes": 450,
+      "stdout_sha256": "d035b163e444c55f83fb367ac4230d6c12dbc20513c4a63f95bd1d8008af07d4",
+      "actual_error": "Content not found. It may have expired or the hash may be incorrect.",
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Claude recovery actually ran and returned useful native operations",
+      "verdict": "confirmed",
+      "evidence": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+      "scope": "Actual native tool inputs/results and final result, not assistant final narrative. Original480s timeout remains retained with unknown final caller usage."
+    },
+    {
+      "claim": "Hindsight installer test source unchanged",
+      "commands": [
+        {
+          "command": "npm ci",
+          "exit_code": 0
+        },
+        {
+          "command": "npm test -- src/installer.test.ts",
+          "exit_code": 0
+        },
+        {
+          "command": "git diff --exit-code -- src/installer.test.ts package.json package-lock.json vitest.config.ts",
+          "exit_code": 0
+        }
+      ],
+      "actual": {
+        "passed": 203,
+        "skipped": 2
+      },
+      "verdict": "confirmed",
+      "scope": "Pinned upstream temporary-home/mock-host installer suite only",
+      "working_directory_relative_to_source_repository": "hindsight-integrations/coding-agents"
+    }
+  ],
+  "sources": [
+    "scripts/native_token_ci.py",
+    "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/installer.test.ts"
+  ],
+  "limitations": [
+    "Supplied own test state and explicit environment were reused; no production credentials, authentication stores or unrelated session data inspected.",
+    "Process success and semantic success remain distinct. Hindsight backend/live-provider acceptance is not claimed."
+  ],
+  "final_independent_review": {
+    "date": "2026-09-30",
+    "reviewer_role": "stack-verifier",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "composed_tool_hashes_checked": 24,
+    "composed_tool_hashes_match": true,
+    "native_memory_version_exit_code": 0,
+    "native_service_query_exit_code": 0,
+    "service_state": "loaded/active/running; Result=success; ExecMainStatus=0",
+    "active_executable_sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93",
+    "fresh_hooks_list_process_exit_code": 0,
+    "hooks_total": 13,
+    "memory_hooks_trusted_enabled_nonmanaged": 7,
+    "other_hooks_present": 6,
+    "all_memory_command_executables_match_verified_binary": true,
+    "published_after_hashes_match": true,
+    "hindsight_retained_stdout_match": true,
+    "public_files_scanned": 11,
+    "privacy_scan_personal_paths_native_ids_credential_shapes_found": 0,
+    "validate_py_exit_code": 0,
+    "validate_convergence_exit_code": 0,
+    "convergence_observations": 26,
+    "scope": "No config/read, authentication stores, databases or provider runs. Actual native hooks/list and service/executable metadata checked. PR creation not yet independently checked.",
+    "preserved_attempts": [
+      {
+        "condition": "Context Mode service query returned no properties",
+        "exit_code": 1,
+        "correction": "Direct native service query and executable check succeeded."
+      },
+      {
+        "condition": "Experiment artifact modified before manifest refresh",
+        "validate_py_exit_code": 1,
+        "correction": "Hash registration then validate.py passed."
+      },
+      {
+        "condition": "Root transcription inserted nonexistent tests/ prefix in Hindsight unchanged-source command",
+        "correction": "Original cwd and exact argv restored; immutable source URL verified."
+      }
+    ]
+  }
+}

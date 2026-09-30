@@ -1,0 +1,54 @@
+{
+  "kind": "claude-ordinary-agent-integration",
+  "evidence_class": "synthetic-client-integration",
+  "started_at": "2026-09-30T15:49:22.241Z",
+  "completed_at": "2026-09-30T15:52:23.188Z",
+  "exit_code": 124,
+  "signal": null,
+  "session_id": "<owned-native-id-5>",
+  "model": "claude-opus-5-5",
+  "tool_calls": [
+    {
+      "id": "toolu_01HWCyHxEFfUPFWheverM5G5",
+      "name": "Bash"
+    },
+    {
+      "id": "toolu_0167Azxz2tmCLxQx51ordbKE",
+      "name": "Read"
+    },
+    {
+      "id": "toolu_014kvqLrZhMznnvzYAUWbsLi",
+      "name": "Agent",
+      "subagent_type": "isolated-builder"
+    }
+  ],
+  "agent_results": [],
+  "hooks": [
+    {
+      "subtype": "hook_started",
+      "event": "SubagentStart",
+      "name": "SubagentStart:isolated-builder"
+    },
+    {
+      "subtype": "hook_started",
+      "event": "SubagentStart",
+      "name": "SubagentStart:isolated-builder"
+    },
+    {
+      "subtype": "hook_response",
+      "event": "SubagentStart",
+      "name": "SubagentStart:isolated-builder",
+      "exit_code": 0,
+      "outcome": "success"
+    },
+    {
+      "subtype": "hook_response",
+      "event": "SubagentStart",
+      "name": "SubagentStart:isolated-builder",
+      "exit_code": 0,
+      "outcome": "success"
+    }
+  ],
+  "results": [],
+  "stderr": ""
+}

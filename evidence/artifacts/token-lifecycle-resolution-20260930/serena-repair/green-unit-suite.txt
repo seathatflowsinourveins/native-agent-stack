@@ -1,0 +1,7 @@
+COMMAND rtk python3 -m unittest discover -s tests -p test_native_token_ci.py
+EXIT 0
+................................................
+----------------------------------------------------------------------
+Ran 48 tests in 2.747s
+
+OK

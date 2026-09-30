@@ -1,0 +1,867 @@
+{
+  "evidence_class": "independent_source_identity",
+  "upstream_revision": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "source": "https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "started_at": "2026-09-30T15:41:22.204225+00:00",
+  "finished_at": "2026-09-30T15:41:22.947026+00:00",
+  "tree_command": {
+    "argv": [
+      "rtk",
+      "gh",
+      "api",
+      "repos/oraios/serena/git/trees/c6fbd1c5932df2494ffa0020af5a9fbe80b82143?recursive=1"
+    ],
+    "exit_code": 0,
+    "stdout_raw_sha256": "d115a274ebfc272eb67d986ab2181f8c4b0abdbd405a2689f0a2c2f3b84cd58c",
+    "stderr": ""
+  },
+  "package_discovery_exit_code": 0,
+  "distribution_versions": {
+    "bottle": "0.13.4",
+    "distro": "1.9.0",
+    "blinker": "1.9.0",
+    "ruamel.yaml": "0.18.14",
+    "oslex": "2.0.0",
+    "httpcore": "1.0.9",
+    "attrs": "26.1.0",
+    "cffi": "2.1.1",
+    "proxy_tools": "0.1.0",
+    "python-multipart": "0.0.31",
+    "pydantic-settings": "2.15.0",
+    "httpx": "0.28.1",
+    "mslex": "1.3.0",
+    "soupsieve": "2.10",
+    "types-PyYAML": "6.0.12.20250516",
+    "serena-agent": "2.0.0.dev0",
+    "typing-inspection": "0.4.4",
+    "itsdangerous": "2.2.0",
+    "annotated-types": "0.8.0",
+    "PyYAML": "6.0.2",
+    "cattrs": "26.2.0",
+    "jsonschema": "4.26.0",
+    "pywebview": "6.2",
+    "mcp": "1.28.1",
+    "jiter": "0.17.0",
+    "ruamel.yaml.clib": "0.2.15",
+    "joblib": "1.5.1",
+    "pygls": "2.1.1",
+    "python-xlib": "0.33",
+    "certifi": "2026.7.22",
+    "idna": "3.20",
+    "referencing": "0.37.0",
+    "typing_extensions": "4.16.0",
+    "pystray": "0.19.5",
+    "Jinja2": "3.1.6",
+    "Flask": "3.1.3",
+    "anthropic": "0.117.0",
+    "starlette": "1.3.1",
+    "rpds-py": "2026.6.3",
+    "sniffio": "1.3.1",
+    "requests": "2.33.0",
+    "filelock": "3.25.2",
+    "pydantic_core": "2.41.5",
+    "beautifulsoup4": "4.14.2",
+    "pydantic": "2.12.5",
+    "pillow": "12.3.0",
+    "regex": "2026.2.28",
+    "tqdm": "4.67.1",
+    "overrides": "7.7.0",
+    "python-dotenv": "1.2.2",
+    "cryptography": "50.0.0",
+    "click": "8.5.0",
+    "pycparser": "3.0",
+    "six": "1.17.0",
+    "uvicorn": "0.53.0",
+    "h11": "0.16.0",
+    "lsprotocol": "2025.0.0",
+    "jsonschema-specifications": "2025.9.1",
+    "docstring_parser": "0.17.0",
+    "anyio": "4.15.1",
+    "psutil": "7.0.0",
+    "MarkupSafe": "3.0.3",
+    "pathspec": "0.12.1",
+    "sse-starlette": "3.4.11",
+    "tiktoken": "0.12.0",
+    "Werkzeug": "3.1.7",
+    "httpx-sse": "0.4.3",
+    "urllib3": "2.7.0",
+    "sensai-utils": "1.5.0",
+    "charset-normalizer": "3.5.1",
+    "PyJWT": "2.15.0"
+  },
+  "files": [
+    {
+      "path": "src/interprompt/__init__.py",
+      "upstream_git_blob_sha1": "7df6eaa0277a25722d9fe4353fc62114e02e8251",
+      "installed_git_blob_sha1": "7df6eaa0277a25722d9fe4353fc62114e02e8251",
+      "matches": true
+    },
+    {
+      "path": "src/interprompt/jinja_template.py",
+      "upstream_git_blob_sha1": "8542579b24c816bfa67551c37911a0872ec2f5bc",
+      "installed_git_blob_sha1": "8542579b24c816bfa67551c37911a0872ec2f5bc",
+      "matches": true
+    },
+    {
+      "path": "src/interprompt/multilang_prompt.py",
+      "upstream_git_blob_sha1": "57b25659096f9706b368cbe55384bbe60c167060",
+      "installed_git_blob_sha1": "57b25659096f9706b368cbe55384bbe60c167060",
+      "matches": true
+    },
+    {
+      "path": "src/interprompt/prompt_factory.py",
+      "upstream_git_blob_sha1": "0f4d58ecdbc3ff6fc08f28ee5730fa6179b38c5c",
+      "installed_git_blob_sha1": "0f4d58ecdbc3ff6fc08f28ee5730fa6179b38c5c",
+      "matches": true
+    },
+    {
+      "path": "src/interprompt/util/__init__.py",
+      "upstream_git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "installed_git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "matches": true
+    },
+    {
+      "path": "src/interprompt/util/class_decorators.py",
+      "upstream_git_blob_sha1": "dc82b142ffc6b6427be9d055065afd8b6d39f7d3",
+      "installed_git_blob_sha1": "dc82b142ffc6b6427be9d055065afd8b6d39f7d3",
+      "matches": true
+    },
+    {
+      "path": "src/serena/__init__.py",
+      "upstream_git_blob_sha1": "0d2c577ed9e050e90a412dd7cfc0f26bb98772a5",
+      "installed_git_blob_sha1": "0d2c577ed9e050e90a412dd7cfc0f26bb98772a5",
+      "matches": true
+    },
+    {
+      "path": "src/serena/agent.py",
+      "upstream_git_blob_sha1": "59a77f2927f2945e48d5bc9535cf7faa4113cccb",
+      "installed_git_blob_sha1": "59a77f2927f2945e48d5bc9535cf7faa4113cccb",
+      "matches": true
+    },
+    {
+      "path": "src/serena/agno.py",
+      "upstream_git_blob_sha1": "5f8a9c456646ee945684be2815f651b72c322fed",
+      "installed_git_blob_sha1": "5f8a9c456646ee945684be2815f651b72c322fed",
+      "matches": true
+    },
+    {
+      "path": "src/serena/analytics.py",
+      "upstream_git_blob_sha1": "8fcc563601751f1d93ada51e2ff30552f87bae7b",
+      "installed_git_blob_sha1": "8fcc563601751f1d93ada51e2ff30552f87bae7b",
+      "matches": true
+    },
+    {
+      "path": "src/serena/cli.py",
+      "upstream_git_blob_sha1": "29d8733190b216e35cf9c78dde36de41bab13721",
+      "installed_git_blob_sha1": "29d8733190b216e35cf9c78dde36de41bab13721",
+      "matches": true
+    },
+    {
+      "path": "src/serena/code_editor.py",
+      "upstream_git_blob_sha1": "85aa8b96eddc697ea9d017116dabce786bee4e52",
+      "installed_git_blob_sha1": "85aa8b96eddc697ea9d017116dabce786bee4e52",
+      "matches": true
+    },
+    {
+      "path": "src/serena/config/__init__.py",
+      "upstream_git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "installed_git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "matches": true
+    },
+    {
+      "path": "src/serena/config/client_setup.py",
+      "upstream_git_blob_sha1": "5500d36e58a07aa476b88188a83c69fe6211cc0b",
+      "installed_git_blob_sha1": "5500d36e58a07aa476b88188a83c69fe6211cc0b",
+      "matches": true
+    },
+    {
+      "path": "src/serena/config/context_mode.py",
+      "upstream_git_blob_sha1": "eae373ed54f67438672a9d7a88ec916a98daea49",
+      "installed_git_blob_sha1": "eae373ed54f67438672a9d7a88ec916a98daea49",
+      "matches": true
+    },
+    {
+      "path": "src/serena/config/serena_config.py",
+      "upstream_git_blob_sha1": "a73c3d4969554171b7eacc499769ecb0312e75e5",
+      "installed_git_blob_sha1": "a73c3d4969554171b7eacc499769ecb0312e75e5",
+      "matches": true
+    },
+    {
+      "path": "src/serena/constants.py",
+      "upstream_git_blob_sha1": "be45dc8eff57675b20d5085f8bdfa2d1ad60b501",
+      "installed_git_blob_sha1": "be45dc8eff57675b20d5085f8bdfa2d1ad60b501",
+      "matches": true
+    },
+    {
+      "path": "src/serena/dashboard.py",
+      "upstream_git_blob_sha1": "117482b43a3ebfd04a274d8159161c4e2f6599bb",
+      "installed_git_blob_sha1": "117482b43a3ebfd04a274d8159161c4e2f6599bb",
+      "matches": true
+    },
+    {
+      "path": "src/serena/generated/generated_prompt_factory.py",
+      "upstream_git_blob_sha1": "035055ccd1aafd5fca3664398d84d6f9f5312158",
+      "installed_git_blob_sha1": "035055ccd1aafd5fca3664398d84d6f9f5312158",
+      "matches": true
+    },
+    {
+      "path": "src/serena/gui_log_viewer.py",
+      "upstream_git_blob_sha1": "8d83ecd0a0e1e0aa0160d43cc97efd4d70129f47",
+      "installed_git_blob_sha1": "8d83ecd0a0e1e0aa0160d43cc97efd4d70129f47",
+      "matches": true
+    },
+    {
+      "path": "src/serena/hooks.py",
+      "upstream_git_blob_sha1": "4bd51a84b30cba6bfb4f8350b62c8a186fda10ad",
+      "installed_git_blob_sha1": "4bd51a84b30cba6bfb4f8350b62c8a186fda10ad",
+      "matches": true
+    },
+    {
+      "path": "src/serena/jetbrains/jetbrains_backend.py",
+      "upstream_git_blob_sha1": "6e62fce9cead197c9ae4ca7e11c70555615558af",
+      "installed_git_blob_sha1": "6e62fce9cead197c9ae4ca7e11c70555615558af",
+      "matches": true
+    },
+    {
+      "path": "src/serena/jetbrains/jetbrains_plugin_client.py",
+      "upstream_git_blob_sha1": "d7a65fa6f501fc813f1c45335c4814e1bd1910be",
+      "installed_git_blob_sha1": "d7a65fa6f501fc813f1c45335c4814e1bd1910be",
+      "matches": true
+    },
+    {
+      "path": "src/serena/jetbrains/jetbrains_types.py",
+      "upstream_git_blob_sha1": "5ccd561b7ec8dd2e9817470b96bc8f477d8899e1",
+      "installed_git_blob_sha1": "5ccd561b7ec8dd2e9817470b96bc8f477d8899e1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/jetbrains/launch_coordinator.py",
+      "upstream_git_blob_sha1": "ae2978db0472b8e6becb663ebf9cdc835fc40b14",
+      "installed_git_blob_sha1": "ae2978db0472b8e6becb663ebf9cdc835fc40b14",
+      "matches": true
+    },
+    {
+      "path": "src/serena/language_backend.py",
+      "upstream_git_blob_sha1": "54b9852524709c9d6ccfe4b82a65b4fb8639f24d",
+      "installed_git_blob_sha1": "54b9852524709c9d6ccfe4b82a65b4fb8639f24d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/ls_manager.py",
+      "upstream_git_blob_sha1": "cb8a736c499ec259f8f33e109546336060f7fd76",
+      "installed_git_blob_sha1": "cb8a736c499ec259f8f33e109546336060f7fd76",
+      "matches": true
+    },
+    {
+      "path": "src/serena/lsp/lsp_backend.py",
+      "upstream_git_blob_sha1": "1d672195e77e18ed07f0b36397f562c16fb92aa8",
+      "installed_git_blob_sha1": "1d672195e77e18ed07f0b36397f562c16fb92aa8",
+      "matches": true
+    },
+    {
+      "path": "src/serena/lsp/lsp_diagnostics.py",
+      "upstream_git_blob_sha1": "4d0a0844fa14efc62644a85b134c78962da0f71c",
+      "installed_git_blob_sha1": "4d0a0844fa14efc62644a85b134c78962da0f71c",
+      "matches": true
+    },
+    {
+      "path": "src/serena/mcp.py",
+      "upstream_git_blob_sha1": "a7bee1054ddfd6e16a90014b726bc0a05d52ae3a",
+      "installed_git_blob_sha1": "a7bee1054ddfd6e16a90014b726bc0a05d52ae3a",
+      "matches": true
+    },
+    {
+      "path": "src/serena/memories/memory_manager.py",
+      "upstream_git_blob_sha1": "a112180ea70335ec20eb90bc4f52f926463ae807",
+      "installed_git_blob_sha1": "a112180ea70335ec20eb90bc4f52f926463ae807",
+      "matches": true
+    },
+    {
+      "path": "src/serena/memories/memory_reference_analysis.py",
+      "upstream_git_blob_sha1": "03b84e615327a988aae53423cf0111101c93d9ec",
+      "installed_git_blob_sha1": "03b84e615327a988aae53423cf0111101c93d9ec",
+      "matches": true
+    },
+    {
+      "path": "src/serena/project.py",
+      "upstream_git_blob_sha1": "396a01cf67935fea6c2222c1a622440dffb2391f",
+      "installed_git_blob_sha1": "396a01cf67935fea6c2222c1a622440dffb2391f",
+      "matches": true
+    },
+    {
+      "path": "src/serena/project_server.py",
+      "upstream_git_blob_sha1": "abc2e3c084a718b250ec41fa1b97c52f1889b37a",
+      "installed_git_blob_sha1": "abc2e3c084a718b250ec41fa1b97c52f1889b37a",
+      "matches": true
+    },
+    {
+      "path": "src/serena/prompt_factory.py",
+      "upstream_git_blob_sha1": "801a6a4a4dc967727323b835e18d4b992b382e56",
+      "installed_git_blob_sha1": "801a6a4a4dc967727323b835e18d4b992b382e56",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/cfg_api.py",
+      "upstream_git_blob_sha1": "610537279a2f95e7f8077df202db38725785fd55",
+      "installed_git_blob_sha1": "610537279a2f95e7f8077df202db38725785fd55",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/edit_api.py",
+      "upstream_git_blob_sha1": "be09770e514f54a16a1899f8aad9095a88042318",
+      "installed_git_blob_sha1": "be09770e514f54a16a1899f8aad9095a88042318",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/ext_api.py",
+      "upstream_git_blob_sha1": "eed18827baa22988a53bc1bf2278bc082b3e5e37",
+      "installed_git_blob_sha1": "eed18827baa22988a53bc1bf2278bc082b3e5e37",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/fs_api.py",
+      "upstream_git_blob_sha1": "b457035ec65303c09165801675f40b238ab33d1e",
+      "installed_git_blob_sha1": "b457035ec65303c09165801675f40b238ab33d1e",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/jb_api.py",
+      "upstream_git_blob_sha1": "5cf8fc277c5be61239b73d040aef2cc19321652d",
+      "installed_git_blob_sha1": "5cf8fc277c5be61239b73d040aef2cc19321652d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/lsp_api.py",
+      "upstream_git_blob_sha1": "8b86bff7c506586d78c9d640435553a9b959ae74",
+      "installed_git_blob_sha1": "8b86bff7c506586d78c9d640435553a9b959ae74",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/mem_api.py",
+      "upstream_git_blob_sha1": "91f2803a3827efb8d8dbc12627ec759e23a2ef64",
+      "installed_git_blob_sha1": "91f2803a3827efb8d8dbc12627ec759e23a2ef64",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/api/shell_api.py",
+      "upstream_git_blob_sha1": "9f4db097f8601a143746bd8acc1bba233f8c65e4",
+      "installed_git_blob_sha1": "9f4db097f8601a143746bd8acc1bba233f8c65e4",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/external_project.py",
+      "upstream_git_blob_sha1": "401c2d1935f33ef3a69dc680bdccef644510db22",
+      "installed_git_blob_sha1": "401c2d1935f33ef3a69dc680bdccef644510db22",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/facade.py",
+      "upstream_git_blob_sha1": "968286821941f7274658de7f2630de67e4c2d591",
+      "installed_git_blob_sha1": "968286821941f7274658de7f2630de67e4c2d591",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/repl.py",
+      "upstream_git_blob_sha1": "9dc1b7b133707fc0c564141da9d4cb0038b27e27",
+      "installed_git_blob_sha1": "9dc1b7b133707fc0c564141da9d4cb0038b27e27",
+      "matches": true
+    },
+    {
+      "path": "src/serena/repl/representable.py",
+      "upstream_git_blob_sha1": "069d712cafc70daa703c148704029aaed86ffc4f",
+      "installed_git_blob_sha1": "069d712cafc70daa703c148704029aaed86ffc4f",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/agent.yml",
+      "upstream_git_blob_sha1": "a3b324f0e862360f49881460177fc3c616bf8b3d",
+      "installed_git_blob_sha1": "a3b324f0e862360f49881460177fc3c616bf8b3d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/antigravity.yml",
+      "upstream_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "installed_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/chatgpt.yml",
+      "upstream_git_blob_sha1": "494e9c42659cfdb45c38a4acd54fc35015a7cc9c",
+      "installed_git_blob_sha1": "494e9c42659cfdb45c38a4acd54fc35015a7cc9c",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/claude-code.yml",
+      "upstream_git_blob_sha1": "4a636e42b37aaadb40cdb12d7af7d355fbeef3cb",
+      "installed_git_blob_sha1": "4a636e42b37aaadb40cdb12d7af7d355fbeef3cb",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/codebuddy.yml",
+      "upstream_git_blob_sha1": "9e2ff53e77d4840514ba841441be54183589d106",
+      "installed_git_blob_sha1": "9e2ff53e77d4840514ba841441be54183589d106",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/codex.yml",
+      "upstream_git_blob_sha1": "2dbd870aaedd13d42cdce0da948c27f016797d28",
+      "installed_git_blob_sha1": "2dbd870aaedd13d42cdce0da948c27f016797d28",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/context.template.yml",
+      "upstream_git_blob_sha1": "71eefa51b358fbee438571469f65bcd9dd0bd341",
+      "installed_git_blob_sha1": "71eefa51b358fbee438571469f65bcd9dd0bd341",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/copilot-cli.yml",
+      "upstream_git_blob_sha1": "c7da899efa5fa1e069335cb6d227c8e1a3c2d486",
+      "installed_git_blob_sha1": "c7da899efa5fa1e069335cb6d227c8e1a3c2d486",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/desktop-app.yml",
+      "upstream_git_blob_sha1": "aad51ac865b2de95bd21684f04efa6ec4fa5b5c5",
+      "installed_git_blob_sha1": "aad51ac865b2de95bd21684f04efa6ec4fa5b5c5",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/grok.yml",
+      "upstream_git_blob_sha1": "ddd2e23e7d57d56beec719f56225454413fd1780",
+      "installed_git_blob_sha1": "ddd2e23e7d57d56beec719f56225454413fd1780",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/ide.yml",
+      "upstream_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "installed_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/jb-ai-assistant.yml",
+      "upstream_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "installed_git_blob_sha1": "33411ac2f695f0d72a054244d2fa1c09dc69cca1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/jb-copilot-plugin.yml",
+      "upstream_git_blob_sha1": "9cbae115d15eafe82e4ec7453c21a2b80d89ec0e",
+      "installed_git_blob_sha1": "9cbae115d15eafe82e4ec7453c21a2b80d89ec0e",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/junie.yml",
+      "upstream_git_blob_sha1": "8bfdc67d9c778a57792515f87a5bb15f67b111ed",
+      "installed_git_blob_sha1": "8bfdc67d9c778a57792515f87a5bb15f67b111ed",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/oaicompat-agent.yml",
+      "upstream_git_blob_sha1": "cdec1eed15957c033bb69287b735c2c1702b5a5d",
+      "installed_git_blob_sha1": "cdec1eed15957c033bb69287b735c2c1702b5a5d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/contexts/vscode.yml",
+      "upstream_git_blob_sha1": "fd74fd4d1dac67130b7559f4da735bf670ba3cdd",
+      "installed_git_blob_sha1": "fd74fd4d1dac67130b7559f4da735bf670ba3cdd",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/internal_modes/jetbrains.yml",
+      "upstream_git_blob_sha1": "e4eb218e5654c951d44c65d5bbde7c7aae19126a",
+      "installed_git_blob_sha1": "e4eb218e5654c951d44c65d5bbde7c7aae19126a",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/benchmark.yml",
+      "upstream_git_blob_sha1": "04e7d8d7429094139fb8f8c8c2a03d6b66b32d85",
+      "installed_git_blob_sha1": "04e7d8d7429094139fb8f8c8c2a03d6b66b32d85",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/editing.yml",
+      "upstream_git_blob_sha1": "1602ca51d02d1035c38dfa2f2a0debf47675cda3",
+      "installed_git_blob_sha1": "1602ca51d02d1035c38dfa2f2a0debf47675cda3",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/interactive.yml",
+      "upstream_git_blob_sha1": "74e438b95be2d786d15f30f5caf7112f4a3366ff",
+      "installed_git_blob_sha1": "74e438b95be2d786d15f30f5caf7112f4a3366ff",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/mode.template.yml",
+      "upstream_git_blob_sha1": "7efb6f9b05b07af4493aa42f15c35af9b7ef16d1",
+      "installed_git_blob_sha1": "7efb6f9b05b07af4493aa42f15c35af9b7ef16d1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/no-memories.yml",
+      "upstream_git_blob_sha1": "0d6c50a730cb734fb140bed35dc40eda460bfcee",
+      "installed_git_blob_sha1": "0d6c50a730cb734fb140bed35dc40eda460bfcee",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/no-onboarding.yml",
+      "upstream_git_blob_sha1": "bae5cb36eebc162c18071b0c661a58c3e2b63236",
+      "installed_git_blob_sha1": "bae5cb36eebc162c18071b0c661a58c3e2b63236",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/onboarding.yml",
+      "upstream_git_blob_sha1": "dff45403611cd87c2c64b17860e5a51cbf92e5cf",
+      "installed_git_blob_sha1": "dff45403611cd87c2c64b17860e5a51cbf92e5cf",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/one-shot.yml",
+      "upstream_git_blob_sha1": "ebbbfafc1ea264f83a6237d15c265fd6cb797af9",
+      "installed_git_blob_sha1": "ebbbfafc1ea264f83a6237d15c265fd6cb797af9",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/planning.yml",
+      "upstream_git_blob_sha1": "a24d0dfb150bc3c10b0c16be8c15014297cc6687",
+      "installed_git_blob_sha1": "a24d0dfb150bc3c10b0c16be8c15014297cc6687",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/modes/query-projects.yml",
+      "upstream_git_blob_sha1": "9ceea8faf3b52ad459941b506536ea651c6fca4c",
+      "installed_git_blob_sha1": "9ceea8faf3b52ad459941b506536ea651c6fca4c",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/prompt_templates/info_prompts.yml",
+      "upstream_git_blob_sha1": "4c8964298b77e82d3d24d8f3437701ee270afdcf",
+      "installed_git_blob_sha1": "4c8964298b77e82d3d24d8f3437701ee270afdcf",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/prompt_templates/simple_tool_outputs.yml",
+      "upstream_git_blob_sha1": "809bdb3088021267137601e1db3249c36a0d6747",
+      "installed_git_blob_sha1": "809bdb3088021267137601e1db3249c36a0d6747",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/config/prompt_templates/system_prompt.yml",
+      "upstream_git_blob_sha1": "95d5bae9384118d523b9b4b4b29590c8c9169605",
+      "installed_git_blob_sha1": "95d5bae9384118d523b9b4b4b29590c8c9169605",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/dashboard.css",
+      "upstream_git_blob_sha1": "08514e77091ffee54c94412dc185015b44472ad1",
+      "installed_git_blob_sha1": "08514e77091ffee54c94412dc185015b44472ad1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/dashboard.js",
+      "upstream_git_blob_sha1": "453304667e534a5f9b3325d3ea3dcbf2539c7699",
+      "installed_git_blob_sha1": "453304667e534a5f9b3325d3ea3dcbf2539c7699",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/index.html",
+      "upstream_git_blob_sha1": "5129bbafc238ce9c88550e5ad4c643cfd18a25a5",
+      "installed_git_blob_sha1": "5129bbafc238ce9c88550e5ad4c643cfd18a25a5",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/jquery.min.js",
+      "upstream_git_blob_sha1": "7f37b5d99122b4928505d1e0ac5ca7279edd56ed",
+      "installed_git_blob_sha1": "7f37b5d99122b4928505d1e0ac5ca7279edd56ed",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-1024-mac.png",
+      "upstream_git_blob_sha1": "2ad41dae7efa8844187336b802b9f006e3311795",
+      "installed_git_blob_sha1": "2ad41dae7efa8844187336b802b9f006e3311795",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-16.png",
+      "upstream_git_blob_sha1": "ffb6a5d02e44baa82ccfd4cb901381c031e22cc3",
+      "installed_git_blob_sha1": "ffb6a5d02e44baa82ccfd4cb901381c031e22cc3",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-32.png",
+      "upstream_git_blob_sha1": "1596e4703ae44066819cfc24fa12c4cc601ba809",
+      "installed_git_blob_sha1": "1596e4703ae44066819cfc24fa12c4cc601ba809",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-48.png",
+      "upstream_git_blob_sha1": "6aadd7b689af2b823d654e0916320a02fd2abf82",
+      "installed_git_blob_sha1": "6aadd7b689af2b823d654e0916320a02fd2abf82",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-64.png",
+      "upstream_git_blob_sha1": "28dc7d042e5957bd9106335a0d4790f1abefe524",
+      "installed_git_blob_sha1": "28dc7d042e5957bd9106335a0d4790f1abefe524",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-icon-tray-mac.png",
+      "upstream_git_blob_sha1": "8e807057d5672cd245f1efce106427f927e8c347",
+      "installed_git_blob_sha1": "8e807057d5672cd245f1efce106427f927e8c347",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-logo-dark-mode.svg",
+      "upstream_git_blob_sha1": "3b1d929ee68ac5b83ba2bfe3a37b910251910476",
+      "installed_git_blob_sha1": "3b1d929ee68ac5b83ba2bfe3a37b910251910476",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-logo.svg",
+      "upstream_git_blob_sha1": "c7ca22339999e393e366af436c601a3b9fba1ec3",
+      "installed_git_blob_sha1": "c7ca22339999e393e366af436c601a3b9fba1ec3",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-logs-dark-mode.png",
+      "upstream_git_blob_sha1": "1b4f26008110c70d1ec55597dc288e9e6806b0e7",
+      "installed_git_blob_sha1": "1b4f26008110c70d1ec55597dc288e9e6806b0e7",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena-logs.png",
+      "upstream_git_blob_sha1": "8f110b0578d04cab0b3a00c704d9dcdd1aa46258",
+      "installed_git_blob_sha1": "8f110b0578d04cab0b3a00c704d9dcdd1aa46258",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/dashboard/serena.ico",
+      "upstream_git_blob_sha1": "e6ec48a1c22e5c9eb0ac5fd512bb3fab51c11d68",
+      "installed_git_blob_sha1": "e6ec48a1c22e5c9eb0ac5fd512bb3fab51c11d68",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/memory_maintenance.md",
+      "upstream_git_blob_sha1": "6f84514d7c073ad726a1572c4c3e221ddf4ce7f2",
+      "installed_git_blob_sha1": "6f84514d7c073ad726a1572c4c3e221ddf4ce7f2",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/project.local.template.yml",
+      "upstream_git_blob_sha1": "36cd3defd719a2bf479631b0eff650f14447499b",
+      "installed_git_blob_sha1": "36cd3defd719a2bf479631b0eff650f14447499b",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/project.template.yml",
+      "upstream_git_blob_sha1": "c72f7ad0cf909f28823e52019035a3967252d0bb",
+      "installed_git_blob_sha1": "c72f7ad0cf909f28823e52019035a3967252d0bb",
+      "matches": true
+    },
+    {
+      "path": "src/serena/resources/serena_config.template.yml",
+      "upstream_git_blob_sha1": "12f70b9f33014fc8d84fb3e7c8f3e1b9ae208e29",
+      "installed_git_blob_sha1": "12f70b9f33014fc8d84fb3e7c8f3e1b9ae208e29",
+      "matches": true
+    },
+    {
+      "path": "src/serena/session.py",
+      "upstream_git_blob_sha1": "01d668a64a513aeccd69447b8f361647faf222ac",
+      "installed_git_blob_sha1": "01d668a64a513aeccd69447b8f361647faf222ac",
+      "matches": true
+    },
+    {
+      "path": "src/serena/symbol.py",
+      "upstream_git_blob_sha1": "e0d357369bf2e20fecfa7d8d580db8f55f3d6747",
+      "installed_git_blob_sha1": "e0d357369bf2e20fecfa7d8d580db8f55f3d6747",
+      "matches": true
+    },
+    {
+      "path": "src/serena/task_executor.py",
+      "upstream_git_blob_sha1": "7de4e0d3eb734d9282a82a40365ff0cd128d7627",
+      "installed_git_blob_sha1": "7de4e0d3eb734d9282a82a40365ff0cd128d7627",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/__init__.py",
+      "upstream_git_blob_sha1": "0ed2e6bf7057aadf19f9ce8cd81a96594cd6bb71",
+      "installed_git_blob_sha1": "0ed2e6bf7057aadf19f9ce8cd81a96594cd6bb71",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/cmd_tools.py",
+      "upstream_git_blob_sha1": "51357995c36d257fab3f90c9c41794e891de29e8",
+      "installed_git_blob_sha1": "51357995c36d257fab3f90c9c41794e891de29e8",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/config_tools.py",
+      "upstream_git_blob_sha1": "0fdd7f56a89318404710aef918db6d089c31bbba",
+      "installed_git_blob_sha1": "0fdd7f56a89318404710aef918db6d089c31bbba",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/file_tools.py",
+      "upstream_git_blob_sha1": "fd61ed54af72e742cb34250aa15fa1f27fa253a6",
+      "installed_git_blob_sha1": "fd61ed54af72e742cb34250aa15fa1f27fa253a6",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/jetbrains_tools.py",
+      "upstream_git_blob_sha1": "6f856ebc74f3ebaf538c2decdf515a32ce6fe19d",
+      "installed_git_blob_sha1": "6f856ebc74f3ebaf538c2decdf515a32ce6fe19d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/memory_tools.py",
+      "upstream_git_blob_sha1": "cfbbf3e4546767bcd91903cf06c92bc392604ce1",
+      "installed_git_blob_sha1": "cfbbf3e4546767bcd91903cf06c92bc392604ce1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/query_project_tools.py",
+      "upstream_git_blob_sha1": "781ccc27f85b3a31b9a040bce43ffae62cfa17b5",
+      "installed_git_blob_sha1": "781ccc27f85b3a31b9a040bce43ffae62cfa17b5",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/repl_tools.py",
+      "upstream_git_blob_sha1": "14df5c61755b20b070aedd61405d3e5ecbc34107",
+      "installed_git_blob_sha1": "14df5c61755b20b070aedd61405d3e5ecbc34107",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/symbol_tools.py",
+      "upstream_git_blob_sha1": "9712b8213a8028d5c853cc1cfa281588707a4b0c",
+      "installed_git_blob_sha1": "9712b8213a8028d5c853cc1cfa281588707a4b0c",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/tools_base.py",
+      "upstream_git_blob_sha1": "decfac1e897ae4c3d08cbc63727b095fedff3bb1",
+      "installed_git_blob_sha1": "decfac1e897ae4c3d08cbc63727b095fedff3bb1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/tools/workflow_tools.py",
+      "upstream_git_blob_sha1": "4aeff2049d3e3a335846aaa4d001dfe092d7be84",
+      "installed_git_blob_sha1": "4aeff2049d3e3a335846aaa4d001dfe092d7be84",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/class_decorators.py",
+      "upstream_git_blob_sha1": "4bb0ee7fe8a6d5515d9bded807d1375f89a55c0e",
+      "installed_git_blob_sha1": "4bb0ee7fe8a6d5515d9bded807d1375f89a55c0e",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/cli_util.py",
+      "upstream_git_blob_sha1": "9257f7e56fda239c5759182d40f74b5d672526ce",
+      "installed_git_blob_sha1": "9257f7e56fda239c5759182d40f74b5d672526ce",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/dataclass.py",
+      "upstream_git_blob_sha1": "9edfa9de7fe1cc2334fcbc3ddaf81cf5167a63c4",
+      "installed_git_blob_sha1": "9edfa9de7fe1cc2334fcbc3ddaf81cf5167a63c4",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/dotnet.py",
+      "upstream_git_blob_sha1": "20dcaf3091ea8f443e59c05b5c881a3ccdde2c33",
+      "installed_git_blob_sha1": "20dcaf3091ea8f443e59c05b5c881a3ccdde2c33",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/exception.py",
+      "upstream_git_blob_sha1": "04c7667a6a600acb2b4c0cefd9eeacd8ed94a29b",
+      "installed_git_blob_sha1": "04c7667a6a600acb2b4c0cefd9eeacd8ed94a29b",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/file_proxy.py",
+      "upstream_git_blob_sha1": "14889a1a1b2a2f2a745c38f04c4c19e1470df3a0",
+      "installed_git_blob_sha1": "14889a1a1b2a2f2a745c38f04c4c19e1470df3a0",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/file_system.py",
+      "upstream_git_blob_sha1": "b08d483bc8603b6c4afa3c7914bff89e76c1f203",
+      "installed_git_blob_sha1": "b08d483bc8603b6c4afa3c7914bff89e76c1f203",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/git.py",
+      "upstream_git_blob_sha1": "9b84b0622e7a12c8531464a80111e81d4de46cf8",
+      "installed_git_blob_sha1": "9b84b0622e7a12c8531464a80111e81d4de46cf8",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/gui.py",
+      "upstream_git_blob_sha1": "3bea782890a2781dd87933c61452d5078e9f4778",
+      "installed_git_blob_sha1": "3bea782890a2781dd87933c61452d5078e9f4778",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/inspection.py",
+      "upstream_git_blob_sha1": "8bc8a3289e8b475fa93b67bf159c42772d7d27f1",
+      "installed_git_blob_sha1": "8bc8a3289e8b475fa93b67bf159c42772d7d27f1",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/logging.py",
+      "upstream_git_blob_sha1": "f66ccfff092c07d5d455fe04c1066dc51f5bc95b",
+      "installed_git_blob_sha1": "f66ccfff092c07d5d455fe04c1066dc51f5bc95b",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/pypi.py",
+      "upstream_git_blob_sha1": "bba20040749a247880552dbddfd9b89d575c5599",
+      "installed_git_blob_sha1": "bba20040749a247880552dbddfd9b89d575c5599",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/pywebview.py",
+      "upstream_git_blob_sha1": "1a5df654fb6a82b9fd29604bc861edf40e732490",
+      "installed_git_blob_sha1": "1a5df654fb6a82b9fd29604bc861edf40e732490",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/shell.py",
+      "upstream_git_blob_sha1": "f6efddbe9e3086aa0647ff4332450d3705e24b7e",
+      "installed_git_blob_sha1": "f6efddbe9e3086aa0647ff4332450d3705e24b7e",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/text_utils.py",
+      "upstream_git_blob_sha1": "986eed85c4226ec0a3e8dce11b9ea33be983bd54",
+      "installed_git_blob_sha1": "986eed85c4226ec0a3e8dce11b9ea33be983bd54",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/thread.py",
+      "upstream_git_blob_sha1": "6a7640621b5375d3526fde5a763c0944a79a4d5e",
+      "installed_git_blob_sha1": "6a7640621b5375d3526fde5a763c0944a79a4d5e",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/version.py",
+      "upstream_git_blob_sha1": "bd49936ba5add1ecc4cf18eb0fb26aab4a868e5d",
+      "installed_git_blob_sha1": "bd49936ba5add1ecc4cf18eb0fb26aab4a868e5d",
+      "matches": true
+    },
+    {
+      "path": "src/serena/util/yaml.py",
+      "upstream_git_blob_sha1": "d0ee5891684b6bf9393897d91e80e69112469618",
+      "installed_git_blob_sha1": "d0ee5891684b6bf9393897d91e80e69112469618",
+      "matches": true
+    }
+  ],
+  "limits": [
+    "Only src/serena and src/interprompt Python files and resource files are compared",
+    "Dependency source is not locked by Serena's upstream installation; these versions describe this run",
+    "Source identity does not establish the origin of the historical golden response hash"
+  ]
+}

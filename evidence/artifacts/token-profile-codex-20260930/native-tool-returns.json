@@ -1,0 +1,189 @@
+{
+  "kind": "sanitized_actual_native_returns",
+  "context-mode": {
+    "source_item": {
+      "stream": "repair",
+      "id": "item_1"
+    },
+    "returned_marker": "amberquartz verdict: 19"
+  },
+  "serena": [
+    {
+      "name_path": "greeting",
+      "kind": "Function",
+      "relative_path": "fixtures/after.py",
+      "body_location": {
+        "start_line": 0,
+        "end_line": 1
+      },
+      "body": "def greeting(name):\n    return \"Hello, \" + name + \"!\""
+    }
+  ],
+  "socraticode": {
+    "returned_text": "Search results for \"Python greeting function returns Hello and the name with an exclamation mark\" (1 matches):\n\n--- after.py (lines 1-3) [python] score: 1.0000 ---\ndef greeting(name):\n    return \"Hello, \" + name + \"!\"\n\n",
+    "cleanup_return": "Removed index for: R/project",
+    "post_cleanup_return": "No index found for project: R/project\nRun codebase_index to create one.\n\nFile watcher: inactive"
+  },
+  "mcporter": {
+    "source_item": {
+      "stream": "main",
+      "id": "item_31"
+    },
+    "returned_text": "Search results for \"Python greeting function returns Hello and the name with an exclamation mark\" (1 matches):\n\n--- after.py (lines 1-3) [python] score: 1.0000 ---\ndef greeting(name):\n    return \"Hello, \" + name + \"!\"\n\n"
+  },
+  "headroom": {
+    "compress": {
+      "hash": "fdf314394a9854039da18b2f",
+      "original_tokens": 826,
+      "compressed_tokens": 511,
+      "tokens_saved": 315,
+      "savings_percent": 38.1,
+      "transforms": [
+        "router:smart_crusher:0.42"
+      ]
+    },
+    "retrieve": {
+      "hash": "fdf314394a9854039da18b2f",
+      "source": "local",
+      "retrieval_count": 1,
+      "original_item_count_as_returned": 0,
+      "original_content_sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+      "original_content_bytes": 2969,
+      "independently_parsed_record_count": 24,
+      "first_latency_ms": 17
+    }
+  },
+  "ai-memory": {
+    "query_hits": [
+      {
+        "path": "notes/amberquartz.md",
+        "title": "Amberquartz retention",
+        "snippet": "# <mark>Amberquartz</mark> retention\n\nThe <mark>amberquartz</mark> fixture keeps 19 entries.\n",
+        "rank": -0.018032786885245903
+      }
+    ],
+    "read_page": {
+      "path": "notes/amberquartz.md",
+      "title": "Amberquartz retention",
+      "body": "# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n",
+      "frontmatter": {
+        "tier": "semantic",
+        "type": "Note",
+        "generated": {
+          "by": "process:ai-memory/2.4.2",
+          "at": "2026-09-30T18:28:21Z"
+        }
+      }
+    },
+    "missing_query_return": {
+      "hits": []
+    }
+  },
+  "qmd": {
+    "returned_search": [
+      {
+        "docid": "#0497a5",
+        "score": 0,
+        "file": "qmd://token-profile-docs/amberquartz.md?index=token-profile-codex-20260930",
+        "line": 1,
+        "title": "Amberquartz retention",
+        "snippet": "@@ -1,3 @@ (0 before, 1 after)\n# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries."
+      }
+    ],
+    "get_body": "qmd://token-profile-docs/amberquartz.md  #0497a5\n---\n\n# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n\n",
+    "remove_stdout": "✓ Removed collection 'token-profile-docs'\n  Deleted 1 documents\n  Cleaned up 1 orphaned content hashes\n"
+  },
+  "rtk": {
+    "filtered_return": "5cfa2400 Key runner: id-based injector that masks the keys it injects (credential_run.py), public_variables inventory...\n  * credential inventory: public_variables classifies each optional stored variable\n  The key runner of the next commit (tools/credentials/credential_run.py)\n  masks every variable it injects except the names an entry lists in the new\n  [+619 lines omitted]\n",
+    "original_full_subject": "Key runner: id-based injector that masks the keys it injects (credential_run.py), public_variables inventory field, docs as available (#497)",
+    "source_exits": [
+      0,
+      0
+    ]
+  },
+  "toon": {
+    "returned_representation": "items[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3\n",
+    "decoded_values": {
+      "items": [
+        {
+          "name": "alpha",
+          "enabled": true,
+          "count": 2
+        },
+        {
+          "name": "beta",
+          "enabled": false,
+          "count": 3
+        }
+      ]
+    },
+    "original_bytes": 96,
+    "encoded_bytes": 60
+  },
+  "markitdown": {
+    "returned_markdown": "Local browser command check\n\n# Local browser command check\n\nNameGreet\n\nReady"
+  },
+  "repomix": {
+    "returned_selected_xml_sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+    "parsed_file_bodies": {
+      "after.py": "def greeting(name):\n    return \"Hello, \" + name + \"!\"",
+      "before.py": "def greeting(name):\n    return \"Hello, \" + name"
+    }
+  },
+  "ccusage": {
+    "daily": [
+      {
+        "cacheCreationTokens": 100,
+        "cacheReadTokens": 50,
+        "date": "2026-01-05",
+        "inputTokens": 1500,
+        "modelBreakdowns": [
+          {
+            "cacheCreationTokens": 100,
+            "cacheReadTokens": 50,
+            "cost": 0.0271,
+            "inputTokens": 1500,
+            "modelName": "claude-sonnet-4-5-20250929",
+            "outputTokens": 300
+          }
+        ],
+        "modelsUsed": [
+          "claude-sonnet-4-5-20250929"
+        ],
+        "outputTokens": 300,
+        "totalCost": 0.0271,
+        "totalTokens": 1950
+      },
+      {
+        "cacheCreationTokens": 0,
+        "cacheReadTokens": 0,
+        "date": "2026-01-06",
+        "inputTokens": 400,
+        "modelBreakdowns": [
+          {
+            "cacheCreationTokens": 0,
+            "cacheReadTokens": 0,
+            "cost": 0.0057,
+            "inputTokens": 400,
+            "modelName": "claude-sonnet-4-5-20250929",
+            "outputTokens": 80
+          }
+        ],
+        "modelsUsed": [
+          "claude-sonnet-4-5-20250929"
+        ],
+        "outputTokens": 80,
+        "totalCost": 0.0057,
+        "totalTokens": 480
+      }
+    ],
+    "totals": {
+      "cacheCreationTokens": 100,
+      "cacheReadTokens": 50,
+      "inputTokens": 1900,
+      "outputTokens": 380,
+      "totalCost": 0.032799999999999996,
+      "totalTokens": 2430
+    }
+  }
+}

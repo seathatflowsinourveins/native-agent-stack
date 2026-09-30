@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "kind": "native_lifetime_counter_snapshot",
+  "generated_at": "2026-09-30T19:50:52.587097+00:00",
+  "canonical_source_revision": "8fc86119eacfd5be9b8a139e1ed167d85748091b",
+  "reporter_source": "tools/token-report/token_manifest.py",
+  "tokenizer": {
+    "package": "gpt-tokenizer",
+    "version": "4.0.0",
+    "upstream_pin": "fb04ebca53f662200e737caefe9a5ef372a5e41a"
+  },
+  "manifest_original_sha256": "81128939a29ab3dd339f0ab2d78f6911fa7208110365bfe8b27e0bb207943e8e",
+  "scope": "This host, retained native history. Latest snapshots only. Historical copies are not newly executed provider trials.",
+  "counters": [
+    {
+      "tool": "context-mode",
+      "scope": "Claude Code (Context Mode plugin)",
+      "observed_at": "2026-09-30T19:50:41.830186+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 12739328,
+        "session_estimated_saved": 40088768
+      },
+      "snapshot_count": 33,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "context-Claude-Code-(Context-Mode-plugin).json",
+          "bytes": 672,
+          "sha256": "79a379a24964b75d387155df30c5304119cff4156ec40cfbfb3a00a41c71a584",
+          "scope": "Exact private native snapshot copied by this retained capture; no fresh MCP call."
+        }
+      ]
+    },
+    {
+      "tool": "context-mode",
+      "scope": "Codex (Context Mode plugin)",
+      "observed_at": "2026-09-30T19:50:41.849964+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 24794880,
+        "session_estimated_saved": 737563
+      },
+      "snapshot_count": 33,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "context-Codex-(Context-Mode-plugin).json",
+          "bytes": 659,
+          "sha256": "454bf7ae043f1bdf8cda652329dcb27a01a8e20eacd6329c63f211f5d39780fc",
+          "scope": "Exact private native snapshot copied by this retained capture; no fresh MCP call."
+        }
+      ]
+    },
+    {
+      "tool": "headroom",
+      "scope": "Native / last 30 days",
+      "observed_at": "2026-09-30T19:50:15.173301+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 579852
+      },
+      "snapshot_count": 37,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "headroom/stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "capture_file": "headroom/stdout.txt",
+          "bytes": 1687,
+          "sha256": "9908069d24aebe2144445c6ec44f9fc427b529365cbf444c016b14a52c693159"
+        }
+      ]
+    },
+    {
+      "tool": "jcodemunch",
+      "scope": "Linux / upstream default index",
+      "observed_at": "2026-09-30T19:50:16.314614+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 10497245
+      },
+      "snapshot_count": 37,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "jcodemunch/stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "capture_file": "jcodemunch/stdout.txt",
+          "bytes": 6488,
+          "sha256": "eb2ab5f40c8f8df834b341afd0157efed3e433b66ca47484ca79bbba3fdeb1a7"
+        }
+      ]
+    },
+    {
+      "tool": "rtk",
+      "scope": "Native / all retained projects",
+      "observed_at": "2026-09-30T19:50:14.497799+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 82018310
+      },
+      "snapshot_count": 37,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "rtk-global/stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "capture_file": "rtk-global/stdout.txt",
+          "bytes": 241,
+          "sha256": "7aa4b3a5d3b0fd143b359b938472086bc0dea01a696a2832ab53099436a88c20"
+        }
+      ]
+    },
+    {
+      "tool": "rtk",
+      "scope": "Native / project <PRIVATE_PATH>",
+      "observed_at": "2026-09-30T19:50:14.912337+00:00",
+      "success": true,
+      "metrics": {
+        "saved": 54206849
+      },
+      "snapshot_count": 37,
+      "counter_decreased": false,
+      "source_evidence": [
+        {
+          "capture_file": "rtk-project/stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "capture_file": "rtk-project/stdout.txt",
+          "bytes": 239,
+          "sha256": "184d64f0659e646d417e43c984b9e972c5b1607d3f97348f04c3e226052d15c3"
+        }
+      ]
+    }
+  ],
+  "retained_events": [
+    {
+      "tool": "headroom",
+      "scope": "Linux native event ledger",
+      "events": 6,
+      "estimated_saved": 579852,
+      "first_event": "2026-09-24T03:52:59.164149+00:00",
+      "last_event": "2026-09-30T18:32:44.455731+00:00"
+    },
+    {
+      "tool": "rtk",
+      "scope": "Linux tracking database",
+      "events": 145103,
+      "estimated_saved": 82004325,
+      "first_event": "2026-09-24T03:50:42.079091470+00:00",
+      "last_event": "2026-09-30T19:50:15.926453359+00:00"
+    }
+  ],
+  "append_ledger_counts": {
+    "snapshots": 214,
+    "comparisons": 25,
+    "native_events": 145109
+  },
+  "artifact_comparison_count": 25,
+  "issues": [],
+  "native_commands": [
+    {
+      "argv": [
+        "rtk",
+        "gain",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:14.142711+00:00",
+      "completed_at": "2026-09-30T19:50:14.497799+00:00",
+      "stdout": {
+        "bytes": 241,
+        "sha256": "7aa4b3a5d3b0fd143b359b938472086bc0dea01a696a2832ab53099436a88c20"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "rtk",
+        "gain",
+        "--project",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:14.656285+00:00",
+      "completed_at": "2026-09-30T19:50:14.912337+00:00",
+      "stdout": {
+        "bytes": 239,
+        "sha256": "184d64f0659e646d417e43c984b9e972c5b1607d3f97348f04c3e226052d15c3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "headroom",
+        "savings",
+        "--json"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:14.934324+00:00",
+      "completed_at": "2026-09-30T19:50:15.173301+00:00",
+      "stdout": {
+        "bytes": 1687,
+        "sha256": "9908069d24aebe2144445c6ec44f9fc427b529365cbf444c016b14a52c693159"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "<PRIVATE_PATH>",
+        "call",
+        "--stdio",
+        "<PRIVATE_PATH>",
+        "--env",
+        "CODE_INDEX_PATH=<PRIVATE_PATH>",
+        "--env",
+        "JCODEMUNCH_SHARE_SAVINGS=0",
+        "--name",
+        "jcodemunch",
+        "--tool",
+        "order",
+        "--args",
+        "{\"action\":\"get_session_stats\",\"args\":{}}",
+        "--output",
+        "json",
+        "--no-oauth"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:15.195426+00:00",
+      "completed_at": "2026-09-30T19:50:16.314614+00:00",
+      "stdout": {
+        "bytes": 6488,
+        "sha256": "eb2ab5f40c8f8df834b341afd0157efed3e433b66ca47484ca79bbba3fdeb1a7"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "<PRIVATE_PATH>",
+        "<PRIVATE_PATH>",
+        "--stats",
+        "--output",
+        "<PRIVATE_PATH>"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:41.871378+00:00",
+      "completed_at": "2026-09-30T19:50:42.037538+00:00",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 289,
+        "sha256": "a16bb9c0a8a9d13cb47bc36f9f59d80d066f021d33930edfcc20691cdc95413f"
+      }
+    },
+    {
+      "argv": [
+        "<PRIVATE_PATH>",
+        "<PRIVATE_PATH>",
+        "--decode",
+        "--strict",
+        "--output",
+        "<PRIVATE_PATH>"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-30T19:50:42.038454+00:00",
+      "completed_at": "2026-09-30T19:50:51.515646+00:00",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 202,
+        "sha256": "c451a06db98f7b39a53ea33bc08a9b433d0134e2e0ab44926ef36f2229523138"
+      }
+    }
+  ],
+  "service": {
+    "start_command": "systemctl --user start token-report-refresh.service",
+    "native_exit_code": 0,
+    "exec_main_status": 0,
+    "result": "success",
+    "started_at": "2026-09-30T19:50:14Z",
+    "completed_at": "2026-09-30T19:50:54Z",
+    "timer_state": "active/waiting",
+    "next_trigger_at": "2026-09-30T20:15:00Z"
+  },
+  "preserved_failures": [
+    {
+      "condition": "stale checkout reporter expected 3.4.0 while installed config was 4.0.0",
+      "native_exit_code": 1
+    },
+    {
+      "condition": "temporary 3.4.0 config mismatched canonical installed reporter requiring qualified 4.0.0",
+      "native_exit_code": 1,
+      "correction": "restored 4.0.0; actual installed service then passed twice"
+    }
+  ],
+  "limitations": [
+    "Tool counters overlap and are not summed. RTK project is a subset of global; Headroom has a 30-day window.",
+    "Context Mode counters copy latest retained native source; capture timestamp is not a fresh MCP stats-call timestamp. Native formulas use byte/4 or event*256 estimates. Running MCP artifact binding remains unknown.",
+    "Snapshot counts are ledger rows, not additive savings. Exact artifact comparisons count each boundary once and remain separate from native/provider/cache scopes.",
+    "No exact lifetime provider tokens saved or dollars saved are established; missing pre-retention history remains unknown.",
+    "Historical RTK client-visible model is Claude2.1.282 with 30k inline and 2k preview limits; it does not measure current2.1.285 provider savings."
+  ]
+}

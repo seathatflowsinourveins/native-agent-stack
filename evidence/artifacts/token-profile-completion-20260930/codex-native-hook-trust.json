@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "native_hook_trust_repair",
+  "client": "codex0.159.2",
+  "source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+  "wrapper_source": "tools/adoption/apply_codex_lane.py:AppServer",
+  "wrapper_sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
+  "native_rpc_methods": [
+    "initialize",
+    "hooks/list",
+    "config/batchWrite",
+    "hooks/list (new process)"
+  ],
+  "writer": "native config/batchWrite",
+  "merge_strategy": "upsert",
+  "scope": "Seven reviewed nonmanaged enabled ai-memory2.4.2 executable commands only. Native keys/current hashes used without local hash fabrication. Recursive merge preserves unmentioned state. No config/read, thread/start, authentication copying or provider call.",
+  "source_references": [
+    "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/tui/src/hooks_rpc.rs#L58",
+    "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs#L611",
+    "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/config/src/merge.rs#L139"
+  ],
+  "guarded_attempts": [
+    {
+      "condition": "Initial assumed script /hooks/ path filter returned0 rows",
+      "exit_code": 1,
+      "mutations": 0,
+      "correction": "Native hook listing showed executable commands in verified release prefix; scope checked against that prefix and exactly seven events."
+    }
+  ],
+  "before": [
+    {
+      "event": "preToolUse",
+      "trust_status": "modified",
+      "hash": "sha256:0355ec008df14a864a4a95b77b7dd795e3447f74749a7298ae47d9b97736535a"
+    },
+    {
+      "event": "postToolUse",
+      "trust_status": "modified",
+      "hash": "sha256:9c1b2273f9b2f9acbb10744a948e08691f6a13dfcaaecd0ce299ddb0110b9062"
+    },
+    {
+      "event": "preCompact",
+      "trust_status": "modified",
+      "hash": "sha256:f7398ca9a57b35bd9d4591e6b04299a20adb3f3258bc3c0ca92afb2da3dc2772"
+    },
+    {
+      "event": "sessionStart",
+      "trust_status": "modified",
+      "hash": "sha256:32fcd2077e4a2a9644fbcc1e8b9a01b2c55dbf3a2a6a3c0b84c4a4ceabc388ec"
+    },
+    {
+      "event": "sessionEnd",
+      "trust_status": "modified",
+      "hash": "sha256:3249a5525b36705fd98c8931ecd127b6310e0d17adc4ed84f441c7a17385c2b4"
+    },
+    {
+      "event": "userPromptSubmit",
+      "trust_status": "modified",
+      "hash": "sha256:12a5ce1719bc2921bc0886196d93be23f42c1e47731e8df5b96b288c1e56b2d3"
+    },
+    {
+      "event": "stop",
+      "trust_status": "modified",
+      "hash": "sha256:196f4a37ee9bd36630762296aa06c01e879cbc8cea6f94aad466f59e9a6575dd"
+    }
+  ],
+  "after": [
+    {
+      "event": "preToolUse",
+      "trust_status": "trusted",
+      "hash": "sha256:0355ec008df14a864a4a95b77b7dd795e3447f74749a7298ae47d9b97736535a"
+    },
+    {
+      "event": "postToolUse",
+      "trust_status": "trusted",
+      "hash": "sha256:9c1b2273f9b2f9acbb10744a948e08691f6a13dfcaaecd0ce299ddb0110b9062"
+    },
+    {
+      "event": "preCompact",
+      "trust_status": "trusted",
+      "hash": "sha256:f7398ca9a57b35bd9d4591e6b04299a20adb3f3258bc3c0ca92afb2da3dc2772"
+    },
+    {
+      "event": "sessionStart",
+      "trust_status": "trusted",
+      "hash": "sha256:32fcd2077e4a2a9644fbcc1e8b9a01b2c55dbf3a2a6a3c0b84c4a4ceabc388ec"
+    },
+    {
+      "event": "sessionEnd",
+      "trust_status": "trusted",
+      "hash": "sha256:3249a5525b36705fd98c8931ecd127b6310e0d17adc4ed84f441c7a17385c2b4"
+    },
+    {
+      "event": "userPromptSubmit",
+      "trust_status": "trusted",
+      "hash": "sha256:12a5ce1719bc2921bc0886196d93be23f42c1e47731e8df5b96b288c1e56b2d3"
+    },
+    {
+      "event": "stop",
+      "trust_status": "trusted",
+      "hash": "sha256:196f4a37ee9bd36630762296aa06c01e879cbc8cea6f94aad466f59e9a6575dd"
+    }
+  ],
+  "unrelated_hooks_unchanged": true,
+  "unrelated_hook_count": 6,
+  "native_write_response_fields": [
+    "status",
+    "version",
+    "filePath",
+    "overriddenMetadata"
+  ],
+  "verified_in_new_appserver_process": true,
+  "native_process_exit_code": 0
+}

@@ -3689,6 +3689,69 @@
         "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave and 11 after it, 22 after the re-check; other sessions may have used points in between."
       ],
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
+    },
+    {
+      "id": "token-lifecycle-resolution-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "rtk",
+        "context-mode",
+        "serena",
+        "qmd",
+        "repomix",
+        "toon",
+        "mcporter",
+        "markitdown",
+        "ast-grep",
+        "ccusage",
+        "codebase-memory-mcp",
+        "headroom",
+        "jcodemunch-mcp",
+        "ai-memory",
+        "context-hub",
+        "agentsview"
+      ],
+      "claim": "A fresh selected native token-tool installation passed 259 returned commands and 82 integration checks after a source-verified exact Serena reference repair. Three unchanged personal Claude workflows were installed/reused safely; live Claude role Workflow, cached saved-audit recovery, ordinary builder handback and native Codex V2 Astra/max child completed. Final Claude parent continuations exited cleanly.",
+      "limitations": [
+        "Scoped host and synthetic task acceptance; no equal-quality whole-task token saving or universal SOTA ranking.",
+        "The full token-efficiency profile remains drafted; this does not qualify every catalog candidate/tool inside each client.",
+        "Failed native caller timeouts/turn-limit attempts and partial or unknown usage remain retained; task completion is distinct from parent exit.",
+        "Native client accounts retained. Claude reinstall is not a fresh OS/account simulation; Codex platform attestation does not separately attest the wrapper.",
+        "Local integration assertions and tests remain separate from unchanged upstream verification."
+      ],
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json"
+    },
+    {
+      "id": "token-profile-completion-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "claim": "The selected fourteen-component token-efficiency profile has native installation/lifecycle evidence and one useful operation per tool in both native client families on this host. Codex0.159.2 supplies fresh twelve-tool observations; Claude2.1.285 supplies eight fresh tool observations plus four dated unchanged-pin subagent observations. ai-memory2.4.2 is active with native hook refresh, exact isolated restart/rollback and client read/query checks. The installed lifetime reporter completed with zero issues and retains distinct native counter scopes.",
+      "limitations": [
+        "This is composed native acceptance on the existing host, not a fresh physical machine/WSL installation or new sign-in. Per-platform bootstrap pins do not confer acceptance on macOS.",
+        "Claude's TOON/MarkItDown/Serena/SocratiCode operations reuse dated unchanged-tool-pin positive checks; the historical receipt's absent discriminating controls remain absent. Retracted historical QMD/Repomix acceptance is replaced by fresh operations. No fresh twelve-tool Claude provider run is claimed.",
+        "Upstream RTK inline and Hindsight unchanged installer tests remain distinct from local native integration fixtures. Hindsight203pass/2skip does not establish a live memory/backend winner; other memory/RAG candidates remain comparisons.",
+        "Native counters are retained-history/window/event/byte estimates and overlap. Provider/cache usage, cumulative snapshots and exact artifact comparisons remain separate; exact lifetime provider tokens/dollars saved is unknown.",
+        "ai-memory activation retained the old binary and copied no production database/authentication. Binary rollback is not logical-data rollback; a new forced production PreCompact/provider extraction run was not performed.",
+        "Context Mode official tag, installed plugin and npm artifact identities differ. Counter formulas were verified, but the current MCP connection's loaded artifact binding remains unknown."
+      ],
+      "path": "evidence/receipts/token-profile-completion-20260930.json"
     }
   ],
   "files": [
@@ -3879,8 +3942,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "41a8c93655c16b7a0301f3e82223f3652cb7858453ca1cdd4cdeeae4916b14b2",
-      "bytes": 17989
+      "sha256": "bb3a4fa8e7bb400e38c8a2bbf283ebcae2b5ce6892379bb9952bc691bcb63513",
+      "bytes": 18093
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -4044,8 +4107,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
-      "bytes": 19316
+      "sha256": "113c8bc343489c5771451c9977fb34d0fac7c280c0f800263806b3b73cce6946",
+      "bytes": 19388
     },
     {
       "path": "adoption/paired/README.md",
@@ -4079,8 +4142,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
-      "bytes": 31905
+      "sha256": "a3e3598e60a5b25cd6aee369ad41061991e2949947b7ae0ab2344a789d9fd769",
+      "bytes": 30545
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -5787,6 +5850,11 @@
       "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
       "sha256": "8143d570f8f321db56b5deefc718c9e7aa7e4e00676c7f146f196b55272d0e7c",
       "bytes": 2816
+    },
+    {
+      "path": "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
+      "sha256": "fb36e7d0f9993e1338cd6519642ec82e3bf3ddaa9c2bdeb43aa397c970d692cd",
+      "bytes": 46625
     },
     {
       "path": "blueprints/convergence-practice/validation.json",
@@ -14165,8 +14233,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "6b05385e04a97d9816b8ab35c7fc3c5c33ad8ff5e4a7c7e34e7c043ba4c5af00",
+      "bytes": 26408
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14270,8 +14338,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2ebd9157605dd694ded3bc79506680161cc1f461383f02517488160f1a700440",
-      "bytes": 248908
+      "sha256": "e3554080f411d25a47bed14ed0a2f8c8dd15324073b78239dc85782425b6d203",
+      "bytes": 249517
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -14944,6 +15012,16 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-token-lifecycle-resolution.md",
+      "sha256": "b678f6c0f8ebb90909d78aa1ef74422f860171b43f3cd618d7231b73332ab7fb",
+      "bytes": 17325
+    },
+    {
+      "path": "docs/decisions/2026-09-30-token-profile-completion.md",
+      "sha256": "de87bbb07042a870e33df7c7487e958f6d962b7ef2c23a5ebe746b1a37669880",
+      "bytes": 10431
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15075,8 +15153,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "24f470c7123b272d1c10ecf412bd672b770e40ba8b39e8a50e055b3beb39490c",
-      "bytes": 85765
+      "sha256": "8231feaa71469eeaa66393384be429c9952ceb18d60e37df85e3375fbeb1bc5f",
+      "bytes": 89064
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15300,8 +15378,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "701ae440e016c8fa1085f34f567dfbfa74e9746c22582f3510fde4b87dfbfd44",
-      "bytes": 33810
+      "sha256": "7a0b2f66890805986f2ef191914a52ab0de59424a07b3d6eee6693c081b205e5",
+      "bytes": 34451
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -41744,6 +41822,476 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/README.md",
+      "sha256": "2b68579d2fedec225245c7642c2964b5bbf39323ea7f821a40ba30feacd88cb8",
+      "bytes": 3687
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-2.4.2-native/receipt.json",
+      "sha256": "cd3a927e13ce312dc4d79019607fe742789ce63c393ba721e4d3992d01a69292",
+      "bytes": 226001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-binary-rollback/receipt.json",
+      "sha256": "c939eaf3d07179ff163b7344b8beadb1fcd1d170339c599b87edc37afde4103d",
+      "bytes": 68221
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-complete.json",
+      "sha256": "0c87e7ff001441b6a82026d71e44e0866f0b4e18965457141053845505dd6326",
+      "bytes": 4227
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+      "sha256": "34754620796d5311f03244c07046d7da8dfbed0bc08a255384876d42dbec48f2",
+      "bytes": 567
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-prompt.txt",
+      "sha256": "7ccbfa5ea9e9c9c789719e74f68120109d432bf416288cb78dbc75f27c5bad4a",
+      "bytes": 1229
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+      "sha256": "56542233289097db043ac9508707808a383fc10b2c19c1badf65cd096f8edd2c",
+      "bytes": 808
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery.json",
+      "sha256": "3a2c87f60dd936bfdbbe47a0c29574b7d9d5cf199cef22884359ad5cd531ca24",
+      "bytes": 3188
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json",
+      "sha256": "d92bf4163f90d1efcf89273b2da8ca2a518e33fa9800ea59a9fdeee4f654c8b5",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-client-install.json",
+      "sha256": "caa20a522b106c48972246eb2b811b77cf8a9231a348398ac30e4dc2c333d9ec",
+      "bytes": 2113
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-role-marker.json",
+      "sha256": "b47dbd05d24497364438bc0c20435504902e47cb676ed2b2191cbbce417b3455",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-complete.json",
+      "sha256": "d3c5de0a4a7417f4224566354f1344ddb4dc6bb4a0516d841c8a7ebbf7137416",
+      "bytes": 3360
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+      "sha256": "20b0bab4a95af99de93e8285b6bf004d8af40edcc251cf30e1525d89b851ec36",
+      "bytes": 504
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-close-prompt.txt",
+      "sha256": "546d224aab9479306f93761917040b4ba07a19c1aecefd5522e40afebea781e7",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-complete.json",
+      "sha256": "f3bded5184e8677f6d1ffffe2e3e1eb23d5a2db5cdeba450c52651be715462fe",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-limit.json",
+      "sha256": "f6510dd97211b0fb77e5255bf32cb41697aedcb18e4fb0b5c415f89e2f053f69",
+      "bytes": 2956
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-partial.json",
+      "sha256": "d27f01c19c78798fa14c1fa064ec3be6d8863bf6b52a3c7bcf82d8d37c9494d5",
+      "bytes": 2994
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+      "sha256": "ec1c8276b4bde3427a62ba18a37fb84964133be564670270634917853debfc28",
+      "bytes": 875
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json",
+      "sha256": "de9dead88a0d9ea3243c8968eb87acf1be12648fb667e700801b0887ec6c1573",
+      "bytes": 4096
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-workflow-prompt.txt",
+      "sha256": "8feadc30ece52b6e7d7d0c3bfcc00f5f751478ceee4a6d491917262f49917c8a",
+      "bytes": 851
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-children.json",
+      "sha256": "fb01638d1f60c4c8affe848fc9a335fc11048890349c0511b97567057b375ea0",
+      "bytes": 2883
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt",
+      "sha256": "350caea80633287e579f81dc66283d8893230cffc41e2ffa919ce16f54d28691",
+      "bytes": 2047
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json",
+      "sha256": "b233c36fc17b6b6fd9f7212d5f47dedbaccc83dbe5a984e5ac024ab66181133d",
+      "bytes": 21001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/receipt.json",
+      "sha256": "3432d68aafd022311ec6b4a1df1f3917d389db429e1acf96ce5257e1a0c313fa",
+      "bytes": 732035
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/receipt.json",
+      "sha256": "e313ad548fcb3265352b8843c589c4031d3e9b1241c76a2a344a084bc4758c88",
+      "bytes": 730468
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/cleanup.json",
+      "sha256": "8a4fd5942397d0619433a10d13e83c017c841d9c75962c28899dc8dc6382572c",
+      "bytes": 1201
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-clean-install.json",
+      "sha256": "2da7abd4734f99c9bc808e47a731e7c978428d14e80a0835041903705b1f9ae1",
+      "bytes": 2279
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json",
+      "sha256": "1b1fd20dec3e47011b5b24cb23d9a58a995e75e1bd189beb35eeb32e30a134b4",
+      "bytes": 3619
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+      "sha256": "711b5695debcec0e16d5b3fa307d966732091b11e214a84944f13546993f304b",
+      "bytes": 4163
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-prompt.txt",
+      "sha256": "5790564708258335a692e160ac87fb2454d68551caa6543d29ce434360246bbe",
+      "bytes": 1011
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/hindsight-upstream/installer-test.stdout.txt",
+      "sha256": "5c989e59e51c1a9cac2280b2bc03b2e2e4a3c8bd369740daf9a25cc024046f39",
+      "bytes": 369
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/independent-review.json",
+      "sha256": "ca163016f8b766e123ce6092d95459ed6a6e1144082e8edc739688eb910741d3",
+      "bytes": 2815
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-harness-241.py",
+      "sha256": "cace071899ba46fa60f49ed3256c2320beb9622b5cf5cf59b877763eacb8867e",
+      "bytes": 114987
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/privacy.json",
+      "sha256": "80296a839fd5ff6e8424456306894f393b72e4e0dc5f933e1b18b117919e1e2a",
+      "bytes": 2941
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/publication-validation.json",
+      "sha256": "6ed89cb295ebf69441d2c88f25fb11910a537e3a3f6672238f4c57d81d4dde51",
+      "bytes": 2120
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/qmd-index-refresh.json",
+      "sha256": "c1fbecc07eb31dc2938d1dc9710aa77184ec5f0b5ef463f701afbf29afe77b77",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-existing/receipt.json",
+      "sha256": "59ad10ed93cc69b302d648ce5e34d122a9e782888d9459030c8928dfeea88c3d",
+      "bytes": 90114
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/README.md",
+      "sha256": "e5edda23cc5ff7998e3cdf73711118e385643f5a32b18b70da5fecfcbf0cb0e1",
+      "bytes": 6568
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude/receipt.json",
+      "sha256": "d22e63ed95ce40b1d79a9f50433efd75a0c2de0b3202994fe6c5e257417738c2",
+      "bytes": 91478
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex/receipt.json",
+      "sha256": "20bd33cb404c00e7db31a5d89578e48bdfb55b8cf2658e9b9bcef6851c37ff35",
+      "bytes": 91487
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/controls-observation.json",
+      "sha256": "45a24f61e8a2b872a005f6b69c047df823643e5c8777fca33f8d2ad60f24216f",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/final-unit-suite.txt",
+      "sha256": "c8c8fbb9a8e3cf21635bb7432ffcdd6dacf21e8a591d47b65602b0206ac21f11",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing/receipt.json",
+      "sha256": "af05563b9f0c1deff9ce4c4545127f748f48e9c9e428930e6922f552d19255e0",
+      "bytes": 91621
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-regression.txt",
+      "sha256": "fb0578c63a599272724e1b9d6f3cd8105c1f3e8885f88dae3915df29041442cb",
+      "bytes": 211
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-unit-suite.txt",
+      "sha256": "67d4f4f467dd30124bffbfb4c0fdd5a2d75ad2ec11bf1d0efa3035b7e21200ae",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stderr.txt",
+      "sha256": "9a4c6e08eff9b4ef064133699a15f7b735ce8cd27f7184763f9f5e41e2c95b14",
+      "bytes": 8986
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stdout.txt",
+      "sha256": "c34c2dcb08b92a60e040ba0c8d7378b0ce2904643d76db0fa5831dfbb6e1031d",
+      "bytes": 25825
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stderr.txt",
+      "sha256": "eda7467d375d6f915f4591480de55a6514626395a17a1d7e0d098d6c5f4c1016",
+      "bytes": 8721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stdout.txt",
+      "sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "bytes": 30548
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/observation.json",
+      "sha256": "2bda24d355d476afcb96eacea190c5b4ad75602199435a3eb6cedd2e0f062921",
+      "bytes": 4721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent_probe.py",
+      "sha256": "be854d87c058eae712efd38097c1cdce35f76c7bc907346bdb5385916ab198da",
+      "bytes": 5596
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/inspect_controls.py",
+      "sha256": "a49ad3b45adfa140781318b340c87b3b39fcab099350f1c72e45791326544337",
+      "bytes": 3311
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing/receipt.json",
+      "sha256": "04ecdc57d20b319242c828d44dd404eec52ccde92bfd8f1ca195e8c31d552dcb",
+      "bytes": 91108
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression-observation.json",
+      "sha256": "1fcb32b555632bbb7ac6398a89cdd2b2c7591fc326ecc454d0de43124a275e31",
+      "bytes": 553
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression.txt",
+      "sha256": "0505c8f3dbc3c92e06ff90e778629f9f5043951f9d62c95a48cbec010ab66526",
+      "bytes": 1523
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/repair.patch",
+      "sha256": "b160ec7d8fa433de9ef8399a2ad40d8cca960b28e4dfad0ec0eabf80af658f8d",
+      "bytes": 6954
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py",
+      "sha256": "f70e25e32f862d04f336307ff569eb6c4105e2b8dc23a63d8f1fd37ec509842a",
+      "bytes": 4136
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/source-identity.json",
+      "sha256": "4318aaad04aae171b6703957dbdbb102326c1d0f897eebb4eefd5a95e1bdd0d9",
+      "bytes": 34036
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/validation.txt",
+      "sha256": "9efb6b3aa73d04734c756b2e61c2297f1535e4c1c7e9e1544f5b119999553082",
+      "bytes": 2563
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/verify_source.py",
+      "sha256": "68ec456fdbc85b29fdfabf100864b7cfb89b5618b46548d04a715c71188e05b8",
+      "bytes": 3511
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-SHA256SUMS-5cfa2400.txt",
+      "sha256": "633a5d511261b5df04ef74bdc8c873cd5b2a1f7cc6cceacb755b9b50a2d4da20",
+      "bytes": 1129
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/README.md",
+      "sha256": "71df39560678cb43f83fa842e86dceba5e783408ba055dfd905668ced31b544c",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/focused-tests.txt",
+      "sha256": "f722c2960f9425896acde852873ff81fc6eefb82ab01ed7373e2fbe85f6f1a8f",
+      "bytes": 848
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/source-checksums.txt",
+      "sha256": "6dcb032720780d4bca43cef97abc6fd23e959bcb0f789364a3f93201b44cc431",
+      "bytes": 507
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/README.md",
+      "sha256": "6536329077f14df9dd05dd15c930566aff557bb87b863288080af3ea6a3c960c",
+      "bytes": 6452
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/frozen-task.json",
+      "sha256": "04571d14f6540cc2640d455388e9127056cf3f47206755a45ce1a299b82bf94e",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-invocations.json",
+      "sha256": "d457181746c74d3eb0a5e834b769c24db2ee5251e0b1e6d5faef1455030b56f5",
+      "bytes": 3208
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-prompt.txt",
+      "sha256": "833d5bd18690829649c59120a80e9d7358b76a4d79726d5b84b41063a80d9ccf",
+      "bytes": 8639
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-repair-prompt.txt",
+      "sha256": "0d23d6fc16fbddbcc2783ddcd441db9981df71169597a33db4f69ac1f947b4bb",
+      "bytes": 3723
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+      "sha256": "e5c5d26cf31c190f640806987d44aa389af2c5053e2a057a7900a20940155966",
+      "bytes": 6282
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+      "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+      "bytes": 19810
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+      "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+      "bytes": 22145
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/codex-native-hook-trust.json",
+      "sha256": "5888c1e16e5ba9de12fef726af20a7790cf277cb547e84305d15a9aea0794f11",
+      "bytes": 4084
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
+      "sha256": "33677a8a7e8cee504df5c64380d3a30bcefa35e6b8847f636d15fa6ffdc8530d",
+      "bytes": 15176
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/independent-verification.json",
+      "sha256": "f7484e000a572c4f4d73f15b9359862e427f51b52fff4e805546e7a7c1e84877",
+      "bytes": 5611
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/lifetime-native.json",
+      "sha256": "c8a73461e2565d4345f342129237d8efd2c12d17c04c11a83acb841dcf0a8ecc",
+      "bytes": 10480
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/local-validation.json",
+      "sha256": "d65d3ed0e25f1810f97afecbfc28ebfa2baa14c15aea618b42ef2560da975e09",
+      "bytes": 1850
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/memory-selection.json",
+      "sha256": "2f1a877a1b7144e35180f5231dfed5b927c8dc9387e351994c07a72657480cd8",
+      "bytes": 9801
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json",
+      "sha256": "33de92f8ed1e25759f5278c7990f67c821f3a7036b71cbac6d2caca2296c6d5e",
+      "bytes": 5720
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/wiring-before-native-trust.json",
+      "sha256": "694c7d17c23a853ed4647005859fc79d51c263fdbb3df26de5f1e455adec50b2",
+      "bytes": 5724
+    },
+    {
       "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
       "sha256": "7c04fec29e4fbbf5be5fcce0d65469bf6b3f873af41e3a840edbba32b086b1f6",
       "bytes": 13531
@@ -43979,6 +44527,11 @@
       "bytes": 17308
     },
     {
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+      "sha256": "58457849b0d132e18d2bf8c0e3751a4869d0bda40c3d92f36d0d7fc4a7b76e29",
+      "bytes": 6177
+    },
+    {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
       "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
       "bytes": 17135
@@ -44017,6 +44570,11 @@
       "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
       "sha256": "6c6edfde2da2c1292d36222372b62b2614b980337b72b399984a3a4b368cd37c",
       "bytes": 6386
+    },
+    {
+      "path": "evidence/receipts/token-profile-completion-20260930.json",
+      "sha256": "6ea7f0e10de32e5765349259675e966260aee234f56866a16e3cdb97323255d5",
+      "bytes": 5884
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
@@ -44405,8 +44963,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "265bcff0ed17a7f328abb783829fa6a8598f888badc31431e32f9874fe46e61e",
-      "bytes": 98938
+      "sha256": "a3cda6b33d88d0e3e9a1ab1cf3e5713ce931dd44eb41e69aa60f8413df23b714",
+      "bytes": 99683
     },
     {
       "path": "observability/README.md",
@@ -44600,8 +45158,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "b111c099bdc4ed82eb6747c043236a413d61e676077a0815dfdc855179f1d50d",
-      "bytes": 18245
+      "sha256": "1c2f3654a13bfba4edd18432e03ae769ce6a8c70ddeff214891a409e544d90f9",
+      "bytes": 18760
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -44685,8 +45243,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "f9887685ddb61970e70cc414a8937e126a77507e879fb3e9111e33bcb20d7662",
-      "bytes": 123259
+      "sha256": "eecaff94594d8e63433e5598810c7c4c7e25ee0909a1f553d1027433d0d9a66a",
+      "bytes": 121973
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -44800,8 +45358,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
-      "bytes": 114715
+      "sha256": "a38d1a135fef77a5c92ccd2e7bd0268716af8465f81f42db0884ada24e8e7da8",
+      "bytes": 114987
     },
     {
       "path": "scripts/path_safety.py",
@@ -45445,8 +46003,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "f5c88d88e8fce91ce8ec01f9da0f64a301dcb0cbb20cd1162602a905e5c5f734",
-      "bytes": 65209
+      "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e",
+      "bytes": 79170
     },
     {
       "path": "tests/test_install_skills.py",
@@ -45580,8 +46138,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "d233c0148973fca20352b6df2e93e75fde68b65fee3ee11b9ba282aff8f604e0",
-      "bytes": 104999
+      "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a",
+      "bytes": 108181
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -45955,8 +46513,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "c0bfa5d33a78703574ae97a8e90963f036f1a96546e45d79c2b7be55bb15b733",
-      "bytes": 14697
+      "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687",
+      "bytes": 21557
     },
     {
       "path": "tools/adoption/install_skills.py",

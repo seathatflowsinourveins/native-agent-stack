@@ -1,0 +1,56 @@
+{
+  "kind": "native-identity-sanitization",
+  "public_aliases_preserve_within_run_joins": true,
+  "private_originals_retained": true,
+  "original_artifact_identities": [
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-complete.json",
+      "original_sha256": "0241e260fb24540d0adec47ac7211fdcc496fead260d9239d35b47a6116085cb"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+      "original_sha256": "b3a6c73ea0c16e3f096d9831ef5a3192e9fdccce1363d068d6f90d44ae40aa01"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+      "original_sha256": "4f88e0e750f5cf54e7a6f1f595dc979a32cc74e112d4e30fbd76a07d8b0925e2"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery.json",
+      "original_sha256": "6593850e483c6441cd6033e01afa2f5ec59f45791e4348243c94e1240fc5cac1"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json",
+      "original_sha256": "e45ac52b35cf92c8ef303d4aa2eef034f92520a9a12cd97b1a4dc22d68406c76"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-complete.json",
+      "original_sha256": "b6e07fae9edc7432f2bdfbeaac31643b8698f2c78cf3457b0f550de3c0b0e320"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+      "original_sha256": "fdb8af6d1f2318f385a3e1391c597e0687a09c794c6a7ba4c5d9ce665212dcd2"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+      "original_sha256": "baa54e7a2430854130f5049b4c4f875029065ed35db4efeb49f575f5c628259b"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json",
+      "original_sha256": "db7946301ceb7dc4cab94ffaff8e5b15c1c5da0087492f1cf7c63f9848d7a2bb"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json",
+      "original_sha256": "de5c17e1493193bd91f864909a359061a07b97901c5bb223f9b27f56c4b47a04"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json",
+      "original_sha256": "6320c663ba9f73842d87d3564c6d621561e0ec6dbfa2c2d01aa380aa006959fb"
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+      "original_sha256": "f8191e28e74d82721342e5c8975418cc9c7ea5b021abb7a33f0a7db3c94e4289"
+    }
+  ],
+  "claim_boundary": "Public native session/thread/task identifiers and encoded project-directory keys use stable owned aliases. Original submitted prompts and exact native outputs remain private. Source hashes, native Serena stdout preimages and installed workflow bytes are unchanged."
+}

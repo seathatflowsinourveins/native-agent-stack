@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "local_integration_validation",
+  "date": "2026-09-30",
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_install_claude_profile.py",
+      "exit_code": 0,
+      "tests": 77,
+      "skipped": 3,
+      "returned_result": "Ran 77 tests in 1.044s; OK (skipped=3)",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "python3 -m unittest discover -s tests -p test_native_token_ci.py",
+      "exit_code": 0,
+      "tests": 48,
+      "skipped": 0,
+      "returned_result": "Ran 48 tests in 2.596s; OK",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json --json",
+      "exit_code": 0,
+      "observations": 26,
+      "valid": true,
+      "scope": "Declared consistency only; not independent truth or provider acceptance"
+    }
+  ],
+  "preserved_attempts": [
+    {
+      "command": "python3 -m pytest -q tests/test_install_claude_profile.py tests/test_native_token_ci.py",
+      "exit_code": 1,
+      "returned_error": "No module named pytest",
+      "correction": "Used repository unittest runner; both relevant suites passed."
+    },
+    {
+      "condition": "Convergence label native_model_execution unsupported",
+      "exit_code": 1,
+      "correction": "Used schema model_task_execution"
+    },
+    {
+      "condition": "Additional failures_and_skips entries had no observation",
+      "exit_code": 1,
+      "correction": "Moved non-observation failed conditions to limitations and retained original native artifacts."
+    }
+  ],
+  "limitations": [
+    "Locally authored fixture tests and consistency validation are separate from unchanged upstream RTK/Hindsight tests and live native-client operations."
+  ]
+}

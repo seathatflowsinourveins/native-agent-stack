@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "kind": "dated_composed_profile_acceptance",
+  "date": "2026-09-30",
+  "client_components": [
+    "codex",
+    "claude-code"
+  ],
+  "tool_components": [
+    {
+      "component_id": "rtk",
+      "selected_version": "0.50.0",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-retrieval-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "context-mode",
+      "selected_version": "1.0.169",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-profile-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "repomix",
+      "selected_version": "1.18.1",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-retrieval-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "headroom",
+      "selected_version": "0.37.0",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-profile-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "toon",
+      "selected_version": "4.1.1",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-25",
+        "client_version": "historical_native_Claude_receipt_scope",
+        "evidence_path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+        "sha256": "9332b722012836e57d4b8f97ebac8970675ba36af5bb8471d41e259cb70bf447",
+        "worked_in_subagent": true,
+        "positive_quality_check_passed": true,
+        "historical_adjudication": {
+          "as_of": "2026-09-27",
+          "task_acceptance": "partial",
+          "bad_input_control_recorded": false,
+          "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The 2026-09-27 review reproduced the output hash, a full round trip and a wrong-row-count failure with TOON 4.1.1; that is fresh reviewer evidence, not a control this run recorded.",
+          "evidence": [
+            "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
+          ]
+        },
+        "scope": "Dated actual subagent use and positive oracle at unchanged tool pin. Missing discriminating controls stay missing; not relabeled a fresh current-client run."
+      }
+    },
+    {
+      "component_id": "ccusage",
+      "selected_version": "20.0.26",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-profile-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "qmd",
+      "selected_version": "2.8.3",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-retrieval-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "markitdown",
+      "selected_version": "0.1.8",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-25",
+        "client_version": "historical_native_Claude_receipt_scope",
+        "evidence_path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+        "sha256": "9332b722012836e57d4b8f97ebac8970675ba36af5bb8471d41e259cb70bf447",
+        "worked_in_subagent": true,
+        "positive_quality_check_passed": true,
+        "historical_adjudication": {
+          "as_of": "2026-09-27",
+          "task_acceptance": "partial",
+          "bad_input_control_recorded": false,
+          "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The conversion scope is one selected HTML page."
+        },
+        "scope": "Dated actual subagent use and positive oracle at unchanged tool pin. Missing discriminating controls stay missing; not relabeled a fresh current-client run."
+      }
+    },
+    {
+      "component_id": "serena",
+      "selected_version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-25",
+        "client_version": "historical_native_Claude_receipt_scope",
+        "evidence_path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+        "sha256": "9332b722012836e57d4b8f97ebac8970675ba36af5bb8471d41e259cb70bf447",
+        "worked_in_subagent": true,
+        "positive_quality_check_passed": true,
+        "historical_adjudication": {
+          "as_of": "2026-09-27",
+          "task_acceptance": "partial",
+          "bad_input_control_recorded": false,
+          "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+        },
+        "scope": "Dated actual subagent use and positive oracle at unchanged tool pin. Missing discriminating controls stay missing; not relabeled a fresh current-client run."
+      }
+    },
+    {
+      "component_id": "socraticode",
+      "selected_version": "1.15.0",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-25",
+        "client_version": "historical_native_Claude_receipt_scope",
+        "evidence_path": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+        "sha256": "9332b722012836e57d4b8f97ebac8970675ba36af5bb8471d41e259cb70bf447",
+        "worked_in_subagent": true,
+        "positive_quality_check_passed": true,
+        "historical_adjudication": {
+          "as_of": "2026-09-27",
+          "task_acceptance": "partial",
+          "bad_input_control_recorded": false,
+          "basis": "The check passed, but E1 recorded no failing run of it (docs/acceptance-evidence-policy.md, Discriminating controls). Tool use inside the subagent is observed. The baseline is retained by hash only."
+        },
+        "scope": "Dated actual subagent use and positive oracle at unchanged tool pin. Missing discriminating controls stay missing; not relabeled a fresh current-client run."
+      }
+    },
+    {
+      "component_id": "ai-memory",
+      "selected_version": "2.4.2",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-memory-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    },
+    {
+      "component_id": "mcporter",
+      "selected_version": "0.14.1",
+      "codex": {
+        "date": "2026-09-30",
+        "client_version": "0.159.2",
+        "evidence_path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+        "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+        "native_returns": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+        "scope": "Fresh native useful operation and independent fixture oracle; local integration evidence, not upstream tests."
+      },
+      "claude": {
+        "date": "2026-09-30",
+        "client_version": "2.1.285",
+        "evidence_path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+        "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+        "observation": "claude-profile-delta",
+        "scope": "Fresh actual native tool inputs/returns, final successful native result."
+      }
+    }
+  ],
+  "gate": "adoption/README.md token-efficiency: command/client wiring, pinned-version evidence and one useful native call per selected tool in each client family, recorded through a PR.",
+  "fresh_codex_tools": 12,
+  "fresh_claude_tools": 8,
+  "dated_reused_claude_tools": 4,
+  "limitations": [
+    "Historical retracted QMD/Repomix results are not reused.",
+    "Positive operation acceptance is distinct from complete equal-quality/provider-saving acceptance.",
+    "macOS/new-physical-host acceptance and fresh forced memory PreCompact are not supplied."
+  ]
+}

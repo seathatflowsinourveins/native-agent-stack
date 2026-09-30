@@ -1,0 +1,532 @@
+{
+  "schema_version": 1,
+  "kind": "native_codex_token_profile_useful_calls",
+  "date_utc": "2026-09-30",
+  "status": "accepted_with_explicit_scope",
+  "evidence_class": "live_native_provider_task_with_same_session_bounded_repair",
+  "native_client": {
+    "version": "0.159.2",
+    "model": "gpt-6.1-sol",
+    "effort": "ultra",
+    "native_turn_context_independently_read": true,
+    "native_turn_statuses": [
+      "completed",
+      "completed"
+    ],
+    "read_only_RPC": "thread/read on own generated thread only",
+    "status_in_separate_inspector_after_native_shutdown": {
+      "type": "notLoaded"
+    }
+  },
+  "accepted_components": 12,
+  "independent_semantic_checks_passed": 12,
+  "components": {
+    "rtk": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "commit_prefix": "5cfa2400",
+        "original_recovery_succeeded": true,
+        "prior_subject_equality_status": "failed",
+        "evidence_reused": true,
+        "filtered_full_subject_equality": false
+      },
+      "native_tool_or_command": {
+        "cwd": "CHECKOUT",
+        "commands": [
+          "rtk git log -1",
+          "rtk proxy git log -1 --format=%s"
+        ]
+      }
+    },
+    "context-mode": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "marker": "amberquartz verdict: 19",
+        "retention_entries": 19,
+        "source_and_owned_SHA256_equal": true,
+        "frozen_SHA256_matches": true,
+        "prior_denied_calls": [
+          {
+            "path": "R/frozen-task.json",
+            "status": "failed"
+          },
+          {
+            "path": "R/project/context-mode-build.log",
+            "status": "failed"
+          }
+        ]
+      },
+      "native_tool_or_command": "ctx_execute_file(path='CHECKOUT/fixtures/context-mode-build.log', language='javascript', code=\"console.log(FILE_CONTENT.split('\\n').find(l => l.includes('amberquartz verdict')))\")"
+    },
+    "repomix": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "version": "1.18.1",
+        "files": [
+          "after.py",
+          "before.py"
+        ],
+        "before": "Hello, Ada",
+        "after": "Hello, Ada!"
+      },
+      "native_tool_or_command": "rtk repomix P --config R/repomix.config.json --include before.py,after.py --style xml --parsable-style --token-count-encoding o200k_base --no-file-summary --no-directory-structure --output R/selected.xml"
+    },
+    "headroom": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "hash": "fdf314394a9854039da18b2f",
+        "recovery_source": "local",
+        "exact_byte_recovery": true,
+        "bytes": 2969,
+        "records": 24,
+        "first_latency_ms": 17,
+        "tool_counters": {
+          "scope": "this headroom_compress call",
+          "original_tokens": 826,
+          "compressed_tokens": 511,
+          "tokens_saved": 315,
+          "savings_percent": 38.1
+        },
+        "warning": "Configured proxy was unreachable (ConnectTimeout); local retrieval succeeded."
+      },
+      "native_tool_or_command": [
+        "headroom_compress(content=<exact P/headroom-records.json text>)",
+        "headroom_retrieve(hash='fdf314394a9854039da18b2f')"
+      ]
+    },
+    "toon": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "version": "4.1.1",
+        "table": "items[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3\n",
+        "items": 2,
+        "count_sum": 5,
+        "bytes": {
+          "original_json": 96,
+          "toon": 60,
+          "recovered_json": 172
+        }
+      },
+      "native_tool_or_command": [
+        "rtk toon P/records.json --stats -o R/records.toon",
+        "rtk toon R/records.toon --decode --strict -o R/recovered.json"
+      ]
+    },
+    "ccusage": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "dates": [
+          "2026-01-05",
+          "2026-01-06"
+        ],
+        "daily_count": 2,
+        "totals": {
+          "inputTokens": 1900,
+          "outputTokens": 380,
+          "cacheCreationTokens": 100,
+          "cacheReadTokens": 50,
+          "totalTokens": 2430,
+          "totalCost": 0.032799999999999996
+        },
+        "scope": "Public synthetic fixture aggregation",
+        "cache_scope": "Native cache categories within fixture totalTokens",
+        "added_to_task_provider_usage": false,
+        "artifact": "R/ccusage-fixture.json",
+        "prior_attempt": {
+          "status": "failed",
+          "scope": "out-of-contract host-date aggregation",
+          "artifact": "R/ccusage.json",
+          "accepted_usage_or_savings_claims": []
+        },
+        "tool_warning": "RTK reported no hook installed; no installation performed."
+      },
+      "native_tool_or_command": {
+        "environment": {
+          "CLAUDE_CONFIG_DIR": "CHECKOUT/fixtures/ccusage-synthetic-claude"
+        },
+        "command": "rtk proxy ccusage claude daily --json --offline --timezone UTC"
+      }
+    },
+    "qmd": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "version": "2.8.3",
+        "hits": 1,
+        "returned_uri": "qmd://token-profile-docs/amberquartz.md?index=token-profile-codex-20260930",
+        "retention_entries": 19,
+        "collection_removed": true,
+        "deleted_documents": 1
+      },
+      "native_tool_or_command": {
+        "environment": {
+          "XDG_CACHE_HOME": "R/qmd-cache",
+          "XDG_CONFIG_HOME": "R/qmd-config"
+        },
+        "commands": [
+          "rtk qmd --index token-profile-codex-20260930 collection add P/docs --name token-profile-docs --mask '*.md'",
+          "rtk qmd --index token-profile-codex-20260930 search amberquartz -c token-profile-docs -n 1 --json",
+          "rtk qmd --index token-profile-codex-20260930 get qmd://token-profile-docs/amberquartz.md?index=token-profile-codex-20260930 --no-line-numbers",
+          "rtk qmd --index token-profile-codex-20260930 collection remove token-profile-docs"
+        ]
+      }
+    },
+    "markitdown": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "version": "0.1.8",
+        "heading": "Local browser command check",
+        "text": "Ready",
+        "javascript_execution": "not performed"
+      },
+      "native_tool_or_command": "rtk markitdown P/greeting.html -o R/greeting.md"
+    },
+    "serena": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "context": "Codex IDE",
+        "symbol": "greeting",
+        "file": "fixtures/after.py",
+        "body": "def greeting(name):\n    return \"Hello, \" + name + \"!\"",
+        "greeting": "Hello, Ada!"
+      },
+      "native_tool_or_command": [
+        "initial_instructions({})",
+        "find_symbol(name_path_pattern='greeting', relative_path='fixtures/after.py', include_body=true)"
+      ]
+    },
+    "socraticode": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "status": "green",
+        "indexed_chunks": 8,
+        "hits": 1,
+        "file": "after.py",
+        "score": 1,
+        "greeting": "Hello, Ada!",
+        "index_removed": true,
+        "watcher": "inactive"
+      },
+      "native_tool_or_command": [
+        "codebase_index(projectPath='P')",
+        "codebase_status(projectPath='P')",
+        "codebase_search(projectPath='P', query='Python greeting function returns Hello and the name with an exclamation mark', fileFilter='after.py', languageFilter='python', limit=1, minScore=0, includeLinked=false)",
+        "codebase_remove(projectPath='P')",
+        "codebase_status(projectPath='P')"
+      ]
+    },
+    "ai-memory": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "server": "token-profile-memory",
+        "version": "2.4.2",
+        "workspace": "native-ci",
+        "project": "fixture",
+        "path": "notes/amberquartz.md",
+        "query_hits": 1,
+        "body": "# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n",
+        "retention_entries": 19,
+        "nonsense_query_hits": 0
+      },
+      "native_tool_or_command": [
+        "token-profile-memory.memory_write_page(workspace='native-ci', project='fixture', path='notes/amberquartz.md', body='# Amberquartz retention\\n\\nThe amberquartz fixture keeps 19 entries.\\n')",
+        "token-profile-memory.memory_query(workspace='native-ci', project='fixture', query='amberquartz')",
+        "token-profile-memory.memory_read_page(workspace='native-ci', project='fixture', path='notes/amberquartz.md')",
+        "token-profile-memory.memory_query(workspace='native-ci', project='fixture', query=<nonsense>)"
+      ]
+    },
+    "mcporter": {
+      "native_producer_status": "passed",
+      "independent_semantic_check": true,
+      "observed_result": {
+        "version": "0.14.1",
+        "hits": 1,
+        "file": "after.py",
+        "greeting": "Hello, Ada!",
+        "exact_answer_matches_native": true,
+        "exit_code": 0
+      },
+      "native_tool_or_command": "rtk mcporter --config R/mcporter.json call socraticode.codebase_search --args '{\"projectPath\":\"P\",\"query\":\"Python greeting function returns Hello and the name with an exclamation mark\",\"fileFilter\":\"after.py\",\"languageFilter\":\"python\",\"limit\":1,\"minScore\":0,\"includeLinked\":false}' --output json --no-oauth --timeout 120000"
+    }
+  },
+  "selected_sources": {
+    "ai-memory": {
+      "repository": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2",
+      "pin": "2.4.2",
+      "binary_sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93"
+    },
+    "ccusage": {
+      "repository": "https://github.com/ccusage/ccusage",
+      "pin": "20.0.26"
+    },
+    "context-mode": {
+      "repository": "https://github.com/mksglu/context-mode",
+      "pin": "1.0.169",
+      "upstream_annotated_tag_commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "installed_source_commit": null,
+      "source_note": "Native installed package1.0.169 verified; commit listed is upstream annotated tag target, not a claimed installed-source attestation."
+    },
+    "headroom": {
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "pin": "0.37.0"
+    },
+    "markitdown": {
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "pin": "0.1.8"
+    },
+    "mcporter": {
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "pin": "0.14.1"
+    },
+    "qmd": {
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "pin": "2.8.3"
+    },
+    "repomix": {
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+      "pin": "1.18.1"
+    },
+    "rtk": {
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "pin": "0.50.0"
+    },
+    "serena": {
+      "repository": "https://github.com/oraios/serena",
+      "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    },
+    "socraticode": {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "1.15.0"
+    },
+    "toon": {
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "pin": "4.1.1"
+    }
+  },
+  "fixture_source_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "method_sources": [
+    "scripts/native_token_ci.py:ccusage_fixture",
+    "scripts/native_token_ci.py:qmd_fixture",
+    "scripts/native_token_ci.py:repomix_fixture",
+    "scripts/native_token_ci.py:toon_fixture",
+    "scripts/native_token_ci.py:headroom_fixture",
+    "scripts/native_token_ci.py:ai_memory_fixture",
+    "scripts/native_token_ci.py:verify_pack",
+    "scripts/native_token_ci.py:verify_qmd_document",
+    "tools/adoption/apply_codex_lane.py:run_codex",
+    "tools/adoption/apply_codex_lane.py:AppServer",
+    "docs/token-efficiency-stack.json:matched_selected_upstream_operations"
+  ],
+  "native_processes": [
+    {
+      "operation": "codex exec",
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "completed_at": "2026-09-30T18:44:24Z"
+    },
+    {
+      "operation": "codex exec resume",
+      "same_session": true,
+      "exit_code": 0,
+      "stderr_bytes": 0,
+      "completed_at": "2026-09-30T18:54:28Z"
+    }
+  ],
+  "failed_conditions": [
+    {
+      "stream": "main",
+      "source_item_id": "item_4",
+      "kind": "native_MCP_denial",
+      "component": "context-mode",
+      "actual_return": "File access blocked: \"R/frozen-task.json\" resolves outside the project root (CHECKOUT). context-mode confines ctx_execute_file to the workspace so it cannot be used to bypass the host's sandbox/permission controls (issue #852). To intentionally process a file outside the project, add a host allow rule, e.g. \"permissions\": { \"allow\": [\"Read(R/frozen-task.json)\"] } in your settings.",
+      "usage_attributable_to_condition": null
+    },
+    {
+      "stream": "main",
+      "source_item_id": "item_5",
+      "kind": "native_MCP_denial",
+      "component": "context-mode",
+      "actual_return": "File access blocked: \"R/project/context-mode-build.log\" resolves outside the project root (CHECKOUT). context-mode confines ctx_execute_file to the workspace so it cannot be used to bypass the host's sandbox/permission controls (issue #852). To intentionally process a file outside the project, add a host allow rule, e.g. \"permissions\": { \"allow\": [\"Read(R/project/context-mode-build.log)\"] } in your settings.",
+      "usage_attributable_to_condition": null
+    },
+    {
+      "kind": "information_contract_failed",
+      "component": "rtk",
+      "condition": "filtered_return_contains_entire_original_subject",
+      "result": false,
+      "recovery": "native original read; same commit prefix verified",
+      "usage_attributable_to_condition": null
+    },
+    {
+      "kind": "out_of_contract_scope",
+      "component": "ccusage",
+      "native_command_exit": 0,
+      "condition": "initial host-date aggregate substituted for bounded public fixture",
+      "accepted_lifetime_or_savings_claims": [],
+      "raw_native_return_retained_privately": true,
+      "usage_attributable_to_condition": null
+    }
+  ],
+  "counter_scope": {
+    "kind": "cumulative_native_thread_totals",
+    "earlier_snapshot": {
+      "input_tokens": 732117,
+      "cached_input_tokens": 637184,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 16918,
+      "reasoning_output_tokens": 5519
+    },
+    "last_snapshot": {
+      "input_tokens": 1340232,
+      "cached_input_tokens": 1229056,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 24849,
+      "reasoning_output_tokens": 9086
+    },
+    "native_returned_total_tokens": 1365081,
+    "count_once_rule": "Use last cumulative snapshot; do not sum both snapshots. Cached input is within input; reasoning output is within output. Public ccusage fixture totals and Headroom artifact reductions are separate scopes.",
+    "source": "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/exec/src/event_processor_with_jsonl_output.rs#L118",
+    "per_failed_condition_usage": null,
+    "external_orchestration_usage": null
+  },
+  "isolation_and_cleanup": {
+    "production_ai_memory_MCP": "disabled only in native invocations; owned stdio2.4.2 used for all synthetic page operations",
+    "native_lifecycle_capture": "left enabled under existing accepted wiring; outside synthetic fixture operations",
+    "memory_workspace": "native-ci",
+    "memory_project": "fixture",
+    "memory_watcher": false,
+    "QMD": "owned XDG cache/config and named index; collection removed after fresh-process get",
+    "SocratiCode": "owned project; native remove and no-index/inactive-watcher returned",
+    "shared_services": "not restarted",
+    "accounts_cache_discovery_compaction": "preserved",
+    "private_evidence": "normal own native logs and owned artifacts retained outside checkout"
+  },
+  "evidence_controls": {
+    "original_native_streams_retained_privately": true,
+    "main_stream_sha256": "0569deca98246d77d26fbc3c353bc97216cdbb2cd01df7c64c0c28497d986ca7",
+    "repair_stream_sha256": "79ca3fc1f3ef0b7d485870b7bb0f291bf91b5c8732692c36a0af52c04c96697d",
+    "runtime_version_controls": [
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "codex",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "codex-cli 0.159.2",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "rtk",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "rtk 0.50.0",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "repomix",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "1.18.1",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "toon",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "4.1.1",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "ccusage",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "ccusage 20.0.26",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "qmd",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "qmd 2.8.3 (facd35e)",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "markitdown",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "markitdown 0.1.8",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "rtk",
+          "proxy",
+          "mcporter",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "0.14.1",
+        "stderr": ""
+      }
+    ],
+    "current_fixture_matches_recorded_sha256": true,
+    "upstream_tests_run_in_this_task": false,
+    "checks_class": "local semantic integration observations on actual native returned results",
+    "historical_16tool_summary_reused_as_acceptance": false,
+    "observation_corrections": [
+      {
+        "condition": "flat XML body substring comparison",
+        "correction": "XML entities must be decoded; existing verify_pack/pack_file_texts oracle passed both original bodies."
+      },
+      {
+        "condition": "Context Mode commit inherited from a research summary",
+        "correction": "Removed unverified commit; GitHub annotated tag v1.0.169 resolves to589d8214d56740a28b5f7bf63167743d586b0b40. Installed package source commit stays unknown."
+      }
+    ]
+  },
+  "limitations": [
+    "Covers12 non-client selected tools in native Codex; Claude and clean native client installation are separate receipts.",
+    "No equal-quality baseline or causal whole-task token-savings claim.",
+    "No automatic compaction event observed; no new subagent run in this task.",
+    "CLI provider aggregate was replaced by public synthetic fixture; its counts are not lifetime or provider acceptance.",
+    "RTK filtered full subject equality remains failed even though native original recovery passes the useful provenance contract.",
+    "Headroom returned original_item_count0 for raw JSON text; independent exact original recovery parsed24 records.",
+    "Historical worked=true summaries are leads, not acceptance."
+  ]
+}

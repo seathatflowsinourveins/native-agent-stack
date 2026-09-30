@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "kind": "native_useful_operation_observations",
+  "client": {
+    "version": "2.1.285",
+    "version_evidence": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-client-install.json"
+  },
+  "observations": {
+    "claude-profile-delta": {
+      "native_exit": 0,
+      "supervisor_terminated": false,
+      "model": "claude-opus-5-5",
+      "tool_names": [
+        "Bash",
+        "mcp__plugin_context-mode_context-mode__ctx_execute",
+        "mcp__plugin_context-mode_context-mode__ctx_execute",
+        "mcp__plugin_context-mode_context-mode__ctx_execute"
+      ],
+      "native_result": {
+        "subtype": "success",
+        "is_error": false,
+        "num_turns": 5
+      },
+      "usage_returned": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 23737,
+        "cache_read_input_tokens": 489641,
+        "output_tokens": 14453,
+        "output_tokens_details": {
+          "thinking_tokens": 9553
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 23737,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 5577,
+            "cache_read_input_tokens": 130484,
+            "cache_creation_input_tokens": 4160,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 4160
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage_snapshot": {
+        "claude-opus-5-5": {
+          "inputTokens": 32,
+          "outputTokens": 40135,
+          "thinkingTokens": 29585,
+          "cacheReadInputTokens": 1457011,
+          "cacheCreationInputTokens": 119333,
+          "maxOutputTokens": 128000
+        }
+      },
+      "counter_scope": "Returned result usage and modelUsage snapshot are separate overlapping scopes; never add them. Resume has a prior failed attempt with no final result.",
+      "actual_tool_return_excerpts": [
+        {
+          "original_tool_return_bytes": 106,
+          "original_tool_return_sha256": "6cb7cdf74acb44ac349649cc813d9fed5650d09bcbd0c80bf37aa599e716397f",
+          "selected_returned_objects": [],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 1704,
+          "original_tool_return_sha256": "4de9165239a3e95c2284295fd1d737961712db638aee45e77024946de59fa9ac",
+          "selected_returned_objects": [],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 3613,
+          "original_tool_return_sha256": "0fcf161dbcdd9bb6925053bb0c284f3a073e8298c7c631525ba64eed8e6a5f3f",
+          "selected_returned_objects": [
+            {
+              "hash": "fdf314394a9854039da18b2f",
+              "original_tokens": 826,
+              "compressed_tokens": 511,
+              "tokens_saved": 315,
+              "savings_percent": 38.1,
+              "note": "Original stored with hash=fdf314394a9854039da18b2f. Use mcp__headroom__headroom_retrieve to get full content later.",
+              "warning": "Configured proxy http://127.0.0.1:1 is unreachable (ConnectTimeout: )."
+            }
+          ],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 2674,
+          "original_tool_return_sha256": "fb886af916f40b220d519d43375d7ee869f1b4f1b9b0005a0724e191436b5043",
+          "selected_returned_objects": [
+            {
+              "hash": "fdf314394a9854039da18b2f"
+            },
+            {
+              "exact_str_equal": true,
+              "byte_equal": true,
+              "sha256_equal": true,
+              "container": "list",
+              "records": 24,
+              "services": [
+                "native-ci-fixture"
+              ],
+              "regions": [
+                "us-east-1"
+              ],
+              "matches_compressed_answer": true
+            }
+          ],
+          "is_error": false
+        }
+      ],
+      "model_answer": "Both operations passed: the ccusage totals matched and the difference is the cache fields, and Headroom's compress → retrieve round trip returned the fixture byte-for-byte.\n\n```json\n{\n  \"client\": {\"name\": \"Claude Code\", \"version\": \"2.1.285 (as you stated; not re-checked)\", \"model\": \"claude-opus-5-5\", \"effort\": \"max\", \"ultracode\": \"on\", \"delegated\": false},\n  \"ccusage\": {\n    \"version\": \"20.0.26\",\n    \"command\": \"rtk proxy env CLAUDE_CONFIG_DIR=<repo>/fixtures/ccusage-synthetic-claude ccusage claude daily --json --offline --timezone UTC\",\n    \"exit\": 0,\n    \"daily\": [\n      {\"date\": \"2026-01-05\", \"inputTokens\": 1500, \"outputTokens\": 300, \"cacheCreationTokens\": 100, \"cacheReadTokens\": 50, \"totalTokens\": 1950},\n      {\"date\": \"2026-01-06\", \"inputTokens\": 400, \"outputTokens\": 80, \"cacheCreationTokens\": 0, \"cacheReadTokens\": 0, \"totalTokens\": 480}\n    ],\n    \"totals\": {\"inputTokens\": 1900, \"outputTokens\": 380, \"cacheCreationTokens\": 100, \"cacheReadTokens\": 50, \"totalTokens\": 2430},\n    \"checks\": {\"two_rows\": true, \"input_1900\": true, \"output_380\": true, \"total_2430\": true, \"rows_sum_to_totals\": true, \"difference_150_equals_cache_fields\": true},\n    \"difference\": \"2430 - 1900 - 380 = 150 = cacheCreationTokens 100 + cacheReadTokens 50. ccusage's totalTokens adds input, output, cache creation and cache read (ccusage v20.0.26 rust/crates/ccusage-core/src/types.rs:115-121). The cache fields are prompt tokens written to or read from the cache. They count as tokens used, not tokens avoided.\",\n    \"scope\": \"ccusage's own totals over the committed synthetic fixture; not this host's usage, cost or provider savings\"\n  },\n  \"headroom_via_mcporter\": {\n    \"versions\": {\"mcporter\": \"0.14.1\", \"headroom\": \"0.37.0\", \"rtk\": \"0.50.0\"},\n    \"invocation\": \"rtk proxy mcporter --config <state>/mcporter.json call --stdio '<headroom> mcp serve --proxy-url http://127.0.0.1:1' --env HEADROOM_WORKSPACE_DIR=<state>/headroom --env HEADROOM_CONFIG_DIR=<state>/headroom-config --env HEADROOM_OFFLINE=1 --env DO_NOT_TRACK=1 --name token-profile-headroom --tool <tool> --args <json> --output json --no-oauth --timeout 20000; each subprocess timeout 45 s\",\n    \"fixture\": {\"path\": \"fixtures/headroom-records.json\", \"bytes\": 2969, \"sha256\": \"fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448\", \"frozen\": \"worktree blob == HEAD == origin/main\"},\n    \"compress\": {\"exit\": 0, \"hash\": \"fdf314394a9854039da18b2f\", \"hash_is_sha256_prefix\": true, \"original_tokens\": 826, \"compressed_tokens\": 511, \"tokens_saved\": 315, \"savings_percent\": 38.1, \"compressed_chars\": 1565, \"form\": \"table header [24]{id,latency_ms,note,region,service,status} followed by 24 rows\", \"warning\": \"configured proxy 127.0.0.1:1 unreachable (expected; no proxy started)\"},\n    \"answer_from_compressed\": {\"records\": 24, \"shared_service\": \"native-ci-fixture\", \"shared_region\": \"us-east-1\"},\n    \"retrieve_new_process\": {\"exit\": 0, \"original_content_exact\": true, \"byte_equal\": true, \"sha256_equal\": true, \"records\": 24, \"services\": [\"native-ci-fixture\"], \"regions\": [\"us-east-1\"], \"matches_compressed_answer\": true},\n    \"missing_hash_24_zeros\": {\"exit\": 0, \"error_reported\": true, \"error\": \"Content not found. It may have expired or the hash may be incorrect.\", \"original_content_returned\": false, \"note\": \"the error comes back in the JSON reply; MCPorter still exits 0\"},\n    \"state\": {\"workspace_entries\": [\"ccr_store.db\", \"savings_events.jsonl\", \"session_stats.jsonl\"], \"config_entries\": [], \"mcporter_config\": \"already existed: {\\\"mcpServers\\\":{},\\\"imports\\\":[]}\"},\n    \"scope\": \"Headroom's own local token estimates for one public fixture; not provider-billed tokens and no provider saving\"\n  },\n  \"not_performed_or_superseded\": [\n    \"The earlier ccusage daily report across all agents on this host's own logs (exit 0) was too broad; it is superseded and its counts are not reported\",\n    \"A blobless clone of the public ccusage v20.0.26 source is still in /tmp/ccusage-src.cTIaSW from the interrupted run; not removed\",\n    \"The short-note negative control in headroom_fixture was not run (not requested)\"\n  ]\n}\n```",
+      "original_stream_sha256": "f6bf13bff3f8448488167e73b6cdf93b59f1d7985c098ae2268171e4a0b5267b"
+    },
+    "claude-memory-delta": {
+      "native_exit": 0,
+      "supervisor_terminated": false,
+      "model": "claude-opus-5-5",
+      "tool_names": [
+        "ToolSearch",
+        "mcp__resolution-memory__memory_query",
+        "mcp__resolution-memory__memory_query",
+        "mcp__resolution-memory__memory_read_page"
+      ],
+      "native_result": {
+        "subtype": "success",
+        "is_error": false,
+        "num_turns": 5
+      },
+      "usage_returned": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 53179,
+        "cache_read_input_tokens": 200575,
+        "output_tokens": 2314,
+        "output_tokens_details": {
+          "thinking_tokens": 1457
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 53179,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1125,
+            "cache_read_input_tokens": 64873,
+            "cache_creation_input_tokens": 346,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 346
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage_snapshot": {
+        "claude-opus-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 2314,
+          "cacheReadInputTokens": 200575,
+          "cacheCreationInputTokens": 53179,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 1457
+        }
+      },
+      "counter_scope": "Returned result usage and modelUsage snapshot are separate overlapping scopes; never add them. Resume has a prior failed attempt with no final result.",
+      "actual_tool_return_excerpts": [
+        {
+          "original_tool_return_bytes": 1,
+          "original_tool_return_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+          "selected_returned_objects": [],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 314,
+          "original_tool_return_sha256": "7ab9f8bf875d77eb5dd3fbac26265d7ed56b2cf49dc8274b9e9dbdaaa396a516",
+          "selected_returned_objects": [
+            {
+              "hits": [
+                {
+                  "id": "<OWNED_NATIVE_ID>",
+                  "path": "notes/amberquartz.md",
+                  "title": "Amberquartz retention",
+                  "snippet": "# <mark>Amberquartz</mark> retention\n\nThe <mark>amberquartz</mark> fixture keeps 19 entries.\n",
+                  "rank": -0.018032786885245903
+                }
+              ]
+            }
+          ],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 16,
+          "original_tool_return_sha256": "c3e1e9a3cf150012f3058ee18abb8cd72259f840e04dc28a1bb19d906e9e8da0",
+          "selected_returned_objects": [
+            {
+              "hits": []
+            }
+          ],
+          "is_error": false
+        },
+        {
+          "original_tool_return_bytes": 323,
+          "original_tool_return_sha256": "36903f422e151b32db57f820a72e99098bde52306f9266df8bd9908788b3bed5",
+          "selected_returned_objects": [
+            {
+              "path": "notes/amberquartz.md",
+              "title": "Amberquartz retention",
+              "body": "# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n",
+              "frontmatter": {
+                "tier": "semantic",
+                "type": "Note",
+                "generated": {
+                  "by": "process:ai-memory/2.4.2",
+                  "at": "2026-09-30T18:24:35Z"
+                }
+              }
+            }
+          ],
+          "is_error": false
+        }
+      ],
+      "model_answer": "```json\n{\"server\":\"resolution-memory\",\"discovery\":\"ToolSearch select:mcp__resolution-memory__memory_query,mcp__resolution-memory__memory_read_page\",\"scope\":{\"workspace\":\"native-ci\",\"project\":\"fixture\"},\"query\":{\"term\":\"amberquartz\",\"hits\":1,\"path\":\"notes/amberquartz.md\",\"title\":\"Amberquartz retention\",\"id\":\"<OWNED_NATIVE_ID>\",\"rank\":-0.018032786885245903},\"read_page\":{\"path\":\"notes/amberquartz.md\",\"body\":\"# Amberquartz retention\\n\\nThe amberquartz fixture keeps 19 entries.\\n\",\"frontmatter\":{\"tier\":\"semantic\",\"type\":\"Note\",\"generated\":{\"by\":\"process:ai-memory/2.4.2\",\"at\":\"2026-09-30T18:24:35Z\"}}},\"answer\":\"The stored decision says the amberquartz fixture keeps 19 entries.\",\"empty_query\":{\"term\":\"zzznativecimissing\",\"response\":{\"hits\":[]},\"has_hits\":false},\"native_tool_errors\":null,\"writes_resets_or_production_listing\":false,\"delegated\":false}\n```",
+      "original_stream_sha256": "aa2b91cfc88d3e0b96855c38c7d5d973813d93a2895e1877ceed4507bf47d3a5"
+    },
+    "claude-retrieval-delta": {
+      "native_exit": 0,
+      "supervisor_terminated": false,
+      "model": "claude-sonnet-5-5",
+      "tool_names": [
+        "Bash"
+      ],
+      "native_result": {
+        "subtype": "success",
+        "is_error": false,
+        "num_turns": 2
+      },
+      "usage_returned": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 13287,
+        "cache_read_input_tokens": 139282,
+        "output_tokens": 15107,
+        "output_tokens_details": {
+          "thinking_tokens": 12639
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 13287,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 5979,
+            "cache_read_input_tokens": 71467,
+            "cache_creation_input_tokens": 9635,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 9635
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage_snapshot": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 41999,
+          "thinkingTokens": 37808,
+          "cacheReadInputTokens": 310050,
+          "cacheCreationInputTokens": 56749,
+          "maxOutputTokens": 128000
+        }
+      },
+      "counter_scope": "Returned result usage and modelUsage snapshot are separate overlapping scopes; never add them. Resume has a prior failed attempt with no final result.",
+      "actual_tool_return_excerpts": [
+        {
+          "original_tool_return_bytes": 1009,
+          "original_tool_return_sha256": "cb9fa3e39cbe6b0f7d85b5f6eaf452dce3cd9904b274e87103073bcbddccb1c8",
+          "selected_returned_objects": [
+            {
+              "rtk": {
+                "native_exits": [
+                  0,
+                  0
+                ],
+                "subjects": [
+                  "CI_BASELINE_FIXED",
+                  "CI_FOLLOWUP_FIXED"
+                ],
+                "contract_passed": true,
+                "compact_bytes": 126,
+                "original_bytes": 315
+              },
+              "qmd": {
+                "native_exits": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "uri": "qmd://token-profile-claude/rag-note.md?index=token-profile-claude",
+                "source_exact": true,
+                "retrieved_body": "# Automatic local code RAG\n\nSocratiCode watches a deliberately indexed project. Qdrant persists its vectors and code payloads. The local Nemotron embedding service uses query: and passage: prefixes. QMD retrieves Markdown documents separately. File watching runs while the native MCP process is alive, with upstream incremental catch-up on reopening.\n",
+                "owned_collection_removed": true,
+                "lane": "BM25 without models"
+              },
+              "repomix": {
+                "native_exit": 0,
+                "source_exact": true,
+                "files": {
+                  "before.py": "def greeting(name):\n    return \"Hello, \" + name\n",
+                  "after.py": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n"
+                },
+                "selected_count": 2,
+                "pack_bytes": 289,
+                "savings_claim": null
+              }
+            },
+            {
+              "native_exit": 0,
+              "source_exact": true,
+              "files": {
+                "before.py": "def greeting(name):\n    return \"Hello, \" + name\n",
+                "after.py": "def greeting(name):\n    return \"Hello, \" + name + \"!\"\n"
+              },
+              "selected_count": 2,
+              "pack_bytes": 289,
+              "savings_claim": null
+            }
+          ],
+          "is_error": false
+        }
+      ],
+      "model_answer": "All three operations ran in the single call and passed every check. There was no traceback, and `assert rc` passed.\n\n```json\n{\n  \"call\": \"rtk proxy python3 - <<'PY' (coordinator script, one Bash call, 45 s per native subprocess)\",\n  \"rtk\": {\n    \"commands\": [\"rtk git log -2\", \"rtk proxy git log -2\"],\n    \"native_exits\": [0, 0],\n    \"subjects\": [\"CI_BASELINE_FIXED\", \"CI_FOLLOWUP_FIXED\"],\n    \"both_full_subjects_in_compact_and_original\": true,\n    \"compact_bytes\": 126,\n    \"original_bytes\": 315,\n    \"recovery\": \"the proxy output returned both full subjects verbatim, so the compact output did not truncate them\",\n    \"not_checked\": \"commit-ID agreement; the script neither printed nor compared IDs\",\n    \"scope\": \"output bytes of a two-commit fixture only; no provider savings and no full-history claim\"\n  },\n  \"qmd\": {\n    \"native_exits\": [0, 0, 0, 0],\n    \"steps\": [\"collection add\", \"search Nemotron -n 1 --json\", \"get <returned URI> --no-line-numbers (fresh subprocess)\", \"collection remove\"],\n    \"uri\": \"qmd://token-profile-claude/rag-note.md?index=token-profile-claude\",\n    \"answer\": {\n      \"embedding_service\": \"local Nemotron embedding service\",\n      \"query_prefixes\": [\"query:\", \"passage:\"]\n    },\n    \"check\": \"verify_qmd_document passed: the fresh get output equals the URI/docid header, '---', then fixtures/rag-note.md exactly\",\n    \"retrieved_body_field\": \"the printed retrieved_body is the on-disk source, which that check shows is identical to the retrieved body\",\n    \"owned_collection_removed\": \"remove exited 0; absence not re-listed\",\n    \"lane\": \"BM25/FTS only, no embedding, expansion or reranking\"\n  },\n  \"repomix\": {\n    \"native_exit\": 0,\n    \"pack\": \"<owned>/pack.xml, 289 bytes, uncompressed\",\n    \"selected_count\": 2,\n    \"answer\": {\n      \"shared_function\": \"greeting(name)\",\n      \"before_return\": \"\\\"Hello, \\\" + name\",\n      \"after_return\": \"\\\"Hello, \\\" + name + \\\"!\\\"\"\n    },\n    \"check\": \"verify_pack passed: exactly 2 <file> entries, paths {before.py, after.py}, bodies equal the fixtures after stripping XML wrapper newlines\",\n    \"savings_claim\": null,\n    \"note\": \"the pack (289 B) is larger than the two inputs (48 + 54 = 102 B)\"\n  },\n  \"deviations_and_limits\": [\n    \"Repomix ran as the coordinator's script specifies: target <checkout>/fixtures, --include before.py,after.py, plus --no-file-summary --no-directory-structure. The first prompt's --include 'fixtures/before.py,fixtures/after.py' from the checkout root was not used, so packed paths are before.py and after.py.\",\n    \"RTK_DB_PATH was set only on the two rtk git log calls. The rtk proxy wrappers around qmd and repomix carried no override from the script.\",\n    \"Tool versions were not run. Path-derived only: tools/rtk-0.50.0, tools/qmd-2.8.3, tools/repomix-1.18.1. Client 2.1.285 is not established by me.\"\n  ],\n  \"failures\": []\n}\n```",
+      "original_stream_sha256": "30fbf602f84b6f813e42236f6e04558971357f1d3587d4f6a097c4453fef5ac3"
+    }
+  },
+  "failed_attempts": [
+    {
+      "phase": "claude-profile-delta",
+      "supervisor_exit": 1,
+      "native_exit": null,
+      "timeout_seconds": 480,
+      "final_result": null,
+      "complete_provider_usage": null,
+      "condition": "Whole-host ccusage route and unnecessary source research exceeded the bounded caller; resumed same session against the public fixture."
+    },
+    {
+      "phase": "claude-retrieval-delta",
+      "supervisor_exit": 1,
+      "native_exit": null,
+      "timeout_seconds": 360,
+      "final_result": null,
+      "complete_provider_usage": null,
+      "condition": "Orientation-only source-scout run performed none of the three useful operations before supervision cutoff; resumed same session with one source-backed native command."
+    }
+  ],
+  "scope": "Actual selected tool-return objects, original hashes, native final status and model answers are distinct. No raw conversations or native identities; originals remain private. No equal-quality provider saving claim."
+}

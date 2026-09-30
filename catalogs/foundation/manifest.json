@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "catalog_id": "foundation",
-  "checked_at": "2026-09-21",
+  "checked_at": "2026-09-30",
   "scope": "General native engineering, research, documentation, applications, workers, observation and recovery. FOUNDATION is a capability selection over canonical evidence, separate from the US-equities domain catalog.",
   "limitations": [
     "Historical receipts qualify their named host, input and operation only; this catalog does not run or certify a new host.",
@@ -22,7 +22,7 @@
       "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
       "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here, and the catalogs/us-equities/models.json ledger remains a note on this native-clients selection. The user decided on 2026-09-27 to adopt a loopback OmniRoute gateway (component omniroute) for pooled GPT-6 access by gateway-routed Codex lanes such as the landscape sweep. It is a source build of release/v3.8.51 with an upstream fix (#14904) and an upstream feature (#13788); see docs/decisions/2026-09-27-omniroute-account-pool.md. Native Codex stays the max-quality default. The agent-sdks layer default stays pending the preregistered three-arm workers comparison (docs/grand-catalog-handbook.md, agent-sdks row), which remains its only acceptance gate. The terminal surface of these clients (tab titles, bell, colour depth, needed-only alerts) is settled by docs/decisions/2026-09-28-terminal-experience.md: AI-client (Claude, Codex) Windows Terminal profiles must not suppress application titles (static shell profiles may keep fixed titles), BEL is the only bell or notification signal Windows Terminal 1.24 and 1.25 act on (OSC 9;4 only sets progress state), and alerts are limited to pending decisions.",
       "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
-      "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
+      "lifecycle_scope": "Native Claude2.1.285 reinstall, Ultracode/Workflow/subagent recovery and Codex0.159.2 clean npm install/removal plus V2 worker lifecycle are dated source-host evidence. Existing native sign-ins retained. See docs/decisions/2026-09-30-token-lifecycle-resolution.md; host-wide restart and new-host acceptance remain separate.",
       "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
     },
     {
@@ -85,7 +85,7 @@
       "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
       "selection": "One ai-memory store as cross-harness memory of record.",
       "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
-      "lifecycle_scope": "Native scoped retrieval, Codex/Claude session-end consolidation, bounded assistant capture and scheduled learning admission have separate dated evidence. Synthetic migration and off-host empty-target recovery remain separate; capture is not a full transcript.",
+      "lifecycle_scope": "ai-memory2.4.2 native service activation, both hook installers, exact isolated retrieval/restart and same-V67 binary rollback passed. Earlier scoped capture/consolidation/scheduled learning evidence remains dated; forced production PreCompact was not rerun. No authentication/production database was copied. Hindsight upstream203pass/2skip installer tests do not qualify a backend. See docs/decisions/2026-09-30-token-profile-completion.md.",
       "next_gap": "Measure retrieval and learned-page quality on representative work; preserve once-per-session learning, all-project scheduler scope and separate lost-account/key recovery limits. See docs/memory-landscape-maintenance.md."
     },
     {
@@ -103,7 +103,7 @@
       "purpose": "Reduce task context only while preserving required facts, source recovery and answer quality.",
       "selection": "Known focused reads, RTK, Context Mode, scoped jCodeMunch, guarded Headroom and selected representations.",
       "activation": "Choose the cheapest sufficient lane for each artifact; preserve raw failure output and native caching.",
-      "lifecycle_scope": "Exact artifact comparisons and mixed native trial results are retained; heuristic counters and consumed usage are separate.",
+      "lifecycle_scope": "Selected profile has twelve fresh useful Codex operations and eight fresh plus four dated unchanged-pin Claude subagent operations, with source-backed clean installation/lifecycle and preserved failed conditions. Installed lifetime reporter completed with separate native retained-history/window estimates and exact artifact boundaries; no aggregate/provider saving claim. See evidence/receipts/token-profile-completion-20260930.json.",
       "next_gap": "Measure complete matched attempts only for a decision-changing optimization; do not infer causal lifetime savings."
     },
     {

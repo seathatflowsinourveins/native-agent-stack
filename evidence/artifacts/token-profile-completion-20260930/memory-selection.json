@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "kind": "source_backed_native_memory_selection",
+  "recorded_date": "2026-09-30",
+  "decision": "Retain one scoped durable capture system: activate ai-memory2.4.2; retain QMD document retrieval, SocratiCode code retrieval and task-selected structural navigation. Hindsight is the next isolated comparison, not a qualified replacement.",
+  "consequential_review": {
+    "role": "stack-researcher",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "triggers": [
+      "Consequential memory architecture and authentication boundary",
+      "Conflicting Context Mode release and installed-artifact identities"
+    ],
+    "acceptance": "Primary pinned source and returned native results support activation and scoped provenance. No matched provider-cost/quality winner or loaded Context Mode MCP process identity is established."
+  },
+  "active_memory": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "version": "2.4.2",
+    "pin": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+    "release": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2",
+    "archive": {
+      "bytes": 16096931,
+      "sha256": "e23bd078ff1c84ff1917ca9dba3a6332560b9bb6d6dce2d5df6b6c66166b69e3",
+      "native_checksum_exit_code": 0
+    },
+    "binary_sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93",
+    "previous_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "identical_store_tree": "69f067017fe325c0485f5d03559c78285d2642e3",
+    "last_migration": 67,
+    "migration_runner_blob": "aba7e9cd904553a75a52765db9e8779999c70ae7",
+    "compatibility": "Both releases have identical store and migration-runner source, V67 maximum; no new schema migration on an existing V67 store. Ordinary startup logical writes remain possible.",
+    "backup_boundary": "No production database, configuration or native authentication was copied. Upstream native full backup includes authentication tables; binary rollback is distinct from data rollback.",
+    "native_delta": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-2.4.2-native",
+    "native_rollback": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-binary-rollback",
+    "activation": {
+      "unit": "nativestack-memory.service",
+      "stop_exit_code": 0,
+      "executable_selection_exit_code": 0,
+      "start_exit_code": 0,
+      "active_state": "active",
+      "sub_state": "running",
+      "result": "success",
+      "exec_main_status": 0,
+      "active_executable_sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93",
+      "native_version": "ai-memory 2.4.2",
+      "native_mcp_status_success": true,
+      "previous_executable_retained": true
+    },
+    "hook_refresh": [
+      {
+        "argv": "ai-memory install-hooks --agent claude-code --apply --hooks-dir <OWNED_RELEASE>/hooks --server-url <LOOPBACK_MEMORY_URL>",
+        "native_exit_code": 0
+      },
+      {
+        "argv": "ai-memory install-hooks --agent codex --apply --hooks-dir <OWNED_RELEASE>/hooks --server-url <LOOPBACK_MEMORY_URL>",
+        "native_exit_code": 0
+      }
+    ],
+    "limitations": [
+      "Hook installation returned success; no fresh forced production PreCompact/provider extraction trial was run.",
+      "Correctness/native lifecycle fixes justify this upgrade; no measured provider-token saving from 2.4.2 is claimed."
+    ]
+  },
+  "hindsight": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "integration_version": "0.8.0",
+    "integration_pin": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "server_version": "0.10.2",
+    "server_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "license": "MIT",
+    "native_installer_help_exit_code": 1,
+    "native_stats_exit_code": 0,
+    "codex_named_mcp_lookup_exit_code": 1,
+    "observation": "Installed integration runtime and local usage command only. Named Hindsight MCP not found in installed Codex mcp get; Claude backend health/wiring unverified.",
+    "upstream_installer_tests": {
+      "argv": "npm test -- src/installer.test.ts",
+      "exit_code": 0,
+      "passed": 203,
+      "skipped": 2,
+      "skip_reason": "Upstream sqlite3-dependent Trae install/remove guard",
+      "source_unchanged_diff_exit_code": 0,
+      "source_sha256": "1ff5565edfa3df04bdfa25cb3f4dbd117f363a858ad8bd7d44f103b1bcf1a153",
+      "sanitized_stdout": "evidence/artifacts/token-lifecycle-resolution-20260930/hindsight-upstream/installer-test.stdout.txt",
+      "sanitized_stdout_sha256": "5c989e59e51c1a9cac2280b2bc03b2e2e4a3c8bd369740daf9a25cc024046f39",
+      "scope": "Unchanged upstream installer suite in temporary homes/mock host CLI; not a model/backend/container acceptance."
+    },
+    "live_trial_requirements": [
+      "Explicit backend and separate backend authentication route, not copied native client authentication",
+      "Opt-in project/bank, autoSeed false, gitIngest none, codebaseSurvey false",
+      "Disable automatic synthesis/updates/retention/injection until measured",
+      "Dedicated harness/session namespace; global temporary cursors need separate isolation"
+    ],
+    "e2e_boundary": "Pinned upstream Claude container entry is unsupported/skipped; Codex container fixture copies authentication state and does not satisfy this session's boundary.",
+    "research_sources": [
+      "https://arxiv.org/abs/2512.12818",
+      "https://github.com/vectorize-io/agent-memory-benchmark/tree/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150"
+    ],
+    "status": "candidate_live_trial_unqualified"
+  },
+  "candidates": [
+    {
+      "id": "qmd",
+      "version": "2.8.3",
+      "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "repository": "https://github.com/tobi/qmd",
+      "license": "MIT",
+      "status": "selected_scoped_document_retrieval",
+      "scope": "Native BM25 exact-body acceptance; optional embeddings/rerank not exercised in these fresh fixtures"
+    },
+    {
+      "id": "socraticode",
+      "version": "1.16.0",
+      "pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "repository": "https://github.com/giancarloerra/socraticode",
+      "license": "MIT",
+      "status": "candidate_existing_1.15.0_retained",
+      "scope": "Opt-in Git refresh does not track every uncommitted content change"
+    },
+    {
+      "id": "serena",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "repository": "https://github.com/oraios/serena",
+      "license": "GPL app / SolidLSP MIT",
+      "status": "selected_structural_navigation"
+    },
+    {
+      "id": "jcodemunch",
+      "version": "1.108.319",
+      "pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "license": "Dual-use; commercial terms separate",
+      "status": "existing_optional_navigation_not_in_full14"
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "version": "0.11.0",
+      "pin": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "license": "MIT",
+      "status": "existing_optional_graph_navigation_not_in_full14"
+    },
+    {
+      "id": "cognee",
+      "version": "1.6.2",
+      "pin": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+      "integration_pin": "7538e97223770d445dcaacefc0b8737530e82a72",
+      "repository": "https://github.com/topoteretes/cognee",
+      "license": "Apache-2.0",
+      "status": "comparison",
+      "scope": "Native integrations present; duplicate capture/graph/backend cost needs matched measurement"
+    },
+    {
+      "id": "graphiti",
+      "version": "0.30.2",
+      "pin": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+      "repository": "https://github.com/getzep/graphiti",
+      "license": "Apache-2.0",
+      "status": "comparison",
+      "scope": "Temporal graph database/LLM/embedding dependencies; experimental MCP"
+    },
+    {
+      "id": "mem0",
+      "python_version": "2.2.1",
+      "typescript_version": "3.3.1",
+      "pin": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "repository": "https://github.com/mem0ai/mem0",
+      "license": "Apache-2.0",
+      "status": "comparison",
+      "scope": "SDK or hosted account; upstream benchmark is not this host's matched coding acceptance"
+    },
+    {
+      "id": "letta",
+      "version": "0.16.8",
+      "pin": "1131535716e8a31c9a437f8695e25ac98f203a24",
+      "repository": "https://github.com/letta-ai/letta",
+      "license": "Apache-2.0",
+      "status": "comparison",
+      "scope": "Separate executing agent runtime; native Claude/Codex lifecycle replacement not established"
+    }
+  ],
+  "context_mode_provenance": {
+    "repository": "https://github.com/mksglu/context-mode",
+    "version": "1.0.169",
+    "official_tag_object": "442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587",
+    "official_release_commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+    "installed_codex_plugin_bundles_commit": "6f0cc6841c687e754059f36714a11233fda1a02b",
+    "installed_source_sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59",
+    "published_npm_archive_sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+    "registry_git_head": null,
+    "loaded_mcp_process_artifact": null,
+    "formulas": {
+      "tokens_saved": "Math.round((bytesIndexed + bytesSandboxed + cacheBytesSaved) / 4)",
+      "tokens_saved_lifetime": "totalEvents * 256"
+    },
+    "formula_source": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts#L1032"
+  },
+  "limitations": [
+    "Maintained upstream selection is dated, task-specific and replaceable; no universal memory/RAG winner is asserted.",
+    "Native installation, source equivalence, unchanged upstream tests and live client fixtures are separate evidence levels."
+  ]
+}

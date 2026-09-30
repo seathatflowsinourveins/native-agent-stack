@@ -126,6 +126,15 @@ state. Native Claude HUD is not a Codex Desktop panel.
 
 ## Coverage check
 
+The [2026-09-30 source-host qualification](decisions/2026-09-30-token-profile-completion.md)
+records twelve fresh Codex tool operations and eight fresh plus four dated
+unchanged-pin Claude subagent operations. Native wiring is complete after seven
+updated memory hooks were approved through Codex's supported native writer.
+ai-memory 2.4.2 is active; Hindsight's unchanged installer tests remain candidate
+evidence. The installed lifetime-report service and timer retain separate tool
+estimates and exact artifact boundaries. Other hosts need their own native
+sign-ins and useful-call acceptance; complete provider-token saving is unknown.
+
 Any host (a WSL2 workstation, a Mac) runs one value-free command from its checkout
 to see whether the selected practice is present and wired into both native clients:
 

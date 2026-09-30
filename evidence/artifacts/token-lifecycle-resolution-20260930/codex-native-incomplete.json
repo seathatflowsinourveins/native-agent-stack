@@ -1,0 +1,93 @@
+{
+  "kind": "codex-native-child-integration",
+  "evidence_class": "synthetic-client-integration",
+  "started_at": "2026-09-30T15:34:32.934Z",
+  "completed_at": "2026-09-30T15:37:17.445Z",
+  "exit_code": 0,
+  "signal": null,
+  "event_types": [
+    "thread.started",
+    "turn.started",
+    "item.completed",
+    "item.started",
+    "turn.completed"
+  ],
+  "native_turns": [
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 235395,
+        "cached_input_tokens": 208768,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2353,
+        "reasoning_output_tokens": 1373
+      }
+    }
+  ],
+  "native_failures": [],
+  "tool_calls": [
+    {
+      "id": "item_1",
+      "type": "command_execution",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "tool": "ctx_execute",
+      "server": "context-mode",
+      "status": "completed",
+      "arguments": {
+        "language": "javascript",
+        "code": "const { spawnSync } = require('node:child_process'); const r = spawnSync('rtk', ['proxy', 'codex', '--version'], {encoding:'utf8',timeout:30000}); console.log(JSON.stringify({command:'rtk proxy codex --version',exit_code:r.status,version:(r.stdout||'').trim(),stderr:(r.stderr||'').trim(),error:r.error?.message||null}));",
+        "timeout": 40000
+      },
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "```javascript\nconst { spawnSync } = require('node:child_process'); const r = spawnSync('rtk', ['proxy', 'codex', '--version'], {encoding:'utf8',timeout:30000}); console.log(JSON.stringify({command:'rtk proxy codex --version',exit_code:r.status,version:(r.stdout||'').trim(),stderr:(r.stderr||'').trim(),error:r.error?.message||null}));\n```\n\n{\"command\":\"rtk proxy codex --version\",\"exit_code\":0,\"version\":\"codex-cli 0.159.2\",\"stderr\":\"\",\"error\":null}\n"
+          }
+        ],
+        "structured_content": null
+      },
+      "error": null
+    },
+    {
+      "id": "item_3",
+      "type": "collab_tool_call",
+      "tool": "wait",
+      "status": "completed",
+      "sender_thread_id": "<owned-native-id-1>",
+      "receiver_thread_ids": [],
+      "agents_states": {}
+    },
+    {
+      "id": "item_4",
+      "type": "collab_tool_call",
+      "tool": "wait",
+      "status": "completed",
+      "sender_thread_id": "<owned-native-id-1>",
+      "receiver_thread_ids": [],
+      "agents_states": {}
+    }
+  ],
+  "stderr": "",
+  "claim_boundary": "Native parent Context Mode operation passed. The processed stream does not establish child role/model/effort or completed closure. The final model response reports unavailable close_agent; retain as incomplete child lifecycle acceptance.",
+  "final_model_response": {
+    "conclusion": "Removed tool-search flags do not remove native deferred MCP discovery. At rust-v0.159.2, discovery remains gated by model supports_search_tool and provider namespace_tools. Actual session activation or usage was not verified.",
+    "version": "codex-cli 0.159.2",
+    "upstream_sources": [
+      "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/features/src/lib.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/src/tools/spec_plan.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/src/mcp_tool_exposure.rs"
+    ],
+    "failed_operations": [
+      {
+        "operation": "close_agent",
+        "reason": "Native operation unavailable in exposed tools. Child completion was confirmed; closure was not performed."
+      }
+    ]
+  }
+}

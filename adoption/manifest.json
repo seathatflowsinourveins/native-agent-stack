@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-26",
+  "updated_at": "2026-09-30",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
@@ -380,7 +380,7 @@
     },
     {
       "id": "token-efficiency",
-      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "label": "Source-host native qualification complete; PR recording pending: selected token practice and both native clients",
       "required_commands": [
         "codex",
         "claude",
@@ -416,7 +416,8 @@
         "docs/token-efficiency-stack.md",
         "docs/token-session-handbook.md",
         "recipes/README.md",
-        "recipes/native-upgrades-20260921.md"
+        "recipes/native-upgrades-20260921.md",
+        "docs/decisions/2026-09-30-token-profile-completion.md"
       ]
     }
   ],

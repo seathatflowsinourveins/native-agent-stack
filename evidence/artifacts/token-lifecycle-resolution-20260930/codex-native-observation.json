@@ -1,0 +1,154 @@
+{
+  "kind": "codex-v2-own-thread-independent-observation",
+  "evidence_class": "supported-native-read-only-protocol-and-own-rollout-observation",
+  "child_count": 1,
+  "children": [
+    {
+      "thread_id": "<owned-native-id-2>",
+      "status": {
+        "type": "notLoaded"
+      },
+      "agent_role": "stack-researcher",
+      "source": {
+        "subAgent": {
+          "thread_spawn": {
+            "parent_thread_id": "<owned-native-id-1>",
+            "depth": 1,
+            "agent_path": "/root/native_token_lane",
+            "agent_nickname": "Leibniz",
+            "agent_role": "stack-researcher"
+          }
+        }
+      },
+      "model_provider": "openai",
+      "turns": [
+        {
+          "status": "completed",
+          "items": [
+            {
+              "type": "commandExecution",
+              "status": "completed",
+              "exitCode": 0
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_fetch_and_index",
+              "status": "completed"
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_execute",
+              "status": "completed"
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_search",
+              "status": "completed"
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_search",
+              "status": "completed"
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_search",
+              "status": "completed"
+            },
+            {
+              "type": "mcpToolCall",
+              "server": "context-mode",
+              "tool": "ctx_search",
+              "status": "completed"
+            }
+          ]
+        }
+      ],
+      "native_turn_contexts": [
+        {
+          "model": "gpt-6-astra",
+          "effort": "max"
+        }
+      ],
+      "native_source": {
+        "subagent": {
+          "thread_spawn": {
+            "parent_thread_id": "<owned-native-id-1>",
+            "depth": 1,
+            "agent_path": "/root/native_token_lane",
+            "agent_nickname": "Leibniz",
+            "agent_role": "stack-researcher"
+          }
+        }
+      },
+      "last_cumulative_usage": {
+        "input_tokens": 176899,
+        "cached_input_tokens": 135552,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1909,
+        "reasoning_output_tokens": 737,
+        "total_tokens": 178808
+      },
+      "native_task_complete": true
+    }
+  ],
+  "parent": {
+    "thread_id": "<owned-native-id-1>",
+    "status": {
+      "type": "notLoaded"
+    },
+    "agent_role": null,
+    "source": "exec",
+    "model_provider": "openai",
+    "turns": [
+      {
+        "status": "completed",
+        "items": [
+          {
+            "type": "commandExecution",
+            "status": "completed",
+            "exitCode": 0
+          },
+          {
+            "type": "mcpToolCall",
+            "server": "context-mode",
+            "tool": "ctx_execute",
+            "status": "completed"
+          },
+          {
+            "type": "collabAgentToolCall",
+            "tool": "wait",
+            "status": "completed"
+          },
+          {
+            "type": "collabAgentToolCall",
+            "tool": "wait",
+            "status": "completed"
+          }
+        ]
+      }
+    ],
+    "native_turn_contexts": [
+      {
+        "model": "gpt-6.1-sol",
+        "effort": "ultra"
+      }
+    ],
+    "native_source": "exec",
+    "last_cumulative_usage": {
+      "input_tokens": 235395,
+      "cached_input_tokens": 208768,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2353,
+      "reasoning_output_tokens": 1373,
+      "total_tokens": 237748
+    },
+    "native_task_complete": true
+  },
+  "limits": "Inspecting app-server metadata after exec ended; not a deletion or close_agent observation. Cumulative usage retained separately for each native thread."
+}

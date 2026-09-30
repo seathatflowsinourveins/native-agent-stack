@@ -1,0 +1,20 @@
+{
+  "evidence_class": "local_integration_regression",
+  "argv": [
+    "rtk",
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_native_token_ci.py",
+    "-k",
+    "verified_native_preimages"
+  ],
+  "exit_code": 1,
+  "output_raw_sha256": "f26ad752d80751c880039b328d2e2fff87bd7efa87d5a010c135c52a9536efc6",
+  "output_sanitized_sha256": "0505c8f3dbc3c92e06ff90e778629f9f5043951f9d62c95a48cbec010ab66526",
+  "sanitization": "Local checkout and native HOME paths replaced; all other returned text retained"
+}
