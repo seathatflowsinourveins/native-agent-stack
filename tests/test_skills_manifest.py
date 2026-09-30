@@ -161,6 +161,31 @@ class BudgetTests(unittest.TestCase):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["codex_enabled"])
         self.assertEqual(self.budget["codex_enabled_description_chars"], expected)
 
+    def test_codex_catalog_description_chars_counts_only_the_skills_codex_shows_the_model(self):
+        # Codex leaves a skill whose agents/openai.yaml sets allow_implicit_invocation: false out of the model's
+        # catalog (openai/codex rust-v0.159.2 codex-rs/ext/skills/src/provider/host.rs L147-148; the flag defaults
+        # to true, codex-rs/skills/src/model.rs L22-28). At their pins only the two upstream user-only skills set it.
+        for skill in self.skills:
+            if "upstream_allow_implicit_invocation" in skill:
+                with self.subTest(skill=skill["name"]):
+                    self.assertIsInstance(skill["upstream_allow_implicit_invocation"], bool)
+        explicit_only = {s["name"] for s in self.skills if s.get("upstream_allow_implicit_invocation") is False}
+        self.assertEqual(explicit_only, {"grill-me", "improve-codebase-architecture"})
+        shown = [s for s in self.skills if s["codex_enabled"] and s.get("upstream_allow_implicit_invocation", True)]
+        self.assertEqual(self.budget["codex_catalog_description_chars"],
+                         sum(skill["description_chars"] for skill in shown))
+
+    def test_codex_configured_budget_tokens_is_the_codex_template_budget(self):
+        # scripts/skills_status.py compares its catalog estimate with this figure, so it must be what hosts apply.
+        template = tomllib.loads(CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")).get("skills", {})
+        self.assertEqual(self.budget["codex_configured_budget_tokens"], template.get("max_context_tokens"))
+
+    def test_codex_eight_thousand_characters_is_kept_as_the_fallback_not_a_cap(self):
+        # codex-rs/ext/skills/src/render.rs L19 and L138-151 at rust-v0.159.2: 8,000 characters only when the
+        # context window is unknown and no max_context_tokens is set.
+        self.assertEqual(self.budget["codex_fallback_budget_chars"], 8000)
+        self.assertNotIn("codex_default_budget_chars", self.budget)
+
 
 class ExcludedEntryTests(unittest.TestCase):
     @classmethod
@@ -247,6 +272,14 @@ class ListingBudgetTemplateTests(unittest.TestCase):
         self.assertEqual(budget, 6000)
         # Per-skill disables come from tools/adoption/install_skills.py --print-codex-config, never the template.
         self.assertNotIn("config", skills)
+
+    def test_codex_template_comment_counts_the_skills_the_catalog_shows(self):
+        text = CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")
+        match = re.search(r"manifest's (\d+) catalog-visible skills", text)
+        self.assertIsNotNone(match, "the [skills] comment names the manifest's catalog-visible count")
+        skills = load_json(MANIFEST_PATH)["skills"]
+        shown = [s for s in skills if s["codex_enabled"] and s.get("upstream_allow_implicit_invocation", True)]
+        self.assertEqual(int(match.group(1)), len(shown))
 
 
 class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
