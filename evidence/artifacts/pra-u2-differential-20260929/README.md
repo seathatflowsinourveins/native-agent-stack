@@ -200,7 +200,8 @@ Over the U2 kernel's sweep of W_AA (744 actors, `waa-invariants.json`):
 - M15: every server classifies every error (`every_error_classified`), and no server is `threshold_sensitive`. The
   context-mode server has 6 infrastructure errors in 1,312 child calls (rate 0.0046) and 2 in 57 main-session
   calls (0.0351, above the 0.01 threshold); codebase-memory has 1 in 3 child calls. These are baseline
-  descriptions, not a gate result.
+  descriptions, not a gate result. Server names outside the stack's vocabulary are folded into `(other)`, as in
+  `kernel-m14-m15.json`.
 - The private ledger: a sweep with `--call-ledger` wrote 41,602 records into a new file of mode 600; its stdout was
   byte-identical to the sweep without the flag and held none of the ledger's 42,337 distinct call, session and
   agent ids, as a value or as a substring, nor the root directory. A ledger path inside this repository exited 2

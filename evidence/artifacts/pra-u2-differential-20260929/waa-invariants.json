@@ -43,13 +43,23 @@
  "kind": "pra_u2_real_window_invariants",
  "m15_by_server": {
   "children": {
+   "(other)": {
+    "attempted": 3,
+    "every_error_classified": true,
+    "infrastructure_errors": 0,
+    "new_class_errors": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
+    "threshold_sensitive": false,
+    "unknowns": 0
+   },
    "ai-memory": {
     "attempted": 11,
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },
@@ -68,8 +78,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },
@@ -78,8 +88,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },
@@ -98,8 +108,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },
@@ -108,8 +118,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },
@@ -118,18 +128,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
-    "threshold_sensitive": false,
-    "unknowns": 0
-   },
-   "wp1probe_cli": {
-    "attempted": 3,
-    "every_error_classified": true,
-    "infrastructure_errors": 0,
-    "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    }
@@ -140,8 +140,8 @@
     "every_error_classified": true,
     "infrastructure_errors": 0,
     "new_class_errors": 0,
-    "rate": 0,
-    "rate_lower_bound": 0,
+    "rate": 0.0,
+    "rate_lower_bound": 0.0,
     "threshold_sensitive": false,
     "unknowns": 0
    },

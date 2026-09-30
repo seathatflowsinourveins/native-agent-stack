@@ -234,6 +234,66 @@
       ],
       "note": "the version the context-mode 1.0.169 install holds (its package.json asks ^1.26.0); the tarball's sha512 equals the registry integrity and the three installed files equal the tarball's",
       "used_by": "M15 classes connection ('Connection closed', -32000) and invalid_arguments (-32602)"
+    },
+    {
+      "id": "tools-reference-background-tasks",
+      "url": "https://code.claude.com/docs/en/tools-reference.md",
+      "fetched_at": "2026-09-29T20:16:09Z",
+      "sha256": "cc0eda9856f0f966182acb7a9b63000197fe15672dd14cea6c69e52c573e93d3",
+      "bytes": 72977,
+      "sections": ["### Background commands (line 176)", "## Monitor tool (line 321)"],
+      "quotes": [
+        "A command that a [foreground subagent](/docs/en/sub-agents#run-subagents-in-foreground-or-background) started stops when that subagent gives its final response.",
+        "At the deadline the watch ends. Claude gets one notice, so it can start the watch again if it's still needed.",
+        "When you stop a [subagent](/docs/en/sub-agents) that started monitors, for example from `/tasks`, those monitors stop with it."
+      ],
+      "note": "the same fetched bytes as the tools-reference entry; which results start a task (backgroundTaskId, a Monitor or Workflow taskId, an async Agent's agentId), where notifications arrive and their <status> values are host observations, not a documented schema (scans/final-returns.json, scans/task-notifications.json, scans/task-stop.json, scans/task-stop-2.json)",
+      "used_by": "finalReturn (item 6): a background task still running at a child's final message makes it incomplete"
+    },
+    {
+      "id": "rtk-registry",
+      "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.50.0/src/discover/registry.rs",
+      "tag": "v0.50.0",
+      "tag_commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+      "fetched_at": "2026-09-29T22:34:41Z",
+      "sha256": "3b5f3d20fb7a224ceef0b2bea49c27eae7ae6dae5f27e60b41ef43e3583c12d0",
+      "bytes": 246926,
+      "lines": "342-347 (has_heredoc), 703-731 (rewrite_command_precompiled)",
+      "quotes": [
+        "/// Quote-aware heredoc detection — `<<` inside quotes is not a heredoc.",
+        "if has_heredoc(trimmed) || trimmed.contains(\"$((\") {",
+        "return None;"
+      ],
+      "note": "observed with the installed rtk 0.50.0 too: `rtk hook check --agent claude` gives no rewrite for a command with a heredoc or $(( and rewrites (( )) and comments",
+      "used_by": "binding decision B8: the eligible parts of a heredoc or $(( call, unknown before, count as observed uncovered, since the hook never rewrites such a call"
+    },
+    {
+      "id": "posix-xcu-here-document",
+      "url": "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html",
+      "fetched_at": "2026-09-30T00:52:59Z",
+      "sha256": "0889867a53fe12508a71e8739ec23ecdddc95e6f67697c98e26acc8ff0ec1acd",
+      "bytes": 357953,
+      "sections": ["2.7 Redirection", "2.7.4 Here-Document"],
+      "quotes": [
+        "The here-document shall be treated as a single word that begins after the next NEWLINE token and continues until there is a line containing only the delimiter and a <newline>, with no <blank> characters in between. Then the next here-document starts, if there is one.",
+        "If the redirection operator is \"<<\" or \"<<-\", the word that follows the redirection operator shall be subjected to quote removal; it is unspecified whether any of the other expansions occur."
+      ],
+      "used_by": "shellParts (B8): a body begins after the newline that ends its operator's line, bodies follow in order, and the delimiter is the operator's word with its quotes removed (heredocWord)"
+    },
+    {
+      "id": "bash-manual-here-documents",
+      "package": "bash 5.2.21-2ubuntu4 (the installed GNU bash 5.2.21)",
+      "file": "share/man/man1/bash.1.gz",
+      "sha256": "3ca7a67df55bd2f80a2de111f8d44df359f7a795573aaaadce09a52a22bcedeb",
+      "bytes": 97471,
+      "sections": ["Here Documents (line 4280 of the roff source)"],
+      "quotes": [
+        "This type of redirection instructs the shell to read input from the current source until a line containing only delimiter (with no trailing blanks) is seen.",
+        "If any part of word is quoted, the delimiter is the result of quote removal on word, and the lines in the here-document are not expanded.",
+        "If the redirection operator is <<-, then all leading tab characters are stripped from input lines and the line containing delimiter."
+      ],
+      "note": "roff markup removed from the quotes. The frame-depth rule for a newline inside \"$( )\" is not written there: it was observed with GNU bash 5.2.21 and dash on 2026-09-29 (the two cases in tests/test_token_measurement.py B8_PARTS), and the case where they disagree is left out (README, B8 part splitter)",
+      "used_by": "shellParts (B8): the <<- tab rule and the quoted delimiter"
     }
   ]
 }
