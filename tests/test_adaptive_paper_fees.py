@@ -13,11 +13,13 @@ published files).
 from __future__ import annotations
 
 import asyncio
-from contextlib import nullcontext
+from contextlib import nullcontext, redirect_stdout, redirect_stderr
 from datetime import datetime, timezone
 from decimal import Decimal as D
 import hashlib
 import json
+import io
+import logging
 import os
 from pathlib import Path
 import sqlite3
@@ -114,11 +116,53 @@ def utc(epoch):
     return datetime.fromtimestamp(epoch, timezone.utc)
 
 
+class FeePrivacyCapture:
+    """Capture all output around every fee fixture, including rejected rows."""
+    def setUp(self):
+        super().setUp()
+        self.fee_output = io.StringIO()
+        self.enterContext(redirect_stdout(self.fee_output))
+        self.enterContext(redirect_stderr(self.fee_output))
+        logger = logging.getLogger()
+        handler = logging.StreamHandler(self.fee_output)
+        logger.addHandler(handler)
+        self.addCleanup(logger.removeHandler, handler)
+        previous_level = logger.level
+        logger.setLevel(logging.NOTSET)
+        self.addCleanup(logger.setLevel, previous_level)
+        original_handle = logging.Logger.handle
+        def capture_log(emitter, record):
+            self.fee_output.write(record.getMessage() + "\n")
+            return original_handle(emitter, record)
+        self.enterContext(patch.object(logging.Logger, "handle", capture_log))
+        self.addCleanup(lambda: self.assertNotIn(ACCOUNT_TEXT, self.fee_output.getvalue()))
+
+
+class DescriptionUnreadable(dict):
+    """Reading description, even by enumerating items, is a privacy failure."""
+    def __getitem__(self, key):
+        if key == "description":
+            raise AssertionError("description was read")
+        return super().__getitem__(key)
+
+    def get(self, key, default=None):
+        if key == "description":
+            raise AssertionError("description was read")
+        return super().get(key, default)
+
+    def items(self):
+        for key in self:
+            yield key, self[key]
+
+
 # ---------------------------------------------------------------------------
 # Item 2: normalization
 # ---------------------------------------------------------------------------
 
-class FeeNormalization(unittest.TestCase):
+class FeeNormalization(FeePrivacyCapture, unittest.TestCase):
+    def test_description_is_never_accessed(self):
+        self.assertEqual(t.normalize_fee_activity(DescriptionUnreadable(fee_row())), measured_fees()[0])
+
     def test_documented_fee_row_keeps_four_fields_and_never_the_description(self):
         for row, expected in zip(measured_rows(), measured_fees()):
             with self.subTest(sub_type=expected["sub_type"]):
@@ -182,8 +226,9 @@ AFTER = "2026-09-29T08:00:00Z"
 
 
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
-class FeeHTTPBoundary(unittest.TestCase):
+class FeeHTTPBoundary(FeePrivacyCapture, unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.budget = Mock(return_value=None)
         self.session = t.GuardedSession(origin=t.PAPER_URL, before_request=self.budget)
         self.addCleanup(self.session.close)
@@ -247,7 +292,7 @@ FEE_PATH = "/v2/account/activities/FEE"
 
 
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
-class FeeSnapshot(unittest.IsolatedAsyncioTestCase):
+class FeeSnapshot(FeePrivacyCapture, unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.budgets = []
         self.port = self.make_port(fee_history_start=BASELINE)
@@ -364,14 +409,49 @@ class FeeSnapshot(unittest.IsolatedAsyncioTestCase):
         sent.assert_not_called()
 
 
+@unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+class FeeCheckpoint(FeePrivacyCapture, unittest.TestCase):
+    serve = FeeSnapshot.serve
+
+    def test_checkpoint_returns_f2_and_normalized_cash_on_one_read_only_client(self):
+        budgets = []
+        request, calls = self.serve([measured_rows(), list(reversed(measured_rows()))])
+        with patch("requests.Session.request", side_effect=request):
+            checkpoint = t.fee_checkpoint("fixture-key", "fixture-secret", after=BASELINE,
+                                          before_request=lambda kind, **_: budgets.append(kind))
+        self.assertEqual(checkpoint, {"account": {"cash": "1000", "equity": "1000", "buying_power": "1000"},
+                                      "fees": list(reversed(measured_fees()))})
+        self.assertEqual([c[1] for c in calls], [FEE_PATH, "/v2/account", FEE_PATH])
+        self.assertEqual(budgets, ["read"] * 3)
+        self.assertEqual(calls[0][2], calls[2][2])
+
+    def test_checkpoint_refuses_a_fee_posted_between_its_reads(self):
+        request, calls = self.serve([[], measured_rows()])
+        with patch("requests.Session.request", side_effect=request):
+            with self.assertRaisesRegex(t.TransportError, "^fee_activity_posted_during_checkpoint$"):
+                t.fee_checkpoint("fixture-key", "fixture-secret", after=BASELINE,
+                                 before_request=lambda kind, **_: None)
+        self.assertEqual([c[1] for c in calls], [FEE_PATH, "/v2/account", FEE_PATH])
+
+    def test_checkpoint_refuses_a_changed_normalized_row(self):
+        for changes in ({"net_amount": "-0.20"}, {"date": "2026-09-28"}, {"activity_sub_type": "TAF"}):
+            with self.subTest(changes=changes):
+                request, _ = self.serve([[fee_row()], [fee_row(**changes)]])
+                with patch("requests.Session.request", side_effect=request):
+                    with self.assertRaisesRegex(t.TransportError, "^fee_activity_posted_during_checkpoint$"):
+                        t.fee_checkpoint("fixture-key", "fixture-secret", after=BASELINE,
+                                         before_request=lambda kind, **_: None)
+
+
 # ---------------------------------------------------------------------------
 # Item 5: the ledger (schema 3)
 # ---------------------------------------------------------------------------
 
-class FeeLedger(unittest.TestCase):
+class FeeLedger(FeePrivacyCapture, unittest.TestCase):
     NOW = 1_790_000_000.0
 
     def setUp(self):
+        super().setUp()
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.path = Path(self.tmp.name) / "ledger.sqlite3"
@@ -432,12 +512,68 @@ class FeeLedger(unittest.TestCase):
                 raw.close()
                 self.ledger = Ledger(self.path)
 
-    def test_the_previous_engine_refuses_a_migrated_ledger(self):
-        # The exact open check of Ledger.__init__ at 11227bfd (this change's base), before any insert.
-        version = self.schema_version()
-        with self.assertRaisesRegex(SafetyError, "^unsupported_ledger_schema$"):
-            if version not in (None, "1", "2"):
-                raise SafetyError("unsupported_ledger_schema")
+    def test_migrated_schema_is_outside_the_previous_accept_list(self):
+        """Compare with None/1/2 copied from b528bb55 safety.py:443; no previous engine runs."""
+        self.assertNotIn(self.schema_version(), (None, "1", "2"))
+
+    def check_batch_risk(self, amounts, expected):
+        limits = RiskLimits(max_drawdown_usd=D("0.5"), max_gross_loss_usd=D("10"))
+        ledgers = [Ledger(Path(self.tmp.name) / (name + ".sqlite3"), limits) for name in ("batch", "single")]
+        for ledger in ledgers:
+            self.addCleanup(ledger.close)
+            ledger.start_trial(self.NOW)
+        fees = [dict(measured_fees()[i], net_amount=amount) for i, amount in enumerate(amounts)]
+        ledgers[0].record_fees(fees, self.NOW)
+        for fee in fees:
+            ledgers[1].record_fees([fee], self.NOW)
+        for ledger in ledgers:
+            state = ledger.accounting()
+            self.assertEqual((state.peak_pnl_usd, state.drawdown_usd, state.halted_reason), expected)
+            with self.assertRaisesRegex(SafetyError, "^drawdown_cap_reached$"):
+                ledger.reserve_intent("after-fees", "SPY", "buy", "1", "100.02",
+                                      quote=safety.Quote("SPY", "100", "100.01", self.NOW + 1),
+                                      now=self.NOW + 1, market_open=True, session_close=self.NOW + 3600,
+                                      stop_file=Path(self.tmp.name) / "STOP")
+
+    def test_credit_then_debit_batch_preserves_the_intermediate_peak_and_halt(self):
+        self.check_batch_risk(("1", "-1"), (D("1"), D("1"), "drawdown_cap_reached"))
+
+    def test_debit_then_credit_batch_preserves_the_intermediate_halt(self):
+        self.check_batch_risk(("-1", "1"), (D("0"), D("0"), "drawdown_cap_reached"))
+
+    def recovery_position(self, limits):
+        ledger = Ledger(Path(self.tmp.name) / "recovery.sqlite3", limits)
+        self.addCleanup(ledger.close)
+        ledger.start_trial(self.NOW)
+        ledger.reserve_intent("buy", "SPY", "buy", "1", "100.02",
+                              quote=safety.Quote("SPY", "100", "100.01", self.NOW), now=self.NOW,
+                              market_open=True, session_close=self.NOW + 3600, stop_file=Path(self.tmp.name) / "STOP")
+        ledger.record_order("buy", "broker-buy", "filled", "1", "100", timestamp=self.NOW)
+        ledger.begin_recovery(self.NOW + 1)
+        return ledger
+
+    def finish_recovery(self, ledger):
+        ledger.reserve_intent("sell", "SPY", "sell", "1", "99.98",
+                              quote=safety.Quote("SPY", "100", "100.01", self.NOW + 3), now=self.NOW + 3,
+                              market_open=True, session_close=self.NOW + 3600, stop_file=Path(self.tmp.name) / "STOP")
+        ledger.record_order("sell", "broker-sell", "filled", "1", "100", timestamp=self.NOW + 3)
+        self.assertFalse(ledger.positions())
+
+    def test_measured_recovery_fees_preserve_recovery_only_and_allow_the_sell(self):
+        ledger = self.recovery_position(RiskLimits())
+        ledger.record_fees(measured_fees(), self.NOW + 2)
+        self.assertEqual(ledger.halted_reason(), "recovery_only")
+        self.assertEqual(ledger._get("recovery_only"), "1")
+        self.finish_recovery(ledger)
+
+    def test_recovery_fee_crossing_the_loss_cap_cannot_be_cleared_by_the_next_trial(self):
+        ledger = self.recovery_position(RiskLimits(max_gross_loss_usd=D("0.40")))
+        ledger.record_fees(measured_fees(), self.NOW + 2)
+        self.assertEqual(ledger.halted_reason(), "gross_loss_cap_reached")
+        self.assertEqual(ledger._get("recovery_only"), "1")
+        self.finish_recovery(ledger)
+        with self.assertRaisesRegex(SafetyError, "^next_trial_cannot_clear_risk_halt$"):
+            ledger.begin_next_trial(self.NOW + 4, "after-fees")
 
     def test_record_fees_books_cash_realized_and_loss_once_with_one_event_each(self):
         self.assertEqual(self.ledger.record_fees(measured_fees(), self.NOW), measured_fees())
@@ -535,8 +671,9 @@ class FeeLedger(unittest.TestCase):
 # Items 6 and 8: reconciliation
 # ---------------------------------------------------------------------------
 
-class FeeReconciliation(unittest.TestCase):
+class FeeReconciliation(FeePrivacyCapture, unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.ledger = self.new_ledger("ledger")
@@ -572,6 +709,15 @@ class FeeReconciliation(unittest.TestCase):
                                  "open_orders": 0, "positions": 0})
         self.assertEqual(tuple(self.ledger.db.iterdump()), before)
 
+    def test_cash_tolerance_is_exactly_one_cent_with_and_without_fees(self):
+        for fees, cash_at_one_cent, cash_at_two_cents in ((None, "100000.01", "100000.02"),
+                                                        (measured_fees(), "99999.54", "99999.55")):
+            with self.subTest(fees=fees):
+                ledger = self.new_ledger("boundary-" + str(fees is not None))
+                self.assertTrue(runner_module.reconcile(ledger, self.snapshot(cash_at_one_cent, fees), "100000")["cash_match"])
+                with self.assertRaisesRegex(SafetyError, "^cash_mismatch_or_unmodeled_fees$"):
+                    runner_module.reconcile(ledger, self.snapshot(cash_at_two_cents, fees), "100000")
+
     def test_other_account_activity_still_fails_closed(self):
         # A dividend credit, a cash withdrawal or a cash journal beside the recorded fees stays unexplained.
         for label, cash in (("DIV", "100000.55"), ("CSW", "99899.53"), ("JNLC", "99999.00")):
@@ -583,11 +729,9 @@ class FeeReconciliation(unittest.TestCase):
         with self.assertRaises(SafetyError):
             runner_module.reconcile(self.new_ledger("dividend"), self.snapshot("100001.02", [dividend]), "100000")
 
-    def test_a_fee_the_per_trial_baseline_already_holds_must_not_reach_reconcile(self):
-        # Why the mover's fee window is its own trial's start, not the lane's started_at: trial 1 ended flat
-        # at broker cash 100000 (ledger cash_delta 0); overnight the day's three fees posted (cash 99999.53);
-        # command_paper then recomputed trial 2's baseline as preflight cash minus the ledger's cash_delta
-        # (mover_runner.py), which already holds them. Handing trial 2 those fees again double counts.
+    def test_an_unbooked_fee_absorbed_into_an_arbitrary_baseline_counts_twice(self):
+        # A caller that fixes a baseline before booking a fee already included in cash
+        # double counts it. The checkpoint avoids this by booking before computing baseline.
         baseline = format(D("99999.53") - self.ledger.accounting().cash_delta_usd, "f")
         with self.assertRaisesRegex(SafetyError, "^cash_mismatch_or_unmodeled_fees$"):
             runner_module.reconcile(self.ledger, self.snapshot("99999.53", measured_fees()), baseline)
@@ -631,11 +775,12 @@ def full_gate_result(input_sha256):
             "versions": {"pandera": "0.33.1"}, "checked_at": "2026-09-22T00:00:00+00:00"}
 
 
-class AdaptiveLaneFees(unittest.TestCase):
-    """runner.main keeps its first trial's baseline_cash (trial.json started_at), so its fee window is
-    started_at, and its next-trial cash check records the fees posted since then before comparing."""
+class AdaptiveLaneFees(FeePrivacyCapture, unittest.TestCase):
+    """runner.main keeps its first checkpoint's cash baseline and fee window; legacy
+    metadata retains started_at. The next-trial check books fees before comparing."""
 
     def setUp(self):
+        super().setUp()
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
@@ -657,7 +802,7 @@ class AdaptiveLaneFees(unittest.TestCase):
             "config_sha256": hashlib.sha256(self.config_file.read_bytes()).hexdigest(),
             "baseline_cash": "10000.47", "phase": "finished", "status": "passed"}))
 
-    def run_main(self, command, fees, cash):
+    def run_main(self, command, fees, cash, *, fee_reader=None, checkpoint=None):
         self.observation["account"]["cash"] = cash
         seen = {}
         sentinel = RuntimeError("transport_constructed")
@@ -671,6 +816,12 @@ class AdaptiveLaneFees(unittest.TestCase):
             seen["transport"] = kwargs
             raise sentinel
 
+        def fake_checkpoint(key, secret, *, after, before_request, **kwargs):
+            seen["checkpoint_after"] = after
+            for _ in range(3):
+                before_request("read")
+            return {"account": {"cash": cash}, "fees": fees}
+
         argv = ["runner.py", command, "--env-file", str(self.env_file), "--config", str(self.config_file),
                 "--output", str(self.output), "--state-root", str(self.root / "state"), "--trial", "fee-2"]
         if command == "paper":
@@ -681,10 +832,11 @@ class AdaptiveLaneFees(unittest.TestCase):
              patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
              patch.object(runner_module, "preflight", return_value=self.observation), \
              patch.object(runner_module, "account_lock_fingerprint", lambda _fingerprint: nullcontext()), \
-             patch.object(runner_module, "fee_activities", fake_fees, create=True), \
+             patch.object(runner_module, "fee_activities", fee_reader or fake_fees), \
+             patch.object(runner_module, "fee_checkpoint", checkpoint or fake_checkpoint, create=True), \
              patch.object(runner_module, "AlpacaPaperTransport", fake_transport):
             try:
-                runner_module.main()
+                seen["return_code"] = runner_module.main()
             except Exception as exc:  # noqa: BLE001 -- the sentinel says the transport was reached
                 raised = exc
         return seen, raised, sentinel
@@ -721,12 +873,101 @@ class AdaptiveLaneFees(unittest.TestCase):
                          (utc(T0), utc(T0)))
         self.assertNotIn("fee_after", seen)        # recover records fees through its own snapshots
 
+    def test_first_adaptive_trial_books_checkpoint_fees_before_fixing_baseline(self):
+        (self.state / "trial.json").unlink()
+        def checkpoint(key, secret, *, after, before_request, **kwargs):
+            for _ in range(3):
+                before_request("read")
+            return {"account": {"cash": "9999.53"}, "fees": measured_fees()}
+        seen, raised, sentinel = self.run_main("paper", measured_fees(), "10000", checkpoint=checkpoint)
+        self.assertIs(raised, sentinel, raised)
+        metadata = json.loads((self.state / "trial.json").read_text())
+        self.assertEqual(D(metadata["baseline_cash"]), D("10000"))
+        self.assertEqual(seen["transport"]["fee_history_start"], utc(metadata["fee_window_start"]))
+        ledger = self.ledger()
+        self.assertEqual(ledger.accounting().cash_delta_usd, D("-0.47"))
+        self.assertEqual(len(ledger.fees()), 3)
+        self.assertTrue(runner_module.reconcile(ledger, FeeReconciliation.snapshot("9999.53", measured_fees()),
+                                               metadata["baseline_cash"])["cash_match"])
+
+    def test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport(self):
+        path = self.state / "trial.json"
+        metadata = json.loads(path.read_text())
+        metadata["fee_window_start"] = T0 - 3600
+        path.write_text(json.dumps(metadata))
+        seen, raised, sentinel = self.run_main("paper", measured_fees(), "10000")
+        self.assertIs(raised, sentinel, raised)
+        self.assertEqual(seen["fee_after"], utc(T0 - 3600))
+        self.assertEqual(seen["transport"]["fee_history_start"], utc(T0 - 3600))
+        self.assertEqual(seen["transport"]["history_start"], utc(T0))
+        self.assertEqual(json.loads(path.read_text())["fee_window_start"], T0 - 3600)
+
+    def test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered(self):
+        path = self.state / "trial.json"
+        path.unlink()
+        for error in (t.TransportError("fee_activity_posted_during_checkpoint"),
+                      SafetyError("fee_checkpoint_budget_exhausted")):
+            with self.subTest(reason=str(error)):
+                seen, raised, _ = self.run_main("paper", [], "10000", checkpoint=Mock(side_effect=error))
+                self.assertIsNone(raised)
+                self.assertEqual(seen["return_code"], 2)
+                result = json.loads(self.output.read_text())
+                self.assertEqual((result["status"], result["stage"], result["reason"]),
+                                 ("not_started", "trial_start", str(error)))
+                self.assertNotIn("transport", seen)
+                self.assertFalse(path.exists())
+                ledger = self.ledger()
+                self.assertFalse(ledger.intents())
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM trials").fetchone()[0], 0)
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_full_next_trial_budget_prevents_the_http_read(self):
+        now = time.time()
+        ledger = self.ledger()
+        for _ in range(ledger.limits.max_rest_per_minute):
+            self.assertEqual(ledger.request_budget(now, "read"), 0)
+        with patch("requests.Session.request") as sent:
+            seen, raised, _ = self.run_main("paper", [], "10000.47", fee_reader=t.fee_activities)
+        self.assertIsInstance(raised, SafetyError)
+        sent.assert_not_called()
+        self.assertNotIn("transport", seen)
+
+    @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
+    def test_failed_next_trial_pagination_charges_every_sent_read(self):
+        page = [fee_row(i, "CAT", "-0.01") for i in range(100)]
+        with patch("requests.Session.request", side_effect=[response(page), requests.RequestException("fixture")]) as sent:
+            _, raised, _ = self.run_main("paper", [], "10000.47", fee_reader=t.fee_activities)
+        self.assertIsNotNone(raised)
+        self.assertEqual(sent.call_count, 2)
+        self.assertEqual([r[0] for r in self.ledger().db.execute("SELECT kind FROM requests")], ["read", "read"])
+
+    def test_next_trial_cash_tolerance_is_exactly_one_cent_with_and_without_fees(self):
+        path = self.state / "trial.json"
+        original = path.read_text()
+        for fees, one, two in (([], "10000.48", "10000.49"), (measured_fees(), "10000.01", "10000.02")):
+            with self.subTest(fees=len(fees)):
+                (self.state / "ledger.sqlite3").unlink(missing_ok=True)
+                path.write_text(original)
+                _, raised, sentinel = self.run_main("paper", fees, one)
+                self.assertIs(raised, sentinel, raised)
+                path.write_text(original)
+                _, raised, _ = self.run_main("paper", fees, two)
+                self.assertIsInstance(raised, SafetyError)
+                self.assertEqual(str(raised), "next_trial_cash_mismatch")
+
 
 # ---------------------------------------------------------------------------
 # Items 4 and 9: mover helpers, fee window and receipts
 # ---------------------------------------------------------------------------
 
-class MoverFeeHelpers(unittest.TestCase):
+class MoverFeeHelpers(FeePrivacyCapture, unittest.TestCase):
+    def test_checkpoint_window_is_preferred_and_invalid_values_are_refused(self):
+        self.assertEqual(mover_runner.fee_window_start({"fee_window_start": T0 - 3600,
+                                                       "current_trial_started_at": T0}), utc(T0 - 3600))
+        for value in (None, True, "1790000000", float("nan"), float("inf"), 0, -1):
+            with self.subTest(value=value), self.assertRaises(SafetyError):
+                mover_runner.fee_window_start({"fee_window_start": value, "current_trial_started_at": T0})
+
     def test_fee_receipt_counts_totals_and_sub_types_without_ids(self):
         rows = [{"activity_id": f["id"], "date": f["date"], "net_amount": D(f["net_amount"]),
                  "sub_type": f["sub_type"], "recorded_at": T0} for f in measured_fees()]
@@ -768,7 +1009,7 @@ def scan_raw(rows):
 
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
-class MoverLaneFees(unittest.TestCase):
+class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
     """``mover_runner.py paper``/``recover`` end to end with a fake preflight and the synthetic port in
     place of AlpacaPaperTransport (as test_adaptive_paper_mover_native.MoverPaperCommandWiring), plus a
     broker-side FEE list the port filters by the transport's fee window. A SYN wiring fixture."""
@@ -777,21 +1018,30 @@ class MoverLaneFees(unittest.TestCase):
     FINGERPRINT = "f" * 64
 
     def setUp(self):
+        super().setUp()
         self.broker = None
         self.sell_blocked_ports = 0
         self.windows = []            # (fee_history_start, history_start) per transport built
         self.posted = []             # (created_at epoch, raw FEE row) the broker lists
         self.post_on_port = None     # post the measured fees as this transport (1-based) is built
+        self.checkpoint_hook = None
+        self.checkpoint_override = None
+        self.after_checkpoint = None
+        self.start_cash = D("100000")
+        self.time_offset = 0
 
     def post_fees(self):
         """The broker posts the measured FEE activities now: cash falls by 0.47 and the rows are listed."""
         created = time.time()
         self.posted.extend((created, row) for row in measured_rows())
-        self.broker.cash -= D("0.47")
+        if self.broker is None:
+            self.start_cash -= D("0.47")
+        else:
+            self.broker.cash -= D("0.47")
 
     def observation(self, symbols):
         server_ns, now_ns = int(self.SERVER * 1e9), time.time_ns()
-        cash = format(self.broker.cash, "f") if self.broker is not None else "100000"
+        cash = format(self.broker.cash if self.broker is not None else self.start_cash, "f")
         positions = [] if self.broker is None else [
             {"symbol": s, "qty": format(q, "f"), "avg_entry_price": "10"} for s, q in self.broker.positions.items() if q]
         orders = [] if self.broker is None else [
@@ -817,12 +1067,13 @@ class MoverLaneFees(unittest.TestCase):
     def trial_json(self, root):
         return json.loads((Path(root) / "state" / self.FINGERPRINT / "mover" / "trial.json").read_text())
 
-    def run_command(self, root, trial, *, command="paper", config=None):
+    def run_command(self, root, trial, *, command="paper", config=None, checkpoint_seam=False):
         import signal
         import transport
         out = Path(root) / f"{trial or command}.json"
         real_load_scan, real_build_plan, real_flag = (mover_runner.load_scan, mover_runner.build_plan,
                                                       native_adapter.order_extended_hours_flag)
+        real_time = time.time
 
         def compressed_plan(settings, limits, scan, session, *, t0, **kwargs):
             timing = mover.Timing(t0, t0 + 2.0, 1.0, 1.0, t0 + 4.0, t0 + 8.0, None, 1.5)
@@ -836,6 +1087,8 @@ class MoverLaneFees(unittest.TestCase):
             if self.broker is not None:
                 port.orders, port.positions, port.cash = self.broker.orders, self.broker.positions, self.broker.cash
                 port.t0 = self.broker.t0
+            else:
+                port.cash = self.start_cash
             port.fill_sells = self.sell_blocked_ports <= 0
             self.sell_blocked_ports -= 1
             window = kwargs.get("fee_history_start")
@@ -846,14 +1099,32 @@ class MoverLaneFees(unittest.TestCase):
                 result = await listed()
                 if window is not None:
                     # The broker's `after` filter on created_at; the rows pass the real normalization.
-                    result["fees"] = [t.normalize_fee_activity(row) for created, row in self.posted
-                                      if created > window.timestamp()]
+                    result["fees"] = self.list_fees(window)
                 return result
             port.snapshot = snapshot
             self.broker = port
             if self.post_on_port == len(self.windows):
                 self.post_fees()
             return port
+
+        def fake_checkpoint(key, secret, *, after, before_request, **kwargs):
+            if self.checkpoint_hook:
+                self.checkpoint_hook(after)
+            for _ in range(3):
+                before_request("read")
+            result = {"account": self.observation([])["account"], "fees": self.list_fees(after)}
+            if self.after_checkpoint:
+                self.after_checkpoint(after)
+            return result
+
+        async def reconciled_trial(controller, plan, config, baseline_cash, **kwargs):
+            """Start/checkpoint seam: actual snapshot reconciliation without a native node."""
+            proof = mover_runner.mover_reconcile(controller.ledger, await controller.port.snapshot(), baseline_cash)
+            return {"status": "passed", "flat": True, "native_fill_events": 0, "legs": [], "reconciliation": proof}
+
+        async def reconciled_recovery(controller, metadata, config):
+            proof = mover_runner.mover_reconcile(controller.ledger, await controller.port.snapshot(), metadata["baseline_cash"])
+            return {"status": "passed", "flat": True, "errors": [], "reconciliation": proof}
 
         args = [command, "--env-file", str(Path(root) / "unused.env"), "--output", str(out),
                 "--state-root", str(Path(root) / "state")]
@@ -865,20 +1136,138 @@ class MoverLaneFees(unittest.TestCase):
         try:
             with patch.object(mover_runner, "credentials", return_value=("key", "secret")), \
                  patch.object(transport, "preflight", lambda key, secret, symbols, **kw: self.observation(symbols)), \
+                 patch.object(transport, "fee_checkpoint", self.checkpoint_override or fake_checkpoint, create=True), \
                  patch.object(transport, "AlpacaPaperTransport", fake_transport), \
                  patch.object(mover_runner, "load_scan",
                               lambda raw, settings, *, now: real_load_scan(raw, settings, now=SCAN_TIME + 20)), \
                  patch.object(mover_runner, "build_plan", compressed_plan), \
                  patch.object(mover_runner, "_controller_session", lambda close, now, policy: (now + 36000, True)), \
                  patch.object(native_adapter, "order_extended_hours_flag", lambda ts, p: real_flag(PRE_TS, p)), \
-                 patch("builtins.print"):
+                 (patch("time.time", lambda: real_time() + self.time_offset) if checkpoint_seam else nullcontext()), \
+                 (patch.object(mover_runner, "run_mover", reconciled_trial) if checkpoint_seam else nullcontext()), \
+                 (patch.object(mover_runner, "recover_mover", reconciled_recovery) if checkpoint_seam else nullcontext()):
                 code = mover_runner.main(args)
         finally:
             for sig, handler in handlers.items():
                 signal.signal(sig, handler)
         return code, json.loads(out.read_text())
 
-    def test_each_mover_transport_reads_fees_from_its_trials_own_baseline_time(self):
+    def list_fees(self, window):
+        cutoff = datetime.strptime(t.fee_after_text(window), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+        return [t.normalize_fee_activity(row) for created, row in self.posted if created > cutoff]
+
+    def test_mover_checkpoint_books_preflight_to_start_fees_before_the_baseline(self):
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            self.checkpoint_hook = lambda after: self.post_fees()
+            code, receipt = self.run_command(root, "checkpoint-1", config=config, checkpoint_seam=True)
+            self.assertEqual((code, receipt["status"], receipt["flat"]), (0, "passed", True), receipt)
+            self.assertEqual(receipt["fees_recorded"]["total_usd"], "-0.47")
+            self.assertTrue(receipt["totals"]["pnl_consistent"], receipt["totals"])
+            metadata = self.trial_json(root)
+            self.assertEqual(D(metadata["baseline_cash"]), D("100000"))
+            self.checkpoint_hook = None
+            code, result = self.run_command(root, None, command="recover", config=config, checkpoint_seam=True)
+            self.assertEqual((code, result["status"], result["flat"]), (0, "passed", True), result)
+            ledger = Ledger(Path(root) / "state" / self.FINGERPRINT / "mover" / "ledger.sqlite3",
+                            mover_runner.load_mover_config(config)[1])
+            try:
+                self.assertEqual(len(ledger.fees()), 3)
+            finally:
+                ledger.close()
+
+    def test_mover_same_second_fee_before_account_read_is_booked_once(self):
+        def post_before_fractional_start(after):
+            start = after.timestamp()
+            created = int(start) + (start - int(start)) / 2
+            self.assertLess(created, start)
+            self.posted.extend((created, row) for row in measured_rows())
+            self.start_cash -= D("0.47")
+        self.checkpoint_hook = post_before_fractional_start
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            code, receipt = self.run_command(root, "same-second", config=config, checkpoint_seam=True)
+            self.assertEqual((code, receipt["status"]), (0, "passed"), receipt)
+            self.assertEqual(receipt["fees_recorded"]["count"], 3)
+            self.assertEqual(D(self.trial_json(root)["baseline_cash"]), D("100000"))
+            code, result = self.run_command(root, None, command="recover", config=config, checkpoint_seam=True)
+            self.assertEqual((code, result["status"]), (0, "passed"), result)
+            self.assertEqual(result["fees_recorded"]["count"], 0)
+
+    def test_fee_posted_after_checkpoint_before_trial_start_remains_in_the_window(self):
+        def post_after_f2(after):
+            self.post_fees()
+            # Move the trial clock across a second so the trial-start cutoff mutant
+            # excludes these fees even after the API's whole-second formatting.
+            self.time_offset += 2
+        self.after_checkpoint = post_after_f2
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            code, receipt = self.run_command(root, "after-f2", config=config, checkpoint_seam=True)
+            self.assertEqual((code, receipt["status"]), (0, "passed"), receipt)
+            self.assertEqual(receipt["fees_recorded"]["count"], 3)
+            metadata = self.trial_json(root)
+            self.assertLess(metadata["fee_window_start"], metadata["current_trial_started_at"] - 1)
+
+    def test_checkpoint_instability_refuses_start_and_the_next_start_retries(self):
+        self.checkpoint_override = Mock(side_effect=t.TransportError("fee_activity_posted_during_checkpoint"))
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            code, receipt = self.run_command(root, "retry-1", config=config, checkpoint_seam=True)
+            self.assertEqual((code, receipt["status"], receipt["stage"], receipt["reason"]),
+                             (2, "not_started", "trial_start", "fee_activity_posted_during_checkpoint"))
+            self.assertFalse((Path(root) / "state" / self.FINGERPRINT / "mover" / "trial.json").exists())
+            self.checkpoint_override = None
+            self.assertEqual(self.run_command(root, "retry-1", config=config, checkpoint_seam=True)[0], 0)
+
+    def test_second_mover_start_reuses_the_first_checkpoint_window(self):
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            self.assertEqual(self.run_command(root, "window-1", config=config, checkpoint_seam=True)[0], 0)
+            first = self.trial_json(root)
+            self.post_fees()  # fees earlier engines absorbed into the next trial baseline
+            code, receipt = self.run_command(root, "window-2", config=config, checkpoint_seam=True)
+            self.assertEqual((code, receipt["status"]), (0, "passed"), receipt)
+            second = self.trial_json(root)
+            self.assertEqual(second["fee_window_start"], first["fee_window_start"])
+            self.assertEqual(D(second["baseline_cash"]), D(first["baseline_cash"]))
+            self.assertEqual(receipt["fees_recorded"]["count"], 3)
+            self.assertTrue(receipt["totals"]["pnl_consistent"])
+            self.assertEqual(self.windows[-1][0], utc(first["fee_window_start"]))
+
+    def test_full_mover_budget_refuses_checkpoint_before_any_http_call(self):
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            state = Path(root) / "state" / self.FINGERPRINT / "mover"
+            _, limits, _ = mover_runner.load_mover_config(config)
+            ledger = Ledger(state / "ledger.sqlite3", limits)
+            try:
+                now = time.time()
+                for _ in range(limits.max_rest_per_minute):
+                    self.assertEqual(ledger.request_budget(now, "read"), 0)
+            finally:
+                ledger.close()
+            self.checkpoint_override = getattr(t, "fee_checkpoint", None)
+            with patch("requests.Session.request") as sent:
+                code, receipt = self.run_command(root, "budget", config=config)
+            self.assertEqual((code, receipt["status"], receipt["stage"], receipt["reason"]),
+                             (2, "not_started", "trial_start", "fee_checkpoint_budget_exhausted"))
+            sent.assert_not_called()
+            self.assertFalse((state / "trial.json").exists())
+            ledger = Ledger(state / "ledger.sqlite3", limits)
+            try:
+                self.assertFalse(ledger.intents())
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM trials").fetchone()[0], 0)
+            finally:
+                ledger.close()
+
+    def test_each_mover_trial_and_recover_reuses_the_lineage_checkpoint_window(self):
         with tempfile.TemporaryDirectory() as root:
             config = self.fast_config(root)
             (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
@@ -888,11 +1277,12 @@ class MoverLaneFees(unittest.TestCase):
             second = self.trial_json(root)
             self.assertEqual(second["started_at"], first["started_at"])
             self.assertLess(first["current_trial_started_at"], second["current_trial_started_at"])
-            self.assertEqual(self.windows, [(utc(first["current_trial_started_at"]), utc(first["started_at"])),
-                                            (utc(second["current_trial_started_at"]), utc(second["started_at"]))])
+            self.assertEqual(second["fee_window_start"], first["fee_window_start"])
+            self.assertEqual(self.windows, [(utc(first["fee_window_start"]), utc(first["started_at"])),
+                                            (utc(first["fee_window_start"]), utc(second["started_at"]))])
             code, result = self.run_command(root, None, command="recover", config=config)
             self.assertEqual((code, result["status"]), (0, "passed"))
-            self.assertEqual(self.windows[-1], (utc(second["current_trial_started_at"]), utc(second["started_at"])))
+            self.assertEqual(self.windows[-1], (utc(first["fee_window_start"]), utc(second["started_at"])))
 
     def test_recover_records_fees_posted_after_the_trial_and_reports_them(self):
         # The account 2 case: the trial ends needs_attention holding a position, the day's REG/TAF/CAT
@@ -904,10 +1294,19 @@ class MoverLaneFees(unittest.TestCase):
             code, receipt = self.run_command(root, "ext-1", config=config)
             self.assertEqual((code, receipt["status"], receipt["flat"]), (3, "needs_attention", False))
             self.assertEqual(receipt["fees_recorded"], {"count": 0, "total_usd": "0", "sub_types": {}})
+            # The real residual's legacy metadata has no checkpoint window.
+            path = Path(root) / "state" / self.FINGERPRINT / "mover" / "trial.json"
+            metadata = json.loads(path.read_text())
+            metadata.pop("fee_window_start", None)
+            legacy = datetime(2026, 9, 29, 20, 25, 19, tzinfo=timezone.utc)
+            metadata["current_trial_started_at"] = legacy.timestamp()
+            path.write_text(json.dumps(metadata))
             self.post_fees()
             code, result = self.run_command(root, None, command="recover", config=config)
             self.assertEqual((code, result["kind"], result["status"], result["flat"], result["errors"]),
                              (0, "mover_recovery_receipt", "passed", True, []))
+            self.assertEqual(self.windows[-1][0], legacy)
+            self.assertEqual(t.fee_after_text(self.windows[-1][0]), "2026-09-29T20:25:19Z")
             self.assertEqual(result["fees_recorded"], {"count": 3, "total_usd": "-0.47",
                                                        "sub_types": {"CAT": {"count": 1, "total_usd": "-0.01"},
                                                                      "REG": {"count": 1, "total_usd": "-0.19"},

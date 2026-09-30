@@ -241,7 +241,7 @@ any change. `record_fees` validates every row, then inserts each new activity id
 once, in one transaction: `net_amount` is added to `cash_delta` and to realized
 P&L and `max(0, -net_amount)` to the realized loss, so a fee is a realized cost
 that counts against the gross-loss budget and a credit never lowers it; peak P&L
-and the risk halts follow as after a fill, and one `fee_recorded` event carries
+and the risk halts refresh after each newly inserted fee, as after each fill, and one `fee_recorded` event carries
 the id, date, amount and sub-type. A known id is a no-op; the same id with another
 date, amount or sub-type raises `fee_activity_changed` and records nothing from
 that batch. The open-time accounting re-derivation adds recorded fees back beside
@@ -253,33 +253,55 @@ comparison and its 0.01 USD tolerance are unchanged. Deposits, withdrawals,
 journals, dividends, interest and every other activity stay unexplained and still
 fail it.
 
-**Fee window: the instant of the ledger's cash baseline.** `runner.main` (adaptive
-lane) keeps its first trial's `baseline_cash`, read at trial.json `started_at`: its
-transport reads fees from `started_at`, and its next-trial check
-(`next_trial_cash_mismatch`) first reads the FEE activities posted since
-`started_at` (`fee_activities`, each GET charged to the durable budget as a read)
-and records them. `mover_runner.py` recomputes `baseline_cash` at every trial start
-(preflight cash minus the ledger's `cash_delta`), so a fee posted before that start
-is already inside the baseline: its paper and recover transports read fees from
-trial.json `current_trial_started_at` (`mover_runner.fee_window_start`). A
-`started_at` window there would hand each trial the fees posted overnight after
-the previous one and fail its first reconciliation.
+**Fee window: a consistent checkpoint (repair brief, 2026-09-30).** Under the
+account lock, `transport.fee_checkpoint` uses one fresh read-only client to read
+F1 (the FEE list after L), then the account, then F2 with the same filter. It
+compares id-to-normalized-row maps and refuses a start if they differ. Every GET
+is admitted synchronously through the ledger's durable read budget before sending.
+The mover uses the saved `fee_window_start` of a continuing lineage (legacy:
+`started_at`); a new lineage takes L immediately before the checkpoint. It books
+F2 before `begin_next_trial` and before taking the accounting snapshot, then
+computes `baseline_cash = checkpoint account cash - ledger cash_delta`. The
+between-trial cash observation also uses checkpoint cash. `trial.json` saves L
+as epoch seconds; every paper/recover snapshot uses its same formatted `after`
+string. The adaptive lane does this at its first trial, keeps that baseline, and
+uses L for snapshots and its synchronously admitted next-trial fee read (legacy:
+`started_at`). The old preflight account read precedes `started_at`.
+
+Assumption: a FEE activity is visible in the activity list exactly when its
+amount is in account cash. Under that assumption, every fee in F2 is in both
+checkpoint cash and ledger `cash_delta` before computing the baseline. Later
+fees after the fixed cutoff are listed and booked once by id. Fees before the
+cutoff are in cash and never listed, so the per-trial baseline neither double
+counts nor misses a fee. Alpaca's documented `after` has whole-second precision:
+formatting fractional L can include a fee from earlier within that second, which
+is also booked before baseline and deduplicated thereafter. Fees earlier engines
+absorbed into a baseline are booked at the next checkpoint; recomputing baseline
+after booking preserves cash reconciliation. Fee losses still consume the risk
+budget during recovery: a cap halt replaces `recovery_only`, while the sell-only
+restriction remains in force.
 
 **Receipts.** The mover trial receipt and the `mover_recovery_receipt` carry
 `fees_recorded` (count, total and per sub-type count and total; no activity ids).
 The trial receipt's `totals.fees_recorded_usd` joins the per-symbol P&L in
 `pnl_consistent`.
 
-**Limits.** Fees posted between mover trials are absorbed into the next trial's
-baseline and never enter the mover ledger's realized loss (as before this change).
-A fee posted between one snapshot's account read and its fee read, or between a
-preflight and the trial start, fails one cash comparison (fail closed). If paper
-cash ever reflects the intraday pending accrual the Regulatory Fees page describes
-before the FEE activity posts, reconciliation fails closed until it posts; the
-2026-09-30 measurement, a gap equal to the three posted activities, did not show
-that. The adaptive lane's fee window grows with the lane's life (more pages per
-snapshot, bounded by `max_snapshot_pages`). `tests/test_adaptive_paper_fees.py`
-covers this section with local synthetic fixtures (no broker request).
+**Limits.** A fee posted during the checkpoint refuses that start; the next
+start retries. Fees of a lineage's last day that post after its last trial are
+never booked into that lineage: cash remains consistent because the next lineage
+absorbs them into its baseline (except any included by the whole-second cutoff,
+which are booked before baseline). A fee posted between a later snapshot's
+account and fee reads can still cause a cash mismatch; reconciliation fails
+closed. Under the Regulatory Fees page's intraday-accrual hypothesis, a mover
+trial starting after an earlier trial's accrual stays blocked once the FEE posts
+inside its window, until an operator re-baselines. The 2026-09-30 measured gap
+equaled the three posted activities; that observation did not establish pending
+accrual behavior. Legacy mover metadata without `fee_window_start` keeps
+`current_trial_started_at` for recovery, including the account-2 residual's
+2026-09-29T20:25:19Z window. Legacy adaptive metadata keeps `started_at`. Both
+lineages' fee windows grow with their life (more pages per snapshot, bounded by
+`max_snapshot_pages`). `tests/test_adaptive_paper_fees.py` covers this section
+with local synthetic fixtures (no broker request).
 
 ## Leverage schedule (opt-in, `leverage-schedule-v1-20260922`)
 

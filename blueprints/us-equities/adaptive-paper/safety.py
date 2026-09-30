@@ -802,7 +802,7 @@ class Ledger:
             reason = "drawdown_cap_reached"
         elif state.gross_exposure_usd > cap:
             reason = "gross_exposure_cap_exceeded"
-        if reason and not state.halted_reason:
+        if reason and state.halted_reason in (None, "recovery_only"):
             self._set("halted_reason", reason)
             self._event("risk_halt", reason=reason)
         return self._state()
@@ -1346,10 +1346,9 @@ class Ledger:
                 for name, delta in (("cash_delta", amount), ("realized", amount),
                                     ("realized_loss", max(ZERO, -amount))):
                     self._set(name, D(self._get(name)) + delta)
+                self._refresh_risk(now)
                 self._event("fee_recorded", activity_id=activity_id, date=day, net_amount=text, sub_type=sub_type)
                 recorded.append({"id": activity_id, "date": day, "net_amount": text, "sub_type": sub_type})
-            if recorded:
-                self._refresh_risk(now)
             return recorded
 
     def request_budget(self, now, kind, client_id=None):

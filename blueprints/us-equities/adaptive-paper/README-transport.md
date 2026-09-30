@@ -84,11 +84,20 @@ UTC `YYYY-MM-DDTHH:MM:SSZ` instant) and `direction` `asc`, plus an optional
 `page_size` 1-100 and activity-id `page_token`. Another activity type, filter, page
 size or method is refused before any request. `snapshot()` lists `"fees"`, the FEE
 activities created after the transport's `fee_history_start` (default
-`history_start`; the caller passes its ledger's cash-baseline instant), normalized by
+`history_start`; new callers reuse their saved lineage checkpoint window), normalized by
 `normalize_fee_activity` to `{id, date, net_amount, sub_type}` without the
 `description` field, read after the account, bounded by `max_snapshot_pages`; a
 fee-read failure makes the snapshot incomplete. `fee_activities(...)` is the same
-read on a fresh read-only client (see README-safety.md, "Broker FEE activities"). An
+read on a fresh read-only client. `fee_checkpoint(...)` uses one fresh read-only
+client for F1/account/F2 with the same `after`, and refuses changed id-to-normalized-row
+maps as `fee_activity_posted_during_checkpoint`. Each GET is admitted synchronously
+as a durable `read` before sending. Assuming fee visibility exactly coincides with
+its inclusion in cash, callers book F2 before calculating baseline as checkpoint
+cash minus ledger cash delta, and reuse that formatted cutoff on later reads.
+Whole-second formatting can include earlier same-second fees; booking before baseline
+and deduplicating by id keeps cash consistent. A refused checkpoint leaves a start
+unentered for retry. Legacy mover recovery uses `current_trial_started_at`; legacy
+adaptive metadata uses `started_at` (see README-safety.md, "Broker FEE activities"). An
 activity id is `<timestamp>::<uuid>`; its 36-character UUID is the native trade id.
 
 ## Pre-submission order-contract boundary

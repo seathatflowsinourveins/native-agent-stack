@@ -432,9 +432,9 @@ def _activity_params(params):
 
 def fee_after_text(moment):
     """The documented UTC ``after`` value (YYYY-MM-DDTHH:MM:SSZ) for a timezone-aware instant,
-    truncated to the second: the window can open up to one second early, never late. A fee in
-    that second that a cash baseline already holds is then counted twice and fails the cash
-    check once (fail closed); it is never silently dropped."""
+    truncated to the second. The checkpoint and every subsequent fee read use this same
+    formatted cutoff. Fees from earlier within that second are booked by the checkpoint
+    before computing the cash baseline, and subsequent reads deduplicate them by id."""
     if not isinstance(moment, datetime) or moment.tzinfo is None:
         raise TransportError("timezone-aware fee window required")
     return moment.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -1025,6 +1025,35 @@ def fee_activities(api_key, secret_key, *, after, before_request, request_observ
         trading._session.close()
 
 
+def fee_checkpoint(api_key, secret_key, *, after, before_request, request_observer=None, max_pages=20):
+    """Read F1, account cash, then F2 on one fresh read-only client; refuse a changed
+    id -> normalized row map. Reuse the Alpaca account-activities endpoint and pagination
+    documented above; before_request synchronously admits each GET as a read.
+
+    Assuming a FEE activity is visible exactly when its amount is in account cash,
+    every fee in F2 is in checkpoint cash and must be booked into ledger cash_delta
+    before computing baseline = cash - cash_delta. Later fees after the fixed formatted
+    L cutoff are booked once by id; fees before that cutoff are in cash and never listed.
+    Thus the per-trial baseline neither double counts nor misses a fee. Truncation can
+    include an earlier fee in L's fractional second; it too is booked before baseline.
+    Fees earlier engines absorbed into baseline are booked at the next checkpoint and
+    baseline is recomputed afterwards, preserving cash reconciliation.
+    """
+    fee_after_text(after)
+    if type(max_pages) is not int or not 1 <= max_pages <= 100:
+        raise TransportError("bounded fee activity pages required")
+    trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True)
+    try:
+        first = _collect_fee_pages(trading, after, max_pages)
+        account = normalize_account(trading.get_account())
+        second = _collect_fee_pages(trading, after, max_pages)
+        if {row["id"]: row for row in first} != {row["id"]: row for row in second}:
+            raise TransportError("fee_activity_posted_during_checkpoint")
+        return {"account": account, "fees": second}
+    finally:
+        trading._session.close()
+
+
 def _symbols(symbols):
     result = tuple(sorted(set(symbols)))
     if not result or len(result) > 30 or any(not isinstance(s, str) or not SYMBOL.fullmatch(s) for s in result):
@@ -1145,10 +1174,8 @@ class AlpacaPaperTransport:
         self.history_start = history_start or datetime.now(timezone.utc)
         if self.history_start.tzinfo is None or not 1 <= max_snapshot_pages <= 100:
             raise TransportError("bounded snapshot with timezone-aware history start required")
-        # snapshot() lists the FEE activities created after this instant: the ledger's cash
-        # baseline, which the caller knows (runner.main: the lane's first trial, whose cash is
-        # baseline_cash; mover_runner: each trial's own start, since it recomputes baseline_cash
-        # per trial). Defaults to history_start.
+        # The caller reuses its checkpoint's fixed lineage window for every snapshot.
+        # Legacy callers keep their recorded baseline window. Defaults to history_start.
         self.fee_history_start = fee_history_start or self.history_start
         fee_after_text(self.fee_history_start)
         self.max_snapshot_pages = max_snapshot_pages
@@ -1686,8 +1713,8 @@ class AlpacaPaperTransport:
                               "avg_entry_price": decimal_string(p["avg_entry_price"])}
                              for p in self._client.get_all_positions()]
                 orders = self._pages("open") + self._pages("all", after=self.history_start)
-                # Last, after the account's cash: every listed fee is a posted activity. A fee
-                # posted between the two reads fails one cash comparison (fail closed).
+                # Last, after account cash, through the caller's fixed fee window. A fee
+                # posted between these reads can cause a cash mismatch; fail closed.
                 fees = _collect_fee_pages(self._client, self.fee_history_start, self.max_snapshot_pages)
                 return account, positions, orders, fees
             try:
