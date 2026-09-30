@@ -31,8 +31,9 @@ another layer. Paths are repository-relative and must exist.
 writes docs/decisions/<date>-skills-landscape-sweep.md for a skills sweep's RESULT.json (every layer a skills-*
 layer of catalogs/landscape/skills-lifecycle.json): the survivors per lifecycle task with their labels, the installed
 skill each would replace, invocation flags and source reviews; every refuted proposal with the reasoning of the votes
-that refuted it; the completeness critic's findings (the manifest's critic); the reopened layers; and the overturn
-conditions (each task's overturn_when and each survivor's comparison_that_would_overturn). It reads the returns and
+that refuted it; the completeness critic's findings (the manifest's critic); the reopened layers; the lost workers
+(RESULT.json lost_workers), whose layers are reported as incomplete rather than refuted; and the overturn conditions
+(each task's overturn_when and each survivor's comparison_that_would_overturn). It reads the returns and
 manifest RESULT.json names, under --repo-root, and edits no manifest: adoption/skills/manifest.json changes only
 through its own trial and decision records. An existing record is kept unless --force.
 """
@@ -241,6 +242,10 @@ def decision_record(result: dict, returns: dict, manifest: dict, catalog: dict, 
     date.fromisoformat(run_date)
     sweep_id = result.get("sweep_id")
     ids = [layer["layer_id"] for layer in layers]
+    # Workers that never returned (the usage record's incomplete children): a layer that lost one has an incomplete
+    # result, which the record must not present as a refutation. The critic belongs to every layer.
+    lost = [str(label) for label in result.get("lost_workers") or []]
+    lost_by_layer, lost_unmapped = deviation_rounds([{"child": label} for label in lost], ids)
     lines = [f"# Decision: skills landscape sweep {sweep_id} ({run_date})", "", "## Context", "",
              f"`{sweep_id}` ran the landscape sweep's skills modality over {len(layers)} lifecycle task(s) of "
              f"`{SKILLS_CATALOG}` ({', '.join(ids)}): workflow run `{result.get('workflow_run')}`, lane "
@@ -266,6 +271,11 @@ def decision_record(result: dict, returns: dict, manifest: dict, catalog: dict, 
     lines += ["", "Reopened layers (each reopen entry resets the layer's clean count):", ""]
     lines += [f"- `{layer_id}`: {entry.get('trigger')} (`{entry.get('ref')}`)" for layer_id, entry in reopened] \
         or ["- None."]
+    lines += ["", "Lost workers (they never returned, so their layers' results are incomplete, not refutations):", ""]
+    lines += [f"- `{label}`" for label in lost] or ["- None."]
+    if lost_unmapped:
+        unmapped = ", ".join("`" + str(item["child"]) + "`" for item in lost_unmapped)
+        lines.append(f"- Of these, {unmapped} name no layer of this record.")
     alternatives, decisions, overturns, reviews = [], [], [], []
     for layer in layers:
         layer_id, task = layer["layer_id"], tasks[layer["layer_id"]]
@@ -295,7 +305,19 @@ def decision_record(result: dict, returns: dict, manifest: dict, catalog: dict, 
             overturns.append(f"  - `{entry['repo']}`: {one_line(proposal.get('comparison_that_would_overturn'), 1200)}")
             if entry.get("source_review"):
                 reviews.append(f"- Source review of `{entry['repo']}`: `{entry['source_review']}`")
-        decisions += [heading, "", *(survivors or ["- No proposal survived."]), ""]
+        lost_here = [f"`{item['child']}`" for _, item in lost_by_layer.get(layer_id, [])]
+        if survivors:
+            outcome = survivors
+        elif lost_here:
+            outcome = [f"- No proposal survived, and the layer lost workers ({', '.join(lost_here)}): its result is "
+                       "incomplete, not a refutation, and its reopen entries keep it from counting as clean."]
+        elif layer.get("refuted"):
+            outcome = [f"- No proposal survived: the refuters refuted all {len(layer['refuted'])} (see Alternatives)."]
+        else:
+            outcome = ["- No proposal was made."]
+        if survivors and lost_here:
+            outcome.append(f"- The layer also lost workers ({', '.join(lost_here)}); its reopen entries record them.")
+        decisions += [heading, "", *outcome, ""]
     lines += ["", "## Alternatives", "", "Refuted proposals per lifecycle task, with the votes that refuted them:", ""]
     lines += alternatives or ["No proposal was refuted.", ""]
     lines += ["## Decision", "", "Survivors per lifecycle task:", "", *decisions]

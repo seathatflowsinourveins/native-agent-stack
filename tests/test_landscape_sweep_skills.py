@@ -1024,6 +1024,33 @@ class DecisionRecordTests(unittest.TestCase):
         patterns = sweep_common.private_content(ROOT)
         self.assertEqual(sweep_common.private_findings(text, patterns), [])
 
+    def test_lost_workers_are_reported_as_incomplete_layers_not_refutations(self):
+        result = json.loads(self.result.read_text())
+        self.assertNotIn("lost_workers", result)
+        result["layers"][1]["refuted"], result["layers"][1]["proposed"] = [], []
+        result["lost_workers"] = ["discover:skills-review", "refute-fit:skills-debug:followup", "stray-label"]
+        write_json(self.result, result)
+        self.assertEqual(self.write("--force").returncode, 0)
+        text = self.record.read_text(encoding="utf-8")
+        context, _, decision, _, _ = re.split(r"^## .*$", text, flags=re.M)[1:]
+        self.assertIn("- `discover:skills-review`", context)
+        self.assertIn("Of these, `stray-label` name no layer of this record.", context)
+        review = decision.split("### `skills-review`")[1]
+        self.assertIn("No proposal survived, and the layer lost workers (`discover:skills-review`): its result is "
+                      "incomplete, not a refutation", review)
+        self.assertNotIn("refuted all", review)
+        debug = decision.split("### `skills-debug`")[1].split("###")[0]
+        self.assertIn(A1, debug)
+        self.assertIn("The layer also lost workers (`refute-fit:skills-debug:followup`)", debug)
+        # A layer with no proposal and no lost worker says so, rather than "No proposal survived".
+        del result["lost_workers"]
+        write_json(self.result, result)
+        self.assertEqual(self.write("--force").returncode, 0)
+        context, _, decision, _, _ = re.split(r"^## .*$", self.record.read_text(encoding="utf-8"), flags=re.M)[1:]
+        self.assertIn("- No proposal was made.", decision.split("### `skills-review`")[1])
+        self.assertIn("Lost workers (they never returned, so their layers' results are incomplete, not refutations):"
+                      "\n\n- None.", context)
+
     def test_refusals(self):
         self.assertEqual(self.write().returncode, 0)
         done = self.write()
