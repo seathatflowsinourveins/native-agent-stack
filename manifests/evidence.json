@@ -7324,6 +7324,101 @@
       "bytes": 16076
     },
     {
+      "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
+      "sha256": "249e9448f3331fcca470c3af38a6a26b8a6157e018495d87cfa558f5526e6573",
+      "bytes": 267215
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
+      "sha256": "c5f25772de014b945a20b02c2e4b464d34c59f90e9f09060500600ebff0c7f55",
+      "bytes": 17143
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/gateway-ab-designs.md",
+      "sha256": "d38e9973eda2ae1c84fb2f635959a2068a4358267bb4df51586460959a0ee73b",
+      "bytes": 9207
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/memory-merit-synth.md",
+      "sha256": "89da63f6197d03384e7b716270cb04130d4b3f534dc2a88a247791d05824688f",
+      "bytes": 21124
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/r6-claude-review.md",
+      "sha256": "aac90a9b092c7a1ea38cb42c455bd00768cabc7a8696b6035001c458924a4824",
+      "bytes": 16488
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/s3-r6-inputs.md",
+      "sha256": "22389274ad57b42b4ad365a9495ab630331cc2ba4e7f76cfe9a10c3d52901e31",
+      "bytes": 5018
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/gpt6-review-20260930.md",
+      "sha256": "ce7275817f4664f9ca1c60b48cb3cb1f600bf96834fd9c247d104cf943239d00",
+      "bytes": 7868
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/landscape-foldin-gate-20260930.json",
+      "sha256": "bed16fa91e45d116d0ee968bb86b5e9c7fcd503eff820b1c0a92bc33c5a4ac65",
+      "bytes": 13895
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/landscape-memory-20260930.json",
+      "sha256": "8f877d85ea57421f1c50704b6a2f9e88b0f8e03e8f281e9f165e03b78cfd75b8",
+      "bytes": 33086
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/live-verification-20260930.json",
+      "sha256": "c02d1c506d31164891d3f1782a55993d1d5ae61f9a5c4b9c7e285aa839e24f69",
+      "bytes": 13757
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/repair1-verification-20260930.json",
+      "sha256": "e17484588948dc7150afba464d4806924bc08ae7858a726bda5ef1b70c9a2b35",
+      "bytes": 15941
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/repair2-verification-20260930.json",
+      "sha256": "f8e3514c11903a4530a74f5976a4da9dc457a2fb5267843c452428e3a24e8650",
+      "bytes": 17294
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/repair3-verification-20260930.json",
+      "sha256": "30de6af2d63e3676e669b27cec79df0ec413105484ce6977e537b76bbe878bc7",
+      "bytes": 21177
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
+      "sha256": "f483ab23aaf9f2d0c414364895b6e6e7dcd5a08f863ad708baf25567d4d39be6",
+      "bytes": 3433
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/embed.md",
+      "sha256": "a50bed303d79b3f35bb92e4a18a6f8270f8728ee1b006f83c08c332768b4014d",
+      "bytes": 22181
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/gen.md",
+      "sha256": "bbb5c6a881305868ff3e2e40dc62f87fd3083f1fb2ee12281a61f905470ba44c",
+      "bytes": 20470
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/memllm.md",
+      "sha256": "dfcee43461c567b3eaf467720bd1af2344aaa027bbdeecbfc2d81aaafdc9bfeb",
+      "bytes": 28704
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/memsys.md",
+      "sha256": "556eb2c0e26cc35835ea615a0c251edc11eb80c7f12d7f6b5ce81f5e239157de",
+      "bytes": 19813
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/rerank.md",
+      "sha256": "943368b875af6a09ddd4712da61c6cd6133835c0aa6c65522d23139d0970efd1",
+      "bytes": 23880
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -8397,6 +8492,11 @@
       "path": "blueprints/memory-stack/longmemeval/.gitignore",
       "sha256": "cf45ee658753072c0e197c98fc851f610e278ab01ed5dfb61b73e2e5854eb6ae",
       "bytes": 85
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md",
+      "sha256": "377ab0d329aa8629824cde33ec9ab7b8ffed4cbb98f588e20c5103229ce14518",
+      "bytes": 3185
     },
     {
       "path": "blueprints/memory-stack/longmemeval/PREREGISTRATION.md",
@@ -14937,6 +15037,11 @@
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
+    },
+    {
+      "path": "docs/decisions/2026-09-30-memory-s3-r7.md",
+      "sha256": "1fe95662d20072f701466b897c67cd1e6476988a945a785a849acba2e14cf4cb",
+      "bytes": 45756
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
