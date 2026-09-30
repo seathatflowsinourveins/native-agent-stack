@@ -418,7 +418,7 @@ evidence.
   its `[agents]` table sets `default_subagent_model = "gpt-6.1-sol"` with `default_subagent_reasoning_effort = "max"`
   (lines 27-28). The stack-worker profile moves to `gpt-6.1-sol` at `max` (lines 13 and 17 of
   `adoption/templates/codex.stack-worker.config.toml`), so the lane's `worker_pins`
-  (`tools/adoption/apply_codex_lane.py` lines 295-301, read from that profile) now pass `-m gpt-6.1-sol`. Lanes that
+  (`tools/adoption/apply_codex_lane.py` lines 298-304, read from that profile) now pass `-m gpt-6.1-sol`. Lanes that
   name Astra keep it: `tools/sota-convergence/landscape-sweep/codex_job.py` (`-m`, lines 455-457), the OmniRoute
   profile (`cx/gpt-6-astra` at `max`), the Codex role carriers under `adoption/agents/codex` and the Gate A runbook and
   preregistration arms, which pass `-m gpt-6-astra` explicitly. A host's own `config.toml` changes only when the
@@ -474,12 +474,24 @@ rule measures extraction only; none exists yet.
 `origin/main@f77612b6` (only a comment in `tools/sota-convergence/adjudicate.py` and a seed string in the landscape
 sweep name the model). `gpt-6.1-sol` is named by the two Codex templates, the worker command in `recipes/README.md`
 and `tools/adoption/prove_codex_lane.py`'s live-worker description; no measured run of those Sol routes is recorded
-here (the routing record lists the acceptance it still requires). `tools/adoption/apply_codex_lane.py` still pins
-`CODEX_VERSION = "0.157.1"` (line 114), so its dry run in a scratch home reports `[fail] codex version: codex-cli
-0.159.2 (pin 0.157.1)` and its apply refuses on a 0.159.2 host; moving that constant and its fixtures in
-`tests/test_codex_worker_lane.py` is a separate unit. Live 0.159.2 behaviour on this stack (role spawn through
+here (the routing record lists the acceptance it still requires). The same branch moves
+`tools/adoption/apply_codex_lane.py`'s `CODEX_VERSION` from 0.157.1 to 0.159.2 (its dry run had reported `[fail]
+codex version: codex-cli 0.159.2 (pin 0.157.1)` in a scratch home), with a test that keeps the constant equal to the
+Linux pin; the opt-in `CodexIntegrationTests` passed 10 of 10 against the 0.159.2 prefix's native binary on
+2026-09-30, with no model call. Live 0.159.2 behaviour on this stack (role spawn through
 `agent_type`, `--ignore-user-config` with role carriers, sandbox behaviour, the join proof) is covered by the Gate A
 owner's rehearsal receipts (peer rehearsal, session native-agent-stack-2d, not re-run here). `rust-v0.159.2` was
 published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that the
 [workstation refresh](2026-09-25-workstation-sota-refresh.md#socraticode-1150) applied to a release that is not a
 security fix; it moves because the Gate A owner chose 0.159.2 and the host launcher already runs it.
+
+**Follow-up: macOS needs its own 0.159.x qualification before the template default applies there.**
+`adoption/pins-macos-arm64.json` keeps Codex 0.155.1, while `adoption/templates/codex.config.template.toml` is shared
+by both platforms and names `gpt-6.1-sol` as a literal. That model entered the bundled catalog in `rust-v0.159.1` (its
+release notes), and offline `codex debug models --bundled` lists it for the Linux 0.159.2 build but not for the Linux
+0.155.1 or 0.157.1 builds (2026-09-30, in a sandbox with no network; no Mac build was run, so this is not macOS
+evidence). No per-platform model override exists today. The natural place is `tools/adoption/render_config.py`, which
+already fills two placeholders from the selected platform's pins file: `render_one` (lines 174-184) calls
+`resolve_socraticode_version` (lines 158-163), which reads `adoption/pins-<platform>.json` through `pinned_version`
+(lines 135-147) for `--platform macos-arm64`; a model placeholder resolved the same way would let a Mac render keep a
+model its pinned client knows. It is not implemented here.
