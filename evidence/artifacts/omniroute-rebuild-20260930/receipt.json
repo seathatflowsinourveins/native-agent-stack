@@ -70,6 +70,29 @@
    "codex_client_version": "0.159.1 (literal in both unit files; installed Codex is 0.157.1)"
   }
  },
+ "upstream_release_after_rebuild": {
+  "checked_utc": "2026-09-30T04:40:00Z",
+  "how": "git ls-remote and git fetch against github.com/diegosouzapw/OmniRoute (no REST call), and a read of registry.npmjs.org/omniroute",
+  "tag": {
+   "name": "v3.8.51",
+   "type": "annotated",
+   "tagger_time_utc": "2026-09-30T01:41:23Z",
+   "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+   "subject": "Release v3.8.51",
+   "author_time_utc": "2026-09-29T22:58:13Z"
+  },
+  "npm": {
+   "latest": "3.8.51",
+   "published_utc": "2026-09-30T02:54:04.736Z",
+   "previous": "3.8.50"
+  },
+  "tree_ids": {
+   "release_v3.8.51_tip_2f42a9ac1": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+   "tag_commit_c1e30b767": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+   "equal": true
+  },
+  "reading": "the running builds are the released 3.8.51 tree plus the carries; #13788 is still open upstream (title prefix [defer]); the repo's component pin is not changed by this record"
+ },
  "switch": {
   "time_utc": "2026-09-30T00:02:41Z",
   "order": [
@@ -199,7 +222,8 @@
   "Open user decisions: compression on 20128 (the user's conditional yes of 2026-09-30, relayed, is not applied: neither the headerless lane nor the gpt6-safe-lossy header lane shows a saving without lost exact values on real Codex traffic, claims C10 and C11 and the decision record); blockedProviders and noAuthFallbackDisabledProviders (not expressible in the apply contract).",
   "The 0.159.x announcement enabling gpt-6.1-sol rests on two observations (the live catalog with 0.157.1 announced and with 0.159.1 announced); max effort on gpt-6.1-sol clamps to xhigh; the live canary waits for Codex capacity; upstream e2e and integration suites were not run.",
   "The #13788 carry's credential lookup in src/app/api/v1/alpha/search/route.ts (lines 92-103: getProviderCredentialsWithQuotaPreflight for the selected search provider, used server-side for the upstream search call, the same shape as /v1/search; the carry's own test asserts auth through enforceApiKeyPolicy like /v1/search) is the site upstream's hard-lease inventory test reports as unclassified: the classification is missing from the carry, and it is not shown to be unsafe.",
-  "Two internal identifiers per plan file are shortened to eight hex characters; route and unit digests in host-readback-20260930.json are full length as printed; no credential value, host path or user name is stored here."
+  "Two internal identifiers per plan file are shortened to eight hex characters; route and unit digests in host-readback-20260930.json are full length as printed; no credential value, host path or user name is stored here.",
+  "gateway_apply.py's SECRET_GET guard (a GET body it retains only through named non-secret keep paths) covers /api/settings, /api/providers* and /api/keys*, and post_apply_checks.py also forbids /api/settings/cache-config; session 88's source read found credentials also on /api/settings/cache-config, /api/sync/* and /api/cli-tools/keys while requireLogin is false. The plans read /api/providers/<id> only through keep lists and name none of those three routes, and the owner record reads four non-secret routes; a future plan that reads more must extend the guard first. The anonymous surface itself is session 88's decision with the Gate A owner."
  ],
  "provenance": {
   "operation_scripts": "T01-T09 (00:05:57Z-00:06:17Z) ran through gateway_apply.py, plan.json and post_apply_checks.py as they stood at 00:05:53Z; those versions are NOT retained (no script digest was logged). The published scripts/*.txt and plan.json.txt are later text: a design workflow's fix stage rewrote gateway_apply.py at 00:33:23Z and edited it five times between 00:43:06Z and 00:43:19Z, rewrote post_apply_checks.py at 00:40:42Z, and edited plan.json and test_gateway_apply.py until 00:45:44Z. T10, the delta (dry run 00:43:38Z, apply 00:43:52Z), ran through that unreviewed edit of the applier 19 s and 33 s after its last write; the offline module ran on it at 00:46:17Z (20 tests, OK). plan-delta.json was built by the coordinator at 00:43:32Z from T09's step and the pi-practice session's delta-20260930-upstream-defaults.json.",

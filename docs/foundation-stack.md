@@ -214,7 +214,7 @@ For owned lifecycle, preserve the same DATA_DIR/secrets through restart. Upstrea
 
 Since 2026-09-27 the workstation's gateway pools its Codex accounts for GPT-6 lanes. The [decision record](decisions/2026-09-27-omniroute-account-pool.md) holds the reasons, the keyless loopback posture and its risk, and the overturn conditions. Its [evidence](../evidence/artifacts/omniroute-gateway-20260927/README.md) holds the 2026-09-27 build's provenance, its installed unit and the probes. Both gateways were rebuilt on 2026-09-30 ([decision](decisions/2026-09-30-omniroute-rebuild.md), [evidence](../evidence/artifacts/omniroute-rebuild-20260930/README.md)).
 
-**What runs.** Two source builds of upstream's default branch `release/v3.8.51` at [`2f42a9ac1`](https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061) (no `v3.8.51` tag exists yet):
+**What runs.** Two source builds of upstream's default branch `release/v3.8.51` at [`2f42a9ac1`](https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061) (upstream tagged `v3.8.51` later, on the same tree; see the decision record):
 - **20128**, `omniroute.service`, the shared gateway: build `ae5539a56`. It carries the open upstream PR [#13788](https://github.com/diegosouzapw/OmniRoute/pull/13788) (`/v1/alpha/search`, which Codex's standalone `web.run` calls) and the local affinity patch, which keeps a reused session pin ahead of OmniRoute's OAuth occupancy re-pick.
 - **20129**, `omniroute-fw.service`, the framework instance: build `87c4c488d`, which is `2f42a9ac1` + #13788. It has its own data directory, and a provider node inside it forwards to 20128.
 
@@ -222,7 +222,7 @@ Upstream's merged [#14886](https://github.com/diegosouzapw/OmniRoute/pull/14886)
 
 The non-upstream deltas are #13788 (both gateways) and the affinity patch (20128 only); the `lsof` shim is still on both units' `PATH` but redundant, because upstream #14812 is in the base. The [decision's deltas table](decisions/2026-09-30-omniroute-rebuild.md#non-upstream-deltas) gives each one's purpose, evidence and the upstream change that retires it. While the affinity patch runs, create no OAuth (Codex) routing combo on 20128 (its standing constraint F1; the [decision record](decisions/2026-09-30-omniroute-rebuild.md#non-upstream-deltas) gives its basis and limits).
 
-The component pin in `manifests/stack.json` stays 3.8.50 until npm publishes 3.8.51 or upstream carries #13788. Upstream already carries the fix, #14886.
+npm published 3.8.51 on 2026-09-30 (the tag's tree equals `2f42a9ac1`'s), so the pin's own condition is met; the component pin in `manifests/stack.json` is still 3.8.50, and moving it is a separate qualified change to that shared file. Upstream already carries the fix, #14886.
 
 - **Build.** Use upstream's own scripts in a clean clone at the cherry-picked head:
   1. `npm ci`;

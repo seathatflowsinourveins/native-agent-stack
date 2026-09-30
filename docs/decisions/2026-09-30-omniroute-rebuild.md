@@ -42,8 +42,8 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 
 ## Decision
 
-1. **Target.** Upstream `release/v3.8.51` tip `2f42a9ac1` (no `v3.8.51` tag exists; npm latest is 3.8.50), frozen for the
-   window. It is three commits past the first target `0e290809`: #15128 (the idempotency replay key is namespaced by the
+1. **Target.** Upstream `release/v3.8.51` tip `2f42a9ac1` (when it was chosen no `v3.8.51` tag existed and npm latest was 3.8.50;
+   both changed later that day, see item 5), frozen for the window. It is three commits past the first target `0e290809`: #15128 (the idempotency replay key is namespaced by the
    calling API key), #15145 (e2e specs) and #15147 (the pack-boot check derives its CLI token against the smoke's
    DATA_DIR). With #15147, upstream's own `check:pack-boot` runs green on both builds' tarballs (the 20129 tarball on its third attempt: see Evidence). At `0e290809` upstream's
    pack check was red on the failure #15147 fixes (seen in the scope research, not reproduced here: our first run there
@@ -84,6 +84,14 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
    combo selects it (`planResolution.ts:56-57` at 2f42a9ac1), so on 20129 the header `allow-lossy` selects the peer combo of that
    name, eleven engines including headroom, and not the ten engines of the engines map
    ([`checks/effective-plan-20260930.json`](../../evidence/artifacts/omniroute-rebuild-20260930/checks/effective-plan-20260930.json)).
+5. **Upstream released 3.8.51 after the rebuild (checked 2026-09-30, git protocol and the npm registry).** The annotated tag `v3.8.51`
+   (tagger time 2026-09-30T01:41:23Z) points at commit `c1e30b767` "Release v3.8.51" (author time 2026-09-29T22:58:13Z, parent
+   `443d66996`), and npm `omniroute@3.8.51` was published at 2026-09-30T02:54:04Z (`latest`). That commit is not a descendant of
+   `2f42a9ac1`, but **its tree is the same tree**: both are `0f58d8df20c0c2ae4336b432b3f39837119b6eed`. So the running builds are the
+   released 3.8.51 tree plus the carries, and no rebuild is needed for the tree. #13788 is still open upstream (its title now starts
+   with `[defer]`), so the carry stays; `release/v3.8.52` (`a1a2dce1a`) exists and `main` was two commits past the tag
+   (`fc5e2bccd`, Electron release fixes). The repo's component pin (`manifests/stack.json`, npm 3.8.50) is unchanged by this record: it
+   is a shared hot file, and moving it needs its own qualification and change.
 
 ### How each setting relates to upstream's shipped defaults
 
@@ -206,7 +214,8 @@ Classes are kept apart.
 
 - **Keep the `0e290809` builds** (built, installed, smoke-tested). Rejected: upstream's pack check was red on that
   commit until #15147 and #15128 was missing; three small commits were cheaper than carrying a known red.
-- **Wait for a `v3.8.51` tag.** Rejected: no date; the tip is what the gateway would be rebuilt from anyway.
+- **Wait for a `v3.8.51` tag.** Rejected: no date; the tip is what the gateway would be rebuilt from anyway (the tag came at
+  2026-09-30T01:41Z with the same tree as the tip, so waiting would have cost a day for the same code).
 - **Keep `CODEX_CLIENT_VERSION` as the installed Codex version.** Rejected for now: it hides a model released after the
   installed client; the literal is one line in the unit and reverts with one edit.
 - **Headerless `[ccr]` only** (the first plan, from our fixtures). Superseded by the user's direction to follow upstream.
@@ -278,5 +287,13 @@ Classes are kept apart.
   T10) run it for a caller that names them, with the integer and decimal re-encoding the mitigation is about. Restoring `minRows`
   16 globally, or dropping headroom from those combos, would narrow it; both are gateway writes that need the Gate A owner's
   timing (and the peers' consent for their rows), so this record does not make them.
+- **The applier's secret-route guard is narrower than the gateway's anonymous surface.** `gateway_apply.py` refuses to retain a GET body of
+  `/api/settings`, `/api/providers*` or `/api/keys*` unless the capture names the non-secret paths to keep (its `SECRET_GET` pattern),
+  and `post_apply_checks.py` forbids those three families and `/api/settings/cache-config`. Session 88's source read of both builds
+  (blob-identical to upstream `2f42a9ac1` for the 25 files it cited; nothing was called) found credentials also on
+  `/api/settings/cache-config`, `/api/sync/*` and `/api/cli-tools/keys` while `requireLogin` is false (the keyless loopback posture of
+  the 2026-09-27 record). The plans here read `/api/providers/<connection id>` only through `keep` lists of named non-secret paths,
+  and name none of the three routes 88 lists; the owner record reads four non-secret routes. A future plan that reads more must extend
+  the guard first. That surface, and what to do about it, are session 88's decision with the Gate A owner, not this record's.
 - The context-window reconciler rewrites automatic override rows without any write, so the raw overrides route digest
   drifts; the owner record uses the sorted rows without `refreshedAt`.
