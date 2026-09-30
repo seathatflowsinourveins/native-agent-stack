@@ -58,7 +58,26 @@ class ObservabilityTests(unittest.TestCase):
             cumulative = next(json.loads(f.read_text()) for f in observations
                               if json.loads(f.read_text())["usage_scope"] is not None)
             self.assertEqual(cumulative["usage_scope"], "native_thread_cumulative")
+            self.assertIsNone(cumulative["usage"])
             self.assertNotIn("thread_id", cumulative)
+
+    def test_sdk_observation_keeps_native_usage_private_and_does_not_infer_a_delta(self):
+        source = ast.parse((ROOT / "blueprints/us-equities/workers/native_worker.py").read_text())
+        helper = next(n for n in source.body if isinstance(n, ast.FunctionDef) and n.name == "write_observation")
+        scope = {"os": os, "uuid": uuid, "json": json, "Path": Path}
+        exec(compile(ast.Module(body=[helper], type_ignores=[]), "native_worker.py", "exec"), scope)
+        with tempfile.TemporaryDirectory() as directory:
+            for usage_scope in (None, "unknown", "native_thread_cumulative"):
+                with self.subTest(usage_scope=usage_scope):
+                    data = {"status": "completed", "usage_status": "reported", "usage_scope": usage_scope,
+                            "usage": {"total": {"totalTokens": 52286}, "last": {"totalTokens": 1}}}
+                    original = json.dumps(data, sort_keys=True)
+                    scope["write_observation"](Path(directory), data)
+                    self.assertEqual(json.dumps(data, sort_keys=True), original)
+            observations = [json.loads(path.read_text()) for path in Path(directory).glob("*.json")]
+            self.assertEqual(len(observations), 3)
+            self.assertTrue(all(item["usage"] is None for item in observations))
+            self.assertTrue(all(item["usage_status"] == "reported" for item in observations))
 
     def test_sdk_observation_never_replaces_existing_receipt(self):
         source = ast.parse((ROOT / "blueprints/us-equities/workers/native_worker.py").read_text())

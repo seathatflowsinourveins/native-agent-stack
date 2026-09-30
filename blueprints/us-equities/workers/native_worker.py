@@ -83,13 +83,18 @@ def process_telemetry_env(scope: str) -> dict[str, str]:
 
 
 def write_observation(directory: Path, result: dict) -> None:
-    """Atomically publish bounded SDK result metadata for the native file receiver."""
+    """Atomically publish bounded metadata, without additive token claims.
+
+    Codex rust-v0.159.2 _run.py returns ThreadTokenUsage: total accumulates across
+    the thread and last describes only the last request. Neither is a per-turn
+    delta. Preserve the native usage in the private result; without a serialized
+    preceding baseline this observation has no additive usage to publish.
+    """
     identifier = str(uuid.uuid4())
     observation = {"observation_id": identifier}
     observation.update({key: result.get(key) for key in (
         "status", "configured_model", "duration_ms", "usage_status", "usage_scope")})
-    usage = result.get("usage")
-    observation["usage"] = {"total": usage["total"]} if isinstance(usage, dict) and "total" in usage else None
+    observation["usage"] = None
     temporary = directory / (identifier + ".pending")
     final = directory / (identifier + ".json")
     fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
