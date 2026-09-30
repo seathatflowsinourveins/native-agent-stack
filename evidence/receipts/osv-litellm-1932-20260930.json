@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "record": "osv-litellm-1932-20260930",
+  "purpose": "Bounded native security relock required by the token profile CI; unchanged OpenHands source and unchanged dependency artifacts retain their dated scopes.",
+  "checked_commit": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+  "observed_utc": "2026-09-30",
+  "evidence_class": [
+    "native_command_execution",
+    "source_review",
+    "local_integration"
+  ],
+  "sources": [
+    {
+      "repository": "https://github.com/BerriAI/litellm",
+      "pin": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+      "release": "v1.93.2",
+      "advisory": "https://github.com/advisories/GHSA-3cv6-jpf6-8222",
+      "publisher_advisory": "https://github.com/BerriAI/litellm/security/advisories/GHSA-3cv6-jpf6-8222"
+    },
+    {
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "pin": "fcc102a697874d54a357e36004e02c95040dbdc0",
+      "version": "1.49.6",
+      "native_recipe": "blueprints/runtime-workers/openhands/research.md",
+      "sdk_compatible_requirement": "litellm>=1.93.0"
+    }
+  ],
+  "failed_ci": {
+    "run_id": 36787434259,
+    "job_id": 110132108747,
+    "exit_code": 1,
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "original_log_bytes": 65939,
+    "original_log_sha256": "b2f814751c7e95cb4811c2fd0b059c7ffc2ecb907961c5461cc6f1658f84c0ee",
+    "affected_package": "litellm==1.93.0",
+    "first_patched": "1.93.2",
+    "baseline_main": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+    "baseline_lock_identical": true
+  },
+  "locks": [
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "before": {
+        "bytes": 106002,
+        "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c"
+      },
+      "after": {
+        "bytes": 106257,
+        "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1"
+      },
+      "delta": "Only LiteLLM version and hashes changed: 1.93.0 to1.93.2. Every other package block and both direct SDK wheel blocks are byte-identical.",
+      "preserved_versions": {
+        "pyjwt": "2.15.0",
+        "urllib3": "2.8.0",
+        "cryptography": "50.0.0",
+        "oauthlib": "3.3.1",
+        "requests-oauthlib": "2.0.0"
+      },
+      "native_regeneration": {
+        "uv": "0.12.17",
+        "python": "3.13.15",
+        "resolved_packages": 412,
+        "baseline_lock_export_comparison_exit_codes": [
+          0,
+          0,
+          0
+        ],
+        "candidate_lock_export_comparison_exit_codes": [
+          0,
+          0,
+          0
+        ],
+        "scratch_changes": [
+          "Keep documented Linux x86_64 environment.",
+          "Set LiteLLM constraint1.93.2 and its package cutoff2026-08-10T00:00:00Z.",
+          "Preserve global seven-day rule and other package-specific cutoffs.",
+          "Retain all previous security upgrades."
+        ],
+        "commands": [
+          [
+            "rtk",
+            "proxy",
+            "env",
+            "-u",
+            "UV_NO_CONFIG",
+            "UV_CACHE_DIR=<owned-uv-cache>",
+            "uv",
+            "lock",
+            "--upgrade-package",
+            "anyio==4.14.2",
+            "--upgrade-package",
+            "click==8.5.0",
+            "--upgrade-package",
+            "pypdf==6.19.0",
+            "--upgrade-package",
+            "soupsieve==2.9.2",
+            "--upgrade-package",
+            "pyjwt==2.15.0",
+            "--upgrade-package",
+            "urllib3==2.8.0",
+            "--upgrade-package",
+            "litellm==1.93.2"
+          ],
+          [
+            "rtk",
+            "proxy",
+            "env",
+            "-u",
+            "UV_NO_CONFIG",
+            "UV_CACHE_DIR=<owned-uv-cache>",
+            "uv",
+            "export",
+            "--frozen",
+            "--format",
+            "requirements.txt",
+            "--no-header",
+            "--no-annotate",
+            "--package",
+            "openhands-tools",
+            "--no-emit-workspace",
+            "--output-file",
+            "<scratch>/fixed-export.lock"
+          ],
+          [
+            "rtk",
+            "proxy",
+            "cat",
+            "<scratch>/fixed-export.lock",
+            "<scratch>/direct-wheels.lock"
+          ],
+          [
+            "rtk",
+            "proxy",
+            "cmp",
+            "<scratch>/fixed-generated.lock",
+            "<worktree>/blueprints/runtime-workers/openhands/requirements.lock"
+          ],
+          [
+            "rtk",
+            "proxy",
+            "env",
+            "-u",
+            "UV_NO_CONFIG",
+            "UV_CACHE_DIR=<owned-uv-cache>",
+            "uv",
+            "lock",
+            "--check"
+          ]
+        ]
+      }
+    }
+  ],
+  "replacement_wheel": {
+    "filename": "litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl",
+    "sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692",
+    "python_files": 2104,
+    "hash_in_generated_lock": true,
+    "targeted_search": {
+      "contract_source": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+      "oauthlib_server_and_revocation_and_pkce_matches": 0,
+      "native_rg_exit_code": 1,
+      "meaning": "Native rg exit1 means no matches for the retained queries.",
+      "pyjwkclient_matches": 0,
+      "pyjwkset_proxy_matches": 3,
+      "pyjwk_proxy_matches": 2,
+      "jwt_imports_under_proxy": 17,
+      "limitations": "Search of Python sources only; no general absence claim for compiled code or agent-generated code."
+    },
+    "native_import_scope": {
+      "native_ast_exit": 0,
+      "stdout": {
+        "file": "ast-import-scopes-original.json",
+        "bytes": 681,
+        "sha256": "3f97ce5ebd72a46f6aa48b7c83e3056328d14a0c11c4bbf777194785b3972585"
+      },
+      "stderr": {
+        "file": "ast-import-scopes-original.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "returned": [
+        {
+          "file": "litellm/__init__.py",
+          "line": 1324,
+          "module": "proxy.proxy_cli",
+          "scope": []
+        },
+        {
+          "file": "litellm/proxy/proxy_cli.py",
+          "line": 895,
+          "module": "proxy_server",
+          "scope": [
+            "run_server"
+          ]
+        },
+        {
+          "file": "litellm/proxy/proxy_cli.py",
+          "line": 903,
+          "module": "proxy_server",
+          "scope": [
+            "run_server"
+          ]
+        },
+        {
+          "file": "litellm/proxy/proxy_cli.py",
+          "line": 917,
+          "module": "proxy_server",
+          "scope": [
+            "run_server"
+          ]
+        },
+        {
+          "file": "litellm/proxy/proxy_cli.py",
+          "line": 1219,
+          "module": "litellm.proxy.proxy_server",
+          "scope": [
+            "run_server"
+          ]
+        }
+      ],
+      "native_rg_exit": 0,
+      "stdout_native_rg": {
+        "file": "module-imports-original.stdout.txt",
+        "bytes": 5965,
+        "sha256": "132e937afe0fb9d5ea7ee28eee10c368baeeb60967ac53059ad2ff5fb906d382"
+      },
+      "stderr_native_rg": {
+        "file": "module-imports-original.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "source_query_record_count": 12
+  },
+  "osv_scanner": {
+    "version": "2.6.0",
+    "policy": ".github/osv-scanner.toml",
+    "scoped_native_scan_exit_code": 0,
+    "policy_changed": false,
+    "whole_repository_ci": "pending"
+  },
+  "carried_forward_review": {
+    "reviewed_record": "evidence/receipts/osv-urllib3-next-20260930.json",
+    "earlier_contract": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+    "advisories": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "expiry": "2026-10-13",
+    "status": "accepted_bounded_source_review",
+    "unchanged_artifacts_reused": true,
+    "scope": "Retain the original OAuthlib static reachability boundaries and OAuthlib upgrade follow-up; replace the reviewed LiteLLM artifact with its hash-verified source check."
+  },
+  "independent_review": {
+    "model_role": "Astra/max source verifier",
+    "trigger": "Replacing an artifact invalidates part of the hash-bound OAuthlib exception review.",
+    "status": "accepted",
+    "counterexamples": [],
+    "new_wheel_python_files_exact_match": 2104,
+    "pinned_sdk_python_files_exact_match": 1341,
+    "independently_replayed_queries": 12,
+    "original_query_log_hashes_all_match": true,
+    "scope": "Source artifact and existing two-advisory exception replacement only; no compiled binary, provider or runtime acceptance."
+  },
+  "failures_and_corrections": [
+    {
+      "stage": "pure-wheel-selection",
+      "status": "failed",
+      "reason": "Assumed py3-none-any wheel absent in official release metadata; selector returned undefined before any fetch",
+      "original_context_tool_exit": 1
+    },
+    {
+      "stage": "premature-native-wheel-extraction",
+      "status": "failed",
+      "native_command": "rtk proxy python3 -m zipfile -e <absent-assumed-pure-wheel> <owned-source-directory>",
+      "native_exit": 1,
+      "reason": "FileNotFoundError after failed selector",
+      "raw_log_hash": null,
+      "provider_usage": "not_applicable"
+    },
+    {
+      "stage": "scanner-PATH-prerequisite",
+      "command": "rtk proxy osv-scanner --version",
+      "native_proxy_exit": 1,
+      "scanner_executed": false,
+      "reason": "osv-scanner absent from PATH; resolved using exact CI-pinned private binary",
+      "raw_log_hash": null
+    },
+    {
+      "stage": "scanner-PATH-prerequisite",
+      "command": "rtk proxy osv-scanner scan source --help",
+      "native_proxy_exit": 1,
+      "scanner_executed": false,
+      "reason": "osv-scanner absent from PATH; resolved using exact CI-pinned private binary",
+      "raw_log_hash": null
+    }
+  ],
+  "limitations": [
+    "Recipe venv security relock only. No image compiled-server binary update, provider run or model trial is claimed.",
+    "Upstream source, native resolver/OSV commands and local integration/source searches are distinct evidence levels.",
+    "Policy-filtered OSV exit0 alone is not OAuthlib reachability acceptance.",
+    "Original command returns and wheel stay in owned private state; compact sanitized evidence is public."
+  ],
+  "native_proof": {
+    "path": "evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json",
+    "bytes": 22849,
+    "sha256": "1275e6c495088a1b6b1b2c2dbf7fc0bb5f0c05622feab8c09de5d7f8939f91a3",
+    "scope": "Sanitized exact native argv and returned exit/log hashes; owned temporary paths are placeholders. Original returns retained privately."
+  },
+  "native_command_count": 10,
+  "local_integration_returns": {
+    "security_policy_unittest": {
+      "command": "python3 -m unittest tests.test_osv_lockfile_coverage",
+      "exit_code": 0,
+      "tests": 38
+    },
+    "convergence_registry": {
+      "command": "python3 scripts/validate_convergence.py --all-recorded",
+      "exit_code": 0,
+      "records": 26
+    },
+    "publication_integrity": {
+      "first_exit_code": 1,
+      "first_failure": [
+        "blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch",
+        "blueprints/runtime-workers/openhands/requirements.lock: byte count mismatch"
+      ],
+      "cause": "Changed-file registration relative to HEAD omitted the already cherry-picked lock.",
+      "correction": "Register exact independent-verified candidate SHA256 and106257byte length.",
+      "corrected_exit_code": 0
+    },
+    "guide_build": {
+      "command": "python3 scripts/build_ecosystem.py --write",
+      "exit_code": 0
+    },
+    "scope": "Local repository integration checks; not unchanged upstream, image, provider or model acceptance."
+  }
+}

@@ -1,0 +1,795 @@
+{
+  "observed_date": "2026-09-30",
+  "base_head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+  "evidence_class": "Native upstream uv resolver/export plus scoped native OSV scan; source-query integration observation",
+  "source": {
+    "sdk": {
+      "repository": "OpenHands/software-agent-sdk",
+      "revision": "fcc102a697874d54a357e36004e02c95040dbdc0",
+      "archive": {
+        "file": "source.tar.gz",
+        "bytes": 4073311,
+        "sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8"
+      }
+    },
+    "advisory": "https://github.com/advisories/GHSA-3cv6-jpf6-8222",
+    "litellm_source": "https://github.com/BerriAI/litellm/tree/cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+    "pypi_metadata": {
+      "file": "litellm-1.93.2-pypi.json",
+      "bytes": 72340,
+      "sha256": "819d3bd8d22fc404a9ad0bcf83568917de56c9e7767e678a3c3f2594d37a459d"
+    },
+    "native_generation_reference": "blueprints/runtime-workers/openhands/research.md:421-426",
+    "search_reference": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json locks[openhands].targeted_search/full_lock_sweep"
+  },
+  "versions": {
+    "uv": "0.12.17",
+    "python": "3.13.15",
+    "osv_scanner": "2.6.0"
+  },
+  "scratch_edits": {
+    "environments": [
+      "sys_platform == 'linux' and platform_machine == 'x86_64'"
+    ],
+    "root_litellm_constraint": {
+      "before": "1.93.0",
+      "after": "1.93.2"
+    },
+    "only_litellm_package_cutoff": {
+      "before": "2026-07-20T00:00:00Z",
+      "after": "2026-08-10T00:00:00Z"
+    },
+    "global_guardrail": "7 days (preserved)",
+    "lmnr_cutoff": "2026-08-23T00:00:00Z (preserved)"
+  },
+  "lock_delta": {
+    "changed_packages": [
+      "litellm"
+    ],
+    "old": {
+      "bytes": 106002,
+      "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c"
+    },
+    "fixed": {
+      "bytes": 106257,
+      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1"
+    },
+    "fixed_litellm_hashes": 7,
+    "preserved": [
+      "pyjwt==2.15.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \\",
+      "urllib3==2.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \\",
+      "cryptography==50.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \\"
+    ],
+    "uv_lock_log": "Using CPython 3.13.15\nResolved 412 packages in 269ms\nUpdated litellm v1.93.0 -> v1.93.2"
+  },
+  "native_commands": [
+    {
+      "stage": "baseline-lock",
+      "cwd": "<pinned-sdk-scratch>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "-u",
+        "UV_NO_CONFIG",
+        "UV_CACHE_DIR=<owned-uv-cache>",
+        "uv",
+        "lock",
+        "--upgrade-package",
+        "anyio==4.14.2",
+        "--upgrade-package",
+        "click==8.5.0",
+        "--upgrade-package",
+        "pypdf==6.19.0",
+        "--upgrade-package",
+        "soupsieve==2.9.2",
+        "--upgrade-package",
+        "pyjwt==2.15.0",
+        "--upgrade-package",
+        "urllib3==2.8.0"
+      ],
+      "exit": 0,
+      "combined_log": {
+        "file": "baseline-uv-lock.log",
+        "bytes": 461,
+        "sha256": "8869eb03042740c62dc9f41cc927596ca8ab3a2ced278173cb69739087179b6b"
+      }
+    },
+    {
+      "stage": "baseline-export",
+      "cwd": "<pinned-sdk-scratch>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "-u",
+        "UV_NO_CONFIG",
+        "UV_CACHE_DIR=<owned-uv-cache>",
+        "uv",
+        "export",
+        "--frozen",
+        "--format",
+        "requirements.txt",
+        "--no-header",
+        "--no-annotate",
+        "--package",
+        "openhands-tools",
+        "--no-emit-workspace",
+        "--output-file",
+        "<scratch>/baseline-export.lock"
+      ],
+      "exit": 0,
+      "combined_log": {
+        "file": "baseline-uv-export.log",
+        "bytes": 105506,
+        "sha256": "8731b2a2ec4b94b5ffbe6aa4b445e57691e693915f44e52a21d39e122cb21050"
+      }
+    },
+    {
+      "stage": "baseline-wheel-append",
+      "argv": [
+        "rtk",
+        "proxy",
+        "cat",
+        "<scratch>/baseline-export.lock",
+        "<scratch>/direct-wheels.lock"
+      ],
+      "redirect_stdout": "<scratch>/baseline-reconstructed.lock",
+      "exit": 0,
+      "output": {
+        "file": "baseline-reconstructed.lock",
+        "bytes": 106002,
+        "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c"
+      }
+    },
+    {
+      "stage": "baseline-compare",
+      "argv": [
+        "rtk",
+        "proxy",
+        "cmp",
+        "<scratch>/baseline-reconstructed.lock",
+        "<worktree>/blueprints/runtime-workers/openhands/requirements.lock"
+      ],
+      "exit": 0,
+      "observed_tool_output": "",
+      "raw_log_hash": null
+    },
+    {
+      "stage": "fixed-lock",
+      "cwd": "<pinned-sdk-scratch>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "-u",
+        "UV_NO_CONFIG",
+        "UV_CACHE_DIR=<owned-uv-cache>",
+        "uv",
+        "lock",
+        "--upgrade-package",
+        "anyio==4.14.2",
+        "--upgrade-package",
+        "click==8.5.0",
+        "--upgrade-package",
+        "pypdf==6.19.0",
+        "--upgrade-package",
+        "soupsieve==2.9.2",
+        "--upgrade-package",
+        "pyjwt==2.15.0",
+        "--upgrade-package",
+        "urllib3==2.8.0",
+        "--upgrade-package",
+        "litellm==1.93.2"
+      ],
+      "exit": 0,
+      "combined_log": {
+        "file": "fixed-uv-lock.log",
+        "bytes": 88,
+        "sha256": "fe0d589407e44ef8d18957b6d26d6d614561a596b77c11900f5e8b53d5900c19"
+      }
+    },
+    {
+      "stage": "fixed-export",
+      "cwd": "<pinned-sdk-scratch>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "-u",
+        "UV_NO_CONFIG",
+        "UV_CACHE_DIR=<owned-uv-cache>",
+        "uv",
+        "export",
+        "--frozen",
+        "--format",
+        "requirements.txt",
+        "--no-header",
+        "--no-annotate",
+        "--package",
+        "openhands-tools",
+        "--no-emit-workspace",
+        "--output-file",
+        "<scratch>/fixed-export.lock"
+      ],
+      "exit": 0,
+      "combined_log": {
+        "file": "fixed-uv-export.log",
+        "bytes": 105761,
+        "sha256": "bbb6c7feccc638dd70c4dd665d86d377f6a6c8a9b3db5d5fa9dd1661968dce77"
+      }
+    },
+    {
+      "stage": "fixed-wheel-append",
+      "argv": [
+        "rtk",
+        "proxy",
+        "cat",
+        "<scratch>/fixed-export.lock",
+        "<scratch>/direct-wheels.lock"
+      ],
+      "redirect_stdout": "<scratch>/fixed-generated.lock",
+      "exit": 0,
+      "output": {
+        "file": "fixed-generated.lock",
+        "bytes": 106257,
+        "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1"
+      }
+    },
+    {
+      "stage": "fixed-owned-compare",
+      "argv": [
+        "rtk",
+        "proxy",
+        "cmp",
+        "<scratch>/fixed-generated.lock",
+        "<worktree>/blueprints/runtime-workers/openhands/requirements.lock"
+      ],
+      "exit": 0,
+      "observed_tool_output": "",
+      "raw_log_hash": null
+    },
+    {
+      "stage": "fixed-native-check",
+      "cwd": "<pinned-sdk-scratch>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "env",
+        "-u",
+        "UV_NO_CONFIG",
+        "UV_CACHE_DIR=<owned-uv-cache>",
+        "uv",
+        "lock",
+        "--check"
+      ],
+      "exit": 0,
+      "combined_log": {
+        "file": "fixed-uv-lock-check.log",
+        "bytes": 51,
+        "sha256": "8c8ee36b9738ce514d502eeae61f34b26ae98e8003c53375123b67ba91db0771"
+      }
+    },
+    {
+      "stage": "osv",
+      "cwd": "<worktree>",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<ci-pinned-osv-scanner>",
+        "scan",
+        "source",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--config=.github/osv-scanner.toml",
+        "--format=json"
+      ],
+      "exit": 0,
+      "stdout": {
+        "file": "osv-fixed-original.json",
+        "bytes": 124,
+        "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+      },
+      "stderr": {
+        "file": "osv-fixed-original.stderr",
+        "bytes": 3720,
+        "sha256": "72fda1000f4c7f1f8d2e55181bc9adefd33e093ff2655e324e3613d326911e2b"
+      }
+    }
+  ],
+  "wheel": {
+    "filename": "litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl",
+    "url": "https://files.pythonhosted.org/packages/98/60/cb326e1094f7042f28f9e21543d9f367a8aa25af6915bf4253b77da5c2a2/litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl",
+    "sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692",
+    "bytes": 20158336,
+    "native_fetch_exit": 0,
+    "official_pypi_sha_matches": true,
+    "hash_listed_in_fixed_lock": true
+  },
+  "source_query_records": [
+    {
+      "name": "oauthlib",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\boauthlib\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-oauthlib.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-oauthlib.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "enable_jsonp",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\benable_jsonp\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-enable_jsonp.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-enable_jsonp.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "create_revocation_response",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bcreate_revocation_response\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-create_revocation_response.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-create_revocation_response.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "oauthlib_servers",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "oauthlib.*(WebApplicationServer|MobileApplicationServer|LegacyApplicationServer|BackendApplicationServer|Server)|oauthlib\\.oauth2\\.rfc6749\\.(endpoints|grant_types)|oauthlib\\.openid",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-oauthlib_servers.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-oauthlib_servers.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "pkce_comparison_functions",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\b(code_challenge_method_plain|code_challenge_method_s256)\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-pkce_comparison_functions.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-pkce_comparison_functions.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "RevocationEndpoint",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bRevocationEndpoint\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-RevocationEndpoint.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-RevocationEndpoint.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "AuthorizationCodeGrant",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bAuthorizationCodeGrant\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-AuthorizationCodeGrant.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-AuthorizationCodeGrant.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "validate_code_challenge",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bvalidate_code_challenge\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-validate_code_challenge.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-validate_code_challenge.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "PyJWKSet",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bPyJWKSet\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 0,
+      "matched_lines": 3,
+      "locations": [
+        "./litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:419",
+        "./litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:420",
+        "./litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:423"
+      ],
+      "stdout": {
+        "file": "search-PyJWKSet.stdout.txt",
+        "bytes": 416,
+        "sha256": "c167a67f9e5deabefa0b29c5b6e5c64ff9d1199d5eb5aa3d9558d431ae0cac3d"
+      },
+      "stderr": {
+        "file": "search-PyJWKSet.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "PyJWKClient",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bPyJWKClient\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 1,
+      "matched_lines": 0,
+      "locations": [],
+      "stdout": {
+        "file": "search-PyJWKClient.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "file": "search-PyJWKClient.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "PyJWK",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\bPyJWK\\b",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 0,
+      "matched_lines": 2,
+      "locations": [
+        "./litellm/proxy/auth/handle_jwt.py:22",
+        "./litellm/proxy/auth/handle_jwt.py:941"
+      ],
+      "stdout": {
+        "file": "search-PyJWK.stdout.txt",
+        "bytes": 210,
+        "sha256": "c2291802c65ba7f77c1220840b49562eb3d140393cc498afc82a82cb32853a9d"
+      },
+      "stderr": {
+        "file": "search-PyJWK.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "jwt_import",
+      "argv": [
+        "rtk",
+        "proxy",
+        "rg",
+        "-n",
+        "--hidden",
+        "--no-ignore",
+        "--glob",
+        "*.py",
+        "\\b(from\\s+jwt(\\.[A-Za-z0-9_.]+)?\\s+import|import\\s+jwt\\b)",
+        "."
+      ],
+      "cwd": "<verified-new-wheel>",
+      "native_exit": 0,
+      "matched_lines": 17,
+      "locations": [
+        "./litellm/proxy/management_endpoints/mcp_management_endpoints.py:1505",
+        "./litellm/proxy/management_endpoints/ui_sso.py:38",
+        "./litellm/proxy/management_endpoints/ui_sso.py:763",
+        "./litellm/proxy/management_endpoints/ui_sso.py:3055",
+        "./litellm/proxy/management_endpoints/ui_sso.py:3911",
+        "./litellm/proxy/proxy_server.py:13267",
+        "./litellm/proxy/proxy_server.py:13313",
+        "./litellm/proxy/proxy_server.py:13392",
+        "./litellm/proxy/proxy_server.py:13559",
+        "./litellm/proxy/proxy_server.py:13621",
+        "./litellm/proxy/proxy_server.py:13678",
+        "./litellm/proxy/_experimental/mcp_server/byok_oauth_endpoints.py:24",
+        "./litellm/proxy/auth/handle_jwt.py:17",
+        "./litellm/proxy/auth/handle_jwt.py:22",
+        "./litellm/proxy/_experimental/mcp_server/outbound_credentials/envelope.py:41",
+        "./litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:78",
+        "./litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:420"
+      ],
+      "stdout": {
+        "file": "search-jwt_import.stdout.txt",
+        "bytes": 1187,
+        "sha256": "da7f6c5dd40ae5c70895f91034bbee67611f9539883648253fe3d39f3f30caa6"
+      },
+      "stderr": {
+        "file": "search-jwt_import.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_scope": {
+    "py_files": 2104,
+    "enumeration_exit": 0,
+    "enumeration_log": {
+      "file": "wheel-python-files.txt",
+      "bytes": 107122,
+      "sha256": "27701f655f6980d523f9b3b2bf79fab759b722a834c7064140fe817f9c98980b"
+    },
+    "jwt_import_lines_all_under_proxy": true,
+    "delta": "Only changed LiteLLM artifact rescanned; all unchanged requirement blocks retained byte-for-byte",
+    "not_binary_or_provider_runtime_acceptance": true
+  },
+  "import_scopes": {
+    "native_ast_exit": 0,
+    "stdout": {
+      "file": "ast-import-scopes-original.json",
+      "bytes": 681,
+      "sha256": "3f97ce5ebd72a46f6aa48b7c83e3056328d14a0c11c4bbf777194785b3972585"
+    },
+    "stderr": {
+      "file": "ast-import-scopes-original.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "returned": [
+      {
+        "file": "litellm/__init__.py",
+        "line": 1324,
+        "module": "proxy.proxy_cli",
+        "scope": []
+      },
+      {
+        "file": "litellm/proxy/proxy_cli.py",
+        "line": 895,
+        "module": "proxy_server",
+        "scope": [
+          "run_server"
+        ]
+      },
+      {
+        "file": "litellm/proxy/proxy_cli.py",
+        "line": 903,
+        "module": "proxy_server",
+        "scope": [
+          "run_server"
+        ]
+      },
+      {
+        "file": "litellm/proxy/proxy_cli.py",
+        "line": 917,
+        "module": "proxy_server",
+        "scope": [
+          "run_server"
+        ]
+      },
+      {
+        "file": "litellm/proxy/proxy_cli.py",
+        "line": 1219,
+        "module": "litellm.proxy.proxy_server",
+        "scope": [
+          "run_server"
+        ]
+      }
+    ],
+    "native_rg_exit": 0,
+    "stdout_native_rg": {
+      "file": "module-imports-original.stdout.txt",
+      "bytes": 5965,
+      "sha256": "132e937afe0fb9d5ea7ee28eee10c368baeeb60967ac53059ad2ff5fb906d382"
+    },
+    "stderr_native_rg": {
+      "file": "module-imports-original.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "failed_attempts": [
+    {
+      "stage": "pure-wheel-selection",
+      "status": "failed",
+      "reason": "Assumed py3-none-any wheel absent in official release metadata; selector returned undefined before any fetch",
+      "original_context_tool_exit": 1
+    },
+    {
+      "stage": "premature-native-wheel-extraction",
+      "status": "failed",
+      "native_command": "rtk proxy python3 -m zipfile -e <absent-assumed-pure-wheel> <owned-source-directory>",
+      "native_exit": 1,
+      "reason": "FileNotFoundError after failed selector",
+      "raw_log_hash": null,
+      "provider_usage": "not_applicable"
+    },
+    {
+      "stage": "scanner-PATH-prerequisite",
+      "command": "rtk proxy osv-scanner --version",
+      "native_proxy_exit": 1,
+      "scanner_executed": false,
+      "reason": "osv-scanner absent from PATH; resolved using exact CI-pinned private binary",
+      "raw_log_hash": null
+    },
+    {
+      "stage": "scanner-PATH-prerequisite",
+      "command": "rtk proxy osv-scanner scan source --help",
+      "native_proxy_exit": 1,
+      "scanner_executed": false,
+      "reason": "osv-scanner absent from PATH; resolved using exact CI-pinned private binary",
+      "raw_log_hash": null
+    }
+  ],
+  "worker_provider_usage": null,
+  "native_model_invocations": 0,
+  "command_normalization": "Only owned filesystem paths replaced with declared placeholders; package args/order and native exit codes retained."
+}

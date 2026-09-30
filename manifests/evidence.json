@@ -9048,8 +9048,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "37fdb5e555d96af47d8bf463cd2eae384ed955fa0b7c81c7e56506fc5fa7a546",
+      "bytes": 72598
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9403,7 +9403,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "67e2c4a77526fa85c217fbeb35dfadd2fea0726381a88ac9dea5d3389b1dcb97",
+      "sha256": "36f9ab6c1b901621d685b6721b789dcbcc3cc0ce4526f9c997772c371cf24464",
       "bytes": 4460
     },
     {
@@ -9423,13 +9423,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
-      "bytes": 106002
+      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+      "bytes": 106257
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "6d153ff1b738202e93534ddc9fb9626801985ff0dfb338d96a8458ca6ef797d5",
-      "bytes": 69880
+      "sha256": "7b4cf9ff895a1993615bb5f4fc5232702411c4b3b87d94deed8897137c3a8ba0",
+      "bytes": 72118
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -42593,8 +42593,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
-      "sha256": "1d8987838b0a5ca8f3f63ea9d2652e0de0c7b56e108560e4360f917ab7d81176",
-      "bytes": 13317
+      "sha256": "82958006af277f69d28f9c69f9c7e8cba03502dee18bc087e99382de3ff5b48f",
+      "bytes": 17044
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
@@ -42610,6 +42610,11 @@
       "path": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
       "sha256": "33677a8a7e8cee504df5c64380d3a30bcefa35e6b8847f636d15fa6ffdc8530d",
       "bytes": 15176
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/final-lifetime-refresh.json",
+      "sha256": "60c38eedef2ec800dec6ed2b3454196c96258109a577eae9524fbdb0df6609b3",
+      "bytes": 2122
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/independent-verification.json",
@@ -42640,6 +42645,11 @@
       "path": "evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/receipt.json",
       "sha256": "3ef752b071595e49351e4e2e33001c6a92fda7126dd73feb2019b39ab8d72092",
       "bytes": 729601
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json",
+      "sha256": "1275e6c495088a1b6b1b2c2dbf7fc0bb5f0c05622feab8c09de5d7f8939f91a3",
+      "bytes": 22849
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/README.md",
@@ -44822,6 +44832,11 @@
       "bytes": 16128
     },
     {
+      "path": "evidence/receipts/osv-litellm-1932-20260930.json",
+      "sha256": "be20d59cf08931f60cfd7c1778ac7860280fdad24cc0e41988df3e6df3f9b307",
+      "bytes": 11853
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -46623,8 +46638,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "8fd006726513cb591801c0e0878cd87de593c05996c76f09ecbde1f2eb87131a",
-      "bytes": 46292
+      "sha256": "3e617fd767f97051f843337aa6508a6ea6fbf64bb67e1e8d08e4ec6372c51071",
+      "bytes": 46293
     },
     {
       "path": "tests/test_path_safety.py",

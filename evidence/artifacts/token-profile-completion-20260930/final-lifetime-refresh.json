@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "kind": "native_lifetime_refresh_observation",
+  "date": "2026-09-30",
+  "evidence_class": "native_command_execution_and_native_retained_counter_observation",
+  "report_generated_at": "2026-09-30T22:52:12.097813+00:00",
+  "report_manifest_sha256": "352abb6a330a364ff61d803ddba6c9452578d64e17dce0911d6912a7aa4f34d3",
+  "html_sha256": "f1cc650d64b6315afb944610e66bfa3a3f18b46042d3f3ed1c3fc2035b5ef143",
+  "native_service": {
+    "command": "systemctl --user show token-report-refresh.service --property=Result --property=ExecMainStatus --property=ExecMainExitTimestamp",
+    "exit_code": 0,
+    "stdout": "Result=success\nExecMainExitTimestamp=Wed 2026-09-30 18:52:13 EDT\nExecMainStatus=0\n"
+  },
+  "native_timer": {
+    "command": "systemctl --user is-active token-report-refresh.timer",
+    "exit_code": 0,
+    "stdout": "active\n"
+  },
+  "issue_count": 0,
+  "retained_exact_artifact_comparisons": 25,
+  "counter_snapshots": [
+    {
+      "tool": "context-mode",
+      "scope": "Claude Code (Context Mode plugin)",
+      "native_estimated_saved": 12898560
+    },
+    {
+      "tool": "context-mode",
+      "scope": "Codex (Context Mode plugin)",
+      "native_estimated_saved": 25472256
+    },
+    {
+      "tool": "headroom",
+      "scope": "Native / last 30 days",
+      "native_estimated_saved": 579852
+    },
+    {
+      "tool": "jcodemunch",
+      "scope": "Linux / upstream default index",
+      "native_estimated_saved": 10497245
+    },
+    {
+      "tool": "rtk",
+      "scope": "Native / all retained projects",
+      "native_estimated_saved": 83275349
+    },
+    {
+      "tool": "rtk",
+      "scope": "Native / project",
+      "native_estimated_saved": 55255271
+    }
+  ],
+  "limits": [
+    "Separate native estimates and artifact scopes; snapshots and overlapping project subsets are never summed.",
+    "Context Mode events times256 and byte estimates are not provider billing. Headroom retains a30day window.",
+    "Exact full-host lifetime provider tokens and dollars saved remain unknown.",
+    "Private report and original native counter history stay outside this checkout."
+  ]
+}

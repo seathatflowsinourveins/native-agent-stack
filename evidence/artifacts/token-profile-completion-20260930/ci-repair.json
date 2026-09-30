@@ -297,6 +297,83 @@
         "bytes": 79170
       }
     ],
-    "full_corrected_ci": "pending"
+    "full_corrected_ci": "passed on bbb4b3eb; later baseline dependency relock remains separate"
+  },
+  "full_corrected_linux_ci": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787697051,
+    "job_id": 110133164535,
+    "conclusion": "success",
+    "native_gh_log_fetch_exit_code": 0,
+    "tests": 8816,
+    "skipped": 806,
+    "duration_seconds": 1308.254,
+    "original_log_bytes": 399318,
+    "original_log_sha256": "8c76100ad196f623270f6f9dc45796c0fb99b32800237f64f8f01941f9ccfd7a",
+    "evidence_class": "Native CI execution of repository integration and validation tests; not live provider or GPU qualification."
+  },
+  "subsequent_native_tool_ci": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434133,
+    "job_id": 110132108170,
+    "conclusion": "success",
+    "commands": 259,
+    "checks": 82,
+    "failures": [],
+    "receipt_bytes": 729624,
+    "receipt_sha256": "f730d5dcc9f199f9e89ce8b636868089d8a1e1ff5604d71615774e16cf47d9df",
+    "artifact_id": 11130208006,
+    "artifact_digest": "sha256:3043166b9a2a58082c0f4ae4ef0857dacf0bf3928e05a3014d1fbb487f0f97ee",
+    "owned_temporary_files_gone": true,
+    "original_job_log_bytes": 64340,
+    "original_job_log_sha256": "4218be538d5c0aca0ed36ca013531dc4effd0b11a59670de90f75b707d614f16",
+    "native_gh_download_exit_code": 0,
+    "scope": "Native installed-tool fixture E2E; no provider/model execution. Complete unchanged earlier native receipt remains public with matching17sourceinputs."
+  },
+  "baseline_dependency_gate": {
+    "receipt": "evidence/receipts/osv-litellm-1932-20260930.json",
+    "finding": "GHSA-3cv6-jpf6-8222",
+    "scope": "Unchanged main-branch OpenHands runtime lock; bounded native1.93.2 relock and hash-bound exception source revalidation are separate from token-profile native/model acceptance.",
+    "independent_review": "accepted bounded source exception replacement; all12 queries replayed and new2104Python wheel plus1341SDK files exact"
+  },
+  "latest_lifetime_refresh": "evidence/artifacts/token-profile-completion-20260930/final-lifetime-refresh.json",
+  "corrected_macos_validation": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434204,
+    "job_id": 110132144196,
+    "conclusion": "success",
+    "native_gh_log_fetch_exit_code": 0,
+    "tests": 489,
+    "skipped": 29,
+    "duration_seconds": 155.412,
+    "original_log_bytes": 265439,
+    "original_log_sha256": "77ccbaa64e9b58b4a311a42edec797a1362ec30e8421c8867d193cd18b4876e0",
+    "scope": "Actual returned macOS selected test suite count; distinct from Linux8816 and native client/provider acceptance."
+  },
+  "corrected_macos_bootstrap": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434204,
+    "native": {
+      "job_id": 110132265095,
+      "conclusion": "success",
+      "original_log_bytes": 173293,
+      "original_log_sha256": "2a3a04fb9b71540b47ca06c7c6ddf19b6992b21c1b373f71fb050542146a77fc"
+    },
+    "brew": {
+      "job_id": 110132265070,
+      "conclusion": "success",
+      "original_log_bytes": 157290,
+      "original_log_sha256": "7551ee68582c7e218e4066dbe19bb14315f9febbc0bdb772d1db45b1e9089e55"
+    },
+    "native_gh_log_fetch_exit_codes": [
+      0,
+      0
+    ],
+    "scope": "Hosted bootstrap operations; not fresh Mac12component/model qualification."
+  },
+  "review_handoff_correction": {
+    "error": "send_message queued completed evidence on an idle verifier without triggering a turn.",
+    "correction": "Observed completed agent status and resumed with followup_task; independent native source replay returned accepted bounded verdict.",
+    "source": "Installed collaboration tool contract: send_message does not trigger a turn; followup_task does."
   }
 }
