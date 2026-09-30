@@ -13851,8 +13851,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/README.md",
-      "sha256": "fd4c8af6b73cf733a1332365e0efb3f64ff8401898a4e34eafd3c960ef50003d",
-      "bytes": 13982
+      "sha256": "7e2623020f40c784638b832f823cc0acd0fe29d5656af44fd4205e085c9e59e0",
+      "bytes": 14235
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
@@ -38141,8 +38141,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
-      "sha256": "a8e53932ea032a4603dfd8411201d6c646ccf8e1a09e7de02b1abf00c7f39ca8",
-      "bytes": 13406
+      "sha256": "a394962b516cd9b45c30888c2337e6f5bee2ace99f8ded50f3aece9488253f1a",
+      "bytes": 13447
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
@@ -44953,11 +44953,6 @@
       "path": "tests/test_native_worker_fixture.py",
       "sha256": "e4bd5345e9d23a338602fd0f6f34a67d959af51cb7939f4112dced74bcb01301",
       "bytes": 1341
-    },
-    {
-      "path": "tests/test_native_worker_route.py",
-      "sha256": "624904c7e25458cfd5662e032e98159d52989458665701f84fdd3d538c2e379d",
-      "bytes": 4189
     },
     {
       "path": "tests/test_nautilus_equity_replay.py",
