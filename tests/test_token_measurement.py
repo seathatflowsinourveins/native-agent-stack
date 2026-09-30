@@ -1874,22 +1874,23 @@ class TokenMeasurement(unittest.TestCase):
         add("mcp__context_mode__ctx_execute_file", {"path": "/abs/outside/app.log", "language": "shell", "code": "cat x"}, outside,
             fields={"root_mismatch": True})
 
-        def row(attempted, succeeded, classes, infrastructure, new, unknowns, rate, lower, upper, sensitive, classified, is_ctx=False):
+        def row(attempted, succeeded, classes, infrastructure, new, unknowns, unassigned, rate, lower, upper, over, sensitive, classified,
+                is_ctx=False):
             return {"attempted": attempted, "succeeded": succeeded, "ctx": is_ctx, "classes": classes, "infrastructure_errors": infrastructure,
-                    "new_class_errors": new, "unknowns": unknowns, "rate": rate, "rate_lower_bound": lower, "rate_upper_bound": upper,
-                    "threshold_sensitive": sensitive, "every_error_classified": classified}
+                    "new_class_errors": new, "unknowns": unknowns, "unassigned_errors": unassigned, "rate": rate, "rate_lower_bound": lower,
+                    "rate_upper_bound": upper, "over_threshold": over, "threshold_sensitive": sensitive, "every_error_classified": classified}
 
-        want = {
+        want = {  # unassigned: policy_deny, remote_fetch, search_throttle, rejected, invalid (7 on the ctx server); graded on the ceiling
             "plugin_context-mode_context-mode": row(100, 73, {
                 "boundary": 2, "timeout": 5, "module": 2, "invoked_command_exit": 2, "invoked_command_exit_indexed": 2, "policy_deny": 2,
                 "remote_fetch": 2, "search_throttle": 1, "rejected": 1, "invalid": 1, "server_error": 1, "usage_error": 1,
                 "storage_directory": 1, "invalid_arguments": 1, "unmatched": 1, "echo_mismatch": 1, "outcome_unknown": 1},
-                9, 5, 4, 0.18, 0.14, 0.25, False, False, True),
-            "qmd": row(10, 8, {"connection": 1, "unmatched": 1}, 1, 1, 0, 0.2, 0.2, 0.2, False, False),
-            "ai-memory": row(1, 0, {"approval": 1}, 1, 0, 0, 1, 1, 1, False, True),
-            "linear": row(2, 1, {"connection": 1}, 1, 0, 0, 0.5, 0.5, 0.5, False, True),
-            "serena": row(50, 49, {"outcome_unknown": 1}, 0, 0, 1, 0.02, 0, 0.02, True, True),
-            "context_mode": row(1, 0, {"binding": 1}, 1, 0, 0, 1, 1, 1, False, True, True),
+                9, 5, 4, 7, 0.18, 0.14, 0.25, True, False, False, True),
+            "qmd": row(10, 8, {"connection": 1, "unmatched": 1}, 1, 1, 0, 0, 0.2, 0.2, 0.2, True, False, False),
+            "ai-memory": row(1, 0, {"approval": 1}, 1, 0, 0, 0, 1, 1, 1, True, False, True),
+            "linear": row(2, 1, {"connection": 1}, 1, 0, 0, 0, 0.5, 0.5, 0.5, True, False, True),
+            "serena": row(50, 49, {"outcome_unknown": 1}, 0, 0, 1, 0, 0.02, 0, 0.02, True, True, True),
+            "context_mode": row(1, 0, {"binding": 1}, 1, 0, 0, 0, 1, 1, 1, True, False, True, True),
         }
         return rows, want
 
@@ -1898,33 +1899,74 @@ class TokenMeasurement(unittest.TestCase):
         anchored templates context-mode returns before it builds the code echo (boundary, the deny firewall, Runtime error, storage and
         usage errors) are tested on the raw text first; the echo is required, and stripped, only for ctx_execute and ctx_execute_file
         outputs after execution (the review's high finding), and the outdated-version notice trackResponse may put first (server.ts:892-896)
-        is stripped before both. rate counts the six infrastructure classes, every new class (named, or unmatched text: 'a new class counts
-        as our misuse until reproduced') and every call whose class or outcome cannot be established (binding decision B2: an unknown is
-        not a success); rate_lower_bound counts the unknowns as successes; threshold_sensitive marks a server whose two bounds fall on
-        different sides of 0.01; every_error_classified is the criterion classify_every_ctx_error. rate_upper_bound is the design's
-        descriptive ceiling: every call that neither succeeded nor ended in the invoked command's own exit."""
+        is stripped before both. rate_upper_bound, the graded rate until Amendment 4 assigns the classes outside the named groups (U2 design
+        5.3; binding decisions: the harder-to-pass reading), counts every call that neither succeeded nor ended in the invoked command's own
+        exit, and over_threshold is its verdict by counts; unassigned_errors is its residual after the named groups. rate counts the six
+        infrastructure classes, every new class (named, or unmatched text: 'a new class counts as our misuse until reproduced') and every
+        call whose class or outcome cannot be established (binding decision B2: an unknown is not a success); rate_lower_bound counts the
+        unknowns as successes; threshold_sensitive marks a server whose rate_lower_bound and rate_upper_bound fall on different sides of
+        0.01; every_error_classified is the criterion classify_every_ctx_error."""
         rows, want = self.m15_rows()
         got = self.measure(rows).get("m15")
         self.assertEqual(got, {"threshold": 0.01, "by_server": want})
         per_call = self.exports("cu.callLedger(x.rows).filter((r) => r.server).map((r) => r.m15_class)", {"rows": rows})
         self.assertEqual(per_call[:4], ["boundary", "boundary", "timeout", "timeout"])
+        for server, r in got["by_server"].items():  # the ceiling is the named groups plus the residual, on every server
+            with self.subTest(server=server):
+                self.assertEqual(r["infrastructure_errors"] + r["new_class_errors"] + r["unknowns"] + r["unassigned_errors"],
+                                 r["attempted"] - r["succeeded"] - r["classes"].get("invoked_command_exit", 0))
+
+    def m15_server_rows(self, cases, attempted):
+        """Each case's classes as the one server of an aggregated measurement with `attempted` calls, the rest successes:
+        [rate, rate_lower_bound, rate_upper_bound, over_threshold, threshold_sensitive, unassigned_errors] per case."""
+        rows = [call("q", "mcp__qmd__search", query="x"), result("q", "[]")]
+        return self.exports("x.cases.map((classes) => { const m = cu.measureTranscript(x.rows); m.m15.by_server = { qmd: { attempted: x.n,"
+                            " succeeded: x.n - Object.values(classes).reduce((a, b) => a + b, 0), ctx: false, classes } };"
+                            " const r = cu.aggregateMeasurements([m]).m15.by_server.qmd;"
+                            " return [r.rate, r.rate_lower_bound, r.rate_upper_bound, r.over_threshold, r.threshold_sensitive, r.unassigned_errors] })",
+                            {"rows": rows, "cases": cases, "n": attempted})
 
     def test_m15_threshold_comparison_uses_counts_not_the_rounded_rate(self):
         """rate is rounded to four places, as every kernel share is, so a server just over the 0.01 threshold can print as 0.01: 202 of
-        20,100 calls is 1.005%. threshold_sensitive (binding decision B2) therefore compares the counts: errors * 100 > attempted."""
-        rows = [call("q", "mcp__qmd__search", query="x"), result("q", "[]")]
-        cases = {  # classes of one server with 20,100 attempts: (rate, rate_lower_bound, threshold_sensitive)
-            "over by counts, 0.01 when rounded; lower bound under": ({"connection": 190, "outcome_unknown": 12}, (0.01, 0.0095, True)),
-            "exactly at the threshold is not over it": ({"connection": 190, "outcome_unknown": 11}, (0.01, 0.0095, False)),
-            "both bounds over": ({"connection": 202}, (0.01, 0.01, False)),
+        20,100 calls is 1.005%. over_threshold and threshold_sensitive (binding decision B2) therefore compare the counts: errors * 100 >
+        attempted, with the graded ceiling's count for over_threshold."""
+        cases = {  # classes of one server with 20,100 attempts:
+            # (rate, rate_lower_bound, rate_upper_bound, over_threshold, threshold_sensitive, unassigned_errors)
+            "over by counts, 0.01 when rounded; lower bound under": ({"connection": 190, "outcome_unknown": 12}, (0.01, 0.0095, 0.01, True, True, 0)),
+            "exactly at the threshold is not over it": ({"connection": 190, "outcome_unknown": 11}, (0.01, 0.0095, 0.01, False, False, 0)),
+            "both bounds over": ({"connection": 202}, (0.01, 0.01, 0.01, True, False, 0)),
+            "only the ceiling crosses: an unassigned class counts in the graded rate": (
+                {"connection": 100, "outcome_unknown": 50, "rejected": 52}, (0.0075, 0.005, 0.01, True, True, 52)),
+            "the invoked command's own exit stays out of every rate": ({"invoked_command_exit": 5000, "connection": 100}, (0.005, 0.005, 0.005, False, False, 0)),
         }
-        got = self.exports("x.cases.map((classes) => { const m = cu.measureTranscript(x.rows); m.m15.by_server = { qmd: { attempted: 20100,"
-                           " succeeded: 20100 - Object.values(classes).reduce((a, b) => a + b, 0), ctx: false, classes } };"
-                           " const r = cu.aggregateMeasurements([m]).m15.by_server.qmd; return [r.rate, r.rate_lower_bound, r.threshold_sensitive] })",
-                           {"rows": rows, "cases": [classes for classes, _ in cases.values()]})
+        got = self.m15_server_rows([classes for classes, _ in cases.values()], 20100)
         for (name, (_, want)), row in zip(cases.items(), got):
             with self.subTest(case=name):
                 self.assertEqual(tuple(row), want)
+
+    def test_m15_grades_the_ceiling_until_amendment_4_assigns_the_classes(self):
+        """The review's high finding: a server every call of which fails with a class outside the named groups must not pass the 0.01
+        threshold. The U2 design (5.3: 'Grading reads rate_upper_bound until a dated amendment assigns the other classes') and the binding
+        decisions ('the harder-to-pass reading applies') grade on the ceiling, every attempted call that neither succeeded nor ended in the
+        invoked command's own exit (the frozen M15 row excludes only that exit). The client's own text for a tool it does not have (the
+        M14 fixture above; 6 MCP results on this host, scans/call-states.json) is an invalid call; on the base kernel it read rate 0,
+        rate_lower_bound 0 and threshold_sensitive false, and only rate_upper_bound 1."""
+        missing = "No such tool available: mcp__qmd__search"
+        rows = []
+        for i in range(5):
+            rows += [call("nt%d" % i, "mcp__qmd__search", query="q%d" % i),
+                     {**result("nt%d" % i, "<tool_use_error>Error: " + missing + "</tool_use_error>", True), "toolUseResult": "Error: " + missing}]
+        got = self.measure(rows)["m15"]["by_server"]["qmd"]
+        self.assertEqual(got, {"attempted": 5, "succeeded": 0, "ctx": False, "classes": {"invalid": 5}, "infrastructure_errors": 0,
+                               "new_class_errors": 0, "unknowns": 0, "unassigned_errors": 5, "rate": 0, "rate_lower_bound": 0,
+                               "rate_upper_bound": 1, "over_threshold": True, "threshold_sensitive": True, "every_error_classified": True})
+        # Each class outside the named groups alone, 2 of 100 calls, is over the threshold on the ceiling; so is a class no list names (a
+        # template added later), since the ceiling is a residual; the invoked command's own exit is the one exclusion.
+        unassigned = ["policy_deny", "remote_fetch", "search_throttle", "rejected", "invalid", "cancelled_with_result", "a_later_class"]
+        got = self.m15_server_rows([{k: 2} for k in unassigned] + [{"invoked_command_exit": 50}], 100)
+        for name, row in zip(unassigned + ["invoked_command_exit"], got):
+            with self.subTest(case=name):
+                self.assertEqual(tuple(row), (0, 0, 0, False, False, 0) if name == "invoked_command_exit" else (0, 0, 0.02, True, True, 2))
 
     def test_m15_aggregate_recomputes_rates_and_sweep_output_is_id_free(self):
         """aggregateMeasurements sums each server's attempts and classes over actors and computes the rates again; the sweep prints class
