@@ -805,6 +805,144 @@ class IntegrityTests(FixtureCase):
                 self.assertIn(f"catalog-freshness manifest {expected}", sl.render_markdown(report))
 
 
+# --------------------------------------------------------------------------- skills layers
+
+
+SKILL, SKILL_OUT = "acme/agent-skills@debug-kit", "beta/skills@root-cause"
+SKILLS_SWEEP = "fx-skills"
+SKILLS_MANIFEST_REF = "catalogs/sota-convergence/manifest-fx-skills.json"
+SKILLS_USAGE = "evidence/artifacts/fx/child-usage-wf_fx-skills.json"
+SKILLS_RETURNS = "evidence/artifacts/fx/fx-skills/returns.json"
+SKILLS_REVIEW = "evidence/artifacts/fx/acme-agent-skills-debug-kit.json"
+SKILLS_TASKS = [
+    {"layer_id": "skills-debug", "lifecycle_task": "debug", "requirement": "debug things", "installed": [],
+     "source_ids": [], "open_gaps": [], "overturn_when": "a skill-creator paired benchmark says so"},
+    {"layer_id": "skills-review", "lifecycle_task": "review", "requirement": "review things", "installed": [],
+     "source_ids": [], "open_gaps": [], "overturn_when": "a promptfoo config says so"}]
+
+
+def build_skills_fixture(root: Path) -> None:
+    """The fixture checkout plus a two-task skills lifecycle catalog and one skills sweep's retained files: its
+    manifest (no skills section), usage, returns (frozen scope included) and one source review."""
+    write(root, sl.SKILLS_CATALOG, {"schema_version": 1, "kind": "skills-lifecycle", "checked_at": "2026-10-01",
+                                    "sources": [], "tasks": SKILLS_TASKS})
+    profiles = sl.platform_profiles_sha256(json.loads((root / sl.ADOPTION).read_text(encoding="utf-8")))
+    write(root, SKILLS_MANIFEST_REF, {"checked_at": "2026-10-02", "foundation": [], "trading": []})
+    write(root, SKILLS_USAGE, usage_of(f"wf_{SKILLS_SWEEP}", [
+        {"label": f"{role}:skills-debug", "complete": True} for role in ("discover", "refute-facts", "refute-fit")]))
+    write(root, SKILLS_RETURNS, {
+        "workflow_run": f"wf_{SKILLS_SWEEP}",
+        "discovery": {"skills-debug": {"catalog": "skills", "layer_id": "skills-debug", "proposed": [SKILL, SKILL_OUT],
+                                       "requirement_sha256": sl.skills_requirement_sha256(SKILLS_TASKS[0]),
+                                       "platform_profiles_sha256": profiles}},
+        "votes": {"skills-debug": [
+            {"facts": {"role": "facts", "repository": SKILL, "refuted": False},
+             "fit": {"role": "fit", "repository": SKILL, "refuted": False}},
+            {"facts": {"role": "facts", "repository": SKILL_OUT, "refuted": False},
+             "fit": {"role": "fit", "repository": SKILL_OUT, "refuted": True}}]}})
+    write(root, SKILLS_REVIEW, {"repository": SKILL, "layers": ["skills-debug"]})
+    register(root)
+
+
+def skills_result(**overrides):
+    """make_result.py's RESULT.json for the fixture's skills sweep: one survivor, one refuted skill."""
+    votes = f"{SKILLS_RETURNS}#/votes/skills-debug"
+    value = {"sweep_id": SKILLS_SWEEP, "date": "2026-10-02", "workflow_run": f"wf_{SKILLS_SWEEP}",
+             "status": "completed", "manifest_ref": SKILLS_MANIFEST_REF, "lane": SKILLS_SWEEP,
+             "prompts_sha256": "d" * 64, "usage_ref": SKILLS_USAGE, "lower_bound_usage": False,
+             "returns_ref": SKILLS_RETURNS,
+             "layers": [{"catalog": "skills", "layer_id": "skills-debug", "votes": "retained",
+                         "discovery_ref": f"{SKILLS_RETURNS}#/discovery/skills-debug", "calls": None,
+                         "proposed": [SKILL, SKILL_OUT],
+                         "survived": [{"repo": SKILL, "source_review": SKILLS_REVIEW,
+                                       "facts": {"vote": "not_refuted", "ref": f"{votes}/0/facts"},
+                                       "fit": {"vote": "not_refuted", "ref": f"{votes}/0/fit"}}],
+                         "refuted": [{"repo": SKILL_OUT, "facts": {"vote": "not_refuted", "ref": f"{votes}/1/facts"},
+                                      "fit": {"vote": "refuted", "ref": f"{votes}/1/fit"}}],
+                         "reopen": []}]}
+    value.update(overrides)
+    return value
+
+
+class SkillsLayerTests(FixtureCase):
+    """The skills modality's layers (catalog skills, one per skills lifecycle task) in the report and the ledger."""
+
+    def setUp(self):
+        super().setUp()
+        build_skills_fixture(self.root)
+
+    def test_a_skills_sweep_appends_and_checks_without_a_manifest_row(self):
+        ledger = self.appended(result(), skills_result())
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        debug = ledger["sweeps"][1]["layers"][0]
+        self.assertEqual((debug["catalog"], debug["layer_id"]), ("skills", "skills-debug"))
+        self.assertEqual(debug["requirement_sha256"], sl.skills_requirement_sha256(SKILLS_TASKS[0]))
+        self.assertEqual((debug["known"], debug["new"]), ([], [SKILL, SKILL_OUT]))
+        # The skills catalog's hash covers exactly the task's lifecycle_task, requirement and overturn_when.
+        self.assertEqual(sl.skills_requirement_sha256(dict(SKILLS_TASKS[0], open_gaps=["new gap"])),
+                         sl.skills_requirement_sha256(SKILLS_TASKS[0]))
+        self.assertNotEqual(sl.skills_requirement_sha256(dict(SKILLS_TASKS[0], requirement="x")),
+                            sl.skills_requirement_sha256(SKILLS_TASKS[0]))
+
+    def test_the_report_lists_the_skills_layers_as_due(self):
+        ledger = self.appended(skills_result())
+        report = sl.build_report(self.root, ledger)
+        keys = [(row["catalog"], row["layer_id"]) for row in report["layers"]]
+        self.assertEqual(keys, [("foundation", "alpha"), ("us-equities", "beta"), ("foundation", "gamma"),
+                                ("skills", "skills-debug"), ("skills", "skills-review")])
+        debug = report["layers"][3]
+        self.assertEqual((debug["research_status"], debug["due"], debug["clean_count"], debug["last_sweep"]),
+                         (None, True, 0, SKILLS_SWEEP))
+        self.assertEqual(debug["reset"], [{"trigger": "survivor", "ref": f"{SKILLS_SWEEP}:{SKILL}"}])
+        self.assertIn("skills/skills-review", report["due"])
+        self.assertIn(f"| skills/skills-debug | - | 0 | no | {SKILLS_SWEEP} |", sl.render_markdown(report))
+        # The --report --json rows build_args.py --due-report reads: catalog, layer_id and due.
+        rows = json.loads(self.cli_output(["--report", "--json"]))["layers"]
+        self.assertIn({"catalog": "skills", "layer_id": "skills-review", "due": True},
+                      [{key: row[key] for key in ("catalog", "layer_id", "due")} for row in rows])
+
+    def test_a_changed_task_requirement_is_a_current_trigger_citing_the_skills_catalog(self):
+        ledger = self.appended(skills_result())
+        catalog = json.loads((self.root / sl.SKILLS_CATALOG).read_text(encoding="utf-8"))
+        catalog["tasks"][0]["requirement"] = "debug other things"
+        write(self.root, sl.SKILLS_CATALOG, catalog)
+        report = sl.build_report(self.root, ledger)
+        self.assertEqual(report["current_reopen_triggers"]["skills/skills-debug"],
+                         [{"trigger": "requirement_changed", "ref": sl.SKILLS_CATALOG}])
+
+    def test_unknown_skills_layers_and_unbound_skill_survivors_are_refused(self):
+        unknown = skills_result()
+        unknown["layers"][0]["layer_id"] = "skills-deploy"
+        with self.assertRaisesRegex(sl.LedgerError, r"skills/skills-deploy is not a layer in .* or a task in "
+                                                    r"catalogs/landscape/skills-lifecycle\.json"):
+            sl.append(self.root, self.ledger(), unknown)
+        ledger = self.appended(skills_result())
+        other = copy.deepcopy(ledger)
+        other["sweeps"][0]["layers"][0]["survived"][0]["source_review"] = REVIEW  # a review of o/surv
+        self.assertErrorMatches(sl_rechain(other), r"reviews a different repository")
+        wrong_catalog = copy.deepcopy(ledger)
+        wrong_catalog["sweeps"][0]["layers"][0]["catalog"] = "papers"
+        self.assertErrorMatches(sl_rechain(wrong_catalog), r"catalog must be one of \['foundation', 'skills', "
+                                                           r"'us-equities'\]")
+        # A repository layer still needs its manifest row.
+        missing_row = copy.deepcopy(ledger)
+        missing_row["sweeps"][0]["layers"][0]["catalog"] = "foundation"
+        self.assertErrorMatches(sl_rechain(missing_row), r"layer foundation/skills-debug is not in")
+
+    def test_without_a_skills_catalog_only_the_research_state_layers_are_reported(self):
+        (self.root / sl.SKILLS_CATALOG).unlink()
+        report = sl.build_report(self.root, self.ledger())
+        self.assertEqual([row["catalog"] for row in report["layers"]], ["foundation", "us-equities", "foundation"])
+        with self.assertRaisesRegex(sl.LedgerError, r"skills/skills-debug is not a layer"):
+            sl.append(self.root, self.ledger(), skills_result())
+
+    def cli_output(self, argv):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(sl.main(["--root", str(self.root), *argv]), 0)
+        return out.getvalue()
+
+
 def sl_rechain(ledger):
     """Recompute prev/head hashes so a test isolates the non-chain check it exercises."""
     ledger = copy.deepcopy(ledger)
@@ -884,6 +1022,19 @@ class RepositoryLedgerTests(unittest.TestCase):
     def test_the_committed_ledger_checks(self):
         ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
         self.assertEqual(sl.check_ledger(ROOT, ledger), [])
+
+    def test_the_report_lists_every_skills_lifecycle_task_after_the_research_state_layers(self):
+        ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
+        report = sl.build_report(ROOT, ledger)
+        tasks = json.loads((ROOT / sl.SKILLS_CATALOG).read_text(encoding="utf-8"))["tasks"]
+        research = list(sl.research_rows(ROOT))
+        keys = [(row["catalog"], row["layer_id"]) for row in report["layers"]]
+        self.assertEqual(keys, research + [("skills", task["layer_id"]) for task in tasks])
+        skills = [row for row in report["layers"] if row["catalog"] == "skills"]
+        self.assertTrue(skills)
+        # No skills sweep is recorded yet, so every skills layer is due with a clean count of 0.
+        self.assertTrue(all(row["due"] and row["clean_count"] == 0 and row["research_status"] is None
+                            for row in skills))
 
     # The requirement and platform-profile hashes are computed from the research-state and adoption
     # files at append time. They legitimately differ from today's files after a landscape edit, so
