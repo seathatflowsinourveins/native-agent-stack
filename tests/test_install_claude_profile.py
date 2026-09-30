@@ -1075,12 +1075,15 @@ class PortableTopRuleTests(unittest.TestCase):
     not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
     Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
     default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-09-30 to 1,656 words: the file became the single managed source of the operator's user-level
+    file, so it took the rules only that file held and six standing clauses (docs/decisions/2026-09-30-rule-text-every-layer.md);
+    the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1372  # wc -w after the 2026-09-29 Sonnet 5.5 rule and its review repairs (1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1656  # wc -w after the 2026-09-30 standing clauses and user-level rules (1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
@@ -1101,6 +1104,24 @@ class PortableTopRuleTests(unittest.TestCase):
     )
     # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
     RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
+    # Checked anywhere in the file, since this template became the single managed source of the operator's
+    # user-level file (docs/decisions/2026-09-30-rule-text-every-layer.md): the six standing clauses of 2026-09-30,
+    # the rules that file held beyond this template, and its worker, model, Ultracode and agent-team rules.
+    STANDING_PHRASES = (
+        "OmniRoute gateway", "`gpt-6-astra` at max", "`gpt-6-sol` at medium", "`gpt-6.1-sol`",
+        "Codex CLI is the second native client",
+        "completeness critic", "next landscape sweep", "lifecycle task",
+        "`search-first`", "`find-skills`", "`npx skills find`", "`skill-creator`", "model invocation in both clients",
+        "north-star action",
+        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
+        "audits, trials or network at startup", "due-file line",
+        "record what you found", "build only from a cited reference implementation", "from the selected source revision",
+        "popularity guide discovery", "More tools, more reasoning and reviewer agreement alone do not prove quality",
+        "retain source pins and reasons", "Research only the relevant layers", "Use a short plan for bounded work",
+        "so the reads, searches and dead ends stay in the child",
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1", "CLAUDE_CODE_SUBAGENT_MODEL=opus", "CLAUDE_CODE_EFFORT_LEVEL",
+        "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1", "safety refusal",
+    )
 
     @staticmethod
     def top_rule(text: str) -> str:
@@ -1126,6 +1147,10 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_the_template_states_the_procedure_within_the_word_budget(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
+
+    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
 
     def test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
