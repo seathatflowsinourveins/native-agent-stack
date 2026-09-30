@@ -23,7 +23,7 @@ the merged manifest, stay with the lane owners.
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
 | `codex_quota.py` | staged | A copy of the checkout's `scripts/codex_quota.py`, the account quota probe the runner's optional quota gate runs. |
 | `make_prompt.py` | staged | Composes a GPT-6 prompt from the frozen templates. |
-| `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>` and `<<SKILLS_CHECKED_AT>>` open, and the strict return schemas. `probe.json` is for the one-call lane probe. |
+| `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>`, `<<SKILLS_CHECKED_AT>>` and `<<MODALITY>>` open, and the strict return schemas (`discover-skills.json` for the skills modality). `probe.json` is for the one-call lane probe. |
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
 | `convert.py` | checkout | Converts the run record into `returns.json`, `lanes.json`, `layers.json` and `survivors.json`. |
 | `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api`; the public Hugging Face Hub API for a model repository). |
@@ -421,6 +421,61 @@ Read these fields of `convert.py`'s summary before appending:
 - **`lost`**: every lost round, first or follow-up, as `<layer>:<round>`. `sweep.js` returns a lost follow-up round
   as `{lost: true}` too. `convert.py` refuses a return whose follow-up rounds do not match the critic's requests,
   so no round can go missing silently.
+
+## Skills modality
+
+The second discovery modality sweeps skills per lifecycle task instead of repositories per landscape layer. A skill is
+one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survival rule, retained failures and
+`--layers`/`--smoke` selection are the same. The design and its overturn condition are in
+[the decision record](../../../docs/decisions/2026-09-30-skills-sweep-modality.md).
+
+- **Inputs.** [`catalogs/landscape/skills-lifecycle.json`](../../../catalogs/landscape/skills-lifecycle.json) has 13
+  lifecycle tasks, `skills-research` to `skills-mcp-build`. Each task has its requirement, the installed skills of
+  `adoption/skills/manifest.json` that serve it, its pinned sources (GitHub skill repositories, the skills.sh
+  registry and a curated list), its open gaps and its overturn condition. `build_inputs.py --modality skills` writes
+  one input per task. The input carries the installed skills' manifest pins and invocation flags, the task's
+  sources, `known_skill_refs` (the installed and excluded skills) and any seeds. It reads no freshness manifest.
+- **Scope.** `saturation_ledger.py --scope` covers only the layers of `research-state.json`. So
+  `build_inputs.py --skills-scope` prints the skills layers' frozen scope in the same format, computed with the
+  ledger's own functions. Each hash covers the task's `lifecycle_task`, `requirement` and `overturn_when`.
+- **Templates and schema.** `build_args.py` resolves the modality at build time:
+  - A skills run's `discover` and `critic` are `discover_skills` and `critic_skills`.
+  - Its `facts` and `fit` end in `modality_skills`, through the `<<MODALITY>>` placeholder.
+  - A repository run fills `<<MODALITY>>` with nothing, so its frozen templates and `prompts_sha256` are unchanged.
+    The tests pin both runs' values.
+  - Skills discovery returns `schemas/discover-skills.json`: the identity fields (`skill_ref`, `source_id`,
+    `lifecycle_task`, `pin`, `skill_md_sha256`, `license`, `source`), the fit fields (`description_chars`,
+    `model_invocable`, `codex_implicit`, `replaces`) and the verdict fields.
+  - Its `comparison_that_would_overturn` must name skill-creator's paired benchmark or a promptfoo config.
+  - `model_invocable` is false when the SKILL.md sets `disable-model-invocation: true`
+    ([Claude Code skills](https://code.claude.com/docs/en/skills)), or when its `agents/openai.yaml` sets
+    `allow_implicit_invocation: false` ([Codex skills](https://developers.openai.com/codex/skills)).
+- **Identity.** `sweep.js` merges both families' skill proposals by `skill_ref` and carries it as the merged row's
+  `repository`. The refuters vote on it, and `convert.py`, `make_result.py` and the ledger compare it unchanged.
+  `source_reviews.py` reviews a skill survivor at its SKILL.md.
+- **One modality per run.** A run covers repository layers only or skills layers only, because one completeness
+  critic covers the whole run. Stage a skills run in its own work directory.
+
+```sh
+python3 $H/build_inputs.py --skills-scope > "$W/scope.json"
+python3 $H/build_inputs.py --work-dir "$W" --modality skills
+python3 $H/build_args.py --work-dir "$W" --sweep-id "landscape-sweep-skills-$STAMP" --date "$DATE" --smoke skills-research
+# Smoke, full run (--layers skills-research,skills-debug,... instead of --due-report), usage, convert, manifest,
+# source reviews and RESULT.json as in "Run it"; then:
+python3 $H/make_result.py --decision-record "$W/RESULT.json"
+```
+
+- **Outputs.** The run produces the same `returns.json`, `layers.json` (catalog `skills`) and `survivors.json`, one
+  source review per skill survivor, and `RESULT.json`. `make_result.py --decision-record` then writes
+  `docs/decisions/<date>-skills-landscape-sweep.md`. The record lists the survivors per task, each refuted proposal
+  with its refuting votes' reasoning, the critic's findings, the reopened layers and the overturn conditions. The
+  sweep edits no manifest.
+- **Not yet in the ledger.** `scripts/saturation_ledger.py` accepts only the foundation and us-equities catalogs and
+  the layers of `research-state.json`. It refuses to `--append` a skills `RESULT.json`, and its `--report` lists no
+  skills layer, so `--due-report` selects none. Until the ledger learns the skills catalog, select skills layers with
+  `--layers` or `--smoke`; the decision record is the retained outcome. `build_manifest.py` has no skills section:
+  its docstring (`build_manifest.py:1301-1303`) puts a lane layer that is not a foundation or trading row in
+  `lane_groupings`. No skills run has exercised that path yet.
 
 ## Cost reference
 
