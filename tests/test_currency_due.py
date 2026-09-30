@@ -163,12 +163,22 @@ def json_paths(node, prefix=()):
         yield from json_paths(child, (*prefix, key))
 
 
+def short_temp_base() -> str:
+    """The shortest writable temporary base among TMPDIR (tempfile.gettempdir()) and /tmp. macOS runners put TMPDIR
+    under /private/var/folders/..., long enough to push a fixture checkout's absolute command out of the
+    160-character notice line, which changes the line's form and fails the exact-text assertions; the tests that
+    need a long path build one on purpose."""
+    candidates = [tempfile.gettempdir(), "/tmp"]
+    usable = [c for c in candidates if os.path.isdir(c) and os.access(c, os.W_OK)]
+    return min(usable, key=lambda c: len(os.path.realpath(c)))
+
+
 class Checkout:
     """A temporary checkout whose checks are fakes, with a state directory beside it (outside the checkout).
     By default nothing is due."""
 
     def __init__(self, test: unittest.TestCase, name: str = "checkout"):
-        temporary = tempfile.TemporaryDirectory()
+        temporary = tempfile.TemporaryDirectory(dir=short_temp_base())
         test.addCleanup(temporary.cleanup)
         base = Path(temporary.name).resolve()
         self.root = base / name
@@ -937,7 +947,7 @@ class ThisCheckoutTests(unittest.TestCase):
     def test_the_real_checks_run_dry_and_write_nothing(self):
         # The five-second budget is measured on the workstation by the acceptance command; this bound only
         # catches a pathological slowdown on slower runners.
-        with tempfile.TemporaryDirectory() as temporary:
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
             state = Path(temporary) / "state"
             started = time.monotonic()
             result = subprocess.run([sys.executable, str(ROOT / "scripts/currency_due.py"), "--dry-run", "--json",
