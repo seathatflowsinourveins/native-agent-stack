@@ -3,9 +3,11 @@
 docs/decisions/2026-09-30-task-model-routing.md maps each task class to a client, a model, an effort and the place that
 enforces the assignment today. These are integration checks of the repository's own record against its own files, not
 upstream acceptance and not a model run. Every value the record's table quotes from a file ("`path:line` says `value`")
-must still be on the cited lines, and every other `path:line` the table cites must exist, so a change to an agent's
-frontmatter, a settings template key, a Codex profile or a lane constant fails here until the record is restated.
-GPT-6.1 Sol stays listed only as pending qualification, with no route in any routing file.
+must still be in that file, at least once for each distinct line the table quotes it from, and every `path:line` the
+table cites must exist. The record reads its line numbers at its base revision, so an edit that only moves a quoted
+value passes here, while a change to an agent's frontmatter, a settings template key, a Codex profile or a lane constant
+fails until the record is restated. GPT-6.1 Sol stays listed only as pending qualification, and no routing file binds
+it as a model; a mention in prose is not a binding.
 """
 
 from __future__ import annotations
@@ -33,6 +35,10 @@ SAYS = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+)(?:-(\d+))?` says ([^;]+)")
 PENDING = "pending unit D4 qualification (Codex >= 0.159.x pin)"
 ROUTING_PLACES = (".claude/agents", "adoption/templates", "tools/adoption", "tools/sota-convergence/landscape-sweep",
                   "examples/claude-native/workflows")
+# A model binding of GPT-6.1: a model key or constant assigned the ID (TOML, JSON, YAML, Python, JavaScript) or a CLI
+# model flag, with an optional gateway prefix such as `cx/`.
+BINDS_GPT_6_1 = re.compile(r"""(?:model["'`]?\s*[:=]\s*["'`]?|(?<![\w-])-m\s+["'`]?|--model(?:\s+|=)["'`]?)"""
+                           r"""(?:[\w.-]+/)?gpt-6\.1""", re.IGNORECASE)
 
 
 def table(text: str) -> tuple[list[str], list[list[str]]]:
@@ -66,18 +72,21 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             with self.subTest(task_class=wanted):
                 self.assertTrue(any(wanted in name for name in classes), classes)
 
-    def test_every_quoted_value_is_on_its_cited_lines(self):
-        checked = 0
+    def test_every_quoted_value_is_in_its_cited_file(self):
+        # Look each value up in the whole file, once for every distinct line the table quotes it from, so that two
+        # stages binding the same value are both held and a sibling change that only moves lines does not fail here.
+        cited: dict[tuple[str, str], set[str]] = {}
         for row in self.rows:
             for path, first, last, said in SAYS.findall(row[4]):
                 quotes = re.findall(r"`([^`]+)`", said)
-                span = "\n".join(lines(path)[int(first) - 1:int(last or first)])
                 self.assertTrue(quotes, f"{row[0]}: {path}:{first} quotes nothing")
                 for quote in quotes:
-                    with self.subTest(row=row[0], cited=f"{path}:{first}", quote=quote):
-                        self.assertIn(quote, span)
-                    checked += 1
-        self.assertGreaterEqual(checked, 30, "the table quotes its enforcement points")
+                    cited.setdefault((path, quote), set()).add(f"{first}-{last or first}")
+        self.assertGreaterEqual(sum(map(len, cited.values())), 30, "the table quotes its enforcement points")
+        for (path, quote), spans in sorted(cited.items()):
+            with self.subTest(cited=path, quote=quote):
+                found = (ROOT / path).read_text(encoding="utf-8").count(quote)
+                self.assertGreaterEqual(found, len(spans), sorted(spans))
 
     def test_every_cited_line_exists(self):
         cited = 0
@@ -107,7 +116,7 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             for path in sorted((ROOT / place).rglob("*")):
                 if path.is_file():
                     with self.subTest(path=path.relative_to(ROOT).as_posix()):
-                        self.assertNotIn("gpt-6.1", path.read_text(encoding="utf-8", errors="replace"))
+                        self.assertIsNone(BINDS_GPT_6_1.search(path.read_text(encoding="utf-8", errors="replace")))
 
     def test_token_practice_points_to_the_record(self):
         self.assertIn("](decisions/2026-09-30-task-model-routing.md)", POINTER.read_text(encoding="utf-8"))
