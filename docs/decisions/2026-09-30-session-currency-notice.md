@@ -65,6 +65,17 @@ installed and no host file was written: the timer and the service are drafted te
 - **Removing the earlier due-file when a run fails.** Rejected, because it would hide due items exactly when the
   checks break. A failed run leaves the state directory as it was, the unit shows in
   `systemctl --user --failed`, and the hook's 48-hour age limit below keeps an old line from lingering.
+- **Counting an incomplete skill check as nothing due.** Rejected. The first draft did, and a `--network` run whose
+  `gh api` calls failed, or whose skill pin did not verify, could delete the notice an earlier run had written (found by
+  the cross-family review of that draft and reproduced by the failing-first tests below). The check's own report says
+  "Incomplete fetches remain unknown" (`tools/adoption/runtime_skill_freshness.py:134`). Unknown is not nothing due,
+  so an incomplete run never removes the file.
+- **Exit 2 for an incomplete skill check.** Not adopted. No `gh` login and a rate limit are expected conditions, not
+  internal errors: exit 2 would fail the unit every day and withhold the offline counts, which are known. The run
+  exits 0, writes what it found or leaves the state directory as it was, and records the gap.
+- **A details command that prints the saved file instead of running the checks again.** Not adopted. The command
+  exists to confirm that what the notice names is still due, and a saved copy shows only what the timer saw. The
+  command repeats the options that change what a run reports instead, so that it reproduces the notice.
 
 ## Decision
 
@@ -84,9 +95,10 @@ installed and no host file was written: the timer and the service are drafted te
    `saturation_ledger.py --staleness` as a file. It derives four counts:
    - `pins_behind`: the distinct `mismatched` ids across the selected profiles
      (`scripts/adoption_status.py:1266-1270`). With `--network` it adds the skill pins in `skill-drift`,
-     `repository-drift` or `removed-at-head` and a drifted skills CLI pin
-     (`tools/adoption/runtime_skill_freshness.py:103,152`). A mismatch can also mean the installed version is ahead
-     of the pin; the detail entry names the component and the pin.
+     `repository-drift` or `removed-at-head`, a skill pin in `invalid-pin` (the fetch succeeded and the manifest's
+     recorded tree is not the tree at the pinned ref, so it is an answer, and a detail of its own kind) and a
+     drifted skills CLI pin (`tools/adoption/runtime_skill_freshness.py:77-81,103,152`). A mismatch can also mean the
+     installed version is ahead of the pin; the detail entry names the component and the pin.
    - `stale_receipts`: the report's `flagged` count (`scripts/receipt_staleness.py:162`).
    - `due_layers`: the layers the saturation report marks due whose last completed sweep is at least
      `--sweep-cadence-days` old (default 30), or that have no datable sweep. The default follows
@@ -96,12 +108,21 @@ installed and no host file was written: the timer and the service are drafted te
      (`scripts/saturation_ledger.py:999-1000`); the report's own summary counts layers too (`:1022`).
 
    The script writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json` only when a count is
-   nonzero, and removes the file otherwise. A relative `XDG_STATE_HOME` is ignored, as the XDG specification
-   requires. The write goes through a mode-0600, fsynced temporary file in the same directory and `os.replace`,
-   the pattern of `saturation_ledger.write_ledger` (`scripts/saturation_ledger.py:1159-1177`). The document's
-   keys are `generated_at`, `due`, `summary_line` (at most 160 characters, ending with
-   `python3 scripts/currency_due.py --dry-run`) and `details`. The script exits 0 whether or not anything is due,
-   and 2 on an internal error, which leaves the state directory as it was. It makes no network call unless
+   nonzero, and removes the file otherwise, unless a `--network` skill check was incomplete: an error in its report,
+   a skill left `unfetched` or in a state the script does not know, or a skills CLI release that was not fetched.
+   That run writes the file when a count it did reach is nonzero, with the gap in the `coverage` detail
+   (`skills_complete`, `skills_fetch_errors`, `skills_unresolved` and the first five error strings, which the
+   check keeps value-free, `runtime_skill_freshness.py:46-47`), and otherwise leaves the state directory as it was.
+   Its line says `nothing known due` and its journal entry says `kept` or `no due-file`. A relative
+   `XDG_STATE_HOME` is ignored, as the XDG specification requires. The write goes through a mode-0600, fsynced
+   temporary file in the same directory and `os.replace`, the pattern of `saturation_ledger.write_ledger`
+   (`scripts/saturation_ledger.py:1159-1177`). The document's keys are `generated_at`, `due`, `summary_line` (at
+   most 160 characters) and `details`. The line ends with `python3 scripts/currency_due.py --dry-run`, plus
+   `--network` and a non-default `--sweep-cadence-days N` when the run used them, so that running the command
+   reproduces the notice; the option is bounded to 36500 to keep the line short. The unit passes neither, so its
+   notice ends with the bare command, and a test compares the flags in the unit's `ExecStart` with the flags the
+   command names. The script exits 0 whether or not anything is due, and 2 on an internal error, which leaves the
+   state directory as it was. That includes a report field of the wrong type. It makes no network call unless
    `--network` is given, and the unit does not pass it. It refuses a state directory inside the checkout.
 3. **The startup rule.** Item 4 of `docs/token-practice.md` now allows exactly one read-only SessionStart line from
    that file, printed fail-open; the checks never run at startup. `AGENTS.md:28` still reads "Do not rerun the full
@@ -122,14 +143,35 @@ installed and no host file was written: the timer and the service are drafted te
      line of at most 160 characters, a failed rename that keeps the earlier file, exit 2 and no write for malformed
      output from each check and for a malformed ledger, dry runs that write nothing, the cadence boundary (30 days
      counts, 29 does not), network checks off by default, and the two units' settings. Seven patched mutants of the
-     script (no removal, a direct non-atomic write, no cadence gate, no truncation, network ignored, adoption exit 2
-     rejected, a relative `XDG_STATE_HOME` accepted) were each caught by the test named for them, in eight runs:
-     the direct write was run against both the failed-rename test and the file-mode test. One test runs this
-     checkout's real checks dry.
-   - A dry run on the workstation: exit 0 in 1.56 s, and 1.57 s under `/usr/bin/python3` 3.12.3 with the unit's
-     `PATH` and a cleared environment.
+     first draft (`8d371e9e`: no removal, a direct non-atomic write, no cadence gate, no truncation, network ignored,
+     adoption exit 2 rejected, a relative `XDG_STATE_HOME` accepted) were each caught by the test named for them, in
+     eight runs: the direct write was run against both the failed-rename test and the file-mode test. One test runs
+     this checkout's real checks dry.
+   - Repair of the cross-family review of `3d1cfada` (three findings, each checked against the source first). The
+     tests were written first and run against the unrepaired script: 43 tests, 19 failures and 13 errors in 15 of
+     them, among them seven `FileNotFoundError` (the earlier due-file deleted), `TypeError: 'bool' object is not
+     iterable` at `currency_due.py:199` (and the same for an integer and for an unhashable id) and a notice command
+     without `--network`. They pass on the repaired script (43 tests, OK). They cover: an incomplete skill check
+     keeping an earlier file byte-identical and creating none, for six incomplete shapes; the control that a complete
+     check with nothing due still removes it; an incomplete check that still writes what the other checks found; an
+     invalid pin counted, replacing the earlier file; the command in the notice run in process for `--network`, for a
+     non-default cadence and for both, each reporting the notice's counts again (for the first two, the bare
+     command reports nothing due); the `ExecStart` flags of the unit equal to the flags the command names (a
+     consistency check that also passes on the unrepaired script); the cadence bound; the
+     next-step line; eight malformed `pinned_versions` shapes exiting 2; and a shape test that replaces each of
+     2,277 nested report fields by wrong-typed values and requires a document or a `CheckError`. Thirteen patched
+     mutants of the repaired script (removal for an incomplete check, an incomplete check read as complete, errors
+     ignored, an invalid pin not counted, an unknown state read as current, an unknown release ignored, no write
+     beside an incomplete check, the command without `--network` or without the cadence, the old `pinned_versions`
+     read, "nothing due" for an incomplete run, no cadence bound, a next step that always names
+     `adoption_status.py`) were each caught by a test written for them.
+   - A dry run on the workstation at the first draft: exit 0 in 1.56 s, and 1.57 s under `/usr/bin/python3` 3.12.3
+     with the unit's `PATH` and a cleared environment. After the repair: exit 0 in 1.59 s with `HOME` redirected to
+     a scratch directory, because the version probes create files under `HOME` (`.codex/tmp` appeared there), and
+     the same counts as the first draft: 1 pin behind, 7 stale receipts, 12 layers with reopen triggers.
    - `systemd-analyze --user verify` on both units rendered with the documented `sed` command: exit 0 with no
-     warnings. A copy with an unparseable calendar and a missing interpreter failed the same check, exit 1.
+     warnings, before and after the repair (which changed a header comment only). A copy with an unparseable
+     calendar and a missing interpreter failed the same check, exit 1, in both rounds.
      `systemd-analyze calendar daily` normalizes to `*-*-* 00:00:00`. These are synthetic checks; no unit was
      loaded or started.
 
@@ -175,7 +217,8 @@ Fetched on 2026-09-30.
   <https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp>: "The file is readable and writable only by
   the creating user ID."
 - This repository: `recipes/saturation-sweep.md:20-21,36-37`, `recipes/sota-convergence-practice.md:9`,
-  `scripts/receipt_staleness.py:60,156-164`, `scripts/adoption_status.py:1266-1270,1400`,
-  `scripts/saturation_ledger.py:966-1002,1022,1159-1177`, `tools/adoption/runtime_skill_freshness.py:103,152,154`,
+  `scripts/receipt_staleness.py:60,156-164`, `scripts/adoption_status.py:1258-1263,1266-1270,1331,1400`,
+  `scripts/saturation_ledger.py:966-1002,1022,1159-1177`,
+  `tools/adoption/runtime_skill_freshness.py:46-47,77-81,100-103,115,134,152,154`,
   and the unit conventions of `adoption/templates/systemd/credential-boot-receipt.service` (the `@REPOSITORY@`
   render) and `host-requests-workstation.service:26-28` (an explicit `PATH`).
