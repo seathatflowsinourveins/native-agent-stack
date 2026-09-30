@@ -54,12 +54,16 @@ that guard refused passes (tightening only, by construction).
 A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
-are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
-blocks; a hook that outlasts its timeout does not, so every scan reads a text once, a command of more than
-200,000 characters is refused (`command_too_large`), and check() reads a command inside a work budget
-(WORK_LIMITS: characters passed to shlex at their storage width, texts read, words emitted, launched-command
-reads) and raises WorkBudgetExceeded when it is gone, which main() refuses (`command_too_complex`); see
-docs/secret-storage.md, "An internal error blocks; a timeout does not". It is not a security boundary. A process
+are never taken for arguments, and a number is a redirection's descriptor only
+where it touches the operator (`set 1>out`, not `set 1 > out`). An internal error blocks the command
+(`guard_error`), because only exit 2 blocks; a hook that outlasts its timeout does not, so every raw-text rule
+takes time linear in the text (four STORE_PATHS patterns that backtracked on a repeated literal are LinearScan
+rules since 2026-09-30; before, a claim here that every scan read a text once was not true of them), a text with
+no quote and no backslash is split without shlex's per-character word building, a command of more than 200,000
+characters is refused (`command_too_large`), and check() reads a command's words, in both readings, inside one
+work budget (WORK_LIMITS: characters passed to shlex at their storage width, texts read, words emitted,
+launched-command reads) and raises WorkBudgetExceeded when it is gone, which main() refuses (`command_too_complex`);
+see docs/secret-storage.md, "An internal error blocks; a timeout does not". It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
@@ -84,7 +88,8 @@ class LinearScan:
     generated texts). Four STORE_PATHS patterns have an unbounded run after a literal that a text can repeat, and the regular expression
     engine reads that run again from every repeat: 102,016 characters of `XDG_CONFIG_HOME:-` took 11.9 s, 54,000 of `HF_HOME:-` 13 to 14 s
     and 80,000 of `/proc` 13 to 15 s (third verification review, 2026-09-29), past a hook timeout of 10 s that fails open, before any work
-    budget was charged. Each scan below splits the text once into the runs the pattern cannot cross and searches each run for literals."""
+    budget was charged. Each scan below reads only the runs of the text that the pattern cannot cross and that hold its literal, once each,
+    and searches them for literals."""
     __slots__ = ("pattern", "_scan")
 
     def __init__(self, pattern: str, scan) -> None:
@@ -96,10 +101,10 @@ class LinearScan:
 
 
 # A `${NAME:-default}` default (`[^}\s]*`) cannot cross a `}` or a blank, so a match that has one lies in one run of neither, plus the `}`
-# that ends the run. A path in `/proc/(?:[^/\s]+/)*environ` cannot cross a blank or `//` (its components are not empty), so a match lies in
-# one run of neither (PATH_RUN keeps a `/` only when another does not follow it).
-DEFAULT_RUN = re.compile(r"[^}\s]+")
-PATH_RUN = re.compile(r"(?:[^\s/]|/(?!/))+")
+# that ends the run (DEFAULT_RUN_END finds that end). A path in `/proc/(?:[^/\s]+/)*environ` cannot cross a blank or `//` (its components are
+# not empty), so a match lies in one run of neither, which ends at a blank or at the first slash of a `//` (PATH_RUN_END).
+DEFAULT_RUN_END = re.compile(r"[}\s]")
+PATH_RUN_END = re.compile(r"\s|//")
 XDG_STORE_PLAIN = re.compile(r"XDG_CONFIG_HOME\}?/native-agent-stack(?:/|\b)")
 XDG_STORE_TAIL = re.compile(r"/native-agent-stack(?:/|\b)")
 HF_TOKEN_PLAIN = re.compile(r"(?:huggingface|HF_HOME)\}?[\"']?/(?:token|stored_tokens)(?![\w-])")
@@ -114,24 +119,32 @@ def default_run_scan(text: str, plain: re.Pattern[str], head: str, tail: re.Patt
     """NAME(?::-[^}\\s]*)?\\}?TAIL, where `plain` is the pattern without the default and `head` is `NAME:-`: plain anywhere, or head in a
     run with tail after it in the same run (the default ends inside the run, and a `}` cannot come before the tail there), or head in a
     run that a `}` ends and tail right after that `}`. The first head of a run leaves the most room, and a match inside a run is a match
-    in the text, since the character after a run is a `}` or a blank, which ends a word as the end of the run does."""
+    in the text, since the character after a run is a `}` or a blank, which ends a word as the end of the run does. Only the runs that
+    hold a head are read: from the first head, to the end of its run (the next `}` or blank), then from the next head after that run."""
     if plain.search(text):
         return True
-    for run in DEFAULT_RUN.finditer(text):
-        start = text.find(head, run.start(), run.end())
-        if start >= 0 and (tail.search(text, start + len(head), run.end())
-                           or (text.startswith("}", run.end()) and tail.match(text, run.end() + 1))):
+    start = text.find(head)
+    while start >= 0:
+        found = DEFAULT_RUN_END.search(text, start)
+        end = found.start() if found else len(text)
+        if tail.search(text, start + len(head), end) or (text.startswith("}", end) and tail.match(text, end + 1)):
             return True
+        start = text.find(head, end)
     return False
 
 
 def proc_environ_scan(text: str) -> bool:
     """/proc/(?:[^/\\s]+/)*environ\\b: a `/proc/` and, at or after its last slash in the same path run, `/environ` ending a word. Within a
-    run every component is non-empty and blank-free, so any `/environ` after the first `/proc/` completes a match."""
-    for run in PATH_RUN.finditer(text):
-        start = text.find("/proc/", run.start(), run.end())
-        if start >= 0 and ENVIRON_TAIL.search(text, start + 5, run.end()):
+    run every component is non-empty and blank-free, so any `/environ` after the first `/proc/` of the run completes a match. A path run
+    ends at a blank or at the first slash of a `//`, and only the runs that hold a `/proc/` are read (one that a `//` cuts short of its
+    last slash holds none)."""
+    start = text.find("/proc/")
+    while start >= 0:
+        found = PATH_RUN_END.search(text, start)
+        end = found.start() if found else len(text)
+        if end >= start + 6 and ENVIRON_TAIL.search(text, start + 5, end):
             return True
+        start = text.find("/proc/", max(end, start + 1))
     return False
 
 
@@ -419,14 +432,19 @@ MAX_COMMAND_CHARACTERS = 200_000
 # tenth of that in ordinary words, a text read 15 to 60, a word of an emitted segment 0.5 to 1, and a keyring read 50 to 100 beyond its
 # characters, so each counter alone holds its worst case near one second (400,000 characters: 1.1 s; 10,000 texts: 0.3 s; 1,000,000
 # words: 0.2 s; 500 reads: 0.03 s). The largest real command of this repository (an 82,000-character script written through a
-# here-document) spends 35% of `characters`, 1% of `words` and under 1% of `texts` and `reads`, so the limits leave ordinary work far
-# inside them, and 500 random mixes of the adversarial shapes at 199,000 characters took at most 0.9 s.
+# here-document) spends 34% of `characters`, 1% of `words` and `texts` and under 1% of `reads` with both readings (measured 2026-09-30), so
+# the limits leave ordinary work far inside them, and 1,000 random mixes of the adversarial shapes at 199,000 characters took at most
+# 0.96 s at a load average of 23 (the slowest is one quoted word of two-byte characters, which shlex reads a character at a time; the
+# guard of 6c4f63d7 took at most 1.07 s on the same mixes there).
 WORK_LIMITS = {
     "characters": 400_000,  # characters passed to shlex, each at its storage width (storage_width), over every reading and nesting level
     "texts": 10_000,  # texts read: the command, each double-quoted substitution body, each `sh -c` or `eval` string, each keyring read
     "words": 1_000_000,  # words in the segments that reading emits, each segment counted with one more (a list of words copied)
     "reads": 500,  # commands read again from the words of a keyring exec (the started command, each launched program inside it)
 }
+# Both readings of a command (this version's and, when it allows the command, the prior reading of c26800f3) spend from the same budget: the
+# prior reading counts its texts, its segments' words and its keyring reads the same way, and costs no characters for a text this reading
+# has tokenized already (lex() keeps the words), so a command that both read spends each counter once for each reading.
 # What check() has spent so far (None outside a check() call, where nothing is counted): start_work() and stop_work() bracket a call.
 _work: dict[str, int] | None = None
 # The words lex() has read in this check() call, by text and mode (None outside a call): the prior reading tokenizes the command as the
@@ -1462,6 +1480,9 @@ def reader_arguments(words: list[str]) -> list[str] | None:
         ends: dict[int, int] = {}
         for position, word in enumerate(words[:-1]):
             if word in FIND_EXEC:
+                following = words[position + 1]
+                if following.startswith("-") and "/" not in following:
+                    continue  # an option word is no assignment, redirection or launcher name, and no reader: the walk would stop on it
                 start = prefix_end(words, position + 1, ends=ends)
                 if program_of(words[start:start + 1]) in READERS:
                     return words[1:]
@@ -1482,13 +1503,15 @@ def is_environment_dump(words: list[str]) -> bool:
         return True
     if program == "env":
         return env_command_start(words) is None
+    if program == "ps":
+        return ps_shows_environment(words)
+    if program not in {"set", "export", "declare", "typeset"}:
+        return False
     arguments = command_arguments(words, touching_only=True)
     if program in {"set", "export"} and (not arguments or arguments == ["-p"]):
         return True
-    if program in {"declare", "typeset"} and all(w.startswith("-") for w in arguments) \
-            and (not arguments or any(set(w[1:]) & set("xp") for w in arguments)):
-        return True
-    return program == "ps" and ps_shows_environment(words)
+    return program in {"declare", "typeset"} and all(w.startswith("-") for w in arguments) \
+        and (not arguments or any(set(w[1:]) & set("xp") for w in arguments))
 
 
 def dumps_after_source(words: list[str]) -> bool:
@@ -1829,6 +1852,9 @@ def prior_reader_arguments(words: list[str]) -> list[str] | None:
         ends: dict[int, int] = {}
         for position, word in enumerate(words[:-1]):
             if word in FIND_EXEC:
+                following = words[position + 1]
+                if following.startswith("-") and "/" not in following:
+                    continue  # as in reader_arguments: the walk would stop on an option word, which is no reader
                 start = prior_prefix_end(words, position + 1, ends)
                 if program_of(words[start:start + 1]) in READERS:
                     return words[1:]

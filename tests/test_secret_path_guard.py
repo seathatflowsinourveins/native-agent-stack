@@ -1769,8 +1769,9 @@ PATHOLOGICAL_SECONDS = 3.0
 # repeat of the literal before it, before any work budget was charged (11.9 s, 13 to 14 s and 13 to 15 s, past the 10 s hook timeout, where
 # a hook fails open). They are linear scans now (LinearScan), and a text without a quote or a backslash is split without shlex (SHLEX_PLAIN),
 # whose per-character word building cost 0.53 s on one word of 199,000 characters. Each input must finish in-process in under
-# LINEAR_SECONDS, with its verdict, and the real hook in under HOOK_LINEAR_SECONDS (a CI runner is slower and shared, and a regression to
-# the old reading takes 3 to 15 s, so the bounds there are wider).
+# LINEAR_SECONDS of processor time (a shared host at a load average of 20 stretched a 0.32 s run to 0.54 s of wall clock; the wall clock
+# gets PATHOLOGICAL_SECONDS), with its verdict, and the real hook in under HOOK_LINEAR_SECONDS (a CI runner is slower and shared, and a
+# regression to the old reading takes 3 to 15 s, so the bounds there are wider).
 LINEAR_SECONDS = 1.5 if IN_CI else 0.5
 HOOK_LINEAR_SECONDS = 2.0 if IN_CI else 1.0
 REVIEW_STORE_PATH_SHAPES = {
@@ -1804,12 +1805,12 @@ _LINEAR_CHILD = (
     "            shapes[f'{lead!r} {tail}'] = 'echo ' + lead * ((199000 - 16) // len(lead)) + tail\n"
     "results = {}\n"
     "for name, text in shapes.items():\n"
-    "    start = time.perf_counter()\n"
+    "    start, cpu = time.perf_counter(), time.process_time()\n"
     "    try:\n"
     "        verdict = t.guard.check(text)\n"
     "    except t.guard.WorkBudgetExceeded:\n"
     "        verdict = 'command_too_complex'\n"
-    "    results[name] = [verdict, time.perf_counter() - start, len(text)]\n"
+    "    results[name] = [verdict, time.process_time() - cpu, time.perf_counter() - start, len(text)]\n"
     "print(json.dumps(results))\n")
 _TIMING_CHILD = (
     "import json, sys, time\n"
@@ -1824,8 +1825,11 @@ _TIMING_CHILD = (
     "print(json.dumps([verdict, time.perf_counter() - start]))\n")
 
 # The four groups of the acceptance oracle for this work (kw/guard_oracle.py, phase base), kept here so a change to the guard is checked
-# against them without that file: forms that passed before and must be blocked, ordinary work that must pass, controls that were blocked
-# and must stay blocked, and controls that passed and must keep passing (the trading lane's loader path, the id-based credential tools).
+# against them without that file: forms that must be blocked (each passed the base guard but the fifth, a regression control for the
+# launcher walk), ordinary work that must pass, controls that were blocked and must stay blocked, and controls that passed and must keep
+# passing (the trading lane's loader path, the id-based credential tools). Not every row that this work adds to BLOCKED and
+# KEYRING_BLOCKED is a new refusal either (the third verification review's note): recounted on 2026-09-30 against the tables and the guard
+# at c26800f3, 245 of the 342 added rows were allowed by the base guard, and 97 it already refused are regression controls.
 ORACLE_MUST_BLOCK = [
     'systemd-run --user --pipe --wait cat "$PAPER_ENV_FILE"',
     "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
@@ -2075,9 +2079,10 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr[-300:])
         results = json.loads(done.stdout)
         self.assertEqual(len(results), len(REVIEW_STORE_PATH_SHAPES) + 2 * sum(map(len, STORE_PATH_LEADS.values())))
-        for name, (verdict, seconds, length) in results.items():
+        for name, (verdict, cpu_seconds, wall_seconds, length) in results.items():
             with self.subTest(shape=name, characters=length):
-                self.assertLess(seconds, LINEAR_SECONDS)
+                self.assertLess(cpu_seconds, LINEAR_SECONDS)  # the work of check(); the host may be shared, so the wall clock gets more room
+                self.assertLess(wall_seconds, PATHOLOGICAL_SECONDS)
                 if name in REVIEW_STORE_PATH_SHAPES:
                     self.assertEqual(verdict, REVIEW_STORE_PATH_SHAPES[name][1])
                 else:
