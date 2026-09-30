@@ -293,6 +293,76 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
                 with self.subTest(allowed=spelling):
                     self.assertFalse(any(self.bash_rule_matches(rule, spelling) for rule in rules))
 
+    # skills@1.7.0 (vercel-labs/skills@7407f389) src/cli.ts L336-402: the spellings that write installed skills are
+    # add/a/i/install (L355-358), remove/rm/r (L381-383), check/update/upgrade (one runUpdate, L398-400) and the two
+    # experimental_* commands (L350, L388). find/search/f/s, list/ls, init, use (a temporary copy) and --version do not.
+    SKILLS_CLI_WRITERS = ("add", "a", "i", "install", "remove", "rm", "r", "check", "update", "upgrade")
+    # In `npx *skills@* <word> *` the `*` after `@` can also span a find query, so the versioned form leaves out the
+    # one-letter aliases, which are common query words.
+    SKILLS_CLI_VERSIONED_WRITERS = ("add", "install", "remove", "rm", "check", "update", "upgrade")
+    # Without arguments these three update every installed skill, and a trailing ` *` after another `*` needs an
+    # argument (permissions page, "Wildcard patterns"), so their rules with a leading or middle `*` end in `<word>*`.
+    SKILLS_CLI_BARE_WRITERS = ("check", "update", "upgrade")
+
+    def skills_cli_rules(self) -> list[str]:
+        def tail(word: str) -> str:
+            return word + ("*" if word in self.SKILLS_CLI_BARE_WRITERS else " *")
+        rules = []
+        for word in self.SKILLS_CLI_WRITERS:
+            rules += [f"Bash(skills {word} *)", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
+        rules += [f"Bash(npx *skills@* {tail(word)})" for word in self.SKILLS_CLI_VERSIONED_WRITERS]
+        return rules + ["Bash(skills experimental_*)", "Bash(npx *skills experimental_*)",
+                        "Bash(npx *skills@* experimental_*)", "Bash(*bin/skills experimental_*)"]
+
+    def test_a_session_cannot_install_or_remove_skills_through_the_skills_cli(self):
+        # adoption/skills/lifecycle.md: a session never installs a skill ad hoc; installation goes only through
+        # tools/adoption/install_skills.py, whose own `add` and rollback `remove` run as subprocesses that Bash rules
+        # do not see (https://code.claude.com/docs/en/permissions, "What a Bash rule doesn't match"). The pinned
+        # find-skills body tells the model to run `npx skills add ... -g -y` and `npx skills update`
+        # (vercel-labs/skills@7407f389 skills/find-skills/SKILL.md L28-29, L90, L100). Raised by the Gate A owner's
+        # review of PR #553 (#381: an install during a run changes the measured skill catalog).
+        deny = self.settings()["permissions"]["deny"]
+        for rule in self.skills_cli_rules() + ["Edit(~/.agents/**)"]:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+        rules = [rule for rule in deny if rule.startswith("Bash(")]
+
+        def denied(command: str) -> bool:
+            # Deny rules apply when any subcommand matches, and match past any leading variable assignment
+            # (permissions page, "Compound commands" and "Wrappers").
+            parts = re.split(r"\s*(?:&&|\|\||;|\|)\s*", command)
+            parts = [re.sub(r"^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+", "", part) for part in parts]
+            return any(self.bash_rule_matches(rule, part) for rule in rules for part in parts)
+
+        tool = "/opt/eco/tools/skills-1.7.0/bin/skills"
+        blocked = (
+            "npx skills add owner/repo@skill -g -y", "npx skills add vercel-labs/agent-skills@react-best-practices",
+            "npx skills update", "npx skills remove name -g -y", "npx -y skills@1.7.0 add owner/repo@skill -g -y",
+            "npx --yes skills@latest install owner/repo", "npx skills@1.7.0 remove name -g -y",
+            "skills add owner/repo@skill -g -y", "skills a owner/repo", "skills i owner/repo",
+            "skills install owner/repo", "skills remove name -g -y", "skills rm name", "skills r name",
+            "skills check", "skills update -g", "skills upgrade", "skills experimental_install",
+            "skills experimental_sync", f"{tool} add https://github.com/owner/repo/tree/0123abc/skills/x -g -y",
+            f"{tool} remove name -g -y", "./node_modules/.bin/skills add owner/repo",
+            "npx skills check", "npx -y skills@1.7.0 update", f"{tool} update", f"{tool} check -g",
+            "npx skills experimental_install", "DISABLE_TELEMETRY=1 skills remove name -g -y",
+            "cd /var/tmp/scratch && npx skills add owner/repo@skill -g -y")
+        allowed = (
+            "npx skills find react performance", "npx skills find", "npx skills find pr review --owner vercel-labs",
+            "npx -y skills@1.7.0 find changelog", "skills find typescript", "skills search testing",
+            "skills f testing", "skills s testing", f"{tool} find testing", f"{tool} list -g --json",
+            "skills list -g --json", "skills ls", "skills --version", "skills init my-skill",
+            "npx skills init my-xyz-skill", "skills use owner/repo@skill",
+            f"python3 tools/adoption/install_skills.py --skills-bin {tool} --json",
+            "python3 scripts/skills_status.py --json", "git commit -m 'lifecycle: deny skills add in sessions'",
+            "grep -rn 'npx skills add' adoption/skills")
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertTrue(denied(command))
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertFalse(denied(command))
+
     def test_the_bash_ceiling_and_the_status_line_refresh(self):
         settings = self.settings()
         self.assertEqual(settings["env"]["BASH_MAX_TIMEOUT_MS"], "1800000")
