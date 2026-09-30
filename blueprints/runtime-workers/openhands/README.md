@@ -76,7 +76,8 @@ versions: Critical 32, High 168, Medium 208, Low 57, Negligible 780 and
 Unknown 219. The flagged packages are Debian packages, openvscode-server npm
 modules and Node, Docker/containerd Go binaries and the base Python interpreter.
 The cataloger does not unpack the PyInstaller archive, so the scan neither
-confirms nor excludes the four lock versions inside the binary. The receipt
+confirms nor excludes the lock versions inside the binary: the four the 2026-09-27 relock replaced, and PyJWT 2.13.0,
+which the 2026-09-30 relock replaced in the venv only. The receipt
 lists grype's advisories for those exact versions as lock evidence. On this
 host's containerd image store, `docker image inspect` reports the index digest
 as the image ID, so the receipt verifies the platform manifest and config
