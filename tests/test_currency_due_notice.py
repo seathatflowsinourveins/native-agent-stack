@@ -8,8 +8,9 @@ event JSON on stdin under a temporary HOME, stdout read back, exit 0 always.
 
 Only the Claude registration (settings template, installer hook map, SHA256SUMS) is applied by the Claude profile.
 adoption/templates/codex.hooks.template.json is a template only, not applied by any installer; B1 applies no Codex
-hook. CodexParityTests therefore check that Codex 0.157.1 would parse and hash the template as the config template's
-trusted_hash says, not that any host runs it.
+hook. CodexParityTests therefore check that Codex 0.157.1 would parse and hash the template under the key its
+position gives it (untrusted until reviewed in /hooks; no config-template trust entry ships), not that any host
+runs it.
 
 Output and input contracts:
 - Claude Code: https://code.claude.com/docs/en/hooks#sessionstart (read 2026-09-30): SessionStart input carries
@@ -57,7 +58,7 @@ CEILING_MS = 1000  # a coarse bound on the whole process, past which a hang or a
 # The key Codex gives the template's handler once it is hand-appended after ai-memory's one SessionStart group in
 # the user hooks.json: <hooks.json path>:<event>:<group>:<handler> (discovery.rs; adoption_status.py L146-149).
 CODEX_KEY = "${HOME}/.codex/hooks.json:session_start:1:0"
-# What the Codex template, its trust entry and the hook's docstring say about who applies the template: nobody.
+# What the Codex template and the hook's docstring say about who applies the template: nobody.
 TEMPLATE_ONLY = "template only, not applied by any installer; B1 applies no Codex hook"
 SUMMARY = "Stack currency: 2 pins behind, 1 stale receipt; run python3 scripts/currency_due.py --json"
 # Neutral paths and ids: scripts/validate.py rejects personal home paths and UUID-shaped session ids.
