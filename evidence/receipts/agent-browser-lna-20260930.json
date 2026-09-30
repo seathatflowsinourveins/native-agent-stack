@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "agent-browser-lna-20260930",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "agent-browser",
+    "playwright-test"
+  ],
+  "claim": "On this host on 2026-09-30, Chrome for Testing 153.0.8010.12 launched by agent-browser 0.38.1, by Playwright 1.63.0 (the headless shell and its CLI Chromium configurations, headless and offscreen) and directly (headless and offscreen full browser) did not deliver a fetch, an image or an iframe request from a page placed in the public address space (--ip-address-space-overrides=127.0.0.1:<page port>=public) to a loopback listener on another port without a permission grant: Chromium's Local Network Access blocked all three in each of the six configurations. With the override off, and with --disable-features=LocalNetworkAccessChecks, all three requests reached the listener, so the probe could see a delivered request. playwright-cli 0.1.21 on Playwright 1.64.0-alpha, the manifest pin, was not found installed and was not measured.",
+  "limitations": [
+    "One host, one Chromium build (153.0.8010.12), two listeners started by the measurement itself on loopback inside an isolated network namespace; no existing service and neither OmniRoute gateway was contacted.",
+    "agent-browser ran with its documented --executable-path and --args options and a CDP pipe transport instead of its ordinary TCP CDP endpoint, which the measurement's endpoint rules excluded; its page context and default flags were otherwise used.",
+    "Measured: fetch, image and iframe requests from a public-address-space page. Not measured: main-frame navigations and popups (which Chromium's Local Network Access does not gate), pages in the private address space, a user or tool permission grant, other Chromium versions, and the manifest-pinned playwright-cli 0.1.21.",
+    "The measurement shows whether an HTTP request reached the listener; it does not show whether Chromium opened a TCP connection before refusing."
+  ],
+  "evidence_class": "independent observation: a local measurement with a positive control (override off) and a diagnostic control (Local Network Access disabled), run by a GPT-6 worker (gpt-6-astra, effort max) through the OmniRoute gateway lane; scripts published",
+  "recorded_at_utc": "2026-09-30T15:50:00Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the agent browsers installed for the ecosystem"
+  },
+  "data": {
+    "chromium": "153.0.8010.12",
+    "override_switch": "--ip-address-space-overrides=127.0.0.1:<page port>=public",
+    "results": [
+      {"launch": "agent-browser 0.38.1 (CDP pipe)", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "agent-browser 0.38.1 (CDP pipe)", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "Playwright 1.63.0 headless shell", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "Playwright 1.63.0 headless shell", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "Playwright 1.63.0 CLI Chromium config, headless", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "Playwright 1.63.0 CLI Chromium config, headless", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "Playwright 1.63.0 CLI headed config, offscreen", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "Playwright 1.63.0 CLI headed config, offscreen", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "Chrome for Testing direct, offscreen full browser", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "Chrome for Testing direct, offscreen full browser", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "Chrome for Testing direct, headless", "override": "off", "fetch": "reached", "img": "reached", "iframe": "reached"},
+      {"launch": "Chrome for Testing direct, headless", "override": "public", "fetch": "blocked", "img": "blocked", "iframe": "blocked"},
+      {"launch": "diagnostic: Playwright headless shell with LocalNetworkAccessChecks disabled", "override": "public", "fetch": "reached", "img": "reached", "iframe": "reached"}
+    ],
+    "page_observed_when_blocked": "fetch rejected with TypeError; image error; iframe load event without its message",
+    "preflights_and_permission_grants": "none observed"
+  },
+  "provenance": {
+    "commands": [
+      "bash evidence/artifacts/agent-browser-lna-20260930/run.sh.txt (starts the two listeners in an isolated namespace and runs measure.cjs)",
+      "node evidence/artifacts/agent-browser-lna-20260930/report.cjs.txt (builds the results table)"
+    ],
+    "withheld": "the raw per-run logs and the worker's full results file stay in the lane's private state directory; the published values are copied from them",
+    "decision_record": "docs/decisions/2026-09-29-key-management.md, section \"OmniRoute management API (decision, 2026-09-30)\""
+  }
+}
