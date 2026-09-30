@@ -11,6 +11,7 @@ import io
 import json
 import os
 import re
+import shutil
 import string
 import subprocess
 import sys
@@ -309,7 +310,7 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
             return word + ("*" if word in self.SKILLS_CLI_BARE_WRITERS else " *")
         rules = []
         for word in self.SKILLS_CLI_WRITERS:
-            rules += [f"Bash(skills {word} *)", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
+            rules += [f"Bash(skills {tail(word)})", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
         rules += [f"Bash(npx *skills@* {tail(word)})" for word in self.SKILLS_CLI_VERSIONED_WRITERS]
         return rules + ["Bash(skills experimental_*)", "Bash(npx *skills experimental_*)",
                         "Bash(npx *skills@* experimental_*)", "Bash(*bin/skills experimental_*)"]
@@ -362,6 +363,40 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         for command in allowed:
             with self.subTest(allowed=command):
                 self.assertFalse(denied(command))
+
+    @unittest.skipUnless(shutil.which("node") and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode security module "
+                         "(a checkout's build/security.js or the plugin's hooks/security.bundle.mjs)")
+    def test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path(self):
+        # Context Mode (mksglu/context-mode 1.0.169, src/security.ts: evaluateCommandDenyOnly, matchesAnyPattern,
+        # globToRegex) checks ctx_execute / ctx_batch_execute commands and the shell calls embedded in code against
+        # the same user deny rules, but with a plain ^glob$ regex: a trailing " *" does not match the bare command
+        # and a leading assignment is not stripped. The three bare-form writer verbs therefore end in "<word>*", so a
+        # bare `skills update` is denied on both paths; the short aliases keep " *" because `skills init` is
+        # legitimate (the Gate A owner's decision on #553, 2026-09-30). The leading-assignment gap remains there.
+        deny = [rule for rule in self.settings()["permissions"]["deny"] if rule.startswith("Bash(")]
+        script = (
+            "const [url, rulesJson, commandsJson] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const policies = [{deny: JSON.parse(rulesJson)}];\n"
+            "const out = {};\n"
+            "for (const c of JSON.parse(commandsJson)) out[c] = m.evaluateCommandDenyOnly(c, policies, false).decision;\n"
+            "console.log(JSON.stringify(out));\n")
+        blocked = ("skills update", "skills check", "skills upgrade", "skills update -g", "skills add owner/repo -g -y",
+                   "npx skills update", "npx skills add owner/repo@skill -g -y", "npx -y skills@1.7.0 check")
+        allowed = ("skills find x", "skills init my-skill", "skills list -g --json", "npx skills find pr review")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = subprocess.run([shutil.which("node"), "--input-type=module", "-e", script, url, json.dumps(deny),
+                               json.dumps(list(blocked + allowed))], capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        decisions = json.loads(done.stdout)
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertEqual(decisions[command], "deny")
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertNotEqual(decisions[command], "deny")
 
     def test_the_bash_ceiling_and_the_status_line_refresh(self):
         settings = self.settings()

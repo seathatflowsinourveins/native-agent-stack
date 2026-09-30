@@ -107,6 +107,10 @@ model writes, not every route to the program: `"$SKILLS_BIN" add`, `sh -c`,
 ([permissions](https://code.claude.com/docs/en/permissions), "Wildcard patterns",
 "Compound commands" and "What a Bash rule doesn't match"), so the manifest and
 `skills_status.py` stay the check of what is installed.
+The three bare-form verb rules end in `<word>*` (`Bash(skills check*)`, `update*`, `upgrade*`) so that Context
+Mode's plain-regex matcher (mksglu/context-mode 1.0.169, `evaluateCommandDenyOnly`), which applies the same user
+rules to `ctx_execute` commands without the bare-command match, also denies the bare command; the short aliases
+keep ` *` because `skills init` is legitimate. A leading assignment is not stripped on that path.
 
 `skills_status.py` checks required metadata and reports supporting-file hashes
 separately. Its zero exit does not establish full-tree integrity or successful

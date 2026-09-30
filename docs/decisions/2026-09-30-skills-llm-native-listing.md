@@ -151,6 +151,10 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
      neither step 6 nor the body's `npx skills update` (L28-29, L90, L100). 41 `Bash(...)` deny rules now cover every
      Skills CLI command that writes installed skills (skills 1.7.0 `src/cli.ts` L336-402: `add`, `a`, `i`, `install`,
      `remove`, `rm`, `r`, `check`, `update`, `upgrade` and `experimental_*`).
+     Round 4 (the owner's decision, 2026-09-30): the three bare-form verb rules end in `<word>*` so that Context Mode's
+     plain-regex matcher (mksglu/context-mode 1.0.169, `evaluateCommandDenyOnly`) denies the bare `skills update`,
+     `check` and `upgrade` on its `ctx_execute` path too; the short aliases keep ` *` because `skills init` is legitimate.
+     A leading assignment is still not stripped there.
    - The rules take four forms: a bare `skills`, `npx [flags] skills`, `npx [flags] skills@<version>` and a path
      ending in `bin/skills`. The versioned form leaves out the one-letter aliases, which are common query words.
      `Edit(~/.agents/**)` keeps the file tools out of the canonical skill folders.
