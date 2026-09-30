@@ -2,7 +2,8 @@
 
 **Status: DRAFT r7, not frozen.**
 - r7 applies the coordinator's r7 brief of 2026-09-30, which relays the user's standing requirements of that date (quoted in "r6 → r7 changes"). It removes r6's reference arm and replacement routes in favour of a symmetric merit rule (sections 6–7), adds a maintenance gate (section 1), a token ledger (5.2) and a RAG section (8), and re-pins every system at its current release (3.1).
-- This is a protocol revision. It made no deployment, provider call or scored run. Its live checks are metadata and source reads (GitHub, PyPI, Hugging Face, container registries, `nvidia-smi`, client `--version`), captured in [`inputs/r7/live-verification-20260930.json`](inputs/r7/live-verification-20260930.json).
+- **r7 repair round 1 (2026-09-30)** applies the GPT-6 cross-family review of this draft (verdict needs_changes, seven findings; [`inputs/r7/gpt6-review-20260930.md`](inputs/r7/gpt6-review-20260930.md)). The resolutions are listed under "r7 repair round 1" below. The text stays DRAFT r7.
+- This is a protocol revision. It made no deployment, provider call or scored run. Its live checks are metadata and source reads (GitHub, PyPI, Hugging Face, container registries, `nvidia-smi`, client `--version`), captured in [`inputs/r7/live-verification-20260930.json`](inputs/r7/live-verification-20260930.json) and, for the repair round, [`inputs/r7/repair1-verification-20260930.json`](inputs/r7/repair1-verification-20260930.json).
 - The freeze needs **both the user's acceptance and a GPT-6 cross-family review** of the complete bundle (section 11). Until then nothing runs under this protocol.
 - Once frozen, it is never edited; later changes are dated amendments. A result that misses a bar is a documented FAIL, never a reason to loosen the bar or rerun silently.
 - The r1–r6 review history is kept unchanged in Appendix A, with r6's section numbers. Decision record: [`docs/decisions/2026-09-30-memory-s3-r7.md`](../../docs/decisions/2026-09-30-memory-s3-r7.md).
@@ -46,7 +47,28 @@
 - (e) `CoIR-team/coir` is also stale; CoIR enters only as MTEB task data (1, 8.2).
 - (f) AMB's LongMemEval judge prompts have no abstention branch; the 30 abstention questions form their own reported stratum (5.5).
 
-**Coordinator decisions made here and awaiting the user's acceptance**, because the brief does not settle them: the optional-stage rule and the generalized fallback preflight (2, 7.5); agentmemory's embedder under the symmetric rule (3.1); the symmetric usefulness floor (7.1); the cost scalar and its frozen price table (5.2); the release-cadence and CI terms inside the repo-quality score (7.4); and the RAG task partition (8.1).
+**Coordinator decisions made here and awaiting the user's acceptance**, because the brief does not settle them: the optional-stage rule and the generalized fallback preflight (2, 7.5); agentmemory's embedder under the symmetric rule (3.1); the symmetric usefulness floor (7.1); the cost scalar and its frozen price table (5.2); the release-cadence and CI terms inside the repo-quality score (7.4); and the RAG task partition (8.1). Repair round 1 adds: the no-memory requirement on S8 and its coupling to host selection, with alternatives (7.1 item 7); the common recall depth (4.5); and the S8 route (8.4). The decision record lists all of them under "Decisions for acceptance".
+
+### r7 repair round 1 (2026-09-30)
+
+A GPT-6 cross-family review of this draft (gateway `cx/gpt-6-astra`, effort max) returned **needs_changes** with seven findings. The coordinator reports that all 12 of the review's quoted source excerpts matched their sources. The findings are captured verbatim in [`inputs/r7/gpt6-review-20260930.md`](inputs/r7/gpt6-review-20260930.md). This is the single repair round of the bounded review loop. Every upstream locator it adds was read at its pinned commit through `gh api graphql` and is captured in [`inputs/r7/repair1-verification-20260930.json`](inputs/r7/repair1-verification-20260930.json).
+
+| Finding | Resolution | Sections |
+|---|---|---|
+| **F1 (high)**: stale harbor-datasets task bundles could execute code | "Static data" excludes any executed or interpreted file, and harbor-datasets supplies nothing. A task-level provenance manifest, enforced before every trial, governs any lane that executes tasks. The S8 code-task stage regenerates SWE-bench Verified tasks through Harbor's maintained adapter, with every executable part from a gate-passing source, and stays `pending` until its dated amendment. | 1, 8.4 |
+| **F2 (high)**: AMB's Hindsight provider turns native observations off; "equal candidate depth" undefined | Hindsight gets a thin local provider like every other system, and AMB stays byte-identical. Banks keep the vendor's documented defaults; the effective bank configuration is read back and matched to the frozen settings before any ingest, and ingest ends only after consolidation. One operational depth policy covers every provider. The parity audit exercises every provider's actual ingest and recall paths, failures included. | 2, 3.5, 4.3, 4.5 |
+| **F3 (high)**: tie-break membership undefined when several systems share the maximum | The maximizer set M is defined. A non-maximizer joins B only within 0.02 of the maximum and only if Holm finds it significantly worse than no leader. Comparisons use exact rationals, with frozen executable examples. | 7.2, 7.3 |
+| **F4 (medium)**: gross versus control-subtracted cost | C is the gross, nonnegative priced cost of 5.2's frozen workload; the difference from the no-memory control is reported separately. Several equal minima, zero included, go to 7.4. C_RAG is defined for 8.3. | 5.2, 7.3, 8.3 |
+| **F5 (medium)**: the fallback preflight mixed concurrency K with concurrency 1 | Two measurements: the fallback rate under the confirmatory dispatch at K, with a stated denominator, which alone controls stage disabling; and warm latency at concurrency 1. | 7.5 |
+| **F6 (medium)**: the CI term could score unfinished runs | K = 10 needs the complete, paginated check and status set, with every run completed and passing. Missing, incomplete or truncated sets give K = 0. R and K are labelled coordinator heuristics. | 7.4 |
+| **F7 (medium)**: no minimum usefulness for deployment | New 7.1 item 7: every system must be non-inferior to the same client's no-memory control on the S8 code tasks. While S8 is `pending`, host selection is `pending`; that coupling and its alternatives await the user's acceptance. | 7.1, 8.4 |
+
+**Corrections and clarifications made with these fixes:**
+- r7 said AMB's locked `hindsight-all` 0.4.17 serves no arm, but AMB's `hindsight-http` provider builds its synchronous client from it (`from hindsight import HindsightClient`, `memory/hindsight.py:1252-1255`). With the thin provider, the statement now holds (4.3).
+- C counts only 5.2's frozen workload. LongMemEval ingest usage is reported in ledger (a) but never enters C; r7 had left the workload implicit.
+- At the 7.3 boundary, a member whose C is exactly c_min / 0.80 is dominated, as r6's selection condition c_min ≤ 0.80 × C implies. r7's wording had also kept it in the tied set.
+
+**Residuals**, also in the decision record: item 7 alone does not close the reviewer's example of every system scoring 0/25 on 5.5(a); S8's design, margin and test, and the receipt for the relayed 36-task check remain to be frozen; the depth policy and the effective-bank check are specified here but not yet executed.
 
 ## 1. Maintenance gate (r7)
 
@@ -59,13 +81,17 @@ gh api repos/OWNER/REPO --jq .archived
 gh api "repos/OWNER/REPO/commits?since=SINCE&per_page=1" --jq length
 ```
 
+When the account's REST quota is exhausted, `gh api graphql` gives the same verdict from the repository's `isArchived` field and its default branch's `history(since: SINCE) { totalCount }`; repair round 1 used that route ([`inputs/r7/repair1-verification-20260930.json`](inputs/r7/repair1-verification-20260930.json)).
+
 **When.** At freeze, and before each development and confirmatory run on each host. A repository that becomes stale stops executing from that point; results it already produced stay recorded as they are, and the change needs a dated amendment.
 
 **Consequences.**
 - No code from a stale repository runs in any S3 process: no scripts, evaluators, prompt code or packages built from it.
-- A stale source may supply static data only: a file pinned by the sha256 of its downloaded bytes and read by code from active repositories or from this one. Registry metadata, such as a Hugging Face LFS oid, is recorded but never replaces the downloaded-file hash.
+- A stale source may supply static data only: a file pinned by the sha256 of its downloaded bytes and read by code from active repositories or from this one. **Static data is inert input that is only read (r7 repair).** A file that is executed, sourced, built or interpreted, such as a Dockerfile, a setup or build script, a test, a judge or grading script or a solution script, is code wherever it is hosted, and a bundle that contains one is not static data. Registry metadata, such as a Hugging Face LFS oid, is recorded but never replaces the downloaded-file hash.
 - **LongMemEval `9e0b455f` appears only as a citation**: for the paper's definitions, the dataset format and the reference implementation that 4.2 reimplements. The dataset file is static data pinned by sha256 (4.1).
-- LoCoMo enters only as MTEB data (`mteb/LoCoMo`, revision `02e2c3dea15d9fdfd1cd7a0f65f5f8ae2ed4c1ac`, read by MTEB); CoIR only as MTEB's CoIR tasks (8.2); harbor-datasets only as hashed task data in the separate Harbor lane (8.4).
+- LoCoMo enters only as MTEB data (`mteb/LoCoMo`, revision `02e2c3dea15d9fdfd1cd7a0f65f5f8ae2ed4c1ac`, read by MTEB); CoIR only as MTEB's CoIR tasks (8.2).
+- **harbor-datasets supplies nothing (r7 repair).** Its task bundles carry executable tests and judges: [`datasets/aa-lcr/aa-lcr-1/tests/test.sh:4`](https://github.com/harbor-framework/harbor-datasets/blob/37db108843a49bb31a592e37a75e2c40dc3f9749/datasets/aa-lcr/aa-lcr-1/tests/test.sh#L4) at `37db1088` runs `python /tests/llm_judge.py`, and Harbor's verifier uploads a task's tests and executes its test script ([`src/harbor/verifier/verifier.py:175-232`](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/verifier/verifier.py#L175-L232) at v0.23.0). No bundle, file or data from it enters any S3 process; the S8 stage regenerates its tasks from maintained sources (8.4).
+- **Task-level provenance manifest (r7 repair).** A lane that executes task bundles, today only 8.4's S8 stage, freezes one manifest per task. It lists every file of the generated task and every artifact the task fetches when built or run, such as the base image, installers and verifier dependencies. Each entry carries its sha256 or image digest, its class (inert input; environment or Dockerfile; setup or build script; test; judge or grader; solution) and its source (repository and commit, or dataset and revision) with that source's latest gate verdict. Only entries whose source passes the gate may execute. Before every trial the runner re-hashes the task directory and checks the built image's digest; it refuses the trial if any file is unlisted or differs, or if an executable entry's source is not ACTIVE at the latest gate run. A refused task is recorded, and excluding a task after any result needs a dated amendment.
 
 **Results at 2026-09-30T02:52:42Z** (window start 2026-07-02T02:52:42Z). The full capture, with every head, release date and the 300-commit counting cap, is [`inputs/r7/live-verification-20260930.json`](inputs/r7/live-verification-20260930.json) (sha256 `c02d1c506d31164891d3f1782a55993d1d5ae61f9a5c4b9c7e285aa839e24f69`). "300+" means the count reached the cap. No repository below is archived.
 
@@ -73,7 +99,7 @@ gh api "repos/OWNER/REPO/commits?since=SINCE&per_page=1" --jq length
 |---|---|---|---|---|
 | snap-research/locomo | LoCoMo origin; data only through MTEB | 2024-08-13 (`3eb6f2c5`) | 0 | **STALE** |
 | xiaowu0162/LongMemEval | citation only | 2026-05-11 (`9e0b455f`) | 0 | **STALE** |
-| harbor-framework/harbor-datasets (formerly laude-institute/harbor-datasets) | Harbor task data | 2026-05-16 (`37db1088`) | 0 | **STALE** |
+| harbor-framework/harbor-datasets (formerly laude-institute/harbor-datasets) | none; supplies nothing (1, 8.4) | 2026-05-16 (`37db1088`) | 0 | **STALE** |
 | CoIR-team/coir | CoIR origin; data only through MTEB | 2025-06-30 (`89d0e769`) | 0 | **STALE** |
 | vectorize-io/agent-memory-benchmark (AMB) | harness; the pin `03c1d0f1` is its head | 2026-09-22 | 12 | ACTIVE |
 | embeddings-benchmark/mteb | harness | 2026-09-29 | 300+ | ACTIVE |
@@ -90,13 +116,18 @@ gh api "repos/OWNER/REPO/commits?since=SINCE&per_page=1" --jq length
 | tobi/qmd; HKUDS/LightRAG; run-llama/llama_index | document-RAG candidates (8.3) | 2026-09-09; 2026-09-26; 2026-09-29 | 110; 300+; 102 | ACTIVE |
 | DeusData/codebase-memory-mcp | code-retrieval fit record (8.4) | 2026-09-28 | 300+ | ACTIVE |
 
+**Repair-round rerun at 2026-09-30T04:23:48Z** (window start 2026-07-02T04:23:48Z), for the sources of 8.4's S8 stage, through `gh api graphql` ([`inputs/r7/repair1-verification-20260930.json`](inputs/r7/repair1-verification-20260930.json), sha256 `e17484588948dc7150afba464d4806924bc08ae7858a726bda5ef1b70c9a2b35`). None is archived.
+- ACTIVE: harbor-framework/harbor (526 commits in the window), SWE-bench/SWE-bench (113), huggingface/datasets (62), AnswerDotAI/fastcore (262) and astral-sh/uv (1,218).
+- STALE: harbor-framework/harbor-datasets, still with no commit in the window (head `37db1088`).
+
 ## 2. Systems, arms and the GPT-6 backbone
 
 There is **no reference arm**. Every system in the family, ai-memory included, has exactly **one primary arm**, defined by the same rule:
 - its upstream-recommended self-hosted deployment for coding-agent memory at the release pinned in 3.1, installed as 3.5 requires;
 - every active LLM role on GPT-6 through the host's own OmniRoute (2.1–2.2);
 - a current local embedder and dedicated reranker selected by 8.2 wherever upstream supports configuring them; otherwise the shipped model, labelled **shipped default**;
-- **optional-stage rule (r7):** where upstream documents an optional recall stage, such as an LLM or cross-encoder reranker, without recommending it for this use case, the stage setting is chosen per system on the development split by the frozen comparison of 2.1 (LoCoMo supporting-evidence recall@5 with a one-sided cluster bootstrap at α = 0.05) before any confirmatory run. An inconclusive comparison keeps the upstream default. The unselected setting is a diagnostic outside the family.
+- **optional-stage rule (r7):** where upstream documents an optional recall stage, such as an LLM or cross-encoder reranker, without recommending it for this use case, the stage setting is chosen per system on the development split by the frozen comparison of 2.1 (LoCoMo supporting-evidence recall@5 with a one-sided cluster bootstrap at α = 0.05) before any confirmatory run. An inconclusive comparison keeps the upstream default. The unselected setting is a diagnostic outside the family;
+- **native store configuration (r7 repair):** each arm keeps the system's documented defaults for per-store settings, such as Hindsight's bank configuration. Neither the harness nor a provider client overrides them, and the effective settings are frozen and read back before ingest (4.3, 4.5). A departure from them is a frozen, labelled configuration choice made before freeze, never a harness side effect.
 
 **ai-memory v2.4.2 (r7).** ai-memory competes under exactly this rule. Its LLM reranker is "optional and off by default" and makes at most one LLM call per query to reorder candidates ([`docs/llm-providers.md:331-341`](https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/llm-providers.md#L331-L341); `AI_MEMORY_RERANKER=llm` is validated at [`crates/ai-memory-cli/src/config.rs:427-433,1762-1774`](https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/config.rs#L427-L433)), so the optional-stage rule decides it. If selected, it runs through the openai-compatible provider on GPT-6 and is subject to the fallback preflight in 7.5. Its embedder follows 8.2 like any configurable system, through its `openai-compat` embedding provider (`docs/llm-providers.md:343-349`). r6's C3′/C4′ definitions and v2.4.0 feasibility notes are historical (r6 §1 in the r6 text at `f7e5e228`; review history in Appendix A). Of the ai-memory files r6 cited, `crates/ai-memory-llm/src/embedding.rs` and `reranker.rs` are byte-identical from v2.4.0 to v2.4.2; `config.rs` and `docs/llm-providers.md` changed (live capture, `changed_between_releases`), so r6's line references into those two files do not carry over.
 
@@ -208,7 +239,7 @@ Every system uses its upstream-recommended deployment for the selected host/use 
 | System | Pinned native deployment and verified configuration to carry into the isolated arm | Evidence and boundary |
 |---|---|---|
 | **cognee 1.6.2** | Release commit `ba3631f2ed363a6ea50d649c34c56885af6b36fe`; image `cognee/cognee:1.6.2@sha256:41c06180608a053f07fffc4da56dd1efba62967dd3d4a1023b33939abee5d45d`, or that tag's `uv.lock` with `uv sync --python 3.12 --frozen --no-dev --no-editable` in a fresh container. `LLM_PROVIDER=custom`, `LLM_ENDPOINT` = local gateway, and LiteLLM model spelling `openai/cx/gpt-6-…`. Set base plus `LLM_EXTRACTION_MODEL`, `LLM_SUMMARIZATION_MODEL`, `LLM_QUERY_MODEL` from the role matrix; all other roles inherit the GPT-6 base. Set `STRUCTURED_OUTPUT_FRAMEWORK=instructor`, `LLM_INSTRUCTOR_MODE=tool_call`, `GRAPH_EXTRACTOR=llm`, `ENABLE_BACKEND_ACCESS_CONTROL=true`, `TELEMETRY_DISABLED=1`, `LITELLM_LOCAL_MODEL_COST_MAP=True`. Give each arm its own `/cognee-storage` and home, with no inherited `.env`. Use shipped SQLite/LanceDB/Ladybug stores. Pin `DataItem(data_id=uuid5(...))` per opaque source session, with frozen namespace/mapping. | I:16–35; [Dockerfile](https://github.com/topoteretes/cognee/blob/ba3631f2ed363a6ea50d649c34c56885af6b36fe/Dockerfile#L59-L140) and [DataItem](https://github.com/topoteretes/cognee/blob/ba3631f2ed363a6ea50d649c34c56885af6b36fe/cognee/tasks/ingestion/data_item.py#L14-L22), both byte-identical to 1.6.1; [LLM config at 1.6.2](https://github.com/topoteretes/cognee/blob/ba3631f2ed363a6ea50d649c34c56885af6b36fe/cognee/infrastructure/llm/config.py#L107-L128): `structured_output_framework` defaults to `litellm_native` (L107), so `instructor` is a frozen departure; per-role models L116–128; `llm_args` L193. The supplied 1.6.1 bare-metal smoke is setup evidence only; it is not the scored container. |
-| **Hindsight 0.10.2** | Release commit `5fc4ce20917b916240cef27c212c387a177f115b`; upstream Docker path, e.g. standalone `ghcr.io/vectorize-io/hindsight:0.10.2@sha256:d1840062a5b79940ab7a9f4809ceb90fc776d4ad737cd9329e9b5836cc64ab70`, with the selected database mode pinned separately. Set `HINDSIGHT_API_LLM_PROVIDER=openai`, `_BASE_URL` = local gateway, `_MODEL` = frozen GPT-6; explicitly freeze the `HINDSIGHT_API_{RETAIN,REFLECT,CONSOLIDATION,MENTAL_MODEL_REFRESH}_LLM_{MODEL,REASONING_EFFORT}` model/effort/provider/base overrides. Set `HINDSIGHT_API_LLM_TEMPERATURE=none` and leave `HINDSIGHT_API_LLM_TEMPERATURE_{RETAIN,REFLECT,CONSOLIDATION,VERIFICATION}` unset: explicit operation values override the global value, and their built-in defaults are respectively 0.1/0.9/0.0/0.0. Verify omission at the wire. Freeze local embedding/reranker choices under 8.2. Use owned API/database/worker identities and loopback publishing, and external PostgreSQL, since upstream calls embedded pg0 "not recommended for production". | I:56–58; at 0.10.2: [temperature names and defaults](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L216-L245), [operation config](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L383-L462), [installation](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L37-L39); [loopback compose](https://github.com/vectorize-io/hindsight/blob/f8950b0c07d9e34c76493dba802bb309f0ce60fd/docker/docker-compose/claude-code/docker-compose.yaml#L14-L17) (unchanged at 0.10.2). Four of the five Hindsight files r6 cited at `f8950b0c` changed at 0.10.2, so these links supersede r6's line references. The recorded gateway request-shape probes (**9/9** across sol/luna/astra, `max_tokens` up to 64000, JSON-object and required-tool shapes) are wire compatibility for the 0.10.1 service, not a ≥65000-output or complete lifecycle acceptance. |
+| **Hindsight 0.10.2** | Release commit `5fc4ce20917b916240cef27c212c387a177f115b`; upstream Docker path, e.g. standalone `ghcr.io/vectorize-io/hindsight:0.10.2@sha256:d1840062a5b79940ab7a9f4809ceb90fc776d4ad737cd9329e9b5836cc64ab70`, with the selected database mode pinned separately. Set `HINDSIGHT_API_LLM_PROVIDER=openai`, `_BASE_URL` = local gateway, `_MODEL` = frozen GPT-6; explicitly freeze the `HINDSIGHT_API_{RETAIN,REFLECT,CONSOLIDATION,MENTAL_MODEL_REFRESH}_LLM_{MODEL,REASONING_EFFORT}` model/effort/provider/base overrides. Set `HINDSIGHT_API_LLM_TEMPERATURE=none` and leave `HINDSIGHT_API_LLM_TEMPERATURE_{RETAIN,REFLECT,CONSOLIDATION,VERIFICATION}` unset: explicit operation values override the global value, and their built-in defaults are respectively 0.1/0.9/0.0/0.0. Verify omission at the wire. Freeze local embedding/reranker choices under 8.2. Use owned API/database/worker identities and loopback publishing, and external PostgreSQL, since upstream calls embedded pg0 "not recommended for production". Leave `HINDSIGHT_API_ENABLE_OBSERVATIONS` and `HINDSIGHT_API_ENABLE_AUTO_CONSOLIDATION` unset, so observations and automatic consolidation keep their documented default `true` ([`configuration.mdx:2257-2258`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/configuration.mdx#L2257-L2258)), and create banks without configuration fields (4.3, r7 repair). | I:56–58; at 0.10.2: [temperature names and defaults](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L216-L245), [operation config](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L383-L462), [installation](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L37-L39); [loopback compose](https://github.com/vectorize-io/hindsight/blob/f8950b0c07d9e34c76493dba802bb309f0ce60fd/docker/docker-compose/claude-code/docker-compose.yaml#L14-L17) (unchanged at 0.10.2). Four of the five Hindsight files r6 cited at `f8950b0c` changed at 0.10.2, so these links supersede r6's line references. The recorded gateway request-shape probes (**9/9** across sol/luna/astra, `max_tokens` up to 64000, JSON-object and required-tool shapes) are wire compatibility for the 0.10.1 service, not a ≥65000-output or complete lifecycle acceptance. |
 | **agentmemory 0.9.29** | Release commit `2d38dafede67d0d4ed920cde94d2106e98825b8a`, its lockfile, iii **0.11.2**, and the platform-specific iii digest. Use the upstream CLI/source-build path inside a fresh arm container, including the local Transformers optional dependency for the MiniLM diagnostic, plus an isolated engine volume/home. Pin the worker and MCP package independently; keep Node/model pins above. Embedder per 3.1 and GPT-6 LLM configuration as specified above. | [upstream start](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md#L76-L115), [source build](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md#L748-L765), [engine-only compose](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/docker-compose.yml#L1-L47). The MCP package's `~0.9.0` runtime dependency is not a runtime pin. |
 
 OpenViking, MemPalace, basic-memory, memsearch, ai-memory and any admitted reserve get their recipes resolved under the same rules before freeze.
@@ -251,12 +282,22 @@ AMB at [`03c1d0f1d27da63034f0931121c858faba512383`](https://github.com/vectorize
 1. **LongMemEval dataset adapters** on the pinned file (4.1). Each is passed as the `dataset` instance to unmodified `EvalRunner.run` ([`runner.py:51-71`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/runner.py#L51-L71)). Each builds documents with opaque session IDs and an ID-free context (r6 N2, Appendix A) in place of AMB's `"{question_id}_{session_id}"` IDs and ID-bearing context ([`dataset/longmemeval.py:285-289,329-342`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/dataset/longmemeval.py#L285-L342)):
    - **retrieval variant**: `task_type = "retrieval"`, run in AMB's LLM-free `retrieval` mode. For a retrieval-typed dataset the runner scores only `raw_response["documents"]` ([`runner.py:222-227`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/runner.py#L222-L227)), which only [`modes/retrieval.py:56-61`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/modes/retrieval.py#L56-L61) supplies. In `rag` mode that key is absent, so the brief's "rag mode only" governs the next variant, not this one. `retrieval_limit` is the common depth (4.5), `score_retrieval` only exports each ranked opaque-ID list, and the S3 scorer (4.2) computes the metrics;
    - **open-QA variant**: `task_type = "open"`, run in AMB's `rag` mode only, because `agentic-rag` constructs `GeminiLLM()` whenever no LLM is passed in ([`modes/agentic_rag.py:8,26-27`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/modes/agentic_rag.py#L26-L27)). It inherits AMB's LongMemEval answer prompt (`build_rag_prompt`, `dataset/longmemeval.py:129-168`) and per-category judge prompts (`get_judge_prompt_fn`, `:177-258`) unchanged (5.5).
-2. **Thin `MemoryProvider` clients** (HTTP, MCP or CLI) to each system's current upstream deployment (3.5). They implement AMB's interface ([`memory/base.py:8-79`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/base.py#L8-L79)) without changing ingest or recall semantics.
-3. **Reused AMB providers.**
-   - Hindsight uses AMB's `hindsight-http` provider ([`memory/hindsight.py:1242-1255`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/hindsight.py#L1242-L1255); `HINDSIGHT_HTTP_URL`, `HINDSIGHT_HTTP_KEY`).
+2. **Thin `MemoryProvider` clients** (HTTP, MCP or CLI) to each system's current upstream deployment (3.5). They implement AMB's interface ([`memory/base.py:8-79`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/base.py#L8-L79)) without changing ingest or recall semantics, including each system's native store configuration (section 2). Since repair round 1 every system uses one, Hindsight included.
+3. **No AMB provider is reused (r7 repair).**
+   - r7 had reused AMB's `hindsight-http` provider for Hindsight ([`memory/hindsight.py:1242-1255`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/hindsight.py#L1242-L1255)). That provider cannot keep Hindsight's native pipeline:
+     - It creates every bank with `enable_observations=False` ([`_bank_kwargs`, `:218-219`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/hindsight.py#L218-L219)), on the synchronous path (`:236-243`) and on the asynchronous path that AMB's per-unit ingest takes (`:425-433`). The 0.10.2 server stores that field as a bank override ([`api/http.py:1951-1954,1989-2030`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/api/http.py#L1951-L2030); `PUT /v1/default/banks/{bank_id}`, `:8364-8384`), and a bank with it `false` runs no consolidation at all, automatic or manual ([`memory-banks.mdx:242`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/memory-banks.mdx#L242)). Hindsight's documented defaults turn observations and automatic consolidation on ([`config.py:1711-1712`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L1711-L1712); `memory-banks.mdx:240-246`; `configuration.mdx:2257-2258`). AMB has no setting that restores them: its only bank-level overrides are `AMB_RETAIN_MISSION` and `AMB_RETAIN_EXTRACTION_MODE` (`:224-233`).
+     - Its asynchronous recall ignores the `k` that AMB's retrieval mode passes and sends `budget: "high"` with `max_tokens` 32768 (`:708-747`).
+     - It builds its synchronous client from AMB's locked `hindsight-all` 0.4.17 (`from hindsight import HindsightClient`, `:1252-1255`; that wheel's `hindsight/__init__.py:60`).
+     - A timed-out or five-times-failed asynchronous recall returns an empty list (`:1155-1180`).
+   - Hindsight therefore gets a **thin local provider** in this repository. It speaks the 0.10.2 service's documented REST API over `httpx`, as AMB's own provider already does for recall (`:838-861`). It:
+     - creates each bank with no configuration field, so the bank keeps the server's defaults; configuration fields belong to the separate config API, not to bank creation ([`memory-banks.mdx:508`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/memory-banks.mdx#L508));
+     - before any ingest, reads `GET /v1/default/banks/{bank_id}/config` ([`api/http.py:9380-9382`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/api/http.py#L9380-L9382)), whose response separates the resolved `config` from the bank's `overrides` (`memory-banks.mdx:546-548`). It proceeds only if `overrides` is empty and the resolved `config` matches the frozen effective settings, whose canonical-JSON sha256 is frozen at freeze from a development bank created the same way. A mismatch stops the run before ingest;
+     - treats ingest as complete only when `GET /v1/default/banks/{bank_id}/operations` ([`operations.mdx:109-117`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/operations.mdx#L109-L117)) lists no pending or processing operation of any type for the bank, including the `consolidation` operations that follow each retain (`operations.mdx:67-73`). A failed operation is a logged ingest failure;
+     - maps facts and observations to source sessions under the common expansion rule (4.1, 4.5); an observation reaches its sessions through the facts it cites (`source_fact_ids`, [`recall.mdx:163`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/recall.mdx#L163));
+     - uses the common depth policy and retry policy of 4.5.
    - AMB's `supermemory` provider is **not** reusable against the local server. Its indexing-status poll hard-codes `https://api.supermemory.ai/v3/memories/{id}` and sends the API key there ([`memory/supermemory.py:77-85`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/supermemory.py#L77-L85)). It ignores `k` in favour of 30 results (`:7,113-119`), and it returns one merged context document (`:127-128`), so no session ranking exists. The provider's SDK honours `SUPERMEMORY_BASE_URL` (supermemory 3.28.0 `_client.py:113-115`), but the poll does not.
    - supermemory-local therefore uses a thin client in this repository. This departs from the brief on the evidence above.
-4. **AMB's locked system libraries serve no arm:** `mem0ai` 1.0.5, `cognee` 0.5.4 and `hindsight-all` 0.4.17 ([`uv.lock:3129-3130,854-855,2005-2006`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/uv.lock#L854-L855)). AMB's in-process `mem0`, `cognee` and `hindsight` providers are not used; each system runs at its 3.1 release in its own arm (3.5). The parity audit checks AMB's locked `hindsight-client` 0.9.2 (`uv.lock:2077-2078`) against the 0.10.2 service.
+4. **AMB's locked system libraries serve no arm:** `mem0ai` 1.0.5, `cognee` 0.5.4 and `hindsight-all` 0.4.17 ([`uv.lock:3129-3130,854-855,2005-2006`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/uv.lock#L854-L855)). AMB's in-process `mem0`, `cognee` and `hindsight` providers are not used, and since repair round 1 neither is its `hindsight-http` provider, so the statement now holds for `hindsight-all` too (item 3 corrects r7). Each system runs at its 3.1 release in its own arm (3.5). AMB's locked `hindsight-client` 0.9.2 (`uv.lock:2077-2078`) is likewise unused, so r7's parity check of it against the 0.10.2 service is dropped.
 5. **The frozen dispatch wrapper (r6, retained)** holds no ingest, retrieval, scoring or statistics logic. It launches per-unit `EvalRunner.run(..., unit=<question_id>)` processes ([unit filter 119–121](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/runner.py#L119-L121)) in the frozen block-randomized order at the frozen process concurrency, and records each process identity and exit status. It exists because AMB runs questions one at a time in one process, and its provider `concurrency` bounds only queries within a unit (runner.py:282–385, 338–363). The parity audit and the bundle review cover it. The v4 driver (#386) remains a cited adapter/provenance reference, never an executable S3 runner.
 
 The adapters are offered upstream to AMB after the S3 decision; the offer is not a precondition.
@@ -279,12 +320,20 @@ The adapters are offered upstream to AMB after the S3 decision; the offer is not
 
 AMB is maintained by vectorize-io, Hindsight's vendor. The controls:
 1. **A primary metric with no LLM judge:** `recall_all@5` (4.2, 5.1).
-2. **Equal k.** Every provider receives the same `retrieval_limit`, and the scorer cuts each ranking at the first 5 distinct source sessions. Providers that ignore `k`, such as Hindsight's token budget ([`hindsight.py:732-735`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/hindsight.py#L732-L735)), are listed with their effective depth. A ranking shorter than 5 sessions is scored as returned and flagged.
-3. **One parity checklist for every system, Hindsight included** (r6's pre-freeze audit, retained):
-   - native ingest and recall at equal candidate depth, with identical session mapping and deduplication;
+2. **Equal depth, defined operationally (r7 repair).**
+   - *Scoring depth:* the first 5 distinct source sessions of each ranking (4.2), for every provider.
+   - *Request depth:* every provider receives the same `retrieval_limit`, k = 20. That is AMB's retrieval-mode default, and it reaches the provider as `async_retrieve(query, k=k)` ([`modes/retrieval.py:34,45-47`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/modes/retrieval.py#L34-L47)). Each provider contributes at most its first k ranked items.
+   - *Native mapping:* a provider whose recall takes a count passes k. A provider whose recall is sized in tokens passes its upstream default and truncates the ranking to its first k items. For Hindsight that is `max_tokens` 4096 ([`api/http.py:448-449`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/api/http.py#L448-L449)), within which facts come back in relevance order ([`recall.mdx:112`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/recall.mdx#L112)). If such a default returns fewer than k items on a development query while the store holds more, the smallest multiple of the default that returns k items on every development query is frozen before any confirmatory run.
+   - *Recall effort:* upstream defaults; for Hindsight, `budget` `mid` (`api/http.py:448`; [`configuration.mdx:1630`](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/configuration.mdx#L1630)). A documented non-default level, such as the `budget: "high"` that AMB's replaced provider sent (`memory/hindsight.py:743`), is an optional stage under section 2's rule.
+   - A ranking shorter than 5 distinct sessions is scored as returned and flagged, with its item count recorded.
+3. **One parity checklist for every system, Hindsight included** (r6's pre-freeze audit, extended in repair round 1):
+   - native ingest and recall at the common depth above, with identical session mapping and deduplication, and one expansion rule for artifacts that cite several sessions, such as graph nodes, summaries, pages and observations (4.1);
    - no oracle input, the frozen GPT-6 role matrix, and no vendor-specific shortcut;
+   - each system's effective store configuration, read back before ingest and matched to its frozen settings (for Hindsight, 4.3);
    - wire proof that no provider receives a raw session ID;
-   - provider logs that separate a failed recall from an empty ranking (AMB's Hindsight provider returns an empty list after three failed recalls, `hindsight.py:740-747,865-883`).
+   - the actual ingest and recall paths as AMB calls them under the per-unit dispatch (`async_ingest` and `async_retrieve`), exercised on development fixtures. Ingest ends only when the system's own status interface reports that every background operation it started has finished. Injected failures at ingest and at recall (refused connection, timeout, server error) must each end in a logged failure, never in an empty ranking or a silently dropped document;
+   - one frozen retry policy (attempts, backoff and per-call timeout) in every thin provider;
+   - provider logs that separate a failed recall from an empty ranking. AMB's replaced Hindsight provider did not: it returned an empty list after a timeout or five failed attempts ([`memory/hindsight.py:1155-1180`](https://github.com/vectorize-io/agent-memory-benchmark/blob/03c1d0f1d27da63034f0931121c858faba512383/src/memory_bench/memory/hindsight.py#L1155-L1180)).
 
    Registry coverage and source inspection are not parity acceptance.
 4. **A GPT-6 adversarial audit** of the adapters, providers, scorer and checklist before freeze, in addition to the section 11 bundle review. Its findings are resolved before freeze.
@@ -323,18 +372,21 @@ AMB is maintained by vectorize-io, Hindsight's vendor. The controls:
   - Claude Code: native usage from `claude -p --output-format json`, whose payload carries usage and `total_cost_usd` with a per-model breakdown ([headless docs](https://code.claude.com/docs/en/headless)).
   - Codex: `codex exec --json`, whose `turn.completed` events carry `input_tokens`, `cached_input_tokens`, `cache_write_input_tokens`, `output_tokens` and `reasoning_output_tokens` ([`codex-rs/exec/src/exec_events.rs:20-21,50-72`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs#L50-L72)).
   - Each system is installed upstream-clean in a scratch `CLAUDE_CONFIG_DIR` or `CODEX_HOME` and runs the frozen workload. `CLAUDE_CONFIG_DIR` overrides `~/.claude` and holds settings, session history and plugins ([env-vars docs](https://code.claude.com/docs/en/env-vars)). `CODEX_HOME` must already exist as a directory ([`codex-rs/utils/home-dir/src/lib.rs:6-11`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/utils/home-dir/src/lib.rs#L6-L11)).
-  - The same client's no-memory control on the same workload is subtracted pairwise.
+  - The same client's no-memory control runs the same workload. Its usage is reported beside each system's as a signed difference, never subtracted inside C (r7 repair).
   - The user's real `~/.claude` and `~/.codex` are never read or written; they stay frozen until Gate A window W closes.
   - Scratch homes sign in through a supported non-interactive route the user sets up; no credential is copied from the real homes (section 11).
 - **(d) Latency p95 and resources** (5.3).
 
 Count once: a payload count is never added to a usage total that already contains it. Unknown usage stays unknown and leaves that system's cost `pending`, never zero. MCP-only paths are measured at the client tool-call boundary. Payload-only counts support only a payload-size claim; being under a budget is not a token-saving claim.
 
-**Decision cost scalar C (tie-break 1 in 7.3).**
-- Per host and system, C is summed over every model invocation in ledgers (a) and (c): for each invocation, the sum over its token classes (uncached input, cached input, cache write, output including reasoning) of tokens × the frozen list price of that model and class.
+**Decision cost scalar C (tie-break 1 in 7.3; repaired in round 1).**
+- C is the **gross, nonnegative** priced cost of the frozen workload above, per host and system. It sums, over every model invocation that workload causes in ledger (a) (the system's own calls while serving it) and ledger (c) (both clients' own model calls in its sessions), the sum over the invocation's token classes (uncached input, cached input, cache write, output including reasoning) of tokens × the frozen list price of that model and class. Usage from LongMemEval and the other benchmark lanes is reported in ledger (a) but never enters C.
+- The control difference ΔC = C − C₀, where C₀ is the same clients' no-memory control on the same workload, is reported beside C and may be zero or negative. It never enters 7.3, because a ratio of control-subtracted costs moves with the baseline: gross costs of 120 and 130 stay tied under 7.3's 0.80 ratio, while 20 and 30 left after subtracting 100 would not.
+- C is computed exactly, as a rational number from integer token counts and the frozen decimal prices, so that 7.3's equalities are exact.
 - The price table is frozen at freeze for every model ID involved, with the source URL, the retrieval date and the saved page's sha256.
 - Local inference has no token price; it enters through 5.3.
 - If a model's price is unavailable and C could change the winner, selection is unresolved (7.3).
+- 8.3's RAG decision uses C_RAG, defined there.
 
 **r6 ingest budget, throughput and wall-clock feasibility (retained).** Use **about 115K extraction-input tokens per LongMemEval-S question per GPT-6-powered system** as coordinator brief B:G's planning assumption, not a measured total for every architecture (coordinator brief B:G; the approximately 115K-token history scale is also documented in [Attemory's pinned benchmark overview:125](https://github.com/AttemorySystem/attemory/blob/603c03afa9a04e48b778922eae156a0024752f37/README.md#L125)). Native calls may revisit text, and some systems have no extraction role; measure each complete workload rather than treating this estimate as usage.
 
@@ -443,7 +495,7 @@ p = min(1.0, 2 * min(numpy.mean(d <= 0), numpy.mean(d >= 0)))
   - For a difference of 0.02 it is at most 0.04 at the strictest step and 0.28 at the last.
   - Differences inside the 0.02 band will therefore rarely be separated, and even 0.05 differences may remain not separated. 7.2 therefore decides on the point estimate and uses the tests to label the result and to bar significantly worse systems from the tie-break.
   - Power is information, not a gate or a margin change. A prospective subset (5.2) must report this calculation for its frozen size before any result.
-- **Outside the family:** controls and diagnostics (3.4), development checks, the official track, `ndcg_any@5`, 5.5(b) and LongMemEval-V2.
+- **Outside the family:** controls and diagnostics (3.4), development checks, the official track, `ndcg_any@5`, 5.5(b), LongMemEval-V2 and S8's non-inferiority test (7.1 item 7, 8.4).
 - **Missing results:** a missing system or lane result is `pending` and is not imputed.
 - **Governing statistics (r4, retained):** these statistics govern S3 on both hosts. The A-protocol's family α values (0.0333, 0.0167), its +5 pp/−2 pp rule and its one-look-per-family rule do not transfer (r6 §12, Appendix A).
 
@@ -456,23 +508,90 @@ p = min(1.0, 2 * min(numpy.mean(d <= 0), numpy.mean(d >= 0)))
 3. warm p95 latency (5.3) at most 1.0 s;
 4. its decision cost C (5.2) is complete, not `pending`;
 5. its 5.5(a) results are complete for all 25 frozen tasks, including at least eight research-memory queries among the 20 queries;
-6. **usefulness floor (r3's floor in symmetric form, r7):** its 5.5(a) successes are at least the highest success count among the systems meeting items 1–5, minus one, on the same 25 frozen tasks with the same scoring rules. Research-memory tasks count toward that floor and cannot be omitted from either side. Missing task results leave qualification `pending`.
+6. **usefulness floor (r3's floor in symmetric form, r7):** its 5.5(a) successes are at least the highest success count among the systems meeting items 1–5, minus one, on the same 25 frozen tasks with the same scoring rules. Research-memory tasks count toward that floor and cannot be omitted from either side. Missing task results leave qualification `pending`;
+7. **no-memory non-inferiority on S8 (r7 repair):** for each client, its result on the frozen S8 code tasks (8.4) is non-inferior to the same client's no-memory control (3.4) on the same tasks, seeds and scoring. S8's own dated amendment freezes the margin and the test before S8's first run. While S8 is `pending`, item 7 is `pending` for every system, so each host's selection is `pending` too. This coupling and its alternatives await the user's acceptance (decision record, "Decisions for acceptance").
+
+Neither usefulness item sets a fixed minimum success count: item 6 is relative to the other systems and item 7 to the no-memory control. The reviewer's example of every system scoring 0/25 on 5.5(a) therefore stays open unless the user adopts one of the alternatives in the decision record.
 
 ### 7.2 Winner and tie-break set
 
-- Let q be each eligible system's full-track `recall_all@5` (4.2), and let L be the system with the highest q (on an exact tie, every tied system).
-- The tie-break set B contains L and every other eligible system i whose Holm-adjusted test against L (section 6) does not reject **and** whose q_i ≥ q_L − **0.02**, the preregistered practical-equivalence band.
-- A system significantly worse than L (Holm rejects in L's favour) is never in B, however small the difference.
-- A system not separated from L but more than 0.02 below it is outside B: L wins over it on the point estimate, and the report states "not separated from" that system.
-- If B = {L}, L is selected. L is labelled **best** if Holm separates it from every other eligible system; otherwise it is labelled **leader, not separated from** the listed systems.
-- If B has several members, 7.3 applies, then 7.4.
+Repaired in round 1 (finding F3): the maximizer set and the quantifier are explicit.
+- Let q_i be each eligible system's full-track `recall_all@5` (4.2). Each q_i is computed exactly, as a rational number; a seed-averaged question score is a multiple of 1/5, so every comparison below is exact.
+- Let q* be the largest q_i. The **maximizer set** is M = {i : q_i = q*}, and every member of M is a leader.
+- The **tie-break set** B contains every member of M and each other eligible system j that meets both conditions:
+  - q_j ≥ q* − **0.02**, the preregistered practical-equivalence band;
+  - for **every** leader m in M, Holm does not reject the pair (j, m) in m's favour (section 6). A significant loss to any one leader excludes j.
+- A system significantly worse than a leader is therefore never in B, however small the difference. A system that no leader is separated from, but that lies more than 0.02 below q*, is outside B: the leaders win over it on the point estimate, and the report states "not separated from" for each such pair.
+- If B has one member, it is selected. It is labelled **best** if Holm separates it from every other eligible system, and otherwise **leader, not separated from** the listed systems.
+- If B has several members, whether several leaders or leaders plus admitted systems, 7.3 applies, then 7.4.
+- The frozen code at the end of 7.3 states this rule exactly, with examples that include tied leaders whose pairwise decisions against a third system conflict.
 
 ### 7.3 Tie-break 1: token and cost efficiency
 
-- Within B, let c_min be the lowest decision cost C (5.2).
-- The member with c_min is selected if c_min ≤ **0.80 ×** every other member's C, the cost ratio r6 froze for its cost route.
-- Otherwise every member with C ≤ c_min / 0.80 stays tied and goes to 7.4.
+Repaired in round 1 (finding F4): the rule handles several equal minima, zero included.
+- Within B, let c_min be the lowest decision cost C (5.2), which is gross, nonnegative and exact.
+- The **cost-tied set** A contains each member j with C_j = c_min or 0.80 × C_j < c_min, where 0.80 is the cost ratio r6 froze for its cost route. A member whose C exceeds c_min leaves A when c_min ≤ **0.80 ×** its C; every member at c_min stays.
+- If A has one member, it is selected. Otherwise every member of A goes to 7.4; this covers several equal minimum costs, zero included.
+- A member whose C is exactly c_min / 0.80 leaves A, matching r6's selection condition c_min ≤ 0.80 × C. r7's wording had also kept such a member tied (repair clarification).
 - If an unknown C, or an unavailable price, could change the outcome, selection is unresolved.
+
+**Frozen rule and examples for 7.2 and 7.3 (repair round 1).** This code is part of the preregistration. The analysis applies exactly these two functions, and the examples must pass under the frozen Python before freeze. `worse` holds the pairs that section 6's Holm step rejects, oriented by the observed difference.
+
+```python
+# S3 r7 sections 7.2-7.3: frozen rule and examples (r7 repair round 1, F3 and F4)
+from fractions import Fraction as F
+
+BAND = F(2, 100)    # 7.2 practical-equivalence band
+RATIO = F(80, 100)  # 7.3 cost ratio (r6)
+
+
+def tie_break_set(q, worse):
+    """q: {system: exact full-track recall_all@5}. worse: the pairs (i, m) that
+    Holm rejects with m ahead of i (section 6); a pair with a zero observed
+    difference never enters it. Returns the maximizer set M and the set B."""
+    top = max(q.values())
+    M = {i for i in q if q[i] == top}
+    B = M | {j for j in q if j not in M and q[j] >= top - BAND
+             and all((j, m) not in worse for m in M)}
+    return M, B
+
+
+def cost_tied(C):
+    """C: {member of B: exact gross decision cost, >= 0}. A single member is
+    selected by 7.3; several members go to 7.4."""
+    c_min = min(C.values())
+    return {j for j in C if C[j] == c_min or RATIO * C[j] < c_min}
+
+
+n = F(470)  # full-track questions; seed averages are multiples of 1/5
+
+# (1) One maximizer; the runner-up is 20/470 below it, outside the band.
+assert tie_break_set({"A": 300 / n, "B": 280 / n}, set()) == ({"A"}, {"A"})
+# (2) Tied leaders with conflicting pairwise decisions. C is inside the band
+# but Holm separates it from co-leader A (not from B), so C is out. D is
+# separated from neither co-leader, so D is in.
+q = {"A": 300 / n, "B": 300 / n, "C": 295 / n, "D": F(1453, 5) / n}
+assert tie_break_set(q, {("C", "A")}) == ({"A", "B"}, {"A", "B", "D"})
+assert tie_break_set(q, set()) == ({"A", "B"}, {"A", "B", "C", "D"})
+# (3) The band is compared exactly: 271.2 of 470 is exactly 0.02 below 280.6
+# of 470 and is in (binary floating point would put it out); one fifth of a
+# question less is out.
+assert tie_break_set({"A": F(1403, 5) / n, "E": F(1356, 5) / n}, set())[1] == {"A", "E"}
+assert tie_break_set({"A": F(1403, 5) / n, "E": F(1355, 5) / n}, set())[1] == {"A"}
+# (4) Several equal minimum costs, zero included: every minimum stays tied.
+assert cost_tied({"A": F(10), "B": F(10), "D": F(13)}) == {"A", "B"}
+assert cost_tied({"A": F(0), "B": F(0), "D": F(5)}) == {"A", "B"}
+assert cost_tied({"A": F(0), "B": F(3)}) == {"A"}
+# (5) A unique minimum is selected when it costs at most 0.80 x every other
+# member, r6's boundary included; otherwise the members above stay tied.
+assert cost_tied({"A": F(8), "B": F(10)}) == {"A"}
+assert cost_tied({"A": F(8), "B": F("9.9")}) == {"A", "B"}
+# (6) Gross costs, never control-subtracted ones (5.2): 120 and 130 stay tied,
+# although 20 and 30 left after subtracting a common 100 would not.
+assert cost_tied({"A": F(120), "B": F(130)}) == {"A", "B"}
+assert cost_tied({"A": F(20), "B": F(30)}) == {"A"}
+print("7.2-7.3 frozen examples: all assertions hold")
+```
 
 ### 7.4 Tie-break 2: repo-quality score
 
@@ -488,8 +607,18 @@ RQ = (Σ_{c ∈ S} w_c · s_c + 2.5 · R + 2.5 · K) / (Σ_{c ∈ S} w_c + 5)
 
   The first term is therefore Scorecard's own aggregate over these seven checks.
 - **R**, release cadence: R = 10 × min(1, n90 / 3). n90 counts GitHub releases that are neither drafts nor prereleases, published in the 90 days before the gate run; for a project that publishes no releases, it counts version tags. One release a month on average over Scorecard's 90-day window earns full marks.
-- **K**, CI on the pinned release commit: K = 10 if every completed check run on that commit concluded success, neutral or skipped and its combined status is not failure or error (`gh api repos/OWNER/REPO/commits/SHA/check-runs` and `.../status`). Otherwise, including when no CI result exists, K = 0.
-- R and K take the Low-risk weight 2.5, the same as CI-Tests. Their definitions and weights are coordinator parameters, not Scorecard's, and the user may change them before freeze.
+- **K**, CI on the pinned release commit (repaired in round 1, finding F6). At the freeze gate run, capture the commit's complete check and status set:
+
+  ```sh
+  gh api --paginate "repos/OWNER/REPO/commits/SHA/check-runs?filter=latest&per_page=100"
+  gh api --paginate "repos/OWNER/REPO/commits/SHA/status?per_page=100"
+  gh api "repos/OWNER/REPO/commits/SHA/check-suites?per_page=1" --jq .total_count
+  ```
+
+  GitHub's REST description ([`rest-api-description@af2c1025`](https://github.com/github/rest-api-description/blob/af2c102501766f14fe4edc688e449427a971e66a/descriptions/api.github.com/api.github.com.json), `api.github.com.json`) caps `per_page` at 100 and limits the check-run listing to a ref's 1000 most recent check suites (`:55478-55482`); the check-suite listing reports a `total_count` (`:55584`). The capture is complete when the retrieved check runs and status contexts each equal their reported `total_count` and the ref has at most 1000 check suites. The complete set is frozen, with its sha256, as the relevant set.
+  - K = 10 only if the set is complete and non-empty, every check run has status `completed` (none `queued`, `in_progress`, `waiting`, `requested` or `pending`; `:145900-145911`) and conclusion `success`, `neutral` or `skipped` (`:145913-145925`), and every status context's latest state is `success`. A commit with check runs but no status context meets the last condition; the combined `state` is not used alone, because GitHub reports it as `pending` when there are no statuses (`:55667`).
+  - Otherwise K = 0, with the reason recorded: missing (no check run and no status), incomplete (an unfinished run or a `pending` context), truncated (a retrieved count below `total_count`, or more than 1000 check suites) or failed (any other conclusion or state, such as `failure`, `error`, `cancelled`, `timed_out` or `action_required`). An API error or rate-limit refusal is retried after the reported reset, and the final response is the one recorded.
+- R and K take the Low-risk weight 2.5, the same as CI-Tests. Their definitions and weights are coordinator heuristics, not Scorecard's measures, and the user may change them before freeze.
 - **Scorecard runs.**
   - The v5.5.0 CLI, `scorecard --repo=github.com/OWNER/REPO --checks=Maintained,CI-Tests,Code-Review,Branch-Protection,Signed-Releases,Vulnerabilities,Dangerous-Workflow --format=json`, runs against the default branch.
   - It runs again with `--commit=<pinned SHA>` ([`options/flags.go:35-36,124-127`](https://github.com/ossf/scorecard/blob/c395761df6afe1a69e476bc60a013a94bcbc153f/options/flags.go#L124-L127)) for Vulnerabilities and Dangerous-Workflow. A check that cannot evaluate a non-HEAD commit keeps its default-branch result, recorded as such.
@@ -501,9 +630,11 @@ RQ = (Σ_{c ∈ S} w_c · s_c + 2.5 · R + 2.5 · K) / (Σ_{c ∈ S} w_c + 5)
 ### 7.5 Silent-fallback LLM stages (r6's C4′ preflight, generalized)
 
 - **Scope.** This applies to every system whose selected configuration has an LLM stage that can silently fall back. ai-memory's reranker is an example: "A timeout, provider error, or incomplete/invalid score set preserves the normal order", and queries over its four-call cap "keep their local ranking without waiting" (`docs/llm-providers.md:338-341` at `a0ca8d1a`).
-- **Preflight.** Before confirmatory scoring, a development preflight measures the fallback rate and the warm p95 under the frozen envelope. It runs at the confirmatory concurrency K and on 5.3's warm schedule.
-- **Development fallbacks above 5%:** the stage is disabled before any confirmatory run by dated amendment, or the arm is `pending`.
-- **Confirmatory fallbacks above 5%:** that system's comparisons are inconclusive, and host selection is unresolved if they could change the winner.
+- **Preflight: two separate development measurements under the frozen envelope** (repaired in round 1, finding F5):
+  1. *Fallback rate under confirmatory load.* The system's development retrieval queries (4.1's development split) are dispatched as the confirmatory run will dispatch them: through the frozen dispatch wrapper (4.3), with K in-flight GPT-6 calls per host (5.2) and the same query concurrency per instance. The denominator is every recall request for which the selected stage is configured to run. The numerator is the requests on which the stage fell back, whether through a timeout, a provider error, an invalid output or a saturation skip such as ai-memory's four-call cap ([`docs/llm-providers.md:338-341`](https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/llm-providers.md#L338-L341)). A fallback is identified from the system's own logs where it records one, and otherwise from the absence of a completed stage call attributed to that request in the gateway `call_logs` (2.2).
+  2. *Gated warm latency at concurrency 1.* 5.3's frozen warm schedule (200 requests, concurrency 1, a 20-request warm-up discarded, no other arm's call in flight), with the stage on. Its p95 is the development estimate for 7.1 item 3. Fallbacks seen here are reported but do not enter the 5% rate.
+- **Stage disabling** follows measurement 1 alone: development fallbacks above 5% disable the stage before any confirmatory run by dated amendment, or the arm is `pending`. Measurement 2 disables nothing; the confirmatory 5.3 run decides latency eligibility.
+- **Confirmatory fallbacks above 5%**, counted as in measurement 1 over the system's confirmatory recall requests: that system's comparisons are inconclusive, and host selection is unresolved if they could change the winner.
 - No configuration may switch after confirmatory scores.
 
 ### 7.6 No eligible system
@@ -571,23 +702,34 @@ MTEB 2.21.10, run one model at a time on the workstation's RTX 4090 without stop
 - **Decision.** Section 7's merit and quality rules apply:
   - the primary is the unweighted mean nDCG@10 over E_doc;
   - tests use a paired bootstrap over queries stratified by task, with Holm over all 15 pairs;
-  - then the 0.02 band, 7.3 and 7.4.
+  - then the 0.02 band, 7.3 and 7.4;
+  - 7.3 uses C_RAG (repair round 1, finding F4): the gross priced cost of ingesting E_doc and answering every E_doc query through the wrapper, summed over every model call at ingest and at query time from ledger (a), with 5.2's price table and exact arithmetic. No client session exists here. A system with no priced model call has C_RAG = 0, which 7.3's equal-minimum rule handles.
 
-  The memory-specific eligibility items (5.4 and 5.5) do not apply; the maintenance gate and the latency bar do.
+  The memory-specific eligibility items (5.4, 5.5 and 7.1 item 7) do not apply; the maintenance gate and the latency bar do.
 - **Feasibility.** Before freeze, project the GPT-6 ingest tokens and wall-clock of the LLM-extraction systems on E_doc. If the projection exceeds the RAG window, drop E_doc tasks prospectively, largest corpus first, before any result. The coordinator or user sets that window before freeze; it defaults to 96 h per host, as in 5.2.
 
-### 8.4 Code retrieval
+### 8.4 Code retrieval and the S8 code-task stage
 
-- Whole-task value for code comes from the separate Harbor E2E lane.
-  - Its harness, `harbor-framework/harbor` v0.23.0 (`1e5c5c6db929a10a140d05e606882c671ae20729`), is ACTIVE.
-  - `harbor-datasets` is stale, so its tasks enter only as hashed data (section 1).
+- **S8.** Whole-task value for code comes from a separate Harbor end-to-end stage, which the repair brief calls S8. The retrieval family of sections 4–7 uses no Harbor task; S8 enters the memory decision only through 7.1 item 7.
+- **Route (repair round 1, finding F1).** S8 uses SWE-bench Verified tasks regenerated by Harbor's maintained adapter, never task bundles from the stale `harbor-datasets` (section 1).
+  - *Harness and adapter:* `harbor-framework/harbor` v0.23.0 (tag object `3c305dc5`, commit `1e5c5c6db929a10a140d05e606882c671ae20729`) and its `adapters/swebench`, ACTIVE.
+  - *Data:* the adapter loads `princeton-nlp/SWE-bench_Verified` by name, with no revision ([`adapters/swebench/src/swebench_adapter/adapter.py:46`](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/adapters/swebench/src/swebench_adapter/adapter.py#L46)). That is a separate Hugging Face dataset ([revision `c104f840cc67f8b6eec6f759ebc8b2693d585d4a`](https://huggingface.co/datasets/princeton-nlp/SWE-bench_Verified/tree/c104f840cc67f8b6eec6f759ebc8b2693d585d4a), last modified 2025-02-18), not an alias of the maintained [`SWE-bench/SWE-bench_Verified` at `78f471bf655a3137b2e8a75af1501690ec009ec3`](https://huggingface.co/datasets/SWE-bench/SWE-bench_Verified/tree/78f471bf655a3137b2e8a75af1501690ec009ec3), its main head on 2026-09-30 (last modified 2026-08-16). Both are static data pinned by the sha256 of the downloaded parquet. Every generated task's source row must be field-identical to the maintained revision's row for the same instance, and a task with any differing field is excluded before any result.
+  - *Executable parts and their sources:*
+    - the Dockerfile, from the adapter's template: `FROM` the SWE-bench instance image that swebench's test specification names ([`task-template/environment/Dockerfile:18`](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/adapters/swebench/src/swebench_adapter/task-template/environment/Dockerfile#L18); `utils.py:55`), then the uv 0.7.13 installer fetched with `curl | sh` (`Dockerfile:40`);
+    - `tests/test.sh`, generated from swebench's test specifications ([`utils.py:6-8,55`](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/adapters/swebench/src/swebench_adapter/utils.py#L6-L55); the adapter requires `swebench>=4.1.0`, `pyproject.toml:12`). It runs the subject repository's own tests ([`task-template/tests/test.sh:4`](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/adapters/swebench/src/swebench_adapter/task-template/tests/test.sh#L4)), then a grading `parser.py` whose inline dependencies `swebench==4.0.3`, `datasets==2.16.1` and `fastcore<1.11` resolve when the verifier runs (`:10,82`), on a public verifier network (`task.toml:18-19`);
+    - Harbor's verifier, which uploads and runs that script (`verifier.py:175-232`). No LLM judge is involved.
+
+    At the repair-round gate, harbor, SWE-bench/SWE-bench, huggingface/datasets, AnswerDotAI/fastcore and astral-sh/uv were ACTIVE (section 1).
+  - *Enforcement:* section 1's task-level provenance manifest. Image tags are mutable, so the built task image is frozen by digest; that covers the base image and the installer. The verifier's resolved dependency set is frozen and recorded on every trial, and a trial whose resolved set differs does not score. Every selected task's subject repository must pass the gate at freeze, and a task whose subject repository is stale is excluded (a task-selection filter).
+- **Relayed prior check.** The coordinator relays that the separate token-tool E2E verified 36 SWE-bench Verified tasks as field-identical to `SWE-bench/SWE-bench_Verified@78f471bf`, with `tests/test.sh` being Harbor's adapter-generated script. This revision has not seen that receipt, nor which task bundles it compared. The check is cited as relayed, and its receipt is required before freeze.
+- **Status: `pending`.** S8 runs only after a dated amendment freezes its task and provenance manifests, its arms (each primary system and each client's no-memory control, 3.4), its task count and seeds, and the margin and test for 7.1 item 7. Until then 7.1 item 7 is `pending` for every system.
 - codebase-memory-mcp v0.11.0 (`8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798`) refused `/testbed`. That refusal is recorded as a fit limit, not as a quality result.
   - Upstream refuses any indexing root with fewer path components than the platform minimum ([`src/foundation/workspace.h:28-29`](https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/src/foundation/workspace.h#L28-L29); `docs/CONFIGURATION.md:196-199`), and Harbor tasks mount the repository at `/testbed`.
   - The refusal itself is relayed by the brief. No receipt for it exists in this checkout, so the Harbor lane's receipt must be cited before freeze.
 
 ## 9. Hosts (r6, retained with r7 edits)
 
-Each host selects **separately**, with every lane (5.1–5.5) and section 7's rule applied to its own measurements.
+Each host selects **separately**, with every lane (5.1–5.5, and S8 through 7.1 item 7) and section 7's rule applied to its own measurements.
 - **Order of acceptance testing on each host:** by primary-lane point estimate, descending. Continue while any untested eligible configuration could still change that host's selection.
 - **Cross-host differences** are a diagnostic, not a gate.
 - **CUDA timing, VRAM behaviour, model-serving compatibility and lifecycle acceptance do not transfer to macOS**, and Mac results do not transfer back.
@@ -604,6 +746,7 @@ Each host selects **separately**, with every lane (5.1–5.5) and section 7's ru
 - Passing the maintenance gate shows activity, not quality. A Scorecard score is a heuristic, and RQ only breaks ties.
 - Registry metadata, such as Hugging Face LFS oids and image digests, is not a hash of downloaded bytes.
 - A retrieval score says nothing about capture or deletion safety; 5.4 covers those.
+- Non-inferiority to no memory on S8 (7.1 item 7) shows that a memory system does not lower coding-task success; it is not evidence of positive coding-task value.
 - Agreement among reviewers, and blinding, do not validate a measurement.
 - Nothing here changes a host until the winner passes a cold-copy cutover with rollback.
 
@@ -611,21 +754,22 @@ Each host selects **separately**, with every lane (5.1–5.5) and section 7's ru
 
 1. Build the experiment bundle:
    - this document and the decision record;
-   - the inputs under `inputs/` with sha256: the r4 Mac sweeps, the five r6 captures (r6 §14), the r7 live capture, and the maintenance-gate rerun at freeze with its own capture;
+   - the inputs under `inputs/` with sha256: the r4 Mac sweeps, the five r6 captures (r6 §14), the r7 live capture, the repair-round capture and the GPT-6 review capture, and the maintenance-gate rerun at freeze with its own capture;
    - the downloaded dataset's sha256 and byte count, the full-population 470, official 419 and QA 500 manifests, any prospectively selected subset with its recomputed cluster and official-intersection counts, the development split hashes with the no-overlap check, and all 20 query and 5 continuation task specifications with their expected evidence and the manual-audit sampling rule;
-   - **AMB `03c1d0f1d27da63034f0931121c858faba512383` verified byte-identical**, each arm's executed-environment hash, both S3 dataset adapter variants with the no-judge and zero-Google/Groq wire proof, the S3 scorer and its tests, the dispatch wrapper, every thin provider client, the parity checklist, and the GPT-6 adversarial audit with its resolutions;
+   - **AMB `03c1d0f1d27da63034f0931121c858faba512383` verified byte-identical**, each arm's executed-environment hash, both S3 dataset adapter variants with the no-judge and zero-Google/Groq wire proof, the S3 scorer and its tests, the dispatch wrapper, every thin provider client (Hindsight's included), each system's frozen effective store settings (for Hindsight, the bank-configuration hash), the common depth mapping and retry policy, the parity checklist, and the GPT-6 adversarial audit with its resolutions;
+   - the S8 amendment with its task and provenance manifests and the receipt for the relayed 36-task check, or S8's recorded `pending` status and what it leaves `pending` under 7.1 item 7;
    - the A17 supersession amendment (`blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md`), revised to match r7. Its lines 16 and 19–21 still describe r4–r6's reference arm, and that file lies outside this revision's paths;
-   - the analysis code bound to **SciPy 1.18.1 / statsmodels 0.15.0**, its locked NumPy version, the pairwise family definition (k, m, placeholders), the 10,000-resample and linear-quantile settings, the diagnostic sign-flip and the achieved-power report (plus prospective subset power if applicable);
+   - the analysis code bound to **SciPy 1.18.1 / statsmodels 0.15.0**, its locked NumPy version, the frozen 7.2–7.3 functions with their examples passing, the pairwise family definition (k, m, placeholders), the 10,000-resample and linear-quantile settings, the diagnostic sign-flip and the achieved-power report (plus prospective subset power if applicable);
    - client and plugin versions;
    - the 8.2 selection receipts with every model's full revision, quantization and native serving pin, and the E_doc/S_doc partition;
    - the RAG wrappers and their mapping rules;
    - the GPT-6 per-role model/effort matrix, the R02 and optional-stage decisions with per-role or coupled-set n, metric, α and test and per-host outcomes, the fixed Astra-max answerer and judge, and no stale fallback models;
    - per-host gateway build receipts, container-to-loopback transport, conversation affinity, cache/dedup exclusion and effective-effort wire receipts for all call paths, AMB's answerer and judge included;
    - each system's upstream install/test/lifecycle recipe and immutable image/lock pins, fresh container/volume/home identities, effective role overrides and early lifecycle-screen results, both sanitized live deploy receipts, and the Mac's own hosting and 12-of-12 gateway receipts;
-   - prompts, seeds, fixtures, configurations, **development-selected K**, supported concurrency knobs and observed call concurrency, the block-randomized dispatch order, measured development tokens/s and the **projected wall-clock per host against the 96 h window**, the prospective full/subset decision, the 7.5 preflights, the complete non-overlapping ledger definitions, the frozen price table, the Scorecard and RQ inputs, and the scratch-home sign-in route for 5.2(c).
+   - prompts, seeds, fixtures, configurations, **development-selected K**, supported concurrency knobs and observed call concurrency, the block-randomized dispatch order, measured development tokens/s and the **projected wall-clock per host against the 96 h window**, the prospective full/subset decision, the 7.5 preflights, the complete non-overlapping ledger definitions, the frozen price table, the Scorecard and RQ inputs with each pinned commit's frozen check and status capture (7.4), and the scratch-home sign-in route for 5.2(c).
 2. Verify that every referenced file and link exists.
 3. Get a GPT-6 cross-family review of the **bundle**, and resolve every required finding.
-4. **Obtain the user's explicit acceptance** of the reviewed bundle, including the coordinator decisions listed in "r6 → r7 changes" and the A17 supersession. Freeze only after both.
+4. **Obtain the user's explicit acceptance** of the reviewed bundle, including the coordinator decisions listed in "r6 → r7 changes", the repair-round decisions in the decision record's "Decisions for acceptance" and the A17 supersession. Freeze only after both.
 5. Record the immutable commit and the bundle's sha256 list outside the worktree, rerun the maintenance gate, then run.
 6. Keep per-case outputs, failures and each arm's actual execution status.
 

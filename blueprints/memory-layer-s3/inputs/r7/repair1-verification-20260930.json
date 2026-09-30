@@ -1,0 +1,333 @@
+{
+ "captured_utc": "2026-09-30T04:23:48Z",
+ "purpose": "Live verification behind the r7 repair round 1 of blueprints/memory-layer-s3/PREREGISTRATION.md (DRAFT r7): maintenance gate for the sources of the S8 code-task stage, the Harbor tag resolution, the SWE-bench Verified dataset revisions, GitHub's REST description for the CI term, the locked hindsight-all wheel, and every upstream locator the repair relies on.",
+ "scope": "Metadata and source reads only. GitHub reads used `gh api graphql` (gh 2.101.0) because the account's shared REST core quota refused requests at 2026-09-30T04:16Z; GraphQL returns the same archived flag, default-branch commit history and blob text at a pinned commit. Hugging Face Hub API, PyPI JSON and one raw.githubusercontent.com read at a pinned commit. No deployment, provider call or scored run.",
+ "gate": {
+  "rule": "PREREGISTRATION section 1: stale if archived or no default-branch commit in the 90 days before the check",
+  "window_start_utc": "2026-07-02T04:23:48Z",
+  "query": "repository(owner,name){isArchived defaultBranchRef{name target{... on Commit{oid committedDate history(since: WINDOW_START){totalCount}}}}}",
+  "repos": [
+   {
+    "repo": "harbor-framework/harbor",
+    "role": "S8 harness and SWE-bench adapter (8.4)",
+    "archived": false,
+    "default_branch": "main",
+    "head": "9b168361ebe973113640b9183b03cbd7884d720e",
+    "last_commit_utc": "2026-09-30T02:33:35Z",
+    "commits_in_window": 526,
+    "verdict": "ACTIVE"
+   },
+   {
+    "repo": "harbor-framework/harbor-datasets",
+    "role": "supplies nothing to S3 (1, 8.4)",
+    "archived": false,
+    "default_branch": "main",
+    "head": "37db108843a49bb31a592e37a75e2c40dc3f9749",
+    "last_commit_utc": "2026-05-16T19:48:38Z",
+    "commits_in_window": 0,
+    "verdict": "STALE"
+   },
+   {
+    "repo": "SWE-bench/SWE-bench",
+    "role": "swebench package: test specs at task generation (4.1.0), the verifier's parser (4.0.3), instance images",
+    "archived": false,
+    "default_branch": "main",
+    "head": "02e7a74ffd0b707aab73d203fe87bdc7c76afc8e",
+    "last_commit_utc": "2026-09-02T01:50:34Z",
+    "commits_in_window": 113,
+    "verdict": "ACTIVE"
+   },
+   {
+    "repo": "huggingface/datasets",
+    "role": "adapter's dataset loader; verifier parser dependency (2.16.1)",
+    "archived": false,
+    "default_branch": "main",
+    "head": "fa995bdaea171d50d086743364f23e9db6b557d8",
+    "last_commit_utc": "2026-09-28T10:04:31Z",
+    "commits_in_window": 62,
+    "verdict": "ACTIVE"
+   },
+   {
+    "repo": "AnswerDotAI/fastcore",
+    "role": "verifier parser dependency (<1.11)",
+    "archived": false,
+    "default_branch": "main",
+    "head": "ebbe03da6a711f56755568ac0d13d823088dc2ea",
+    "last_commit_utc": "2026-09-28T07:18:32Z",
+    "commits_in_window": 262,
+    "verdict": "ACTIVE"
+   },
+   {
+    "repo": "astral-sh/uv",
+    "role": "runs the verifier parser; installer 0.7.13 in the task image",
+    "archived": false,
+    "default_branch": "main",
+    "head": "06fdf0cdb591adae479feb5b769b0213eabb229c",
+    "last_commit_utc": "2026-09-30T02:07:14Z",
+    "commits_in_window": 1218,
+    "verdict": "ACTIVE"
+   }
+  ]
+ },
+ "tags": [
+  {
+   "repo": "harbor-framework/harbor",
+   "tag": "v0.23.0",
+   "tag_object": "3c305dc5611e3600afc3c818735a82322f0264f8",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729"
+  }
+ ],
+ "huggingface": [
+  {
+   "id": "SWE-bench/SWE-bench_Verified",
+   "revision": "78f471bf655a3137b2e8a75af1501690ec009ec3",
+   "last_modified_utc": "2026-08-16T04:23:43.000Z",
+   "files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "eval.yaml"
+   ],
+   "note": "maintained dataset; this revision was also its main head at capture"
+  },
+  {
+   "id": "princeton-nlp/SWE-bench_Verified",
+   "revision": "c104f840cc67f8b6eec6f759ebc8b2693d585d4a",
+   "last_modified_utc": "2025-02-18T23:48:55.000Z",
+   "files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "note": "a separate dataset repository, not an alias; Harbor v0.23.0's swebench adapter loads it by name without a revision (adapter.py:46)"
+  }
+ ],
+ "pypi": [
+  {
+   "package": "hindsight-all",
+   "version": "0.4.17",
+   "wheel": "hindsight_all-0.4.17-py3-none-any.whl",
+   "sha256": "480bcdb04049fc8aeeeb5b55390e63c90803ba1e52cb2c8b7a3aa270557e7a99",
+   "note": "AMB 03c1d0f1's locked version; the downloaded wheel matched this digest; it provides the top-level module `hindsight`, whose __init__.py:60 imports HindsightClient from client_wrapper.py:185 (class HindsightClient(Hindsight))"
+  }
+ ],
+ "github_rest_description": {
+  "repo": "github/rest-api-description",
+  "commit": "af2c102501766f14fe4edc688e449427a971e66a",
+  "committed_utc": "2026-09-29T22:35:20Z",
+  "file": "descriptions/api.github.com/api.github.com.json",
+  "bytes": 13008045,
+  "sha256": "bab647359529118583d35867f0fdb42ea7ea1b8a2f712590b61ba45b6d4d9b37",
+  "facts": [
+   {
+    "lines": "55478-55482",
+    "fact": "GET /repos/{owner}/{repo}/commits/{ref}/check-runs (checks/list-for-ref): above 1000 check suites on a ref, check runs are limited to the 1000 most recent suites; parameters status (queued, in_progress, completed), filter (latest default, all), per_page (default 30, max 100), page"
+   },
+   {
+    "lines": "55667-55671",
+    "fact": "GET /repos/{owner}/{repo}/commits/{ref}/status (repos/get-combined-status-for-ref): combined state is failure if any context reports error or failure, pending if there are no statuses or a context is pending, success if the latest status for all contexts is success; per_page (default 30, max 100), page"
+   },
+   {
+    "lines": "55584",
+    "fact": "GET /repos/{owner}/{repo}/commits/{ref}/check-suites (checks/list-suites-for-ref): the response carries total_count and check_suites"
+   },
+   {
+    "lines": "145900-145911",
+    "fact": "check-run status enum: queued, in_progress, completed, waiting, requested, pending"
+   },
+   {
+    "lines": "145913-145925",
+    "fact": "check-run conclusion enum: success, failure, neutral, cancelled, skipped, timed_out, action_required; nullable"
+   }
+  ]
+ },
+ "source_locators": [
+  {
+   "repo": "harbor-framework/harbor-datasets",
+   "commit": "37db108843a49bb31a592e37a75e2c40dc3f9749",
+   "path": "datasets/aa-lcr/aa-lcr-1/tests/test.sh",
+   "lines": {
+    "4": "python /tests/llm_judge.py"
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "src/harbor/verifier/verifier.py",
+   "lines": {
+    "175": "if not self._skip_tests_upload:",
+    "180": "await self.environment.upload_dir(",
+    "229": "await self.environment.exec("
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/src/swebench_adapter/adapter.py",
+   "lines": {
+    "46": "ds = load_dataset(\"princeton-nlp/SWE-bench_Verified\")[\"test\"]"
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/src/swebench_adapter/utils.py",
+   "lines": {
+    "6": "from swebench.harness.constants import LATEST, MAP_REPO_VERSION_TO_SPECS",
+    "8": "from swebench.harness.test_spec.test_spec import make_test_spec",
+    "10": "extra_build_instance_images_kwargs = {\"tag\": LATEST}",
+    "55": "spec = make_test_spec(sample, namespace=\"swebench\")"
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/src/swebench_adapter/task-template/tests/test.sh",
+   "lines": {
+    "4": "{test_commands}",
+    "10": "# dependencies = [\"swebench==4.0.3\", \"datasets==2.16.1\", \"fastcore<1.11\"]",
+    "82": "uv run parser.py | tee -a \"$LOG_FILE\""
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/src/swebench_adapter/task-template/environment/Dockerfile",
+   "lines": {
+    "18": "FROM {docker_image}",
+    "40": "RUN curl -LsSf https://astral.sh/uv/0.7.13/install.sh | sh"
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/src/swebench_adapter/task-template/task.toml",
+   "lines": {
+    "18": "[verifier]",
+    "19": "network_mode = \"public\""
+   }
+  },
+  {
+   "repo": "harbor-framework/harbor",
+   "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+   "path": "adapters/swebench/pyproject.toml",
+   "lines": {
+    "12": "\"swebench>=4.1.0\","
+   }
+  },
+  {
+   "repo": "vectorize-io/agent-memory-benchmark",
+   "commit": "03c1d0f1d27da63034f0931121c858faba512383",
+   "path": "src/memory_bench/memory/hindsight.py",
+   "lines": {
+    "219": "kwargs: dict = dict(enable_observations=False)",
+    "225": "env_mission = os.environ.get(\"AMB_RETAIN_MISSION\")",
+    "231": "extraction_mode = os.environ.get(\"AMB_RETAIN_EXTRACTION_MODE\")",
+    "243": "self._client.create_bank(bank_id=bank_id, name=f\"Benchmark Bank ({bank_id})\", **kwargs)",
+    "433": "await client.acreate_bank(bank_id=bank_id, name=f\"Benchmark Bank ({bank_id})\", **kwargs)",
+    "728": "max_tokens = 32768",
+    "743": "\"budget\": \"high\",",
+    "744": "\"max_tokens\": max_tokens,",
+    "1087": "retain_async=True,",
+    "1146": "await self._await_bank_ingest(client, bank_id)",
+    "1159": "response = await asyncio.wait_for(_call, timeout=300)",
+    "1175": "return [], None",
+    "1180": "return [], None",
+    "1242": "class HindsightHTTPMemoryProvider(HindsightCloudMemoryProvider):",
+    "1252": "from hindsight import HindsightClient",
+    "1255": "self._client = HindsightClient(base_url=self._cloud_base_url, api_key=self._cloud_api_key)"
+   }
+  },
+  {
+   "repo": "vectorize-io/agent-memory-benchmark",
+   "commit": "03c1d0f1d27da63034f0931121c858faba512383",
+   "path": "src/memory_bench/modes/retrieval.py",
+   "lines": {
+    "34": "k = int(meta.get(\"retrieval_limit\") or 20)",
+    "45": "docs, raw = await memory.async_retrieve(",
+    "46": "query, k=k, user_id=user_id, query_timestamp=meta.get(\"query_timestamp\"), filters=filters"
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-api-slim/hindsight_api/config.py",
+   "lines": {
+    "1711": "DEFAULT_ENABLE_OBSERVATIONS = True  # Observations enabled by default",
+    "1712": "DEFAULT_ENABLE_AUTO_CONSOLIDATION = True  # Auto-consolidation after retain enabled by default"
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-docs/docs/developer/api/memory-banks.mdx",
+   "lines": {
+    "35": "You don't need to pre-create a bank. Hindsight will automatically create it with default settings when you first use it.",
+    "242": "Toggles observation consolidation on or off. When `false`, no consolidation runs for this bank — neither automatic nor manual. Defaults to `true` when the observations feature is enabled on the server.",
+    "246": "Controls whether consolidation runs automatically after retain, delete, and update operations. When `false`, consolidation only runs when explicitly triggered via the [consolidate endpoint](/developer/observations#trigger-consolidation). Defaults to `true`.",
+    "508": "Bank configuration fields (retain mission, extraction mode, observations mission, etc.) are managed via a **separate config API**, not the `create_bank` call. This lets you change operational settings independently from the bank's identity and disposition.",
+    "547": "- **`config`** — the fully resolved configuration (server defaults merged with bank overrides)",
+    "548": "- **`overrides`** — only the fields explicitly overridden for this bank"
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-docs/docs/developer/configuration.mdx",
+   "lines": {
+    "1630": "The recall request takes a `budget` parameter (`low` / `mid` / `high`, default `mid`) that maps to an integer `thinking_budget` used by every retrieval method (semantic, BM25, graph, temporal). These knobs control that mapping. They are hierarchical — overridable per bank via the [config API](#hierarchical-configuration).",
+    "2257": "| `HINDSIGHT_API_ENABLE_OBSERVATIONS` | Enable observation consolidation | `true` |",
+    "2258": "| `HINDSIGHT_API_ENABLE_AUTO_CONSOLIDATION` | Automatically trigger consolidation after retain, delete, and update operations. When `false`, consolidation only runs when explicitly triggered via the [consolidate endpoint](/developer/api/operations#consolidation). Configurable per bank. | `true` |"
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-api-slim/hindsight_api/api/http.py",
+   "lines": {
+    "413": "class RecallRequest(BaseModel):",
+    "448": "budget: Budget = Budget.MID",
+    "449": "max_tokens: int = 4096",
+    "1951": "enable_observations: bool | None = Field(",
+    "1989": "def get_config_updates(self) -> dict[str, Any]:",
+    "2020": "\"enable_observations\",",
+    "8365": "\"/v1/default/banks/{bank_id}\",",
+    "8380": "config_updates = request.get_config_updates()",
+    "8384": "config_updates=config_updates or None,",
+    "9381": "\"/v1/default/banks/{bank_id}/config\","
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-docs/docs/developer/api/operations.mdx",
+   "lines": {
+    "67": "### `consolidation`",
+    "73": "- After every retain that added world/experience facts (gated by per-bank `enable_auto_consolidation` and `enable_observations`).",
+    "109": "GET /v1/default/banks/{bank_id}/operations",
+    "116": "| `status` | Filter by `pending`, `processing`, `completed`, `failed`, `cancelled`. |",
+    "117": "| `type` | Filter by `retain`, `file_convert_retain`, `consolidation`, `refresh_mental_model`, `graph_maintenance`, `webhook_delivery`. |"
+   }
+  },
+  {
+   "repo": "vectorize-io/hindsight",
+   "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+   "path": "hindsight-docs/docs/developer/api/recall.mdx",
+   "lines": {
+    "112": "The maximum number of tokens the returned facts can collectively occupy. Defaults to `4096`. Only the `text` field of each fact is counted toward this budget — metadata, tags, entities, and other fields are not included. After reranking, facts are included in relevance order until this budget is exhausted — so you always get the most relevant memories that fit. A fact too long for the remaining budget is skipped rather than ending the selection, so shorter facts ranked behind it still come back. Hindsight is designed for agents, which think in tokens rather than result counts: set `max_tokens` to however much of your context window you want to allocate to memories.",
+    "163": "When enabled and `types` includes `observation`, each observation result is accompanied by the original contributing facts it was synthesized from. Source facts are returned in a top-level `source_facts` dict keyed by fact ID, and each observation result carries a `source_fact_ids` list for cross-referencing. Facts are deduplicated across observations. The `max_tokens` sub-option (default `4096`) limits the total token budget for source facts."
+   }
+  },
+  {
+   "repo": "akitaonrails/ai-memory",
+   "commit": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+   "path": "docs/llm-providers.md",
+   "lines": {
+    "338": "untrusted data. A timeout, provider error, or incomplete/invalid score set",
+    "339": "preserves the normal order. `global=true` and supplemental global-preference",
+    "340": "hits keep their existing non-RRF ranking. Concurrent provider calls are capped",
+    "341": "at four; saturated queries keep their local ranking without waiting."
+   }
+  }
+ ]
+}

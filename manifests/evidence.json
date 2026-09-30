@@ -7245,8 +7245,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "5b9a4274f41d74b6dbefef00c3a3b1161ae1ee21bb924c2232d9cf1e5bdbb772",
-      "bytes": 143590
+      "sha256": "0d7b7fddae9e4618ce9718e1c494ee932f8a37cd57786d92991f7043f39e239d",
+      "bytes": 172845
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
@@ -7274,9 +7274,19 @@
       "bytes": 5018
     },
     {
+      "path": "blueprints/memory-layer-s3/inputs/r7/gpt6-review-20260930.md",
+      "sha256": "ce7275817f4664f9ca1c60b48cb3cb1f600bf96834fd9c247d104cf943239d00",
+      "bytes": 7868
+    },
+    {
       "path": "blueprints/memory-layer-s3/inputs/r7/live-verification-20260930.json",
       "sha256": "c02d1c506d31164891d3f1782a55993d1d5ae61f9a5c4b9c7e285aa839e24f69",
       "bytes": 13757
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/repair1-verification-20260930.json",
+      "sha256": "e17484588948dc7150afba464d4806924bc08ae7858a726bda5ef1b70c9a2b35",
+      "bytes": 15941
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
