@@ -2265,11 +2265,12 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
               "mcp-surfaces")
     CURRENT_CHOICE = {"RTK": "rtk", "Context Mode": "context-mode", "Repomix": "repomix", "Headroom": "headroom",
                       "TOON": "toon", "ccusage": "ccusage"}
-    # The code-navigation layer's current choice names these three as its task-selected tools; the profile has carried
-    # them since 2026-09-30 (docs/decisions/2026-09-30-task-model-routing.md). They are not that layer's winners.
-    NAVIGATION_CHOICE = {"ast-grep": "ast-grep", "codebase-memory": "codebase-memory-mcp",
-                         "jCodeMunch": "jcodemunch-mcp"}
-    OPTIONAL = {"context-hub", "agentsview", "claude-hud", "otel-tui", "omniroute"}
+    # jcodemunch-mcp, ast-grep and codebase-memory-mcp are the code-navigation layer's task-selected tools and the
+    # SubagentStart carrier's task-appended lanes, and they stay optional rows: neither bootstrap can install a profile
+    # member that has no pin, and none of the three has one (docs/decisions/2026-09-30-task-model-routing.md).
+    OPTIONAL = {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub", "agentsview", "claude-hud",
+                "otel-tui", "omniroute"}
+    PIN_FILES = ("adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
 
     @staticmethod
     def load(relative: str):
@@ -2297,27 +2298,36 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
         self.assertEqual(selected - self.rows, {"codex", "claude-code"})
         choice = layers["token-efficiency"]["current_choice"]
         self.assertTrue(all(name in choice for name in self.CURRENT_CHOICE), choice)
-        navigation = layers["code-navigation"]["current_choice"]
-        self.assertTrue(all(name in navigation for name in self.NAVIGATION_CHOICE), navigation)
         winners = {winner["component_id"] for layer_id in self.LAYERS for winner in layers[layer_id]["winners"]}
-        expected = ((winners & self.rows) | set(self.CURRENT_CHOICE.values())
-                    | set(self.NAVIGATION_CHOICE.values()))
-        self.assertEqual(selected & self.rows, expected,
+        self.assertEqual(selected & self.rows, (winners & self.rows) | set(self.CURRENT_CHOICE.values()),
                          "a token row these layers now select (or drop) must join (or leave) the profile")
         self.assertEqual(selected & self.OPTIONAL, set())
         self.assertLessEqual(self.OPTIONAL, self.rows)
 
-    def test_the_sixteen_subagent_tools_are_thirteen_profile_rows_and_three_optional_rows(self):
+    def test_the_sixteen_subagent_tools_are_ten_profile_rows_and_six_optional_rows(self):
         # docs/token-efficiency-stack.md, "Inside Ultracode subagents": the 16 tools that run used are not the
-        # profile's 17 component_ids. Thirteen are profile rows; three are optional rows; the profile's other four are
-        # the two clients, ccusage (not run) and MCPorter (there only as Headroom's bridge).
+        # profile's 14 component_ids. Ten are profile rows; six are optional rows; the profile's other four are the
+        # two clients, ccusage (not run) and MCPorter (there only as Headroom's bridge).
         receipt = self.load("evidence/artifacts/token-e2e-ultracode-20260925/receipt.json")
         tools = {tool["component_id"] for tool in receipt["tools"]}
         selected = set(self.profile["component_ids"])
-        self.assertEqual((len(tools), len(selected), len(tools & selected)), (16, 17, 13))
-        self.assertEqual(tools - selected, {"context-hub", "agentsview", "otel-tui"})
+        self.assertEqual((len(tools), len(selected), len(tools & selected)), (16, 14, 10))
+        self.assertEqual(tools - selected, {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub",
+                                            "agentsview", "otel-tui"})
         self.assertLessEqual(tools - selected, self.OPTIONAL)
         self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
+
+    def test_every_profile_component_has_a_pin_on_both_platforms(self):
+        # adoption/bootstrap-linux.sh and adoption/bootstrap-macos.sh fail closed on a selected component that their
+        # pin file lacks ("No pin in <file> for selected component(s)", exit 3, before anything is installed), and
+        # adoption/bootstrap-macos.sh no longer exempts any component from a pin by default. So a profile lists only
+        # components that both pin files carry; the bootstrap plan tests (tests/test_adoption_bootstrap_macos.py,
+        # TokenEfficiencyPlanTests) fail otherwise, and they are outside this file's module set.
+        selected = set(self.profile["component_ids"])
+        for pin_file in self.PIN_FILES:
+            with self.subTest(pin_file=pin_file):
+                pinned = {tool["id"] for tool in self.load(pin_file)["tools"]}
+                self.assertEqual(selected - pinned, set(), "a profile component without a pin makes the bootstrap exit 3")
 
 
 class RetainedEvidenceTests(unittest.TestCase):

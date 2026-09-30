@@ -395,10 +395,7 @@
         "serena",
         "socraticode",
         "ai-memory",
-        "mcporter",
-        "jcodemunch-mcp",
-        "codebase-memory-mcp",
-        "ast-grep"
+        "mcporter"
       ],
       "component_ids": [
         "codex",
@@ -414,10 +411,7 @@
         "serena",
         "socraticode",
         "ai-memory",
-        "mcporter",
-        "jcodemunch-mcp",
-        "codebase-memory-mcp",
-        "ast-grep"
+        "mcporter"
       ],
       "recipe_paths": [
         "docs/token-efficiency-stack.md",

@@ -21,8 +21,15 @@ ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / "docs" / "decisions" / "2026-09-30-task-model-routing.md"
 POINTER = ROOT / "docs" / "token-practice.md"
 MANIFEST = ROOT / "adoption" / "manifest.json"
-# The three code-navigation tools the record's Decision adds to the token-efficiency profile.
-PROFILE_TOOLS = ("jcodemunch-mcp", "codebase-memory-mcp", "ast-grep")
+FOUNDATION = ROOT / "catalogs" / "landscape" / "foundation.json"
+CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
+PIN_FILES = ("adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
+# The three code-navigation tools the record's Decision leaves outside the token-efficiency profile: the SubagentStart
+# carrier's task-appended lanes (jCodeMunch and codebase-memory by tool id, ast-grep as a command) and the
+# code-navigation layer's current choice, installed on demand until each has a reviewed pin on both platforms.
+CARRIER_TOOLS = ("jcodemunch-mcp", "codebase-memory-mcp", "ast-grep")
+CARRIER_LANES = ("mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodemunch__order",
+                 "mcp__codebase-memory__search_graph", "mcp__codebase-memory__trace_path")
 SECTIONS = ["Context", "Alternatives", "Decision", "Overturn condition", "Sources"]
 HEADER = ["Task class", "Client", "Model", "Effort", "Enforced today", "Rule source"]
 # The task classes the routing brief names (research split into breadth and judgment, building split by whether a
@@ -122,10 +129,11 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                     with self.subTest(path=path.relative_to(ROOT).as_posix()):
                         self.assertIsNone(BINDS_GPT_6_1.search(path.read_text(encoding="utf-8", errors="replace")))
 
-    def test_the_token_efficiency_profile_is_accepted_by_this_record_and_carries_the_three_tools(self):
-        # The Decision's "Profile acceptance" and "Three tools join the profile" paragraphs make claims about
-        # adoption/manifest.json: hold them to the file. Versions are not compared: manifests/stack.json owns them and
-        # the record dates the ones it quotes at its base revision.
+    def test_the_token_efficiency_profile_is_accepted_by_this_record_and_leaves_the_three_tools_out(self):
+        # The Decision's "Profile acceptance" and "Three tools stay outside the profile" paragraphs make claims about
+        # adoption/manifest.json, both pin files, the carrier block and the landscape's code-navigation choice: hold
+        # them to the files. Versions are not compared: manifests/stack.json owns them and the record dates the ones it
+        # quotes at its base revision.
         [profile] = [item for item in json.loads(MANIFEST.read_text(encoding="utf-8"))["profiles"]
                      if item["id"] == "token-efficiency"]
         relative = RECORD.relative_to(ROOT).as_posix()
@@ -133,11 +141,28 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
         self.assertNotIn("Drafted", profile["label"])
         self.assertIn(relative, profile["label"])
         self.assertIn(relative, profile["recipe_paths"])
-        for tool in PROFILE_TOOLS:
+        pinned = {pin_file: {tool["id"] for tool in json.loads((ROOT / pin_file).read_text(encoding="utf-8"))["tools"]}
+                  for pin_file in PIN_FILES}
+        for tool in CARRIER_TOOLS:
             with self.subTest(tool=tool):
-                self.assertIn(tool, profile["component_ids"])
-                self.assertIn(tool, profile["required_commands"])
+                self.assertNotIn(tool, profile["component_ids"])
+                self.assertNotIn(tool, profile["required_commands"])
                 self.assertIn(f"`{tool}` ", self.text)
+                # The record's reason is that neither pin file has an entry. A pin that arrives meets the record's
+                # overturn condition, so the record, the profile and this check are restated together.
+                for pin_file, ids in pinned.items():
+                    self.assertNotIn(tool, ids, pin_file)
+        # Every member the profile does list is pinned on both platforms, which is what the bootstraps require.
+        for pin_file, ids in pinned.items():
+            self.assertEqual(set(profile["component_ids"]) - ids, set(), pin_file)
+        # The record's basis for naming the three: the layer's current choice and the carrier's task-appended lanes.
+        layers = json.loads(FOUNDATION.read_text(encoding="utf-8"))["layers"]
+        choice = next(layer for layer in layers if layer["layer_id"] == "code-navigation")["current_choice"]
+        for name in ("ast-grep", "codebase-memory", "jCodeMunch"):
+            self.assertIn(name, choice)
+        carrier = CARRIER.read_text(encoding="utf-8")
+        for lane in CARRIER_LANES:
+            self.assertIn(lane, carrier)
 
     def test_token_practice_points_to_the_record(self):
         self.assertIn("](decisions/2026-09-30-task-model-routing.md)", POINTER.read_text(encoding="utf-8"))
