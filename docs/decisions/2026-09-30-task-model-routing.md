@@ -46,8 +46,14 @@ fixture `my_gw/gpt-6.1` in `tests/test_landscape_sweep_harness.py:754`.
 No automatic router exists. Each route below is a static assignment: an agent definition, a workflow stage, a settings
 key, a Codex profile or a lane script names the model and the effort, or the row is an instruction to whoever
 dispatches. No repository configuration picks a model by task; even the opt-in Codex OmniRoute profile names its model
-and effort (`adoption/templates/codex.omniroute.config.toml:23,25`). OmniRoute's D04 singleton combos, D06 lane aliases
-and task-aware router (D11) stay off until the promptfoo A/B of wave unit D3 reports. That unit label belongs to this
+and effort (`adoption/templates/codex.omniroute.config.toml:23,25`). Claude Code's own content-based fallback, which
+re-runs a flagged request on an older model, is switched off in this repository's settings and in the user-settings
+template: `.claude/settings.json:7` says `"switchModelsOnFlag": false`, `.claude/settings.json:11` says
+`"CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"`, and the template sets both
+(`adoption/templates/claude.settings.template.json:26,318`). The model-currency addendum leaves their coverage of every
+flagged route unverified, and availability fallback chains are a separate mechanism that these keys do not touch
+(`docs/decisions/2026-09-27-model-currency.md:341-361`). OmniRoute's D04 singleton combos, D06 lane aliases and
+task-aware router (D11) stay off until the promptfoo A/B of wave unit D3 reports. That unit label belongs to this
 wave; it is not #423's feature D03 (prompt-cache affinity).
 
 The Claude rows assume Claude Code 2.1.284 or later, where the `sonnet` alias resolves to Sonnet 5.5 and `opus` to
