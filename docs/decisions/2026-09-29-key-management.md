@@ -799,12 +799,12 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
 
 - **Reads:**
   - `GET /api/providers/client` returns every connection with its decrypted `apiKey`, `accessToken`, `refreshToken` and `idToken`, and with unsanitized `providerSpecificData` (`src/app/api/providers/client/route.ts:5-15`; `src/lib/db/providers/lazyConnectionView.ts:149,177-189`).
-  - `GET /api/settings` returns every stored setting except the password and two session keys. That includes the decrypted `oidcClientSecret`, and `skillsmpApiKey`, `cliproxyapi_api_key`, `qdrantApiKey`, `quotaStore.redisUrl` and `deepHealthToken` whenever they are set (`src/app/api/settings/route.ts:230-289`; `src/lib/db/settings.ts:154,287,295-297`).
+  - `GET /api/settings` returns every stored non-internal setting (keys starting with `_` are skipped, `settings.ts:287`) except the password and two session keys. That includes the decrypted `oidcClientSecret`, and `skillsmpApiKey`, `cliproxyapi_api_key`, `qdrantApiKey`, `quotaStore.redisUrl` and `deepHealthToken` whenever they are set (`src/app/api/settings/route.ts:230-289`; `src/lib/db/settings.ts:154,287,295-297`).
   - `GET /api/settings/cache-config` returns the semantic-cache embedding API key and the Redis URL (`src/app/api/settings/cache-config/route.ts:50-51,86,109`). Upstream open issue #14484 reports the same echo.
   - `POST /api/sync/tokens` followed by `GET /api/sync/bundle` returns the whole decrypted credential bundle (`src/app/api/sync/tokens/route.ts:28-29,77-79`; `src/lib/sync/bundle.ts:68-89,112-127`).
   - `GET /api/cli-tools/keys` returns the raw OmniRoute keys.
   - `GET /api/oauth/cursor/auto-import` returns the host's Cursor OAuth tokens (`src/app/api/oauth/cursor/auto-import/route.ts:15,22-25`).
-  - The `cli-tools/*-settings` readers return whole client configuration files.
+  - Several `cli-tools/*-settings` readers return whole client configurations: `claude-settings` returns `~/.claude/settings.json` including `env` (`src/app/api/cli-tools/claude-settings/route.ts:56,66`) and `codex-settings` the raw `config.toml` text (`codex-settings/route.ts:120,171`); `omp-settings` returns an API key (`omp-settings/route.ts:91`). Not every reader does: `cline-settings` returns five selected fields (`cline-settings/route.ts:77-83`).
   - The `providerSpecificData` keys `cookie`, `cookies`, `access_token`, `clientSecret` and `token` pass even upstream's own sanitizer for `/api/providers` (`src/lib/providers/requestDefaults.ts:327-371`).
 - **Writes:**
   - `POST /api/keys`, `POST /api/keys/[id]/regenerate`, `POST /api/cli/tokens` and `POST /api/relay/tokens` mint credentials, manage-scope ones included, and return them.
@@ -821,10 +821,11 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
   - Windows processes. With mirrored networking they reach WSL's `localhost`: on this host `wslinfo --networking-mode` prints `mirrored` (<https://learn.microsoft.com/en-us/windows/wsl/networking>). Through `\\wsl$` they also read distribution files as the default user (<https://learn.microsoft.com/en-us/windows/wsl/file-permissions>).
 
   Every such process can already read the gateway's data directory: the store, `server.env` and the CLI token salt. No HTTP control changes what they can reach.
-- **Containers.** Rootless Docker on this host runs with `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, set in the user unit `docker.service` at line 33. Upstream's default in `dockerd-rootless.sh` is `true` (moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`). So every container reaches host-loopback ports as `10.0.2.2` ([OpenHands isolation record](2026-09-28-openhands-resolver-isolation.md)). On 2026-09-30 the Harbor benchmark lane reproduced this with a canary listener on another loopback port. A container that runs model-written or third-party code is an untrusted local process, which meets the overturn condition of the keyless posture in [the account-pool record](2026-09-27-omniroute-account-pool.md), decision 5.
+- **Containers.** Rootless Docker on this host runs with `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, set in the user unit `docker.service` at line 33. Upstream's default in `dockerd-rootless.sh` is `true` (moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`). So every container whose network routes through the rootless daemon's RootlessKit network, and that has no separate isolation, reaches host-loopback ports as `10.0.2.2` ([OpenHands isolation record](2026-09-28-openhands-resolver-isolation.md)); a container with network mode `none`, such as the OpenHands grader, does not. On 2026-09-30 the Harbor benchmark lane reported reproducing this with a canary listener on another loopback port; that is a peer report, and this record retains no receipt of it. A container that runs model-written or third-party code is an untrusted local process, which meets the overturn condition of the keyless posture in [the account-pool record](2026-09-27-omniroute-account-pool.md), decision 5.
 - **Browsers.**
   - On current defaults, Chrome 142+ (and Chromium Edge) and Firefox 154+ put a public origin's fetch, subresource and iframe requests to loopback behind a Local Network Access permission. Only a secure context can request that permission, and the check runs on every new connection, which stops DNS-rebinding reads (Chrome Platform Status 5152728072060928; <https://developer.chrome.com/blog/local-network-access>; WICG Local Network Access draft of 2026-08-07, sections 2.2 and 5.2).
   - Chromium does not apply these restrictions to main-frame navigations, so a popup remains an untested residual.
+  - Firefox 154 exempts private-network pages that contact loopback by default (`network.lna.local-network-to-localhost.skip-checks` is `true`: mozilla-firefox/firefox@FIREFOX_154_0_RELEASE `modules/libpref/init/StaticPrefList.yaml:15679-15684`; `netwerk/protocol/http/nsHttpTransaction.cpp:4104-4108`), so an untrusted page on a private-network origin, for example an intranet page, is not stopped by Local Network Access in Firefox.
   - Upstream's origin validator rejects cross-site and DNS-rebinding origins, but only for dashboard-session subjects (`src/server/authz/pipeline.ts:418-421`; `src/server/origin/publicOrigin.ts:177-179,243-245`).
 
 **Options compared:**
@@ -843,18 +844,18 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
 
 **Decision.** (d) plus (c), with one load-bearing rule and no gateway change now.
 
-1. **Trust boundary.** The anonymous management API is accepted only because every process that can reach host loopback is a same-uid process the user runs. Its reads and writes are same-uid residuals, like the data directory itself.
+1. **Trust boundary.** The anonymous management API is accepted only while every process that can reach host loopback is a same-uid process the user runs, and every workload that runs model-written or third-party code is either stopped or has verified isolation (rule 2). An exposed untrusted workload invalidates the boundary at once, whether or not it could adopt isolation later: it is stopped until it is isolated. Within the boundary, the reads and writes above are same-uid residuals, like the data directory itself.
 2. **Container rule (load-bearing).**
    - A container that runs model-written or third-party code must have no route to `10.0.2.2`, nor to any other host address that reaches the gateway ports.
    - If it needs a model, it reaches the gateway only through a proxy that passes the client API and refuses `/api/*`.
-   - References: the OpenHands lane's O1 (a Docker `internal: true` network plus a proxy; [isolation record](2026-09-28-openhands-resolver-isolation.md)), and Harbor v0.23.0's own egress control (`[environment] network_mode = "allowlist"`: a sidecar proxy plus nftables with an allowlist of public hosts), which the Harbor benchmark lane applied on 2026-09-30.
+   - References: the OpenHands lane's O1 (a Docker `internal: true` network plus a proxy; [isolation record](2026-09-28-openhands-resolver-isolation.md)), and Harbor v0.23.0's own egress control (`[environment] network_mode = "allowlist"`: a sidecar proxy plus nftables with an allowlist of public hosts; harbor-framework/harbor@v0.23.0 `src/harbor/environments/docker/docker.py`). The Harbor benchmark lane reported applying it on 2026-09-30; that is a peer report without a retained receipt here, and the lane's own records carry its acceptance.
    - Daemon-wide `DISABLE_HOST_LOOPBACK=true` is not chosen, for the isolation record's reasons: it cuts off the proxy and the memory services, and binding the gateway elsewhere would expose it beyond loopback.
    - Each container lane applies the rule to its own workloads.
-3. **Guard rule (K4).** Claude's command guard refuses:
+3. **Guard rule (planned in K4; not yet built, accepted or installed).** Once K4 is built, accepted and installed after window W, Claude's command guard refuses:
    - a command that sends a request under `/api/` to the gateway ports (`20128`, `20129`) on `127.0.0.1`, `localhost`, `[::1]`, `10.0.2.2` or `host.docker.internal`, except an allowlist of read-only paths the repository documents. The allowlist is derived so that the documented-command replay stays at 0 newly blocked;
    - the matching `omniroute api ...` and `omniroute sync ...` CLI forms.
 
-   It also treats both live data directories, `~/.local/share/omniroute` and `~/.local/share/omniroute-fw`, as credential stores.
+   It will also treat both live data directories, `~/.local/share/omniroute` and `~/.local/share/omniroute-fw`, as credential stores. Until then the installed guard covers neither (`scripts/hooks/secret_path_guard.py`, `HOME_CREDENTIAL_STORE`).
 4. **No gateway change now.** Neither carry is applied, and the gateway operator keeps the current settings. Any gateway apply stays on the Gate A owner's timing.
 5. **Operator hygiene after window W, at the gateway operator's discretion.**
    - Take a metadata-only inventory of the OmniRoute keys, `oma_` tokens, sync tokens and relay tokens created while management was anonymous.
@@ -862,31 +863,31 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
    - Revoke any the operator does not recognise.
 
 **Verification.**
-- For the container rule, from inside a task container: a TCP connect to `10.0.2.2:20128` and `10.0.2.2:20129`, with no HTTP request, must fail, and a model call through the proxy must succeed.
+- For the container rule: a canary listener on a host loopback port (never a gateway port) must record no connection from a task container that tries `10.0.2.2` and the host's other addresses on that port, observed on the listener side, because a transparent egress proxy may accept a TCP connection before it enforces its policy; the proxy's refusal of `/api/*` is checked against a throwaway upstream, never a live gateway; and a model call through the proxy must succeed.
 - Never verify with an HTTP request to `/api/*` of a live gateway. The OpenHands probe P0 (`blueprints/runtime-workers/openhands/e2e/netprobe.py:90-94`) sends one to `/api/settings`; it should become a TCP-only probe or target a throwaway instance.
 - For the guard rule: K4's oracle phase `routes` and the documented-command replay.
 
 **Residual exposure:**
 - Every same-uid process, including Windows processes of the user's account, holds full administrative control of both gateways and every stored provider credential.
-- A browser popup navigation to a loopback route is untested.
-- Containers stay exposed wherever a lane has not applied the container rule.
+- A browser popup navigation to a loopback route is untested, and Firefox does not stop untrusted private-network (intranet) pages.
+- Until the container rule is verified for a workload, that workload must not run model-written or third-party code.
 
 **Overturn:**
-- A container workload that runs model-written or third-party code without that isolation and cannot adopt it. Then `requireLogin=true` with a password is the only close. That reverses the user's 2026-09-28 direction, so it is the user's decision.
+- A workload that runs model-written or third-party code found without verified isolation: it is stopped at once. If it cannot be isolated, `requireLogin=true` with a password is the only close; that reverses the user's 2026-09-28 direction, so it is the user's decision.
 - Upstream ships a non-interactive management credential that an anonymous loopback caller cannot disable, for example key-only management with the bootstrap write closed: adopt it.
-- A measured read or write of a loopback gateway route from a public-origin page in this host's browsers: apply the origin-validator carry.
+- A measured read or write of a loopback gateway route from any untrusted origin, public or private-network, in this host's browsers: apply the origin-validator carry.
 - A gateway port bound beyond loopback, a second OS user on the host, or a gateway reachable from the LAN: the posture no longer holds.
 
 ## Codex shell snapshots that recorded the messaging token (done, 2026-09-30)
 
 On 2026-09-29 the sink inventory found 19 files under `~/.codex/shell_snapshots` that each declared `CLAUDE_CODE_MESSAGING_TOKEN`. The scan read names only. Codex writes the exported environment of the process that launched it into these files (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at `rust-v0.157.1`).
 
-At 2026-09-30T03:00Z a names-only rescan covered every `shell_snapshots` directory under the home directory, `/tmp` and `/var/tmp`: 222 directories holding 12 files.
-- Only 2 files still declared the variable, both dated 2026-09-27 and both in `~/.codex/shell_snapshots`. No process held either open.
+At 2026-09-30T03:00Z a names-only rescan walked `~/.codex`, `~/.local/state`, `~/.local/share`, `~/code`, `/tmp` and `/var/tmp`, without following symlinked directories and skipping `node_modules`, `.git`, `__pycache__`, `.venv`, `venv`, `site-packages` and Claude's own `shell-snapshots`; directories or files it could not read were skipped without a count. It found 222 `shell_snapshots` directories holding 12 files it could read.
+- Only 2 of those files still declared the variable, both in `~/.codex/shell_snapshots`, with modification times of 2026-09-27T02:19Z and 04:45Z (an earlier scan of that one directory printed both). No open descriptor to either was observed among the processes whose descriptors were readable.
 - The other 17 were already gone. Codex's own three-day snapshot retention is the likely remover (`codex-rs/core/src/shell_snapshot.rs:105` at `rust-v0.157.1`), but the removal was not observed.
 
-After an announcement to the live peers, the set was asserted by a digest of the enumerated paths, and the two files were deleted by their literal paths at 03:02:25Z.
-- A rescan found 0 files declaring the variable.
+After an announcement to the live peers, the enumerated path list was compared byte for byte (`cmp`) with the two literal paths, and the two files were deleted by their literal paths at 03:02:25Z.
+- A rescan found 0 files declaring the variable among the files it could read.
 - A names-only listing of `~/.codex` taken before and after showed exactly those two entries removed.
 - No file content was printed.
 
@@ -912,7 +913,7 @@ Overturn: any new snapshot file with a credential-named `declare -x` line. That 
     - a documentation note.
   - Receipt: `guard-k3-verification-20260930`.
   - The merge and the host reinstall wait for the Gate A owner to close window W, because the frozen check `hooks.carriers_match_repo` compares the installed hooks with main.
-- **K4** (item 2). The build contract had its first independent review, by GPT-6: 1 blocking and 6 high findings. The largest were a delimiter-suffix gap in the interpreter here-document form, a second loosening the amendments had not authorised, and an unbounded gateway matrix. Version 2 is being written with one gateway matrix, one loosening and an independent reference recognizer for the tests.
+- **K4** (item 2). These counts are status reports from the lane's review records, which are not retained in this repository; each PR carries its own receipt. The build contract had its first independent review, by GPT-6: 1 blocking and 6 high findings. The largest were a delimiter-suffix gap in the interpreter here-document form, a second loosening the amendments had not authorised, and an unbounded gateway matrix. Version 2 is being written with one gateway matrix, one loosening and an independent reference recognizer for the tests.
 - **Canary proof tool** (item 3). Draft 2 of the contract took one Opus review round (4 blocking findings, fixed). A GPT-6 review then found 7 more blocking false-clean paths:
   - sink bytes reaching the coordinator's memory;
   - a pass still standing after a failed retry;
