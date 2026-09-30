@@ -1,0 +1,5 @@
+[2026-09-30T06:06:21Z] first instance health: 200
+[2026-09-30T06:06:23Z] second instance exit code: 1
+✖ Port 20197 is already in use by an unknown process.
+[2026-09-30T06:06:23Z] first instance still healthy: 200
+namespace wrapper rc=0

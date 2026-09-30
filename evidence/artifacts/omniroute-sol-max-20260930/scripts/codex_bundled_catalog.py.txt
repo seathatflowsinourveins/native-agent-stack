@@ -1,0 +1,14 @@
+"""The effort levels Codex 0.159.2's bundled model catalog lists for the GPT-6 models, from `codex debug models --bundled` run offline (a network-less
+user namespace, scratch HOME and CODEX_HOME). Usage: codex_bundled_catalog.py <bundled.json> <version.txt>"""
+import json
+import sys
+
+models = json.load(open(sys.argv[1], encoding="utf-8"))
+models = models["models"] if isinstance(models, dict) and "models" in models else models
+print("codex --version:", open(sys.argv[2], encoding="utf-8").read().strip())
+print("models in the bundled catalog:", len(models))
+for model in models:
+    slug = model.get("slug") or model.get("id")
+    if slug in ("gpt-6.1-sol", "gpt-6-astra", "gpt-6-sol"):
+        levels = [(level.get("effort") if isinstance(level, dict) else level) for level in (model.get("supported_reasoning_levels") or [])]
+        print(f"{slug}: default {model.get('default_reasoning_level')}, levels {levels}, context_window {model.get('context_window')}, max_context_window {model.get('max_context_window')}")

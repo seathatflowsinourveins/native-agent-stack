@@ -1,0 +1,31 @@
+"""Scratch-port reproduction of serve's port-preflight trap (no gateway involved): after the server side of a connection is gone, a client that has not
+closed its end stays in CLOSE-WAIT, and `lsof -ti :PORT` (what findListeningPids runs) still lists the client's pid although nothing listens.
+Prints the lsof result and what upstream's findListeningPids returns for the port, with and without a listener."""
+import json, os, socket, subprocess, sys, time
+
+NODE = "<TOOLS>/node-24.21.0/bin/node"
+PID_MJS = "<B3>/bin/cli/utils/pid.mjs"
+
+def lsof(port):
+    r = subprocess.run(["/usr/bin/lsof", "-ti", f":{port}"], capture_output=True, text=True)
+    return sorted(int(x) for x in r.stdout.split() if x.strip().isdigit())
+
+def discover(port):
+    code = f"import('file://{PID_MJS}').then(async m => console.log(JSON.stringify(await m.findListeningPids({port}))))"
+    r = subprocess.run([NODE, "-e", code], capture_output=True, text=True)
+    return r.stdout.strip() or r.stderr.strip()[:120]
+
+server = socket.socket(); server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); server.bind(("127.0.0.1", 0)); server.listen(5)
+port = server.getsockname()[1]
+client = socket.create_connection(("127.0.0.1", port))
+conn, _ = server.accept()
+out = {"me": os.getpid(), "scratch_port": port}
+out["with_listener_and_client"] = {"lsof": lsof(port), "findListeningPids": discover(port)}
+conn.close(); server.close()          # the server side is gone; the client has not closed its end
+time.sleep(0.5)
+states = subprocess.run(["ss", "-Htn", f"( dport = :{port} )"], capture_output=True, text=True).stdout.split()
+out["after_server_gone"] = {"client_socket_state": states[0] if states else None, "lsof": lsof(port), "findListeningPids": discover(port)}
+client.close()
+time.sleep(0.3)
+out["after_client_closed"] = {"lsof": lsof(port), "findListeningPids": discover(port)}
+print(json.dumps(out, indent=1))

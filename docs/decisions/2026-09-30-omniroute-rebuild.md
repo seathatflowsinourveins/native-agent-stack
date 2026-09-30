@@ -123,6 +123,8 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 | --- | --- | --- | --- |
 | #13788 (two commits) | both builds | `/v1/alpha/search` for Codex `web.run` | a release carries it (open upstream PR at the time of writing) |
 | affinity patch `045aa81f3` | 20128 | keeps a reused session pin ahead of OAuth occupancy | upstream ships an equivalent |
+| upstream PR 15167 (`f5d8e150b`, one commit) | 20128 | `gpt-6.1-sol` in the Codex registry and both alias sets, so `max` and the `-max` suffix reach the wire | a release carries it (open upstream PR at the time of writing) |
+| `lsof` shim v2 (`b6ae900224df3dc7`) | 20128's new prefix | keeps a client's dead connection from blocking a restart (upstream's bind-probe fallback becomes the preflight guard) | upstream's preflight counts only listeners |
 | `lsof` shim on `PATH` | both units | port preflight on a free port | redundant now: upstream #14812 (`8183e9b79`, `resolveServeBusyPids`) is in 2f42a9ac1; drop at the next rebuild after a free-port start passes without it |
 | settings above (512, `compressToolResults` false, headroom off in the engines map) | 20129 | defect mitigations | upstream fixes the defects |
 
@@ -228,13 +230,42 @@ Classes are kept apart.
 - **Headerless `[ccr]` only** (the first plan, from our fixtures). Superseded by the user's direction to follow upstream.
 - **Compression on 20128.** Not applied; see below.
 
+## Update 2026-09-30, 06:32Z: 20128 carries upstream PR 15167 (gpt-6.1-sol at max)
+
+**Why.** The rebuild's residual said `max` clamps to `xhigh` for `gpt-6.1-sol`. The live cost was measured before the restart: 1154 of 1495 `gpt-6.1-sol`
+rows since 00:00Z had `max` requested and `xhigh` sent ([`checks/calllog-effort-counts-before-switch.json`](../../evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-before-switch.json)),
+native Codex callers included, and the `-max` suffix of the new base was an unknown model id (HTTP 400 with the prefix, 401 without it). The user asked (relayed by the pi-practice session, not seen
+first-hand here) for the highest quality on 6.1.
+
+**Source.** Upstream PR [#15167](https://github.com/diegosouzapw/OmniRoute/pull/15167), head `f5d8e150b79e0901fa18241c7f29bff889b87c14`, one commit, 5 files +23/-0 on release/v3.8.52 (same practice as
+the #13788 carry: a cited upstream change, no self-written patch). It applies cleanly, its stable patch-id equals the cherry-pick's, and its registry entries use the capabilities
+block whose context (872000) equals the live catalog's. Codex 0.159.2's bundled catalog lists `max` for `gpt-6.1-sol`.
+
+**Decision.** Carry it on 20128 only. The clamp and the suffix parser are in the Codex executor, which runs only on 20128; 20129's sharedgw node forwards to it. One restart, no
+hindsight-live restart, 20129 unchanged (the Gate A owner's conditions). Alternatives: both builds (a second restart for no effect); wait for a release (upstream's release/v3.8.52 and
+main lack it); use the body effort only (`max` in the body is the clamped path, the defect itself; the suffix ids `-max` and `-xhigh` were rejected with HTTP 400 before the carry).
+
+**A hazard found on the way, and its fix in the new prefix only.** `omniroute serve` refuses to start while any client holds a dead connection to its port: its preflight runs
+`lsof -ti :PORT`, which lists client sockets, and hindsight-api held such a CLOSE-WAIT socket to 20128 (this is why the 00:02Z switch restarted hindsight-live). Upstream main and
+release/v3.8.52 still do it. Shim v2 (`b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854`; v1 was `b12c64614c54bc86...`) answers that one query with exit status 2, which upstream's own fallback for an unusable discovery tool
+(`resolveServeBusyPids`, #14518) turns into a bind probe. Tests with kept outputs: control with shim v1, real `omniroute serve` of the candidate prefix: restart refused; shim v2: same restart
+reaches health in 5 s; a second real instance is still refused. The previous prefix and 20129's prefix keep v1 (residual).
+
+**Applied.** 2026-09-30T06:32:50Z, `switch_gateways.py --only 20128`: three unit lines changed (Description, the PATH shim segment, ExecStart), MainPID 950031 to 3262255, 20129 and hindsight-live
+untouched, no settings write, rollback copy in the switch directory. Probe gate before and after: `gpt-6.1-sol` with body `max` went from `xhigh` to `max` upstream, the suffix ids and the
+bare id answer 200 with the right effort, astra stays `max`, a 0.157.1 client request answers 200. The gateway's context-window reconciler removed one automatic override row on restart
+(same 872000 now in the registry). Everything is in [`evidence/artifacts/omniroute-sol-max-20260930/`](../../evidence/artifacts/omniroute-sol-max-20260930/receipt.json).
+
+**Also recorded.** The sharedgw connection expiry of 05:50Z to 05:55Z (claim C9): my baseline probe sent `sharedgw/gpt-6.1-sol-max` before the carry; 20128 answered 401 and 20129 parked the node's
+only connection as expired for all callers until the dashboard's Test connection restored it. Upstream has no fix; the probe script now sends a lane request only after the bare id answered 200.
+
 ## Comparison that would overturn it
 
 - The tip's `check:pack-boot` or a later unit run shows a defect the carries cause; then rebuild without the carry.
 - Upstream merges #13788 into a release or `main`: drop the carry. Upstream ships an equivalent of the affinity patch:
   drop it. Upstream fixes the session-dedup key collision, the integer re-encoding or the Responses tool-loop truncation:
   restore the upstream default of the matching setting (80, headroom on, `compressToolResults` true).
-- Upstream lists `gpt-6.1-sol` in `CODEX_MAX_ALIAS_MODELS`: `max` stops clamping to `xhigh` for it.
+- Upstream merges PR 15167 into a release: drop that carry (20128 carries it since 2026-09-30T06:32:50Z).
 - A measured drop of the cache-read share on 20128 traffic that arrives through the `sharedgw` hop (baseline 93.8% over
   573 rows, reported by the pi-practice session, not reproduced here) after headerless dedup, beyond what the user accepts.
 - A first-time `apply_patch` failure, or another exact-match failure, traced to lite's whitespace folding on traffic through either
@@ -263,8 +294,8 @@ Classes are kept apart.
   outputs of older models and very long sessions with large tool outputs. The Gate A owner's stated preference is off through the
   windows, and any change must land at least 6 h before the seal announcement with a new owner record. (b) `blockedProviders` and `noAuthFallbackDisabledProviders`,
   which the apply contract cannot read back.
-- `max` effort on `gpt-6.1-sol` clamps to `xhigh` (static alias sets in `reasoningSuffix.ts`; a two-line local patch
-  would lift it and is not applied).
+- `max` effort on `gpt-6.1-sol` clamped to `xhigh` on the rebuild (static alias sets in `reasoningSuffix.ts`); 20128 carries upstream PR 15167
+  since 2026-09-30T06:32:50Z and sends `max` (update below); 20129 forwards and never had the clamp.
 - The live canary of the token-save settings (12 requests) waits for Codex capacity (2026-10-04T00:35Z); the output style
   it would have measured is now off. The cache-share effect of headerless dedup is unmeasured until the pi runs report.
 - The Opus review of the first plan returned twelve defects (three medium); the workflow was stopped in its fix stage,

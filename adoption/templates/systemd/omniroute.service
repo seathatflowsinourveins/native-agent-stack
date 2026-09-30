@@ -38,11 +38,13 @@
 # Generate it without printing any value: evidence/artifacts/omniroute-gateway-20260927/scripts/make_server_env.py.txt.
 # Values in that file override the Environment= lines below (systemd.exec(5), EnvironmentFile=).
 #
-# The lsof shim. shim/ on PATH holds evidence/artifacts/omniroute-gateway-20260927/scripts/lsof-shim.sh.txt. Without
-# it, serve's port preflight (bin/cli/commands/serve.mjs L252-261 at a58000c7 and 81c9b6da) reads null.length on a free
-# port whenever lsof exits 1, and serve exits. Upstream 8183e9b79 (#14812, resolveServeBusyPids in serve.mjs) fixes this
-# and is in 2f42a9ac1, so the shim is redundant on that build; it stays only for continuity with the recorded units.
-# Drop the shim/ segment at the next rebuild after a free-port start passes without it.
+# The lsof shim. shim/ on PATH holds evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt (v2, sha256
+# b6ae900224df3dc7...; v1, the 2026-09-27 shim, is evidence/artifacts/omniroute-gateway-20260927/scripts/lsof-shim.sh.txt). Upstream's
+# port preflight (bin/cli/utils/pid.mjs findListeningPids, used by serve.mjs resolveServeBusyPids) runs `lsof -ti :PORT`, which
+# lists CLIENT sockets too: a client's dead pooled connection (CLOSE-WAIT) makes a restart, or systemd's restart after a crash,
+# fail with "Port is already in use" although nothing listens. v2 answers that one query with exit status 2, which upstream's own
+# fallback for an unusable discovery tool (#14518) turns into a bind probe of the port; a real second listener is still refused.
+# v1 (no-match status 1 becomes 0, for the pre-#14812 null.length crash) is redundant since #14812 and does not help with clients.
 #
 # Posture. The workstation runs with REQUIRE_API_KEY=false and requireLogin=false by the user's decision, which is
 # safe on loopback only. Any multi-user or non-loopback host sets REQUIRE_API_KEY=true and keeps the dashboard login.
@@ -67,7 +69,7 @@ After=network-online.target
 [Service]
 Type=simple
 EnvironmentFile=%h/.local/share/omniroute/server.env
-# shim/ first, so serve's port preflight finds the lsof no-match adaptation (see "The lsof shim" above).
+# shim/ first, so serve's port preflight is guarded by the bind probe and not by lsof (see "The lsof shim" above).
 Environment=PATH=@OMNIROUTE_PREFIX@/shim:@NODE_PREFIX@/bin:/usr/local/bin:/usr/bin:/bin
 # serve binds 0.0.0.0 when this is unset (bin/cli/utils/serverHost.mjs L16-26); the keyless posture needs loopback.
 Environment=OMNIROUTE_SERVER_HOST=127.0.0.1

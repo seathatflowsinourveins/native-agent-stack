@@ -1,0 +1,8 @@
+[2026-09-30T06:05:43Z] shim label=v2; lsof on PATH: <throwaway>/ns-omni-trap-v2-20260930/shim/lsof sha256=b6ae900224df3dc7
+[2026-09-30T06:05:43Z] phase 1: health=200 after 3s
+[2026-09-30T06:05:48Z] client (pid 2472283) socket before stop: FIN-WAIT-2 ESTAB ESTAB 
+[2026-09-30T06:05:48Z] server stopped, exit 0
+[2026-09-30T06:05:50Z] client alive after stop: yes; its socket: CLOSE-WAIT  | lsof -ti :20197 by the real tool: 2472283 
+[2026-09-30T06:05:51Z] phase 2 (restart with the dead client connection still held): health=200 after 5s
+[2026-09-30T06:05:56Z] done
+namespace wrapper rc=0
