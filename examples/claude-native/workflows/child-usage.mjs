@@ -2561,8 +2561,8 @@ export function returnQuality(value) {
 }
 // The transcript side of item 6 (counts only): the kind of the final assistant row, whether its message's text is empty or a wait notice, and
 // the actor's background tasks still running at that row. A foreground subagent's background command "stops when that subagent gives its final
-// response" (code.claude.com/docs/en/tools-reference, "Background commands"), and so do its monitors ("Monitor tool"), so such a task's result
-// never reached the return. Count-only scans of this host (evidence/artifacts/pra-u2-differential-20260929/scans: final-returns,
+// response" (code.claude.com/docs/en/tools-reference, "Background commands"), and the monitors of a stopped subagent "stop with it" ("Monitor
+// tool"); either way the return did not wait for the task's outcome. Count-only scans of this host (evidence/artifacts/pra-u2-differential-20260929/scans: final-returns,
 // task-notifications and task-stop) replace the design's rule, which read only backgroundTaskId and any notification: a task starts with a
 // result whose toolUseResult carries a backgroundTaskId (Bash run_in_background, or a command moved to the background at its timeout), a
 // Monitor or Workflow result's taskId, or an async Agent result's agentId (isAsync true); it ends with a <task-notification> naming it in
