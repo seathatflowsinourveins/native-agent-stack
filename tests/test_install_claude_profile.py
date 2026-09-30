@@ -1075,7 +1075,7 @@ class PortableTopRuleTests(unittest.TestCase):
     not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
     Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
     default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
-    Re-baselined on 2026-09-30 to 1,680 words: the file became the single managed source of the operator's user-level
+    Re-baselined on 2026-09-30 to 1,697 words: the file became the single managed source of the operator's user-level
     file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex routing and skill
     matching (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
@@ -1083,7 +1083,7 @@ class PortableTopRuleTests(unittest.TestCase):
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1680  # wc -w after the 2026-09-30 standing clauses and user-level rules (1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1697  # wc -w after the 2026-09-30 standing clauses and user-level rules (1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
@@ -1109,7 +1109,8 @@ class PortableTopRuleTests(unittest.TestCase):
     # with the Sol-primary Codex routing, skill matching, the rules that file held beyond this template, and its
     # worker, model, Ultracode and agent-team rules.
     STANDING_PHRASES = (
-        "OmniRoute gateway", "`gpt-6.1-sol` at ultra", "`gpt-6-astra` at max", "one bounded Sol repair",
+        "OmniRoute gateway", "`gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
+        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
         "Codex CLI is the second native client", "Keep context small", "match available skill descriptions",
         "`SKILL.md`",
         "completeness critic", "next landscape sweep", "lifecycle task",

@@ -45,10 +45,10 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (496 words by `wc -w`, marker line included; 153 before the standing clauses, routing
+# The staged top-rule block (515 words by `wc -w`, marker line included; 153 before the standing clauses, routing
 # and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk v0.50.0
 # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "2d3107a242751bea8dfa2b90d26e012d7f459617ec2d32006c810fd4bf707532"
+TOP_RULE_SHA256 = "d1195686cc283b957d35a2209768a0e7222a5b9bdd1592789b133bb43538ab4a"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -281,7 +281,7 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 496)
+        self.assertEqual(len(top.split()), 515)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
@@ -291,7 +291,8 @@ class TemplateTests(unittest.TestCase):
         "SKILL.md", "native workflow", "model invocation in both clients", "promptfoo", "paired benchmark",
         "Harbor or Inspect", "never a self-written runner", "completeness critic", "next landscape sweep",
         "lifecycle task", "north-star action", "`gpt-6.1-sol` at ultra for coordination", "at max for workers",
-        "`gpt-6-astra` at max", "one bounded Sol repair", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
+        "`gpt-6-astra` at ultra", "complex workflow needs Astra", "single consequential judgment",
+        "complex changes across systems", "one bounded Sol repair", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
         "cooperation lanes", "`docs/decisions/YYYY-MM-DD-<slug>.md`", "No audits, trials or network at startup",
         "due-file line", "one lane per artifact")
 
