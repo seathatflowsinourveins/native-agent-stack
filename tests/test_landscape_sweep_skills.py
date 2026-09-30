@@ -517,6 +517,20 @@ class SkillsStagingTests(unittest.TestCase):
         self.assertEqual((smoke_args["layers"][0]["layer_id"], smoke_args.get("test")), ("skills-review", True))
         self.assertIn("a 1-layer skills sweep", smoke_args["T"]["critic"])
 
+    def test_the_ledgers_due_report_selects_the_due_skills_layers(self):
+        # build_args.py --due-report reads saturation_ledger.py --report --json. Before the ledger learned the skills
+        # catalog, its report had no skills row and a skills work directory selected nothing ("no layer selected").
+        report = sl.build_report(ROOT, json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8")))
+        tasks = json.loads(CATALOG.read_text(encoding="utf-8"))["tasks"]
+        rows = [{"catalog": "skills", "layer_id": task["layer_id"], "title": task["layer_id"], "input": "unused",
+                 "modality": "skills"} for task in tasks]
+        due = [row["layer_id"] for row in report["layers"] if row["catalog"] == "skills" and row["due"]]
+        self.assertTrue(due)
+        self.assertEqual([row["layer_id"] for row in build_args.select_layers(rows, due_report=report)], due)
+        research_only = {"layers": [row for row in report["layers"] if row["catalog"] != "skills"]}
+        with self.assertRaisesRegex(ValueError, "no layer selected"):
+            build_args.select_layers(rows, due_report=research_only)
+
     def test_a_repository_run_keeps_its_args_and_a_mixed_run_is_refused(self):
         repository = harness_tests.stage_work(self, ("alpha",))
         self.assertEqual(harness_tests.build(repository).returncode, 0)
