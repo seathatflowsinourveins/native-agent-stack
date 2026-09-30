@@ -7,8 +7,9 @@ when an ignore in .github/osv-scanner.toml lacks an id, a reason or an ignoreUnt
 days away, and when a repo-wide ignore would hide a pin that IGNORE_ALLOWED_LOCKS does not allow
 for that lock and advisory at the lock's reviewed sha256. That guard follows includes and fails
 closed on a version or line it cannot parse strictly; an allowed lock must be self-contained, and
-an ignore counts as active only before its ignoreUntil date. The npm advisory (next) is guarded by
-readers for pnpm, package-lock and yarn locks (npm_next_pins) that fail closed on any other npm lock.
+an ignore counts as active only before its ignoreUntil date. A dated exception for one frozen artifact lives in a config of its own
+that only that lock's scan uses (FROZEN_LOCKS): the inventory split and that config's scope are checked here, and the scanner itself
+keeps the exception from reaching any other lock.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -19,13 +20,13 @@ import os
 import re
 import subprocess
 import tempfile
-import time
 import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / ".github/osv-scanner-lockfiles.json"
 CONFIG = ROOT / ".github/osv-scanner.toml"
+FROZEN_CONFIG = ".github/osv-scanner-frozen-macos.toml"
 WORKFLOW = ROOT / ".github/workflows/security-scan.yml"
 # Dependency lockfile and manifest names in this repository or supported by OSV-Scanner v2's
 # source extractors (docs/supported_languages_and_lockfiles.md at v2.6.0).
@@ -58,11 +59,7 @@ IGNORE_SCOPES = {
     # oauthlib 4.0.0 fixes both oauthlib advisories (GitHub and OSV records, 2026-09-29).
     "GHSA-hj66-6f7g-4r5v": {"package": "oauthlib", "fixed": (4, 0, 0)},
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
-    # next (npm), affected from 16.2.0 and fixed in 16.3.6 (OSV and GitHub records, 2026-09-30). python_pins reads no npm
-    # format, so this entry drives the npm readers (npm_next_pins) and their test, not affected_pins; only they use "introduced".
-    "GHSA-vcvr-r3jv-pc5j": {"package": "next", "introduced": (16, 2, 0), "fixed": (16, 3, 6)},
 }
-NEXT_ADVISORY = "GHSA-vcvr-r3jv-pc5j"
 IGNORE_ALLOWED_LOCKS = {
     # Live recipe lock, relocked onto PyJWT 2.14.0 and then, on 2026-09-30, onto urllib3 2.8.0 and PyJWT 2.15.0. Its receipt carries
     # the 2026-09-29 oauthlib review forward at this sha256 (those relocks change only the urllib3 and PyJWT entries); the relock onto
@@ -72,18 +69,26 @@ IGNORE_ALLOWED_LOCKS = {
         "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
         "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
     },
-    # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
-    "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
-        "advisories": ["GHSA-vcvr-r3jv-pc5j"],
-        "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
-        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
-    },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.
     "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock": {
         "advisories": ["GHSA-8mgp-746c-j5xp", "GHSA-h35f-9h28-mq5c", "GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
         "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
         "evidence": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+    },
+}
+# A dated exception for one frozen artifact is not a repo-wide ignore: OSV-Scanner 2.6.0 applies an explicit --config to every input of its
+# invocation (docs/configuration.md, internal/config/manager.go Manager.Get), so the exception lives in a config of its own and security-scan.yml
+# scans the inventory entries that name it in an invocation of their own, and every other entry under CONFIG, which holds no exception for the
+# advisory. FROZEN_LOCKS binds each such config to the one lock it is for: its advisories, the lock's sha256 (a changed lock needs a new review)
+# and the repository path of the evidence.
+FROZEN_LOCKS = {
+    # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
+    "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
+        "config": FROZEN_CONFIG,
+        "advisories": ["GHSA-vcvr-r3jv-pc5j"],
+        "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
     },
 }
 
@@ -181,349 +186,6 @@ def python_pins(path, parser=None):
     return pins
 
 
-# npm-ecosystem lock formats, by file name or by the parser name the inventory gives. python_pins reads none of them, so the next
-# advisory is guarded by npm_next_pins, which follows what OSV-Scanner 2.6.0 extracts (google/osv-scalibr at the commit its go.mod
-# pins, 3090dbb7aaa24ce7a807899e7f16baa8b802a828, extractor/filesystem/language/javascript/{pnpmlock,packagelockjson,yarnlock}) for the
-# CANONICAL output of each tool, and fails closed (None) on anything else: another npm format, a file it cannot read strictly, or
-# valid syntax outside the canonical subset (a YAML or JSON construct the port does not model would otherwise be read as "no next").
-# A lock in a new format or style therefore fails the test until a reader is extended.
-NPM_LOCKS = ("package-lock.json", "npm-shrinkwrap.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "deno.lock")
-PNPM_LOCKFILE_VERSION = re.compile(r"^lockfileVersion:[ \t]*['\"]?([0-9.]+)['\"]?[ \t\r]*$", re.MULTILINE)
-PNPM_ENTRY_KEY = re.compile(r"""  ('(?:[^']|'')+'|[A-Za-z0-9_.][^\s#]*):""")
-PNPM_FIELD = re.compile(r"""    ([A-Za-z_][A-Za-z0-9_]*):(?: (\S.*))?""")
-PNPM_PLAIN_SCALAR = re.compile(r"""[A-Za-z0-9_.][^#]*""")
-# A top-level key of a pnpm lock: a plain identifier. Anything else at column 0 (a tag such as `!!str packages:`, an anchor, an alias, the merge
-# key `<<:`, a quoted or complex key, a directive) is YAML through which `packages` can reach OSV's decoder in ways this reader does not model.
-PNPM_TOP_KEY = re.compile(r"[A-Za-z_][A-Za-z0-9_-]*:(?: .*)?")
-# Line separators that Python's splitlines() honors and the YAML and line scanners of OSV's extractors may not: a file with one gives no answer.
-EXOTIC_LINE_BREAKS = re.compile("[\x0b\x0c\x1c\x1d\x1e\x85\u2028\u2029]")
-NPM_SEMVER = re.compile(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?", re.ASCII)
-NPM_TARBALL_URL = re.compile(r"https?://[^\s#?]+", re.ASCII)
-GIT_HOST_HINT = re.compile(r"git|bitbucket|codeload", re.IGNORECASE)
-YARN_VERSION = re.compile(r"""^ {2}"?version"?:? "?([\w.+-]+)"?$""")
-GO_JSON_FIELDS = ("lockfileVersion", "packages", "dependencies", "name", "version", "resolved")
-
-
-PNPM_NAME_VALUE = re.compile(r"@?[a-z0-9][a-z0-9._~-]*(?:/[a-z0-9._~-]+)?", re.ASCII)
-PNPM_VERSION_VALUE = re.compile(r"[0-9][0-9A-Za-z.+-]*", re.ASCII)
-# Plain scalars YAML resolves to null or a boolean: a string field given one of them may decode to the empty string, which OSV then replaces by the
-# name or version of the entry's key, so the value written here is not what OSV uses.
-YAML_SPECIAL_WORDS = frozenset(("null", "true", "false", "yes", "no", "on", "off", "y", "n"))
-
-
-def pnpm_scalar(value, pattern=None):
-    """A plain or single-quoted YAML scalar, unquoted; None for anything else (a comment, a flow collection, a double-quoted string, a YAML
-    null or boolean word, and, when a pattern is given, a value that does not fully match it)."""
-    if len(value) >= 2 and value[0] == value[-1] == "'":
-        value = value[1:-1].replace("''", "'")
-    elif not (PNPM_PLAIN_SCALAR.fullmatch(value) and " #" not in value and not value.endswith(":")):
-        return None
-    if value.lower() in YAML_SPECIAL_WORDS or (pattern is not None and not pattern.fullmatch(value)):
-        return None
-    return value
-
-
-def pnpm_packages(text):
-    """(key, fields) for each entry of the top-level `packages:` map of one YAML document of a pnpm-lock.yaml written the way pnpm writes it: entry keys at two
-    spaces, plain or single-quoted, alone on their line; their `name:` and `version:` fields at four, plain or single-quoted scalars;
-    anything deeper is content of a field (flow mappings, block mappings) and is skipped. OSV reads only this map. None when a line
-    of the section is outside that subset: an inline record, a double-quoted key, a quoted field key, a trailing comment, a tab or an
-    odd indentation, a repeated `packages` key, or a top-level line that is not a plain `key:` (a tag, an anchor, an alias, a merge
-    key `<<: *base`: YAML that can supply `packages` without spelling it)."""
-    entries, in_packages, seen, current, first_child = [], False, False, None, False
-    for raw in text.splitlines():
-        line = raw.rstrip()
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        if "\t" in line[: len(line) - len(line.lstrip())]:
-            return None
-        indent = len(line) - len(line.lstrip(" "))
-        if indent == 0:
-            if not PNPM_TOP_KEY.fullmatch(line):
-                return None
-            if line == "packages:" or line.startswith("packages: "):
-                if seen or line != "packages:" and line != "packages: {}":
-                    return None
-                in_packages, seen, current = line == "packages:", True, None
-            else:
-                in_packages, current = False, None
-            continue
-        if not in_packages:
-            continue
-        if indent > 2 and first_child:
-            if indent != 4:
-                return None  # the fields of an entry sit at four spaces; a mapping indented otherwise would hide its name and version
-            first_child = False
-        elif indent <= 2:
-            first_child = False
-        if indent == 2:
-            match = PNPM_ENTRY_KEY.fullmatch(line)
-            if not match:
-                return None
-            key = match.group(1)
-            current, first_child = {}, True
-            entries.append((key[1:-1].replace("''", "'") if key.startswith("'") else key, current))
-        elif indent == 4:
-            match = PNPM_FIELD.fullmatch(line)
-            if not match or current is None:
-                return None
-            if match.group(1) in ("name", "version"):
-                value = pnpm_scalar(match.group(2) or "", PNPM_NAME_VALUE if match.group(1) == "name" else PNPM_VERSION_VALUE)
-                if value is None:
-                    return None
-                current[match.group(1)] = value
-        elif indent % 2 or current is None:
-            return None
-    return entries
-
-
-def pnpm_package_pin(key, fields):
-    """The (name, version) OSV derives for one `packages` entry at lockfileVersion 9: the `<name>@<version>` key (a scope's leading @
-    kept, `file:` keys carry neither), with the entry's own `name:` and `version:` fields taking precedence."""
-    if key.startswith("file:"):
-        name = version = ""
-    else:
-        scoped = key.startswith("@")
-        name, _, version = (key[1:] if scoped else key).partition("@")
-        name = "@" + name if scoped else name
-    return fields.get("name") or name, fields.get("version") or version
-
-
-def pnpm_documents(text):
-    """The non-empty YAML documents of a pnpm-lock.yaml, each as text: pnpm 12 writes the environment lockfile and the project lock as two
-    documents separated by `---`, and OSV extracts the packages of every document. None for a document end marker or a marker that
-    carries content."""
-    documents, current = [], []
-    for raw in text.splitlines():
-        line = raw.rstrip()
-        if line == "---":
-            documents.append(current)
-            current = []
-        elif line.startswith(("---", "...")):
-            return None
-        else:
-            current.append(raw)
-    documents.append(current)
-    return ["\n".join(lines) for lines in documents if any(line.strip() and not line.strip().startswith("#") for line in lines)]
-
-
-def pnpm_next_pins(text):
-    """The versions of `next` in a pnpm-lock.yaml (any document at lockfileVersion 9; another version, or none: None), from the `packages`
-    entries only, as OSV reads them (name and version from the key or the entry's own fields, so tarball, aliased and renamed entries
-    count; importers, snapshots and peer declarations are not packages). None for a file outside the canonical subset (pnpm_packages)."""
-    if EXOTIC_LINE_BREAKS.search(text):
-        return None
-    documents = pnpm_documents(text)
-    if not documents:
-        return None
-    found = set()
-    for document in documents:
-        match = PNPM_LOCKFILE_VERSION.search(document)
-        if not match:
-            return None
-        try:
-            lock_version = float(match.group(1))
-        except ValueError:
-            return None
-        if not 9.0 <= lock_version < 10.0:
-            return None
-        entries = pnpm_packages(document)
-        if entries is None:
-            return None
-        for key, fields in entries:
-            name, version = pnpm_package_pin(key, fields)
-            if name == "next" and version:
-                found.add(version)
-    return sorted(found)
-
-
-def npm_path_name(path):
-    """OSV's extractNpmPackageName: the last path segment, with the scope when the segment before it is `@scope`."""
-    parts = [part for part in path.split("/") if part]
-    if len(parts) >= 2 and parts[-2].startswith("@"):
-        return parts[-2] + "/" + parts[-1]
-    return parts[-1] if parts else ""
-
-
-def strict_json_object(pairs):
-    """An object hook for the package-lock reader. Go decodes a lock into structs whose fields match case-insensitively and merges
-    repeated maps, which this port does not model, so a repeated key or a key that differs from a field the reader uses only in its
-    case (Packages, Version) is rejected (ValueError), not read as the last or the canonical one."""
-    found = {}
-    for key, value in pairs:
-        if key in found or any(key.lower() == field.lower() and key != field for field in GO_JSON_FIELDS):
-            raise ValueError(key)
-        found[key] = value
-    return found
-
-
-def next_entry_version(version, resolved):
-    """The version of a `next` entry of a package-lock.json when it is a plain registry install, else None. OSV replaces the version of an
-    entry whose `version` or `resolved` names a git commit with the commit (or with nothing, in the nested `dependencies` form) and blanks
-    a `file:` path, so the guard accepts only a semver `version` whose `resolved`, when present, is an http(s) tarball URL without a
-    fragment, a query or a git host hint, and gives up (None) on anything else."""
-    if not isinstance(version, str) or not NPM_SEMVER.fullmatch(version):
-        return None
-    if resolved is not None and (not isinstance(resolved, str) or not NPM_TARBALL_URL.fullmatch(resolved) or GIT_HOST_HINT.search(resolved)):
-        return None
-    return version
-
-
-def package_lock_next_pins(text):
-    """The versions of `next` in a package-lock.json or npm-shrinkwrap.json (lockfileVersion 1 to 3), as OSV reads it: the `packages`
-    map when the file has one (the root entry "" skipped; the entry's "name", else the last path segment, so aliases and paths such as
-    vendor/next count), otherwise the nested `dependencies`, where an `npm:<name>@<version>` version is an alias. Any other
-    lockfileVersion, invalid or deeply nested JSON, a repeated or differently cased field, or a next entry that is not a plain registry
-    install (next_entry_version) gives None."""
-    try:
-        data = json.loads(text, object_pairs_hook=strict_json_object)
-    except (ValueError, RecursionError):
-        return None
-    if not isinstance(data, dict) or data.get("lockfileVersion") not in (1, 2, 3):
-        return None
-    found = []
-    packages = data.get("packages")
-    if "packages" in data and not isinstance(packages, dict):
-        return None
-    if isinstance(packages, dict):
-        for key, meta in packages.items():
-            if key == "":
-                continue
-            if not isinstance(meta, dict):
-                return None
-            if (meta.get("name") or npm_path_name(key)) == "next":
-                pinned = next_entry_version(meta.get("version"), meta.get("resolved"))
-                if pinned is None:
-                    return None  # a local path, a git commit or an odd URL: OSV reports another version than the one written here
-                found.append(pinned)
-        return sorted(set(found))
-    dependencies = data.get("dependencies", {})
-    if not isinstance(dependencies, dict):
-        return None
-    stack = [dependencies]
-    while stack:
-        for name, meta in stack.pop().items():
-            if not isinstance(meta, dict):
-                return None
-            version = meta.get("version")
-            if isinstance(version, str) and version.startswith("npm:") and "@" in version[4:]:
-                name, _, version = version[4:].rpartition("@")
-            if name == "next":
-                pinned = next_entry_version(version, meta.get("resolved"))
-                if pinned is None:
-                    return None  # a local path, a git commit or an odd URL: OSV reports another version than the one written here
-                found.append(pinned)
-            nested = meta.get("dependencies")
-            if nested is not None:
-                if not isinstance(nested, dict):
-                    return None
-                stack.append(nested)
-    return sorted(set(found))
-
-
-def yarn_package_name(header):
-    """OSV's extractYarnPackageName: the package a group header names, taken from its first spec and following `npm:` aliases."""
-    text = header
-    while True:
-        text = text[1:] if text.startswith('"') else text
-        text = text[:-1] if text.endswith(":") else text
-        text = text.split(",", 1)[0]
-        scoped = text.startswith("@")
-        name, _, right = (text[1:] if scoped else text).partition("@")
-        if right.startswith("npm:") and "@" in right:
-            text = right[4:]
-            continue
-        return "@" + name if scoped else name
-
-
-def yarn_lock_next_pins(text):
-    """The versions of `next` in a yarn.lock (classic or berry) as OSV groups it: a header line, then its indented lines, the first of
-    which of the form `version "x"` or `version: x` gives the version; a header naming next through an `npm:` alias counts, and the
-    `__metadata:` group and the root workspace (`@workspace:.":`) are skipped. A file with neither the classic header nor
-    `__metadata:`, an indented line before any header, or a next group without a version gives None."""
-    if EXOTIC_LINE_BREAKS.search(text):
-        return None
-    lines = text.splitlines()
-    if not any(line.startswith(("# yarn lockfile v1", "__metadata:")) for line in lines):
-        return None
-    groups = []
-    for line in lines:
-        if not line.strip() or line.strip().startswith("#"):
-            continue
-        if not line.startswith(" "):
-            groups.append((line, []))
-        elif not groups:
-            return None
-        else:
-            groups[-1][1].append(line)
-    found = []
-    for header, props in groups:
-        if header == "__metadata:" or header.endswith('@workspace:.":') or yarn_package_name(header) != "next":
-            continue
-        versions = [m.group(1) for m in (YARN_VERSION.match(prop) for prop in props) if m]
-        if not versions:
-            return None
-        found.append(versions[0])
-    return sorted(set(found))
-
-
-NPM_NEXT_READERS = {"pnpm-lock.yaml": pnpm_next_pins, "package-lock.json": package_lock_next_pins, "npm-shrinkwrap.json": package_lock_next_pins,
-                    "yarn.lock": yarn_lock_next_pins}
-
-
-def npm_next_pins(path, name=None):
-    """The versions of `next` a lockfile in an npm format pins, or None when the guard cannot read it strictly: no reader for that
-    format (bun.lock, bun.lockb, deno.lock, an unknown name), an unreadable file, a format version or a style the reader does not know."""
-    reader = NPM_NEXT_READERS.get(name or Path(path).name)
-    if reader is None:
-        return None
-    try:
-        text = Path(path).read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return None
-    try:
-        return reader(text)
-    except RecursionError:
-        return None
-
-
-def npm_affected(version, fixed, introduced):
-    """Whether an npm version may be one an advisory affects: introduced <= version < fixed by semver, where a prerelease sorts below
-    its release (so 16.2.0-canary.1 is not affected and 16.3.6-canary.1 is) and build metadata is ignored. Text that is not a plain
-    semver (a range, a URL, a tag) counts as affected: the guard errs closed."""
-    match = NPM_SEMVER.fullmatch(version or "")
-    if not match:
-        return True
-    core = tuple(int(part) for part in match.group(1, 2, 3))
-    prerelease = match.group(4) is not None
-    if core < introduced or (core == introduced and prerelease):
-        return False
-    return core < fixed or (core == fixed and prerelease)
-
-
-def npm_next_findings(entries, root=ROOT, allowed=IGNORE_ALLOWED_LOCKS):
-    """(path, problem) for each inventory entry in an npm lock format that the next ignore could hide something in: it pins a next the
-    advisory affects (unless `allowed` lists the advisory for that lock, which must then still pin next), or the guard cannot read it
-    strictly (fail closed)."""
-    scope = IGNORE_SCOPES[NEXT_ADVISORY]
-    found = []
-    for entry in entries:
-        name = entry.get("parser") or Path(entry["path"]).name
-        if name not in NPM_LOCKS:
-            continue
-        versions = npm_next_pins(root / entry["path"], name)
-        if versions is None:
-            found.append((entry["path"], "cannot be read strictly: extend npm_next_pins for this npm format or style"))
-        elif NEXT_ADVISORY in allowed.get(entry["path"], {}).get("advisories", ()):
-            if not versions:
-                found.append((entry["path"], "the allowed lock no longer pins next; drop its entry"))
-        else:
-            found += [(entry["path"], f"pins next {version}, which the {NEXT_ADVISORY} ignore hides")
-                      for version in versions if npm_affected(version, scope["fixed"], scope["introduced"])]
-    return found
-
-
 def affected(version, fixed):
     """Whether a tracked package at this version or specifier (python_pins) may be one its advisory affects: every
     version when no release is fixed. Otherwise a plain release (digits and dots) is compared with the fix as an integer
@@ -598,6 +260,41 @@ def active_ignores(config, today=None):
         if until is None or until > today:
             active.add(entry["id"])
     return active
+
+
+def scan_partition(entries, configs=None):
+    """The split security-scan.yml's jq makes of the inventory: (the entries scanned together under CONFIG, {config path: the entries scanned
+    under that config alone}, the entries that name any other config). The last are in neither scan, which the workflow's count check
+    turns into a failure; `configs` defaults to the configs FROZEN_LOCKS binds."""
+    configs = {lock["config"] for lock in FROZEN_LOCKS.values()} if configs is None else set(configs)
+    ordinary, frozen, stray = [], {config: [] for config in configs}, []
+    for entry in entries:
+        if "config" not in entry:
+            ordinary.append(entry)
+        elif entry["config"] in configs:
+            frozen[entry["config"]].append(entry)
+        else:
+            stray.append(entry)
+    return ordinary, frozen, stray
+
+
+def ignore_entry_problems(config):
+    """Why an [[IgnoredVulns]] entry of a parsed config breaks the ignore policy (a missing id or reason, a missing or distant ignoreUntil)."""
+    problems, latest = [], date.today() + timedelta(days=90)
+    for entry in config.get("IgnoredVulns", []):
+        if not entry.get("id"):
+            problems.append(f"{entry}: no id")
+        if not str(entry.get("reason", "")).strip():
+            problems.append(f"{entry.get('id')}: no reason")
+        until = entry.get("ignoreUntil")
+        if not isinstance(until, date):
+            problems.append(f"{entry.get('id')}: ignoreUntil must be a TOML date")
+            continue
+        if hasattr(until, "date"):
+            until = until.date()
+        if until > latest:
+            problems.append(f"{entry.get('id')}: ignoreUntil more than 90 days away")
+    return problems
 
 
 def tracked_files():
@@ -691,16 +388,16 @@ class LockfileInventoryTests(unittest.TestCase):
 
 class IgnorePolicyTests(unittest.TestCase):
     def test_every_ignore_has_id_reason_and_a_near_expiry(self):
-        config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
-        latest = date.today() + timedelta(days=90)
-        for entry in config.get("IgnoredVulns", []):
-            self.assertTrue(entry.get("id"), entry)
-            self.assertTrue(str(entry.get("reason", "")).strip(), entry)
-            until = entry.get("ignoreUntil")
-            self.assertIsInstance(until, date, f"{entry.get('id')}: ignoreUntil must be a TOML date")
-            if hasattr(until, "date"):
-                until = until.date()
-            self.assertLessEqual(until, latest, f"{entry.get('id')}: ignoreUntil more than 90 days away")
+        for path in (CONFIG, ROOT / FROZEN_CONFIG):
+            config = tomllib.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(ignore_entry_problems(config), [], str(path))
+
+    def test_the_ignore_field_check_catches_a_mutant(self):
+        far = date.today() + timedelta(days=91)
+        self.assertEqual(ignore_entry_problems({"IgnoredVulns": [{"id": "GHSA-x", "reason": "r", "ignoreUntil": date.today() + timedelta(days=90)}]}), [])
+        for entry in ({"reason": "r", "ignoreUntil": far}, {"id": "GHSA-x", "ignoreUntil": far}, {"id": "GHSA-x", "reason": "r"},
+                      {"id": "GHSA-x", "reason": "r", "ignoreUntil": far}, {"id": "GHSA-x", "reason": " ", "ignoreUntil": far}):
+            self.assertNotEqual(ignore_entry_problems({"IgnoredVulns": [entry]}), [], entry)
 
     def test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock(self):
         # Every ignore matches repo-wide, so while one is active no inventory lockfile may pin a version it would hide
@@ -823,226 +520,77 @@ class IgnorePolicyTests(unittest.TestCase):
             self.assertLessEqual(until, latest, f"{entry}: effectiveUntil more than 90 days away")
 
 
+class FrozenScanTests(unittest.TestCase):
+    """A dated exception for a frozen artifact is scoped by the scanner, not by a reader of the lock: its config is used only by the scan of the
+    inventory entries that name it (docs/decisions/2026-09-22-github-automation-closure.md, "urllib3 and PyJWT relock and a frozen macOS lock")."""
+
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    ordinary_config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    def test_the_split_is_exhaustive_and_disjoint(self):
+        entries = self.inventory["lockfiles"]
+        ordinary, frozen, stray = scan_partition(entries)
+        self.assertEqual(stray, [], "an entry that names a config nothing scans")
+        scanned = ordinary + [entry for group in frozen.values() for entry in group]
+        self.assertEqual(len(scanned), len(entries), "an entry in two scans, or in none")
+        self.assertEqual(sorted(entry["path"] for entry in scanned), sorted(entry["path"] for entry in entries))
+        self.assertGreater(len(ordinary), 0)
+        for config, group in frozen.items():
+            self.assertTrue(group, f"{config} is named by no inventory entry")
+
+    def test_only_the_frozen_locks_name_a_config(self):
+        named = {entry["path"]: entry["config"] for entry in self.inventory["lockfiles"] if "config" in entry}
+        self.assertEqual(named, {path: lock["config"] for path, lock in FROZEN_LOCKS.items()})
+        for path, lock in FROZEN_LOCKS.items():
+            self.assertIn(path, [entry["path"] for entry in self.inventory["lockfiles"]], "a frozen lock is a lockfile entry, not a manifest")
+
+    def test_the_ordinary_config_has_no_exception_for_a_frozen_advisory(self):
+        ids = {entry["id"] for entry in self.ordinary_config.get("IgnoredVulns", [])}
+        frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["advisories"]}
+        self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, which only the frozen scan uses")
+        self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next"}, set())
+
+    def test_each_frozen_config_holds_exactly_the_advisories_of_its_locks(self):
+        for config_path in sorted({lock["config"] for lock in FROZEN_LOCKS.values()}):
+            config = tomllib.loads((ROOT / config_path).read_text(encoding="utf-8"))
+            self.assertEqual(set(config), {"IgnoredVulns"}, "a frozen config holds ignores only, no package override")
+            expected = sorted(advisory for lock in FROZEN_LOCKS.values() if lock["config"] == config_path for advisory in lock["advisories"])
+            self.assertEqual(sorted(entry["id"] for entry in config["IgnoredVulns"]), expected)
+            self.assertEqual(ignore_entry_problems(config), [])
+
+    def test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence(self):
+        for path, lock in FROZEN_LOCKS.items():
+            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), lock["sha256"],
+                             f"{path} changed after its review: re-review whether it reaches the advisories of its config, then record the new sha256")
+            self.assertTrue((ROOT / lock["evidence"]).is_file(), lock["evidence"])
+
+    def test_the_workflow_scans_each_config_in_its_own_invocation(self):
+        text = self.workflow
+        configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
+        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
+        for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
+                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
+            self.assertIn(needle, text, needle)
+        # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
+        self.assertIn('"${frozen[@]}")', text)
+        self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
+
+    def test_the_partition_check_catches_a_mutant_inventory(self):
+        entries = [{"path": "a"}, {"path": "b", "config": FROZEN_CONFIG}, {"path": "c", "config": ".github/other.toml"}, {"path": "d", "parser": "requirements.txt"}]
+        ordinary, frozen, stray = scan_partition(entries, {FROZEN_CONFIG})
+        self.assertEqual([entry["path"] for entry in ordinary], ["a", "d"])
+        self.assertEqual({config: [entry["path"] for entry in group] for config, group in frozen.items()}, {FROZEN_CONFIG: ["b"]})
+        self.assertEqual([entry["path"] for entry in stray], ["c"])
+        self.assertEqual(len(ordinary) + sum(len(group) for group in frozen.values()) + len(stray), len(entries))
+
+
 class AllowedLockTests(unittest.TestCase):
     """Each IGNORE_ALLOWED_LOCKS entry is a scanned lock, bound to the advisories reviewed for it, the sha256 of the
     content that review covered and an existing evidence file."""
 
     config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
     inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
-
-    def test_only_the_allowed_lock_pins_an_affected_next(self):
-        # The next ignore is repo-wide by id and python_pins reads no npm format, so every inventory lock in an npm format is read here:
-        # the frozen macOS variant may pin next below the fix, no other lock may, and a lock in a format or style no reader knows fails.
-        entries = self.inventory["lockfiles"]
-        self.assertEqual(npm_next_findings(entries), [])
-        read = [entry for entry in entries if (entry.get("parser") or Path(entry["path"]).name) in NPM_LOCKS]
-        self.assertGreaterEqual(len(read), 3)  # the two pnpm locks and the retrieval recipe's package-lock.json today
-        self.assertEqual({entry["path"]: npm_next_pins(ROOT / entry["path"]) for entry in read if entry["path"].endswith("pnpm-lock.yaml")},
-                         {"blueprints/convergence-practice/application-delivery/pnpm-lock.yaml": ["16.3.6"],
-                          "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": ["16.3.5"]})
-
-    def test_the_npm_next_readers_see_every_shape_or_fail_closed(self):
-        pnpm = "lockfileVersion: '9.0'\n\n"
-        yarn1 = '# yarn lockfile v1\n\n\n'
-        resolution = "    resolution: {integrity: sha512-x}\n"
-        cases = [
-            # pnpm at lockfileVersion 9, canonical style: the `packages` entries only (snapshots, importers and peer declarations are not
-            # packages to OSV); plain or single-quoted keys; a scoped or longer name is not next
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    engines: {node: '>=20.9.0'}\n\n  next@16.3.6:\n" + resolution
-                               + "\nsnapshots:\n\n  next@16.3.5(react@19.3.0):\n    dependencies:\n      react: 19.3.0\n", ["16.3.5", "16.3.6"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  'next@16.3.5':\n" + resolution, ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  '@next/env@16.3.5':\n" + resolution + "\n  eslint-config-next@16.3.5:\n" + resolution
-                               + "\n  next-themes@0.4.6:\n" + resolution + "    peerDependencies:\n      next: 16.3.5\n      react: ^19\n"
-                               "    peerDependenciesMeta:\n      next:\n        optional: true\n", []),
-            ("pnpm-lock.yaml", pnpm + "importers:\n  .:\n    dependencies:\n      next:\n        specifier: ^16.3.0\n        version: 16.3.5(react@19.3.0)\n"
-                               "\npackages:\n\n  react@19.3.0:\n" + resolution, []),
-            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\r\n\r\npackages:\r\n\r\n  next@16.3.5:\r\n    resolution: {integrity: sha512-x}\r\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", "lockfileVersion: 9\n\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
-            ("pnpm-lock.yaml", "lockfileVersion: 9.0\n\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
-            ("pnpm-lock.yaml", pnpm + "packages: {}\n", []),
-            # fields the way YAML allows but pnpm never writes: children indented other than four, name or version as YAML null or boolean words
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n      name: next\n      version: 16.3.5\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: null\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    version: ~\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: 'next'\n    version: '16.3.5'\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "    name: Next\n", None),
-            ("pnpm-lock.yaml", pnpm + "x-anchor: &base\n  foo: 1\npackages:\n\n  next@16.3.6:\n" + resolution, ["16.3.6"]),
-            # YAML that supplies `packages` without spelling it plainly, which OSV's decoder reads (found by the independent verifier of the first repair
-            # with the pinned scanner): a tagged key, a merge key, an anchored or aliased key, a directive, a quoted key
-            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\n!!str packages:\n  next@16.3.5:\n    resolution: {}\n", None),
-            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\nbase: &base\n  packages:\n    next@16.3.5:\n      resolution: {}\n<<: *base\n", None),
-            ("pnpm-lock.yaml", pnpm + "&k packages:\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "*alias : x\npackages:\n\n  react@19.3.0:\n" + resolution, None),
-            ("pnpm-lock.yaml", "%YAML 1.2\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "\"packages\":\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", "lockfileVersion: '9.0'\npackages:\u2028  next@16.3.5:\n    resolution: {}\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n    resolution: {}\x85\n", None),
-            # pnpm 12 writes two documents (the environment lockfile, then the project lock); OSV extracts the packages of every one
-            ("pnpm-lock.yaml", "---\n" + pnpm + "packages:\n\n  react@19.3.0:\n" + resolution + "\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution, ["16.3.5"]),
-            ("pnpm-lock.yaml", "---\n" + pnpm + "packages:\n\n  next@16.3.6:\n" + resolution + "\n---\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution,
-             ["16.3.5", "16.3.6"]),
-            ("pnpm-lock.yaml", "---\n" + pnpm + "packages:\n\n  react@19.3.0:\n" + resolution + "\n---\nlockfileVersion: '10.0'\npackages:\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", "--- # env\n" + pnpm + "packages:\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "...\n", None),
-            ("pnpm-lock.yaml", pnpm + "importers:\n  .: {}\n", []),
-            # entries that carry their own name or version, which OSV prefers over the key: tarball, renamed, disagreeing and file: entries
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@https://registry.npmjs.org/next/-/next-16.3.5.tgz:\n"
-                               "    resolution: {tarball: https://registry.npmjs.org/next/-/next-16.3.5.tgz}\n    version: 16.3.5\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  foo@1.0.0:\n" + resolution + "    name: next\n    version: 16.3.5\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.6:\n" + resolution + "    version: 16.3.5\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  file:vendor/next:\n" + resolution + "    name: next\n    version: '16.3.5'\n", ["16.3.5"]),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@https://registry.npmjs.org/next/-/next-16.3.5.tgz:\n" + resolution,
-             ["https://registry.npmjs.org/next/-/next-16.3.5.tgz"]),
-            # valid YAML outside the canonical subset fails closed instead of reading as "no next": an inline record, a double-quoted or
-            # quoted field key, a trailing comment on a name or version, odd indentation, tabs, a quoted or repeated `packages` key
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  file:vendor/next: {name: next, version: 16.3.5}\n", None),
-            ("pnpm-lock.yaml", pnpm + 'packages:\n\n  "next@16.3.5":\n' + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  foo@1.0.0:\n" + resolution + "    'name': next\n    version: 16.3.5\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  foo@1.0.0:\n" + resolution + "    name: next # renamed\n    version: 16.3.5\n", None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n   next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n\tnext@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "'packages':\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages: # the packages\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n\n  next@16.3.5:\n" + resolution + "\npackages:\n\n  react@19.3.0:\n" + resolution, None),
-            ("pnpm-lock.yaml", pnpm + "packages:\n" + resolution, None),
-            ("pnpm-lock.yaml", "lockfileVersion: '10.0'\npackages:\n\n  next@16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", "lockfileVersion: '6.0'\npackages:\n\n  /next/16.3.5:\n" + resolution, None),
-            ("pnpm-lock.yaml", "packages:\n\n  next@16.3.5:\n" + resolution, None),
-            # package-lock.json and npm-shrinkwrap.json: nested, aliased and path-named entries, the root project named next is not a
-            # dependency, the old nested form with npm: aliases, a lock with only legacy dependencies, unknown versions and malformed files,
-            # and Go-decoder differences this port does not model (repeated keys, differently cased fields) failing closed
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {
-                "": {"name": "app"}, "node_modules/next": {"version": "16.3.5"}, "node_modules/x/node_modules/next": {"version": "16.3.6"},
-                "node_modules/next-themes": {"version": "0.4.6"}}}), ["16.3.5", "16.3.6"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/foo": {"name": "next", "version": "16.3.5"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"name": "", "version": "16.3.5"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"vendor/next": {"version": "16.3.5"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/@scope/next": {"version": "16.3.5"}}}), []),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"": {"name": "next", "version": "16.3.5"}}}), []),
-            ("npm-shrinkwrap.json", json.dumps({"lockfileVersion": 1, "dependencies": {"a": {"version": "1.0.0", "dependencies": {
-                "next": {"version": "16.3.5"}}}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"foo": {"version": "npm:next@16.3.5"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 2, "dependencies": {"next": {"version": "16.3.5"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {}, "dependencies": {"next": {"version": "16.3.5"}}}), []),
-            ("package-lock.json", '{"lockfileVersion":3,"packages":{"node_modules/next":{"version":"16.3.5"}},"packages":{}}', None),
-            ("package-lock.json", '{"lockfileVersion":3,"Packages":{"node_modules/next":{"version":"16.3.5"}}}', None),
-            ("package-lock.json", '{"lockfileVersion":1,"dependencies":{"next":{"version":"16.3.5"}},"dependencies":{}}', None),
-            ("package-lock.json", '{"lockfileVersion":3,"packages":{"node_modules/next":{"Version":"16.3.5"}}}', None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {"version": "file:vendor/next"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {
-                "version": "git+https://github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {
-                "version": "16.3.6", "resolved": "git+https://github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
-                "version": "16.3.6", "resolved": "git+ssh://git@github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
-                "version": "16.3.6", "resolved": "https://codeload.github.com/vercel/next.js/tar.gz/0123456789abcdef0123456789abcdef01234567"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
-                "version": "16.3.6", "resolved": "https://registry.npmjs.org/next/-/next-16.3.6.tgz?x=1"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
-                "version": "16.3.5", "resolved": "https://registry.npmjs.org/next/-/next-16.3.5.tgz", "integrity": "sha512-x"}}}), ["16.3.5"]),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"version": "^16.3.0"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"version": "file:vendor/next"}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 4, "packages": {}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"link": True}}}), None),
-            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": ["node_modules/next"]}), None),
-            ("package-lock.json", "{not json", None),
-            # yarn.lock, classic and berry, with npm: aliases (also long chains) and scopes; the root workspace and __metadata are skipped
-            ("yarn.lock", yarn1 + 'next@^16.3.0, next@^16.3.5:\n  version "16.3.5"\n  resolved "https://x"\n\nnext-themes@^0.4.0:\n  version "0.4.6"\n',
-             ["16.3.5"]),
-            ("yarn.lock", '__metadata:\n  version: 8\n\n"next@npm:^16.3.0, next@npm:16.3.6":\n  version: 16.3.6\n  resolution: "next@npm:16.3.6"\n',
-             ["16.3.6"]),
-            ("yarn.lock", '__metadata:\n  version: 8\n\n"foo@npm:next@^16.3.0":\n  version: 16.3.5\n  resolution: "next@npm:16.3.5"\n', ["16.3.5"]),
-            ("yarn.lock", yarn1 + 'foo@npm:next@^16.3.0:\n  version "16.3.5"\n', ["16.3.5"]),
-            ("yarn.lock", '__metadata:\n  version: 8\n\n"@x/foo@npm:next@^16.3.0":\n  version: 16.3.5\n', ["16.3.5"]),
-            ("yarn.lock", yarn1 + '"@vercel/next@^1.0.0":\n  version "1.0.0"\n', []),
-            ("yarn.lock", '__metadata:\n  version: 8\n"next@workspace:.":\n  version: 16.3.5\n', []),
-            ("yarn.lock", yarn1 + "alias@npm:" * 1200 + 'next@^16.3.0:\n  version "16.3.5"\n', ["16.3.5"]),
-            ("yarn.lock", yarn1 + "next@^16.3.0:\n  resolved \"https://x\"\n", None),
-            ("yarn.lock", "next@^16.3.0:\n  version \"16.3.5\"\n", None),
-            ("yarn.lock", yarn1 + 'next@^16.3.0:\n  version "16.3.5"\u2028', None),
-            ("yarn.lock", '# yarn lockfile v1\n  version "1.0.0"\n', None),
-            # formats no reader knows
-            ("bun.lock", '{"lockfileVersion": 1, "packages": {"next": ["next@16.3.5"]}}', None),
-            ("deno.lock", "{}", None),
-        ]
-        with tempfile.TemporaryDirectory() as scratch:
-            for name, text, expected in cases:
-                path = Path(scratch) / name
-                path.write_bytes(text.encode("utf-8"))
-                self.assertEqual(npm_next_pins(path), expected, f"{name}: {text[:140]!r}")
-            self.assertIsNone(npm_next_pins(Path(scratch) / "missing" / "pnpm-lock.yaml"))
-            binary = Path(scratch) / "bun.lockb"
-            binary.write_bytes(b"\xff\x00bun")
-            self.assertIsNone(npm_next_pins(binary))
-
-    def test_deep_nesting_is_read_or_fails_closed_never_an_error_or_an_empty_read(self):
-        deep = '{"lockfileVersion":1,"dependencies":' + '{"p":{"dependencies":' * 1200 + '{"next":{"version":"16.3.5"}}' + '}}' * 1200 + '}'
-        self.assertIn(package_lock_next_pins(deep), (None, ["16.3.5"]))  # Python's JSON parser may refuse this depth; a walk must not raise
-        with tempfile.TemporaryDirectory() as scratch:
-            path = Path(scratch) / "package-lock.json"
-            path.write_text(deep, encoding="utf-8")
-            self.assertIn(npm_next_pins(path), (None, ["16.3.5"]))
-
-    def test_the_readers_run_in_linear_time_on_large_input(self):
-        # A regex that backtracks over the indentation of a `next:` block took seconds on 604 bytes (review of the first repair).
-        heavy = ("  foo@1.0.0:\n    resolution: {integrity: x}\n    peerDependenciesMeta:\n      next:\n" + " " * 160
-                 + "optional: true\n" + " " * 160 + "injected: true\n" + " " * 160 + "other: true\n")
-        big = "".join(f"  pkg{index}@1.0.{index}:\n    resolution: {{integrity: x}}\n" for index in range(20000))
-        for text in ("lockfileVersion: 9.0\npackages:\n" + heavy, "lockfileVersion: 9.0\npackages:\n" + heavy * 500, "lockfileVersion: '9.0'\npackages:\n" + big):
-            started = time.perf_counter()
-            self.assertEqual(pnpm_next_pins(text), [])
-            self.assertLess(time.perf_counter() - started, 2.0)
-
-    def test_the_next_guard_catches_a_mutant_lock(self):
-        # An extra lock in any npm format that pins an affected next fails; a fixed or older one and a non-npm file do not; the
-        # allowed exemption covers only the lock and advisory it names and requires the lock to keep pinning next.
-        resolution = "    resolution: {integrity: sha512-x}\n"
-        header = "lockfileVersion: '9.0'\n\npackages:\n\n"
-        files = {
-            "a/pnpm-lock.yaml": header + "  next@16.3.5:\n" + resolution,
-            "b/package-lock.json": json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"version": "16.3.5"}}}),
-            "c/yarn.lock": '# yarn lockfile v1\n\nnext@^16.3.0:\n  version "16.3.5"\n',
-            "d/bun.lockb": "binary",
-            "e/pnpm-lock.yaml": header + "  next@16.3.6:\n" + resolution + "\n  'next@16.3.5':\n" + resolution,
-            "f/pnpm-lock.yaml": header + "  next@16.3.6:\n" + resolution,
-            "g/pnpm-lock.yaml": header + "  next@16.1.9:\n" + resolution + "  next@16.4.0-canary.1:\n" + resolution + "  next@16.3.6+build.1:\n" + resolution
-                                + "  next@16.2.0-canary.1:\n" + resolution,
-            "h/requirements.txt": "next==16.3.5\n",
-            "j/pnpm-lock.yaml": header + "  next@https://registry.npmjs.org/next/-/next-16.3.5.tgz:\n" + resolution + "    name: next\n    version: 16.3.5\n",
-            "k/yarn.lock": '__metadata:\n  version: 8\n\n"foo@npm:next@^16.3.0":\n  version: 16.3.5\n',
-            "l/package-lock.json": json.dumps({"lockfileVersion": 1, "dependencies": {"foo": {"version": "npm:next@16.3.5"}}}),
-            "m/pnpm-lock.yaml": header + "  file:vendor/next: {name: next, version: 16.3.5}\n",
-        }
-        with tempfile.TemporaryDirectory() as scratch:
-            root = Path(scratch)
-            for rel, text in files.items():
-                (root / rel).parent.mkdir(parents=True, exist_ok=True)
-                (root / rel).write_text(text, encoding="utf-8")
-            entries = [{"path": rel} for rel in files]
-            flagged = lambda allowed: sorted({path for path, _ in npm_next_findings(entries, root, allowed)})
-            every = ["a/pnpm-lock.yaml", "b/package-lock.json", "c/yarn.lock", "d/bun.lockb", "e/pnpm-lock.yaml", "j/pnpm-lock.yaml", "k/yarn.lock",
-                     "l/package-lock.json", "m/pnpm-lock.yaml"]
-            self.assertEqual(flagged({}), every)
-            allowed = {"a/pnpm-lock.yaml": {"advisories": [NEXT_ADVISORY]}}
-            self.assertEqual(flagged(allowed), every[1:])
-            self.assertEqual(flagged({"a/pnpm-lock.yaml": {"advisories": ["GHSA-8mgp-746c-j5xp"]}}), flagged({}))
-            (root / "a/pnpm-lock.yaml").write_text("lockfileVersion: '10.0'\n", encoding="utf-8")
-            self.assertIn(("a/pnpm-lock.yaml", "cannot be read strictly: extend npm_next_pins for this npm format or style"), npm_next_findings(entries, root, allowed))
-            (root / "a/pnpm-lock.yaml").write_text(header + "  react@19.3.0:\n" + resolution, encoding="utf-8")
-            self.assertIn(("a/pnpm-lock.yaml", "the allowed lock no longer pins next; drop its entry"), npm_next_findings(entries, root, allowed))
-            # the inventory's parser name selects the reader when the file name does not
-            (root / "i.lock").write_text('# yarn lockfile v1\n\nnext@^16.3.0:\n  version "16.3.5"\n', encoding="utf-8")
-            self.assertEqual(npm_next_findings([{"path": "i.lock", "parser": "yarn.lock"}], root, {}),
-                             [("i.lock", f"pins next 16.3.5, which the {NEXT_ADVISORY} ignore hides")])
-
-    def test_the_next_range_has_both_bounds(self):
-        scope = IGNORE_SCOPES[NEXT_ADVISORY]
-        for version, expected in (("16.1.9", False), ("16.2.0-canary.1", False), ("16.2.0", True), ("16.2.1-canary.1", True), ("16.3.5", True),
-                                  ("16.3.6", False), ("16.3.6+build.1", False), ("16.4.0", False), ("16.4.0-canary.1", False),
-                                  ("16.3.6-canary.1", True), ("16.3.5-canary.1", True), ("16.3.x", True), ("16", True),
-                                  ("https://registry.npmjs.org/next/-/next-16.3.5.tgz", True), ("", True), (None, True)):
-            self.assertIs(npm_affected(version, scope["fixed"], scope["introduced"]), expected, version)
 
     def test_every_allowed_lock_is_an_inventory_lockfile(self):
         listed = {entry["path"] for entry in self.inventory["lockfiles"]}
