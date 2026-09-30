@@ -32225,8 +32225,8 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/README.md",
-      "sha256": "6b8fe908a97961d00f3a4d4a6eef4ac6aeb2b0406613845cb6d4da6d0b68c5a2",
-      "bytes": 7756
+      "sha256": "1d61cf443097415d9f452ab7848e75c5f15811cea913badb46e6728089729e29",
+      "bytes": 7850
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/agents_json_probe.py",
@@ -34440,8 +34440,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
-      "sha256": "3cbe69d66a7cd1ec9606e0a1965b750ef3c84459c7df7634e15d99a88c856e4b",
-      "bytes": 37520
+      "sha256": "943f1e1eff93e40eb7cca9140a765b66760da275811f6a2160e6667f13d65ac7",
+      "bytes": 37812
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
@@ -40920,13 +40920,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/README.md",
-      "sha256": "9d5d23ad037bc5eb6a5e722c3f6f8fd75f31e0af781eed1ffd741e6b55a479b1",
-      "bytes": 6380
+      "sha256": "e95e523c38f4450b8ab8c7c36f31ee266f120e743bc52caead353661f5020741",
+      "bytes": 6455
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
-      "sha256": "7b24496a8af96acdc8983558ca16f426fbac09073af41a8546d5f5ced2a01ffe",
-      "bytes": 33901
+      "sha256": "0ec0615506411acd98003b814e66019f73a659ef985805737b65bc9b603b7c30",
+      "bytes": 34193
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
@@ -40940,8 +40940,8 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
-      "sha256": "4015548e2262746ecf3b5562bd72107af5251e3d6e5f5c47d77e5a08cf45a783",
-      "bytes": 6918
+      "sha256": "50504ffb0c32557a052d81ba5a80934dfb488e3b07f564d5ee42e0a35c8e06e1",
+      "bytes": 7022
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/validate_fragment.py",
@@ -41035,7 +41035,7 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_tui_strict_check.txt",
-      "sha256": "fe3698e63f9c71a4819b88105fca1ebc96437b35901fa9ab525431db27e47fc6",
+      "sha256": "24cb0c8e49056418d0a4a1956dfafed461ee021efe9e002c7dc8615360c918ce",
       "bytes": 1417
     },
     {
@@ -41180,7 +41180,7 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/unit_tests.txt",
-      "sha256": "e794e08e45d2088d712bf3d61e0d05a5e86d2dc188bc6fd52340438d5b072751",
+      "sha256": "e03e4498a92c6bded9374a0d0bc8ba2de39e5adb07c8aae9a27a28c7f1b7909b",
       "bytes": 955
     },
     {
@@ -43160,7 +43160,7 @@
     },
     {
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
-      "sha256": "108a7abdae5ec087274621fbb8449885dda208ecd6d564721aeaa3416f66119a",
+      "sha256": "9ff157fd88e6a895b85546373927b653204838e7a0f19d95643741040e05b838",
       "bytes": 22567
     },
     {
