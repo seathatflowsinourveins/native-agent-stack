@@ -1,0 +1,17 @@
+[2026-09-30T05:03:51Z] node v24.21.0 npm 11.19.0
+[2026-09-30T05:03:51Z] npm init -y
+[2026-09-30T05:03:52Z] npm init rc=0
+[2026-09-30T05:03:52Z] npm install omniroute@3.8.51 --ignore-scripts --no-audit --no-fund
+[2026-09-30T05:05:19Z] npm install rc=0
+[2026-09-30T05:05:19Z] installed omniroute version: 3.8.51
+[2026-09-30T05:05:19Z] npm audit signatures
+[2026-09-30T05:05:32Z] npm audit signatures rc=0
+--- audit output (first 40 lines)
+audited 1156 packages in 11s
+
+1156 packages have verified registry signatures
+
+233 packages have verified attestations
+(use --json --include-attestations to view attestation details)
+
+exit 0

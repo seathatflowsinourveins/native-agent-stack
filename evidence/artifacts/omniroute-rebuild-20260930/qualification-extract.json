@@ -108,7 +108,7 @@
   },
   "installed_check": {
    "observed_utc": "2026-09-30T04:52:47Z",
-   "how": "scripts/installed_check.py.txt run at the printed time, counts only; its output as printed is checks/installed-check-20260930.json (an earlier run of an earlier version of the script, which printed no time, gave the same counts)",
+   "how": "scripts/installed_check.py.txt run at the printed time, counts only; its output as printed is checks/installed-check-20260930.json",
    "20128_B2": {
     "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
     "build_sha": "ae5539a56",

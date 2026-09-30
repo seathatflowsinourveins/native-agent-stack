@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-3851-npm-qualification-20260930",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-09-30T05:41:26Z",
+  "component_ids": [
+    "omniroute"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, the published npm package omniroute@3.8.51 (tarball https://registry.npmjs.org/omniroute/-/omniroute-3.8.51.tgz, 137,907,369 bytes, 26,761 entries, sha256 421699fdda34bd85bcf035257e88e359edc033c01b85d54b6a4921c1cda4d2ef, sha1 and sha512 equal to the registry's dist.shasum and dist.integrity) was installed with the install and rebuild commands of the repository's recipe (docs/foundation-stack.md, 'Optional OmniRoute installation and bounded gateway acceptance', which pins omniroute@3.8.50; run here with the version changed to 3.8.51) into a fresh prefix in a clean environment (Node v24.21.0, npm 11.19.0; npm install exit 0 from 2026-09-30T04:44:05Z to 2026-09-30T04:45:40Z, npm rebuild exit 0 at 2026-09-30T04:45:45Z), printed omniroute --version 3.8.51 and dist/BUILD_SHA c1e30b7, and, started twice on one throwaway data directory in a fresh user and network namespace with the real /usr/bin/lsof on PATH and no shim, answered /api/health 200 after 3 s and 4 s, kept its store at 193 migration rows, integrity ok and 138 tables across the restart, and ended each start with exit 143 on SIGTERM with no process or listener left. The registry's SLSA provenance attestation for the package names a subject sha512 equal to the tarball's, the workflow .github/workflows/npm-publish.yml at refs/tags/v3.8.51 of github.com/diegosouzapw/OmniRoute and source commit c1e30b7676975feb298b49eff6ff58923c04b89e, the commit of upstream's v3.8.51 tag, and npm audit signatures (npm 11.19.0), run on the tree of a separate throwaway project that installed omniroute@3.8.51 as a dependency (1156 packages; the smoke-tested global install added 1153, a difference not investigated), reported 0 invalid and 0 missing, verified registry signatures for 1156 of 1156 packages and attestations for 233, among them omniroute@3.8.51's own (npm publish and SLSA provenance). The package contains neither carry of the running gateways (0 alpha/search route files, 0 occurrences of the affinity function). This qualifies the published package as a candidate for the manifests/stack.json omniroute pin; the pin stays 3.8.50 in the change that adds this receipt, and the running gateways are untouched.",
+  "limitations": [
+    "Not a pin move and not a cutover. manifests/stack.json keeps omniroute 3.8.50 and its source_pin in the change that adds this receipt; moving them is a separate lane:shared change, because the landscape check binds the row's version and source_pin to catalogs/landscape/upstream-snapshot.json. The two running gateways were not touched: no write, restart or unit change (Gate A window W). They are source builds of upstream's release/v3.8.51 tip 2f42a9ac1, whose tree equals the v3.8.51 tag commit's, plus carries; the published package contains neither carry (data.carries: 0 alpha/search route files and 0 occurrences of the affinity function, against 6 and 23 on the 20128 build and 6 and 0 on the 20129 build), so installing it would not replace either gateway without dropping upstream PR 13788 (still open upstream) or the local affinity patch.",
+    "Evidence classes. The install, the boot, restart and stop smoke, the provenance read and the carry counts are our integration checks (scripts as published, outputs as printed); npm audit signatures is npm's own verification. Upstream's own checks (check:pack-artifact, check:pack-boot, test:unit) were not run on this package: they need the source checkout and ran on the source builds only (evidence/artifacts/omniroute-rebuild-20260930).",
+    "The provenance read is not our signature verification. The probe decoded the two attestation payloads and compared the subject digest with the tarball's; the certificate and signature verification is npm audit signatures' (checks/audit-signatures-20260930.txt, and its JSON form summarized in checks/audit-signatures-summary-20260930.json), which ran in a separate throwaway project that installed the package as a dependency with --ignore-scripts (not on the smoke-tested prefix, which npm audit signatures refuses: EAUDITGLOBAL, checks/audit-signatures-global-refused-20260930.txt); the audited tree has 1156 packages and the smoke-tested install added 1153, and why they differ was not investigated. The smoke-tested install fetched its own copy through npm install, which checks each download against the registry's dist.integrity itself (that check's output is not part of this record); the digests recorded here are of the separate tarball that npm pack wrote at 2026-09-30T04:44:01Z.",
+    "Recipe deviations. The recipe's last steps (serve --daemon, omniroute status, and curl of /api/health as written) were not run as written: the smoke started serve in the foreground (scripts/smoke_inner.sh.txt) with REQUIRE_API_KEY=true, OMNIROUTE_SERVER_HOST=127.0.0.1, port 20197 and sidecar ports 20198 and 20199, and read /api/health with curl. The smoke ran in a fresh namespace with only its own loopback; npm install and rebuild used the host network.",
+    "Nothing beyond boot was exercised: no provider connection, credential, model call or request through the gateway, and none of the rebuild record's settings (compression, combos, Codex client version). The store was a fresh one that the package created (193 migration rows). Native modules were rebuilt per the recipe's allowlist (rebuild exit 0) and loaded only as far as the server's boot reaches them.",
+    "A first run of scripts/smoke_npm.sh.txt failed: a wrong PREFIX argument (a path with no bin/omniroute) made the serve step exit 127 and the store read print an sqlite open error. Its throwaway directory and logs were deleted before the second run and are not retained, so the failed attempt rests on the coordinator's reading of that printed output and on nothing retained; the second run (2026-09-30T04:46:36Z to 2026-09-30T04:46:57Z) used the correct prefix and is the recorded one.",
+    "The lsof shim of the unit templates (adoption/templates/systemd/omniroute.service, 'The lsof shim') is to be dropped at the next rebuild after a free-port start passes without it. This package's free-port start passed without it (real /usr/bin/lsof, port 20197 free, no shim), which is evidence about the published package and not a test of the running builds' prefixes; the units are unchanged.",
+    "Cooldown. docs/decisions/2026-09-25-workstation-sota-refresh.md records a 7-day cooldown for a release that is not a security fix (applied to socraticode 1.15.0 and waived by the user on 2026-09-27). No recorded decision applies or waives it to an OmniRoute pin move; if it applies, the earliest move is 2026-10-07T02:54:04Z, seven days after the npm publish of 3.8.51 (2026-09-30T02:54:04.736Z, evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json).",
+    "One workstation, Linux x86_64 under WSL2, Node v24.21.0 only. Other platforms, upstream's Electron and Docker artifacts, and other Node versions are not covered. The registry returned no gitHead for 3.8.51, so the tie of the tarball to upstream's tag commit rests on the provenance attestation, not on registry metadata."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; scratch prefix and throwaway project outside every production path"
+  },
+  "data": {
+    "version": "3.8.51",
+    "previous_version": "3.8.50",
+    "windows_utc": {
+      "install": [
+        "2026-09-30T04:44:05Z",
+        "2026-09-30T04:45:40Z"
+      ],
+      "rebuild": [
+        "2026-09-30T04:45:40Z",
+        "2026-09-30T04:45:45Z"
+      ],
+      "smoke": [
+        "2026-09-30T04:46:36Z",
+        "2026-09-30T04:46:57Z"
+      ],
+      "digests_recomputed": "2026-09-30T05:20:00Z",
+      "attestation_read": "2026-09-30T05:20:00Z",
+      "carry_counts": "2026-09-30T05:04:47Z",
+      "audit_signatures": [
+        "2026-09-30T05:05:19Z",
+        "2026-09-30T05:05:32Z"
+      ]
+    },
+    "environment": {
+      "node": "v24.21.0",
+      "npm": "11.19.0",
+      "clean_environment": "env -i with HOME, TMPDIR, PATH, npm cache, HUSKY, NEXT_TELEMETRY_DISABLED, LANG and TERM only (scripts/install_npm.sh.txt)"
+    },
+    "registry": {
+      "evidence_class": "our integration check (npm view and npm pack, outputs as printed)",
+      "npm_view": "checks/npm-view-20260930.json",
+      "dist.tarball": "https://registry.npmjs.org/omniroute/-/omniroute-3.8.51.tgz",
+      "dist.shasum": "12e56f049e617edca50cc17835ea807dbf8c2042",
+      "dist.integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+      "engines.node": ">=22.22.2 <23 || >=24.0.0 <27",
+      "gitHead": "not returned by npm view omniroute@3.8.51 gitHead",
+      "npm_pack": "checks/npm-pack-summary-20260930.json (the returned JSON without its file list)"
+    },
+    "tarball": {
+      "bytes": 137907369,
+      "entries": 26761,
+      "unpacked_bytes": 546111751,
+      "sha256": "421699fdda34bd85bcf035257e88e359edc033c01b85d54b6a4921c1cda4d2ef",
+      "sha1": "12e56f049e617edca50cc17835ea807dbf8c2042",
+      "sha512": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+      "recomputed_from_the_file_npm_pack_wrote": "checks/tarball-digests-20260930.txt"
+    },
+    "install": {
+      "recipe": "docs/foundation-stack.md, 'Optional OmniRoute installation and bounded gateway acceptance', its install and rebuild commands with the version changed from 3.8.50 to 3.8.51 (--include=optional --no-audit --no-fund; --allow-scripts list; --foreground-scripts)",
+      "packages_added_by_install": 1153,
+      "npm_install_exit": 0,
+      "npm_rebuild_exit": 0,
+      "omniroute_version": "3.8.51",
+      "package_json_version": "3.8.51",
+      "dist_BUILD_SHA": "c1e30b7",
+      "steps": "checks/install-steps-20260930.txt",
+      "logs": [
+        "checks/npm-install.log.txt",
+        "checks/npm-rebuild.log.txt"
+      ]
+    },
+    "content_identity": {
+      "evidence_class": "registry read and npm's own verification",
+      "provenance": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/omniroute@3.8.51",
+        "statement_predicate_types": [
+          "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+          "https://slsa.dev/provenance/v1"
+        ],
+        "subject": [
+          {
+            "name": "pkg:npm/omniroute@3.8.51",
+            "digest": {
+              "sha512": "570c12b7e6cff652623c95c524ccf49cd186ba87b03d95379c57b548bb8ed7500381d4b04de8060b1860f0ebfbe7edf59bf72870fc4788eeb7cf2827d5743431"
+            }
+          }
+        ],
+        "subject_sha512_equals_tarball_sha512": true,
+        "workflow": {
+          "ref": "refs/tags/v3.8.51",
+          "repository": "https://github.com/diegosouzapw/OmniRoute",
+          "path": ".github/workflows/npm-publish.yml"
+        },
+        "source": {
+          "uri": "git+https://github.com/diegosouzapw/OmniRoute@refs/tags/v3.8.51",
+          "digest": {
+            "gitCommit": "c1e30b7676975feb298b49eff6ff58923c04b89e"
+          }
+        },
+        "builder": "https://github.com/actions/runner/github-hosted",
+        "invocation": "https://github.com/diegosouzapw/OmniRoute/actions/runs/36656344524/attempts/1",
+        "output": "checks/npm-attestation-20260930.json"
+      },
+      "upstream_tag": {
+        "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "tag_object": "770faa7144f58ada625afc6efe572c8335484ec4",
+        "tagger_time_utc": "2026-09-30T01:41:23Z",
+        "source": "evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json"
+      },
+      "tag_commit_tree_equals_release_tip_tree": true,
+      "BUILD_SHA_is_prefix_of_the_provenance_commit": true,
+      "audit_signatures": {
+        "command": "npm audit signatures (npm 11.19.0) in a throwaway project that installed omniroute@3.8.51 with --ignore-scripts",
+        "audited_packages": 1156,
+        "verified_registry_signatures": 1156,
+        "verified_attestations": 233,
+        "invalid": 0,
+        "missing": 0,
+        "exit": 0,
+        "omniroute_own_verified_attestations": [
+          "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+          "https://slsa.dev/provenance/v1"
+        ],
+        "output": "checks/audit-signatures-20260930.txt",
+        "global_prefix": {
+          "observed_utc": "2026-09-30T05:15:02Z",
+          "result": "npm error code EAUDITGLOBAL, exit 1",
+          "output": "checks/audit-signatures-global-refused-20260930.txt"
+        },
+        "json_summary": {
+          "file": "checks/audit-signatures-summary-20260930.json",
+          "window_utc": [
+            "2026-09-30T05:06:19Z",
+            "2026-09-30T05:06:30Z"
+          ]
+        }
+      }
+    },
+    "carries": {
+      "evidence_class": "our integration check (counts only)",
+      "npm_3_8_51_package": {
+        "build_sha": "c1e30b7",
+        "alpha/search route files": 0,
+        "pickMoreAvailableOAuthPeer occurrences": 0,
+        "files_with_pickMoreAvailableOAuthPeer": 0
+      },
+      "running_builds_for_comparison": {
+        "20128": {
+          "build_sha": "ae5539a56",
+          "alpha/search route files": 6,
+          "pickMoreAvailableOAuthPeer occurrences": 23
+        },
+        "20129": {
+          "build_sha": "87c4c488d",
+          "alpha/search route files": 6,
+          "pickMoreAvailableOAuthPeer occurrences": 0
+        },
+        "source": "evidence/artifacts/omniroute-rebuild-20260930/checks/installed-check-20260930.json"
+      },
+      "output": "checks/carry-presence-20260930.json"
+    },
+    "smoke": {
+      "evidence_class": "our integration check",
+      "output": "checks/smoke-summary-20260930.txt",
+      "serve_excerpt": "checks/smoke-serve-1-excerpt-20260930.txt",
+      "second_start_excerpt": "empty: no line of the second start's log matched the excerpt pattern in scripts/smoke_npm.sh.txt",
+      "namespace": "fresh user and network namespace, own loopback; host listeners unreachable",
+      "port": 20197,
+      "sidecar_ports": [
+        20198,
+        20199
+      ],
+      "lsof": "real /usr/bin/lsof on PATH, no shim; listeners before each start: 0",
+      "phase_1": {
+        "health_200_after_s": 3,
+        "store_rows_integrity_tables": [
+          "193",
+          "ok",
+          "138"
+        ],
+        "sigterm_exit": 143,
+        "orphans_after_exit": "none",
+        "listeners_after_exit": 0
+      },
+      "phase_2": {
+        "health_200_after_s": 4,
+        "store_rows_integrity_tables": [
+          "193",
+          "ok",
+          "138"
+        ],
+        "sigterm_exit": 143,
+        "orphans_after_exit": "none",
+        "listeners_after_exit": 0
+      },
+      "store_identical_across_restart": true,
+      "data_dir_mode": "750"
+    },
+    "pin": {
+      "manifest": "manifests/stack.json component omniroute",
+      "current_version": "3.8.50",
+      "candidate_version": "3.8.51",
+      "candidate_source_commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "moved_by_this_change": false,
+      "moving_it": "a separate lane:shared change that also updates the landscape snapshot row; see limitations for the cooldown"
+    },
+    "rollback": "Nothing to roll back: the prefix and the throwaway project are scratch directories outside every production path, and no unit, launcher, client configuration or manifest pin references them. Remove them by their literal paths if wanted.",
+    "scripts": [
+      "scripts/install_npm.sh.txt",
+      "scripts/smoke_npm.sh.txt",
+      "scripts/smoke_inner.sh.txt",
+      "scripts/npm_attestation_probe.py.txt",
+      "scripts/carry_presence_check.py.txt",
+      "scripts/audit_signatures.sh.txt",
+      "scripts/audit_json_summary.py.txt",
+      "scripts/audit_global_refused.sh.txt"
+    ]
+  }
+}
