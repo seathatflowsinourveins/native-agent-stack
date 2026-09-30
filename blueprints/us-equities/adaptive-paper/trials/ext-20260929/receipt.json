@@ -2854,7 +2854,7 @@
  "paper_lane_row": {
   "dashboard_lane": "Alpaca paper accounts 1 and 2",
   "cites_at_branch_base": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
-  "update": "the coordinator's step: the grand-dashboard state is a shared hot file this branch does not touch",
+  "update": "the coordinator's step: the builder branch did not touch the grand-dashboard state (a shared hot file); the coordinator's integration commit in the same pull request points the paper row at the 2026-09-29 receipts",
   "this_receipt_supports": "account 2: POST series on 2026-09-29, 3 of 4 trials passed (trial 1 completed_no_signals with no fill) and trial 4 needs_attention; the series ended holding IOVA 68 (cost 983.28 USD), still held at the 2026-09-30 09:06Z read; account 2's ledger is in recovery_only; the residual's recovery is pending"
  },
  "committed_copies": {

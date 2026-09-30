@@ -408,8 +408,8 @@ cancels an order, and the broker listing shows no order outside the series and r
 ## Paper lane row
 
 The grand-dashboard `paper` lane, "Alpaca paper accounts 1 and 2", cites [`ext-20260928`](../ext-20260928/README.md)
-at this branch's base. Pointing it at the 2026-09-29 receipts is the coordinator's step; this branch does not touch
-the dashboard. For account 2 this receipt supports a POST series on 2026-09-29 with 3 of 4 trials passed (trial 1
+at the builder branch's base. The builder branch did not touch the dashboard; the coordinator's integration commit in
+the same pull request points the paper row at the 2026-09-29 receipts. For account 2 this receipt supports a POST series on 2026-09-29 with 3 of 4 trials passed (trial 1
 with no fill) and trial 4 `needs_attention`. Account 2 ended the day holding IOVA 68 (cost 983.28 USD), still held at
 the 2026-09-30 09:06Z read, and its ledger is at `recovery_only`; the residual's recovery is pending.
 

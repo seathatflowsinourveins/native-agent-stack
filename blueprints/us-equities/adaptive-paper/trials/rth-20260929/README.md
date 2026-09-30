@@ -171,7 +171,8 @@ Every trial had 0 duplicate executions and 0 unconfirmed fills.
 
 Recorded, not thresholded, as the freeze asks:
 - **Fills and slippage.** 83 of 113 fills were at the order's reference quote (the ask for a buy, the bid for a
-  sell), 13 were better and 17 worse. The worse fills walked the book within their limits: trial 1's BKYI entry (3 of
+  sell), 13 were better and 17 worse, all within their limits (the cause is not recorded; Alpaca paper fills are
+  simulated from real-time quotes): trial 1's BKYI entry (3 of
   5, average 3.7798 against a 3.77 ask), IOVA entry (2 of 2, 13.89 against 13.88), AXTX entry (2 of 2, 38.26 against
   38.14, the largest adverse average at 0.12 USD per share) and AXTX exit (4 of 5, 37.252308 against a 37.27 bid);
   trial 2's BKYI exit (2 of 2, 3.24 against 3.25); trial 3's IOVA exit (2 of 3, 15.032143 against 15.04); and trial
@@ -341,8 +342,8 @@ The broker listing shows no order without the series prefix on account 1 in the 
 ## Paper lane row
 
 The grand-dashboard `paper` lane, "Alpaca paper accounts 1 and 2", cites [`ext-20260928`](../ext-20260928/README.md)
-at this branch's base. Pointing it at the 2026-09-29 receipts is the coordinator's step; this branch does not touch
-the dashboard. For account 1 this receipt supports an RTH series on 2026-09-29 with 5 of 6 trials passed and trial 6
+at the builder branch's base. The builder branch did not touch the dashboard; the coordinator's integration commit in
+the same pull request points the paper row at the 2026-09-29 receipts. For account 1 this receipt supports an RTH series on 2026-09-29 with 5 of 6 trials passed and trial 6
 failed on a ledger halt (`gross_loss_cap_reached`), flat at 15:44 ET. Account 1's ledger is permanently halted.
 
 ## Files

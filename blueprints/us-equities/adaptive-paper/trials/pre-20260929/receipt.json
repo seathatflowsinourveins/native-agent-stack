@@ -2062,7 +2062,7 @@
  "paper_lane_row": {
   "dashboard_lane": "Alpaca paper accounts 1 and 2",
   "cites_at_branch_base": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
-  "update": "the coordinator's step: the grand-dashboard state is a shared hot file this branch does not touch",
+  "update": "the coordinator's step: the builder branch did not touch the grand-dashboard state (a shared hot file); the coordinator's integration commit in the same pull request points the paper row at the 2026-09-29 receipts",
   "this_receipt_supports": "account 2: pre-market series on 2026-09-29, 3 of 3 trials passed, flat at 09:25 ET",
   "later_the_same_day": "account 2 did not stay flat that day: ext-20260929 ended holding IOVA 68 (see its receipt)"
  },

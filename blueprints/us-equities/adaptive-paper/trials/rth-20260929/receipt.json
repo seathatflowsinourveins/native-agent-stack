@@ -3635,7 +3635,7 @@
   "better_than_reference": 13,
   "worse_than_reference": 17,
   "of": 113,
-  "basis": "Each ledger execution price (every one matched to a broker FILL activity on cum_qty, qty and price) compared with its order's reference quote from the engine events: the ask for a buy, the bid for a sell. Better means below the ask for a buy or above the bid for a sell; worse means the order walked the book beyond its reference quote, within its limit."
+  "basis": "Each ledger execution price (every one matched to a broker FILL activity on cum_qty, qty and price) compared with its order's reference quote from the engine events: the ask for a buy, the bid for a sell. Better means below the ask for a buy or above the bid for a sell; worse means the fill price was beyond its reference quote, within its limit (the cause is not recorded; Alpaca paper fills are simulated from real-time quotes, https://docs.alpaca.markets/us/docs/paper-trading)."
  },
  "engine_receipt_average_differences": [
   {
@@ -3964,7 +3964,7 @@
  "paper_lane_row": {
   "dashboard_lane": "Alpaca paper accounts 1 and 2",
   "cites_at_branch_base": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
-  "update": "the coordinator's step: the grand-dashboard state is a shared hot file this branch does not touch",
+  "update": "the coordinator's step: the builder branch did not touch the grand-dashboard state (a shared hot file); the coordinator's integration commit in the same pull request points the paper row at the 2026-09-29 receipts",
   "this_receipt_supports": "account 1: RTH series on 2026-09-29, 5 of 6 trials passed and trial 6 failed on a ledger halt (gross_loss_cap_reached), flat at 15:44 ET; account 1's ledger is permanently halted"
  },
  "committed_copies": {

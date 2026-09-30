@@ -279,8 +279,8 @@ cancels an order, and the broker listing shows no order without the series prefi
 ## Paper lane row
 
 The grand-dashboard `paper` lane, "Alpaca paper accounts 1 and 2", cites [`ext-20260928`](../ext-20260928/README.md)
-at this branch's base. Pointing it at the 2026-09-29 receipts is the coordinator's step; this branch does not touch
-the dashboard. For account 2 this receipt supports a pre-market series on 2026-09-29 with 3 of 3 trials passed,
+at the builder branch's base. The builder branch did not touch the dashboard; the coordinator's integration commit in
+the same pull request points the paper row at the 2026-09-29 receipts. For account 2 this receipt supports a pre-market series on 2026-09-29 with 3 of 3 trials passed,
 flat at 09:25 ET. Account 2 did not stay flat that day: [`ext-20260929`](../ext-20260929/README.md) ended holding
 IOVA 68.
 
