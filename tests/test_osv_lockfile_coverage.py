@@ -192,7 +192,9 @@ PNPM_LOCKFILE_VERSION = re.compile(r"^lockfileVersion:[ \t]*['\"]?([0-9.]+)['\"]
 PNPM_ENTRY_KEY = re.compile(r"""  ('(?:[^']|'')+'|[A-Za-z0-9_.][^\s#]*):""")
 PNPM_FIELD = re.compile(r"""    ([A-Za-z_][A-Za-z0-9_]*):(?: (\S.*))?""")
 PNPM_PLAIN_SCALAR = re.compile(r"""[A-Za-z0-9_.][^#]*""")
-NPM_SEMVER = re.compile(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?")
+NPM_SEMVER = re.compile(r"(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?", re.ASCII)
+NPM_TARBALL_URL = re.compile(r"https?://[^\s#?]+", re.ASCII)
+GIT_HOST_HINT = re.compile(r"git|bitbucket|codeload", re.IGNORECASE)
 YARN_VERSION = re.compile(r"""^ {2}"?version"?:? "?([\w.+-]+)"?$""")
 GO_JSON_FIELDS = ("lockfileVersion", "packages", "dependencies", "name", "version", "resolved")
 
@@ -332,12 +334,24 @@ def strict_json_object(pairs):
     return found
 
 
+def next_entry_version(version, resolved):
+    """The version of a `next` entry of a package-lock.json when it is a plain registry install, else None. OSV replaces the version of an
+    entry whose `version` or `resolved` names a git commit with the commit (or with nothing, in the nested `dependencies` form) and blanks
+    a `file:` path, so the guard accepts only a semver `version` whose `resolved`, when present, is an http(s) tarball URL without a
+    fragment, a query or a git host hint, and gives up (None) on anything else."""
+    if not isinstance(version, str) or not NPM_SEMVER.fullmatch(version):
+        return None
+    if resolved is not None and (not isinstance(resolved, str) or not NPM_TARBALL_URL.fullmatch(resolved) or GIT_HOST_HINT.search(resolved)):
+        return None
+    return version
+
+
 def package_lock_next_pins(text):
     """The versions of `next` in a package-lock.json or npm-shrinkwrap.json (lockfileVersion 1 to 3), as OSV reads it: the `packages`
     map when the file has one (the root entry "" skipped; the entry's "name", else the last path segment, so aliases and paths such as
     vendor/next count), otherwise the nested `dependencies`, where an `npm:<name>@<version>` version is an alias. Any other
-    lockfileVersion, malformed or deeply nested JSON, a repeated or differently cased field, or a next entry without a string version
-    gives None."""
+    lockfileVersion, invalid or deeply nested JSON, a repeated or differently cased field, or a next entry that is not a plain registry
+    install (next_entry_version) gives None."""
     try:
         data = json.loads(text, object_pairs_hook=strict_json_object)
     except (ValueError, RecursionError):
@@ -355,9 +369,10 @@ def package_lock_next_pins(text):
             if not isinstance(meta, dict):
                 return None
             if (meta.get("name") or npm_path_name(key)) == "next":
-                if not isinstance(meta.get("version"), str) or not meta["version"] or meta["version"].startswith("file:"):
-                    return None  # a local path gives OSV no version to match (Go blanks it); the guard cannot judge it
-                found.append(meta["version"])
+                pinned = next_entry_version(meta.get("version"), meta.get("resolved"))
+                if pinned is None:
+                    return None  # a local path, a git commit or an odd URL: OSV reports another version than the one written here
+                found.append(pinned)
         return sorted(set(found))
     dependencies = data.get("dependencies", {})
     if not isinstance(dependencies, dict):
@@ -371,9 +386,10 @@ def package_lock_next_pins(text):
             if isinstance(version, str) and version.startswith("npm:") and "@" in version[4:]:
                 name, _, version = version[4:].rpartition("@")
             if name == "next":
-                if not isinstance(version, str) or not version or version.startswith("file:"):
-                    return None  # a local path gives OSV no version to match (Go blanks it); the guard cannot judge it
-                found.append(version)
+                pinned = next_entry_version(version, meta.get("resolved"))
+                if pinned is None:
+                    return None  # a local path, a git commit or an odd URL: OSV reports another version than the one written here
+                found.append(pinned)
             nested = meta.get("dependencies")
             if nested is not None:
                 if not isinstance(nested, dict):
@@ -870,6 +886,19 @@ class AllowedLockTests(unittest.TestCase):
             ("package-lock.json", '{"lockfileVersion":1,"dependencies":{"next":{"version":"16.3.5"}},"dependencies":{}}', None),
             ("package-lock.json", '{"lockfileVersion":3,"packages":{"node_modules/next":{"Version":"16.3.5"}}}', None),
             ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {"version": "file:vendor/next"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {
+                "version": "git+https://github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 1, "dependencies": {"next": {
+                "version": "16.3.6", "resolved": "git+https://github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
+                "version": "16.3.6", "resolved": "git+ssh://git@github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
+                "version": "16.3.6", "resolved": "https://codeload.github.com/vercel/next.js/tar.gz/0123456789abcdef0123456789abcdef01234567"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
+                "version": "16.3.6", "resolved": "https://registry.npmjs.org/next/-/next-16.3.6.tgz?x=1"}}}), None),
+            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {
+                "version": "16.3.5", "resolved": "https://registry.npmjs.org/next/-/next-16.3.5.tgz", "integrity": "sha512-x"}}}), ["16.3.5"]),
+            ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"version": "^16.3.0"}}}), None),
             ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"version": "file:vendor/next"}}}), None),
             ("package-lock.json", json.dumps({"lockfileVersion": 4, "packages": {}}), None),
             ("package-lock.json", json.dumps({"lockfileVersion": 3, "packages": {"node_modules/next": {"link": True}}}), None),

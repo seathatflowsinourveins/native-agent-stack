@@ -341,15 +341,19 @@ locally with `GH_TOKEN` set and no `--offline`, using
   is a frozen evidence artifact for which the tree records no owner (its only commit is #201, and neither its experiment record nor
   `docs/lanes.md` names one): its next advisory is ignored until 2026-12-24 under the policy above, with the
   `IGNORE_ALLOWED_LOCKS` row and readers in the test that keep the repo-wide ignore from hiding an affected `next` elsewhere. The
-  readers follow what OSV-Scanner 2.6.0 extracts (osv-scalibr `3090dbb7aaa2`, the commit its `go.mod` pins) for the canonical output
-  of each tool: every YAML document of a pnpm lockfileVersion 9 file, whose `packages` entries count with the name and version they
-  carry (tarball and renamed ones too), package-lock and npm-shrinkwrap 1 to 3 with `npm:` aliases and path-derived names, and yarn
-  classic and berry with `npm:` aliases. An npm lock in any other format, or in a style outside that subset (an inline pnpm record,
-  a repeated or differently cased JSON key), fails the test instead of reading as "no next" (the Python guard reads no npm format).
-  Four cross-family reviews (GPT-6 astra/max, read-only) found the first reader fooled by a quoted key and blind to
+  readers follow what OSV-Scanner 2.6.0 extracts (osv-scalibr `3090dbb7aaa2`, the commit its `go.mod` pins) for the canonical
+  output of each tool: every YAML document of a pnpm lockfileVersion 9 file, whose `packages` entries count with the name and
+  version they carry (tarball and renamed ones too); package-lock and npm-shrinkwrap 1 to 3 with `npm:` aliases and path-derived
+  names, where a `next` entry that is not a plain registry install (a local path, a git commit, a URL with a fragment or a
+  query) is refused; and yarn classic and berry with `npm:` aliases. An npm lock in any other format, or in a style outside that
+  subset (an inline pnpm record, a repeated or differently cased JSON key), fails the test instead of reading as "no next" (the
+  Python guard reads no npm format). The readers decide only the `next` pins and do not validate a whole file: a pnpm or yarn
+  file with unparsable lines elsewhere is not rejected by them, and the scanner's own parse fails on it separately. Five
+  cross-family reviews (`gpt-6-astra` at max effort as invoked, read-only) found the first reader fooled by a quoted key and blind to
   package-lock.json and yarn.lock, then to aliases, tarball entries and a backtracking regex, then to valid syntax outside its
-  assumptions, then to a local-path dependency; the last repairs made it canonical-only and
-  fail-closed, with their mutants kept as negative controls. **Alternatives considered:** exclusion from the inventory (rejected: `excluded` is for test
+  assumptions, then to local-path and git dependencies; the repairs made it canonical-only and fail-closed, with their mutants
+  kept as negative controls.
+  **Alternatives considered:** exclusion from the inventory (rejected: `excluded` is for test
   fixtures only, by test); editing the frozen lock (its bytes are hash-bound evidence); waiting for an owner (none recorded); a
   dated ignore for the PyJWT advisory (rejected: the fix was available at the decision point, and an ignore needs its own
   reachability review). **Overturn:** the frozen lock stops being kept, or an application built from it is run (then bump `next`

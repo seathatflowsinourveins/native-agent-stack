@@ -2,7 +2,7 @@
 named test must then fail with the expected rule; the unmutated run must pass. R1-R3 are the mutants of the cross-family review of the first head (a quoted
 key beside an unquoted fixed one, an affected next in a package-lock.json, a version below the advisory's introduced release); R4-R11 those of its review of the
 first repair (a pnpm tarball entry with its own name and version, a yarn berry alias, package-lock aliases and path-named entries, backtracking on whitespace, a
-canary above the fix, an integer lockfileVersion); R12-R19 those of its reviews of the second and third (an inline pnpm record, repeated or differently cased JSON keys, an
+canary above the fix, an integer lockfileVersion); R12-R21 those of its reviews of the second to fifth (an inline pnpm record, repeated or differently cased JSON keys, an
 optional peer pin that is not a package, the yarn root workspace, deep nesting, a pin in a second pnpm document). M1-M12 mutate the guard's own inputs. Run from
 the repository root."""
 import sys
@@ -122,6 +122,10 @@ try:
 except RecursionError:
     check("R17 deep nesting is read or refused, never an error or an empty read", False, "RecursionError")
 caught("R19 a package-lock lockfileVersion 1 dependency named next installed from a local path", UNREADABLE, {WSL: '{"lockfileVersion":1,"dependencies":{"next":{"version":"file:vendor/next"}}}'})
+caught("R20 a package-lock lockfileVersion 1 dependency named next installed from a git commit", UNREADABLE,
+       {WSL: '{"lockfileVersion":1,"dependencies":{"next":{"version":"git+https://github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}'})
+caught("R21 a package-lock entry for next whose resolved URL is a git commit, with a fixed-looking version", UNREADABLE,
+       {WSL: '{"lockfileVersion":3,"packages":{"node_modules/next":{"version":"16.3.6","resolved":"git+ssh://git@github.com/vercel/next.js.git#0123456789abcdef0123456789abcdef01234567"}}}'})
 caught("R18 a pin in the second document of a two-document pnpm lock (live pnpm lock)", HIDES, {LIVE: "---\n" + HEAD + "  react@19.3.0:\n" + RES + "\n---\n" + HEAD + "  next@16.3.5:\n" + RES})
 
 caught("M1 an entry key at the wrong indentation", UNREADABLE, {LIVE: HEAD + "    next@16.3.5:\n" + RES})

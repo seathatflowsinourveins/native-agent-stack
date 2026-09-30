@@ -431,7 +431,7 @@ differs from it in the urllib3 and PyJWT entries only (returned outputs, section
 3.3.1 and its wheel hash are unchanged, and the four oauthlib source files the review names hash as recorded in the new venv
 (section J). PyJWT 2.15.0 changes the JWKS client (`JWKSetCache` stores the parsed `PyJWKSet`, `PyJWKClient.fetch_data()` raises
 for a non-object JWKS); the only caller of that client outside PyJWT in the venv is google-auth's `google/oauth2/id_token.py` (lines
-144 and 145, the JWKS branch of `verify_token`, which is also the call path of GHSA-42vr-xj54-vc7v), and nothing outside the
+144 and 145, the JWKS branch of `verify_token`, an entry point the advisory names), and nothing outside the
 `google` package imports that module (section J).
 
 - **The joint relock in #518** starts from this lock: it adds `--upgrade-package oauthlib==4.0.0`, replaces
