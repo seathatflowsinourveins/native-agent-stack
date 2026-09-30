@@ -14741,8 +14741,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "dbc44da91c236850dd81efb963327a131b489f1586ba2c00c8405231a789ee9a",
-      "bytes": 31969
+      "sha256": "fbd3959bdc46e618eb8ea73709f7dd5eef81d9aea2f21f51333b1a7df8dd7aef",
+      "bytes": 32096
     },
     {
       "path": "docs/direct-results.md",
@@ -34671,8 +34671,8 @@
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/README.md",
-      "sha256": "1684ad41f599bd746affb183956360d5bef14738946011652bba6fa580b7ce99",
-      "bytes": 5272
+      "sha256": "3f5b7eeb6dd58351d0292f9ac0eaf504ae8286127abb9ddced60e7f744d108e7",
+      "bytes": 5645
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-after-dry.json",
@@ -34775,6 +34775,11 @@
       "bytes": 12322
     },
     {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/installed-check-20260930.json",
+      "sha256": "c2412445d627a7082f8412a0d1ce560d493c67ffe36dfdc6f83538ba2e60ef11",
+      "bytes": 502
+    },
+    {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/lite-whitespace-probe-20260930.json",
       "sha256": "b71a0029ff4138cce9941a2ac5942e53dc74d98b7f365912b19c0d1831dbd656",
       "bytes": 9095
@@ -34788,6 +34793,11 @@
       "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/recorded-outputs.txt",
       "sha256": "81c86d3123e8da79766b61cd469e972447abfd29640e0502ca6ccc017e6c1e6d",
       "bytes": 7037
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json",
+      "sha256": "64b227234dfab57127994a0ee94005e3b19140914a756265fd494c36f223330e",
+      "bytes": 1416
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/host-readback-20260930.json",
@@ -34816,13 +34826,13 @@
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/qualification-extract.json",
-      "sha256": "c0d18cc4989536396301ec29f0b3b4e24ecf8c82610cdd92dd3234f0d238f2bf",
-      "bytes": 14739
+      "sha256": "faf86e07f5be8b038e18df63dc3cfc6111da04dc0a51b2e09a6624d8ea3e2efc",
+      "bytes": 15024
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/receipt.json",
-      "sha256": "98cb259fe6d82d674980745288f5ff16ffb083bea6c6dfa9deb2ae0172422d21",
-      "bytes": 20717
+      "sha256": "103fe4d089c2503e22319afa4f6b53cf80ae307af5b6c3df2df7656b4fc58eb3",
+      "bytes": 21415
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/backup_stores.py.txt",
@@ -34856,8 +34866,8 @@
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/installed_check.py.txt",
-      "sha256": "824182261ed346dd5665584e4205ddedde354b52f6a91f2f0781a8b3d50ebc49",
-      "bytes": 1831
+      "sha256": "5fdd348f531e94181e604e343eef5b74df8049a49668e0327d570894e8d2ab02",
+      "bytes": 1938
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/plan_table.ts.txt",
@@ -34903,6 +34913,11 @@
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/test_gateway_apply.py.txt",
       "sha256": "d72ef4d72e822d0f6f3091833ab2861c1cc69fa80a7431076b0252a213161e99",
       "bytes": 22074
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/upstream_release_check.py.txt",
+      "sha256": "647c629b58638cd40b9c75941bdae30b12a906de97db31424cbb5810de2f482e",
+      "bytes": 3032
     },
     {
       "path": "evidence/artifacts/omniroute-routing-20260928/README.md",

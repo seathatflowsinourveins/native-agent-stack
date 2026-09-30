@@ -26,7 +26,9 @@
    "recorded_outputs": "checks/recorded-outputs.txt (the applier's checks as printed during the apply, plus two fresh read-only runs)",
    "effective_plan": "checks/effective-plan-20260930.json (the gateway's plan resolver on the live settings, live build's modules)",
    "lite_probe": "checks/lite-whitespace-probe-20260930.json (dry-run preview on 20129 and an offline Codex-shape probe)",
-   "real_bodies": "checks/real-codex-bodies-lane-probe-20260930.json (the gateway's compression step run offline on eight real Codex request bodies, counts only)"
+   "real_bodies": "checks/real-codex-bodies-lane-probe-20260930.json (the gateway's compression step run offline on eight real Codex request bodies, counts only)",
+   "installed_check": "checks/installed-check-20260930.json (the installed prefixes' contents, counts only)",
+   "upstream_release": "checks/upstream-release-check-20260930.json (upstream's v3.8.51 tag, tree ids, npm data and PR 13788, as printed)"
   }
  },
  "evidence_classes": {
@@ -71,8 +73,8 @@
   }
  },
  "upstream_release_after_rebuild": {
-  "checked_utc": "2026-09-30T04:40:00Z",
-  "how": "git ls-remote and git fetch against github.com/diegosouzapw/OmniRoute (no REST call), and a read of registry.npmjs.org/omniroute",
+  "checked_utc": "2026-09-30T04:53:59Z",
+  "how": "scripts/upstream_release_check.py.txt run at the printed time (git ls-remote and git fetch against github.com/diegosouzapw/OmniRoute, a read of registry.npmjs.org/omniroute and one GraphQL read of PR 13788; no REST call); its output as printed is checks/upstream-release-check-20260930.json. An earlier read of the same facts, between about 04:35Z and 04:38Z, printed no time and gave the same tag, tree ids, npm data and main tip",
   "tag": {
    "name": "v3.8.51",
    "type": "annotated",
@@ -91,7 +93,9 @@
    "tag_commit_c1e30b767": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
    "equal": true
   },
-  "reading": "the running builds are the released 3.8.51 tree plus the carries; #13788 is still open upstream (title prefix [defer]); the repo's component pin is not changed by this record"
+  "reading": "the running builds are the released 3.8.51 tree plus the carries; #13788 is still open upstream (title prefix [defer]); the repo's component pin is not changed by this record",
+  "at": "checks/upstream-release-check-20260930.json",
+  "pr_13788_state_at_check": "OPEN, updated 2026-09-29T11:25:00Z, title starts '[defer]'"
  },
  "switch": {
   "time_utc": "2026-09-30T00:02:41Z",

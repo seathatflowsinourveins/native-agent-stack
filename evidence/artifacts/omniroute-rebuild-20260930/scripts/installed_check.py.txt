@@ -1,5 +1,6 @@
 """Read-only check of the two installed OmniRoute prefixes: BUILD_SHA, the alpha/search route and the affinity function in the built output.
 Prints counts and identifiers only (no path)."""
+import datetime
 import json
 import re
 import sys
@@ -10,7 +11,7 @@ PREFIXES = {
     "20128 (B2)": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
     "20129 (A2)": "omniroute-3.8.51-2f42a9ac-pr13788",
 }
-out = {}
+out = {"observed_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 for label, prefix in PREFIXES.items():
     root = TOOLS / prefix
     package = next(root.rglob("node_modules/omniroute"), None)

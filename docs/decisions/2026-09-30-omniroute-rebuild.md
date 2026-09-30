@@ -84,7 +84,8 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
    combo selects it (`planResolution.ts:56-57` at 2f42a9ac1), so on 20129 the header `allow-lossy` selects the peer combo of that
    name, eleven engines including headroom, and not the ten engines of the engines map
    ([`checks/effective-plan-20260930.json`](../../evidence/artifacts/omniroute-rebuild-20260930/checks/effective-plan-20260930.json)).
-5. **Upstream released 3.8.51 after the rebuild (checked 2026-09-30, git protocol and the npm registry).** The annotated tag `v3.8.51`
+5. **Upstream released 3.8.51 after the rebuild (checked 2026-09-30T04:53:59Z, git protocol and the npm registry; output as printed in
+   `evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json`).** The annotated tag `v3.8.51`
    (tagger time 2026-09-30T01:41:23Z) points at commit `c1e30b767` "Release v3.8.51" (author time 2026-09-29T22:58:13Z, parent
    `443d66996`), and npm `omniroute@3.8.51` was published at 2026-09-30T02:54:04Z (`latest`). That commit is not a descendant of
    `2f42a9ac1`, but **its tree is the same tree**: both are `0f58d8df20c0c2ae4336b432b3f39837119b6eed`. So the running builds are the
