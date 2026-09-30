@@ -107,7 +107,8 @@ The base kernel is `git show fe9f511b:examples/claude-native/workflows/child-usa
 - **M14 and M15 over the store (`kernel-m14-m15.json`, repair-round run over 5,283 files).** Across 4,437 actors
   with calls there are 0 invariant violations (per actor and per server). `calls_without_result` equals
   `cancelled_or_unfinished` for every one of them, since a Claude transcript has no native statuses. 2 lines did
-  not parse (`parse_errors`; files still being written). The context-mode server's 35,665 calls classify
+  not parse (`parse_errors`; their cause was not examined, and the store was live during the scan). The
+  context-mode server's 35,665 calls classify
   completely: 0 `unmatched` and 0 `echo_mismatch`, a rate of 0.0029 and a graded ceiling of 0.0044 (56
   `unassigned_errors`: `remote_fetch` 22, `rejected` 21, `invalid` 9, `search_throttle` 4), so `over_threshold`
   is false. The `plugin_context-mode` server shows the review's high finding on real data: its 2 calls are both

@@ -1949,8 +1949,8 @@ class TokenMeasurement(unittest.TestCase):
         threshold. The U2 design (5.3: 'Grading reads rate_upper_bound until a dated amendment assigns the other classes') and the binding
         decisions ('the harder-to-pass reading applies') grade on the ceiling, every attempted call that neither succeeded nor ended in the
         invoked command's own exit (the frozen M15 row excludes only that exit). The client's own text for a tool it does not have (the
-        M14 fixture above; 6 MCP results on this host, scans/call-states.json) is an invalid call; on the base kernel it read rate 0,
-        rate_lower_bound 0 and threshold_sensitive false, and only rate_upper_bound 1."""
+        M14 fixture above; 6 MCP results on this host, scans/call-states.json) is an invalid call; on the kernel before this fix (b2dd1eb7)
+        it read rate 0, rate_lower_bound 0 and threshold_sensitive false, and only rate_upper_bound 1."""
         missing = "No such tool available: mcp__qmd__search"
         rows = []
         for i in range(5):
