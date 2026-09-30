@@ -39,7 +39,7 @@
       "launcher": "~/.local/share/codex-ecosystem/bin/codex, a 4,184-byte bash telemetry-identity launcher whose last line execs ~/.local/share/codex-ecosystem/tools/codex-0.159.2/bin/codex (last written 2026-09-30T03:22:59Z; the prefix's files 03:21:27Z to 03:21:30Z)",
       "launcher_version": "codex-cli 0.159.2 (in the sandbox, 2026-09-30T04:32:26Z)",
       "installed_versions_txt": "codex-cli 0.157.1 (stale host record, unchanged)",
-      "config_toml_top_level_model": "model = \"gpt-6.1-sol\", model_reasoning_effort = \"ultra\" (the two top-level keys of ~/.codex/config.toml, read-only at 2026-09-30T05:37:50Z; nothing else read from that file)"
+      "config_toml_top_level_model": "withheld: machine-specific active client configuration (AGENTS.md evidence rules); the file's two top-level model keys were read once, read-only, at 2026-09-30T05:37:50Z, and nothing else was read from it"
     },
     "release": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
     "release_published_at_utc": "2026-09-29T23:57:16Z",
