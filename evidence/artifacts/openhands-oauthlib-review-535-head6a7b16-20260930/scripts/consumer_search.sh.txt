@@ -1,0 +1,17 @@
+#!/bin/bash
+# consumer_search.sh -- who consumes the OpenHands requirements.lock in the repository at the reviewed PR head, and whether the recipe has any macOS/darwin/arm64
+# handling. Read-only git grep on the immutable head; prints its observed time.
+set -u
+C=<REPO>
+P=refs/remotes/pr/535b
+echo "observed_utc=$(date -u +%FT%TZ)"
+echo "head: $(git -C $C rev-parse $P)"
+echo "=== references to the OpenHands requirements.lock outside evidence directories and manifests (path or relative form)"
+git -C $C grep -n -E 'runtime-workers/openhands/requirements\.lock|/recipe/requirements\.lock|HERE / "requirements\.lock"|recipe_dir/requirements\.lock' $P -- . ':(exclude)evidence' ':(exclude)blueprints/runtime-workers/openhands/evidence' ':(exclude)manifests' | sed "s#^$P:##" | cut -c1-190
+echo "=== macOS / darwin / arm64 handling in the OpenHands recipe code (evidence, research and README excluded)"
+git -C $C grep -n -i -E 'darwin|macos|mac os|Apple|arm64|aarch64' $P -- blueprints/runtime-workers/openhands ':(exclude)blueprints/runtime-workers/openhands/evidence' ':(exclude)blueprints/runtime-workers/openhands/research.md' ':(exclude)blueprints/runtime-workers/openhands/README.md' | sed "s#^$P:##" | cut -c1-190
+echo "(end of matches)"
+echo "=== pins.json platforms"
+git -C $C show $P:blueprints/runtime-workers/openhands/pins.json | python3 -c 'import json,sys; d=json.load(sys.stdin); print("image platform:", d["image"].get("platform"), "| gateway_proxy platform:", d.get("gateway_proxy", {}).get("platform"))'
+echo "=== the exact-lock entry and its scope comment in tests/test_osv_lockfile_coverage.py"
+git -C $C show $P:tests/test_osv_lockfile_coverage.py | grep -n -B8 -A4 '"blueprints/runtime-workers/openhands/requirements.lock": {' | cut -c1-190

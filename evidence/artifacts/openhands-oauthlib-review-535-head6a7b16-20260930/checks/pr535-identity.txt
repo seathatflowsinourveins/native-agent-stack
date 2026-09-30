@@ -1,0 +1,20 @@
+observed_utc=2026-09-30T09:26:01Z
+pr head:                          6a7b16465e50689334d9dd15ff4fed99a9cd7485
+pr base (main when the PR was made): f03f41c7f3601532b8635f8f112a3d2731454375
+merge base of head and origin/main:  f03f41c7f3601532b8635f8f112a3d2731454375
+candidate lock sha256 at the head:   383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106
+lock sha256 at the PR base:          14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64
+pins.json requirements_sha256:       383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106
+pins.json version:                   1.50.0
+--- the OpenHands entry of IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py at the head:
+  81:    "blueprints/runtime-workers/openhands/requirements.lock": {
+  82-        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
+  83-        "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  84-        "evidence": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930.json",
+--- lines the PR adds or removes in .github/osv-scanner.toml (changed lines only):
+  +# 2026-09-30: the GPT Researcher and Crawl4AI source-only allowances are bound
+  +# to exact locks in IGNORE_ALLOWED_LOCKS and independently rechecked in
+  +# evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json.
+  +# No new ignored advisory or expiry extension; dynamic/model-artifact paths
+  +# and broader worker activation remain outside this bounded source review.
+--- the evidence file the entry names exists at the head: blob

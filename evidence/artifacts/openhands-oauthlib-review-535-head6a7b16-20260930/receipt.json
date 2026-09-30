@@ -1,0 +1,106 @@
+{
+ "schema": "openhands-oauthlib-review-receipt/1",
+ "id": "openhands-oauthlib-review-535-head6a7b16-20260930",
+ "subject": "independent changed-closure OAuthlib reachability review of draft PR 535 at its corrected head (OpenHands SDK 1.50.0 wheel lock, main's versions retained)",
+ "pr": {
+  "number": 535,
+  "head": "6a7b16465e50689334d9dd15ff4fed99a9cd7485",
+  "base": "f03f41c7f3601532b8635f8f112a3d2731454375",
+  "lane": "lane:shared",
+  "state_at_review": "draft"
+ },
+ "lock": {
+  "path": "blueprints/runtime-workers/openhands/requirements.lock",
+  "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  "base_sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+  "platform": "Linux x86_64",
+  "python": "CPython 3.13.15",
+  "packages_parsed_by_osv": 174
+ },
+ "supersedes_scope_of": "evidence/artifacts/openhands-oauthlib-review-535-20260930",
+ "status": "review complete for the exact head and lock; corrections A and B verified; no approval of any merge, exception, pin or promotion",
+ "verdict": "no reachable path from the closure to the two advisories' server-side code; the closure's only oauthlib consumers are client-side (requests-oauthlib 2.0.0)",
+ "evidence_classes": {
+  "source_review": "reads of the candidate's files and of the repository at the head",
+  "our_integration_check": "our scripts and outputs on a reproduced install and on git objects"
+ },
+ "controls": {
+  "empty_config_osv": "exit 1 with exactly the two oauthlib advisory ids (W5)",
+  "ci_config_osv": "exit 0 (W5)",
+  "base_lock_empty_config": "exit 1 with the same two ids (W5)"
+ },
+ "claims": [
+  {
+   "id": "W1",
+   "class": [
+    "source_review",
+    "our_integration_check"
+   ],
+   "text": "identity: the PR head is exactly 6a7b16465e50689334d9dd15ff4fed99a9cd7485 (base f03f41c7f3601532b8635f8f112a3d2731454375); the lock at the head hashes to 383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106, equal to pins.json requirements_sha256 and to the sha256 in the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose evidence file main-reconcile-20260930.json exists at the head; the PR changes .github/osv-scanner.toml by comment lines only (no advisory id, no expiry)",
+   "at": "checks/pr535-identity.txt"
+  },
+  {
+   "id": "W2",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the candidate's two hashed installs (build lock, then the candidate lock with --no-build-isolation) reproduce in a fresh CPython 3.13.15 environment on Linux x86_64 (uv 0.12.17): both exit 0 and uv pip check reports all installed packages compatible; oauthlib 3.3.1, PyJWT 2.14.0, requests-oauthlib 2.0.0, google-auth-oauthlib 1.2.2, authlib 1.6.12, openhands-sdk and openhands-tools 1.50.0",
+   "at": "checks/install-log.txt, checks/independent-scan.txt"
+  },
+  {
+   "id": "W3",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "independent reachability sweep (installed metadata plus a raw-text sweep of every file, a different method from the candidate's AST scan): 14,618 files outside oauthlib; 22 mention 'oauthlib', in requests_oauthlib, google_auth_oauthlib, browser_use (its Gmail integration imports google_auth_oauthlib) and their dist-info; 0 lines name a server-side or advisory class; the only reverse dependency is requests-oauthlib 2.0.0; no dynamic-import shape names oauthlib; authlib (its own implementation) never mentions oauthlib. Verdict for this exact lock: no code in the closure selects or calls oauthlib's RevocationEndpoint/enable_jsonp path (GHSA-hj66-6f7g-4r5v) or its PKCE grant comparison (GHSA-xpv3-w29h-x7cv); the only oauthlib consumers are client-side",
+   "at": "checks/independent-scan.txt"
+  },
+  {
+   "id": "W4",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the four advisory-related oauthlib source files (endpoints/revocation.py, grant_types/authorization_code.py and the two pre_configured.py) are byte-identical to the sha256 values printed in the candidate's own callers output, and func_timeout/py2_raise.py matches the candidate's pinned hash",
+   "at": "checks/advisory-files-and-helper.txt"
+  },
+  {
+   "id": "W5",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "OSV-Scanner 2.6.0 (binary sha256 ca69b3d3..., the CI pin), CI command form, 174 packages parsed: the candidate lock with the head's own config exits 0 with no findings; the control with an EMPTY config exits 1 and its only findings are oauthlib==3.3.1 with GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv; the PR base's lock with an empty config exits 1 with the same two ids",
+   "at": "checks/osv-exit-codes-and-findings.txt, checks/osv-*.json"
+  },
+  {
+   "id": "W6",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "correction A is in: against the PR base's reviewed lock (14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64) the closure is 335 to 176 packages, 0 added, 159 removed (all pyobjc*, the macOS closure: the lock is Linux-only), 2 changed (openhands-sdk and openhands-tools 1.49.6 to 1.50.0); click 8.5.0, pypdf 6.19.0, soupsieve 2.9.2, oauthlib 3.3.1 and PyJWT 2.14.0 are unchanged",
+   "at": "checks/closure-diff-base-vs-head.txt"
+  },
+  {
+   "id": "W7",
+   "class": [
+    "source_review"
+   ],
+   "text": "correction B is in: the exact-lock test entry's comment states Linux x86_64 / CPython 3.13.15 closure only, not a native macOS venv; at the head the lock is consumed only by host.py:324 (a digest check against pins.json) and install-container.sh:19 (inside the pinned linux/amd64 image; pins.json platforms linux/amd64), the recipe code has no darwin, macOS or arm64 handling, and a pattern match in the gpt-researcher installer reads that recipe's own lock, not this one",
+   "at": "checks/lock-consumers-and-platform.txt"
+  }
+ ],
+ "findings": [
+  "No blocking finding for the OAuthlib reachability scope. Housekeeping: the exact-lock test comment still says the reviewer's final candidate-head review is pending; it can cite this record once it is on main."
+ ],
+ "residuals": [
+  "Static source evidence only: no runtime trace, no execution of any OAuth flow or server; dynamic imports and runtime-assembled names are not excluded by this method (none was found by shape).",
+  "Scoped to this exact head and lock. The earlier record (evidence/artifacts/openhands-oauthlib-review-535-20260930/) reviews the previous head bb3d00dc and lock 8d257833 and is historical. Nothing here approves a merge, an exception, a pin or a promotion.",
+  "Not reviewed: the candidate's byte-identical reproduction claim, its 12 SDK fixtures, the image scan (56 fixable High/Critical reported by the candidate), live quality, dispatch and worker code, the GPT Researcher and Crawl4AI nltk allowances.",
+  "The outputs were generated from the immutable git objects of the head and a fresh scratch install; each carries its observed time; the install log is the original run's.",
+  "The joint oauthlib 4.0.0 / PyJWT 2.15.1 relock of the live lock stays with issue #518 and starts no earlier than 2026-10-05T18:40:43Z; the exception this review supports would be deleted by it."
+ ],
+ "provenance": {
+  "reviewer": "native-agent-stack-bc (owner of issue #518)",
+  "scripts": "scripts/ as run; host paths are masks such as <REVIEW-SCRATCH>, <PR535-WORKTREE>, <OSV-BIN>",
+  "commands": "checks/commands-as-typed.txt is a transcription of the commands as typed, with the times of the runs"
+ }
+}

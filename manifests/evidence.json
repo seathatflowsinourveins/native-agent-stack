@@ -35554,6 +35554,116 @@
       "bytes": 5973
     },
     {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/README.md",
+      "sha256": "9ba89c26696bbae82f06a8008dbf0078d08ae0e1c8315518929d59d86d1512d0",
+      "bytes": 2192
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/advisory-files-and-helper.txt",
+      "sha256": "5359803e1355ab5f210ce0f3193298cdc625152f05efe5f23d1ab7747f96810a",
+      "bytes": 1565
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/closure-diff-base-vs-head.txt",
+      "sha256": "359c18a92ef0a270683ec3921d48a0836dca9025ca83814004a2a863be5f0036",
+      "bytes": 6863
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/commands-as-typed.txt",
+      "sha256": "ed4ea78aa7919caa68df782c72fd2ad3f8e56580bb5e2c734459dd79286c364b",
+      "bytes": 1621
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/independent-scan.txt",
+      "sha256": "4f78df3cb72e9c4262497e212a7aaaf3a5056c8e69a7f9660abb0332581e6612",
+      "bytes": 2488
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/install-log.txt",
+      "sha256": "471266dcb2c837fa8a2b5b4c4dd199bc15e1eae6f3d9d393e2b48cb3469e67d0",
+      "bytes": 537
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/lock-consumers-and-platform.txt",
+      "sha256": "fd70e74eab3031db9121827de3f3392e62c99a101fc7aee877a6870853dc1126",
+      "bytes": 2752
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/osv-base-lock-empty-config.json",
+      "sha256": "4e702447ce9a76053a20e7f3c996b0e2ee496814f7cc7c1a2965482f7ac4dfa4",
+      "bytes": 19980
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/osv-exit-codes-and-findings.txt",
+      "sha256": "d9ef0c804c001d7b18d6c3495bc2546e24fc25bfecbae223d3e308d80ca984d1",
+      "bytes": 614
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/osv-head-lock-empty-config-control.json",
+      "sha256": "7948ff7eaaec5a93adb420665d0f27dc61821cf1dbed80050666ebcf648a7d18",
+      "bytes": 20008
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/osv-head-lock-with-ci-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/osv-scanner-identity.txt",
+      "sha256": "f776a9fc37876c5582fddd68c48e2434407374927f460fc36b491e166d0586a0",
+      "bytes": 291
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/pin-sources.txt",
+      "sha256": "b760a61c136c1d8c6f3f664898a791af9a5dd633319669f5150708507c4c2ebd",
+      "bytes": 1114
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/pr535-identity.txt",
+      "sha256": "fe3b82ae9d43e78060134926be707c14fb1d1b970f292adf41d62729853395d5",
+      "bytes": 1592
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/receipt.json",
+      "sha256": "c7473105255cc38bac1da6c7a490f99d863b58d865e82529d221b2a2e759908f",
+      "bytes": 7406
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/constraint_sources.py.txt",
+      "sha256": "74887ba29d2452bd47bd377605c505168a3ca7e6e6a0f96c36e1d61292316a2f",
+      "bytes": 1214
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/consumer_search.sh.txt",
+      "sha256": "0aa3173f9d62d974a226408c618dcde63784262f7c7d295f485ce88efd43f620",
+      "bytes": 1762
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/install_candidate.sh.txt",
+      "sha256": "f509b9ae5eade11391021f7db6996c3aff2efa318e3007abbcce459ef18d4f96",
+      "bytes": 1040
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/lock_closure_diff.py.txt",
+      "sha256": "07e92cfcbdff66f060f53a263d177d2639140382753237e9e7dde05f26795c33",
+      "bytes": 1411
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/oauthlib_independent_scan.py.txt",
+      "sha256": "d79da4cf7a3072a2847862178ad909347aa49ef2c2e02a280c58f11b8a952dac",
+      "bytes": 3943
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/osv_summary.py.txt",
+      "sha256": "3ce73d324c6e7c4dd190a96e1a7ed5a75ca5c760c9aaaa5dd4bd610bf5aad744",
+      "bytes": 709
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/scripts/run_review_outputs.sh.txt",
+      "sha256": "1d3c5eb5974a9b44dec4be947c3cb2ab95cd46faf4483feeeea684d1bfee66d5",
+      "bytes": 5992
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969

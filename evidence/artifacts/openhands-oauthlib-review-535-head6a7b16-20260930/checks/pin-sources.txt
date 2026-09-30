@@ -1,0 +1,22 @@
+observed_utc=2026-09-30T09:26:01Z
+== who requires click:
+   httpx 0.28.1: click==8.*; extra == 'cli'
+   browser-use 0.11.9: click>=8.1.8
+   litellm 1.93.0: click>=8.0.0,<9.0
+   uvicorn 0.52.4: click>=7.0
+   beartype 0.22.9: click; extra == 'dev'
+   beartype 0.22.9: click; extra == 'test'
+   beartype 0.22.9: click; extra == 'test-tox'
+   google-auth-oauthlib 1.2.2: click>=6.0.0; extra == "tool"
+   python-dotenv 1.2.2: click>=5.0; extra == "cli"
+== who requires pypdf:
+   browser-use 0.11.9: pypdf>=5.7.0
+   litellm 1.93.0: pypdf>=6.12.0,<7.0 ; extra == 'proxy-runtime'
+== who requires soupsieve:
+   beautifulsoup4 4.14.2: soupsieve>1.2
+== dynamic-import shapes naming oauthlib in requests_oauthlib and google_auth_oauthlib:
+   requests_oauthlib/oauth1_session.py:316: if not getattr(self._client.client, "verifier", None):
+   requests_oauthlib/oauth2_session.py:132: return getattr(self._client, "client_id", None)
+   requests_oauthlib/oauth2_session.py:144: return getattr(self._client, "token", None)
+   requests_oauthlib/oauth2_session.py:153: return getattr(self._client, "access_token", None)
+   (4 lines)
