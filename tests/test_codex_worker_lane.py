@@ -9,8 +9,9 @@ Evidence classes (docs/acceptance-evidence-policy.md):
   `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`;
 - the prove verdict tests read event fixtures cut from real `codex exec --json` runs of codex-cli 0.157.1
   (tests/fixtures/codex-worker-lane/, paths masked; see that directory's items for what each run was);
-- CodexIntegrationTests runs the real codex 0.157.1 app-server against a scratch Codex home, only when
-  NAS_CODEX_INTEGRATION=1 and that codex is on PATH (local integration evidence; skipped in CI).
+- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.159.2) against a
+  scratch Codex home, only when NAS_CODEX_INTEGRATION=1 and that codex is on PATH (local integration evidence;
+  skipped in CI).
 """
 
 from __future__ import annotations
@@ -39,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 import apply_codex_lane as lane  # noqa: E402
 import prove_codex_lane as prove  # noqa: E402
+import render_config  # noqa: E402
 from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
@@ -88,7 +90,8 @@ emit_toml = _EMIT_NAMESPACE["emit"]
 # config.load has no `startup warning*` detail at all. A warning adds `startup warnings` (a count, as a string), one
 # count per area, and `startup warning` (a string, or a list when it repeats). The value text embeds the role file's
 # absolute path, which the installer must never echo. Sources: openai/codex rust-v0.157.1 codex-rs/cli/src/doctor.rs
-# (JsonDoctorReport, config_check, push_startup_warning_counts, structured_json_details).
+# (JsonDoctorReport, config_check, push_startup_warning_counts, structured_json_details). At rust-v0.159.2 that file
+# differs only in one handshake-error match arm, and CodexIntegrationTests read the real 0.159.2 report (2026-09-30).
 DOCTOR = r'''
 ROLE_WARNING = "Ignoring malformed agent role definition"
 CANARY = "/canary-host-path/agents/stack-researcher.toml"
@@ -128,7 +131,7 @@ def doctor_output(mode, has_roles, home):
         checks["config.load"] = {"id": "config.load", "category": "config", "status": status, "summary": summary,
                                  "details": details, "remediation": None, "durationMs": 3}
     return json.dumps({"schemaVersion": 1, "generatedAt": "2026-09-29T00:00:00Z", "overallStatus": "fail",
-                       "codexVersion": "0.157.1", "checks": checks}) + "\n"
+                       "codexVersion": "0.159.2", "checks": checks}) + "\n"
 '''
 _DOCTOR_NAMESPACE: dict = {}
 exec("import json\n" + DOCTOR, _DOCTOR_NAMESPACE)
@@ -140,7 +143,7 @@ ROLES_SOURCE_DIR = ROOT / "adoption" / "agents" / "codex"
 ROLE_NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 
 FAKE_CODEX = r'''#!{python}
-"""Fake codex 0.157.1 for tests/test_codex_worker_lane.py (see its docstring)."""
+"""Fake codex 0.159.2 for tests/test_codex_worker_lane.py (see its docstring)."""
 import hashlib, json, os, re, sys, tomllib
 from pathlib import Path
 
@@ -178,7 +181,7 @@ def segments(path):
     return out + [cur]
 
 if argv == ["--version"]:
-    print("codex-cli 0.157.1"); sys.exit(0)
+    print("codex-cli 0.159.2"); sys.exit(0)
 if argv[:1] == ["app-server"]:
     race = os.environ.get("FAKE_CODEX_RACE")
     for line in sys.stdin:
@@ -298,9 +301,20 @@ class TemplateTests(unittest.TestCase):
             (home / "AGENTS.md").write_text("@/home/example/.codex/RTK.md\n", encoding="utf-8")
             self.assertIs(adoption_status.rtk_instructions_inline(home), False)
 
+    def test_the_lane_pins_the_linux_codex_pin(self):
+        # apply_codex_lane.py refuses a codex whose --version is not CODEX_VERSION, and CodexIntegrationTests skip any
+        # other codex, so a Linux pin moved without the lane leaves a pinned host unable to apply it and the opt-in
+        # tests unable to run. Found 2026-09-30: the pin moved to 0.159.2 while CODEX_VERSION still named 0.157.1.
+        pins = adoption_status.read_pins(ROOT / "adoption" / "pins-linux-x86_64.json")
+        self.assertEqual(lane.CODEX_VERSION, pins["codex"]["version"])
+
     def test_profile_template(self):
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
-        self.assertEqual(profile["model"], "gpt-6-astra")
+        # A literal, not render_config.py's CODEX_MODEL placeholder: the lane installs this file verbatim, worker_pins()
+        # passes its model as -m, and the lane refuses any codex but CODEX_VERSION (the Linux pin). So the literal must
+        # be the model that placeholder's rule gives for that version, one the pinned client's catalog lists.
+        self.assertEqual(profile["model"], render_config.codex_model_for(lane.CODEX_VERSION))
+        self.assertEqual(profile["model"], "gpt-6.1-sol")
         # max, the effort of #359's control arm; ultra (the user default) turns on proactive delegation.
         self.assertEqual(profile["model_reasoning_effort"], "max")
         self.assertEqual(profile["web_search"], "live")
@@ -375,8 +389,8 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(lane.key_path(["projects", "/a.b/c"]), 'projects."/a.b/c"')
 
     def test_owned_edits_restore_the_start_up_allowance_of_registered_servers(self):
-        # `codex mcp add` takes no timeout option (its --help at 0.157.1), so a server it registered has none and
-        # Codex waits its 30 s default; the template gives serena 60 s and socraticode 120 s.
+        # `codex mcp add` takes no timeout option (its --help at 0.157.1 and 0.159.2), so a server it registered has
+        # none and Codex waits its 30 s default; the template gives serena 60 s and socraticode 120 s.
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         live = {"mcp_servers": {"serena": {"command": "/x/serena"}, "socraticode": {"command": "/x/node"}}}
         timeouts = {tuple(e["key"]): e["value"] for e in lane.owned_edits(live, "/opt/eco", "/usr/bin")
@@ -421,11 +435,15 @@ class TemplateTests(unittest.TestCase):
         # config error, and no `set` here, so the base config's [shell_environment_policy.set] keeps applying.
         self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
         self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
-        # K2: the base template stays gateway-free, so render_config.py --check still compares like with like.
-        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        # K2: the base template stays gateway-free, so render_config.py --check still compares like with like. Its
+        # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum)
+        # where the platform's Codex pin lists it: rendered here for the Linux pin, the lane's CODEX_VERSION. This
+        # gateway profile keeps the judgment lanes' cx/gpt-6-astra at max.
+        user = tomllib.loads(render_config.render_one(TEMPLATES / "codex.config.template.toml",
+                                                      render_config.load_host_values("example"), "linux-x86_64"))
         self.assertNotIn("model_providers", user)
         self.assertNotIn("model_provider", user)
-        self.assertEqual(user["model"], "gpt-6-astra")
+        self.assertEqual((user["model"], user["model_reasoning_effort"]), ("gpt-6.1-sol", "ultra"))
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
@@ -560,7 +578,7 @@ class FakeHost:
 
 
 class ApplyFlowTests(unittest.TestCase):
-    """Synthetic: the fake codex above stands in for codex-cli 0.157.1."""
+    """Synthetic: the fake codex above stands in for codex-cli 0.159.2."""
 
     def setUp(self):
         self.host = FakeHost(self)
@@ -1632,7 +1650,7 @@ class ProveVerdictTests(unittest.TestCase):
         # A project .codex/config.toml outranks the profile file and `-c` outranks both (config_layer_source.rs at
         # rust-v0.157.1), so the launch itself carries the profile's model, effort and web search.
         pins = lane.worker_pins()
-        self.assertEqual(pins, ["-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"'])
+        self.assertEqual(pins, ["-m", "gpt-6.1-sol", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"'])
         for profile in (True, False):
             argv = prove.exec_argv("codex", "prompt", profile)
             self.assertEqual(argv[:2], ["codex", "exec"])
@@ -1640,10 +1658,10 @@ class ProveVerdictTests(unittest.TestCase):
             joined = " ".join(argv)
             self.assertIn(" ".join(pins), joined)
             self.assertIn("-s read-only", joined)
-        self.assertEqual(lane.worker_command(), "codex exec -p stack-worker -m gpt-6-astra "
+        self.assertEqual(lane.worker_command(), "codex exec -p stack-worker -m gpt-6.1-sol "
                          "-c 'model_reasoning_effort=\"max\"' -c 'web_search=\"live\"' -s <sandbox> ... < /dev/null")
         recipe = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
-        self.assertIn('codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live"',
+        self.assertIn('codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live"',
                       recipe)
 
     def test_prove_json_declares_local_integration_and_retention_limits(self):
@@ -2079,7 +2097,7 @@ class SandboxProbeControlTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
-                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.157.1 on PATH to run the real app-server")
+                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.159.2 on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
     """Local integration with the real codex: its app-server writes a scratch Codex home and rollback restores it
     byte for byte; a project config outranks the profile but not the pinned flags; the gateway profile loads under
@@ -2245,7 +2263,8 @@ class CodexIntegrationTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0"}
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0",
+                   "CODEX_MODEL": render_config.codex_model_for(lane.CODEX_VERSION)}  # the model this codex lists
         base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

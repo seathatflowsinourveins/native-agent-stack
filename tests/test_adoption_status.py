@@ -1159,6 +1159,39 @@ class PinnedVersionsCheckTests(unittest.TestCase):
                 self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
 
 
+def pin_manifest_disagreements(pins: dict, components: list[dict]) -> list[str]:
+    """Linux pins whose version differs from manifests/stack.json's version of the same component. A stack version
+    may carry a source commit after " @ " (serena's "2.0.0.dev0 @ <commit>"); only the part before it is a version."""
+    stack = {component["id"]: component["version"].split(" @ ", 1)[0]
+             for component in components if isinstance(component.get("version"), str)}
+    return [f"{identifier}: pin {entry['version']}, manifests/stack.json {stack[identifier]}"
+            for identifier, entry in sorted(pins.items()) if identifier in stack and entry["version"] != stack[identifier]]
+
+
+class PinManifestAgreementTests(unittest.TestCase):
+    """--pinned-versions compares an installed tool with the Linux pins file, while manifests/stack.json names the
+    version that the component's receipts qualified. A pin moved without its manifest row (or the reverse) makes
+    `matches_pin: true` certify a version the manifest does not claim. Found 2026-09-30 while moving codex from 0.157.1
+    to 0.159.2: nothing tied the two files together. The macOS pins file is left out: its codex pin waits for its own
+    qualification (manifests/stack.json codex freshness)."""
+
+    def test_every_linux_pin_names_the_manifest_version(self):
+        pins = adoption_status.read_pins(pins_file_path(REPO, {"os": "linux", "architecture": "x86_64"}))
+        components = json.loads((REPO / "manifests/stack.json").read_text(encoding="utf-8"))["components"]
+        self.assertIn("codex", pins)
+        self.assertGreaterEqual(len([identifier for identifier in pins
+                                     if identifier in {component["id"] for component in components}]), 10)
+        self.assertEqual(pin_manifest_disagreements(pins, components), [])
+
+    def test_the_check_rejects_a_moved_pin_and_reads_a_commit_suffix(self):
+        pins = {"tool": {"id": "tool", "version": "2.0.0"}, "pinned": {"id": "pinned", "version": "1.0.dev0"},
+                "pin-only": {"id": "pin-only", "version": "9.9.9"}}
+        components = [{"id": "tool", "version": "1.0.0"}, {"id": "pinned", "version": "1.0.dev0 @ " + "a" * 40}]
+        self.assertEqual(pin_manifest_disagreements(pins, components), ["tool: pin 2.0.0, manifests/stack.json 1.0.0"])
+        components[0]["version"] = "2.0.0"
+        self.assertEqual(pin_manifest_disagreements(pins, components), [])
+
+
 @unittest.skipUnless(SLEEP, "needs a sleep executable")
 class PinnedVersionInterruptionTests(unittest.TestCase):
     """The --pinned-versions CLI, run as its own process on this host's real platform, gets a signal while a

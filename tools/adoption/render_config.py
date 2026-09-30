@@ -11,7 +11,7 @@ trust entries and hook trusted-hash state, is preserved byte-for-byte inside
 the template text (escaped as ``$$`` where the source already used a literal
 ``$`` for shell syntax such as ``$HOME`` inside a status-line script).
 
-Two placeholders are derived when neither the host value file nor ``--set``
+Three placeholders are derived when neither the host value file nor ``--set``
 supplies them. ``AI_MEMORY_BIN`` is the ai-memory executable that the Claude
 hook commands run. It defaults to the selected platform's pinned install,
 ``${ECO_ROOT}/tools/ai-memory-<version>/ai-memory`` with ``<version>`` read
@@ -24,7 +24,15 @@ same way: the Codex user template's SocratiCode server runs
 ``${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/``, the prefix
 ``adoption/bootstrap-<os>.sh`` installs from the selected platform's pin
 (1.15.0 on linux-x86_64 and 1.14.0 on macos-arm64 since 2026-09-27); ``--set
-SOCRATICODE_VERSION=...`` names another installed version.
+SOCRATICODE_VERSION=...`` names another installed version. ``CODEX_MODEL`` is the
+Codex user template's ``model`` and ``[agents] default_subagent_model``, chosen
+from the selected platform's Codex pin: ``gpt-6.1-sol`` from Codex 0.159.1, the
+release that added it to the bundled catalog, and ``gpt-6-astra`` for an older
+pin (macos-arm64 pins 0.155.1 on 2026-09-30), so a render never names a model
+its pinned client's catalog lacks (the rule and its sources are at
+``CODEX_MODEL_SINCE`` below); ``--set CODEX_MODEL=...`` names another model.
+``--out`` and ``--check`` print a derived ``CODEX_MODEL`` with its pin and
+sources.
 
 One placeholder is an explicit opt-in instead of a host value:
 ``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or
@@ -122,6 +130,21 @@ def parse_set_values(pairs: list[str]) -> dict[str, str]:
 CAPTURE_ASSISTANT = "AI_MEMORY_CAPTURE_ASSISTANT"
 AI_MEMORY_BIN = "AI_MEMORY_BIN"
 SOCRATICODE_VERSION = "SOCRATICODE_VERSION"
+CODEX_MODEL = "CODEX_MODEL"
+# GPT-6.1 Sol entered Codex's bundled catalog in rust-v0.159.1, whose release notes read "Added GPT-6.1 Sol as
+# the default model in the bundled catalog": openai/codex codex-rs/models-manager/models.json has no
+# "gpt-6.1-sol" slug at rust-v0.159.0 (687a119f) and one at rust-v0.159.1 (8e68a98e, line 178). Offline
+# `codex debug models --bundled` lists it for the 0.159.2 build and not for 0.155.1 or 0.157.1
+# (evidence/receipts/codex-01592-qualification-20260930.json, data.checks_after_the_constant_move
+# .bundled_catalogs_offline). A pin before 0.159.1 keeps gpt-6-astra, the template's model until 2026-09-30, which
+# those catalogs list: at rust-v0.155.1 models.json line 4 (efforts low to ultra), and config/src/config_toml.rs
+# L694-696 reads both [agents] default_subagent keys.
+CODEX_MODEL_SINCE = (0, 159, 1)
+CODEX_MODEL_CURRENT = "gpt-6.1-sol"
+CODEX_MODEL_BEFORE = "gpt-6-astra"
+CODEX_MODEL_SOURCES = ("openai/codex rust-v0.159.1 release notes; evidence/receipts/"
+                       "codex-01592-qualification-20260930.json data.checks_after_the_constant_move"
+                       ".bundled_catalogs_offline")
 # This catalog's pins-<os>-<arch>.json spelling of platform.system().lower() (as PIN_OS_ALIASES in
 # scripts/adoption_status.py).
 PIN_OS_ALIASES = {"darwin": "macos"}
@@ -163,6 +186,37 @@ def resolve_socraticode_version(values: dict[str, str], platform_id: str | None 
     return {**values, SOCRATICODE_VERSION: version}
 
 
+def codex_model_for(version: str) -> str:
+    """The model CODEX_MODEL names for a Codex client of this version (the rule at CODEX_MODEL_SINCE)."""
+    match = re.fullmatch(r"([0-9]+)\.([0-9]+)\.([0-9]+)", version)
+    if not match:
+        raise RenderError(f"Codex version {version!r} is not a release version to compare with "
+                          f"{'.'.join(map(str, CODEX_MODEL_SINCE))}; pass --set {CODEX_MODEL}=<model>")
+    return CODEX_MODEL_CURRENT if tuple(map(int, match.groups())) >= CODEX_MODEL_SINCE else CODEX_MODEL_BEFORE
+
+
+def resolve_codex_model(values: dict[str, str], platform_id: str | None = None) -> dict[str, str]:
+    """Supply CODEX_MODEL from the platform's Codex pin when the caller did not (see the module docstring)."""
+    if values.get(CODEX_MODEL):
+        return values
+    version = pinned_version("codex", platform_id or current_platform(), CODEX_MODEL)
+    return {**values, CODEX_MODEL: codex_model_for(version)}
+
+
+def codex_model_note(values: dict[str, str], platform_id: str | None = None) -> str | None:
+    """How a derived CODEX_MODEL was chosen, printed by --out and --check; None when a host or --set supplied it."""
+    placeholder = "${" + CODEX_MODEL + "}"
+    if values.get(CODEX_MODEL) or not any(placeholder in path.read_text(encoding="utf-8")
+                                          for path in TEMPLATE_FILES.values()):
+        return None
+    platform_id = platform_id or current_platform()
+    version = pinned_version("codex", platform_id, CODEX_MODEL)
+    since = ".".join(map(str, CODEX_MODEL_SINCE))
+    return (f"derived {CODEX_MODEL}: {codex_model_for(version)} (adoption/pins-{platform_id}.json pins codex "
+            f"{version}; {CODEX_MODEL_CURRENT} from Codex {since}, {CODEX_MODEL_BEFORE} before it: "
+            f"{CODEX_MODEL_SOURCES})")
+
+
 def resolve_opt_ins(values: dict[str, str]) -> dict[str, str]:
     """Replace the explicit opt-in's setting with the text it renders (see the module docstring)."""
     setting = values.get(CAPTURE_ASSISTANT, "")
@@ -177,6 +231,8 @@ def render_one(template_path: Path, values: dict[str, str], platform_id: str | N
         values = resolve_derived(values, platform_id)
     if "${" + SOCRATICODE_VERSION + "}" in text:
         values = resolve_socraticode_version(values, platform_id)
+    if "${" + CODEX_MODEL + "}" in text:
+        values = resolve_codex_model(values, platform_id)
     resolved = resolve_opt_ins(values)
     try:
         return string.Template(text).substitute(resolved)
@@ -200,6 +256,7 @@ def cmd_out(args: argparse.Namespace) -> int:
     values = collect_values(args)
     try:
         rendered = render_all(values, args.platform)
+        note = codex_model_note(values, args.platform)
     except RenderError as error:
         print(f"render failed: {error}", file=sys.stderr)
         return 1
@@ -208,6 +265,8 @@ def cmd_out(args: argparse.Namespace) -> int:
     for name, text in rendered.items():
         (out_dir / name).write_text(text, encoding="utf-8")
         print(f"wrote {out_dir / name}")
+    if note:
+        print(note)
     return 0
 
 
@@ -215,9 +274,12 @@ def cmd_check(args: argparse.Namespace) -> int:
     values = collect_values(args)
     try:
         rendered = render_all(values, args.platform)
+        note = codex_model_note(values, args.platform)
     except RenderError as error:
         print(f"render failed: {error}", file=sys.stderr)
         return 1
+    if note:
+        print(note)
     live_paths = default_live_paths()
     if args.live_settings:
         live_paths["settings.json"] = Path(args.live_settings)
@@ -303,9 +365,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--set", action="append", metavar="KEY=VALUE",
                          help="Override or supply a template value; repeatable")
     parser.add_argument("--platform", metavar="OS-ARCH",
-                         help="Pins file (adoption/pins-<OS-ARCH>.json) whose ai-memory and socraticode versions "
-                              "the default AI_MEMORY_BIN and SOCRATICODE_VERSION name, e.g. linux-x86_64 or "
-                              "macos-arm64 (default: this machine)")
+                         help="Pins file (adoption/pins-<OS-ARCH>.json) whose ai-memory, socraticode and codex "
+                              "versions the default AI_MEMORY_BIN, SOCRATICODE_VERSION and CODEX_MODEL follow, "
+                              "e.g. linux-x86_64 or macos-arm64 (default: this machine)")
     parser.add_argument("--out", metavar="DIR",
                          help="Write settings.json, codex.config.toml, project.codex.config.toml here")
     parser.add_argument("--check", action="store_true",

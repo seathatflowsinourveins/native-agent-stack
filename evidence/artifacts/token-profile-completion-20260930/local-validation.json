@@ -47,5 +47,48 @@
   ],
   "limitations": [
     "Locally authored fixture tests and consistency validation are separate from unchanged upstream RTK/Hindsight tests and live native-client operations."
-  ]
+  ],
+  "after_upstream_integration": {
+    "upstream_main": "4720b202f1d9795754bf59bb42892193eb87693f",
+    "installer_tests": {
+      "exit_code": 0,
+      "tests": 77,
+      "skipped": 3,
+      "returned": "Ran77tests in0.932s; OK(skipped=3)"
+    },
+    "native_parity_tests": {
+      "exit_code": 0,
+      "tests": 48,
+      "skipped": 0,
+      "returned": "Ran48tests in2.465s; OK"
+    },
+    "generated_ecosystem_guide": {
+      "exit_code": 0,
+      "bytes": 14360138,
+      "sha256": "01fe27c29166ec436f8f1019763480644853c712fd101ca9c78d46140b536e87",
+      "committed": false
+    },
+    "convergence": {
+      "exit_code": 0,
+      "observations": 26
+    },
+    "scope": "Dependency changes from upstream justify repeated affected unit checks; native provider operations were not rerun."
+  },
+  "whitespace_check": {
+    "command": "git diff --check origin/main -- . ':(exclude)evidence/artifacts/token-lifecycle-resolution-20260930/hindsight-upstream/installer-test.stdout.txt' ':(exclude)evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/repair.patch'",
+    "exit_code": 0,
+    "scope": "All PR change paths except two exact retained raw/patch artifacts; their recorded byte identities remain unchanged.",
+    "preserved_failures": [
+      {
+        "command": "git diff --check HEAD after merging current main",
+        "exit_code": 2,
+        "reason": "Raw incoming evidence has trailing whitespace."
+      },
+      {
+        "command": "git diff --check origin/main",
+        "exit_code": 2,
+        "reason": "Exact native Hindsight stdout final blank line and valid Serena unified-patch context space."
+      }
+    ]
+  }
 }

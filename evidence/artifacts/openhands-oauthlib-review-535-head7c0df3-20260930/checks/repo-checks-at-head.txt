@@ -1,0 +1,14 @@
+observed_utc=2026-09-30T19:29:04Z
+head: 7c0df369f6aaeb263fc25576dbedfbfada74b6ab
+...................................................................ss...........................................................................................................................................................................ss..s
+----------------------------------------------------------------------
+Ran 245 tests in 12.309s
+
+OK (skipped=5)
+unittest exit: 0
+{"components": 69, "hashed_files": 8908, "profiles": 4, "receipts": 176, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.
+validate.py exit: 0
+{"files": 8908, "status": "passed"}
+evidence_manifest --check exit: 0
+head unchanged after the checks: 7c0df369f6aaeb263fc25576dbedfbfada74b6ab | worktree clean: yes

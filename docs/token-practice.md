@@ -72,8 +72,13 @@ hook acceptance is not authorization to enable capture on every runtime.
    original implementation before correctness decisions. Lossy retrieval and
    compression can omit necessary information.
 4. Preserve native caching, compaction, tool discovery, accounts and model
-   behavior. Shared PATH is not host acceptance. Do not add hooks or schedulers,
-   override providers, or rerun model trials during ordinary startup.
+   behavior. Shared PATH is not host acceptance. Do not add hooks or
+   schedulers, override providers, run audits or network checks, or rerun
+   model trials during ordinary startup. One addition is allowed: a read-only
+   SessionStart hook that prints one line of at most 160 characters, the
+   `summary_line` of the due-file a daily user timer writes, and prints nothing
+   when that file is absent or unreadable (fail-open). The checks run in that
+   timer, never at startup ([session currency notice](decisions/2026-09-30-session-currency-notice.md)).
 5. Count once at the proper boundary. Missing measurements are unknown.
    Never add cumulative snapshots, cache subsets, provider usage and artifact
    differences, or multiply a measured difference by repository count.

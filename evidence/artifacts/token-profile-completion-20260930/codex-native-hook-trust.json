@@ -110,5 +110,6 @@
     "overriddenMetadata"
   ],
   "verified_in_new_appserver_process": true,
-  "native_process_exit_code": 0
+  "native_process_exit_code": 0,
+  "wrapper_source_revision": "8fc86119eacfd5be9b8a139e1ed167d85748091b"
 }

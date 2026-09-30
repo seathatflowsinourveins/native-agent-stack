@@ -12,6 +12,8 @@ Every default below runs on the [token practice](token-practice.md). Keep always
 
 ## Decide from the task and evidence
 
+The [Sol-primary quality defaults](decisions/2026-09-30-sol-primary-quality-defaults.md) define the user-selected Codex coordinator and worker routes, observable Astra escalation triggers and the unchanged native Claude policy. This is a routing contract with scoped acceptance, not a universal model-quality ranking.
+
 Start from the requested outcome, the current repository state and a concrete acceptance condition. Verify changed behavior with relevant upstream or project checks, inspect original source, and obtain independent review for substantive changes. Resolve supported findings before claiming completion; distinguish measured results, simulations and untested boundaries. More tools, more reasoning and reviewer agreement alone do not prove quality.
 
 Select only the foundation layers needed for the task. Reuse accepted receipts while their inputs, version, platform and scope still match. Resolve a demonstrated missing dependency or broken connection directly; a healthy environment does not need another installation sweep.
@@ -84,6 +86,7 @@ When a claim or action proves wrong, correct it where it was relayed and record 
 
 | Date | Anti-pattern | What happened | Rule or check that prevents it | Where enforced |
 | --- | --- | --- | --- | --- |
+| 2026-09-30 | Whitespace scope overstated | Full diff checks also flag the retained native Hindsight stdout's final blank line and a valid Serena patch context line; incoming main has its own raw-output whitespace. | Keep immutable returned evidence bytes and hashes. Use the exact base/pathspec for the remaining change, and state the two explicit archive exclusions rather than claiming an unrestricted pass. | Profile local-validation receipt and native git diff checks |
 | 2026-09-30 | Installer success mistaken for hook activation | ai-memory's supported hook installer changed seven Codex commands; their old trust hashes no longer matched despite prerequisite exit 0. An initial script-path filter selected zero entries and made no mutation; native listing showed binary commands. | Use native hooks/list hashes and the pinned native config writer; confirm seven trusted events in a new process and preserve unrelated hooks. | Profile wiring-before and native trust recovery artifacts |
 | 2026-09-30 | Stale checkout chosen over installed reporter | The original checkout required tokenizer 3.4.0; changing the private config to it broke the installed service, whose current source requires qualified 4.0.0. Restoring 4.0.0 made the actual service pass. | Resolve the installed unit's source first and test that unit; a successful manual run from another checkout does not qualify it. | [Native profile completion](decisions/2026-09-30-token-profile-completion.md), lifetime receipt |
 | 2026-09-30 | Release, plugin and npm identities collapsed | Context Mode 1.0.169's official tag targets 589d821; installed plugin bundles match 6f0cc68; npm bundles have their own verified registry identity without gitHead. | Record artifact-specific hashes and keep loaded-process binding unknown until observed. Astra/max resolved the conflicting primary evidence. | Profile memory-selection receipt and pinned upstream source |

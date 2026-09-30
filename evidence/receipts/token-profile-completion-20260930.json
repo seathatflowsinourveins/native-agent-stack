@@ -101,6 +101,8 @@
     "native_gh_create_exit_code": 0,
     "recorded_at_utc": "2026-09-30T20:45:21Z",
     "review_pending": true,
-    "merged": false
+    "merged": false,
+    "integrated_upstream_main": "4720b202f1d9795754bf59bb42892193eb87693f",
+    "upstream_evidence_preserved": "codex-01592-qualification-20260930"
   }
 }

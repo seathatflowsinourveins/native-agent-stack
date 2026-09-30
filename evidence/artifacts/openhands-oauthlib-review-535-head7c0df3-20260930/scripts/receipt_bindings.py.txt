@@ -1,0 +1,115 @@
+"""Independent check of the bindings of the PR 535 pyjwt-relock receipt (blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json), run from the
+root of a checkout of the PR head: recompute the sha256 and size of every file the receipt binds and compare; match its checks to its command ledger; print the
+cutoff fields next to the PyPI upload times; compare its registered hashes with manifests/evidence.json of the same tree. Read-only; no network.
+Usage: receipt_bindings.py <receipt path relative to the checkout root>"""
+import hashlib
+import json
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+root = Path.cwd()
+receipt_path = sys.argv[1]
+receipt = json.loads((root / receipt_path).read_text(encoding="utf-8"))
+manifest = json.loads((root / "manifests/evidence.json").read_text(encoding="utf-8"))
+registered = {}
+
+
+def walk(node):
+    if isinstance(node, dict):
+        if "path" in node and "sha256" in node:
+            registered[node["path"]] = node
+        for value in node.values():
+            walk(value)
+    elif isinstance(node, list):
+        for value in node:
+            walk(value)
+
+
+walk(manifest)
+print(f"receipt: {receipt_path}; record {receipt['record']}; observed {receipt['observed_utc']}; status {receipt['status']}")
+print(f"manifests/evidence.json: {len(registered)} registered files")
+
+
+def sha(path):
+    return hashlib.sha256((root / path).read_bytes()).hexdigest()
+
+
+def report(label, entries):
+    missing, digest, size, unregistered, registry_mismatch = [], [], [], [], []
+    for entry in entries:
+        path = entry["path"]
+        if not (root / path).is_file():
+            missing.append(path)
+            continue
+        if sha(path) != entry["sha256"]:
+            digest.append(path)
+        if "bytes" in entry and (root / path).stat().st_size != entry["bytes"]:
+            size.append(path)
+        if path not in registered:
+            unregistered.append(path)
+        elif registered[path]["sha256"] != sha(path):
+            registry_mismatch.append(path)
+    ok = len(entries) - len(missing) - len(digest)
+    print(f"{label}: {len(entries)} entries | file present and sha256 equal: {ok} | missing {len(missing)} | sha256 differs {len(digest)} | size differs {len(size)} | "
+          f"not registered in manifests/evidence.json {len(unregistered)} | registered hash differs from the file {len(registry_mismatch)}")
+    for name, group in (("missing", missing), ("digest", digest), ("size", size), ("unregistered", unregistered), ("registry", registry_mismatch)):
+        for path in group[:6]:
+            print(f"    {name}: {path}")
+
+
+report("artifacts", receipt["artifacts"])
+report("bound_files", receipt["bound_files"])
+
+ledger_path = receipt["command_ledger"]
+ledger = json.loads((root / ledger_path).read_text(encoding="utf-8"))["commands"]
+by_id = {command["id"]: command for command in ledger}
+checks = receipt["checks"]
+problems = []
+for check in checks:
+    command = by_id.get(check["id"])
+    if command is None:
+        problems.append(f"{check['id']}: no ledger entry")
+        continue
+    if command["exit_code"] != check["exit_code"]:
+        problems.append(f"{check['id']}: check exit {check['exit_code']} vs ledger {command['exit_code']}")
+    output = check["returned_output"]
+    if not (root / output).is_file():
+        problems.append(f"{check['id']}: returned output missing")
+    elif sha(output) != check["returned_output_sha256"]:
+        problems.append(f"{check['id']}: returned output sha256 differs")
+same_as_stdout = sum(1 for check in checks if by_id[check["id"]].get("stdout_sha256_sanitized") == check["returned_output_sha256"])
+print(f"checks: {len(checks)} | ledger commands: {len(ledger)} | ids only in the ledger: {sorted(set(by_id) - {c['id'] for c in checks})[:6]} | "
+      f"checks whose returned output is missing, differs in sha256 or records another exit code than the ledger: {len(problems)}")
+print(f"   (informational: the ledger's sanitized-stdout sha256 equals the returned output's sha256 for {same_as_stdout} of {len(checks)}; the returned outputs are written files, not the raw stdout)")
+for line in problems[:12]:
+    print("    ", line)
+nonzero = [(c["id"], c["exit_code"]) for c in checks if c["exit_code"] != 0]
+print(f"checks with a non-zero recorded exit code: {len(nonzero)} {nonzero[:10]}")
+print(f"ledger ids ending in a recorded failure marker (exit != 0): {[(c['id'], c['exit_code']) for c in ledger if c['exit_code'] != 0][:10]}")
+
+for key in ("archive_and_installed_checks", "tag_sdist_selected_test_inputs"):
+    items = receipt["source_archive_and_test_bindings"][key]
+    if key == "tag_sdist_selected_test_inputs":
+        print(f"source_archive_and_test_bindings.{key}: {len(items)} entries bind paths INSIDE the PyJWT 2.15.0 sdist ({[i['path'] for i in items]}), not repository files; "
+              "they are recomputed from the PyPI sdist in external-hashes.txt")
+    else:
+        print(f"source_archive_and_test_bindings.{key}: {len(items)} entries")
+        print("    shape of first entry:", json.dumps(items[0])[:300])
+
+cut = receipt["cutoff_and_owner_boundary"]
+print("cutoff_and_owner_boundary:", json.dumps({k: cut[k] for k in cut}, indent=0)[:1600])
+uploads = [datetime.fromisoformat(t.replace("Z", "+00:00")) for t in ("2026-09-23T16:55:59.241512Z", "2026-09-23T16:56:00.689307Z")]
+window_end = max(uploads) + timedelta(days=7)
+print("PyPI PyJWT 2.15.0 uploads (from the OSV/PyPI reads of the coordinator review): 2026-09-23T16:55:59.241512Z, 2026-09-23T16:56:00.689307Z -> 7 days after the later one:", window_end.isoformat())
+clock = cut.get("native_worker_clock_check_utc")
+if clock:
+    print("native worker clock check:", clock, "| after the window end:", datetime.fromisoformat(clock.replace("Z", "+00:00")) > window_end)
+res = receipt["resolution"]
+print("resolution keys:", list(res))
+for key in ("upstream_sdk_commit", "sdk_tools_versions", "sdk_archive_sha256", "sdk_upstream_uv_lock_sha256", "tool", "command", "exclude_newer", "lock_exit_code", "check_exit_code", "export_exit_code"):
+    if key in res:
+        print(f"  {key}: {json.dumps(res[key])[:300]}")
+ni = receipt["native_install"]
+print("native_install:", json.dumps({k: ni[k] for k in ni if "exit" in k}, indent=0)[:700])
+print("osv:", json.dumps({k: v for k, v in receipt["osv"].items() if "exit" in k or "finding" in k or "result" in k or k in ("version", "binary_sha256")}, indent=0)[:1400])

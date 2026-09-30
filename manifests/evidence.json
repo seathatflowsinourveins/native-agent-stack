@@ -3691,6 +3691,31 @@
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
     },
     {
+      "id": "codex-01592-qualification-20260930",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, Codex CLI 0.159.2 was qualified in its existing prefix tools/codex-0.159.2 and the Linux pin moved to it from 0.157.1. The host launcher bin/codex already executes that prefix (its exec line names it, and `codex --version` through the launcher printed codex-cli 0.159.2 at 2026-09-30T04:32:26Z): a peer installed that prefix and wrote the launcher at 2026-09-30T03:21Z to 03:22Z, before this unit, which installed, relinked and wrote nothing on the host. The npm wrapper @openai/codex@0.159.2 (4,904 bytes, sha256 cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2) and its platform package @openai/codex@0.159.2-linux-x64 (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations; each attestation's subject digest equals the downloaded tarball's sha512, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5, the commit the tag object 8b9fa496bbf2c47aebd62e85a080b9a522a455b5 peels to. The native binary in the platform package (sha256 1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e, 286,754,152 bytes) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the release API digest, and the package's whole vendor tree (44 files, with codex-code-mode-host, rg and bwrap) is byte-identical to the complete native package codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals both its API digest and its line in codex-package_SHA256SUMS. All 49 files of the existing prefix are byte-identical to the two verified tarballs; its only other entry is npm's bin/codex link. Each of these comparisons failed on a copy with one byte changed. In bwrap sandboxes with no network, a read-only root and a fresh scratch HOME and CODEX_HOME per case (~/.codex never used, no credential read), 0.159.2 and the 0.157.1 baseline printed their own versions; `codex exec --help` and `codex --help` were byte-identical between them and to the committed 0.157.1 outputs of the previous qualification; `codex mcp list --json` printed [] in an empty home, and after `codex mcp add` both versions returned the same entry and transport keys from `codex mcp list --json` and `codex mcp get --json`; `codex features list` still lists daemon_auto_start as stable and on, and `codex features disable daemon_auto_start` still writes [features] daemon_auto_start = false; `codex debug prompt-input` rendered the stack's AGENTS.md top-rule marker once from a scratch home holding adoption/templates/codex.AGENTS.template.md and zero times from an empty home, on both versions; offline `codex debug models` lists gpt-6.1-sol at priority 1 in 0.159.2's bundled catalog (gpt-6-astra moves to priority 2) and not at all in 0.157.1's or in the 0.155.1 build's (`codex debug models --bundled`). At the two tag commits the exec layer (codex-rs/exec/src/cli.rs, exec_events.rs, event_processor_with_jsonl_output.rs and codex-rs/utils/cli/src/shared_options.rs) is byte-identical, so the `codex exec --json` events that tools/adoption/prove_codex_lane.py and tools/sota-convergence/landscape-sweep/codex_job.py read keep their shapes, and the config schema adds 18 key paths and removes none. `prove_codex_lane.py --help` exited 0, and its static checks (no --live) in a scratch home gave 0.159.2 and 0.157.1 the same row verdicts, the lane not being applied there, and printed byte-identical output when re-run with this branch's prove_codex_lane.py. tools/adoption/apply_codex_lane.py's dry run failed its codex version precondition on 0.159.2 while its CODEX_VERSION was 0.157.1; with the constant moved to 0.159.2 on the same branch it prints '[ok] codex version: codex-cli 0.159.2 (pin 0.159.2)' and refuses only on the three preconditions an empty scratch home cannot meet (HOST_PATH, config.toml, daemon_auto_start), while the 0.157.1 control adds '[fail] codex version: codex-cli 0.157.1 (pin 0.159.2)' to those three; and the opt-in CodexIntegrationTests of tests/test_codex_worker_lane.py passed 10 of 10 against the prefix's native binary, while all 10 skip with 0.157.1 on PATH. The repository's merged rollout parsers (tools/token-e2e/evidence.py and tools/skill-usage/skill_usage.py), run unchanged and read-only over the host's 19 existing rollouts written by 0.159.2 (3,783 records), reported 0 parse errors, as over the 1,350 rollouts written by 0.157.1; a synthetic malformed line counted as 1 error in each. No live model call ran.",
+      "limitations": [
+        "No live model call ran (not run): `prove_codex_lane.py --live`, a GPT-6 or GPT-6.1 turn through 0.159.2 and any provider request are outside this unit, because the native Codex allowance belongs to the sealed Gate A run. The sandbox cases exercise the CLI surface (version, help, MCP registration, features, prompt input, the bundled catalog) without a provider, a sign-in, streamed turns, sandboxed tool execution, compaction or a running MCP server.",
+        "Live 0.159.2 behaviour on this stack (role spawn through agent_type, --ignore-user-config with the role carriers, sandbox behaviour and the join proof) is covered by the Gate A owner's rehearsal receipts: peer rehearsal (session native-agent-stack-2d), not re-run here.",
+        "The switch was not made by this unit: a peer installed tools/codex-0.159.2 (files written 2026-09-30T03:21:27Z to 03:21:30Z) and wrote the launcher with its exec line naming that prefix at 2026-09-30T03:22:59Z, and ~/.local/share/codex-ecosystem/installed-versions.txt still reads codex-cli 0.157.1, a host record this unit does not own and did not change.",
+        "The lane is not accepted on 0.159.2 here: in a scratch home the static rows marker, rtk-inline, binding (from / and from the checkout), profile and roles fail because the lane is not applied there, with the same verdicts on 0.157.1; blind failed with exit 127 when --codex named the prefix's npm bin (the row's PATH is that directory plus the default path, which has no node) and passed through the launcher. The opt-in CodexIntegrationTests meet the same gap: they build PATH from codex's own directory plus the default path, so with the prefix's npm bin first on PATH codex never started (FAILED, failures=15, skipped=2), and a scratch directory pairing that launcher with node sits under /tmp, which their bwrap hides (4 failures and 2 skips on 'bwrap: execvp codex'). Their 10 of 10 pass ran the prefix's native binary directly, without the two CODEX_MANAGED_* variables the npm launcher adds. Neither the lane's apply nor its --live proof ran on a real Codex home.",
+        "The `npm audit signatures` control did not discriminate: flipping one character of the wrapper's integrity in both lockfiles still gave exit 0 and the same report, because npm 11.19.0 verifies the registry's own manifest for each name and version (lib/utils/verify-signatures.js lines 296-303), not the lockfile. The audit therefore shows only that the registry metadata of both versions is signed and attested; the downloaded bytes are bound to that metadata by the integrity check and to the attestations by their subject digests, each with a failing control.",
+        "The .sigstore bundles of the two GitHub assets were downloaded but not verified: no sigstore verifier is installed here, and `gh attestation verify` needs the GitHub REST API, which was rate-limited for the host's shared login. The tag's own signature was not checked.",
+        "GitHub REST through gh answered HTTP 403 'API rate limit exceeded' for the shared login at 2026-09-30T04:14:32Z and 04:15:10Z, before and after its bucket reset, so the four release records came from the unauthenticated REST endpoint (HTTP 200 at 04:15:38Z), tag objects from git ls-remote and source files from raw.githubusercontent.com at the two tag commits.",
+        "The background app-server probe of the 0.157.1 qualification was not repeated at 0.159.2: only the feature's listing and the disable path were checked, so the interactive-launch copy into CODEX_HOME/packages/app-server-daemon and its updater loop are measured at 0.157.1 only.",
+        "The rollout check covers 19 rollouts written by 0.159.2 (3,783 records) and retains counts and schema type names only. Types present in the 0.157.1 rollouts but absent from that sample (compacted, CollabAgentToolCall, ContextCompaction) were not observed, which is no evidence that 0.159.2 removed them; the one type new to the sample, retained_context, is a RolloutItemWire variant at both tags (codex-rs/history/src/rollout_payload.rs line 51 at rust-v0.157.1, line 60 at rust-v0.159.2).",
+        "rust-v0.159.2 was published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that docs/decisions/2026-09-25-workstation-sota-refresh.md applied to a release that is not a security fix; it moves because the Gate A owner chose 0.159.2 as the candidate frozen Codex version (relayed by the coordinator) and the host launcher already runs it.",
+        "The Linux pin, manifests/stack.json and the records that mirror its version move (catalogs/landscape/upstream-snapshot.json, whose codex entry was re-checked on 2026-09-30, blueprints/token-native-focus/saturation-audit.json and the generated new-host grand list), and so do tools/adoption/apply_codex_lane.py's CODEX_VERSION with its test fakes and the current-pin statements of recipes/README.md, adoption/bootstrap.md and the two platform pages; adoption/pins-macos-arm64.json keeps 0.155.1 until its own qualification, catalogs/landscape/foundation.json keeps its winner pins, and dated measurements and source citations made at 0.157.1 stay as recorded.",
+        "Upstream tests (cargo test) were not run on this host. The qualification and this receipt come from one worker family (Claude Opus 5.5) and were not independently reviewed.",
+        "The shared Codex template's new default does not fit the macOS pin: gpt-6.1-sol, which offline `codex debug models --bundled` lists for the Linux 0.159.2 build but not for the Linux 0.155.1 or 0.157.1 builds (the rust-v0.159.1 release notes add it to the bundled catalog), while adoption/pins-macos-arm64.json stays 0.155.1. adoption/templates/codex.config.template.toml therefore names its model and default_subagent_model through the CODEX_MODEL placeholder, which tools/adoption/render_config.py fills from the selected platform's Codex pin as it fills SOCRATICODE_VERSION (gpt-6.1-sol from 0.159.1, gpt-6-astra before it), so a macOS render keeps gpt-6-astra until macOS has its own 0.159.x qualification (data.checks_after_the_constant_move.template_model_per_platform, run with Linux builds only).",
+        "Linux x86_64 only, one host; nothing here is macOS evidence."
+      ],
+      "path": "evidence/receipts/codex-01592-qualification-20260930.json"
+    },
+    {
       "id": "token-lifecycle-resolution-20260930",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -4007,8 +4032,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "41d3ce13ea5b87697c605a426fe7d8e43afa1e319b8bba937cffc0dff5b1772b",
-      "bytes": 47232
+      "sha256": "82c91ef7ca466efbd62e6d772f0a4bf17e9d32d9d18197720bb723a0a62d648c",
+      "bytes": 47991
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4102,8 +4127,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "26d31caff5267fa5b09adad132a0e38f9171ec1e814d3f65f9ff3be9af0317fc",
-      "bytes": 17045
+      "sha256": "6ac2477a7257bffef2250aef3c54814efdc5a48fcbaf45f3e0a5f0f6fabc6103",
+      "bytes": 18253
     },
     {
       "path": "adoption/manifest.json",
@@ -4142,8 +4167,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "a3e3598e60a5b25cd6aee369ad41061991e2949947b7ae0ab2344a789d9fd769",
-      "bytes": 30545
+      "sha256": "dbc57349d7d8d12c8ef4d1940dbd6cb95b89baa79de7b8885fade1f86ccbd6f9",
+      "bytes": 32430
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4152,13 +4177,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "fc3fbca8192cb407eca61dd361287250fc5b0acac54a5ea22c3f043c7a9fbb66",
-      "bytes": 23624
+      "sha256": "d2a29cb93d2dd0c43ecbd3290e619b20d0b53e9883d06bc1fa2285da65d70718",
+      "bytes": 23798
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "b1527acccffb8602192ce51d8a3e48071e34b8ba6d950bc263e21303a2ac310b",
-      "bytes": 62249
+      "sha256": "f7d4117ff2b5baf287f8663a6fd3d4e283e612c9973daddbc7c6fe69a322282a",
+      "bytes": 62765
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4217,8 +4242,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "0716d4f6996f40d762fa0c98f23ef91cd39ca7422eddedaa0b344d999c53e4da",
-      "bytes": 12875
+      "sha256": "178a0e8108f21badac10da5d89e8d7d89abb0b942a08b693f5a7a438df34f7cc",
+      "bytes": 13388
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -4227,7 +4252,7 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
+      "sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
       "bytes": 4458
     },
     {
@@ -4244,6 +4269,16 @@
       "path": "adoption/templates/systemd/omniroute.service",
       "sha256": "b05477c72372578088d2f51eb6bb47664aadbe3aab938769c2cd07924b2b5951",
       "bytes": 7345
+    },
+    {
+      "path": "adoption/templates/systemd/stack-currency.service",
+      "sha256": "05b97c3596e3e13f0247db8907308f700a160824acc2d146043cf33cd6363499",
+      "bytes": 3305
+    },
+    {
+      "path": "adoption/templates/systemd/stack-currency.timer",
+      "sha256": "ce1800a5a724a196c8327c74e5a2ebd299e93cabfcbd4fb7dc2b67babac053e6",
+      "bytes": 1084
     },
     {
       "path": "adoption/tools/README.md",
@@ -9378,8 +9413,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "c36a161c3ee8a0db2773179b38df6754dd38de67f68b80fb043c4625dda44c6e",
-      "bytes": 482575
+      "sha256": "2ad534497a379f5629bb950bcd21a0219cad321dc7be05b4275a8d52b7ac3a98",
+      "bytes": 482774
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14328,7 +14363,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "743317e890be424484789e8a87826b19d7cd2d64bbb19ca9f599cb24d48ccbb5",
+      "sha256": "a2aeb15f17ed443af6d849b2a3dc3517182a15cb9685c54ce5428be69fa4cc63",
       "bytes": 287241
     },
     {
@@ -14338,8 +14373,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "e3554080f411d25a47bed14ed0a2f8c8dd15324073b78239dc85782425b6d203",
-      "bytes": 249517
+      "sha256": "136b657574777d392b2d41db2f0e2d887c1f8fd7b061806a29420075a3e97b6a",
+      "bytes": 249736
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -14938,8 +14973,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "671bffe39ea1fb59c39753becfa5e0f827c2ec593760ec5fa990fbf02ae3f2f5",
-      "bytes": 41040
+      "sha256": "7c694043a87655189f7055f2830f729a683778cac03562db9369b25a3dbff4f0",
+      "bytes": 56300
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -15010,6 +15045,16 @@
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
       "sha256": "b2d99153c8dffb6169923e9129cfb6e4343cd9f5fc443ad8839fa5f162e20c1e",
       "bytes": 37375
+    },
+    {
+      "path": "docs/decisions/2026-09-30-session-currency-notice.md",
+      "sha256": "32926b9035ba060a3f45df7711faa591d83fc3fced0a9e327f9bdb06ff9cbb2f",
+      "bytes": 22152
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "f309c112da73eb0a2708f0b1ae48c9c4d7dfdc7694b27591942151c373565902",
+      "bytes": 9161
     },
     {
       "path": "docs/decisions/2026-09-30-token-lifecycle-resolution.md",
@@ -15153,8 +15198,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "8231feaa71469eeaa66393384be429c9952ceb18d60e37df85e3375fbeb1bc5f",
-      "bytes": 89064
+      "sha256": "226482de602fc21c204c5db396e3d8375cbe89c29825dd90c7dcba621471c40a",
+      "bytes": 89859
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15273,7 +15318,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "861f3db2d2083f21fbdfc4be2c7655126966f99851acbb6147b2da181d6e7d46",
+      "sha256": "181edb35fc27dea1f7e8ed8e51a80f18f304caa2913e8e1136d850be75c5b514",
       "bytes": 18181
     },
     {
@@ -15388,8 +15433,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "4f4f99a7f3468e198ef9124e0e849f814438bd7e8dc2041dc2854aa692665802",
-      "bytes": 37367
+      "sha256": "d587f68f48036dbe80ee6980382d19e80711c71c9a26aa62aca5059a25a76a33",
+      "bytes": 37773
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -35887,6 +35932,166 @@
       "bytes": 5992
     },
     {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/README.md",
+      "sha256": "1ca128a5276b0f486ba658fe0d4debc386b1239c88fe6ff83f75ab1144606557",
+      "bytes": 2977
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/closure-diff-vs-main.txt",
+      "sha256": "3d840e980fd223eec41edb738825fbdc4aa6e9ec4dd8ad8b965f9843f18b3592",
+      "bytes": 6771
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/closure-diff-vs-reviewed-383ccc.txt",
+      "sha256": "0677260c89b44661d1dec310c0648d231e190f322787cb5bff78f6cafd344d81",
+      "bytes": 1237
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/commands-as-typed.txt",
+      "sha256": "c46bc49e0a5b4e1bc180b3f13fa7e13a3b357ef9c4d2aa615f0f905b7f943df8",
+      "bytes": 491
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/excluded-compile-input-captures.txt",
+      "sha256": "1fa05ea0b652d8c020e3957c9fa73273f3b00faaf90218613f50234a01e61f21",
+      "bytes": 3233
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/external-hashes.txt",
+      "sha256": "98247bd3eaa198578ebcee9db96dd6e70325b6ee4becc6794d4c426a78924bb7",
+      "bytes": 1607
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/independent-scan.txt",
+      "sha256": "73365ee24248054b637ae3ecaf6a02d94444cb8efd1c1eabe9588859ae6d44bc",
+      "bytes": 2488
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/install-log.txt",
+      "sha256": "1a6a617b2c9850a1c87f509010a7b5e70457f4271ac34216746178b892fbc40a",
+      "bytes": 1644
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-cand-lock-empty-config.json",
+      "sha256": "cf00ca0dd001fd320c5feb331a360b75d62c2126d3a25919a5d14c475e802b67",
+      "bytes": 5561
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-cand-lock-with-ci-config.json",
+      "sha256": "ca69bfd57904b04f30d0ddd30ffeb9ddcba914c0589e90a0cc313e397db70251",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-exit-codes-and-findings.txt",
+      "sha256": "adcc31ea520ed011b01dfb5dc9e93b8d490192f12bca16c47b20876ee2379c28",
+      "bytes": 1099
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-reviewed383-lock-empty-config.json",
+      "sha256": "f80185e0706e2632de854fae08476b0a7f05611ba5fe2f3b5b7775b205219932",
+      "bytes": 18249
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-split-controls.txt",
+      "sha256": "0ed0b88176d06601aad1a23e6357e5aaf4346ed77e0c1a9d8b1084aea730fcd0",
+      "bytes": 2704
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/osv-two-new-locks.txt",
+      "sha256": "bccc346ea3a263fb8aa705c40bf1c49354880668f058d5cd01f67eba5259d989",
+      "bytes": 559
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/pin-sources.txt",
+      "sha256": "161a5c2ccc4b263df4fa4ff70933143388be9c93d3e8a782ee44df4f86df92c5",
+      "bytes": 1114
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/pr535-identity.txt",
+      "sha256": "32c1b35b4cd73f3b3f6db3dd0d946eed1fa19b2632fea51be57c84185d16ca32",
+      "bytes": 4984
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/prediction.txt",
+      "sha256": "09f4e5376bd806ffe1cd8efb24438de6a53de8ad5ddf2b09a0dd0a63a733983a",
+      "bytes": 327
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/pyjwt-surface.txt",
+      "sha256": "57253ce7a5321350de37bb7cdd14c8946665a1fe011ebc2abd7bdcb7414c21df",
+      "bytes": 5819
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/receipt-bindings.txt",
+      "sha256": "5b44fa55441ec8834fd86222105e339e9b659d5a4fd9d0960700e8bf39191683",
+      "bytes": 4839
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/checks/repo-checks-at-head.txt",
+      "sha256": "a1b60e869c8f77c73bb3c703145d6abc551d5bdadfc846a6c35581e1890e37ff",
+      "bytes": 803
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json",
+      "sha256": "b0742663250afe8eff4692ad7be26b1b894d9977c80154ee3fa71e878efbe880",
+      "bytes": 12992
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/constraint_sources.py.txt",
+      "sha256": "74887ba29d2452bd47bd377605c505168a3ca7e6e6a0f96c36e1d61292316a2f",
+      "bytes": 1214
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/external_hashes.py.txt",
+      "sha256": "d8362e38b111496fa6437be23d358b6596c3e437426eb5e5bd962573a685d128",
+      "bytes": 3209
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/install_candidate.sh.txt",
+      "sha256": "f907fdffaaa2609aca03e4422474d1275d02ac0694d541856ee3b97e67a37239",
+      "bytes": 2153
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/lock_closure_diff.py.txt",
+      "sha256": "07e92cfcbdff66f060f53a263d177d2639140382753237e9e7dde05f26795c33",
+      "bytes": 1411
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/oauthlib_independent_scan.py.txt",
+      "sha256": "d79da4cf7a3072a2847862178ad909347aa49ef2c2e02a280c58f11b8a952dac",
+      "bytes": 3943
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/osv_split_controls.py.txt",
+      "sha256": "3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18",
+      "bytes": 8296
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/osv_summary.py.txt",
+      "sha256": "3ce73d324c6e7c4dd190a96e1a7ed5a75ca5c760c9aaaa5dd4bd610bf5aad744",
+      "bytes": 709
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/predict_candidate.py.txt",
+      "sha256": "481978c5148db817f0be03bd0706670f1a29b0c6bd5452a411127347518c49c5",
+      "bytes": 1527
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/pyjwt_surface.sh.txt",
+      "sha256": "77808a4f8af8a0fa11cb9be85c6fd291574fae0a61cfb167021fe49ae4f1ac32",
+      "bytes": 3972
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/receipt_bindings.py.txt",
+      "sha256": "54449ad4e7c0ca06c17ea0842ce2ed3e8e309b2796fb9b2dd450384038cdf4c2",
+      "bytes": 6471
+    },
+    {
+      "path": "evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/scripts/run_delta_outputs.sh.txt",
+      "sha256": "208ab9b6b9273cdb21c180845bc5cdcd259dff9e22b8080308b0c00eaa16c144",
+      "bytes": 12542
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -42253,8 +42458,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/codex-native-hook-trust.json",
-      "sha256": "5888c1e16e5ba9de12fef726af20a7790cf277cb547e84305d15a9aea0794f11",
-      "bytes": 4084
+      "sha256": "698b2a099e6428136c40c44e43f9c05530be39828c32de9b8c7762585f7a0755",
+      "bytes": 4157
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
@@ -42273,8 +42478,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/local-validation.json",
-      "sha256": "d65d3ed0e25f1810f97afecbfc28ebfa2baa14c15aea618b42ef2560da975e09",
-      "bytes": 1850
+      "sha256": "d5156bd266d9113bc41d768a6741d7e4da60a0fd365c04769257aa7887b247b3",
+      "bytes": 3502
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/memory-selection.json",
@@ -44047,6 +44252,11 @@
       "bytes": 21813
     },
     {
+      "path": "evidence/receipts/codex-01592-qualification-20260930.json",
+      "sha256": "fa75848f482708ee6aa64398ffe56cbfe6fdddab3120ccdf73b249e261a268ef",
+      "bytes": 41981
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -44573,8 +44783,8 @@
     },
     {
       "path": "evidence/receipts/token-profile-completion-20260930.json",
-      "sha256": "326012bb0829a64753e70853743f8fa51665ccfc77da64b3aa916be9200f2de3",
-      "bytes": 6198
+      "sha256": "8620d2ef1f7b28402f64ffed0679b65a744543c57da0a1b9ae97a5e32e82099c",
+      "bytes": 6347
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
@@ -44723,12 +44933,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "8ffcf5045f19dbd48566f66b818964cc564c6f68a9ed13481c0e6b3470ad528a",
-      "bytes": 107673
+      "sha256": "b25e7d3f2639a54a8a6114c2ca316e8a4121fd85e583793481321765b35f425e",
+      "bytes": 107700
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "d79b44eb8afe4f536dcf23c1bec0814d8abc1c51e27a84c6c7524b37eb2f5e76",
+      "sha256": "575ea29e9173bbfc05d1c44f0c7397d84b9eae0cc08c2e5218fb3cb222ce92b4",
       "bytes": 1217
     },
     {
@@ -44768,8 +44978,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "b5ba8b1601bdad0998d672f90e60ee59fd2ba3bdc82716874532efce320e0dce",
-      "bytes": 114280
+      "sha256": "4f45b0f613d9d73fbd75792ed6a9b2cfad50ab98d3e3dcd54cd6b53791e32674",
+      "bytes": 117347
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -44963,8 +45173,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "a3cda6b33d88d0e3e9a1ab1cf3e5713ce931dd44eb41e69aa60f8413df23b714",
-      "bytes": 99683
+      "sha256": "d32d8d104704602239bcf54fb48682cb8043fa6a83ad413482cf0274555a691f",
+      "bytes": 100870
     },
     {
       "path": "observability/README.md",
@@ -45243,8 +45453,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "eecaff94594d8e63433e5598810c7c4c7e25ee0909a1f553d1027433d0d9a66a",
-      "bytes": 121973
+      "sha256": "5b3ef1e91e7455f34c01509cfc2f3b064a4cc5eef22976b64c76718482c5764a",
+      "bytes": 124858
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -45315,6 +45525,11 @@
       "path": "scripts/credential_status.py",
       "sha256": "636ee1a7b79941f02ea49ed5f62a7ae7860f3f2572b42d45c7cdcc7a986207e8",
       "bytes": 33813
+    },
+    {
+      "path": "scripts/currency_due.py",
+      "sha256": "4c0b579e2899ff3bd71998cc4b6833e8d50c1b9dacfbd526e681430a2476f438",
+      "bytes": 31688
     },
     {
       "path": "scripts/env_freshness.py",
@@ -45673,8 +45888,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "3e2183308263227f71ed4513ab3d5c194a3b2e30fa459dc85045726580e65341",
-      "bytes": 228076
+      "sha256": "1ee0d6f15418f69d2055d6c71679fabb50bcd2b972377ebcc84865b64713791c",
+      "bytes": 228127
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -45698,8 +45913,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "adbcc445252da784791733fdc14647b8b5478aeeb69726291515e0251ee384c5",
-      "bytes": 134643
+      "sha256": "35edb8b0fa812e4633b5024c6cb0237784953d3fb2ad1935507eb464d6e7b69a",
+      "bytes": 137090
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -45833,8 +46048,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "d0def42e8b4df1e9bd613847864dcb00382dff56d8aa812abc2d94634c881028",
-      "bytes": 151321
+      "sha256": "3ea82d2d098bc9cc1cc6b331a80afd7b09cf9e44e5175cfe886bcd878f161743",
+      "bytes": 153145
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -45875,6 +46090,11 @@
       "path": "tests/test_credential_tools.py",
       "sha256": "93aee1682d47a0ac54d1d39ef4d566ac141bbc12434ab9983d99b942156ccc99",
       "bytes": 34946
+    },
+    {
+      "path": "tests/test_currency_due.py",
+      "sha256": "71ef2107b9c5ad188f5d7713be0f23d75865716c4c2b56605ac2101bc61d0bf0",
+      "bytes": 61016
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -46273,8 +46493,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
-      "bytes": 35227
+      "sha256": "4bf7510e9b1a65ababcfb24380b68d6ce652929ba3173e1c34afb76e3b0a5ae0",
+      "bytes": 43257
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -46498,8 +46718,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
-      "bytes": 76436
+      "sha256": "2509b78bbeb2be923d71022245ad3f5824d2324caf7fa8ed527ef8532614a099",
+      "bytes": 76760
     },
     {
       "path": "tools/adoption/codex_roles.py",
@@ -46523,13 +46743,13 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
+      "sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
       "bytes": 35137
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "430e544cf245d500a78c2b748422e95c177db68316c08a7e85db3baa49d84c09",
-      "bytes": 15821
+      "sha256": "0a2e7e0fff08963a0c9f43a0dfe60a86e348de9f04ed8f29dfda8effcc1ced27",
+      "bytes": 19670
     },
     {
       "path": "tools/adoption/render_launchd.py",
