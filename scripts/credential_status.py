@@ -64,10 +64,12 @@ PROC_KEYS_LINE = re.compile(
     r"[0-9a-f]+ (?P<flags>\S{7}) +\d+ +(?P<expiry>\S+) +[0-9a-f]+ +(?P<uid>\d+) +\d+ (?P<type>.{9}) (?P<describe>.*)")
 USER_DESCRIBE = re.compile(r"(?P<description>.*): \d+")  # greedy: only the final ": <payload length>" is removed
 KEYRING_PREFIX = "native-agent-stack:"  # scripts/kernel_keyring.py PREFIX
+# test_only and test_canary label only the canary proof's synthetic key (tools/credentials/canary_proof.py writes and
+# removes it per consumer attempt): a missing file is informational like every missing row, and the pair goes together.
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
-            "interactive_only", "ci_only"}
+            "interactive_only", "ci_only", "test_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
-           "local_service_secret", "native_signin", "ci_secret"}
+           "local_service_secret", "native_signin", "ci_secret", "test_canary"}
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
                      "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
@@ -131,6 +133,8 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             errors.append(f"{label}: unknown status")
         if entry["class"] not in CLASSES:
             errors.append(f"{label}: unknown class")
+        if (entry["status"] == "test_only") != (entry["class"] == "test_canary"):
+            errors.append(f"{label}: status test_only and class test_canary go together (a synthetic canary only)")
         store = entry["store"]
         if not isinstance(store, dict) or store.get("kind") not in LOCAL_KINDS | NONLOCAL_KINDS | MEMORY_KINDS:
             errors.append(f"{label}: unknown store kind")
