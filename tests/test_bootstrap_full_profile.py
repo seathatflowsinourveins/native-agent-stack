@@ -20,9 +20,9 @@
   that reports the pinned version), in a temporary HOME: apply_codex_lane.py's own preconditions report config.toml,
   HOST_PATH and features.daemon_auto_start ok for (a) a fresh HOME with no ~/.codex, which gets the render without the
   source host's [projects] and [hooks.state] trust state (0600 in a 0700 home), (b) a home holding the whole render,
-  left byte for byte, and (c) a config.toml without the feature, set through `codex features disable` after a backup.
-  The dry run still refuses there (no pinned context-mode or node under the example host's ecosystem root), so
-  nothing is applied.
+  left byte for byte, and (c) a config.toml without the feature, set through `codex features disable` after a backup;
+  a running codex stops (c) with nothing written. The dry run still refuses there (no pinned context-mode or node
+  under the example host's ecosystem root), so nothing is applied.
 - codex_home.py's cut of the trust state, on the real rendered template: exactly those tables go, every other value
   stays, and an ecosystem root that is not the render's, or a daemon_auto_start that is not the boolean false, is
   refused with nothing written.
@@ -442,9 +442,11 @@ class StepFunctionTests(unittest.TestCase):
 @unittest.skipUnless(BASH and JQ and PGREP, "needs bash, jq and pgrep")
 class CodexLaneOnARealHomeTests(unittest.TestCase):
     """full_profile_codex_lane, extracted verbatim, with the real render_config.py (--host example), codex_home.py and
-    apply_codex_lane.py dry run in a temporary HOME. Only codex is a stub: it answers --version with the lane's pin,
-    applies `features disable daemon_auto_start` to $CODEX_HOME/config.toml the way Codex 0.157.1 does for a file
-    without a [features] table, and fails any other command, so no rehearsal could run."""
+    apply_codex_lane.py dry run in a temporary HOME. Only codex and pgrep are stubs, in the bin directory the step puts
+    first on PATH: codex answers --version with the lane's pin, applies `features disable daemon_auto_start` to
+    $CODEX_HOME/config.toml the way Codex 0.157.1 does for a file without a [features] table, and fails any other
+    command, so no rehearsal could run; pgrep reports a running codex only when a test asks, so the host's own Codex
+    sessions do not decide the result."""
 
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -470,6 +472,12 @@ class CodexLaneOnARealHomeTests(unittest.TestCase):
                          "  *) exit 64 ;;\n"
                          "esac\n")
         codex.chmod(0o755)
+        self.running = self.base / "codex-is-running"
+        pgrep = self.bin / "pgrep"
+        pgrep.write_text("#!/bin/sh\n"
+                         f'if [ "$*" = "-x codex" ] && [ -e {shlex.quote(str(self.running))} ]; then echo 4242; exit 0; fi\n'
+                         "exit 1\n")
+        pgrep.chmod(0o755)
 
     def run_step(self, text: str = TEXT) -> subprocess.CompletedProcess:
         body = (f"repo_root={shlex.quote(str(ROOT))}\necosystem_root={shlex.quote(EXAMPLE['ECO_ROOT'])}\n"
@@ -540,6 +548,20 @@ class CodexLaneOnARealHomeTests(unittest.TestCase):
         # This host's own trust grant is its operator's: it stays.
         self.assertEqual(tomllib.loads(self.config.read_text(encoding="utf-8"))["projects"],
                          {"/opt/p": {"trust_level": "trusted"}})
+
+    def test_a_running_codex_stops_the_feature_write_and_the_lane(self):
+        # apply_codex_lane.py --apply refuses while codex runs; the feature write before it does too.
+        self.codex_home.mkdir(mode=0o700)
+        original = '# ours\nmodel = "x"\n'
+        self.config.write_text(original, encoding="utf-8")
+        self.running.touch()
+        result = self.run_step()
+        self.assertIn("rc=3", result.stdout, result.stderr)
+        self.assertIn("1 codex process(es) running (pids 4242)", result.stderr)
+        self.assertEqual(self.config.read_text(encoding="utf-8"), original)
+        self.assertEqual([path.name for path in self.codex_home.iterdir()], ["config.toml"])  # no backup either
+        self.assertNotIn("features disable", self.codex_log.read_text())
+        self.assertNotIn("Codex worker lane for", result.stdout)  # the lane's dry run never started
 
 
 class CodexHomeCutTests(unittest.TestCase):

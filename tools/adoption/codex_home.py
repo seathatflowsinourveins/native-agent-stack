@@ -19,8 +19,10 @@ and passes the lane the host value file's HOST_PATH itself. Two cases:
                    itself (<name>.bak.<UTC stamp>, never over an earlier backup) and set through Codex's own config
                    writer, `codex features disable daemon_auto_start` (codex-rs/cli/src/main.rs
                    disable_feature_in_config, ConfigEditsBuilder, at rust-v0.157.1; recipes/README.md, codex row),
-                   then read back: that key false and every other key as it was. A symlink or a non-regular file is
-                   refused rather than written through.
+                   then read back: that key false and every other key as it was. Like apply_codex_lane.py --apply, it
+                   refuses while a process named codex runs (--codex-process-name), since a running Codex writes the
+                   same file. A symlink or a non-regular file is refused rather than written through. The backup is
+                   the only undo: apply_codex_lane.py --rollback does not cover this key.
 
 The Codex home is --codex-home, else $CODEX_HOME, else ~/.codex, as apply_codex_lane.py resolves it. --dry-run
 reports what a real run would do and writes nothing.
@@ -176,7 +178,7 @@ def read_config(config: Path) -> dict:
         raise Refused(f"{config} is not valid UTF-8 TOML ({error}); fix it first") from None
 
 
-def disable_daemon(codex_home: Path, config: Path, codex: str | None, dry_run: bool) -> int:
+def disable_daemon(codex_home: Path, config: Path, codex: str | None, dry_run: bool, process_name: str) -> int:
     before = read_config(config)
     if daemon_disabled(before):
         print(f"{config}: kept; features.daemon_auto_start is already false")
@@ -184,9 +186,14 @@ def disable_daemon(codex_home: Path, config: Path, codex: str | None, dry_run: b
     if config.is_symlink() or not config.is_file():
         raise Refused(f"{config} is a symlink or not a regular file, so it is not written through; set "
                       "features.daemon_auto_start = false there yourself (codex features disable daemon_auto_start)")
+    running = lane.codex_processes(process_name)
     if dry_run:
-        print(f"{config}: kept; DRY RUN, would back it up and run `codex features disable daemon_auto_start`")
+        print(f"{config}: kept; DRY RUN, would back it up and run `codex features disable daemon_auto_start`"
+              + (f" once no {process_name} process runs ({len(running)} now)" if running else ""))
         return 0
+    if running:
+        raise Refused(f"{len(running)} {process_name} process(es) running (pids {', '.join(running)}); a running "
+                      "Codex writes the same config.toml, so stop them, then run again")
     if not codex:
         raise Refused("no codex executable to set features.daemon_auto_start with (pass --codex)")
     backup = file_io.write_backup(config)
@@ -214,6 +221,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--codex", default=None, help="the codex executable (default: codex on PATH)")
     parser.add_argument("--codex-home", type=Path, help="default: $CODEX_HOME, else ~/.codex")
     parser.add_argument("--dry-run", action="store_true", help="report what a real run would do; write nothing")
+    parser.add_argument("--codex-process-name", default="codex",
+                        help="the executable name whose running processes stop a config.toml write (default: codex, "
+                             "as apply_codex_lane.py)")
     return parser
 
 
@@ -225,7 +235,8 @@ def main(argv: list[str] | None = None) -> int:
         if not os.path.lexists(config):
             return install_fresh(codex_home, config, args.rendered.read_text(encoding="utf-8"), args.eco_root,
                                  args.dry_run)
-        return disable_daemon(codex_home, config, args.codex or shutil.which("codex"), args.dry_run)
+        return disable_daemon(codex_home, config, args.codex or shutil.which("codex"), args.dry_run,
+                              args.codex_process_name)
     except (Refused, file_io.ApplyError) as error:
         print(f"refused: {error}", file=sys.stderr)
         return EXIT_REFUSED

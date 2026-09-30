@@ -221,8 +221,9 @@ GitHub-hosted macOS runner; see
    running `~/.local/bin/claude` directly.
 
    **The whole user profile in one run** (Linux/WSL2; `--configure-full-profile`,
-   `tools/adoption/managed_block.py` and `scripts/adoption_status.py --launcher-resolution`
-   added after `v2026.09.26.2`, so a checkout at that tag runs steps 4 and 4a by hand).
+   `tools/adoption/managed_block.py`, `tools/adoption/codex_home.py` and
+   `scripts/adoption_status.py --launcher-resolution` added after `v2026.09.26.2`, so a
+   checkout at that tag runs steps 4 and 4a by hand).
    After native sign-in (step 3), `adoption/bootstrap-linux.sh --profile <id>
    --configure-full-profile --host <name>` replaces the hand steps with the
    repository's own tools, in this order, each skippable with `--skip <step>`
@@ -234,7 +235,7 @@ GitHub-hosted macOS runner; see
    | `claude-settings` | `tools/adoption/render_config.py --host <name> --out` into the run's staging directory, then `tools/adoption/apply_claude_settings.py` with the rendered `settings.json`, then with `adoption/templates/claude.settings.linux-wsl2.overlay.json` when `WSL_DISTRO_NAME` is set (step 4a; [WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)) |
    | `claude-md` | `tools/adoption/managed_block.py claude-md`: `examples/claude-native/CLAUDE.md` as a managed block in `~/.claude/CLAUDE.md` |
    | `skills` | the skills CLI pinned in `adoption/skills/manifest.json` (its npm tarball and sha256, through the script's own checksum-verified npm install) when missing, then `tools/adoption/install_skills.py` ([skills manifest](update.md#apply-the-skills-manifest)) |
-   | `codex-lane` | `tools/adoption/codex_home.py`, which meets the lane's preconditions: a Codex home without `config.toml` gets the rendered `codex.config.toml` (the template's own model, approval and sandbox policy, servers and `features.daemon_auto_start = false`) without the source host's `[projects.*]` trust grants and `[hooks.state.*]` hook approvals, created only when absent, `0600`; an existing `config.toml` is never replaced, and gets `features.daemon_auto_start = false` through `codex features disable daemon_auto_start` (a backup beside it first) when it lacks it. Then `tools/adoption/apply_codex_lane.py` with `--codex $ECO_INSTALL_ROOT/bin/codex` and the host file's `HOST_PATH` as `--host-path`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed |
+   | `codex-lane` | `tools/adoption/codex_home.py`, which meets the lane's preconditions: a Codex home without `config.toml` gets the rendered `codex.config.toml` (the template's own model, approval and sandbox policy, servers and `features.daemon_auto_start = false`) without the source host's `[projects.*]` trust grants and `[hooks.state.*]` hook approvals, created only when absent, `0600`; an existing `config.toml` is never replaced, and gets `features.daemon_auto_start = false` through `codex features disable daemon_auto_start` when it lacks it, only while no `codex` process runs (as `--apply` requires) and after a backup beside it, the only undo for that key. Then `tools/adoption/apply_codex_lane.py` with `--codex $ECO_INSTALL_ROOT/bin/codex` and the host file's `HOST_PATH` as `--host-path`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed |
    | `path-block` | `tools/adoption/managed_block.py profile-path`: a managed block in `~/.profile` that puts `$ECO_INSTALL_ROOT/bin` first on `PATH` |
    | `login-shell` | `scripts/adoption_status.py --login-shell --launcher-resolution` under Python 3.13 (step 6's form); the step fails unless `claude` in a login shell is the ecosystem launcher |
 

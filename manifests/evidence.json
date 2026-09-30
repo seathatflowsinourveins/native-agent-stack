@@ -3959,8 +3959,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "94e3daf91408b4ed71c969f91e553d7887055a590aa5bf242262360c503aeffc",
-      "bytes": 41075
+      "sha256": "48948e05387c020d4765da068e358f4d3e2d753efce97852c81feded64d1aaca",
+      "bytes": 54125
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "82c91ef7ca466efbd62e6d772f0a4bf17e9d32d9d18197720bb723a0a62d648c",
-      "bytes": 47991
+      "sha256": "aa3933d31606c78f0dada00b2c4dc46ebbaf40ea4e7f21eef52587525bf77285",
+      "bytes": 58940
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4069,8 +4069,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
-      "bytes": 19316
+      "sha256": "107de7d06fa4927ebc461cef699832ee32582528803042475563cf6f5351c30c",
+      "bytes": 19367
     },
     {
       "path": "adoption/paired/README.md",
@@ -4234,8 +4234,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "555afb2bff6a5661d5d8fb09f6f863836f4e04fd8621fd0a3d35b7a5794f1df8",
-      "bytes": 20960
+      "sha256": "0216bd9ebaf9e2c852cd02fdbf5b84b3953ab0d166ef8cf2548957ee03ab1c40",
+      "bytes": 23847
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -14675,8 +14675,8 @@
     },
     {
       "path": "docs/activation.md",
-      "sha256": "4f60e56f8b949800ff56523cf329118c672d58a2c9aef3f2bca5b0850b119851",
-      "bytes": 5180
+      "sha256": "a914c4bc4939364f928f50ffb45b8e27d5054594f64c74352dae85a51ce1635a",
+      "bytes": 5651
     },
     {
       "path": "docs/automation-upgrade-evidence.json",
@@ -44760,8 +44760,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "4cd653e094020644e9afb577c1c74b6a6d162ba4b47b6d9fceb7fee6b9f4a988",
-      "bytes": 80117
+      "sha256": "f7362a9e46a6750dd8d4f243ecf27d284d1911af0ea86e50fe711626d48cc01c",
+      "bytes": 88580
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -45170,8 +45170,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "35edb8b0fa812e4633b5024c6cb0237784953d3fb2ad1935507eb464d6e7b69a",
-      "bytes": 137090
+      "sha256": "bb7900085b833be89f68ddc92dbf17ba580688514c09956b486c973343e09f33",
+      "bytes": 145441
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -45935,8 +45935,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "9ad3bc3bb6ad5c9edf8db5fe350e822bdea815720a4a8edc9a28d8e4422ccf0c",
-      "bytes": 10492
+      "sha256": "10f6aaa08fb86cd17d07e764394e50e3ee1d92aadae79f0e173548a8b83d6111",
+      "bytes": 10624
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
