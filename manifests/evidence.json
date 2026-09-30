@@ -4064,8 +4064,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "26d31caff5267fa5b09adad132a0e38f9171ec1e814d3f65f9ff3be9af0317fc",
-      "bytes": 17045
+      "sha256": "6ac2477a7257bffef2250aef3c54814efdc5a48fcbaf45f3e0a5f0f6fabc6103",
+      "bytes": 18253
     },
     {
       "path": "adoption/manifest.json",
@@ -15335,8 +15335,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "4f4f99a7f3468e198ef9124e0e849f814438bd7e8dc2041dc2854aa692665802",
-      "bytes": 37367
+      "sha256": "d587f68f48036dbe80ee6980382d19e80711c71c9a26aa62aca5059a25a76a33",
+      "bytes": 37773
     },
     {
       "path": "docs/token-session-handbook.md",
