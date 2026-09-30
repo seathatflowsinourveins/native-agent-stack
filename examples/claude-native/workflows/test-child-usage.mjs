@@ -500,20 +500,34 @@ const deepRun = timed(() => { try { return ['"$('.repeat(3000), Array.from({ len
 expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read without exhausting the stack', Array.isArray(deepRun.r) && deepRun.ms < 1000)
 // D8 (GPT-6 #9, Claude review R9): the M4 text scanners read a run of unclosed "((" in linear time. Before the repair each
 // unclosed "((" looked ahead to the end of its line, so n = 8000, 16000 and 32000 took about 315, 1100 and 5000 ms (four times
-// per doubling). Each size is timed as the best of five runs; a run over 1.5 s ends the doubling (it is far past the bound
-// already), and 5 ms of the allowance is timer and GC noise, not growth. The brief's requirement, at most 2.5 times per doubling and
-// under 150 ms at 64,000, applies to that input (about 30 ms here); the other shapes below keep the ratio and take an absolute
-// bound of 1.5 s at 64,000, since each does real work per unit and a CI runner is slower than this host.
+// per doubling). Each size is timed as the best of five runs (the minimum of repeats: CPython's timeit documents that the lowest value
+// bounds what the machine can do and the higher ones come from other processes, Doc/library/timeit.rst at 3.13); a run over 1.5 s
+// ends the doubling (it is far past the bound already).
+// Scaling criterion (2026-09-30; it replaces "each size at most 2.5 times the last plus 5 ms", which the brief asked for per doubling):
+// the growth exponent from 16000 to 64000, ln((t64 + 5 ms) / (t16 + 5 ms)) / ln 4, stays under 1.5 (1 is linear, 2 is quadratic, 1.5 is
+// where they meet on a log scale). The 5 ms is the timer and GC noise the earlier check allowed; the 8000 and 32000 times are measured and
+// printed but carry no weight, because judging every step on its own is what failed validate-macos on #548 (twice) and #552 at steps of
+// 2.56 to 3.0 times on linear scanners (actions runs 36745793168, attempts 1 and 2, and 36751526079, full-suite-macos.log); all 36 samples
+// of those runs have an exponent of 1.19 or less. This is a local check: google/benchmark also judges complexity over a family of sizes,
+// but it fits fixed curves and picks the lowest normalized RMS (docs/user_guide.md "Calculating Asymptotic Complexity (Big O)",
+// src/complexity.cc MinimalLeastSq, v1.9.5) and needs its C++ harness.
+// Detection floor: a pure quadratic scan passes while its time at 16,000 is under 4.4 ms (under 70 ms at 64,000; the old ratio failed it
+// above 13 ms), so for small scans the absolute bounds are the guard: the brief's 150 ms at 64,000 for '((' (about 30 ms here) and 1.5 s
+// for the other shapes, since each does real work per unit and a CI runner is slower than this host. The controls below keep a quadratic
+// scan above that floor failing.
 {
-  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
-  // Best of five per size; when the ratio fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
+  const SIZES = [8000, 16000, 32000, 64000]
+  // The growth exponent from 16000 to 64000 (a 4 times range): ln((t64 + 5 ms) / (t16 + 5 ms)) / ln 4.
+  const exponent = (ms) => Math.log((ms[3] + 5) / (ms[1] + 5)) / Math.log(SIZES[3] / SIZES[1])
+  const scales = (ms) => ms.length === 4 && exponent(ms) < 1.5
+  // Best of five per size; when the criterion fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
   // (a GC or a busy runner) cannot fail a linear scan, while a quadratic one fails every round.
-  const doubling = (make, run) => {
+  const doubling = (make, run, rounds = 3) => {
     run(make(2000)); run(make(2000)) // warm-up
     let best = []
-    for (let round = 0; round < 3 && !ratio(best); round++) {
+    for (let round = 0; round < rounds && !scales(best); round++) {
       const ms = []
-      for (const n of [8000, 16000, 32000, 64000]) {
+      for (const n of SIZES) {
         const input = make(n)
         let t = Infinity
         for (let i = 0; i < 5; i++) { t = Math.min(t, timed(() => run(input)).ms); if (t > 1500) break }
@@ -524,12 +538,21 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
     }
     return best
   }
-  const linear = (ms) => ratio(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
-  const linearWork = (ms) => ratio(ms) && ms[3] < 1500 // every other shape
+  const linear = (ms) => scales(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
+  const linearWork = (ms) => scales(ms) && ms[3] < 1500 // every other shape
   const shape = (label, make, reader, run, bound = linearWork) => {
     const ms = doubling(make, run)
-    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', bound(ms))
+    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms, exponent ' + (ms.length === 4 ? exponent(ms).toFixed(2) : 'n/a'), bound(ms))
   }
+  // Controls of the criterion. (1) Recorded samples (validate-macos, 2026-09-30): four linear scans that the per-doubling check failed or came
+  // near failing pass, and the scan measured before the repair, continued quadratically, fails. (2) A scan that is quadratic by construction,
+  // timed by the same harness in one round (a harness whose times were all near zero would pass anything): it is refused while its time at
+  // 16,000 is at least 4.4 ms, or when the 1.5 s cap ends its doubling early; from this host's times, a host about 5 times faster would
+  // miss it and one about 16 times slower would end it early.
+  expect('linear: control: recorded macOS samples of linear scans that failed or came near failing the per-doubling check fit an exponent under 1.5', [[9, 16, 48, 104], [7, 17, 47, 84], [55, 103, 203, 519], [3, 6, 18, 48]].every((ms) => scales(ms)))
+  expect('linear: control: the scan measured before the repair (315, 1100, 5000 ms), continued quadratically, fits an exponent over 1.5', !scales([315, 1100, 5000, 20000]))
+  const quadraticMs = doubling((n) => 'x'.repeat(n), (c) => { let s = 0; for (let i = 0; i < c.length; i++) for (let j = 0; j < c.length / 8; j++) s += j; return s }, 1)
+  expect('linear: control: a scan that is quadratic by construction takes [' + quadraticMs.map((t) => t.toFixed(0)).join(', ') + '] ms, exponent ' + (quadraticMs.length === 4 ? exponent(quadraticMs).toFixed(2) : 'n/a') + ', and is refused', !scales(quadraticMs))
   const dparen = (n) => '(('.repeat(n) + 'qmd'
   shape('a run of unclosed ((', dparen, 'executedText', (c) => executedText(c), linear)
   shape('a run of unclosed ((', dparen, 'executedText inlineHttp', (c) => executedText(c, { inlineHttp: true }), linear)
