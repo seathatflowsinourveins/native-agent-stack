@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "checkout_commit": "cf43ebe321e4afe52b6087a5ad838a238c449990",
+ "checkout_commit": "6643ba60a183b1e25899295bdd9a05394e6c66ec",
  "code_under_test": {
   "tools/sota-convergence/landscape-sweep/skill_md.mjs": {
    "sha256": "4fbd76f219192d629ee962d5aeeb8580cea2a903c3b03fa90c51da8cc69e5791",
@@ -15,8 +15,8 @@
    "bytes": 84195
   }
  },
- "run_start_utc": "2026-09-30T23:45:46Z",
- "run_end_utc": "2026-09-30T23:46:42Z",
+ "run_start_utc": "2026-09-30T23:56:37Z",
+ "run_end_utc": "2026-09-30T23:57:35Z",
  "tools": {
   "node": "v24.21.0",
   "npm": "11.19.0",
@@ -844,7 +844,7 @@
      ".opencode/skills"
     ],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 25,
     "outcomes": {
      "same pick": 25
@@ -855,7 +855,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 294,
     "outcomes": {
      "same pick": 294
@@ -866,7 +866,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 14,
     "outcomes": {
      "same pick": 14
@@ -877,7 +877,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 10,
     "outcomes": {
      "same pick": 10
@@ -888,7 +888,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 20,
     "outcomes": {
      "same pick": 20
@@ -899,7 +899,7 @@
     "symlinks": 1,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 12,
     "outcomes": {
      "same pick": 12
@@ -910,7 +910,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 1,
     "outcomes": {
      "same pick": 1
@@ -921,7 +921,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 28,
     "outcomes": {
      "same pick": 28
@@ -934,7 +934,7 @@
      ".agents/skills"
     ],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 28,
     "outcomes": {
      "same pick": 28
@@ -945,7 +945,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 25,
     "outcomes": {
      "same pick": 25
@@ -956,7 +956,7 @@
     "symlinks": 1,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 37,
     "outcomes": {
      "same pick": 37
@@ -967,7 +967,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 2,
     "outcomes": {
      "same pick": 2
@@ -980,7 +980,7 @@
      ".opencode/skills"
     ],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 13,
     "outcomes": {
      "same pick": 13
@@ -991,7 +991,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 15,
     "outcomes": {
      "same pick": 15
@@ -1002,7 +1002,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 43,
     "outcomes": {
      "no pick either way": 1,
@@ -1014,7 +1014,7 @@
     "symlinks": 1,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 3,
     "outcomes": {
      "same pick": 3
@@ -1025,7 +1025,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 14,
     "outcomes": {
      "same pick": 14
@@ -1036,7 +1036,7 @@
     "symlinks": 2,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 83,
     "outcomes": {
      "same pick": 83
@@ -1047,7 +1047,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 1,
     "outcomes": {
      "same pick": 1
@@ -1058,7 +1058,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 1,
     "outcomes": {
      "same pick": 1
@@ -1069,7 +1069,7 @@
     "symlinks": 1,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 9,
     "outcomes": {
      "same pick": 9
@@ -1080,7 +1080,7 @@
     "symlinks": 0,
     "symlinked_search_locations": [],
     "skill_md_symlinks": 0,
-    "claude_plugin_symlinked": false,
+    "plugin_manifests_unknown": false,
     "names": 1,
     "outcomes": {
      "same pick": 1
@@ -1286,20 +1286,20 @@
    "bytes": 571
   },
   "cli-corpus.stderr": {
-   "sha256": "818f2402e89cc3f58bf5658df54c1bf4075161d5d74811b1346e681866bc5261",
-   "bytes": 547
+   "sha256": "7e8bd6e3a2b2a0f9a63914d0dadb2da9fce711c06a52e879032c70f5ba35f186",
+   "bytes": 551
   },
   "cli-corpus.stdout": {
-   "sha256": "8573d3edcd3d3006a94662470c9bccaf9d274112fa0509c363d0a410bbc92539",
-   "bytes": 475783
+   "sha256": "c1d97cae86ad0660f8006219772b8a9926710010bdda538ecd21040acfa928c5",
+   "bytes": 475819
   },
   "cli-edge.stderr": {
-   "sha256": "6a8dd51254c79c7aa4521a329a6e275e99ef9bb61a90ff0d6d1bc4dfe79c59aa",
-   "bytes": 13278
+   "sha256": "9a7a4cf7ccf394e2ab7892fe606c484a92bb2c5245a7cdea1a0ffcf7e33c2378",
+   "bytes": 13354
   },
   "cli-edge.stdout": {
-   "sha256": "8696428af22c0aa19f068429584d0bfd59e8583b1e09b28cb23780d42a6896d6",
-   "bytes": 858
+   "sha256": "1616f96b2164c7497465fe471844617616a43a473264dd8436e1e66a3a08f6a4",
+   "bytes": 859
   },
   "cli-yaml-version.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1466,7 +1466,7 @@
    "bytes": 0
   },
   "install-skills-cli.stdout": {
-   "sha256": "4f4de6015711b8f4e9528080521b1598a0f5b7e73fe77ee057a442400253419d",
+   "sha256": "11afd5b830a12e29d1fc5205e1521952b89d07ae808824e8841d1bc6f86a3286",
    "bytes": 90
   },
   "install-yaml-2.9.0.stderr": {
@@ -1474,7 +1474,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.0.stdout": {
-   "sha256": "a3bcab4eb5182ebd79fd11bc5ffa315dc986b7582226d04e9e908a498855c6d5",
+   "sha256": "16100c943f407ff905e43df2c3367f72b2ca8554e06a6f5eb5deca318c10aa62",
    "bytes": 26
   },
   "install-yaml-2.9.1.stderr": {
@@ -1482,7 +1482,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.1.stdout": {
-   "sha256": "3be24be4d112607add914b1db9715e620f6757286db44d3cb19cecf5cb3a3f23",
+   "sha256": "cdf5cc08d3f11b3b7cd220a83cd3ba24f1eec706d385e4b1b7d2dd4c187f7615",
    "bytes": 26
   },
   "mutant-sanitize-edge.json": {
@@ -1510,7 +1510,7 @@
    "bytes": 29493
   },
   "oracle-290-edge.stderr": {
-   "sha256": "4ecb8bea957c82bde0e8c1ad41b4d5e2a1e3e83cff537b68b9cb9bcd9d4a3d6d",
+   "sha256": "ffd6173262d3f31c3500ef60462ad1dd5135bea78503b33e63b95e5811a91ca2",
    "bytes": 342
   },
   "oracle-290-edge.stdout": {
@@ -1534,7 +1534,7 @@
    "bytes": 29493
   },
   "oracle-cli-edge.stderr": {
-   "sha256": "8aa347e56a88e22cb28bfa2f8c49a48d22f99ae90dd85e140bdabcae1a65e749",
+   "sha256": "f6d2de25c98bdcdc0d0f9f5a02d00bfcf132ae8145269f752875bb898e716192",
    "bytes": 342
   },
   "oracle-cli-edge.stdout": {
@@ -1594,8 +1594,8 @@
    "bytes": 0
   },
   "symlinks.stdout": {
-   "sha256": "1ae1de1da58120a8030c955b0e98e904557d34ee72e79644540ea3aa1db3c967",
-   "bytes": 5451
+   "sha256": "9c7efee64a9bd95d5f622f8e00753c52e8ef9e9e009290a972b587a09b8c3fc4",
+   "bytes": 5473
   },
   "versions.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

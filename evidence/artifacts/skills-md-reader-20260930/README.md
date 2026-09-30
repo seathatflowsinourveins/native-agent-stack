@@ -1,6 +1,6 @@
 # SKILL.md reader agreement with the pinned skills CLI (2026-09-30)
 
-One workstation, 2026-09-30 23:45:46Z to 23:46:42Z UTC (33 steps). This receipt checks
+One workstation, 2026-09-30 23:56:37Z to 23:57:35Z UTC (33 steps). This receipt checks
 `tools/sota-convergence/landscape-sweep/skill_md.mjs`, the reader the landscape sweep's skills modality runs for every
 `SKILL.md` copy of a skill survivor (`source_reviews.py`), against the pinned skills CLI itself. It also records what
 `source_reviews.py`'s symlink rule changes on the catalog's sources, and checks the CI step that installs the reader's
@@ -60,8 +60,9 @@ The CLI walks a search location through a symlink at or above it, which the git 
 `source_reviews.py` stops a survivor whose pick could depend on such a location (the round-4 review's D1). At the
 catalog pins, 8 of the 22 GitHub sources hold symlinks (69 in all); 3 of them hold a symlinked search location
 (`.opencode/skills` in addyosmani/agent-skills and microsoft/skills, `.agents/skills` in getsentry/skills), none a
-symlinked `SKILL.md` or `.claude-plugin`. For each of the 679 folder names the resolver finds in a search location, the
-pick with the rule equals the pick without it (678 picks, and 1 name with no pick either way): every pick is decided
+symlinked `SKILL.md`, and none a plugin manifest behind a symlink. For each of the 679 folder names the resolver finds
+in a search location, the pick with the rule equals the pick without it (678 picks, and 1 name with no pick either
+way): every pick is decided
 before any symlinked location, so the rule stops none of them. microsoft/skills' other 59 symlinks are skill folders
 inside search locations (48 in `.github/skills`, 11 in plugin `skills/` folders), which the CLI skips (their directory
 entries are not directories), as the tree shows.

@@ -48,16 +48,19 @@ for source in catalog["sources"]:
     skill_dirs = {path[:-len("/SKILL.md")] for path in blobs if path.endswith("/SKILL.md")}
     symlinks = {path for path, entry in entries.items() if entry["mode"] == "120000"}
     linked = {path[:-len("/SKILL.md")] for path in symlinks if path.endswith("/SKILL.md")}
-    manifests = []
+    # As source_reviews.plugin_manifests: a symlinked .claude-plugin, or a manifest that is not a regular file, leaves
+    # the plugin folders unknown.
+    manifests, plugin_doubt = [], ("a symlinked .claude-plugin"
+                                   if source_reviews.symlink_at_or_above(".claude-plugin", symlinks) else None)
     for path in source_reviews.PLUGIN_MANIFESTS:
         entry = entries.get(path)
+        if entry and entry["type"] == "blob" and entry["mode"] not in source_reviews.REGULAR_FILE_MODES:
+            plugin_doubt = plugin_doubt or f"{path} is not a regular file"
         try:
             manifests.append(json.loads(git(repo, "cat-file", "blob", entry["sha"]))
                              if entry and entry["mode"] in source_reviews.REGULAR_FILE_MODES else None)
         except ValueError:
             manifests.append(None)
-    plugin_doubt = ("a symlinked .claude-plugin" if source_reviews.symlink_at_or_above(".claude-plugin", symlinks)
-                    else None)
     plugin_dirs = source_reviews.cli_plugin_dirs(*manifests)
     locations = source_reviews.cli_locations(skill_dirs, plugin_dirs)
     names = sorted({folder.rsplit("/", 1)[-1] for *_, found in locations for folder in found})
@@ -76,7 +79,7 @@ for source in catalog["sources"]:
     symlinked = sorted({container for container, *_ in locations
                         if container and source_reviews.symlink_at_or_above(container, symlinks)})
     rows.append({"source": f"{full}@{pin[:12]}", "symlinks": len(symlinks), "symlinked_search_locations": symlinked,
-                 "skill_md_symlinks": len(linked), "claude_plugin_symlinked": bool(plugin_doubt),
+                 "skill_md_symlinks": len(linked), "plugin_manifests_unknown": bool(plugin_doubt),
                  "names": len(names), "outcomes": dict(sorted(counts.items()))})
     totals.update(counts)
 print(json.dumps({"sources": rows, "totals": dict(sorted(totals.items())),
