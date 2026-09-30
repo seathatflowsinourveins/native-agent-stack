@@ -7,6 +7,10 @@ Sources: OpenHands/software-agent-sdk v1.50.1 at
   14_context_condenser}.py
   examples/05_skills_and_plugins/{01_loading_agentskills,02_loading_plugins}/main.py
   openhands-sdk/openhands/sdk/llm/llm.py
+  openhands-sdk/openhands/sdk/utils/path.py
+
+Set the SDK's OH_PERSISTENCE_DIR before importing this module to scope user-level
+state and extension caches. CLI OPENHANDS_PERSISTENCE_DIR is a separate interface.
 
 The returned mapping is passed directly to the upstream Conversation constructor.
 Skill loading, MCP connection, plugin installation, and provider execution retain
@@ -25,6 +29,7 @@ from openhands.sdk.context.condenser import LLMSummarizingCondenser
 from openhands.sdk.mcp import MCPServer
 from openhands.sdk.plugin import PluginSource
 from openhands.sdk.skills import load_skills_from_dir
+from openhands.sdk.utils.path import get_user_persistence_dir
 from openhands.tools.file_editor import FileEditorTool
 from openhands.tools.task_tracker import TaskTrackerTool
 from openhands.tools.terminal import TerminalTool
@@ -147,6 +152,7 @@ def main() -> None:
                     plugin.model_dump(mode="json") for plugin in kwargs["plugins"]
                 ],
                 "persistence_configured": bool(kwargs["persistence_dir"]),
+                "native_user_persistence_dir": str(get_user_persistence_dir()),
             },
             indent=2,
         )
