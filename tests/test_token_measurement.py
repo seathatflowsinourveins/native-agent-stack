@@ -1960,8 +1960,10 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(got, {"attempted": 5, "succeeded": 0, "ctx": False, "classes": {"invalid": 5}, "infrastructure_errors": 0,
                                "new_class_errors": 0, "unknowns": 0, "unassigned_errors": 5, "rate": 0, "rate_lower_bound": 0,
                                "rate_upper_bound": 1, "over_threshold": True, "threshold_sensitive": True, "every_error_classified": True})
-        # Each class outside the named groups alone, 2 of 100 calls, is over the threshold on the ceiling; so is a class no list names (a
-        # template added later), since the ceiling is a residual; the invoked command's own exit is the one exclusion.
+
+    def test_m15_every_class_outside_the_named_groups_counts_in_the_ceiling(self):
+        """Each class outside the named groups alone, 2 of 100 calls, is over the threshold on the ceiling; so is a class no list names (a
+        template added later), since the ceiling is a residual; the invoked command's own exit is the one exclusion (the frozen M15 row)."""
         unassigned = ["policy_deny", "remote_fetch", "search_throttle", "rejected", "invalid", "cancelled_with_result", "a_later_class"]
         got = self.m15_server_rows([{k: 2} for k in unassigned] + [{"invoked_command_exit": 50}], 100)
         for name, row in zip(unassigned + ["invoked_command_exit"], got):
