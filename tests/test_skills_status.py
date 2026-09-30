@@ -470,10 +470,11 @@ class SkillsStatusTests(unittest.TestCase):
 
     def test_without_a_known_path_a_path_entry_matches_by_its_skill_folder_name(self):
         skill = self.make_skill("gated-skill", codex_enabled=False)
-        entry = {"path": "/home/example/.agents/skills/gated-skill/SKILL.md", "enabled": False}
+        entry = {"path": "/srv/example-home/.agents/skills/gated-skill/SKILL.md", "enabled": False}
         config = {"skills": {"config": [entry]}}
         self.assertEqual(ss.check_codex_disable(config, "ok", skill), {"state": "ok", "disable_entry_present": True})
-        for other in ("/home/example/.agents/skills/other-skill/SKILL.md", "/home/example/.agents/skills/gated-skill"):
+        for other in ("/srv/example-home/.agents/skills/other-skill/SKILL.md",
+                      "/srv/example-home/.agents/skills/gated-skill"):
             with self.subTest(path=other):
                 entry["path"] = other
                 self.assertEqual(ss.check_codex_disable(config, "ok", skill),
