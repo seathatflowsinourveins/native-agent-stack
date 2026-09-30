@@ -427,15 +427,21 @@ evidence.
   single-agent run. It uses subagents to accelerate complex work, making it useful for larger tasks that can be split
   across subagents." The 0.159.2 bundled catalog lists `ultra` among `gpt-6.1-sol`'s efforts, as it does for
   `gpt-6-astra`.
-- **The gateway clamps 6.1 Sol's effort.** The running gateway's process (read from `/proc`, 2026-09-30) is node on
+- **The gateway clamped 6.1 Sol's effort until 2026-09-30T06:32:50Z.** The running gateway's process (read from
+  `/proc` on 2026-09-30, before 04:52Z) was node on
   `~/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/bin/omniroute serve --port 20128`.
   In that build, `open-sse/executors/codex/reasoningSuffix.ts` lines 11-24 list the max-tier and ultra-tier models
   (`gpt-5.6-*`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6-luna`) without `gpt-6.1-sol`, so `getCodexAliasEffortCap` (lines
   27-31) returns null for it; `open-sse/executors/codex.ts` has no `MAX_EFFORT_BY_MODEL` entry for it (lines 319-325),
   `clampEffort` falls back to `xhigh` (lines 331-340), and lines 1436-1441 write the clamped value into the request.
-  The compiled `dist` holds no `gpt-6.1` string. A `cx/gpt-6.1-sol` request at `max` or `ultra` is therefore sent at
-  `xhigh`, while `gpt-6-astra` and `gpt-6-sol` keep `max` (their cap is `ultra`, sent as `max`). This is source
-  reading of the installed build; the outbound effort was not observed.
+  The compiled `dist` holds no `gpt-6.1` string. A `cx/gpt-6.1-sol` request at `max` or `ultra` was therefore sent at
+  `xhigh`, while `gpt-6-astra` and `gpt-6-sol` kept `max` (their cap is `ultra`, sent as `max`); that was source
+  reading of the installed build. At 06:32:50Z 20128 was restarted onto build `cf6748d04`, the running build plus the
+  open upstream [PR #15167](https://github.com/diegosouzapw/OmniRoute/pull/15167), which adds `gpt-6.1-sol` to both
+  alias sets of `reasoningSuffix.ts`. [Its record](../../evidence/artifacts/omniroute-sol-max-20260930/receipt.json)
+  (#534) counts 1,154 of 1,495 `gpt-6.1-sol` rows in 20128's call log with `max` requested and `xhigh` sent before the
+  restart, and its probe gate saw `cx/gpt-6.1-sol` with body `max` sent upstream at `max` after it; 20129 was not
+  changed by that restart. This addendum did not observe either port again.
 
 | Lane and role | Current | Latest available (release date) | Action | Sources |
 | --- | --- | --- | --- | --- |
@@ -450,8 +456,9 @@ children run `gpt-6.1-sol` at `max`; a task that needs a complex workflow runs `
 workers and escalations run at `max` on the routing record's triggers. These follow the user's decision and the
 routing record. The judgment lanes that name Astra keep their recorded bindings and the mechanical tier keeps
 `gpt-6-sol` at `medium`: no same-task measurement on this stack compares 6.1 Sol with them, and Gate A's model set is
-frozen by its owner. Through the gateway's `cx/` route an `ultra` or `max` request for 6.1 Sol is sent at `xhigh` (the
-clamp above), so a gateway session does not get the configured effort; the native client does.
+frozen by its owner. Through the gateway's `cx/` route an `ultra` or `max` request for 6.1 Sol was sent at `xhigh` until
+20128's restart at 06:32:50Z and at `max` after it (the gateway item above), so what a gateway session sends depends on
+the build it reaches and on an upstream PR that is still open.
 
 **Overturn.** The interactive default, the worker default and the complex-workflow choice follow the user's decisions
 and the routing record, and change with the next one or with the routing record's own reopening condition (a
@@ -461,7 +468,8 @@ the lane tiers that keep Astra or GPT-6 Sol the overturn path is a preregistered
 **The preregistered comparison.** A frozen same-task comparison in the style of
 [#359](../../blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md), re-frozen for codex-cli 0.159.2
 (the #359 scripts refuse any other client: `run_arm.py` line 74 pins `codex-cli 0.157.1`), run on native Codex rather
-than through the gateway's `cx/` route (whose clamp would send a `max` arm at `xhigh`), with four arms: A0
+than through the gateway's `cx/` route (whose effort for 6.1 Sol depends on the running build: a `max` arm went out
+at `xhigh` before 20128's restart at 06:32:50Z and at `max` after it, through a carried upstream PR), with four arms: A0
 (`gpt-6-astra`, `max`, the control), S1 (`gpt-6-sol`, `medium`, today's mechanical tier), S61-0 (`gpt-6.1-sol`,
 `max`) and S61-1 (`gpt-6.1-sol`, `medium`). The criterion is #359's, unchanged: an arm is routable when the paired
 bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) − micro-F1(A0) is at least −0.02, its

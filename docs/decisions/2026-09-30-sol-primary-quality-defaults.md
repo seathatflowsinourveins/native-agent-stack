@@ -5,7 +5,7 @@ model acceptance is separate from configuration and source review.
 
 Attribution (2026-09-30): written by the user's Codex coordinator lane as uncommitted work in the main checkout and
 folded unchanged by unit D4 of coordinator session native-agent-stack-c5 (snapshot sha256 5de56d6d81453ed3). This
-is the routing record for Codex models; the release, client-gate and gateway-clamp evidence is in the
+is the routing record for Codex models; the release, client-gate and gateway-effort evidence is in the
 [model-currency addendum of 2026-09-30](2026-09-27-model-currency.md#addendum-2026-09-30-gpt-61-sol-released-codex-cli-01592-pinned-gpt-61-sol-at-ultra-the-interactive-default).
 
 ## Decision
