@@ -896,3 +896,33 @@ Where to act next:
 - A Codex home whose configuration leaves it unset still writes snapshots. Item 5 above (Codex profile hardening) covers the repository templates after window W.
 
 Overturn: any new snapshot file with a credential-named `declare -x` line. That moves the Codex profile change ahead of window W, subject to the Gate A owner.
+
+## Status update (2026-09-30)
+
+- **Guard tightening** (item 1, PR #511, not merged).
+  - Head `dc33b48a`; guard sha256 `a70a056f`, equal to its `SHA256SUMS` pin.
+  - The third GPT-6 verification ran at the pre-repair head. It found one blocking regression, a procps personality selector passing the clustered `ps` loosening. It also found one high finding, inherited from the installed guard: four store-path patterns backtracked and timed out the hook at 10 s.
+  - One repair round followed:
+    - it removed the `ps` loosening;
+    - every command is also read as the installed guard reads it, and is refused when either reading refuses;
+    - the four patterns became linear scans.
+  - A fourth verification found no command the installed guard refuses that the new guard allows.
+  - Its two remaining findings go to the next guard change, because only one repair round is allowed:
+    - a descriptor-deduplication case that the installed guard also allows;
+    - a documentation note.
+  - Receipt: `guard-k3-verification-20260930`.
+  - The merge and the host reinstall wait for the Gate A owner to close window W, because the frozen check `hooks.carriers_match_repo` compares the installed hooks with main.
+- **K4** (item 2). The build contract had its first independent review, by GPT-6: 1 blocking and 6 high findings. The largest were a delimiter-suffix gap in the interpreter here-document form, a second loosening the amendments had not authorised, and an unbounded gateway matrix. Version 2 is being written with one gateway matrix, one loosening and an independent reference recognizer for the tests.
+- **Canary proof tool** (item 3). Draft 2 of the contract took one Opus review round (4 blocking findings, fixed). A GPT-6 review then found 7 more blocking false-clean paths:
+  - sink bytes reaching the coordinator's memory;
+  - a pass still standing after a failed retry;
+  - an unstable file set;
+  - a Git metadata gap;
+  - a gzip-plus-BOM gap;
+  - SQLite schema text;
+  - SQLite URI parsing.
+
+  Draft 3 is being written with a two-process boundary and a stable-file-set rule.
+- **Claude OAuth token for headless runs.**
+  - A credential window stores the token from `claude setup-token` in the kernel keyring as `claude-oauth-token` (transport only; a kernel restart erases it). Commands receive it through `kernel_keyring.py exec claude-oauth-token CLAUDE_CODE_OAUTH_TOKEN -- <command>`.
+  - Its variable is not yet a secret name in the guard, so K4 adds it and an inventory entry. `set_credential.py` can then persist it.
