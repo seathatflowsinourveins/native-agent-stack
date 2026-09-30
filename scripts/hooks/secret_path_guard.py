@@ -36,8 +36,10 @@ refused: write the text with the Write tool and pass `git commit -F FILE`
 (docs/secret-storage.md). `ps -E` (macOS) and `systemctl show-environment` or a bare
 `systemctl show` (a service manager's whole environment block) dump the
 environment like `ps e` and `env`; `ps` is read as procps (Linux) and as macOS
-read it, and either reading that shows the environment blocks (`-C` takes a
-command name on one and is a flag on the other). For a key
+read it, and as the guard at c26800f3 read it (a dashless word of its cluster
+alphabet with an `e` blocks after any cluster, since a procps personality can
+parse `ps -axu e` BSD-style), and any reading that shows the environment blocks
+(`-C` takes a command name on one host and is a flag on the other). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -263,10 +265,14 @@ GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 # The letters of a dashless BSD-style ps cluster (is_ps_bsd_cluster): the flags that the guard reads, `e` and `E` among them.
 PS_BSD_LETTERS = frozenset("aAcefhjlmrsStTuvwxXLnE")
+# The dashless cluster as the guard at c26800f3 read it (prior_ps_shows_environment): its letters with an `e`, wherever the word stands unless
+# a stand-alone value option comes right before it. Linear (its first class has no `e`, so only the last quantifier backtracks, once).
+PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLn]*e[aAcefhjlmrsStTuvwxXLn]*$")
 # The options that take a value, alone (`-u steve`, `--sort pcpu`) or as the last letter of a cluster (`-fu steve`), on procps-ng: ps(1) 4.0.4
 # lists `-C cmdlist`, `-G`, `-g`, `-O`, `-o`, `-p`, `-q`, `-s`, `-t`, `-U` and `-u` (and `k` for the BSD form). macOS's ps has no `-q`, `-s`
 # or `-k`, and `-C` is a flag there ("Change the way the CPU percentage is calculated"): Apple adv_cmds ps/ps.c at 60bc9ebf, PS_ARGS
-# `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`. ps_shows_environment reads a command line with each host's table.
+# `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`. ps_shows_environment reads a command line with each host's table, and
+# with the reading of c26800f3 besides, which takes only the word after a stand-alone value option for a value (2026-09-29 repair round).
 PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-s", "-k",
                   "--pid", "--format", "--sort", "--ppid", "--user"}
 PS_MACOS_ARG_OPTIONS = PS_ARG_OPTIONS - {"-C"}
@@ -1166,11 +1172,27 @@ def is_ps_bsd_cluster(word: str) -> bool:
     return PS_BSD_LETTERS.issuperset(word) and ("e" in word or "E" in word)
 
 
+def prior_ps_shows_environment(words: list[str]) -> bool:
+    """The ps rule of the guard at c26800f3, verbatim: a dashless word that PS_BSD_CLUSTER matches shows the environment, unless it is the
+    value of a stand-alone option of PS_ARG_OPTIONS right before it (`ps -u steve` passes, `ps -fu steve` does not)."""
+    skip = False
+    for word in words[1:]:
+        if skip:
+            skip = False
+            continue
+        if word in PS_ARG_OPTIONS:
+            skip = True
+            continue
+        if not word.startswith("-") and PS_BSD_CLUSTER.match(word):
+            return True
+    return False
+
+
 def ps_reading_shows_environment(words: list[str], procps: bool) -> bool:
-    """Whether one host's ps prints each process's environment for this command line. Both hosts read a dashed word as a cluster of
-    options, and a letter that takes a value takes the rest of the word or, when it ends the cluster, the next word, so that word is
-    a value and not an option or a cluster (`ps -u Eve`, `ps -fu Eve`, `ps -uEve`, `ps -fo user`, `ps -ft e`). They differ in three
-    things. procps (`procps=True`) has `-C cmdlist`, which takes a value, has no `-E`, and reads a dashless BSD cluster wherever it
+    """Whether one host's ps prints each process's environment for this command line, in its default personality. Both hosts read a
+    dashed word as a cluster of options, and a letter that takes a value takes the rest of the word or, when it ends the cluster, the
+    next word, so that word is a value and not an option or a cluster in this reading (`ps -u Eve`, `ps -fu Eve`, `ps -uEve`;
+    ps_shows_environment still refuses `ps -fu steve`, which the guard at c26800f3 refused). They differ in three things. procps (`procps=True`) has `-C cmdlist`, which takes a value, has no `-E`, and reads a dashless BSD cluster wherever it
     stands (`ps -C cat e`, `ps -Ccat e`: `cat` is the command name and `e` shows the environment). macOS has `-E` (and `-e` in its
     legacy mode, see the docs), reads `-C` as a flag, and honours a dashless option string only as the first argument
     (`kludge_oldps_options(..., argv[1], ...)` in Apple adv_cmds ps/ps.c), so `ps -Ccat e` is `-C -c -a -t e`: `t` takes `e`, a tty."""
@@ -1193,13 +1215,22 @@ def ps_reading_shows_environment(words: list[str], procps: bool) -> bool:
 
 
 def ps_shows_environment(words: list[str]) -> bool:
-    """Whether ps prints each process's environment on either host that could run the command line (ps_reading_shows_environment):
-    a dashless BSD-style cluster with `e` or `E` (is_ps_bsd_cluster), or macOS's dashed `-E`, alone or in a cluster before the first
-    option that takes a value (`-Ewwp 123`, where the value starts at `p`). A dashed `-e` is every process and passes, as does an `E`
-    that is a value. `-C` is a flag on macOS and takes a command name on procps, so a dashed word with a `C` is read both ways and
-    refused when either shows the environment: `ps -CE` and `ps -C -E` (macOS), `ps -Ccat e` and `ps -fCcat e` (procps), and
-    `ps -CEmacs` too, which is friction on procps (there `Emacs` is the command name; write `ps -C emacs`)."""
-    return ps_reading_shows_environment(words, True) or ps_reading_shows_environment(words, False)
+    """Whether ps prints each process's environment on either host that could run the command line (ps_reading_shows_environment), or
+    the guard at c26800f3 refused it (prior_ps_shows_environment): a dashless BSD-style cluster with `e` or `E` (is_ps_bsd_cluster), or
+    macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value starts at `p`).
+    A dashed `-e` is every process and passes, as does an `E` that is a value. `-C` is a flag on macOS and takes a command name on
+    procps, so a dashed word with a `C` is read both ways and refused when either shows the environment: `ps -CE` and `ps -C -E`
+    (macOS), `ps -Ccat e` and `ps -fCcat e` (procps), and `ps -CEmacs` too, which is friction on procps (there `Emacs` is the command
+    name; write `ps -C emacs`).
+
+    The reading of c26800f3 stays because procps has personalities that a hook cannot see (third verification review, 2026-09-29):
+    with PS_PERSONALITY=old or I_WANT_A_BROKEN_PS set, on the command line or inherited from the shell, procps parses `ps -axu e`
+    BSD-style, where `u` takes no value and `e` shows the environment. So a dashless word of that guard's cluster alphabet with an `e`
+    is refused wherever it stands, whatever cluster comes before it (`ps -fu steve`, `ps -fo user`, `ps -ft e`, `ps -fC e`): no ps
+    command that guard refused passes. Only its stand-alone value options take the next word, as they did (`ps -u steve` and
+    `ps -C emacs` pass; whether a personality also reads a stand-alone `-u` BSD-style, so that `ps -u e` shows the environment, is not
+    measured here, and that guard passed it too), and a numeric id or pgrep never reads as a cluster (`ps -f -U 1000`, `pgrep -u steve`)."""
+    return prior_ps_shows_environment(words) or ps_reading_shows_environment(words, True) or ps_reading_shows_environment(words, False)
 
 
 def git_subcommand_args(words: list[str]) -> tuple[str | None, list[str]]:
