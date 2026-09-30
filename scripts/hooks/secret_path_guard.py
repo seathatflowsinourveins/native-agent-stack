@@ -1752,7 +1752,9 @@ def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str |
         return "keyring_variable_reference"
     for started_command in unique_segments([command for _variable, command in started]):
         spend("reads", 1)
-        inner = expand(shlex.join(started_command)) if started_command else []
+        # B(T) reads the started command through shlex.join, as dc33b48a did; the K4 walk keeps a touching descriptor touching (k4_join),
+        # so `set 0</dev/null` started by a keyring exec is still a dump after the reread (D-ID).
+        inner = expand(shlex.join(started_command) if _baseline else k4_join(started_command)) if started_command else []
         # The started command, and the commands among its arguments that a launcher the guard does not
         # model would run (launched_commands). The price: a one-word query `env` is blocked too.
         inner = unique_segments(inner + launched_commands(inner))
@@ -2185,9 +2187,11 @@ def current_reading(command: str, texts: tuple[str, str], words_list: list[list[
 # data-tree name, a manager verb, a here-document operator, an environment source. Quote removal never splits these literals (they hold no
 # quote or backslash) and every word of a command is made of its unquoted() characters in order, so one scan of the unquoted text tells which
 # rules can apply at all: an ordinary command pays one charged pass for K4, and a rule whose literal is absent does no work.
-K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012[89]|environment|environ"
+K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|curl|environment|environ"
                        r"|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
-K4_ANCHOR_KEYS = {"20128": ("2012",), "20129": ("2012",), "environment": ("environment", "environ")}
+K4_ANCHOR_KEYS = {"environment": ("environment", "environ")}
+# The gateway rules run when a gateway port shows, the omniroute CLI is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
+K4_GATEWAY_ANCHORS = frozenset({"2012", "omniroute", "curl"})
 # A K4 walk differs from B's only where a runner or keyring start (or tvly-keyring) can hide a shell string or start a command, or where a
 # string-tuple deduplication dropped a segment with other descriptors (note_identity_collision).
 K4_REWALK_ANCHORS = frozenset({"credential_run.py", "kernel_keyring.py", "tvly-keyring"})
@@ -2248,22 +2252,39 @@ def k4_tightenings(r: K4Reading) -> str | None:
     global _baseline
     _baseline = False
     anchors = r.anchors = k4_anchors(r.texts[1])
-    collision = _k4_state is not None and _k4_state["collision"]
-    rewalk = collision or bool(anchors & K4_REWALK_ANCHORS)
-    walked = expand(r.word_text) if rewalk else r.current
+    walked = expand(r.word_text) if k4_needs_walk(r, anchors) else r.current
     segments = unique_segments(walked + r.prior)
     runner = "credential_run.py" in anchors
     return (k4_names_and_stores(r, segments)
             or (k4_runner_environment(r.texts, walked) if runner else None)
-            or (k4_walk_reason(r, walked) if rewalk else None)
+            or (k4_walk_reason(r, walked) if walked is not r.current else None)
             or (k4_runner_usage_reason(r.word_text, segments) if runner else None)
-            or (k4_gateway_reason(r, segments) if anchors & {"2012", "omniroute"} else None)
+            or (k4_gateway_reason(r, segments) if anchors & K4_GATEWAY_ANCHORS else None)
             or (k4_manager_reason(segments) if "environment" in anchors else None)
             or (k4_store_reason(r.word_text) if "kernel_keyring.py" in anchors else None)
             or (k4_ps_reason(r.word_text) if anchors & K4_SELECTORS else None)
             or (k4_canary_reason(segments) if "canary_proof.py" in anchors else None)
             or k4_interpreter_reason(r, segments)
             or (k4_tail_reason(r.command) if "<<" in anchors else None))
+
+
+def k4_needs_walk(r: K4Reading, anchors: frozenset[str]) -> bool:
+    """Whether the K4 walk can read a segment that B's walk did not: a runner start (it exposes the started command); a string-tuple
+    deduplication that dropped a segment with other descriptors (note_identity_collision); or a keyring start (kernel_keyring.py exec or
+    tvly-keyring) where descriptors exist (k4_join keeps them in the command it rereads) or where a shell or eval segment holds the start (its
+    string is read before the unwrap). Otherwise the K4 walk equals B's and B's segments are reused."""
+    if "credential_run.py" in anchors or (_k4_state is not None and _k4_state["collision"]):
+        return True
+    if not anchors & {"kernel_keyring.py", "tvly-keyring"}:
+        return False
+    if _k4_state is None or _k4_state["descriptors"]:
+        return True
+    for words in r.current:
+        k4_word_charge(words)
+        if program_of(words) in SHELLS | {"eval"} and any(
+                KEYRING_SCRIPT in word or "tvly-keyring" in word for word in words):
+            return True
+    return False
 
 
 def k4_walk_reason(r: K4Reading, walked: list[list[str]]) -> str | None:
@@ -2436,6 +2457,10 @@ def k4_program_operand(words: list[str]) -> tuple[str, int, str | None, bool]:
     evaluate and print), 'module' (-m) or 'other' (neither interpreter). `--` ends the options (the script follows) and so do a script and
     `-`, so a later word named -c is the script's argument. `certain` is False when an unknown option stood before the operand: its arity is
     unknown, so a visible environment source among the words fails closed (k4_code_units)."""
+    return k4_memo(("program-operand",), words, lambda: k4_program_operand_scan(words))
+
+
+def k4_program_operand_scan(words: list[str]) -> tuple[str, int, str | None, bool]:
     k4_word_charge(words)
     program = program_of(words)
     python = bool(K4_PYTHON.fullmatch(program))
@@ -2494,10 +2519,29 @@ def k4_program_operand(words: list[str]) -> tuple[str, int, str | None, bool]:
     return "stdin", at, None, certain
 
 
+def k4_memo(kind: tuple, words: list[str], compute):
+    """compute() once per word list and kind within one check(): the K4 tiers ask the same questions of the same segments (is it a runner
+    start, where is its script), and cached work is charged once (section 1, invariant 5). The cache keeps the list itself, so an id is never
+    reused for another list while its answer is cached."""
+    if _k4_cache is None:
+        return compute()
+    key = ("memo", kind, id(words))
+    found = _k4_cache.get(key)
+    if found is not None and found[0] is words:
+        return found[1]
+    value = compute()
+    _k4_cache[key] = (words, value)
+    return value
+
+
 def k4_script_position(words: list[str], script: str, uv: bool = False) -> int | None:
     """Index of `script` (a basename) as the command itself or as the script operand of python/python3/pythonX.Y/pypy/pypy3 (options read
     as k4_program_operand reads them), or with `uv`, of `uv run [options] [python ...] SCRIPT`; None when words do not invoke it (a mention
     in `git add`, `sed`, `echo`, `python3 -m py_compile ...`)."""
+    return k4_memo(("script-position", script, uv), words, lambda: k4_script_position_scan(words, script, uv))
+
+
+def k4_script_position_scan(words: list[str], script: str, uv: bool) -> int | None:
     k4_word_charge(words)
     if not words:
         return None
@@ -2520,6 +2564,10 @@ def k4_runner_start(words: list[str]):
     """(index, runner arguments, started command) of the first word whose basename is credential_run.py that a later `--` follows, at any
     position of words (RUN-START, contract-v2 section 4: any path, any launcher, `uv run python ...`), or None. Input redirections among the
     runner's own arguments are read with the command it starts, as keyring_exec() does."""
+    return k4_memo(("runner-start",), words, lambda: k4_runner_start_scan(words))
+
+
+def k4_runner_start_scan(words: list[str]):
     k4_word_charge(words)
     for at, word in enumerate(words):
         if word.rsplit('/', 1)[-1] == 'credential_run.py':
@@ -2735,8 +2783,10 @@ def k4_store_reason(command: str) -> str | None:
         if depth >= MAX_SUBSTITUTION_NESTING:
             continue
         k4_charge(text)
-        pending.extend((body, depth + 1) for body in scan_shell(text)[0])
+        pending.extend((body, depth + 1) for body in scan_shell(text)[0] if KEYRING_SCRIPT in body)
         for raw in segments(k4_shell_words(text)):
+            if not any(KEYRING_SCRIPT in word for word in raw):
+                continue  # a shell string or eval text can hold a store only if it names the keyring script
             words = k4_visible_words(raw)
             if program_of(words) in SHELLS:
                 inline = shell_parts(words)[1]
@@ -2783,6 +2833,8 @@ def k4_store_text(command: str) -> str | None:
     if raw:
         stages.append((raw, previous if separator in {'|', '|&'} else None))
     for stage, producer in stages:
+        if not any(KEYRING_SCRIPT in word for word in stage):
+            continue  # only a stage that names the keyring script can store (the walk below would find nothing else)
         words = k4_visible_words(stage)
         store = next((at for at, word in enumerate(words)
             if word.rsplit('/', 1)[-1] == KEYRING_SCRIPT and words[at + 1:at + 2] == ['store']), None)
@@ -3993,7 +4045,7 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
         if "2012" not in unit.code:
             continue
         if unit.kind == "uncertain":
-            if any(k4_gateway_url(word, unresolved=True) for word in unit.code.split()):
+            if any(k4_gateway_url(found.group(), unresolved=True) for found in K4_GW_FIND.finditer(unit.code)):
                 return "gateway_credential_route"
             continue
         code = "console.log(" + unit.code + "\n)" if unit.kind == "print" else unit.code
@@ -4005,6 +4057,9 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
 
 
 K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]+)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
+# A covered target inside other text (the words of an interpreter command line whose options could not all be read).
+K4_GW_FIND = re.compile(r"(?:[Hh][Tt][Tt][Pp]://)?(?:127\.0\.0\.1|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\[::1\]|10\.0\.2\.2"
+                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):2012[89][^\s'\"]*")
 K4_GW_ID = re.compile(r"\A[A-Za-z0-9-]{1,64}\Z")
 K4_GW_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
 K4_GW_METHOD = re.compile(r"\A[A-Z]+\Z")

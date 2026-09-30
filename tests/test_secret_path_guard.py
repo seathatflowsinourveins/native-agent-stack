@@ -3457,6 +3457,765 @@ K4_CASES['runner_usage_and_documentation'].append((
     'python3 -B > out tools/credentials/credential_run.py get tavily', 'credential_run_usage'))
 
 
+# K4 contract-v2 fixtures, second part (the continuing Claude session, 2026-09-30): every example of the contract's sections 3 to 7 not
+# listed above, expanded without ellipses, and the review witnesses of the repair round. Inert strings for check(); nothing runs them.
+K4_R = "python3 tools/credentials/credential_run.py "
+K4_KR = "python3 scripts/kernel_keyring.py "
+
+
+def k4_extend(group, pairs):
+    known = {command for command, _expected in K4_CASES.setdefault(group, [])}
+    for command, expected in pairs:
+        if command not in known:
+            known.add(command)
+            K4_CASES[group].append((command, expected))
+
+
+k4_extend("base_reason_precedence", [
+    (K4_R + "get tavily; printenv", "environment_dump"),
+    ("echo $TAVILY_API_KEY; " + K4_R + "tavily -- printenv", "secret_variable_reference"),
+    (K4_R + "tavily -- cat /proc/self/environ", "process_environment"),
+    (K4_R + "tavily -- cat .env", "dotenv_read"),
+    ("kernel_keyring.py exec n X -- printenv; " + K4_R + "tavily -- printenv", "environment_dump_in_keyring_exec"),
+    # form F with an old protected reason: the retained whole-text and keyring-code rules read the body
+    ("python3 - <<'PY'\nprint(open('/home/u/.config/native-agent-stack/x.env').read())\nPY", "credential_store_path"),
+    ("python3 - <<'PY'\nimport os\nprint(os.environ['TAVILY_API_KEY'])\nPY", "secret_variable_reference"),
+    ("python3 - <<'PY'\nKEYCTL_READ = 11\nPY", "keyring_payload_read"),
+    # a B-allowed descriptor repair precedes a gateway finding; a B-refused mixed command keeps B's reason
+    ("echo 1>/dev/null; echo 1 > /dev/null; curl -s http://127.0.0.1:20128/api/health", None),
+    ("curl -s http://127.0.0.1:20128/api/settings; cat .env", "dotenv_read"),
+    ("systemctl --user import-environment; cat \"$PAPER_ENV_FILE\"", "credential_file_read"),
+    ("dbus-update-activation-environment --all; printenv", "environment_dump"),
+])
+k4_extend("descriptor_identity", [
+    ('echo "$(set 0 < /dev/null; set 0</dev/null)"', "environment_dump"),
+    ("sh -c 'set 0 < /dev/null; set 0</dev/null'", "environment_dump"),
+    ("export 2 > out; export 2>out", "environment_dump"),
+    ("set {fd} > out; set {fd}>out", "environment_dump"),
+    ("echo 1>/dev/null; echo 1 > /dev/null", None),
+    ("set 1>out; echo \x01", "environment_dump"),
+    ("set 0 < /dev/null; " + K4_R + "tavily -- set 0</dev/null", "environment_dump_in_credential_run"),
+    (K4_KR + "exec n X -- sh -c 'set 0 < /dev/null; set 0</dev/null'", "environment_dump_in_keyring_exec"),
+])
+k4_extend("runner_start_and_inline_order", [
+    ("tools/credentials/credential_run.py tavily -- printenv", "environment_dump_in_credential_run"),
+    ("sh -c 'python3 tools/credentials/credential_run.py tavily -- printenv'", "environment_dump_in_credential_run"),
+    ("bash -c \"" + K4_R + "tavily -- env\"", "environment_dump_in_credential_run"),
+    ("echo \"$(" + K4_R + "tavily -- printenv)\"", "environment_dump_in_credential_run"),
+    ("bash -c 'printenv' tvly-keyring search x", "environment_dump"),
+    (K4_R + "tavily < in.txt -- cat", None),
+    (K4_R + "tavily -- " + K4_R + "typesafe -- sh -c 'printenv'", "environment_dump_in_credential_run"),
+])
+k4_extend("runner_environment_and_mentions", [
+    (K4_R + "tavily -- awk 'BEGIN {for (k in ENVIRON) print k}'", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- bash -c 'echo ${!T*}'", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- declare -p", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- ps e", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- flock /tmp/l printenv", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- find . -exec printenv ;", "environment_dump_in_credential_run"),
+    (K4_R + "tavily -- watch -n 5 systemctl --user show-environment", "service_manager_environment"),
+    (K4_R + "tavily --only TAVILY_API_KEY -- tvly search markets --json", None),
+    (K4_R + "tavily -- tvly search markets --json --only TAVILY_API_KEY", "secret_variable_reference"),
+    (K4_R + "alpaca-paper --only APCA_API_KEY_ID --only APCA_API_SECRET_KEY -- python3 collect.py", None),
+    (K4_R + "alpaca-paper --only 'APCA_API_KEY_ID' -- python3 collect.py", None),
+    (K4_R + "alpaca-paper --only APCA_API_KEY_ID -- " + K4_R + "tavily --only APCA_API_KEY_ID -- true", None),
+    ("echo x --only TAVILY_API_KEY; " + K4_R + "tavily --only TAVILY_API_KEY -- true", "secret_variable_reference"),
+])
+k4_extend("runner_usage_and_documentation", [
+    (K4_R + "tavily --check --only TAVILY_API_KEY", None),
+    (K4_R + "--help tavily", None),
+    ("./tools/credentials/credential_run.py get tavily", "credential_run_usage"),
+    ("/usr/bin/python3 -I -S tools/credentials/credential_run.py list", "credential_run_usage"),
+    ("rtk proxy python3 tools/credentials/credential_run.py token tavily", "credential_run_usage"),
+    ("python3 -X dev tools/credentials/credential_run.py print tavily", "credential_run_usage"),
+    ("python3 -Wignore tools/credentials/credential_run.py tavily", "credential_run_usage"),
+    ("python3 --check-hash-based-pycs never tools/credentials/credential_run.py get tavily", "credential_run_usage"),
+    ("python3 -m pdb tools/credentials/credential_run.py get tavily", None),
+    ("python3 -c 'print(1)' tools/credentials/credential_run.py get tavily", None),
+    ("cat tools/credentials/credential_run.py", None),
+    ("echo 'tools/credentials/credential_run.py get tavily'", None),
+    # documented allowed runner examples (docs/secret-storage.md, recipes/tavily.md, adoption/credential-inventory.json loaders)
+    (K4_R + "alpaca-paper -- python3 blueprints/us-equities/alpaca-historical/collect.py", None),
+    (K4_R + "tavily -- tvly search \"x\" --depth basic --json", None),
+    (K4_R + "omniroute -- codex exec -p omniroute 'say hi'", None),
+])
+k4_extend("gateway_cli_and_scope", [
+    ("omniroute api", "gateway_credential_route"),
+    ("/opt/omniroute/bin/omniroute api GET /api/health", "gateway_credential_route"),
+    ("sudo omniroute sync", "gateway_credential_route"),
+    (K4_R + "omniroute -- omniroute api GET /api/health", "gateway_credential_route"),
+    ("omniroute --help", None),
+    ("omniroute serve --port 20128", None),
+    ("curl -s localhost:20128/api/settings", "gateway_credential_route"),
+    ("curl -s http://127.0.0.1:20128/v1/models", None),
+    ("curl -s http://127.0.0.1:20128", None),
+    ("curl -s HTTP://LOCALHOST:20128/api/settings", "gateway_credential_route"),
+    ("grep -n 'http://127.0.0.1:20128/api/settings' docs/x.md", None),
+])
+k4_extend("gateway_effective_requests", [
+    ("curl -s 'http://127.0.0.1:2012[8-9]/api/settings'", "gateway_credential_route"),
+    ("curl -s 'http://{127.0.0.1,x}:20128/api/settings'", "gateway_credential_route"),
+    ("curl -s 'http://127.0.0.1:20128/api/{health,cache}'", None),
+    ("curl -s -g 'http://127.0.0.1:20128/api/{health,cache}'", "gateway_credential_route"),
+    ("curl -s 'http://127.0.0.1:20128/api/usage/call-logs/[1-3]'", None),
+    ("curl -s 'http://127.0.0.1:20128/api/[a-z]'", "gateway_credential_route"),
+    ("curl -s http://127.0.0.1:20128/%61pi/settings", "gateway_credential_route"),
+    ("curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:20128/api/health", None),
+    ("curl -sG --data-urlencode 'limit=5' http://127.0.0.1:20128/api/usage/call-logs", None),
+    ("curl -X GET -d '{}' http://127.0.0.1:20128/api/usage/provider-limits", "gateway_credential_route"),
+    ("curl -X POST http://127.0.0.1:20128/api/usage/provider-limits", None),
+    ("curl -X POST http://127.0.0.1:20129/api/usage/provider-limits", "gateway_credential_route"),
+    ("curl -X POST http://127.0.0.1:20129/api/compression/preview -d '{\"text\":\"x\"}'", None),
+    ("curl -X POST http://127.0.0.1:20128/api/compression/preview -d '{}'", "gateway_credential_route"),
+    ("curl http://127.0.0.1:20128/api/health --next -X POST http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    ("curl -X POST --next http://127.0.0.1:20128/api/health", None),
+    ("curl -I -G http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    ("curl -X GET -I http://127.0.0.1:20128/api/health", None),
+    ("curl -L http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    ("curl --netrc http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    ("curl --url-query limit=5 http://127.0.0.1:20128/api/usage/call-logs", "gateway_credential_route"),
+    ("wget --method=get http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    ("wget --post-data=x --method=POST http://127.0.0.1:20128/api/usage/provider-limits", "gateway_credential_route"),
+    ("xh :20128/api/settings", "gateway_credential_route"),
+    ("https :20128/api/settings", None),
+    ("http POST :20128/api/usage/provider-limits", None),
+    ("http :20129/api/usage/provider-limits", "gateway_credential_route"),
+    ("node -p \"fetch('http://127.0.0.1:20128/api/settings')\"", "gateway_credential_route"),
+    ("python3 --weird-option -c \"requests.get('http://127.0.0.1:20128/api/settings')\"", "gateway_credential_route"),
+    ("python3 - <<'PY'\nimport requests\nrequests.get('http://127.0.0.1:20128/api/health')\nPY", None),
+    ("python3 - <<'PY'\nimport requests\nrequests.post('http://127.0.0.1:20128/api/settings', json={})\nPY", "gateway_credential_route"),
+    ("python3 - <<'PY'\nurl = 'http://127.0.0.1:20128/api/health'\nPY", "gateway_credential_route"),
+    ("node - <<'JS'\nfetch('http://127.0.0.1:20129/api/compression/preview', {method: 'POST', body: '{}'})\nJS", None),
+])
+k4_extend("manager_environment", [
+    ("systemctl --user import-environment GH_TOKEN", "secret_variable_reference"),
+    ("dbus-update-activation-environment --systemd GH_TOKEN=x", "secret_variable_reference"),
+    ("systemctl --user import-environment --no-ask-password DISPLAY GH_TOKEN_X", None),
+    ("sudo systemctl --user import-environment", "manager_environment_write"),
+    (K4_R + "tavily -- systemctl --user import-environment", "manager_environment_write"),
+    ("systemctl --user set-environment " + " ".join(f"V{n}=x" for n in range(40)) + " TAVILY_API_KEY=abc",
+     "manager_environment_write"),
+    ("systemctl --user show-environment | grep -c PATH", "service_manager_environment"),
+])
+k4_extend("literal_store_provenance", [
+    ("sudo " + K4_KR + "store sample_key <<< 'demo'", "keyring_store_literal"),
+    (K4_KR + "store --replace sample_key <<< 'demo'", "keyring_store_literal"),
+    (K4_KR + "store --replace sample_key", None),
+    ("export K='demo'; " + K4_KR + "store sample_key <<< \"$K\"", "keyring_store_literal"),
+    ("declare K=demo; printf '%s' \"${K}\" | " + K4_KR + "store sample_key", "keyring_store_literal"),
+    ("K=\"$(cat f)\"; printf '%s' \"$K\" | " + K4_KR + "store sample_key", None),
+    ("printf -v X %s demo | " + K4_KR + "store sample_key", "keyring_store_literal"),
+    ("printf -- '%s' demo | " + K4_KR + "store sample_key", "keyring_store_literal"),
+    ("echo -n demo | " + K4_KR + "store sample_key", "keyring_store_literal"),
+    ("echo -n \"$K\" | " + K4_KR + "store sample_key", None),
+    ("tr -d x < f | " + K4_KR + "store sample_key", None),
+    ("echo demo | sudo " + K4_KR + "store sample_key", "keyring_store_literal"),
+])
+for k4_name in ("PS_PERSONALITY", "CMD_ENV", "I_WANT_A_BROKEN_PS"):
+    k4_extend("ps_selectors", [
+        (f"typeset -x {k4_name}=bsd; ps -e", "ps_personality_selector"),
+        (f"{k4_name}=bsd sudo ps -e", "ps_personality_selector"),
+        (f"export {k4_name}=bsd; bash -c 'ps -e'", "ps_personality_selector"),
+        (f"ps -e | grep {k4_name}", None),
+    ])
+k4_extend("ps_selectors", [("I_WANT_A_BROKEN_PS=1 ps -axu e", "environment_dump"), ("PS_PERSONALITY=old ps -axu e", "environment_dump"),
+                           ("env PS_PERSONALITY=old ps -axu e", "environment_dump")])
+k4_extend("canary_gate", [
+    ("python3 /p/canary_proof.py --phase=comparison --user-run", "canary_user_terminal_required"),
+    ("uv run --with x python3 /p/canary_proof.py --user-run", "canary_user_terminal_required"),
+    ("python3 -IS /p/canary_proof.py --user-run", "canary_user_terminal_required"),
+    ("timeout 60 python3 /p/canary_proof.py --user-run", "canary_user_terminal_required"),
+    ("bash -c 'python3 /p/canary_proof.py --phase=comparison'", "canary_user_terminal_required"),
+    ("git add /p/canary_proof.py", None),
+    ("grep -n user-run /p/canary_proof.py", None),
+])
+for k4_name in ("CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_MESSAGING_TOKEN"):
+    k4_extend("secret_names_and_inventory", [
+        (f"python3 -c 'import os; print(os.environ.get(\"{k4_name}\"))'", "secret_variable_reference"),
+        (f"node -e 'console.log(process.env.{k4_name})'", "secret_variable_reference"),
+        (f"grep -rn {k4_name} .", "secret_name_search"),
+        (K4_R + f"claude-oauth-token -- tvly search {k4_name}", "secret_variable_reference"),
+        (K4_R + f"claude-oauth-token --only {k4_name} -- claude -p hello", None),
+        (f"systemctl --user set-environment {k4_name}=x", "secret_variable_reference"),
+        (f"dbus-update-activation-environment --systemd {k4_name}", "secret_variable_reference"),
+        (f"systemd-run --user -E {k4_name} true", "secret_variable_on_command_line"),
+        (f"systemd-run --user -p Environment={k4_name}=x true", "secret_variable_on_command_line"),
+        (f"echo {k4_name}_HINT", None),
+        (f"rg -n MY_{k4_name}_HINT", None),
+    ])
+for k4_tree in ("omniroute", "omniroute-fw"):
+    k4_extend("omniroute_data_trees", [
+        (f"sudo cat ~/.local/share/{k4_tree}/services/x", "credential_file_read"),
+        (K4_R + f"tavily -- cat ~/.local/share/{k4_tree}/x", "credential_file_read"),
+        (f"grep -r key ~/.local/share/{k4_tree}*", "credential_file_read"),
+        (f"find ~ -name x -exec cat ~/.local/share/{k4_tree}/x ;", "credential_file_read"),
+        (f"ls ~/.local/share/{k4_tree}", None),
+        (f"du -sh ~/.local/share/{k4_tree}", None),
+        (f"echo ~/.local/share/{k4_tree}", None),
+    ])
+k4_extend("omniroute_data_trees", [("cat ~/.local/share/omniroute-fwx/x", None), ("cat ~/.local/share/omni/x", None),
+                                   ("cat ~/.local/share/xomniroute/x", None)])
+k4_extend("shell_literals_and_shellouts", [
+    ("python3 - <<'PY'\nprint(\"set\")\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nd = {\"env\": 1}\nx = f(\"set\", 2)\nPY", None),
+    ("python3 - <<'PY'\nx = 'uses $(printenv) as text'\nPY", None),
+    ("python3 - <<'PY'\nx = \"`printenv`\"\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os\nos.execv('/bin/sh', ['sh', '-c', 'printenv'])\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os\nos.execl('/usr/bin/env', 'env')\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport subprocess\nsubprocess.run(['curl', 'http://127.0.0.1:20128/api/settings'])\nPY",
+     "gateway_credential_route"),
+    ("python3 - <<'PY'\nimport subprocess\nsubprocess.run(['cat', '/home/u/.local/share/omniroute/x'])\nPY", "credential_file_read"),
+    ("node - <<'JS'\nrequire('child_process').execSync('printenv')\nJS", "environment_dump"),
+    ("node - <<'JS'\nrequire('child_process').execFileSync('env', [])\nJS", "environment_dump"),
+    ("node - <<'JS'\nconst x = `a ${1 + 2} b`\nJS", None),
+    ("python3 - <<'PY'\nimport asyncio\nasyncio.run(main())\nPY", None),
+    ("python3 - <<'PY'\nf = os.system\nf('print' 'env')\nPY", None),
+])
+k4_extend("whole_environment", [
+    ("python3 - <<'PY'\nimport os\nprint(getattr(os, 'environ'))\nPY", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nprint(__import__('os').environ)\nPY", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nimport os as o\nprint(o.environ)\nPY", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nimport os\nprint(vars(os)['environ'])\nPY", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nimport os\nprint(ｏｓ.ｅｎｖｉｒｏｎ)\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os\nif 'HOME' in os.environ:\n    pass\nPY", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nimport os\nfor k, v in os.environ.items():\n    print(k, v)\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os, logging\nlogging.info(os.environ)\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os, sys\nsys.stdout.write(str(os.environ))\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nimport os\nos.environ.setdefault('X', '1')\nos.environ.pop('Y', None)\nPY", None),
+    ("python3 - <<'PY'\nfrom os import environ\nprint(environ.get('HOME'))\nPY", None),
+    ("python3 - <<'PY'\nimport os\nprint(os.environ.get('TAVILY_API_KEY'))\nPY", "secret_variable_reference"),
+    ("node - <<'JS'\nconsole.log(process)\nJS", "interpreter_environment_unclassified"),
+    ("node - <<'JS'\nconsole.log(process.env.valueOf())\nJS", "environment_dump"),
+    ("node - <<'JS'\nconsole.log(process.argv)\nJS", None),
+    ("node - <<'JS'\nconsole.log(process.\\u0065nv)\nJS", "interpreter_environment_unclassified"),
+    ("node - <<'JS'\nconst p = require('process'); console.log(p.env)\nJS", "interpreter_environment_unclassified"),
+    ("node - <<'JS'\nconst s = x.replace(/'/g, ''); console.log(process.env)\nJS", "environment_dump"),
+    ("node - <<'JS'\nconst key = 'HOME'\nconsole.log(process.env[key])\nJS", "interpreter_environment_unclassified"),
+    ("node - <<'JS'\nconsole.table(process.env)\nJS", "environment_dump"),
+    ("node - <<'JS'\nconst e = {...process.env}\ne.X = '1'\nJS", None),
+    ("node - <<'JS'\nconst e = {...process.env}\nconsole.log(e)\nJS", "environment_dump"),
+    ("node - <<'JS'\nconst e = {...process.env}\nsend(e)\nJS", "environment_dump"),
+    ("node - <<'JS'\nconst e = {...process.env}\nother(e)\nJS", "interpreter_environment_unclassified"),
+    ("python3 - <<'PY'\nprint(f\"{42:{os.environ}}\")\nPY", "environment_dump"),
+])
+k4_extend("inline_environment_and_deferred_shellouts", [
+    ("python3 -c'import os;print(dict(os.environ))'", "environment_dump"),
+    ("python3 --check-hash-based-pycs never -c 'import os;print(os.environ)'", "environment_dump"),
+    ("python3 -X dev -W ignore -c 'import os;print(os.environ)'", "environment_dump"),
+    ("pypy3 -c 'import os;print(os.environ)'", "environment_dump"),
+    ("python3.13 -c 'import os;print(os.environ)'", "environment_dump"),
+    ("node -p process.env", "environment_dump"),
+    ("node -p process.env.HOME", None),
+    ("node --print 'process.env'", "environment_dump"),
+    ("node -pe 'process.env'", "environment_dump"),
+    ("node --eval='console.log(process.env)'", "environment_dump"),
+    ("node -e'console.log(process.env)'", "environment_dump"),
+    ("node --title x -e 'console.log(process.env)'", "environment_dump"),
+    ("node --require ./x.js -e 'console.log(process.env)'", "environment_dump"),
+    ("node --input-type=module -e 'console.log(process.env)'", "environment_dump"),
+    ("python3 <<< 'import os; print(os.environ)'", "environment_dump"),
+    ("uv run python -c 'import os; print(os.environ)'", "environment_dump"),
+    ("sudo python3 -c 'import os; print(os.environ)'", "environment_dump"),
+    (K4_R + "tavily -- node -e 'console.log(process.env.HOME)'", "environment_dump_in_credential_run"),
+    ("python3 -c 'import os; print(os.environ.get(\"HOME\"))'", None),
+    ("python3 -c 'import os; os.system(\"printenv\")'", None),
+    ("node -e 'require(\"child_process\").execSync(\"printenv\")'", None),
+    ("python3 -q -c 'unknown(os.environ)'", "interpreter_environment_unclassified"),
+    ("python3 -Z -c 'print(os.environ)'", "environment_dump"),
+    ("python3 -Z 'print(os.environ)'", "interpreter_environment_unclassified"),
+])
+k4_extend("tail_reads_share_budget", [
+    ("git commit -m \"$(cat <<'EOF'\nmsg\nEOF\n)\" && echo \"done; printenv is refused\"", None),
+    ("git commit -m \"$(cat <<'EOF'\nmsg\nEOF\n)\" && git push", None),
+    ("cat <<'EOF' > x\n'\nEOF\necho ok; printenv", "environment_dump"),
+    ("cat <<'EOF' > x\n\"\nEOF\ncat <<'EOF2' > y\n'\nEOF2\nprintenv\n'", "environment_dump"),
+    ("cat <<-'EOF' > x\n\"\n\tEOF\nprintenv\n\"", "environment_dump"),
+    ("cat <<'EOF'>x\n\"\nEOF\nprintenv\n\"", "environment_dump"),
+])
+# Manually labelled form F boundaries (section 9.4): (text, eligible). Labels are read off the grammar of section 7.1, not from either
+# recognizer; test_k4_f_reference_boundaries checks the independent reference_form_f and the guard's k4_form_f against every row.
+K4_F_LABELED = [(text, True) for text in K4_F_ALLOW] + [(text, False) for text in K4_F_REJECT] + [
+    ("python3 <<'PY'\npass\nPY", True),
+    ("python <<'PY'\npass\nPY", True),
+    ("python3.12 - <<'PY'\npass\nPY", True),
+    ("pypy - <<'PY'\npass\nPY", True),
+    ("/usr/bin/python3 - <<'PY'\npass\nPY", True),
+    ("./venv/bin/python3 - <<'PY'\npass\nPY", True),
+    ("~/bin/python3 - <<'PY'\npass\nPY", True),
+    ("python3 -B -IS -u - <<'PY'\npass\nPY", True),
+    ("python3 - one 'two words' \"three\" $X ${Y} a/b:c=d,e+f@g%h~i <<'PY'\npass\nPY", True),
+    ("python3 -<<'PY'\npass\nPY", True),
+    ("python3 - << 'PY'\npass\nPY", True),
+    ("python3 - <<'PY_2'\npass\nPY_2", True),
+    ("python3 - <<'_x'\npass\n_x", True),
+    ("python3 - <<'PY'   \npass\nPY", True),
+    ("python3 - <<'PY'\npass\nPY\n", True),
+    ("python3 - <<'PY'\nPY", True),
+    ("node <<'JS'\n1\nJS", True),
+    ("nodejs - <<'JS'\n1\nJS", True),
+    ("node --input-type=commonjs <<'JS'\n1\nJS", True),
+    ("/usr/local/bin/node - <<'JS'\n1\nJS", True),
+    ("cd \"$HOME\" && python3 - <<'PY'\npass\nPY", True),
+    ("cd 'a dir'&&python3 - <<'PY'\npass\nPY", True),
+    ("  cd /tmp  &&  python3 - <<'PY'\npass\nPY", True),
+    ("python3 - <<'PY' > out.txt\npass\nPY", True),
+    ("python3 - <<'PY' >> log 2>> err\npass\nPY", True),
+    ("python3 - <<'PY' &> all\npass\nPY", True),
+    ("python3 - <<'PY' 1>&2\npass\nPY", True),
+    ("python3 - <<'PY' >&2\npass\nPY", True),
+    ("python3 - <<'PY' | head -5\npass\nPY", True),
+    ("python3 - <<'PY' | tail -c 100 | wc -l\npass\nPY", True),
+    ("python3 - <<'PY' | sort -r -n | uniq -c\npass\nPY", True),
+    ("python3 - <<'PY' | grep -iv 'a|b'\npass\nPY", True),
+    ("python3 - <<'PY' 2>&1 | grep -c x\npass\nPY", True),
+    ("python3 - <<\\PY\npass\nPY", False),
+    ("python3 - <<$'PY'\npass\nPY", False),
+    ("python3 - <<'PY'\"X\"\npass\nPYX", False),
+    ("python3 - <<'P'Y\npass\nPY", False),
+    ("python3 - <<''\npass\n", False),
+    ("python3 - <<'1PY'\npass\n1PY", False),
+    ("\npython3 - <<'PY'\npass\nPY", False),
+    ("# c\npython3 - <<'PY'\npass\nPY", False),
+    ("python3 - <<'PY' <<'Q'\npass\nPY\nQ", False),
+    ("python3 - <<'PY'\nx = 1 << 2\nPY", False),
+    ("python3 - <<<'x'\npass", False),
+    ("env X=1 python3 - <<'PY'\npass\nPY", False),
+    ("X=1 python3 - <<'PY'\npass\nPY", False),
+    ("time python3 - <<'PY'\npass\nPY", False),
+    ("rtk proxy python3 - <<'PY'\npass\nPY", False),
+    ("python3 -m mod <<'PY'\npass\nPY", False),
+    ("python3 script.py <<'PY'\npass\nPY", False),
+    ("python3 -W ignore - <<'PY'\npass\nPY", False),
+    ("python3 -X dev - <<'PY'\npass\nPY", False),
+    ("python3 - < in.txt <<'PY'\npass\nPY", False),
+    ("python3 - <<'PY' < in.txt\npass\nPY", False),
+    ("python3 - <<'PY' | bash\npass\nPY", False),
+    ("python3 - <<'PY' | tee x\npass\nPY", False),
+    ("python3 - <<'PY' | cat\npass\nPY", False),
+    ("python3 - <<'PY'; echo x\npass\nPY", False),
+    ("python3 - <<'PY' && echo x\npass\nPY", False),
+    ("python3 - <<'PY' || true\npass\nPY", False),
+    ("python3 - <<'PY' &\npass\nPY", False),
+    ("python3 - <<'PY' | head -n5\npass\nPY", False),
+    ("python3 - <<'PY' | grep\npass\nPY", False),
+    ("python3 - <<'PY' | grep a b\npass\nPY", False),
+    ("python3 - <<'PY' | sort -rn\npass\nPY", False),
+    ("python3 - <<'PY' > \"$(date)\"\npass\nPY", False),
+    ("python3 - <<'PY' 2>&3\npass\nPY", False),
+    ("python3 - <<'PY'\npass\nPY ", False),
+    ("python3 - <<'PY'\npass\n\tPY", False),
+    ("python3 - <<'PY'\npass\nPY\r", False),
+    ("python3 - <<'PY'\npass\n PY", False),
+    ("python3 - <<'PY'\npass", False),
+    ("python3 - <<'PY'\npass\nPY\n\n", False),
+    ("python3 - <<'PY'\r\npass\nPY", False),
+    ("cd /tmp; python3 - <<'PY'\npass\nPY", False),
+    ("cd /tmp && sudo python3 - <<'PY'\npass\nPY", False),
+    ("cd $(pwd) && python3 - <<'PY'\npass\nPY", False),
+    ("cd a b && python3 - <<'PY'\npass\nPY", False),
+    ("pushd /tmp && python3 - <<'PY'\npass\nPY", False),
+    ("bash -c \"python3 - <<'PY'\npass\nPY\"", False),
+    ("node --input-type=module --input-type=module - <<'JS'\n1\nJS", False),
+    ("node -e x <<'JS'\n1\nJS", False),
+    ("node --experimental-x - <<'JS'\n1\nJS", False),
+    ("deno run - <<'JS'\n1\nJS", False),
+    ("bun - <<'JS'\n1\nJS", False),
+    ("python3 - - <<'PY'\npass\nPY", True),
+    ("python3 - <<'PY'\npass\nPY\nPY", False),
+]
+# The historical blocking fixtures of the K3 reviews (contract-v2 section 9.1): B1-B7 (review-k3b), C1-C8 (review-k3c), P1-P3 (reviews/k3-v3).
+K4_REVIEW_CONTROLS = {
+    "B1": ('echo "$(bash <<\'EOF\'\necho "$(printenv)"\nEOF\n)"', "environment_dump"),
+    "B2": ('echo "$(cat <<$\'EOF\'\nEOF\necho "$(printenv)"\ncat <<\'$EOF\'\n$EOF\n)"', "environment_dump"),
+    "B3": ('echo "$(cat <<\'EOF\'\ntext\\\nEOF\necho "$(printenv)"\ncat <<\'EOF\'\nEOF\n)"', "environment_dump"),
+    "B4": ('echo "$(\n((1 << "2"))\necho "$(printenv)"\ncat <<\'2\'\n2\n)"', "environment_dump"),
+    "B5": ("bash <<'EOF'\nprintf ' #x'\nprintenv\nEOF\n#" + "x" * 200000, "environment_dump"),
+    "B6": ('env -u < "$PAPER_ENV_FILE" UNUSED cat', "credential_file_read"),
+    "B7": ('systemd-run --pipe --unit < "$PAPER_ENV_FILE" demo cat', "credential_file_read"),
+    "C1": ('cat <<\'OUT\'\necho "$(cat <<\'EOF\'\nOUT\nprintenv\necho "$(cat <<\'EOF\'\nEOF\n)"', "environment_dump"),
+    "C2": ('bash <<OUT\necho "$(cat <<\'EOF\'\n"; printenv; #\nEOF\n)"\nOUT', "environment_dump"),
+    "C3": ('echo "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)" | sh', "environment_dump"),
+    "C4": ('git rebase --exec "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)" HEAD~2', "environment_dump"),
+    "C5": ('eval $(case x in x) echo "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)";; esac)', "environment_dump"),
+    "C6": ('echo >(sh -c "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)")', "environment_dump"),
+    "C7": ("ps -Ccat e", "environment_dump"),
+    "C8": ("ps -fCcat e", "environment_dump"),
+    "P1": ("I_WANT_A_BROKEN_PS=1 ps -axu e", "environment_dump"),
+    "P2": ("PS_PERSONALITY=old ps -axu e", "environment_dump"),
+    "P3": ("env PS_PERSONALITY=old ps -axu e", "environment_dump"),
+}
+# Prior-only controls (section 9.4, amendment A10): the current reading of dc33b48a allows each command and the prior reading (c26800f3's walk,
+# which finds the keyring exec that systemd-run's --description value hides) refuses it, so dropping the prior reading for any here-document
+# shape would pass it. The base outcomes below were measured by a scratch adapter on the pinned base file (git show
+# dc33b48a:scripts/hooks/secret_path_guard.py, sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51) and are literal
+# constants here: (current reading, prior reading, check) per command. Evidence class: a recorded local measurement.
+K4_PRIOR_PREFIX = "systemd-run --description kernel_keyring.py exec name X -- cat .env"
+K4_PRIOR_ONLY = {
+    K4_PRIOR_PREFIX: (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; python3 - <<'PY'\npass\nPY": (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; sudo python3 - <<'PY'\npass\nPY": (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; python3 -c pass <<'PY'\npass\nPY": (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; python3 - <<'PY' | sh\npass\nPY": (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; python3 - <<'PY'\npass\nPY\necho done": (None, "dotenv_read", "dotenv_read"),
+    K4_PRIOR_PREFIX + "; cat <<'EOF'\npass\nEOF": (None, "dotenv_read", "dotenv_read"),
+}
+# The base outcome of every K4 fixture above that the pinned base refuses (section 9.1: record the base verdict of each new fixture;
+# amendment A10: measured by a scratch adapter that loaded the base file from `git show dc33b48a:scripts/hooks/secret_path_guard.py`,
+# sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51, and called its check() in-process with bytecode disabled; every
+# other fixture is allowed there). Evidence class: a recorded local measurement. test_k4_base_reason_precedence holds the guard to these
+# reasons outside form F.
+K4_BASE_REFUSED = {
+    'env -u < "$PAPER_ENV_FILE" UNUSED cat': 'credential_file_read',
+    'python3 tools/credentials/credential_run.py tavily < "$PAPER_ENV_FILE" -- cat': 'credential_file_read',
+    'systemctl --user import-environment; cat "$PAPER_ENV_FILE"': 'credential_file_read',
+    'systemd-run --pipe --unit < "$PAPER_ENV_FILE" demo cat': 'credential_file_read',
+    "python3 - <<'PY'\nprint(open('/home/u/.config/native-agent-stack/x.env').read())\nPY": 'credential_store_path',
+    'curl -s http://127.0.0.1:20128/api/settings; cat .env': 'dotenv_read',
+    'set 0 < /dev/null; set 0</dev/null; cat .env': 'dotenv_read',
+    'systemd-run --description kernel_keyring.py exec name X -- cat .env': 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; cat <<'EOF'\npass\nEOF": 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; python3 - <<'PY'\npass\nPY": 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; python3 - <<'PY'\npass\nPY\necho done": 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; python3 - <<'PY' | sh\npass\nPY": 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; python3 -c pass <<'PY'\npass\nPY": 'dotenv_read',
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; sudo python3 - <<'PY'\npass\nPY": 'dotenv_read',
+    'I_WANT_A_BROKEN_PS=1 ps -axu e': 'environment_dump',
+    'PS_PERSONALITY=old ps -axu e': 'environment_dump',
+    "bash -c 'printenv' x tools/credentials/credential_run.py tavily -- true": 'environment_dump',
+    'bash <<OUT\necho "$(cat <<\'EOF\'\n"; printenv; #\nEOF\n)"\nOUT': 'environment_dump',
+    "cat <<'EOF' > note.md\nprintenv\nEOF": 'environment_dump',
+    'cat <<\'EOF\' > x\n"\nEOF\ncat <<\'EOF2\' > y\n\'\nEOF2\nprintenv\n\'': 'environment_dump',
+    "cat <<'EOF' > x\n'\nEOF\necho ok; printenv": 'environment_dump',
+    'cat <<\'OUT\'\necho "$(cat <<\'EOF\'\nOUT\nprintenv\necho "$(cat <<\'EOF\'\nEOF\n)"': 'environment_dump',
+    "cd /tmp && python3 - <<'PY'\nprint(set([1]))\nPY": 'environment_dump',
+    "cd /tmp '&&' python3 - <<'PY'\nprint(set([1]))\nPY": 'environment_dump',
+    'curl -s http://127.0.0.1:20128/api/settings; printenv': 'environment_dump',
+    'dbus-update-activation-environment --all; printenv': 'environment_dump',
+    'echo "$(\n((1 << "2"))\necho "$(printenv)"\ncat <<\'2\'\n2\n)"': 'environment_dump',
+    'echo "$(bash <<\'EOF\'\necho "$(printenv)"\nEOF\n)"': 'environment_dump',
+    'echo "$(cat <<$\'EOF\'\nEOF\necho "$(printenv)"\ncat <<\'$EOF\'\n$EOF\n)"': 'environment_dump',
+    'echo "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)" | sh': 'environment_dump',
+    'echo "$(cat <<\'EOF\'\ntext\\\nEOF\necho "$(printenv)"\ncat <<\'EOF\'\nEOF\n)"': 'environment_dump',
+    'echo "$(python3 - <<\'PY\'\nprint(set([1]))\nPY\n)"': 'environment_dump',
+    'echo >(sh -c "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)")': 'environment_dump',
+    'env PS_PERSONALITY=old ps -axu e': 'environment_dump',
+    'eval $(case x in x) echo "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)";; esac)': 'environment_dump',
+    'eval printenv x tools/credentials/credential_run.py tavily -- true': 'environment_dump',
+    'gh pr comment --body-file - <<\'EOF\'\nvalue: "$(printenv)"\nEOF': 'environment_dump',
+    'git commit -F - <<\'EOF\'\nvalue: "$(printenv)"\nEOF': 'environment_dump',
+    'git rebase --exec "$(cat <<\'EOF\'\nprintenv # "\nEOF\n)" HEAD~2': 'environment_dump',
+    "node - <<'JS'\nconst x = `printenv`\nJS": 'environment_dump',
+    "node - <<'JS'\nrequire('child_process').execSync('printenv')\nJS": 'environment_dump',
+    "node - <<'JS' 1>/dev/null\nconst env = {PATH: '/usr/bin'}; console.log(env)\nJS": 'environment_dump',
+    "node - <<'JS'1>/dev/null\nJS1\nprintenv\nJS": 'environment_dump',
+    "node --input-type=module - <<'JS'\nconst env = 1; console.log(env)\nJS": 'environment_dump',
+    'ps -Ccat e': 'environment_dump',
+    'ps -fCcat e': 'environment_dump',
+    'python3 - <<"PY"\nprint(set([1]))\nPY': 'environment_dump',
+    "python3 - <<'PY'\n# unique values\nprint(len(set([1, 1])))\nPY": 'environment_dump',
+    "python3 - <<'PY'\nenv = os.environ.copy()\nprint(env)\nPY": 'environment_dump',
+    "python3 - <<'PY'\nenv = os.environ.copy()\nunknown(env)\nPY": 'environment_dump',
+    "python3 - <<'PY'\ngetattr(__import__('os'), 'system')('printenv')\nPY": 'environment_dump',
+    'python3 - <<\'PY\'\nprint("set")\nPY': 'environment_dump',
+    "python3 - <<'PY'\nprint(set([1]))\nPY\necho done": 'environment_dump',
+    'python3 - <<\'PY\'\nx = "$(printenv)"\nPY': 'environment_dump',
+    'python3 - <<\'PY\'\nx = "`printenv`"\nPY': 'environment_dump',
+    "python3 - <<'PY' 2>&1 | tail -n 5\nprint(set([1]))\nPY": 'environment_dump',
+    "python3 - <<'PY' 2>/dev/null\nprint(set([1]))\nPY": 'environment_dump',
+    "python3 - <<'PY' | 'head'\nprint(set([1]))\nPY": 'environment_dump',
+    "python3 - <<'PY' | head -n '5'\nprint(set([1]))\nPY": 'environment_dump',
+    'python3 - <<\'PY\' | sh\nprint("printenv")\nPY': 'environment_dump',
+    "python3 - <<'PY'2>/dev/null\nPY2\nprintenv\nPY": 'environment_dump',
+    "python3 - <<-'PY'\n\tprint(set([1]))\n\tPY": 'environment_dump',
+    'python3 - <<PY\nprint(set([1]))\nPY': 'environment_dump',
+    "python3 - a b <<'PY'\nimport sys\nprint(set(sys.argv[1]) | set(sys.argv[2]))\nPY": 'environment_dump',
+    "python3 -I - <<'PY'\nprint(set([1]))\nPY": 'environment_dump',
+    "python3 -c pass <<'PY'\nprint(set([1]))\nPY": 'environment_dump',
+    'python3 tools/credentials/credential_run.py get tavily; printenv': 'environment_dump',
+    'set 0</dev/null; set 0 < /dev/null': 'environment_dump',
+    'set 1 > out; echo \x01': 'environment_dump',
+    'set 1>out': 'environment_dump',
+    'set 1>out; echo \x01': 'environment_dump',
+    "sudo python3 - <<'PY'\nprint(set([1]))\nPY": 'environment_dump',
+    'systemctl --user import-environment; printenv': 'environment_dump',
+    'kernel_keyring.py exec n X -- printenv; python3 tools/credentials/credential_run.py tavily -- printenv': 'environment_dump_in_keyring_exec',
+    'python3 scripts/kernel_keyring.py exec n X -- python3 tools/credentials/credential_run.py tavily -- printenv': 'environment_dump_in_keyring_exec',
+    'python3 tools/credentials/credential_run.py tavily -- python3 scripts/kernel_keyring.py exec n X -- printenv': 'environment_dump_in_keyring_exec',
+    "python3 - <<'PY'\nKEYCTL_READ = 11\nPY": 'keyring_payload_read',
+    "python3 - <<'PY'\nsubprocess.run(['keyctl', 'print', '123'])\nPY": 'keyring_payload_read',
+    'python3 tools/credentials/credential_run.py tavily -- cat /proc/self/environ': 'process_environment',
+    'dbus-update-activation-environment --systemd GH_TOKEN=x': 'secret_variable_reference',
+    'dbus-update-activation-environment LABEL=TAVILY_API_KEY': 'secret_variable_reference',
+    'echo $TAVILY_API_KEY; python3 tools/credentials/credential_run.py tavily -- printenv': 'secret_variable_reference',
+    "python3 - <<'PY'\nimport os\nprint(os.environ.get('TAVILY_API_KEY'))\nPY": 'secret_variable_reference',
+    "python3 - <<'PY'\nimport os\nprint(os.environ['TAVILY_API_KEY'])\nPY": 'secret_variable_reference',
+    'python3 tools/credentials/credential_run.py tavily --only "$TAVILY_API_KEY" -- true': 'secret_variable_reference',
+    'systemctl --user import-environment GH_TOKEN': 'secret_variable_reference',
+    'systemctl --user set-environment LABEL=TAVILY_API_KEY': 'secret_variable_reference',
+    'systemctl --user show-environment | grep -c PATH': 'service_manager_environment',
+}
+
+
+# A benign command, allowed by the base and by K4, that reaches each new helper (section 9.6, failure injection). The test wraps the helper
+# to prove it is reached, then makes it raise inside main() (mocked streams) and inside a child Python that patches it and calls main().
+K4_HELPER_FIXTURES = {
+    "segment_identity": "echo 1>/dev/null; echo 1 > /dev/null",
+    "descriptor_positions": "echo 1>/dev/null; echo 1 > /dev/null",
+    "note_identity_collision": "echo 1>/dev/null; echo 1 > /dev/null",
+    "base_text_reason": "git status",
+    "k4_anchors": "git status",
+    "k4_tightenings": "git status",
+    "k4_walk_reason": K4_R + "tavily -- tvly search markets --json",
+    "k4_needs_walk": "python3 scripts/kernel_keyring.py status tavily_api_key",
+    "k4_names_and_stores": "cat ~/.local/share/omniroute-notes/x",
+    "k4_names_stores_segment": "cat ~/.local/share/omniroute-notes/x",
+    "systemd_run_variables": "systemd-run --user -E X=CLAUDE_CODE_x true",
+    "k4_shell_words": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_program_operand": "python3 -c 'print(1)'",
+    "k4_program_operand_scan": "python3 -c 'print(1)'",
+    "k4_memo": "python3 -c 'print(1)'",
+    "k4_script_position": K4_R + "tavily -- tvly search markets --json",
+    "k4_script_position_scan": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_start": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_start_scan": K4_R + "tavily -- tvly search markets --json",
+    "k4_join": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_mentions": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_environment": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_usage_reason": K4_R + "tavily -- tvly search markets --json",
+    "k4_visible_words": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_manager_reason": "systemctl --user set-environment PATH=/usr/bin",
+    "k4_literal": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_store_reason": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_store_text": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_literal_input": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
+    "k4_ps_reason": "echo PS_PERSONALITY; ps -e",
+    "k4_canary_reason": "python3 /p/canary_proof.py --phase baseline",
+    "k4_delimiter_word": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
+    "k4_regions": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
+    "k4_resume_contexts": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
+    "k4_f_arg": "python3 - one <<'PY'\npass\nPY",
+    "k4_f_tail": "python3 - <<'PY' 2>/dev/null\npass\nPY",
+    "k4_f_header": "python3 - <<'PY'\npass\nPY",
+    "k4_form_f": "python3 - <<'PY'\npass\nPY",
+    "k4_tail_reason": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
+    "k4_unescape": "python3 - <<'PY'\nx = 'a\\n'\nPY",
+    "k4_code_tokens": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
+    "k4_code_structure": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
+    "k4_leading_literals": "python3 - <<'PY'\nimport subprocess\nsubprocess.run(['true'])\nPY",
+    "k4_derived": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
+    "k4_shell_literals": "python3 - <<'PY'\nx = 'a'\nPY",
+    "k4_shellouts": "python3 - <<'PY'\nimport subprocess\nsubprocess.run(['true'])\nPY",
+    "k4_whole_environment": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
+    "k4_environment_use": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
+    "k4_single_key": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
+    "k4_code_units": "python3 -c 'print(1)'",
+    "k4_unit_environment_reason": "python3 -c 'import os; print(os.environ.get(\"HOME\"))'",
+    "k4_interpreter_reason": "python3 -c 'print(1)'",
+    "k4_gateway_reason": "curl -s http://127.0.0.1:20128/api/health",
+    "k4_curl_expansions": "curl -s 'http://127.0.0.1:20128/api/{health,cache}'",
+    "k4_gateway_url": "curl -s http://127.0.0.1:20128/api/health",
+    "k4_curl_requests": "curl -s http://127.0.0.1:20128/api/health",
+    "k4_wget_requests": "wget -qO- http://127.0.0.1:20128/api/health",
+    "k4_httpie_requests": "http GET :20128/api/health",
+    "k4_gateway_cli": "omniroute --help",
+    "k4_gateway_shell": "curl -s http://127.0.0.1:20128/api/health",
+    "k4_call_parts": "python3 -c \"import requests; requests.get('http://127.0.0.1:20128/api/health')\"",
+    "k4_code_value": "python3 -c \"import requests; requests.get('http://127.0.0.1:20128/api/health')\"",
+    "k4_call_values": "python3 -c \"import requests; requests.get('http://127.0.0.1:20128/api/health')\"",
+    "k4_query_values": "python3 -c \"import requests; requests.get('http://127.0.0.1:20128/api/usage/call-logs', params={'limit': 5})\"",
+    "k4_gateway_code": "python3 -c \"import requests; requests.get('http://127.0.0.1:20128/api/health')\"",
+}
+# Helpers whose own work is charged (section 1, invariant 5), with a direct call and the counter it must raise by at least the amount given.
+K4_TEXT = "x" * 3200  # 100 units a pass
+K4_CHARGED = {
+    "k4_anchors": (lambda: guard.k4_anchors(K4_TEXT), "characters", 100),
+    "k4_shell_words": (lambda: guard.k4_shell_words(K4_TEXT), "characters", 100),
+    "k4_runner_mentions": (lambda: guard.k4_runner_mentions(K4_TEXT), "characters", 300),
+    "k4_ps_reason": (lambda: guard.k4_ps_reason(K4_TEXT), "characters", 300),
+    "k4_store_text": (lambda: guard.k4_store_text(K4_TEXT), "characters", 100),
+    "k4_regions": (lambda: guard.k4_regions(K4_TEXT + "<<"), "characters", 400),
+    "k4_resume_contexts": (lambda: guard.k4_resume_contexts(K4_TEXT, []), "characters", 100),
+    "k4_f_header": (lambda: guard.k4_f_header(K4_TEXT), "characters", 300),
+    "k4_f_tail": (lambda: guard.k4_f_tail(K4_TEXT), "characters", 200),
+    "k4_form_f": (lambda: guard.k4_form_f(K4_TEXT), "characters", 100),
+    "k4_unescape": (lambda: guard.k4_unescape(K4_TEXT), "characters", 100),
+    "k4_code_tokens": (lambda: guard.k4_code_tokens(K4_TEXT, "py"), "characters", 100),
+    "k4_derived": (lambda: guard.k4_derived("true " + K4_TEXT), "characters", 100),
+    "k4_curl_expansions": (lambda: guard.k4_curl_expansions(K4_TEXT), "characters", 100),
+    "k4_gateway_url": (lambda: guard.k4_gateway_url(K4_TEXT), "characters", 400),
+    "k4_literal": (lambda: guard.k4_literal(K4_TEXT, set()), "characters", 100),
+    "k4_program_operand": (lambda: guard.k4_program_operand(["python3"] + ["-B"] * 99), "words", 100),
+    "k4_script_position": (lambda: guard.k4_script_position(["echo"] * 100, "credential_run.py"), "words", 100),
+    "k4_runner_start": (lambda: guard.k4_runner_start(["echo"] * 100), "words", 100),
+    "k4_join": (lambda: guard.k4_join(["echo"] * 100), "words", 100),
+    "k4_visible_words": (lambda: guard.k4_visible_words(["echo"] * 100), "words", 100),
+    "k4_literal_input": (lambda: guard.k4_literal_input(["echo"] * 100, set()), "words", 100),
+    "k4_manager_reason": (lambda: guard.k4_manager_reason([["echo"] * 100]), "words", 100),
+    "k4_canary_reason": (lambda: guard.k4_canary_reason([["echo"] * 100]), "words", 100),
+    "k4_gateway_shell": (lambda: guard.k4_gateway_shell([["echo"] * 100]), "words", 100),
+    "k4_curl_requests": (lambda: guard.k4_curl_requests(["curl"] * 100), "words", 100),
+    "k4_wget_requests": (lambda: guard.k4_wget_requests(["wget"] * 100), "words", 100),
+    "k4_httpie_requests": (lambda: guard.k4_httpie_requests(["http"] * 100), "words", 100),
+    "k4_gateway_cli": (lambda: guard.k4_gateway_cli(["omniroute"] * 100), "words", 100),
+}
+
+
+# Timing rows of section 9.6: each builds an inert string (under 199,000 characters) and states its exact outcome; a budget-exhausting row
+# names the counter (WorkBudgetExceeded in check(), command_too_complex in the hook). test_k4_timing measures each in a fresh Python child
+# (-B): the median of three time.process_time() spans around check() must stay under 0.5 s.
+def k4_code_f(body, language="py"):
+    return ("python3 - <<'PY'\n" + body + "\nPY") if language == "py" else ("node - <<'JS'\n" + body + "\nJS")
+
+
+K4_TIMING = {
+    "T-RAW-CONFIG": (lambda: "echo " + "XDG_CONFIG_HOME:-" * 6000 + "x; printenv", "environment_dump"),
+    "T-RAW-HF": (lambda: "echo " + "HF_HOME:-" * 6000 + "x; printenv", "environment_dump"),
+    "T-RAW-PROC": (lambda: "echo " + "/proc" * 16000 + "/x; printenv", "environment_dump"),
+    "T-FIND": (lambda: "find . " + "-ok " * 49000 + "; printenv", "environment_dump"),
+    "T-PS": (lambda: "ps " + "E" * 70000 + "q; printenv", "environment_dump"),
+    "T-CODE-PLAIN": (lambda: k4_code_f("x = [1, 2]\n" * 8000), None),
+    "T-CODE-PLAIN-LAUNCHER": (lambda: "sudo " + k4_code_f("x = [1, 2]\n" * 8000), None),
+    "T-CODE-OUTPUT": (lambda: k4_code_f("import os\n" + "print(" * 4000 + "os.environ" + ")" * 4000), "environment_dump"),
+    "T-CODE-OUTPUT-JS": (lambda: k4_code_f("console.log(" * 4000 + "process.env" + ")" * 4000, "js"), "environment_dump"),
+    "T-CODE-NONOUTPUT": (lambda: k4_code_f("import os\nx = " + "f(" * 2048 + ", ".join(["os.environ.get('HOME')"] * 1024)
+                                           + ")" * 2048), None),
+    "T-CODE-NONOUTPUT-JS": (lambda: k4_code_f("x = " + "f(" * 2048 + ", ".join(["process.env.HOME"] * 1024) + ")" * 2048, "js"), None),
+    "T-CODE-NONOUTPUT-DEEP": (lambda: k4_code_f("import os\nx = " + "f(" * 8192 + ", ".join(["os.environ.get('HOME')"] * 4096)
+                                                + ")" * 8192), None),
+    "T-CODE-UNKNOWN": (lambda: k4_code_f("import os\nx = " + "f(" * 2048 + ", ".join(["os.environ[k]"] * 4096) + ")" * 2048),
+                       "interpreter_environment_unclassified"),
+    "T-COMMENT-PY": (lambda: k4_code_f("# it's \"x\" and 'y'\n" * 7000), None),
+    "T-COMMENT-JS-LINE": (lambda: k4_code_f("// it's \"x\" `y`\n" * 7000, "js"), None),
+    "T-COMMENT-JS-BLOCK": (lambda: k4_code_f("/* 'a' \"b\" `c` */\n" * 7000, "js"), None),
+    "T-STRING-ESCAPES": (lambda: k4_code_f("x = 'a\\'b\\\"c'\n" * 8000), None),
+    "T-FSTRING-FIELDS": (lambda: k4_code_f("x = f'{a}{b!r}{c:>{w}}'\n" * 5000), None),
+    "T-TEMPLATE-FIELDS": (lambda: k4_code_f("x = `${a}${b + `${c}`}`\n" * 5000, "js"), None),
+    "T-FSTRING-UNFINISHED": (lambda: k4_code_f("x = f'{a}'\n" * 8000 + "print(f'{os.environ"), "interpreter_environment_unclassified"),
+    "T-LITERAL-REUSE": (lambda: k4_code_f("import os\n" + "os.system('true')\n" * 5000), None),
+    "T-LITERAL-DISTINCT": (lambda: k4_code_f("import os\n" + "".join(f"os.system('t{n}')\n" for n in range(10050))), "texts"),
+    "T-GW-MANY": (lambda: "curl -s " + " ".join(["http://127.0.0.1:20128/api/health"] * 4000), None),
+    "T-GW-MANY-NEXT": (lambda: "curl -s " + " --next ".join(["http://127.0.0.1:20128/api/health"] * 3000), None),
+    "T-GW-MANY-MIXED": (lambda: "curl -s " + " --next ".join(["http://127.0.0.1:20128/api/health"] * 3000)
+                        + " --next http://127.0.0.1:20128/api/settings", "gateway_credential_route"),
+    "T-GW-PREFIX-HOST": (lambda: "curl -s " + "http://127.0.0.1:2012X/ap " * 6000, None),
+    "T-GW-PREFIX-OPTION": (lambda: "curl -s " + "--request-targeX " * 9000 + "http://127.0.0.1:20128/api/health",
+                           "gateway_credential_route"),
+    # one quoted word: shlex (B's own reading) spends about 2 microseconds a character on it, so the row stays near 75,000 characters
+    "T-GW-PREFIX-QUERY": (lambda: "curl -s 'http://127.0.0.1:20128/api/usage/call-logs?" + "limit=1&" * 9000 + "'",
+                          "gateway_credential_route"),
+    "T-GW-PREFIX-ID": (lambda: "curl -s http://127.0.0.1:20128/api/usage/call-logs/" + "a" * 150000, "gateway_credential_route"),
+    "T-GW-PREFIX-METHOD": (lambda: "curl -s " + "-XGETX " * 20000 + "http://127.0.0.1:20128/api/health", "gateway_credential_route"),
+    # Each runner hop re-emits the rest of the words (the words counter), and each interpreter word among a started command's arguments is
+    # read again from there on (the characters counter), so these adversarial rereads stop on a counter instead of scanning every suffix.
+    "T-RUN-DEEP": (lambda: (K4_R + "tavily -- ") * 3000 + "true", "words"),
+    "T-RUN-INTERPRETERS": (lambda: K4_R + "tavily -- echo " + "python3 " * 1200 + "; true", "characters"),
+    "T-RUN-DISTINCT": (lambda: "; ".join(K4_R + f"tavily -- echo {n}" for n in range(1500)), "reads"),
+    "T-RUN-ONLY": (lambda: K4_R + "alpaca-paper " + "--only APCA_API_KEY_ID " * 5000 + "-- true", None),
+    "T-F-PREFIX-FLAGS": (lambda: "python3 " + "-B " * 40000 + "<<'PY'\npass\nPY", None),
+    "T-F-PREFIX-QUOTE": (lambda: "python3 - <<'" + "P" * 75000 + "\npass", None),
+    "T-F-PREFIX-OPERATORS": (lambda: "python3 - " + "<<'PY' " * 20000 + "\npass\nPY", None),
+    "T-F-PREFIX-TERMINATORS": (lambda: "python3 - <<'PY'\n" + "PY \n" * 30000 + "PY", None),
+    "T-STORE-STAGES": (lambda: "echo \"$K\" | " * 12000 + "python3 scripts/kernel_keyring.py store x", None),
+    "T-STORE-PRINTF": (lambda: "printf '" + "%s" * 60000 + "' \"$K\" | python3 scripts/kernel_keyring.py store x", None),
+    "T-STORE-PREFIX": (lambda: "echo " + "kernel_keyring.pX store " * 7000 + "; python3 scripts/kernel_keyring.py store x", None),
+    "T-STORE-ASSIGNMENTS": (lambda: " ".join(f"V{n}=\"$X\"" for n in range(12000)) + "; printf '%s' \"$V1\" | "
+                            "python3 scripts/kernel_keyring.py store x", None),
+    "T-MANAGER-NAMES": (lambda: "systemctl --user set-environment " + " ".join(f"V{n}=x" for n in range(20000)) + " TAVILY_API_KEY=abc",
+                        "manager_environment_write"),
+    "T-MANAGER-PREFIX": (lambda: "echo " + "set-environmenX " * 10000 + "; systemctl --user set-environment PATH=/usr/bin", None),
+    "T-PS-PREFIX": (lambda: "echo " + "PS_PERSONALITX=1 " * 10000 + "; PS_PERSONALITY=1 ps -e", "ps_personality_selector"),
+    "T-CANARY-PREFIX": (lambda: "echo " + "canary_proof.pX --phase=comparisoX " * 5000 + "; python3 /p/canary_proof.py --user-run",
+                        "canary_user_terminal_required"),
+    "T-NAMES-PREFIX": (lambda: "echo " + "CLAUDE_CODE_OAUTH_TOKE CLAUDE_CODE_MESSAGING_TOKE " * 3500 + "; echo $CLAUDE_CODE_OAUTH_TOKEN",
+                       "secret_variable_reference"),
+    "T-STORES-PREFIX": (lambda: "echo " + ".local/share/omniroutX/ " * 7500 + "; cat ~/.local/share/omniroute/x", "credential_file_read"),
+}
+_K4_TIMING_CHILD = (
+    "import json, statistics, sys, time\n"
+    "sys.dont_write_bytecode = True\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "from tests import test_secret_path_guard as t\n"
+    "text = t.K4_TIMING[sys.argv[2]][0]()\n"
+    "spans, verdict = [], None\n"
+    "for _ in range(3):\n"
+    "    cpu = time.process_time()\n"
+    "    try:\n"
+    "        verdict = t.guard.check(text)\n"
+    "    except t.guard.WorkBudgetExceeded as error:\n"
+    "        verdict = error.args[0]\n"
+    "    spans.append(time.process_time() - cpu)\n"
+    "print(json.dumps([verdict, statistics.median(spans), len(text)]))\n")
+
+
+# Per-helper scaling generators (section 9.6): a near-miss repetition that reaches the helper, at about 25k, 50k and 100k characters. The
+# helper->generator map lists every new scanning helper, so a new one cannot escape the gate (test_k4_timing checks the list).
+K4_SCALING = {
+    "k4_anchors": lambda n: "echo " + "credential_run.p " * (n // 17),
+    "k4_shell_words": lambda n: "echo " + "'a' " * (n // 4) + "| python3 scripts/kernel_keyring.py store x",
+    "k4_runner_mentions": lambda n: K4_R + "tavily -- echo " + "TAVILY_API_KE " * (n // 14),
+    "k4_runner_environment": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_runner_start": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_script_position": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_runner_start_scan": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_script_position_scan": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_program_operand_scan": lambda n: "python3 " + "-B " * (n // 3) + "-c 'pass'",
+    "k4_runner_usage_reason": lambda n: K4_R + "tavily " + "--check " * (n // 8),
+    "k4_ps_reason": lambda n: "echo " + "PS_PERSONALITX=1 " * (n // 17) + "; echo PS_PERSONALITY",
+    "k4_store_text": lambda n: "echo \"$K\" | " * (n // 12) + "python3 scripts/kernel_keyring.py store x",
+    "k4_store_reason": lambda n: "echo \"$K\" | " * (n // 12) + "python3 scripts/kernel_keyring.py store x",
+    "k4_visible_words": lambda n: "echo \"$K\" | " * (n // 12) + "python3 scripts/kernel_keyring.py store x",
+    "k4_literal": lambda n: "python3 scripts/kernel_keyring.py store x <<< \"" + "$K" * (n // 2) + "\"",
+    "k4_literal_input": lambda n: "python3 scripts/kernel_keyring.py store x " + "< f " * (n // 4),
+    "k4_regions": lambda n: "cat <<X\n" * (n // 8),
+    "k4_delimiter_word": lambda n: "cat <<" + "'a'" * (n // 3) + "\nx",
+    "k4_resume_contexts": lambda n: "cat <<'EOF'\n\"\nEOF\n" * (n // 16) + "true",
+    "k4_tail_reason": lambda n: "cat <<'EOF'\n\"\nEOF\n" * (n // 16) + "true",
+    "k4_f_header": lambda n: "python3 " + "-B " * (n // 3) + "<<'PY'\npass\nPY",
+    "k4_f_tail": lambda n: "python3 - <<'PY' " + "> x " * (n // 4) + "\npass\nPY",
+    "k4_f_arg": lambda n: "python3 - " + "a" * n + " <<'PY'\npass\nPY",
+    "k4_form_f": lambda n: "python3 - <<'PY'\n" + "PYX\n" * (n // 4),
+    "k4_code_tokens": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
+    "k4_code_structure": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
+    "k4_whole_environment": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
+    "k4_unit_environment_reason": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
+    "k4_unescape": lambda n: k4_code_f("x = 'a\\n'\n" * (n // 10)),
+    "k4_shell_literals": lambda n: k4_code_f("x = \"a\"\n" * (n // 8)),
+    "k4_shellouts": lambda n: k4_code_f("import os\n" + "os.system('true')\n" * (n // 18)),
+    "k4_leading_literals": lambda n: k4_code_f("import os\n" + "os.system('true')\n" * (n // 18)),
+    "k4_code_units": lambda n: "python3 -c 'pass' " + "a " * (n // 2),
+    "k4_program_operand": lambda n: "python3 " + "-B " * (n // 3) + "-c 'pass'",
+    "k4_curl_expansions": lambda n: "curl 'http://127.0.0.1:20128/api/{" + "a," * (n // 2) + "b}'",
+    "k4_gateway_url": lambda n: "curl 'http://127.0.0.1:20128/api/usage/call-logs?" + "limit=1&" * (n // 8) + "'",
+    "k4_curl_requests": lambda n: "curl " + "-s " * (n // 3) + "http://127.0.0.1:20128/api/health",
+    "k4_gateway_shell": lambda n: "curl " + "-s " * (n // 3) + "http://127.0.0.1:20128/api/health",
+    "k4_gateway_reason": lambda n: "curl " + "-s " * (n // 3) + "http://127.0.0.1:20128/api/health",
+    "k4_wget_requests": lambda n: "wget " + "-q " * (n // 3) + "http://127.0.0.1:20128/api/health",
+    "k4_httpie_requests": lambda n: "http GET :20128/api/health " + "X:y " * (n // 4),
+    "k4_gateway_cli": lambda n: "omniroute " + "--debug " * (n // 8) + "serve",
+    "k4_gateway_code": lambda n: "python3 -c \"import requests\n" + "requests.get('http://127.0.0.1:20128/api/health')\n" * (n // 50) + "\"",
+    "k4_call_parts": lambda n: "python3 -c \"import requests\n" + "requests.get('http://127.0.0.1:20128/api/health')\n" * (n // 50) + "\"",
+    "k4_manager_reason": lambda n: "systemctl --user set-environment " + "V=x " * (n // 4),
+    "k4_canary_reason": lambda n: "python3 /p/canary_proof.py " + "--phase baseline " * (n // 17),
+    "k4_names_and_stores": lambda n: "cat " + "~/.local/share/omniroutX/x " * (n // 27) + "~/.local/share/omniroute-notes/x",
+}
+
+
+def k4_all_fixtures():
+    """Every K4 fixture string once, with its expected K4 outcome where one is stated (form F labels have none)."""
+    fixtures = {}
+    for cases in K4_CASES.values():
+        for command, expected in cases:
+            fixtures.setdefault(command, expected)
+    for command, _eligible in K4_F_LABELED:
+        fixtures.setdefault(command, "unstated")
+    for command, (_current, _prior, verdict) in K4_PRIOR_ONLY.items():
+        fixtures.setdefault(command, verdict)
+    for label, (command, expected) in K4_REVIEW_CONTROLS.items():
+        if label != "B5":
+            fixtures.setdefault(command, expected)
+    return fixtures
+
+
 class K4GuardTests(unittest.TestCase):
     def cases(self, name):
         for command, expected in K4_CASES[name]:
@@ -3467,7 +4226,51 @@ class K4GuardTests(unittest.TestCase):
         self.cases("descriptor_identity")
 
     def test_k4_base_reason_precedence(self):
+        # Section 3: B(T) decides first. Every fixture the pinned base refuses (K4_BASE_REFUSED, measured) keeps the base's reason, unless it
+        # is form F (reference_form_f, independent of the guard), where amendment A5 reads the body as code only: there the command may be
+        # allowed (the single loosening L1) or refused for a K4 CODE reason.
         self.cases("base_reason_precedence")
+        fixtures = k4_all_fixtures()
+        self.assertEqual(sorted(set(K4_BASE_REFUSED) - set(fixtures)), [])
+        for command, base_reason in K4_BASE_REFUSED.items():
+            with self.subTest(command=command):
+                got = guard.check(command)
+                if reference_form_f(command) is None:
+                    self.assertEqual(got, base_reason)
+                elif got is None:
+                    self.assertIn(command, K4_F_ALLOW + [text for text, eligible in K4_F_LABELED if eligible])
+
+    def test_k4_prior_only_heredoc_controls(self):
+        # Section 9.4 (amendment A10): each control is refused only by the prior reading of dc33b48a (its current reading allows it), so a
+        # reading that skipped the prior reading for any `<<`, any interpreter region, a rejected launcher, option or tail would pass it.
+        for command, (current, prior, verdict) in K4_PRIOR_ONLY.items():
+            with self.subTest(command=command):
+                self.assertIsNone(reference_form_f(command))
+                self.assertEqual(guard.check(command), verdict)
+                guard.start_work()
+                try:
+                    joined = command.replace("\\\n", "")
+                    texts = (joined, guard.unquoted(joined))
+                    self.assertEqual(guard.current_reading(joined, texts), current)
+                    self.assertEqual(guard.prior_reading(joined, texts), prior)
+                finally:
+                    guard.stop_work()
+
+    def test_k4_original_review_controls(self):
+        # Section 9.1: the eighteen historical blocking fixtures keep their reasons; B5 (200,040 characters) is refused as command_too_large
+        # by the real hook process whatever check() returns for it.
+        self.assertEqual(len(K4_REVIEW_CONTROLS), 18)
+        self.assertEqual(len(K4_REVIEW_CONTROLS["B5"][0]), 200_040)
+        for label, (command, reason) in K4_REVIEW_CONTROLS.items():
+            with self.subTest(label=label):
+                self.assertIsNone(reference_form_f(command))
+                if label == "B5":
+                    done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                    self.assertEqual(done.returncode, 2)
+                    self.assertIn("command_too_large", done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    continue
+                self.assertEqual(guard.check(command), reason)
 
     def test_k4_secret_names_and_inventory(self):
         self.cases("secret_names_and_inventory")
@@ -3524,6 +4327,26 @@ class K4GuardTests(unittest.TestCase):
             with self.subTest(reference='negative', command=text):
                 self.assertIsNone(reference_form_f(text))
         self.cases('f_reference_boundaries')
+        # The manually labelled table: the independent reference and the guard's own recognizer both agree with each label, and every
+        # eligible row's spans (body start and end) agree between them.
+        for text, eligible in K4_F_LABELED:
+            with self.subTest(labelled=eligible, command=text):
+                reference = reference_form_f(text)
+                self.assertEqual(reference is not None, eligible)
+                guard.start_work()
+                try:
+                    form = guard.k4_form_f(text)
+                finally:
+                    guard.stop_work()
+                self.assertEqual(form is not None, eligible)
+                if eligible:
+                    self.assertEqual((form.body_start, form.body_end), reference["body"])
+                    self.assertEqual(form.language, reference["language"])
+        # A harmless eligible body is allowed; an ineligible twin keeps B's refusal (the table rows with a `set` line).
+        for text, eligible in K4_F_LABELED:
+            if "set(" in text:
+                with self.subTest(verdict=eligible, command=text):
+                    self.assertEqual(guard.check(text) is None, eligible)
 
     def test_k4_language_comments_and_interpolation(self):
         self.cases('language_comments_and_interpolation')
@@ -3553,6 +4376,271 @@ class K4GuardTests(unittest.TestCase):
         self.assertEqual(len(K4_DOCUMENTED_GATEWAY), 4)
         self.assertEqual(sum(name.startswith('DOC-JSON-') for name, _text in K4_DOCUMENTED_GATEWAY), 2)
         self.cases('documented_gateway_fixtures')
+
+    def k4_main(self, command):
+        """main() on a Bash payload with mocked streams: (exit status, stdout, stderr)."""
+        stdout, stderr = io.StringIO(), io.StringIO()
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": command}})
+        with mock.patch.object(sys, "stdin", io.StringIO(payload)), mock.patch.object(sys, "stdout", stdout), \
+                mock.patch.object(sys, "stderr", stderr):
+            status = guard.main()
+        return status, stdout.getvalue(), stderr.getvalue()
+
+    def test_k4_helper_failures_and_budget_charges(self):
+        # Section 9.6 "Failure injection": every new helper, reached by a benign fixture (proved by wrapping it), raising a sentinel
+        # RuntimeError (MemoryError and RecursionError for the allocation and recursion helpers) ends in main()'s guard_error line: exit 2,
+        # one stderr line, nothing on stdout, no sentinel, no traceback; WorkBudgetExceeded ends in command_too_complex. No helper swallows it.
+        helpers = sorted(name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))
+                         and name not in {"k4_charge", "k4_word_charge"})
+        helpers += ["segment_identity", "descriptor_positions", "note_identity_collision", "systemd_run_variables", "base_text_reason"]
+        self.assertEqual(sorted(set(helpers) - set(K4_HELPER_FIXTURES)), [])
+        sentinel = "SENTINEL-K4-7e1f"
+        for name, command in sorted(K4_HELPER_FIXTURES.items()):
+            with self.subTest(helper=name):
+                original = getattr(guard, name)
+                calls = []
+
+                def counting(*args, _original=original, **kwargs):
+                    calls.append(1)
+                    return _original(*args, **kwargs)
+
+                with mock.patch.object(guard, name, counting):
+                    self.assertIsNone(guard.check(command))
+                self.assertTrue(calls, f"{name} is not reached by its fixture")
+                errors = [RuntimeError(sentinel)]
+                if name in {"k4_code_tokens", "k4_regions", "k4_derived", "k4_shell_words", "k4_tightenings"}:
+                    errors += [MemoryError(sentinel), RecursionError(sentinel)]
+                for error in errors:
+                    with mock.patch.object(guard, name, side_effect=error):
+                        status, out, err = self.k4_main(command)
+                    self.assertEqual((status, out), (2, ""))
+                    self.assertIn("blocked (guard_error)", err)
+                    self.assertEqual(err.count("\n"), 1)
+                    self.assertNotIn(sentinel, err)
+                    self.assertNotIn("Traceback", err)
+                with mock.patch.object(guard, name, side_effect=guard.WorkBudgetExceeded("characters")):
+                    status, out, err = self.k4_main(command)
+                self.assertEqual((status, out), (2, ""))
+                self.assertIn("blocked (command_too_complex)", err)
+        # The same through a real child process that imports the guard, patches one helper and calls main().
+        child = ("import io, json, sys\nsys.dont_write_bytecode = True\nsys.path.insert(0, sys.argv[1])\n"
+                 "from scripts.hooks import secret_path_guard as g\n"
+                 "def boom(*a, **k):\n    raise RuntimeError('" + sentinel + "')\n"
+                 "setattr(g, sys.argv[2], boom)\n"
+                 "sys.stdin = io.StringIO(json.dumps({'tool_name': 'Bash', 'tool_input': {'command': sys.argv[3]}}))\n"
+                 "raise SystemExit(g.main())\n")
+        for name in ("k4_tightenings", "k4_form_f", "k4_regions", "k4_whole_environment", "k4_gateway_url", "k4_code_tokens",
+                     "k4_runner_environment", "k4_store_text", "k4_ps_reason", "k4_canary_reason", "k4_names_and_stores",
+                     "k4_program_operand", "k4_tail_reason", "k4_manager_reason", "note_identity_collision"):
+            with self.subTest(child=name):
+                done = subprocess.run([sys.executable, "-B", "-c", child, str(ROOT), name, K4_HELPER_FIXTURES[name]],
+                                      capture_output=True, text=True, timeout=60)
+                self.assertEqual((done.returncode, done.stdout), (2, ""))
+                self.assertIn("blocked (guard_error)", done.stderr)
+                self.assertNotIn(sentinel, done.stderr)
+                self.assertNotIn("Traceback", done.stderr)
+        # Each scanning helper charges its own pass before reading (a direct call under the budget raises the counter by at least one unit
+        # per 32 characters a pass), and a limit just below that charge refuses inside it.
+        for name, (call, counter, minimum) in sorted(K4_CHARGED.items()):
+            with self.subTest(charge=name):
+                spent = guard.start_work()
+                try:
+                    call()
+                    used = spent[counter]
+                finally:
+                    guard.stop_work()
+                self.assertGreaterEqual(used, minimum)
+                with mock.patch.dict(guard.WORK_LIMITS, {counter: minimum - 1}):
+                    guard.start_work()
+                    try:
+                        with self.assertRaises(guard.WorkBudgetExceeded):
+                            call()
+                    finally:
+                        guard.stop_work()
+        # One budget for every reading: a fixture that reaches K4 refuses when the characters limit sits just below what its whole check()
+        # spends (B, K4 and a tail together), and never resets between them.
+        for command in (K4_HELPER_FIXTURES["k4_tail_reason"], K4_HELPER_FIXTURES["k4_gateway_code"],
+                        K4_HELPER_FIXTURES["k4_walk_reason"], "python3 - <<'PY'\n" + "x = [1, 2]\n" * 200 + "PY",
+                        "echo 1>/dev/null; echo 1 > /dev/null; " + K4_R + "tavily -- true"):
+            with self.subTest(budget=command[:40]):
+                spent = guard.start_work()
+                try:
+                    self.assertIsNone(guard.read_command(command))
+                    total = dict(spent)
+                finally:
+                    guard.stop_work()
+                for counter in ("characters", "texts", "words"):
+                    with mock.patch.dict(guard.WORK_LIMITS, {counter: total[counter] - 1}):
+                        with self.assertRaises(guard.WorkBudgetExceeded) as caught:
+                            guard.check(command)
+                        self.assertEqual(caught.exception.args, (counter,))
+
+    def test_k4_timing(self):
+        # Section 9.6: each named row in a fresh Python child (-B), median of three process_time spans around check() under LINEAR_SECONDS
+        # (0.5 s; a CI runner gets 1.5 s), with its exact outcome (a counter name for a budget refusal) and its length under 199,000. The
+        # children run one at a time, so no row's processor time includes another's contention.
+        runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name],
+                                     capture_output=True, text=True, timeout=180) for name in sorted(K4_TIMING)}
+        for name, (build, expected) in sorted(K4_TIMING.items()):
+            with self.subTest(row=name):
+                done = runs[name]
+                self.assertEqual(done.returncode, 0, done.stderr[-400:])
+                verdict, cpu, length = json.loads(done.stdout)
+                self.assertLess(length, 199_000)
+                self.assertEqual(verdict, expected)
+                self.assertLess(cpu, LINEAR_SECONDS)
+        # T-CODE-NONOUTPUT's instrumentation: every environment occurrence is visited, and output context is read once a token (a list
+        # built in one pass), so deepening the nesting four times with twice the occurrences stays linear, not depth x tokens.
+        guard.start_work()
+        try:
+            text = K4_TIMING["T-CODE-NONOUTPUT"][0]()
+            self.assertIsNone(guard.read_command(text))
+            body = text.split("\n", 1)[1].rsplit("\n", 1)[0] + "\n"  # the region body runs to the terminator line
+            self.assertEqual(guard._k4_cache[("environment-visits", "py", body)], 1024)
+        finally:
+            guard.stop_work()
+        spans = {}
+        for depth, count in ((1024, 512), (4096, 2048)):
+            text = k4_code_f("import os\nx = " + "f(" * depth + ", ".join(["os.environ.get('HOME')"] * count) + ")" * depth)
+            best = []
+            for _ in range(3):
+                cpu = time.process_time()
+                self.assertIsNone(guard.check(text))
+                best.append(time.process_time() - cpu)
+            spans[depth] = min(best)
+        self.assertLess(spans[4096], 8 * max(spans[1024], 0.005))
+        # T-TAIL-BUDGET: several tail reads that each fit, together over a test-only budget, refuse without any reset.
+        tails = "".join(f"cat <<'E{n}'\n\"\nE{n}\ntrue {n}\n" for n in range(40))
+        spent = guard.start_work()
+        try:
+            self.assertIsNone(guard.read_command(tails))
+            used = spent["texts"]
+        finally:
+            guard.stop_work()
+        with mock.patch.dict(guard.WORK_LIMITS, {"texts": used - 1}):
+            with self.assertRaises(guard.WorkBudgetExceeded):
+                guard.check(tails)
+        # Per-helper generators at about 25k, 50k and 100k characters: the helper is reached with the generated text (instrumented), each
+        # size finishes under LINEAR_SECONDS through check() and inside the helper, and 100k costs less than eight times 25k (a quadratic
+        # scan costs sixteen).
+        scanners = {name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))} - {
+            "k4_charge", "k4_word_charge", "k4_memo", "k4_tightenings", "k4_walk_reason", "k4_needs_walk", "k4_names_stores_segment",
+            "k4_join", "k4_derived", "k4_interpreter_reason", "k4_environment_use", "k4_single_key", "k4_code_value",
+            "k4_call_values", "k4_query_values"}
+        self.assertEqual(sorted(scanners - set(K4_SCALING)), [])
+        for name, generator in sorted(K4_SCALING.items()):
+            with self.subTest(helper=name):
+                totals, helper_totals = {}, {}
+                for size in (25_000, 50_000, 100_000):
+                    text = generator(size)
+                    self.assertLess(len(text), 199_000)
+                    original, inside = getattr(guard, name), []
+
+                    def timed(*args, _original=original, **kwargs):
+                        cpu = time.process_time()
+                        try:
+                            return _original(*args, **kwargs)
+                        finally:
+                            inside.append(time.process_time() - cpu)
+
+                    with mock.patch.object(guard, name, timed):
+                        cpu = time.process_time()
+                        try:
+                            guard.check(text)
+                        except guard.WorkBudgetExceeded:
+                            pass
+                        totals[size] = time.process_time() - cpu
+                    self.assertTrue(inside, f"{name} not reached at {size}")
+                    helper_totals[size] = sum(inside)
+                    self.assertLess(helper_totals[size], LINEAR_SECONDS)
+                    self.assertLess(totals[size], LINEAR_SECONDS)
+                # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
+                self.assertLess(helper_totals[100_000], 8 * max(helper_totals[25_000], 0.01))
+
+    def test_k4_hook_process_and_hints(self):
+        # Section 9.7: the real hook, launched as `python3 -B scripts/hooks/secret_path_guard.py` with a JSON payload on stdin (the payload
+        # command never runs). A refusal is exit 2 with its exact reason on one line, nothing on stdout and no text of the command (each
+        # payload carries a sentinel); an allowed command is exit 0 with empty streams; each finishes within PATHOLOGICAL_SECONDS.
+        sentinel = "SENTINEL-K4-3b9d"
+        refused = [
+            (K4_R + "tavily -- printenv", "environment_dump_in_credential_run"),
+            (K4_R + "get tavily", "credential_run_usage"),
+            ("curl -s http://127.0.0.1:20128/api/settings", "gateway_credential_route"),
+            ("systemctl --user import-environment", "manager_environment_write"),
+            ("echo demo | " + K4_KR + "store sample_key", "keyring_store_literal"),
+            ("PS_PERSONALITY=bsd ps -e", "ps_personality_selector"),
+            ("python3 /p/canary_proof.py --user-run", "canary_user_terminal_required"),
+            (k4_code_f("import os\nunknown(os.environ)"), "interpreter_environment_unclassified"),
+            (k4_code_f("import os\nprint(dict(os.environ))"), "environment_dump"),
+            (k4_code_f("console.log(`${JSON.stringify(process.env)}`)", "js"), "environment_dump"),
+            ("python3 -c 'import os;print(dict(os.environ))'", "environment_dump"),
+            ("python3 - <<'PY'2>/dev/null\nPY2\nprintenv\nPY", "environment_dump"),
+            ("node - <<'JS'1>/dev/null\nJS1\nprintenv\nJS", "environment_dump"),
+            ("set 0 < /dev/null; set 0</dev/null", "environment_dump"),
+            ("echo $CLAUDE_CODE_OAUTH_TOKEN", "secret_variable_reference"),
+            ("rg -n CLAUDE_CODE_MESSAGING_TOKEN docs/", "secret_name_search"),
+            ("cat ~/.local/share/omniroute-fw/db_backups/x", "credential_file_read"),
+            (K4_PRIOR_PREFIX + "; python3 - <<'PY'\npass\nPY", "dotenv_read"),
+            (K4_REVIEW_CONTROLS["C3"][0], "environment_dump"),
+            ("python3 - <<'PY'\ns = \"\"\"\nPY\nprintenv\n\"\"\"\nPY", "environment_dump"),
+            ("sudo " + k4_code_f("import os\n" + "x = [1]\n" * 3000 + "print(os.environ)"), "environment_dump"),
+        ]
+        allowed = [
+            k4_code_f("# unique values\nprint(len(set([1, 1])))"),
+            K4_DOCUMENTED_GATEWAY[0][1],
+            K4_DOCUMENTED_GATEWAY[1][1],
+            K4_R + "tavily -- tvly search \"x\" --depth basic --json",
+            "printf '%s' \"$K\" | " + K4_KR + "store sample_key",
+            "ps -e",
+            "echo 'python3 /p/canary_proof.py --phase=comparison --user-run'",
+            k4_code_f("x = [1, 2]\n" * 8000),
+        ]
+        for command, reason in refused:
+            with self.subTest(refused=command[:60]):
+                payload = command if "\n" in command else command + " # " + sentinel  # a here-document keeps its exact shape
+                started = time.perf_counter()
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": payload}})
+                self.assertLess(time.perf_counter() - started, PATHOLOGICAL_SECONDS)
+                self.assertEqual((done.returncode, done.stdout), (2, ""))
+                self.assertIn(f"blocked ({reason})", done.stderr)
+                self.assertEqual(done.stderr.count("\n"), 1)
+                self.assertNotIn(sentinel, done.stderr)
+                self.assertNotIn(payload.split("\n", 1)[0], done.stderr)
+        for command in allowed:
+            with self.subTest(allowed=command[:60]):
+                started = time.perf_counter()
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertLess(time.perf_counter() - started, PATHOLOGICAL_SECONDS)
+                self.assertEqual((done.returncode, done.stdout, done.stderr), (0, "", ""))
+        # The size cap: just below and at 200,000 characters the command is read (within its budget), above it refused before any rule.
+        for length, outcome in ((199_999, 0), (200_000, 0), (200_001, "command_too_large")):
+            with self.subTest(length=length):
+                command = "echo " + "x" * (length - 5)
+                self.assertEqual(len(command), length)
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                if outcome == 0:
+                    self.assertEqual((done.returncode, done.stdout, done.stderr), (0, "", ""))
+                else:
+                    self.assertEqual(done.returncode, 2)
+                    self.assertIn("blocked (command_too_large)", done.stderr)
+        # Hints: each new reason has one, value-free, with the concepts section 8 asks for.
+        concepts = {
+            "environment_dump_in_credential_run": ("credential_run.py", "masking is a second layer", "without printing"),
+            "credential_run_usage": ("no value-returning subcommands", "--check", "ID -- COMMAND", "docs/secret-storage.md"),
+            "gateway_credential_route": ("management API", "exact allowlist", "user terminal"),
+            "manager_environment_write": ("multiple processes", "systemctl --user show-environment", "one runner command"),
+            "keyring_store_literal": ("transcripts/history", "hidden prompt", "dynamic input"),
+            "ps_personality_selector": ("ps personality", "environment-display flags", "cannot select"),
+            "canary_user_terminal_required": ("canary_proof.py", "user terminal", "pty is not authorization"),
+            "interpreter_environment_unclassified": ("could not be classified", "single non-secret key", "separately reviewed script"),
+        }
+        for reason, words in concepts.items():
+            with self.subTest(hint=reason):
+                hint = guard.HINTS[reason]
+                for word in words:
+                    self.assertIn(word, hint)
+                self.assertNotIn("/api/settings/", hint)
+                self.assertNotIn("$", hint)
 
 
 if __name__ == "__main__":
