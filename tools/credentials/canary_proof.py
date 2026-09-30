@@ -1654,23 +1654,21 @@ def verdict(args, env) -> int:
 
 def cleanup(args, env) -> int:
     run = open_run(args, env)
-    if run.valid:
-        state = arm_state(run.events)
-        if state["armed"] or state["pending"]:
-            disarm(args, env, run)
-        fd, _root = store_root(env)
-        try:
-            absent = _stat(fd) is None
-        finally:
-            os.close(fd)
-        codes = integrity(run)
-        result = classify(run.events, codes, expected_markers(run))
-        run.append("cleaned", receipt=f"{run.id}-{len(run.events) + 1:06d}", absent_verified=absent)
-        result = classify(run.events, codes, expected_markers(run))
-        publish(run, result)
-        code = EXIT[result["verdict"]]
-    else:
-        code = EXIT["invalid"]
+    if not run.valid:  # an unreadable record cannot be disarmed safely: every runtime file stays for the operator
+        return report(run, [])
+    state = arm_state(run.events)
+    if state["armed"] or state["pending"]:
+        disarm(args, env, run)
+    fd, _root = store_root(env)
+    try:
+        absent = _stat(fd) is None
+    finally:
+        os.close(fd)
+    codes = integrity(run)
+    run.append("cleaned", receipt=f"{run.id}-{len(run.events) + 1:06d}", absent_verified=absent)
+    result = classify(run.events, codes, expected_markers(run))
+    publish(run, result)
+    code = EXIT[result["verdict"]]
     import shutil
     shutil.rmtree(run.dir)
     say(None, f"cleaned: {run.id}")

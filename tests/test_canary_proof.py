@@ -886,6 +886,17 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(host.scan("baseline").returncode, 5)
         self.assertEqual(host.tool("arm", "--run", host.run_id, "codex-exec").returncode, 1, "S-refuse hit")
 
+    def test_an_invalid_record_is_never_cleaned_away(self):
+        """An armed run whose record no longer validates cannot be disarmed safely: cleanup reports invalid (4) and
+        keeps the run directory and the synthetic store file for the operator (contract 7, 12)."""
+        host = self.armed_host()
+        host.arm("subagent")
+        with open(host.path / "events.jsonl", "a") as handle:
+            handle.write('{"seq": "not a record"}\n')
+        result = host.tool("cleanup", "--run", host.run_id)
+        self.assertEqual(result.returncode, 4, "R8-invalid-cleanup")
+        self.assertTrue(host.path.is_dir() and (host.store / "canary-e2e.env").exists(), "R8-invalid-cleanup-keeps")
+
     def test_concurrent_invocation_returns_75_and_admits_no_request(self):
         import fcntl
         host = Host(self)
