@@ -1,17 +1,20 @@
 # Decision: the standing rule text in every instruction layer (2026-09-30)
 
-**Decided by:** the user's explicit request of 2026-09-30, relayed in the coordinator's unit brief (unit F1): every future session and repository picks up the defaults. This supersedes the last sentence of the scope in [`2026-09-28-top-rule-templates.md:26`](2026-09-28-top-rule-templates.md) ("The operator's user-level file is the operator's own and is not changed"): the portable template now becomes the single managed source of that file. Branch `claude/sota-defaults-f1-20260930`, rebuilt on `origin/main@11227bfd`. It was first built on `e45328d3`; the three rule surfaces are byte-identical at both commits.
+**Decided by:** the user's explicit request of 2026-09-30, relayed in the coordinator's unit brief (unit F1): every future session and repository picks up the defaults. This supersedes the last sentence of the scope in [`2026-09-28-top-rule-templates.md:26`](2026-09-28-top-rule-templates.md) ("The operator's user-level file is the operator's own and is not changed"): the portable template now becomes the single managed source of that file. Branch `claude/sota-defaults-f1-20260930`, on `origin/main@8fc86119`. It was first built on `e45328d3` and rebuilt on `11227bfd`; the three rule surfaces are byte-identical at all three commits.
 
 ## Context
 
 An audit on 2026-09-30 found the top rule present in text but with gaps in all three rule surfaces: the repository's `AGENTS.md`, the portable user-level template [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md) and the Codex user-level block [`adoption/templates/codex.AGENTS.template.md`](../../adoption/templates/codex.AGENTS.template.md). Six standing clauses were missing:
 
-- **(a) Codex and the gateway.** Codex CLI is the second native client. Its routing follows the [Sol-primary record](2026-09-30-sol-primary-quality-defaults.md), which lands with unit D4 in the same batch:
+- **(a) Codex and the gateway.** Codex CLI is the second native client. Its routing follows the [Sol-primary record](2026-09-30-sol-primary-quality-defaults.md), which lands with unit D4 in the same batch (refined on D4's branch at `9dd4ebe0`):
   - `gpt-6.1-sol` at ultra coordinates, and `gpt-6.1-sol` at max runs primary workers;
-  - `gpt-6-astra` at max takes consequential architecture, conflicting primary evidence or a failure unresolved after one bounded Sol repair;
+  - `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra;
+  - `gpt-6-astra` at max takes a single consequential judgment: conflicting primary evidence, consequential architecture, complex changes across systems, or a failure unresolved after one bounded Sol repair;
   - explicit model choices and role definitions win, so judgment lanes keep their recorded Astra bindings.
 
-  Cross-family research, review and sweep votes run through the OmniRoute gateway. The brief first worded this clause as `gpt-6-astra` max for judgment, `gpt-6-sol` medium for extraction and `gpt-6.1-sol` pending qualification. Its 04:35Z relay then worded it as "GPT-6 Astra at ultra for complex workflow tasks". The Sol-primary record is the later and more specific user selection, so this unit words (a) by it.
+  The split follows the Codex catalog semantics that record documents: ultra selects proactive delegation with the model's `xhigh` reasoning, while max sends the highest reasoning effort ([Codex worker lane recipe](../../recipes/README.md#codex-worker-lane)). The user's words of 2026-09-30, as the coordinator relayed them, were "gpt6.1 sol as main workers and use astra ultra when tasks needed suitable for complex workflow". Cross-family research, review and sweep votes run through the OmniRoute gateway.
+
+  Two earlier wordings are superseded. The brief first had `gpt-6-astra` max for judgment, `gpt-6-sol` medium for extraction and `gpt-6.1-sol` pending qualification. The first rebuild of this branch had Astra only at max.
 - **(b) Completeness critic.** Every substantive research or adoption unit ends with a completeness critic (missed modality, source or candidate class), whose findings feed that layer's next landscape sweep; the skills sweep is keyed by lifecycle task. The sweep method already has one critic per sweep ([`catalogs/sota-convergence/README.md:126`](../../catalogs/sota-convergence/README.md)); the clause makes it standing for every unit.
 - **(c) Model-callable skill discovery.** Invoke `search-first` before custom code or a tool choice, discover skills with `find-skills` (registry: `npx skills find`), verify or A/B a skill with `skill-creator`; every manifest skill stays listed for model invocation in both clients.
 - **(d) R&D direction.** The harness exists to build complex systems, projects and the north-star R&D; each unit names the north-star action it serves.
@@ -36,7 +39,7 @@ The template, in turn, held the five-step verification procedure that the user-l
 - **A UserPromptSubmit carrier.** A hook would inject the rules on every prompt. Rejected for its per-turn cost: a hook's `additionalContext` is inserted into the conversation beside each prompt it fires on ([hooks reference, "Add context for Claude"](https://code.claude.com/docs/en/hooks)), while the user-level file loads once at launch as part of the cached prefix ([memory docs](https://code.claude.com/docs/en/memory)). The 2026-09-29 local token-landscape A/B reported the user-level prefix as 17.6K of a 37.4K first prompt. That A/B is a private artifact with no receipt here, so the figure is context, not evidence.
 - **Leaving the user-level file unmanaged**, as the 2026-09-28 record did. Rejected: the divergence above is what that produced.
 - **Duplicating the text in each agent body.** Agents that omit the user-level file need their own copy. Unit F2 handles those bodies; this unit covers the three rule surfaces only.
-- **Pointers instead of text.** `AGENTS.md` would point to the user-level files for (a), (b), (c) and (e). Measured below as the fallback. Not chosen, because it leaves hosts and checkouts without the managed user-level files with no text for those clauses.
+- **Pointers instead of text.** `AGENTS.md` would point to the user-level files for (a), (b), (c) and (e). Measured as the fallback (below). Not chosen, because it leaves hosts and checkouts without the managed user-level files with no text for those clauses.
 
 ## Decision
 
@@ -90,12 +93,31 @@ Provenance for every item in this list: pre-existing uncommitted changes observe
   - "Assuming a systemd verifier's zero exit means every directive was recognized";
   - "Recommending a generic updater for a CLI behind a versioned launcher".
 - **The finalization record.** [`2026-09-30-sota-native-finalization.md`](2026-09-30-sota-native-finalization.md), unchanged below an attribution paragraph.
+- **The finalization record's evidence.** 18 of the 19 files of [`evidence/artifacts/sota-finalization-20260930/`](../../evidence/artifacts/sota-finalization-20260930/receipt.json), byte-identical to snapshot r2. The coordinator amended this unit's allowed paths for them.
 
 Not folded:
-- `recipes/README.md`: unit D4's branch at `a3a276ac` already carries the identical hunk.
+- `recipes/README.md`: unit D4's branch already carries the identical hunk.
 - The "Sol-primary quality defaults" paragraph of `docs/harness-defaults.md`, which is unit D4's.
 - The removal lines in a plain diff of the snapshot against main. They are main's newer #532 rows and handbook text, which the snapshot predates.
-- The finalization record's evidence directory, which is not assigned to this unit.
+- `evidence/artifacts/codex-01592-qualification-20260930/`, which unit D4's fold decides.
+- `evidence/artifacts/sota-finalization-20260930/convergence.json`, held back:
+  - **Why.** It is a `convergence_experiment` record. Its frozen inputs and observations pin eight files of other units by path and sha256:
+    - five of `native-skill-finalization-20260930` (unit F3), all matching F3's branch bytes;
+    - three of `codex-01592-qualification-20260930`, which are on no branch.
+
+    `scripts/validate_convergence.py --all-recorded`, which CI runs (`adoption-bootstrap.yml`, `publish-catalog.yml`), rejects both ways of publishing it here. Hash-listed but undeclared, it fails record discovery; declared in `convergence_records`, it fails validation on the missing files. Folded with the other 18 files, it made discovery fail on this branch.
+  - **When it can land.** Fold it and declare it once F3 lands and D4 publishes those three files unchanged at those paths. Its pins on six folded files here match, and so do the five F3 pins.
+
+### Sanitization of the folded evidence
+
+Nothing needed stripping, and no file was changed; the one file held back above was held for validation, not privacy:
+- **validate.py.** `python3 scripts/validate.py --scan-file` over all 19 snapshot files returned `{"scanned_files": 19, "status": "passed"}`, and over the 18 folded files `{"scanned_files": 18, "status": "passed"}`. Its patterns cover UUID session identifiers, personal home paths, Windows user paths and token shapes.
+- **A wider scan found none of these:** a personal home path, the host user name, a session UUID, a `/tmp/claude-*` path, an e-mail address, an IPv4 address or a token.
+- **Three kinds of string were reviewed and kept:**
+  - the one `/home/` string, the literal placeholder `/home/example` in `claude-review.json`'s prose ("found no /home paths (except the /home/example fixture)"), which validate.py's pattern exempts;
+  - three generic install locations (`~/.agents/skills/...`, `~/.codex/config.toml`, `~/.claude/`);
+  - 28 configuration-key strings in `convergence.json`, all inside recorded `codex exec` command lines whose outputs were already redacted to `<private-path>`. They are not quotes of a host configuration file, and the `claude_settings` and `codex_config` fields of `installed-skills.json` hold only `{"state": "ok"}`.
+- **Correction.** This unit's first handoff counted 21 files and one home path. The directory holds 19 files, and the "home path" is the placeholder above. Replacing it with `<home>` would have changed a retained review without removing any host data. It would also have broken the sha256 pin that the lane's convergence record holds for `claude-review.json`. So the file stays byte-exact.
 
 ### Rows reported by the Codex runtime lane
 
@@ -112,53 +134,64 @@ The same relay asked for three guards, stated here rather than as rows:
 - The actor behind the 07:34Z and 06:46Z timer and settings changes stays unknown.
 - A historical OSV pass is not current after the advisories of 2026-09-30 (#546).
 
-### Measured size
+### Measured size and the token budget
 
-o200k counts come from the repository's own `tools/token-report/token_manifest.py` `count_files`, with gpt-tokenizer 4.0.0. Words are `wc -w`. The base is `origin/main@11227bfd`.
+o200k counts come from the repository's own `tools/token-report/token_manifest.py` `count_files`, with gpt-tokenizer 4.0.0. Words are `wc -w`. The base is `origin/main@8fc86119`.
 
 | File | o200k tokens | Bytes | Words |
 | --- | --- | --- | --- |
-| `AGENTS.md` | 2,392 → 2,715 (+323) | 11,450 → 12,910 | 1,483 → 1,674 |
-| `examples/claude-native/CLAUDE.md` | 2,051 → 2,414 (+363) | 9,834 → 11,566 | 1,420 → 1,680 |
-| `adoption/templates/codex.AGENTS.template.md` | 829 → 1,336 (+507) | 3,371 → 5,750 (test ceiling 8,192) | 535 → 878 |
+| `AGENTS.md` | 2,392 → 2,733 (+341) | 11,450 → 13,014 | 1,483 → 1,684 |
+| `examples/claude-native/CLAUDE.md` | 2,051 → 2,433 (+382) | 9,834 → 11,681 | 1,420 → 1,696 |
+| `adoption/templates/codex.AGENTS.template.md` | 829 → 1,346 (+517) | 3,371 → 5,827 (test ceiling 8,192) | 535 → 889 |
 | The operator's user-level file today, for comparison | 1,988 | 9,634 | 1,378 |
 
-The folded text alone (origin/main plus the true delta, before this unit's clauses) measures:
-- `AGENTS.md`: +134;
-- the portable template: +5;
-- the Codex template: +78.
+How the sum was reached:
+- **The folded text alone** (origin/main plus the true delta, before this unit's clauses) measures +134 for `AGENTS.md`, +5 for the portable template and +78 for the Codex template.
+- **The Ultra/Max split** added 27, 22 and 24 tokens to the three files.
+- **One tightening pass** then cut 9, 3 and 14 tokens. It removed only words that carry no rule: the contract pointer moved into parentheses, one registry label was dropped and the Codex invocation clauses were merged. Every phrase both phrase checks require still holds.
 
-**Over the unit's growth budget.** The brief set a budget of at most 200 tokens of always-loaded growth, summed over `AGENTS.md` and the portable template. The measured sum is +686: +139 from the folded text and +547 from this unit's clauses and the user-level rules.
-- **The floor.** The template alone grows by 358 without the fold, because the brief also requires it to carry the user-level rules and all six clauses. The floor stays above 200 even with `AGENTS.md` unchanged.
+**Over the unit's growth budget, accepted.** The brief set a budget of at most 200 tokens of always-loaded growth, summed over `AGENTS.md` and the portable template. The measured sum is +723: +139 from the folded text and +584 from this unit's clauses, the user-level rules and the routing split. The coordinator accepted the miss on 2026-09-30, because the clauses are the user's explicit directive.
+- **The floor.** The portable template alone grows by 382, because it must carry the user-level rules and all six clauses. The floor stays above 200 even with `AGENTS.md` unchanged.
 - **The fallback.** In the first build, `AGENTS.md` kept (d) and (f) inline and pointed to the user-level files for the rest. That measured +106 before the fold.
-- **What this host loads.** In this repository a Claude session loads the user-level file and `AGENTS.md`. Once the template replaces the current user-level file, those two files grow from 1,988 + 2,392 to 2,414 + 2,715 o200k tokens: +749, before the managed markers.
-
-The coordinator decides between the budget and the clause set.
+- **What this host loads.** In this repository a Claude session loads the user-level file and `AGENTS.md`. Once the template replaces the current user-level file, those two files grow from 1,988 + 2,392 to 2,433 + 2,733 o200k tokens: +786, before the managed markers.
 
 ## Overturn condition
 
-- **A behavior comparison.** A preregistered comparison on an upstream harness shows that sessions loading these texts follow the rules no better than with the previous texts, or cost more without a quality gain. Promptfoo would serve for the gateway lanes, and Harbor or Inspect for agent tasks.
+- **The 2026-09-29 user-prefix A/B.** Rerun that A/B with these texts on an upstream harness, measuring first-prompt prefix size and task outcome with and without the added clauses. If it shows the added always-loaded text raising cost without a measured rule-following gain, the measured pointer fallback replaces the inline clauses on each surface without a gain. Promptfoo would serve for the gateway lanes, and Harbor or Inspect for agent tasks.
 - **A client change.** A client release changes how `CLAUDE.md` or `AGENTS.md` is loaded or sized, such as Codex's `project_doc_max_bytes` (32 KiB by default).
-- **A rewording.** The operator rewords the rule, the Sol-primary record changes the Codex routing, or the coordinator's budget decision removes clauses from a surface.
+- **A rewording.** The operator rewords the rule, the Sol-primary record changes the Codex routing, or the coordinator removes clauses from a surface.
 
 ## Checks
 
 These are structural checks on text, pins and registration, not a behavior test.
-- **The Codex block's lanes and clauses.** `TemplateTests.test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server` failed first, exit 1 each time. On the first build's unedited block it listed all seven servers as missing. On this build's block it listed five phrases: `SKILL.md`, "native workflow" and three routing phrases. It passes now.
-- **The Codex pin.** The top-rule pin was re-derived with the test module's own `template_segments()`: 496 words, `2d3107a2…`.
-- **The portable template's phrases.** `PortableTopRuleTests.test_the_template_carries_the_standing_clauses_and_the_user_level_rules` failed first, exit 1 each time. On the unedited template it found 29 phrases missing, 9 of them held only by the user-level file. On this build's template it found four routing and skill-matching phrases missing. It passes now. It also requires "Keep context small"; run against the observed version of the template, it reports that phrase missing.
-- **The word budget.** The template's baseline moves to 1,680 words, following the re-baselines of 2026-09-27 and 2026-09-29.
+- **The Codex block's lanes and clauses.** `TemplateTests.test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server` failed first each time, with exit 1:
+  - on the first build's unedited block it listed all seven servers as missing;
+  - after the fold it listed five routing and skill-matching phrases;
+  - before the Ultra/Max split it listed four split phrases.
+
+  It passes now.
+- **The Codex pin.** The top-rule pin was re-derived with the test module's own `template_segments()`: 507 words, `97bbeb8c…`.
+- **The portable template's phrases.** `PortableTopRuleTests.test_the_template_carries_the_standing_clauses_and_the_user_level_rules` failed first each time, with exit 1:
+  - on the unedited template it found 29 phrases missing, 9 of them held only by the user-level file;
+  - after the fold it found four routing and skill-matching phrases missing;
+  - before the split it found four split phrases missing.
+
+  It passes now. It also requires "Keep context small"; run against the observed version of the template, it reports that phrase missing.
+- **The word budget.** The template's baseline moves to 1,696 words, following the re-baselines of 2026-09-27 and 2026-09-29.
+- **The folded evidence.** `validate.py --scan-file` passed over the 18 folded files. `python3 scripts/validate.py` passes with them hash-listed in `manifests/evidence.json`, and `python3 scripts/validate_convergence.py --all-recorded` still finds and validates the 25 declared records.
 
 ## Limitations and integration
 
 - **Clause (c) and the settings.** origin/main keeps `find-skills`, `grill-me` and `improve-codebase-architecture` at `user-invocable-only` in the frozen [settings template](../../adoption/templates/claude.settings.template.json). Unit F3 turns `find-skills`, `search-first` and `skill-creator` on. `grill-me` and `improve-codebase-architecture` stay user-invocable-only, so "every manifest skill" holds only once those two change or are replaced.
-- **References to other units.** `AGENTS.md` cites files that land elsewhere in the batch and resolve when it merges:
-  - `adoption/skills/lifecycle.md` (F3);
-  - `docs/decisions/2026-09-30-sol-primary-quality-defaults.md` (D4);
-  - `docs/decisions/2026-09-30-session-currency-notice.md` (A2).
-- **Unpublished evidence.** `evidence/artifacts/sota-finalization-20260930/` has no owner; the folded finalization record and four folded rows cite it. `evidence/artifacts/codex-01592-qualification-20260930/` is on no branch yet, and its name collides with unit D4's receipt id; two folded rows and the record cite it.
+- **Known residual links.** Seven relative link targets do not resolve on this branch alone. Four resolve when unit F3 lands:
+  - `docs/decisions/2026-09-30-native-skill-lifecycle.md`;
+  - `evidence/artifacts/native-skill-lifecycle-20260930/receipt.json`;
+  - `evidence/artifacts/native-skill-finalization-20260930/results.json`;
+  - `evidence/artifacts/native-skill-finalization-20260930/usage-summary.json`.
+
+  Unit D4's Sol-primary record resolves when D4 lands. The last two are `evidence/artifacts/codex-01592-qualification-20260930/qualification.json` and `profile-command-correction.json`. They stay broken until D4's fold of that directory decides its path; two folded rows and the finalization record cite them. `AGENTS.md` also names two files in code format rather than as links: `adoption/skills/lifecycle.md`, which lands with unit F3, and the currency-notice record, which lands with unit A2.
 - **Older Codex pins.** The Codex block says "default to `gpt-6.1-sol`", while unit D4 renders `gpt-6-astra` for Codex pins before 0.159.1 (macOS). That wording follow-up is D4's.
-- **The scaffold copy.** Unit A3's `adoption/scaffold/AGENTS.md` must carry the Codex template's top-rule block byte for byte (`tests/test_scaffold_repo.py` on A3's branch). Whichever of A3 and this unit lands second copies the block across.
+- **Post-A3 step.** Unit A3's PR #545 (open at head `5e2db230` on 2026-09-30) adds `adoption/scaffold/AGENTS.md`, which its `tests/test_scaffold_repo.py` requires to carry the Codex template's top-rule block byte for byte. After #545 merges, whichever of #545 and this branch lands second copies the block into `adoption/scaffold/AGENTS.md`. The block is the template text between `<!-- native-agent-stack:top-rule -->` and the rtk-upstream marker. This branch does not create the file.
 - **Stale line citation.** [`tools/adoption/codex_roles.py:357`](../../tools/adoption/codex_roles.py) cites `codex.AGENTS.template.md:41-46` for the exceptions, which now sit at lines 49-54.
 - **Codex approvals.** Under `approval_policy = "never"`, Codex refuses the ai-memory, SocratiCode and Headroom tools unless the stack-worker profile approves them ([`codex.config.template.toml:46-51`](../../adoption/templates/codex.config.template.toml)). The token-lanes line names them anyway.
 - **Host step.** A host picks up the texts only when unit A3's installer and `tools/adoption/apply_codex_lane.py` run there after the batch merges. The Gate A freeze snapshot hashes both user-level files (`tools/token-e2e/freeze_snapshot.py:1080,1129`), so the operator does not apply them during the Gate A window without its owner.
@@ -174,7 +207,10 @@ These are structural checks on text, pins and registration, not a behavior test.
   - the global scope reads `AGENTS.override.md`, else `AGENTS.md`, in the Codex home;
   - `project_doc_max_bytes` defaults to 32 KiB.
 - openai/codex `rust-v0.159.2`, `codex-rs/ext/skills/src/catalog_prompt.rs:8`: the skill trigger rules.
-- Model routing: the Sol-primary record (unit D4) and the [model-currency record](2026-09-27-model-currency.md), whose 2026-09-30 addendum lands with D4.
+- Model routing:
+  - the Sol-primary record (unit D4, refined at `9dd4ebe0`);
+  - the [model-currency record](2026-09-27-model-currency.md), whose 2026-09-30 addendum lands with D4;
+  - the effort semantics in the [Codex worker lane recipe](../../recipes/README.md#codex-worker-lane) (`resolve_reasoning_effort` in openai/codex `codex-rs/protocol/src/openai_models/reasoning_effort.rs`).
 - [anthropics/claude-code v2.1.285 `CHANGELOG.md` line 206](https://github.com/anthropics/claude-code/blob/v2.1.285/CHANGELOG.md#L206) (read 2026-09-30): Ultracode "no longer forces xhigh effort and stays on at any effort level", under 2.1.284.
 - Skills:
   - `vercel-labs/skills@7407f389` `skills/find-skills/SKILL.md:27,56` (`npx skills find`);
