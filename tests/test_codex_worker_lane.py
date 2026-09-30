@@ -45,10 +45,10 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (455 words by `wc -w`, marker line included; 153 before the standing clauses of
-# docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk v0.50.0
+# The staged top-rule block (496 words by `wc -w`, marker line included; 153 before the standing clauses, routing
+# and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk v0.50.0
 # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "7b41478f1e4483e5a4cc96d724323aa71268c91ea59c9f5cfd0332f8265766ba"
+TOP_RULE_SHA256 = "2d3107a242751bea8dfa2b90d26e012d7f459617ec2d32006c810fd4bf707532"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -281,17 +281,19 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 455)
+        self.assertEqual(len(top.split()), 496)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
-    # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them.
+    # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
+    # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
     STANDING_PHRASES = (
         "`search-first`", "`find-skills`", "`npx skills find`", "`skill-creator`", "`$skill-name`", "its description",
-        "model invocation in both clients", "promptfoo", "paired benchmark", "Harbor or Inspect",
-        "never a self-written runner", "completeness critic", "next landscape sweep", "lifecycle task",
-        "north-star action", "`gpt-6-astra` at max", "`gpt-6-sol` at medium", "`gpt-6.1-sol`", "OmniRoute",
-        "`codex -p omniroute`", "Opus 5.5 at max", "cooperation lanes", "`docs/decisions/YYYY-MM-DD-<slug>.md`",
-        "No audits, trials or network at startup", "due-file line", "one lane per artifact")
+        "SKILL.md", "native workflow", "model invocation in both clients", "promptfoo", "paired benchmark",
+        "Harbor or Inspect", "never a self-written runner", "completeness critic", "next landscape sweep",
+        "lifecycle task", "north-star action", "`gpt-6.1-sol` at ultra for coordination", "at max for workers",
+        "`gpt-6-astra` at max", "one bounded Sol repair", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
+        "cooperation lanes", "`docs/decisions/YYYY-MM-DD-<slug>.md`", "No audits, trials or network at startup",
+        "due-file line", "one lane per artifact")
 
     def test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server(self):
         # Each MCP server the user config template registers needs a token lane in this block, so a server added to
