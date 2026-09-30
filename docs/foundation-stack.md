@@ -8,7 +8,7 @@ The foundation wave's [acceptance receipt](../evidence/receipts/foundation-nativ
 
 | Need | Selected repositories and pins | Default scope / acceptance |
 | --- | --- | --- |
-| Durable decisions and continuity | [ai-memory 2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) (macOS pin 2.3.2) | One explicitly scoped shared store; fresh native hook events plus exact page retrieval and owned restore. Routine capture is not a complete transcript. |
+| Durable decisions and continuity | [ai-memory 2.4.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2) (macOS pin 2.3.2) | One explicitly scoped shared store; fresh native hook events plus exact page retrieval and owned restore. Routine capture is not a complete transcript. |
 | Find documentation | [QMD 2.8.3](https://github.com/tobi/qmd/releases/tag/v2.8.3) | Named BM25 index and selected Markdown collection; search then read the returned source. No embedding model is needed for this lane. |
 | Conceptual code search | [SocratiCode 1.15.0](https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0) (macOS pin 1.14.0), [Qdrant 1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), [vLLM 0.30.0](https://github.com/vllm-project/vllm/releases/tag/v0.30.0) | One project, local embeddings and persistent vectors; exact returned source plus automatic add/change/delete observation. |
 | Symbols and references | [Serena](https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143) | Enable Python and TypeScript where used; test each actual extension/language. A Bash-only server does not establish Python/TypeScript support. |
@@ -26,7 +26,7 @@ Use native Node 24, Python 3.13, uv, Git and the chosen release tools. Set absol
 For release archives such as ai-memory, RTK and Qdrant, use the [upstream archive procedure](../recipes/README.md#official-release-archives), selecting the actual OS/architecture asset and checking its published digest. For example, discover the assets of ai-memory's Linux pin with the command below; the macOS pin is v2.3.2 ([pins-macos-arm64.json](../adoption/pins-macos-arm64.json)).
 
 ```sh
-gh release view v2.4.1 --repo akitaonrails/ai-memory --json tagName,assets
+gh release view v2.4.2 --repo akitaonrails/ai-memory --json tagName,assets
 ```
 
 For npm/uv tools, retain versioned prefixes, package metadata and the installation output. The following is a clean, selected QMD install; it stops if the prefix already exists:

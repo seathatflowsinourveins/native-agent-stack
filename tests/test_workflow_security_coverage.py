@@ -63,6 +63,8 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "saturation-tracking.yml",
             "practice-references-freshness.yml",
             "runtime-worker-skills-freshness.yml",
+            # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
+            "sota-sources-gate.yml",
         }
         self.assertEqual(
             actual, expected,

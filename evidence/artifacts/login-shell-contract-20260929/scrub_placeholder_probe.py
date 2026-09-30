@@ -81,11 +81,24 @@ def real_home_state(root=None, names=None):
         try:
             info = os.lstat(root / name)
             state[name] = (info.st_mode, info.st_size, info.st_mtime_ns, info.st_ino)
-        except FileNotFoundError:
+        except (FileNotFoundError, NotADirectoryError):   # absent, or its parent is not a directory so it cannot exist
             state[name] = None
         except OSError as error:
             state[name] = ("unreadable", type(error).__name__)
     return state
+
+
+def unreadable(value):
+    return isinstance(value, tuple) and value[:1] == ("unreadable",)
+
+
+def compare_real_home(before, after):
+    """Compare two real_home_state snapshots. A name whose state could not be observed in either one (an error other than absence, for example an unsearchable parent directory) is UNMEASURED: nothing can be
+    concluded about it, so it is neither unchanged nor changed. `unchanged` is True only when every name was measured in both snapshots and none differs, False when a measured name differs, and None when nothing
+    differs among the measured names but some were not measured."""
+    unmeasured = sorted(name for name in before if unreadable(before[name]) or unreadable(after[name]))
+    changed = sorted(name for name in before if name not in unmeasured and before[name] != after[name])
+    return {"changed": changed, "unmeasured": unmeasured, "unchanged": False if changed else (None if unmeasured else True)}
 
 
 def selftest():
@@ -132,6 +145,27 @@ def selftest():
         results[name + "_changes_exactly_the_touched_name"] = changed(before, real_home_state(root)) == touched
         results[name + "_is_missed_by_a_state_that_skips_the_name"] = changed(blind_before, real_home_state(root, blind_names)) == []
         tmp.cleanup()
+    if os.geteuid() != 0:   # root can search any directory
+        tmp, root = fresh()
+        (root / ".config").mkdir()
+        os.chmod(root / ".config", 0)
+        try:
+            before = real_home_state(root)
+            os.chmod(root / ".config", 0o755)
+            (root / ".config" / "git").mkdir()
+            os.chmod(root / ".config", 0)
+            after = real_home_state(root)
+            verdict = compare_real_home(before, after)
+        finally:
+            os.chmod(root / ".config", 0o755)
+        results["the_old_equality_calls_two_unreadable_snapshots_unchanged"] = before == after
+        results["an_unsearchable_parent_makes_the_names_unmeasured_not_unchanged"] = verdict["unchanged"] is None and ".config/git" in verdict["unmeasured"] and not verdict["changed"]
+        results["a_measured_change_beside_unmeasured_names_is_still_reported"] = compare_real_home({**before, ".bashrc": (1, 2, 3, 4)}, {**after, ".bashrc": (1, 2, 3, 5)})["unchanged"] is False
+        tmp.cleanup()
+    tmp, root = fresh()
+    (root / ".config").write_text("a file where a directory is expected")
+    results["a_parent_that_is_a_file_is_an_absence_not_an_unmeasured_name"] = real_home_state(root)[".config/git"] is None and compare_real_home(real_home_state(root), real_home_state(root))["unchanged"] is True
+    tmp.cleanup()
     for label, startup, expect_none in (("login_path_of_a_working_home_is_measured", None, False), ("login_path_of_a_failing_startup_file_is_unmeasured", "exit 1\n", True),
                                         ("login_path_of_a_startup_file_that_exits_early_is_unmeasured", "exit 0\n", True),
                                         ("login_path_of_a_startup_file_that_logs_a_PATH_line_first_is_the_final_path", 'echo "PATH=logged-before-the-probe"\n. "$HOME/.profile"\n', False)):
@@ -204,7 +238,7 @@ def sandbox_doctor(home, env):
 
 def login_path(home):
     """The PATH a login shell ends up with, or None when the shell failed or ended before the probe completed. The probe's record sits between two lines that carry a random nonce, so a startup
-    file's own output cannot pass for it."""
+    file's ordinary output cannot pass for it (one that replays $BASH_EXECUTION_STRING can: shell stdout is not authenticated)."""
     nonce = secrets.token_hex(8)
     begin, end = f"BEGIN-{nonce}\n".encode(), f"\nEND-{nonce}\n".encode()
     run = subprocess.run(["/usr/bin/env", "-i", f"HOME={home}", "PATH=/usr/bin:/bin", "/bin/bash", "-lc", f'printf "BEGIN-{nonce}\\n%s\\nEND-{nonce}\\n" "$PATH"'],
@@ -288,11 +322,12 @@ def main():
         appeared = stat.S_ISREG(info.st_mode) and info.st_size == 0 and info.st_ctime >= started - 1
     if appeared:
         SHARED.unlink()
+    comparison = compare_real_home(presence_before, real_home_state())   # one final snapshot for every field below
     summary = {"claude": subprocess.run([str(CLAUDE.resolve()), "--version"], capture_output=True, text=True).stdout.strip(),
                "bubblewrap": shutil.which("bwrap") is not None, "bubblewrap_version": subprocess.run(["bwrap", "--version"], capture_output=True, text=True).stdout.strip(),
-               "arms": results, "scratch_removed": not base.exists(), "real_home_placeholder_names_unchanged": real_home_state() == presence_before,
-               "real_home_names_checked": len(REAL_HOME_NAMES), "real_home_compared_by": "lstat mode, size, mtime and inode",
-               "real_home_names_changed": sorted(name for name, before in presence_before.items() if real_home_state()[name] != before),
+               "arms": results, "scratch_removed": not base.exists(), "real_home_placeholder_names_unchanged": comparison["unchanged"],
+               "real_home_names_checked": len(REAL_HOME_NAMES) - len(comparison["unmeasured"]), "real_home_compared_by": "lstat mode, size, mtime and inode",
+               "real_home_names_changed": comparison["changed"], "real_home_names_unmeasured": comparison["unmeasured"],
                "real_temp_top_level_entries_new_during_run": {"in_tmp_excluding_the_shared_file": kinds(new_in_tmp), "in_tmp_claude_uid": kinds(new_in_state)},
                "shared_temp_file": {"name": SHARED.name, "present_before_run": shared_before, "appeared_during_run": appeared,
                                     "removed_by_script": appeared and not SHARED.exists(), "present_after_script": SHARED.exists()}}

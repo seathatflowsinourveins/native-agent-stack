@@ -93,7 +93,7 @@
       "kind": "gate",
       "id": "token-efficiency-wiring",
       "title": "Token-efficiency wiring for every session",
-      "state": "source-host wiring complete / seven Codex memory hooks natively trusted / twelve exec pins match / two package probes deliberately unchecked and separately qualified / recorded in draft PR561 / source-host accepted / other hosts unqualified",
+      "state": "source-host qualified / seven native memory hooks trusted / twelve pins match / draft PR561 / other hosts unqualified",
       "evidence_ref": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json"
     },
     {
@@ -282,7 +282,7 @@
       "kind": "gate",
       "id": "token-stack-subagent-e2e",
       "title": "Token stack inside Ultracode subagents",
-      "state": "native Claude Workflow/Agent recovery and Codex V2 Astra/max child completed / fresh Codex12 tools / Claude8fresh+4dated unchanged-pin operations / caller failures retained / no aggregate provider-saving claim",
+      "state": "Claude Workflow and Agent recovery / Codex V2 Astra max child / Codex12 fresh tools / Claude8 fresh plus4 dated / no aggregate savings",
       "evidence_ref": "evidence/receipts/token-profile-completion-20260930.json"
     },
     {
@@ -345,7 +345,7 @@
       "kind": "gate",
       "id": "native-token-lifetime",
       "title": "Native token lifetime accounting",
-      "state": "installed refresh service passed / timer active / retained-history, window and artifact scopes kept separate / exact provider lifetime saving unknown",
+      "state": "refresh service passed / timer active / retained-history and window and artifact scopes separate / exact provider lifetime saving unknown",
       "evidence_ref": "evidence/artifacts/token-profile-completion-20260930/lifetime-native.json"
     }
   ],

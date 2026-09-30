@@ -59,6 +59,7 @@
     "boundaries": "docs/evidence.md",
     "current_activation": "observability/desktop-restart.md",
     "update_protocol": "adoption/update.md",
+    "scaffold": "tools/adoption/scaffold_repo.py",
     "adoption_receipt": "adoption/receipt.json",
     "portability_research": "adoption/research.json",
     "current_paired_acceptance": "adoption/paired/receipt.json",

@@ -80,7 +80,7 @@
         "sha256": "cace071899ba46fa60f49ed3256c2320beb9622b5cf5cf59b877763eacb8867e"
       },
       {
-        "path": "tools/adoption/install_claude_profile.py",
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-11810a05.py",
         "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687"
       },
       {
@@ -156,7 +156,7 @@
         "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a"
       },
       {
-        "path": "tests/test_install_claude_profile.py",
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-tests-11810a05.py",
         "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e"
       },
       {

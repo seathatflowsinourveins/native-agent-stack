@@ -135,6 +135,8 @@
       ]
     }
   ],
+  "catalog_candidates": 1,
+  "unrecognized_catalogs": 0,
   "catalog_extra_values": [
     "elicitation_complete",
     "elicitation_response"

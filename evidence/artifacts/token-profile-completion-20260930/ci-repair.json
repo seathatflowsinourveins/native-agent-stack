@@ -221,5 +221,82 @@
     "private_manifest_json_exists": true,
     "private_manifest_html_exists": true,
     "scope": "Read-only wiring/version report and native host timer observation; separate from provider/GPU execution."
+  },
+  "final_head_validation_failure": {
+    "head": "11810a054546f50962270d93564afad36f3e0c60",
+    "linux": {
+      "run_id": 36782831321,
+      "job_id": 110117060358,
+      "exit_code": 1,
+      "tests": 8706,
+      "failures": 22,
+      "errors": 7,
+      "skipped": 806,
+      "duration_seconds": 1352.625,
+      "original_log_bytes": 281393,
+      "original_log_sha256": "177fcc9f0656fe0b34070eed5aac3a397ff3da215b0ff585e31eeaaea7eb1ace"
+    },
+    "macos": {
+      "run_id": 36782834471,
+      "job_id": 110117065934,
+      "exit_code": 1,
+      "tests": 480,
+      "failures": 1,
+      "skipped": 29,
+      "original_log_bytes": 199370,
+      "original_log_sha256": "7d0bd90d108a9c259d54a73891803790296d99edd61f71d6c7996a086ca62c07"
+    },
+    "corrections": [
+      "Preserve dashboard public metadata guard; shorten three gate state strings to allowed tokens.",
+      "Reconcile selected saturation-audit version and canonical receipt references to current registered native evidence without recertifying historical operations.",
+      "Use qualified ai-memory2.4.2 in the maintained foundation installation guide.",
+      "Preserve Mac2.3.2 qualification while updating Linux expected2.4.2 with the current profile receipt."
+    ],
+    "verification_pending": false,
+    "provider_usage": "unknown",
+    "bounded_corrected_validation": {
+      "command": "python3 -m unittest tests.test_grand_dashboard tests.test_stack_lifecycle tests.test_foundation_stack_pins tests.test_adoption_bootstrap_macos",
+      "exit_code": 0,
+      "tests": 185,
+      "skipped": 32,
+      "duration_seconds": 46.416,
+      "scope": "Local integration and metadata checks; not provider or upstream acceptance."
+    },
+    "patch_control": {
+      "failed_initial_repair_subtests": 11,
+      "cause": "Repeated JSON receipt blocks matched without component anchors.",
+      "correction": "Component-specific anchors and complete canonical identity/receipt equality across all69 selected rows.",
+      "single_consistency_test_exit_code": 0
+    },
+    "astra_review": {
+      "trigger": "Required full CI failures after bounded repair plus shared evidence/source merge.",
+      "status": "accepted_source_invariants",
+      "checks": [
+        "179 canonical receipt IDs preserved",
+        "Historical memory and macOS pins retain dated scope",
+        "All17 passing native CI source inputs match current working files",
+        "Strict dashboard token grammar retained"
+      ],
+      "tests_rerun_by_reviewer": false
+    },
+    "upstream_main_merged": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+    "merged_installer_tests": {
+      "exit_code": 0,
+      "tests": 79,
+      "skipped": 3
+    },
+    "frozen_installer_preimages": [
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-11810a05.py",
+        "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687",
+        "bytes": 21557
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-tests-11810a05.py",
+        "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e",
+        "bytes": 79170
+      }
+    ],
+    "full_corrected_ci": "pending"
   }
 }

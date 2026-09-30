@@ -257,7 +257,7 @@ class PinsSchemaTests(unittest.TestCase):
     # (docs/decisions/2026-09-25-workstation-sota-refresh.md). Each entry names both versions
     # exactly, so a move on either side fails here until this table is reviewed again.
     MAC_PIN_LAGS_LINUX = {
-        "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
+        "ai-memory": ("2.3.2", "2.4.2", "evidence/receipts/token-profile-completion-20260930.json"),
         "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
         # Linux moved to 0.157.1 on 2026-09-26 and to 0.159.2 on 2026-09-30; the Mac keeps 0.155.1 until its own
         # qualification (the receipts' limitations).

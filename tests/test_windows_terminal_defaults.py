@@ -61,6 +61,26 @@ def quoted_matchers(text: str) -> list:
     return [found[key] for key in sorted(found)]
 
 
+OPERATIVE = "<!-- operative-matcher -->"
+
+
+def operative_matchers(text: str) -> list:
+    """The code span that follows each operative-matcher marker, in document order, with whitespace removed and escaped pipes unescaped (so a list split over a line, or written with `\\|`, is compared as its list)."""
+    return [re.sub(r"\s+", "", m.group(1).replace("\\|", "|")) for m in re.finditer(re.escape(OPERATIVE) + r"\s*`([^`]+)`", text)]
+
+
+def matcher_problems(text: str, matcher: str) -> list:
+    """What is wrong with the matcher a document states: the operative one (marked) must be exactly the overlay's, and no other quoted matcher (a pipe list of known types, or a phrase-anchored quote) may differ."""
+    problems = []
+    marked = operative_matchers(text)
+    if marked != [matcher]:
+        problems.append(f"the marked operative matcher is {marked}, not the overlay's")
+    quoted = sorted(frozenset(quoted_matchers(text)))
+    if quoted and quoted != [matcher]:
+        problems.append("another quoted matcher differs from the overlay's")
+    return problems
+
+
 def recipe_profile() -> dict:
     """The first ```json block after the recipe's "For Windows Terminal" sentence."""
     text = RECIPE.read_text(encoding="utf-8")
@@ -400,6 +420,34 @@ class ScanReaderTests(unittest.TestCase):
         self.assertFalse(found["catalogs_resolved"])
         self.assertEqual(run.returncode, 1, "a catalog whose array cannot be resolved must not pass")
 
+    def test_a_suffix_after_the_array_is_not_a_complete_initializer(self):
+        # `Ojo=[...].concat([...])` would add a type that the bare literal lacks: taking the literal alone would miss it.
+        blob = self.blob().replace(b"Ojo=" + self.array(self.NAMES).encode(), b"Ojo=" + self.array(self.NAMES).encode() + b'.concat(["brand_new_type"])')
+        found, run = self.scan_of(blob)
+        self.assertEqual(found["catalogs"][0]["base_candidates"], 0)
+        self.assertFalse(found["catalogs_resolved"])
+        self.assertEqual(run.returncode, 1, "a catalog whose array is extended after the literal must not pass")
+
+    def test_member_access_through_whitespace_or_a_comment_is_not_the_catalog_base(self):
+        problems = []
+        for separator in (" ", "\n", "/* c */", " /* c */ "):
+            text = (f'obj.{separator}Ojo={self.array(self.NAMES)};function f(Ojo){{return {{fieldToMatch:"notification_type",values:[...Ojo,{self.EXTRAS}]}}}}'
+                    'f(["permission_prompt","idle_prompt","brand_new_type"]);').encode()
+            found, run = self.scan_of(text)
+            if found["catalogs"][0]["base_candidates"] != 0 or found["catalogs_resolved"] or run.returncode != 1:
+                problems.append((separator, found["catalogs"][0]["base_candidates"], found["catalogs_resolved"], run.returncode))
+        self.assertEqual(problems, [], "a member access through whitespace or a comment was taken for the catalog's array")
+
+    def test_an_unsupported_second_catalog_fails_closed(self):
+        # A second declared catalog whose values the reader cannot parse (a call, whitespace after the colon) must not be ignored while the first one passes.
+        problems = []
+        for unsupported in ('{fieldToMatch:"notification_type",values:[...getTypes(),"elicitation_complete"]}', '{fieldToMatch: "notification_type",values:[...Ojo,"elicitation_complete"]}',
+                            '{fieldToMatch:"notification_type",values:[...Ojo,"elicitation_complete"].concat(["brand_new_type"])}'):
+            found, run = self.scan_of(self.blob(after=";d=" + unsupported + ";"))
+            if found["unrecognized_catalogs"] < 1 or found["catalogs_resolved"] or run.returncode != 1:
+                problems.append((unsupported[:40], found["unrecognized_catalogs"], found["catalogs_resolved"], run.returncode))
+        self.assertEqual(problems, [], "an unrecognized catalog must fail the scan")
+
     def test_a_base_without_the_required_names_fails_closed(self):
         # all names are known to DECISIONS, so only the missing required names can make the scan fail
         found, run = self.scan_of(self.blob(names=("auth_success", "elicitation_dialog", "agent_needs_input", "agent_completed")))
@@ -424,14 +472,28 @@ class ScanReaderTests(unittest.TestCase):
 
 class DocumentationTests(unittest.TestCase):
     def test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays(self):
-        # Every matcher quote (a backtick list directly after the word matcher, or any backtick pipe list of known notification types), outside HTML comments, must be the overlay's matcher, so a stale
-        # operative copy (one that omits permission_prompt too, or a single type) cannot hide behind a correct one kept in a comment or a history paragraph. A history paragraph names an older
-        # list without the quoted pipe form.
+        # The operative matcher of each document carries a marker and must be exactly the overlay's; every other quoted matcher (a pipe list of known types outside HTML comments, or a phrase-anchored quote) must equal
+        # it too, so a stale operative copy cannot hide behind a correct one kept in a comment or a history paragraph. A history paragraph names an older list without the quoted pipe form.
         matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
         for name, path in (("recipe", RECIPE), ("decision record", ROOT / "docs/decisions/2026-09-28-terminal-experience.md")):
-            quoted = quoted_matchers(path.read_text(encoding="utf-8"))
-            self.assertTrue(quoted, f"the {name} quotes no matcher")
-            self.assertEqual(sorted(frozenset(quoted)), [matcher], f"the {name} quotes a matcher that is not the overlay's")
+            self.assertEqual(matcher_problems(path.read_text(encoding="utf-8"), matcher), [], f"the {name} states a matcher that is not the overlay's")
+
+    def test_a_wrong_operative_matcher_is_found_whatever_its_markup(self):
+        matcher = "idle_prompt|permission_prompt|auth_success"
+        history = f"History: an earlier list was `{matcher}`."
+        self.assertEqual(matcher_problems(f"matcher {OPERATIVE}`{matcher}`. {history}", matcher), [], "the correct document must pass")
+        self.assertEqual(operative_matchers(f"{OPERATIVE}`idle_prompt|permission_prompt|\n auth_success`"), [matcher], "a list split over a line is compared as its list")
+        self.assertEqual(operative_matchers(f"{OPERATIVE}`idle_prompt\\|permission_prompt\\|auth_success`"), [matcher], "escaped pipes are unescaped")
+        wrong_forms = {
+            "a single type": f"whose matcher is {OPERATIVE}`permission_prompt`. {history}",
+            "a table cell": f"| matcher | {OPERATIVE}`permission_prompt|auth_success` |\n{history}",
+            "a list split over a line": f"{OPERATIVE}`idle_prompt|permission_prompt|\n quota_auto_resume_stale`. {history}",
+            "escaped pipes": f"{OPERATIVE}`idle_prompt\\|permission_prompt`. {history}",
+            "no marker at all": f"whose matcher is `permission_prompt`. {history}",
+            "two operative spans": f"{OPERATIVE}`{matcher}` and {OPERATIVE}`{matcher}`",
+        }
+        for label, text in wrong_forms.items():
+            self.assertNotEqual(matcher_problems(text, matcher), [], f"a wrong operative matcher written as {label} passed")
 
     def test_the_matcher_comparison_sees_a_wrong_operative_copy_beside_a_correct_one_in_a_comment(self):
         good, bad, without = "`idle_prompt|permission_prompt|auth_success`", "`idle_prompt|permission_prompt`", "`idle_prompt|auth_success`"

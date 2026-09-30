@@ -206,6 +206,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "native-cli-gaps",
             "path": "evidence/receipts/native-cli-gaps.json",
             "kind": "native_model_e2e"
@@ -254,11 +259,6 @@
             "id": "claude-upstream-checks-20260921",
             "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
-          },
-          {
-            "id": "claude-foundation-finalization-20260921",
-            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
-            "kind": "native_model_e2e"
           },
           {
             "id": "claude-repository-evidence-20260921",
@@ -415,6 +415,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -481,7 +486,7 @@
     {
       "component_id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.4.1",
+      "version": "2.4.2",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
       "installation_assessment": "runtime present at retained native operation date",
@@ -613,6 +618,16 @@
             "id": "ai-memory-241-qualification-20260925",
             "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1077,6 +1092,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1314,6 +1334,16 @@
             "id": "ccusage-20026-qualification-20260927",
             "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1564,11 +1594,6 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "claude-repository-evidence-20260921",
-            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
-            "kind": "native_cli_e2e"
-          },
-          {
             "id": "ultracode-token-routing-20260921",
             "path": "evidence/receipts/ultracode-token-routing-20260921.json",
             "kind": "native_cli_e2e"
@@ -1577,6 +1602,21 @@
             "id": "portable-claude-native-qualification-20260921",
             "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1831,6 +1871,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2076,11 +2121,6 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "claude-repository-evidence-20260921",
-            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
-            "kind": "native_cli_e2e"
-          },
-          {
             "id": "ultracode-token-routing-20260921",
             "path": "evidence/receipts/ultracode-token-routing-20260921.json",
             "kind": "native_cli_e2e"
@@ -2088,6 +2128,11 @@
           {
             "id": "portable-claude-native-qualification-20260921",
             "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-repository-evidence-20260921",
+            "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
           },
           {
@@ -2099,6 +2144,16 @@
             "id": "codex-01592-qualification-20260930",
             "path": "evidence/receipts/codex-01592-qualification-20260930.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -2352,6 +2407,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2548,6 +2608,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3798,6 +3868,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4186,6 +4266,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -4778,6 +4863,16 @@
             "id": "markitdown-018-qualification-20260925",
             "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5021,6 +5116,16 @@
             "id": "mcporter-0141-qualification-20260925",
             "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6877,6 +6982,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7081,6 +7196,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "portable-userspace-install-20260921",
             "path": "evidence/receipts/portable-userspace-install-20260921.json",
             "kind": "native_cli_e2e"
@@ -7121,14 +7241,19 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "claude-foundation-finalization-20260921",
-            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
-            "kind": "native_model_e2e"
-          },
-          {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7454,6 +7579,16 @@
             "id": "rtk-050-qualification-20260925",
             "path": "evidence/receipts/rtk-050-qualification-20260925.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7724,6 +7859,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8314,6 +8459,11 @@
             "id": "socraticode-1150-qualification-20260927",
             "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8702,6 +8852,16 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-profile-completion-20260930",
+            "path": "evidence/receipts/token-profile-completion-20260930.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-lifecycle-resolution-20260930",
+            "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -9283,6 +9443,11 @@
             "kind": "native_cli_e2e"
           },
           {
+            "id": "tavily-research-qualification-20260926",
+            "path": "evidence/receipts/tavily-research-qualification-20260926.json",
+            "kind": "native_cli_e2e"
+          },
+          {
             "id": "native-tavily-session-20260920",
             "path": "evidence/receipts/native-tavily-session-20260920.json",
             "kind": "native_cli_e2e"
@@ -9295,11 +9460,6 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
-            "kind": "native_cli_e2e"
-          },
-          {
-            "id": "tavily-research-qualification-20260926",
-            "path": "evidence/receipts/tavily-research-qualification-20260926.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -9539,5 +9699,14 @@
     "cleanup_boundary": "Owned processes/listeners/task records can be cleaned while evidence and data remain retained. Cleanup never implies deleting user state or having tested package uninstall.",
     "new_host_rule": "Reproduce applicable stages on the intended platform and retain its own native commands/results. Historical authoring-host evidence does not certify a new PC.",
     "source_history_rule": "base_public_commit and retained snapshots keep their original historical identity; reconciliation_base_public_commit records only this aggregation input."
+  },
+  "selection_reconciliation": {
+    "date": "2026-09-30",
+    "source": "manifests/stack.json and manifests/evidence.json",
+    "scope": "Current selected identity and public receipt references reconciled. Historical functional operations and lifecycle stage acceptance retain their dated scopes. No provider run or historical counter was recertified.",
+    "current_profile_receipt": "evidence/receipts/token-profile-completion-20260930.json",
+    "current_selected_source_pins": {
+      "ai-memory": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1"
+    }
   }
 }
