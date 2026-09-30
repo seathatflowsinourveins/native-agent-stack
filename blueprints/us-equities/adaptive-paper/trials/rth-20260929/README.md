@@ -177,7 +177,9 @@ Recorded, not thresholded, as the freeze asks:
   trial 2's BKYI exit (2 of 2, 3.24 against 3.25); trial 3's IOVA exit (2 of 3, 15.032143 against 15.04); and trial
   4's BEX exit (2 of 4, 40.666667 against 40.70).
 - **Exit reasons.** `x2_time` for the 20 legs of trials 1 to 5, `risk_halt` for the 3 legs of trial 6.
-- **Realized P&L and fees.** -115.94 USD. Account 1's fees were not read (see [Limitations](#limitations)).
+- **Realized P&L and fees.** -115.94 USD before fees. The broker's FEE activities for 2026-09-29 on account 1 total
+  -0.65 USD (REG -0.34, TAF -0.30, CAT -0.01), so the realized P&L including fees is -116.59 USD
+  ([Series totals](#series-totals)).
 - **Planned versus realized gross/equity.** The engine's leverage multiple was 4, 2, 1, 2, 2 and 1, and the planned
   gross budgets 5,000.00, 4,892.00, 2,424.04, 4,881.50, 4,870.58 and 2,429.76 USD. Buy notional was 3,542.07,
   4,079.61, 2,220.60, 2,390.20, 2,091.80 and 2,194.76 USD, which is 1.417, 1.668, 0.916, 0.979, 0.859 and 0.903 of
@@ -204,6 +206,15 @@ Recorded, not thresholded, as the freeze asks:
 - The ledger at 15:44 ET: lifetime realized -115.94, cash delta -115.94, `halted_reason` `gross_loss_cap_reached`,
   every position 0. The ledger was created fresh by trial 1, so these are this series' figures, and the halt is
   permanent for it.
+- Fees are not in these figures. The broker posted three FEE activities for 2026-09-29 on account 1: REG -0.34, TAF
+  -0.30 and CAT -0.01 USD, -0.65 in total, so the realized P&L including fees is -116.59 USD. The frozen engine has
+  no fee model.
+  - Source: the coordinator's FEE-activity read of 2026-09-30T18:13Z, a read-only GET on the paper endpoint whose
+    record keeps no activity id (`fee-activities-20260929.json`, sha256 `2d02c55b…`, private, under
+    `<private state root>`). It attributes the three to this series, the only account-1 trading that day, and the
+    broker reconciliation shows no order without the series prefix in its window.
+  - The read keeps no activity description, so the fees' bases (proceeds, shares, executions) are not recomputed
+    from the ledger as they are for account 2.
 
 ## Broker reconciliation (2026-09-30 09:06Z)
 
@@ -317,8 +328,9 @@ The broker listing shows no order without the series prefix on account 1 in the 
   position or partial fills.
 - **Not a strategy evaluation.** Six trials in one regular session evaluate no strategy, and the protocol has no
   validated edge.
-- **Fees not read.** Account 1's FEE activities were not read, so any fees the broker posted for 2026-09-29 on
-  account 1 are unmeasured here. The engine has no fee model.
+- **Fees.** The frozen engine has no fee model. Account 1's REG, TAF and CAT fees for 2026-09-29 (-0.65 USD in
+  total) are outside every figure here except the fee-inclusive realized P&L, -116.59 USD. They rest on one read that
+  keeps no activity description, so their bases are not recomputed from the ledger.
 - **The halt's trigger value.** The ledger's `risk_halt` event carries no timestamp or amount, and later quotes
   overwrote the marks, so the mark-to-market gross loss at 15:44:11 ET is not recorded.
 - **Single-source fields.** Some figures come from one source only. Examples are the halt seed counts, the
@@ -349,5 +361,6 @@ Private and not committed:
 - the config file and rule file, whose content is in `receipt.json`;
 - the scan, check and synthetic files, the engine logs and events, and the scan page ledgers and caches;
 - the series scripts and the systemd units (hashed);
+- the coordinator's FEE-activity read (hashed);
 - the engine ledger and its snapshot;
 - the NautilusTrader logs.

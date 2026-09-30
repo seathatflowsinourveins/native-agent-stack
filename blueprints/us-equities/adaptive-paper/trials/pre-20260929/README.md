@@ -126,7 +126,9 @@ Recorded, not thresholded, as the freeze asks:
   fills better) and YMT entry (2.49 against 2.50), and trial 3's BKYI exit (average 3.299 against a 3.28 bid, 2 of
   2 fills better) and YMT exit (2.1755 against 2.16, 6 of 6).
 - **Exit reasons.** `x2_time` for the 6 legs of trials 1 and 2, `hard_flatten` for the 3 legs of trial 3.
-- **Realized P&L.** -2.05 USD for the series.
+- **Realized P&L.** -2.05 USD for the series, before fees. Account 2's fees for the day, -0.47 USD, cover this series
+  and `ext-20260929` together and cannot be split between them; the two series' joint realized P&L is -17.43 USD
+  before fees and -17.90 USD including them ([Series totals](#series-totals)).
 - **Quote waits and stream gaps.** SANG's `no_fresh_quote` skip in trial 3; no data-stream gap line in any engine
   log.
 - **Websocket reconnects.** One data-stream and one trading-stream restart line per trial. Every trading-stream line
@@ -152,8 +154,16 @@ Recorded, not thresholded, as the freeze asks:
 - Leverage applied: the PRE cell held the engine's leverage multiple at 1 in every trial. Buy notional was 1,385.50,
   748.00 and 933.00 USD, which is 0.278, 0.152 and 0.188 of the trial's sizing equity.
 - Fees are not in these figures. The broker posted three FEE activities for 2026-09-29 on account 2: REG -0.19, TAF
-  -0.27 and CAT -0.01 USD. They are day totals for this series and `ext-20260929` together; the REG fee's basis,
-  8,820.73 USD of proceeds, is all of account 2's sells that day. The frozen engine has no fee model.
+  -0.27 and CAT -0.01 USD, -0.47 in total. The frozen engine has no fee model.
+  - Sources: the cash-gap output (`cash-gap-account2-20260930.json`, sha256 `c309e914…`) and the coordinator's
+    FEE-activity read of 2026-09-30T18:13Z (`fee-activities-20260929.json`, sha256 `2d02c55b…`), a read-only GET on
+    the paper endpoint whose record keeps no activity id. Both are private, under `<private state root>`, and list
+    the same three activities.
+  - They are day totals for this series and `ext-20260929` together; the REG fee's basis, 8,820.73 USD of proceeds,
+    is all of account 2's sells that day. The broker posts one activity per fee type per day for the account, so its
+    records cannot split the -0.47 between the two series, and this receipt makes no split.
+  - The two series' joint realized P&L is -17.43 USD before fees (-2.05 here and -15.38 in `ext-20260929`) and
+    -17.90 USD including them.
 
 ## Broker reconciliation (2026-09-30 09:06Z)
 
@@ -259,7 +269,8 @@ cancels an order, and the broker listing shows no order without the series prefi
   - Whether this use fits the forward study's isolation is referred to the forward protocol's owner, the trading
     lane. This receipt does not decide it.
 - **Fees.** The frozen engine has no fee model. The REG, TAF and CAT fees posted for 2026-09-29 (-0.47 USD in total
-  on account 2) are outside every figure here.
+  on account 2) are outside every figure here except the joint fee-inclusive figure, -17.90 USD for this series and
+  `ext-20260929` together. The broker's records cannot split them between the two series.
 - **Single-source fields.** Some figures come from one source only. Examples are the halt seed counts, the
   crossed-quote drops, the websocket lines, the preflight fields, the HTTP observations and the ledger's peak P&L.
   `receipt.json` `field_provenance` lists every field as asserted across sources, single source, derived or
@@ -289,5 +300,6 @@ Private and not committed:
 - the config file and rule file, whose content is in `receipt.json`;
 - the scan, check and synthetic files, the engine logs and events, and the scan page ledgers and caches;
 - the series scripts and the systemd units (hashed);
+- the coordinator's FEE-activity read (hashed);
 - the engine ledger and its snapshot;
 - the NautilusTrader logs.

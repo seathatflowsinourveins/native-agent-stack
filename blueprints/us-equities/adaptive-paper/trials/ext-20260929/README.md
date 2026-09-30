@@ -165,7 +165,10 @@ Recorded, not thresholded, as the freeze asks:
   40.44.
 - **Exit reasons.** `controller_stop` for the 4 legs of trial 2 and the 2 legs of trial 3, `transport_gap` for the 3
   legs of trial 4.
-- **Realized P&L.** -15.38 USD for the series, with IOVA 68 still open at a cost of 983.28 USD. Fees are excluded.
+- **Realized P&L.** -15.38 USD for the series, with IOVA 68 still open at a cost of 983.28 USD. Fees are excluded:
+  account 2's fees for the day, -0.47 USD, cover `pre-20260929` and this series together and cannot be split between
+  them; the two series' joint realized P&L is -17.43 USD before fees and -17.90 USD including them
+  ([Series totals](#series-totals)).
 - **Quote-freshness waits and stream gaps.** Trial 4 skipped SSTI with `no_fresh_quote`, and its IOVA exit waited on
   `no_fresh_quote` until the handoff. Trials 2, 3 and 4 each logged one data-stream gap line.
 - **Websocket reconnects.** Trial 1 logged one data-stream and one trading-stream restart line, trial 2 one and two,
@@ -212,9 +215,17 @@ Recorded, not thresholded, as the freeze asks:
   `recovery_only`, and IOVA 68 at cost 983.28. At trial 4's paper end the engine's gross loss was 117.14 and its
   drawdown 23.19, against budgets of 480 and 475; both include the open legs' unrealized loss at the bid.
 - Fees are not in these figures. The broker posted three FEE activities for 2026-09-29 on account 2: REG -0.19, TAF
-  -0.27 and CAT -0.01 USD. They are day totals for `pre-20260929` and this series together; their bases, 8,820.73
-  USD of proceeds, 1,357 shares in 38 sell executions and 81 executions, are all of account 2's executions that day.
-  The frozen engine has no fee model.
+  -0.27 and CAT -0.01 USD, -0.47 in total. The frozen engine has no fee model.
+  - Sources: the cash-gap output (`cash-gap-account2-20260930.json`, sha256 `c309e914…`) and the coordinator's
+    FEE-activity read of 2026-09-30T18:13Z (`fee-activities-20260929.json`, sha256 `2d02c55b…`), a read-only GET on
+    the paper endpoint whose record keeps no activity id. Both are private, under `<private state root>`, and list
+    the same three activities.
+  - They are day totals for `pre-20260929` and this series together; their bases, 8,820.73 USD of proceeds, 1,357
+    shares in 38 sell executions and 81 executions, are all of account 2's executions that day. The broker posts one
+    activity per fee type per day for the account, so its records cannot split the -0.47 between the two series, and
+    this receipt makes no split.
+  - The two series' joint realized P&L is -17.43 USD before fees (-2.05 in `pre-20260929` and -15.38 here), the
+    ledger's lifetime realized at the series end, and -17.90 USD including them.
 
 ## Broker reconciliation (2026-09-30 09:06Z)
 
@@ -320,9 +331,11 @@ independent of the engine but not of the broker.
 
 The pre-market recovery of the IOVA 68 residual (`paper-recover-a2-pre-20260930`) made 17 attempts from 06:00:05 to
 06:51:39 ET and sent 0 orders. Each attempt ended `needs_attention` with the error `cash_mismatch_or_unmodeled_fees`.
-The broker posted three FEE activities for 2026-09-29 on account 2: REG -0.19, TAF -0.27 and CAT -0.01 USD. Broker
-cash minus the trial's baseline cash minus the ledger's execution cash flow is -0.47 USD, exactly their sum. The
-frozen engine has no fee model, and its reconciliation fails closed on a cash difference above 0.01 USD
+The broker posted three FEE activities for 2026-09-29 on account 2: REG -0.19, TAF -0.27 and CAT -0.01 USD, as both
+the cash-gap output (`cash-gap-account2-20260930.json`, sha256 `c309e914…`) and the coordinator's FEE-activity read
+(`fee-activities-20260929.json`, sha256 `2d02c55b…`) record ([Series totals](#series-totals)). Broker cash minus the
+trial's baseline cash minus the ledger's execution cash flow, from the cash-gap output, is -0.47 USD, exactly their
+sum. The frozen engine has no fee model, and its reconciliation fails closed on a cash difference above 0.01 USD
 (`runner.py:761-763`). `receipt.json` holds these facts (`residual_recovery_20260930`, status `pending`).
 
 PENDING: final disposition filled in by the coordinator after the engine fee fix and its recovery
@@ -383,7 +396,8 @@ cancels an order, and the broker listing shows no order outside the series and r
   - Whether this use fits the forward study's isolation is referred to the forward protocol's owner, the trading
     lane. This receipt does not decide it.
 - **Fees.** The frozen engine has no fee model. The REG, TAF and CAT fees posted for 2026-09-29 (-0.47 USD in total
-  on account 2) are outside every figure here.
+  on account 2) are outside every figure here except the joint fee-inclusive figure, -17.90 USD for
+  `pre-20260929` and this series together. The broker's records cannot split them between the two series.
 - **Single-source fields.** Some figures come from one source only. Examples are the halt seed counts, the
   crossed-quote drops, the websocket lines, the preflight fields, the HTTP observations, the in-process recovery's
   error and the ledger's peak P&L. `receipt.json` `field_provenance` lists every field as asserted across sources,
@@ -415,6 +429,7 @@ Private and not committed:
 - the scan, check and synthetic files, the engine logs and events, and the scan page ledgers and caches;
 - trial 4's recover log, the 2026-09-30 recovery plan, outcome note, attempt receipts, logs and console (hashed);
 - the cash-gap output and its tool (hashed);
+- the coordinator's FEE-activity read (hashed);
 - the series scripts and the systemd units (hashed);
 - the engine ledger and its snapshot;
 - the NautilusTrader logs.

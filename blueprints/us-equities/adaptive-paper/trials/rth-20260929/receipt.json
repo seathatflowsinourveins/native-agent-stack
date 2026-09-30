@@ -21,8 +21,8 @@
   "section": "paper_e2e"
  },
  "recorded_at_utc": "2026-09-30T15:15:43Z",
- "revised_at_utc": "2026-09-30T18:57:30Z",
- "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed.",
+ "revised_at_utc": "2026-09-30T19:27:52Z",
+ "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed. Revised again on 2026-09-30 (revised_at_utc) to record account 1's FEE activities for 2026-09-29 from the coordinator's FEE-activity read (fees, series_totals.fees_usd and series_totals.realized_pnl_including_fees_usd), replacing the not-read statement. No verdict and no existing figure changed.",
  "started_at": "2026-09-29T14:00:05Z",
  "finished_at": "2026-09-29T19:44:16Z",
  "client_id_prefix": "mvr-rth-20260929-",
@@ -3864,6 +3864,9 @@
    "ledger_delta_sum": "-115.94",
    "broker_recomputed": "-115.94"
   },
+  "fees_usd": "-0.65",
+  "realized_pnl_including_fees_usd": "-116.59",
+  "fees_note": "fees_usd is account 1's FEE activities for 2026-09-29 (fees.total_usd). The engine has no fee model, so realized_pnl_usd excludes them; realized_pnl_including_fees_usd is realized_pnl_usd plus fees_usd.",
   "gross_loss_usd": "250.18",
   "gross_loss_note": "the sum of the losing legs' realized P&L across the six trials; equal to the ledger's realized_loss and to trial 6's lifetime_gross_loss_usd (this ledger began with this series and ended flat)",
   "planned_gross_budget_usd": [
@@ -3920,8 +3923,43 @@
   }
  },
  "fees": {
-  "account_1_fee_activities": "not read: the broker reconciliation reads FILL activities only and the coordinator's cash-gap check covered account 2",
-  "engine_fee_model": "none in b528bb55: realized P&L and every end reconciliation here exclude fees"
+  "account_1_fee_activities_for_2026_09_29": [
+   {
+    "type": "FEE",
+    "fee": "REG",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.34"
+   },
+   {
+    "type": "FEE",
+    "fee": "TAF",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.30"
+   },
+   {
+    "type": "FEE",
+    "fee": "CAT",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.01"
+   }
+  ],
+  "total_usd": "-0.65",
+  "covers": "all account-1 trading on 2026-09-29, which the FEE read attributes to this series alone (the only account-1 trading that day); this receipt's broker reconciliation shows no order without the series prefix in its 14:00-20:20Z window",
+  "bases_recomputed_from_ledger": null,
+  "bases_note": "Not recomputed: the FEE read never reads an activity's description, so the proceeds, shares and executions each fee was charged on are not recorded for account 1 (account 2's are, from the cash-gap output's descriptions).",
+  "source": "fee-activities-20260929.json, the coordinator's read-only FEE-activity read (private; sha256 in fee_read and private_artifacts_sha256)",
+  "fee_read": {
+   "file": "fee-activities-20260929.json",
+   "location": "<private state root>/trials/reconcile-20260929/ (private; not committed)",
+   "sha256": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
+   "recorded_at_utc": "2026-09-30T18:13Z",
+   "by": "the trading-lane coordinator",
+   "method": "GET /v2/account/activities/FEE, read-only, on the paper endpoint for account 1 and account 2, through the allow-listed fee read of the engine fee-fix branch (transport.fee_activities at 7f9e12f2). It never reads an activity's description; its record keeps each activity's date, fee type and net amount and no activity id. Credentials by pointer only: $PAPER_ENV_FILE for account 1, $PAPER_ENV_FILE_2 for account 2.",
+   "evidence_class": "local integration read, not an upstream test",
+   "records_activity_ids": false,
+   "posting": "the broker posts one FEE activity per fee type per day for the account and does not attribute fees to a series"
+  },
+  "engine_fee_model": "none in b528bb55: realized P&L and every end reconciliation here exclude fees, except series_totals.realized_pnl_including_fees_usd"
  },
  "paper_lane_row": {
   "dashboard_lane": "Alpaca paper accounts 1 and 2",
@@ -4049,6 +4087,7 @@
   "frozen-b528bb55.SHA256SUMS": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
   "reconcile-20260929/rth-20260929.json": "d1c4646e1050116c21f348c96590279b31ec5eef69bd60a50d54fe09038bc1f2",
   "reconcile-20260929/reconcile_ext_series.py": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "reconcile-20260929/fee-activities-20260929.json": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
   "systemd user unit paper-rth-20260929.service": "79da68b2ceea69d9706b29309a3b47a21945e30b27e93fa8f48be147ef36be0e",
   "systemd user unit paper-rth-20260929.timer": "d3b2eecceca6c8b5445c6ed0fa2de3e03c0502f8c999900f7b7293562a86d188"
  },
@@ -4117,7 +4156,8 @@
    "journal_query (queried_at, command, journald, result)": "the builder's journalctl --user -o json query at queried_at (the records per unit are in units[].journal_records) and systemctl --version for journald",
    "websocket_lines (logged_by, library, forms)": "the pinned environment's websockets 17.1 (exceptions.py:118-131, 142-143 and 158-175; protocol.py:237-245) and alpaca-py 0.44.0 (alpaca/data/live/websocket.py:468-475; alpaca/trading/stream.py:215-226), read on 2026-09-30",
    "websocket_lines.isolation_check_20260923": "the committed trials/20260923b-needs-attention/transport-isolation-1e2c96a.json (restart_log_records) and that directory's README",
-   "paper_lane_row (dashboard_lane, cites_at_branch_base)": "observability/grand-dashboard/state.json at the branch base f03f41c7 (the paper lane's title and evidence_ref)"
+   "paper_lane_row (dashboard_lane, cites_at_branch_base)": "observability/grand-dashboard/state.json at the branch base f03f41c7 (the paper lane's title and evidence_ref)",
+   "fees (account_1_fee_activities_for_2026_09_29, covers, fee_read)": "the coordinator's FEE-activity read fee-activities-20260929.json (sha256 in fees.fee_read and private_artifacts_sha256): one broker read that keeps no activity description, so no second source repeats the amounts or states their bases; covers takes the series attribution from the read and the prefix check from broker_reconciliation"
   },
   "derived": {
    "orders[].fills_at_reference_quote, fills_better_than_reference, fills_worse_than_reference, fills_at_reference_quote": "ledger execution prices against the asserted reference quotes",
@@ -4128,14 +4168,17 @@
    "series_totals counts": "the attempts and orders above",
    "private_artifacts_sha256, private_notes_sha256": "sha256 of each private file",
    "attempts[].errors.websocket_lines_without_close_frame, websocket_lines_no_close_frame_either_way; websocket_lines.series_counts": "counted from each attempt's paper.log: the lines containing 'no close frame received', the subset containing 'no close frame received or sent', and each stream's lines by form; series_counts sums the attempts (each line belongs to one attempt)",
-   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries"
+   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries",
+   "fees.total_usd, fees.fee_read.sha256": "the sum of the three rows, equal to the read's own account-1 total (-0.65); sha256 of the private read file",
+   "series_totals.fees_usd, realized_pnl_including_fees_usd": "fees.total_usd; series_totals.realized_pnl_usd (-115.94) plus fees.total_usd (-0.65)",
+   "fees.bases_recomputed_from_ledger (null)": "unknown: the FEE read keeps no activity description, so there is no stated fee basis to recompute from the ledger (fees.bases_note)"
   },
   "literal": {
    "units[].role, notes, labels": "the builder's descriptions",
    "attempts[].flat_basis, cleanup.proof": "text written after the asserts on the end reconciliation and the broker read",
    "revised_at_utc, revision_note": "the builder's record of this repair",
    "paper_lane_row (update, this_receipt_supports and the other fields)": "the builder's summary of the verdicts above",
-   "fees": "the builder's statement of what was not read; the engine's lack of a fee model is from the b528bb55 source"
+   "fees.bases_note, engine_fee_model, series_totals.fees_note": "the builder's statements; the engine's lack of a fee model is from the b528bb55 source"
   }
  },
  "error": null,
@@ -4147,7 +4190,7 @@
   "paper_compare.py was not run (decision 11: the tool is not checked against b528bb55 receipts), so no historical fill-model comparison is recorded.",
   "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. The 2026-09-23 isolation check's committed output (trials/20260923b-needs-attention/transport-isolation-1e2c96a.json, transport 1e2c96a) recorded a trading-stream line with a completed closing handshake 0.016 s and a data-stream line with no close frame received 0.018 s after the engine's stop() was called, and no restart line before it; its README names only the trading-stream line. These runs neither confirm nor rule out the same timing.",
   "The journal holds no exit record for the series unit (journal_query). Its result (success, exit status 0) comes from the systemd user manager's state, read on 2026-09-30 (units[0].manager_state); the manager has run since 2026-09-24, but a manager restart would clear that state. The driver's last line reads series ends: past last start 1540 ET.",
-  "Account 1's FEE activities were not read, so any fees the broker posted for 2026-09-29 on account 1 are unmeasured here; the engine has no fee model.",
+  "Fees: the broker posted REG, TAF and CAT fees for 2026-09-29 on account 1, -0.65 USD in total (fees). The engine has no fee model, so no figure here includes them except series_totals.realized_pnl_including_fees_usd (-116.59). They rest on one read that keeps no activity description, so their bases are not recomputed from the ledger.",
   "The halt's exact mark-to-market figure at 15:44:11 ET is not recorded: the ledger's risk_halt event carries no timestamp or amount, and the marks were overwritten by later quotes."
  ],
  "evidence_note": "Built from the private series workspace (the engine's own receipts, consoles, logs and events), a read-only snapshot of account 1's mover ledger, the systemd user journal, git show b528bb55 and the coordinator's read-only broker reconciliation (GET only, paper endpoint), whose stdout is committed here. Figures present in two or more of those sources were cross-checked by assertion, and a mismatch stops the build; field_provenance names the rest. No credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host path is recorded."

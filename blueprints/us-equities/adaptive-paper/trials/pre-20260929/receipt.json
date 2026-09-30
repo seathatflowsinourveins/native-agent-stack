@@ -21,8 +21,8 @@
   "section": "paper_e2e"
  },
  "recorded_at_utc": "2026-09-30T15:09:50Z",
- "revised_at_utc": "2026-09-30T18:57:30Z",
- "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed.",
+ "revised_at_utc": "2026-09-30T19:27:52Z",
+ "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed. Revised again on 2026-09-30 (revised_at_utc) to record the coordinator's FEE-activity read of account 2's FEE activities for 2026-09-29 beside the cash-gap output (fees, series_totals); the fees are stated only jointly for this series and ext-20260929, which the broker records cannot split. No verdict and no existing figure changed.",
  "started_at": "2026-09-29T11:00:05Z",
  "finished_at": "2026-09-29T13:25:03Z",
  "client_id_prefix": "mvr-pre-20260929-",
@@ -1982,6 +1982,15 @@
    "ledger_delta_sum": "-2.05",
    "broker_recomputed": "-2.05"
   },
+  "fees_usd": null,
+  "realized_pnl_including_fees_usd": null,
+  "fees_note": "Unknown for this series alone: account 2's FEE activities for 2026-09-29 (fees, -0.47 in total) cover this series and ext-20260929 together, and the broker posts one activity per fee type per day for the account, so its records cannot split them. The fee-inclusive figure exists only jointly (joint_pre_and_ext_20260929).",
+  "joint_pre_and_ext_20260929": {
+   "realized_pnl_usd": "-17.43",
+   "fees_usd": "-0.47",
+   "realized_pnl_including_fees_usd": "-17.90",
+   "basis": "this series' -2.05 plus ext-20260929's -15.38 (that receipt's series_totals.realized_pnl_usd.series, the recovery's BEX sale included), equal to the per-symbol realized sum in account 2's ledger snapshot, which holds ext-20260929's end state; the open IOVA 68 position's unrealized P&L is in neither figure"
+  },
   "gross_loss_usd": "95.00",
   "gross_loss_note": "the sum of the losing legs' realized P&L (trial 1 YMT -44.00 and MSGY -30.00, trial 3 MSGY -21.00); equal to trial 3's ledger_risk lifetime_gross_loss_usd, because this ledger began with this series and ended flat"
  },
@@ -2027,14 +2036,27 @@
   ],
   "total_usd": "-0.47",
   "covers": "all account-2 trading on 2026-09-29: this series, ext-20260929 and its recovery",
+  "split_between_series": null,
+  "split_note": "The broker posts one FEE activity per fee type per day for the account and does not attribute fees to a series (fee_read), so its records cannot split the total between this series and ext-20260929; no split is made.",
   "bases_recomputed_from_ledger": {
    "sell_proceeds_usd": "8820.73",
    "sell_shares": "1357",
    "sell_executions": 38,
    "executions": 81
   },
-  "source": "reconcile-20260929/cash-gap-account2-20260930.json (private; account number redacted; sha256 in private_artifacts_sha256)",
-  "engine_fee_model": "none in b528bb55: realized P&L and every end reconciliation here exclude fees",
+  "source": "two broker reads that agree on each activity's fee type, date and amount and on the total: reconcile-20260929/cash-gap-account2-20260930.json (the cash-gap output; private; account number redacted; sha256 in private_artifacts_sha256) and fee-activities-20260929.json (the coordinator's FEE-activity read; private; sha256 in fee_read and private_artifacts_sha256). Both read the broker, so they are independent of the engine but not of the broker.",
+  "fee_read": {
+   "file": "fee-activities-20260929.json",
+   "location": "<private state root>/trials/reconcile-20260929/ (private; not committed)",
+   "sha256": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
+   "recorded_at_utc": "2026-09-30T18:13Z",
+   "by": "the trading-lane coordinator",
+   "method": "GET /v2/account/activities/FEE, read-only, on the paper endpoint for account 1 and account 2, through the allow-listed fee read of the engine fee-fix branch (transport.fee_activities at 7f9e12f2). It never reads an activity's description; its record keeps each activity's date, fee type and net amount and no activity id. Credentials by pointer only: $PAPER_ENV_FILE for account 1, $PAPER_ENV_FILE_2 for account 2.",
+   "evidence_class": "local integration read, not an upstream test",
+   "records_activity_ids": false,
+   "posting": "the broker posts one FEE activity per fee type per day for the account and does not attribute fees to a series"
+  },
+  "engine_fee_model": "none in b528bb55: realized P&L and every end reconciliation here exclude fees, except series_totals.joint_pre_and_ext_20260929.realized_pnl_including_fees_usd",
   "timing_note": "The fee rows are day totals: their bases (8820.73 USD of proceeds, 1357 shares in 38 sell executions, 81 executions) equal all of account 2's executions that day, the ext-20260929 recovery's sale at 17:10 ET included."
  },
  "paper_lane_row": {
@@ -2113,6 +2135,7 @@
   "pre-20260929/3/pages/ledger.jsonl": "3cbcd91b5243e660720e95b3ea21ddd6d799b2758399952990b785eb4d9f90d6",
   "reconcile-20260929/cash-gap-account2-20260930.json": "c309e914c74aa26fe7b327885dd7d497cff62967c36cc30ee91fdb189d7e5a51",
   "reconcile-20260929/cash_gap_check.py": "6b9ef4392223d5853332596910cdf78fdf52f15b00e804920337f89c02f0f541",
+  "reconcile-20260929/fee-activities-20260929.json": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
   "pre-20260929/check-probe-20260929T051430Z.json": "71ea4a9c0211ce09f900cedc573b97936067c5dbaf37102be30b3a3fd6e5fb2c",
   "pre-20260929/probe-20260929T110005Z.json": "ae35cfe3d669614e13caac712d8d3a7c20fa5cd2dabf1cf1ae5b9da35c3b5237",
   "series-driver.sh": "feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608",
@@ -2155,6 +2178,8 @@
    "series_totals.realized_pnl_usd": "per-trial engine receipts, ledger deltas and the broker recompute",
    "series_totals.gross_loss_usd, ledger.at_series_end": "the losing legs, trial 3's ledger_risk and the cumulative ledger cash flow",
    "fees.bases_recomputed_from_ledger": "account 2's ledger executions against the fee descriptions (8820.73 proceeds, 1357 shares in 38 sell executions, 81 executions)",
+   "fees (amounts, total_usd)": "the cash-gap output's three FEE rows and the coordinator's FEE-activity read (fee-activities-20260929.json), equal on each fee type, date and amount and on the -0.47 total; both are broker reads",
+   "series_totals.joint_pre_and_ext_20260929.realized_pnl_usd": "this series' -2.05, ext-20260929's committed series_totals.realized_pnl_usd.series -15.38 and the per-symbol realized sum in account 2's ledger snapshot (-17.43)",
    "code.offline_gate": "FREEZE.md, the private series index, and the private gate log and rc record re-read on 2026-09-30 (402 tests, OK, rc 0, the same window; cited by sha256 in code.offline_gate.recheck_2026_09_30)",
    "attempts[].scan.scan_full_sha256": "the sha256 printed in scan.log and in the series console's scan line, equal to sha256 of the private scan-full.json (private_artifacts_sha256)",
    "scanner_rule (frozen_config_rule, rule_txt, every_attempt_argument)": "the config file, rule.txt and every attempt's scan.log, equal after the percent-points to ratio conversion (G20 is G0.20)",
@@ -2184,7 +2209,7 @@
    "units[] except the series unit's times": "systemd user journal and the manager state (units[].manager_state)",
    "ledger.peak_pnl_usd": "ledger meta peak_pnl (mark-to-market; no second source can recompute it)",
    "dry_run": "each series' dryrun-20260929 files and check-probe record",
-   "fees (amounts)": "the cash-gap output (broker FEE activities)",
+   "fees.fee_read, fees.split_note (one activity per fee type per day)": "the FEE-activity read's own record: its method, time and evidence class, and its note that the broker does not attribute fees to a series",
    "units[].manager_state, the exit_status and result it gives, journal_query.exit_results": "systemctl --user show --timestamp=us+utc, read-only, at manager_state.queried_at; the manager's UserspaceTimestamp (manager_running_since) predates the units",
    "series_procedure.key_probe": "the private probe record probe-20260929T110005Z.json (hashed in private_artifacts_sha256): request, http_status, observed_at and the rate-limit headers; the series console's line 4 repeats rc=0 and http_status=200",
    "series_procedure.scripts_note (modification times)": "stat of the private scripts, the three FREEZE files and the private series index on 2026-09-30 (modification times in UTC)",
@@ -2203,7 +2228,9 @@
    "series_totals counts": "the attempts and orders above",
    "private_artifacts_sha256, private_notes_sha256": "sha256 of each private file",
    "attempts[].errors.websocket_lines_without_close_frame, websocket_lines_no_close_frame_either_way; websocket_lines.series_counts": "counted from each attempt's paper.log: the lines containing 'no close frame received', the subset containing 'no close frame received or sent', and each stream's lines by form; series_counts sums the attempts (each line belongs to one attempt)",
-   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries"
+   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries",
+   "series_totals.joint_pre_and_ext_20260929.fees_usd, realized_pnl_including_fees_usd; fees.fee_read.sha256": "fees.total_usd; the joint realized -17.43 plus fees.total_usd -0.47; sha256 of the private read file",
+   "series_totals.fees_usd, realized_pnl_including_fees_usd, fees.split_between_series (null)": "unknown by construction: the broker's per-day, per-type FEE activities carry no series (fees.split_note)"
   },
   "literal": {
    "units[].role, notes, labels": "the builder's descriptions",
@@ -2222,7 +2249,7 @@
   "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. The 2026-09-23 isolation check's committed output (trials/20260923b-needs-attention/transport-isolation-1e2c96a.json, transport 1e2c96a) recorded a trading-stream line with a completed closing handshake 0.016 s and a data-stream line with no close frame received 0.018 s after the engine's stop() was called, and no restart line before it; its README names only the trading-stream line. These runs neither confirm nor rule out the same timing.",
   "Account designation: the series kept its own engine ledger (the new account-2 root, shared with ext-20260929) but traded broker account alpaca-paper-2, which blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 and docs/secret-storage.md:17 designate as the isolated incentive-monitor study account. Whether this use fits the forward study's isolation is referred to the forward protocol's owner, the trading lane; this receipt does not decide it.",
   "The journal holds no exit record for the series unit or the incentive monitor (journal_query). Their results (success, exit status 0) come from the systemd user manager's state, read on 2026-09-30 (units[].manager_state); the manager has run since 2026-09-24, but a manager restart would clear that state. The driver's last line reads series ends: past last start 0915 ET.",
-  "Fees: the broker posted REG, TAF and CAT fees for 2026-09-29 on account 2, for this series and ext-20260929 together. The engine has no fee model, so no figure here includes them."
+  "Fees: the broker posted REG, TAF and CAT fees for 2026-09-29 on account 2, -0.47 USD in total, for this series and ext-20260929 together; it posts one activity per fee type per day for the account, so its records cannot split them between the two series, and no split is made. The engine has no fee model, so no figure here includes them except the joint fee-inclusive figure (series_totals.joint_pre_and_ext_20260929, -17.90)."
  ],
  "evidence_note": "Built from the private series workspace (the engine's own receipts, consoles, logs and events), a read-only snapshot of account 2's mover ledger, the systemd user journal, git show b528bb55 and the coordinator's read-only broker reconciliation (GET only, paper endpoint), whose stdout is committed here. Figures present in two or more of those sources were cross-checked by assertion, and a mismatch stops the build; field_provenance names the rest. No credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host path is recorded."
 }
