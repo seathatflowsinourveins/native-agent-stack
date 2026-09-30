@@ -1,8 +1,8 @@
-# Recreate the accepted native SDK
+# Recreate the pinned native SDK
 
 The existing five direct dependencies remain in [workers/requirements.txt](../../blueprints/us-equities/workers/requirements.txt). Native **uv 0.12.17** resolved their full dependency graph under the [36 accepted version constraints](accepted-constraints.txt), producing [the hash lock](requirements-linux-x86_64-py313.lock): **36 distributions and 867 SHA-256 artifact hashes**. Multiple platform wheel hashes do not make the dependency resolution universally portable.
 
-This lock targets **CPython 3.13.15, Linux x86_64 glibc**. It does not contain an interpreter, OS libraries, GPU services, broker credentials or all npm/native-tool dependencies. The SDK bundles Codex CLI 0.154.0; the existing worker deliberately selects the separately accepted native Codex 0.155.1 with `--codex-bin`. The [official SDK](https://learn.chatgpt.com/docs/codex-sdk) documents this binary override. No model names are replaced during installation.
+This lock targets **CPython 3.13.15, Linux x86_64 glibc**. It does not contain an interpreter, OS libraries, GPU services, broker credentials or all npm/native-tool dependencies. The current SDK and bundled CLI are **0.159.2**; `--codex-bin` selects an explicit native binary. The [official SDK source](https://github.com/openai/codex/tree/rust-v0.159.2/sdk/python) documents this binary override. The September 30 upgrade retains the other 34 distribution versions. Its route and lifecycle qualification is recorded separately in [the new receipt](../../evidence/artifacts/runtime-sdk-20260930/receipt.json); it does not rewrite earlier adoption evidence.
 
 Set `SDK_ENV` to a **new, dedicated private environment path**, and `PYTHON_BIN` to an installed CPython 3.13.15 interpreter. Do not sync a shared/system environment: native sync removes packages outside the lock.
 
@@ -21,7 +21,7 @@ uv pip check --python "$SDK_ENV/bin/python"
 
 Use a clean package-manager environment: review local uv configuration and package-index overrides without printing credential values. The recorded native run used public PyPI. Its additional `--no-cache --reinstall` replay fetched all 36 distributions again, then installed successfully with required hashes and no source builds. Download availability is not guaranteed forever; hashes verify selected artifact bytes, not security or model quality.
 
-The fresh-prefix acceptance is in [the receipt](../receipt.json). It compares installed name/version pairs to the accepted Syft inventory, exercises the SDK import and existing useful DuckDB/data tests, and records model-account readiness separately. This is another prefix on the same WSL host, not a physical second-machine deployment.
+The historical 0.154.0 fresh-prefix acceptance is in [the adoption receipt](../receipt.json). It compares installed name/version pairs to the then-accepted Syft inventory, exercises the SDK import and existing useful DuckDB/data tests, and records model-account readiness separately. The September 30 prefix uses the updated lock and a separately recorded execution; the old receipt is not acceptance of the upgraded packages. Both are prefixes on the same WSL host.
 
 ## Recompile intentionally
 

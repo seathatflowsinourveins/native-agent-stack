@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "kind": "native-sdk-route-lifecycle-qualification",
+  "checked_at": "2026-09-30T05:26:01Z",
+  "status": "bounded_native_execution_verified",
+  "scope": "Official Codex Python SDK installation, native custom-provider routing, dynamic lookup tool and persistent thread resume on the same Linux host. No whole-roster quality or SDK-default promotion claim.",
+  "sources": [
+    {"repository": "openai/codex", "ref": "rust-v0.159.2", "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5", "paths": ["sdk/python", ".github/workflows/sdk.yml", ".github/workflows/python-sdk-build.yml"]},
+    {"url": "https://pypi.org/pypi/openai-codex/0.159.2/json", "artifact": "openai_codex-0.159.2-py3-none-any.whl", "sha256": "03c5a0d7c1da9edc4b62d7b4973d6e8199ce9462a7dec9c6dc9d75a2a88d3786"},
+    {"url": "https://developers.openai.com/codex/config-reference/", "contract": "custom model provider base_url, wire_api=responses, requires_openai_auth=false, model_reasoning_effort=max"},
+    {"url": "https://developers.openai.com/api/docs/guides/deployment-checklist", "contract": "Responses for tool use; no unsupported sampling parameters at non-none reasoning effort"}
+  ],
+  "installation": {
+    "python": "3.13.15",
+    "platform": "Linux x86_64 glibc",
+    "uv": "0.12.17",
+    "sdk": "0.159.2",
+    "bundled_cli": "0.159.2",
+    "selected_native_cli": "0.159.2",
+    "isolated_prefix": true,
+    "shared_environment_modified": false,
+    "lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+    "lock_sha256": "bfde2fa953c8b755b4d1cf499574ebceb8bcad8aa16cab215e0cc0b483e37039",
+    "distribution_count": 36,
+    "artifact_hash_count": 867,
+    "published_python_source_comparison": {"unchanged_files": 21, "different_files": 0, "scope": "All .py files under the pinned SDK src/openai_codex versus the installed published wheel; excludes packaging metadata and the bundled native CLI."},
+    "commands": [
+      {"command": "rtk uv venv --python $PY313 --no-python-downloads $SDK_ENV", "exit_code": 0},
+      {"command": "rtk uv pip sync --python $SDK_ENV/bin/python --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock", "exit_code": 0, "returned_output": "Installed 36 packages"},
+      {"command": "rtk uv pip check --python $SDK_ENV/bin/python", "exit_code": 0, "returned_output": "All installed packages are compatible"}
+    ]
+  },
+  "route": {
+    "provider": "omniroute",
+    "endpoint": "http://127.0.0.1:20128/v1",
+    "configured_model": "cx/gpt-6-astra-max",
+    "wire_api": "responses",
+    "reasoning_effort": "max",
+    "sampling_parameters_added": [],
+    "sign_in_path": "Keyless owned loopback gateway provider with requires_openai_auth=false. Fresh empty private CODEX_HOME; no native sign-in or authentication store was read or copied. The gateway owns its upstream account handling.",
+    "native_account_control": "Default openai mode retains the existing native sign-in and allowance checks.",
+    "gateway_per_request_attestation": null,
+    "compressed_lane_tested": false
+  },
+  "live_attempts": [
+    {
+      "id": "inspect",
+      "evidence_class": "advertised_model_only",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 $SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py inspect --provider omniroute --codex-bin $NATIVE_CODEX_BIN --codex-home $FRESH_CODEX_HOME --workspace $WORKSPACE --receipt $PRIVATE/inspect.json",
+      "exit_code": 0,
+      "returned_output": "{\"status\": \"discovery_complete\", \"model_inference_submitted\": false, \"observation_status\": \"not_configured\"}",
+      "private_receipt_sha256": "fd90aa3870a713eaf7984b1b8d5e8f397f10cff2496a59bc166bc900fcc22cb4",
+      "model_inference_submitted": false,
+      "usage": null
+    },
+    {
+      "id": "tool-start",
+      "evidence_class": "native_provider_execution_configured_route",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 $SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py run --provider omniroute --codex-bin $NATIVE_CODEX_BIN --codex-home $FRESH_CODEX_HOME --workspace $WORKSPACE --receipt $PRIVATE/tool-run1.json --prompt $PRIVATE/prompt.txt --lookup-tool $PRIVATE/lookup.json --persistent --turn-deadline-seconds 180",
+      "exit_code": 0,
+      "returned_output": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}",
+      "private_receipt_sha256": "cfc65ae627756bbb5d217ba5a9b77dc2e67ada5a8302c1f3dc584bb79c2f23b9",
+      "duration_ms": 7894,
+      "thread_mode": "persistent",
+      "model_inference_submitted": true,
+      "tool_calls": [{"tool": "lookup_trial", "key": "nonce", "answered": true}],
+      "declined_server_requests": [],
+      "final_response": "SDK159_TOOL_OK",
+      "task_passed": true,
+      "native_thread_cumulative_usage": {"input_tokens": 25999, "cached_input_tokens": 12800, "output_tokens": 46, "reasoning_output_tokens": 10, "total_tokens": 26045}
+    },
+    {
+      "id": "tool-resume",
+      "evidence_class": "native_provider_execution_configured_route",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 $SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py run --provider omniroute --codex-bin $NATIVE_CODEX_BIN --codex-home $FRESH_CODEX_HOME --workspace $WORKSPACE --receipt $PRIVATE/tool-resume2.json --prompt $PRIVATE/prompt.txt --lookup-tool $PRIVATE/lookup.json --resume-thread-id $PRIVATE_THREAD_ID --turn-deadline-seconds 180",
+      "exit_code": 0,
+      "returned_output": "{\"status\": \"completed\", \"model_inference_submitted\": true, \"observation_status\": \"not_configured\"}",
+      "private_receipt_sha256": "fc94652998b4b9032189cfc70f6ec74cf1333438f3a6dee63c537fe1312fd729",
+      "duration_ms": 3964,
+      "thread_mode": "resumed",
+      "same_private_thread_independently_compared": true,
+      "model_inference_submitted": true,
+      "tool_calls": [{"tool": "lookup_trial", "key": "nonce", "answered": true}],
+      "declined_server_requests": [],
+      "final_response": "SDK159_TOOL_OK",
+      "task_passed": true,
+      "native_thread_cumulative_usage": {"input_tokens": 52206, "cached_input_tokens": 38528, "output_tokens": 80, "reasoning_output_tokens": 10, "total_tokens": 52286}
+    }
+  ],
+  "fixture": {
+    "prompt_sha256": "3dbfb91bcd157c00e32d1e21da661b57161f576f8bf1baea0912e5ff256392c9",
+    "lookup_sha256": "cf1a1af458da044e009365697d825d9bdd4f1f1046da8c03806853ebf6a51d59",
+    "prompt": "Call lookup_trial with key nonce. Return only the stored value. Use the registered lookup tool; no other tools are needed.",
+    "oracle": "Native tool handler records answered=true and final response equals SDK159_TOOL_OK. Compare private persisted thread IDs across two processes; publish equality only.",
+    "meaning": "A locally authored integration fixture executed by the real provider, not an upstream benchmark or research-quality evaluation. The coordinator read the allowlisted native receipts independently of the worker's answer. No separate host observer or gateway billing reconciliation was configured."
+  },
+  "usage_accounting": {
+    "native_execution_total_tokens": 52286,
+    "counting_rule": "Use the last native cumulative thread snapshot exactly once. Do not add the start snapshot to the resumed snapshot. Cached input is included in input and reasoning output is included in output.",
+    "provider_gateway_usage": null,
+    "coordinator_research_and_judge_usage": null,
+    "whole_task_usage": null,
+    "token_savings_claim": null
+  },
+  "unchanged_upstream_checks": {
+    "source_modified": false,
+    "native_command_source": ".github/workflows/sdk.yml at rust-v0.159.2",
+    "uv_version_difference": "Upstream workflow selects uv 0.11.3; this host used installed uv 0.12.17 with the unchanged frozen upstream lock.",
+    "commands": [
+      {"command": "rtk uv sync --only-group dev --frozen --python $PY313", "exit_code": 0},
+      {"command": "rtk uv run --only-group dev --frozen --no-sync ruff check --output-format=github .", "exit_code": 0},
+      {"command": "rtk uv run --only-group dev --frozen --no-sync ruff format --check .", "exit_code": 0, "returned_output": "74 files already formatted"},
+      {"command": "CODEX_EXEC_PATH=$BUNDLED_CLI159 rtk uv run --only-group dev --frozen --no-sync pytest", "exit_code": 1, "returned_output": "1 failed, 266 passed, 38 skipped in 76.83s (0:01:16)", "failed_test": "tests/test_artifact_workflow_and_binaries.py::test_root_format_driver_covers_all_formatter_groups", "skipped_scope": "Upstream opt-in real-runtime/provider tests; not a provider acceptance claim."}
+    ],
+    "remaining_failure": "At this unmodified tag, tests/test_artifact_workflow_and_binaries.py expects rustfmt plus explicit Rust files, while scripts/format.py::rust_formatter_group returns cargo fmt -- --config imports_granularity=Item. The failing assertion is outside SDK provider execution. The suite is not declared passing and the upstream test was not rewritten."
+  },
+  "integration_checks": [
+    {"command": "rtk env PYTHONDONTWRITEBYTECODE=1 $SDK_ENV/bin/python -m unittest tests.test_native_worker_route tests.test_native_worker_fixture tests.test_worker_recovery -v", "exit_code": 0, "returned_output": "Ran 24 tests; OK", "evidence_class": "local_integration_contract_and_recorded_fixture_replay"},
+    {"command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_native_worker_route tests.test_native_worker_fixture tests.test_worker_recovery tests.test_observability -q", "exit_code": 0, "returned_output": "Ran 29 tests in 0.293s; OK", "evidence_class": "local_integration_contract_and_recorded_fixture_replay"},
+    {"command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_native_worker_route tests.test_native_worker_fixture tests.test_worker_recovery tests.test_observability -q", "exit_code": 0, "returned_output": "Ran 29 tests in 0.326s; OK", "evidence_class": "local_integration_contract_and_recorded_fixture_replay", "reason_for_repeat": "Added explicit native_thread_cumulative usage scope to private results and bounded observations after the real resume demonstrated non-additive snapshots. Observation fixture checks scope retention without exporting private thread IDs; no additional model run."}
+  ],
+  "corrections_and_failed_conditions": [
+    {"anti_pattern": "Assuming /usr/bin/python3 matches the lock target", "observed": "The first isolated prefix used /usr/bin/python3, which reported Python 3.12.3. Native install succeeded but did not meet the Python 3.13.15 target.", "correction": "Verified the ecosystem Python reports 3.13.15, created a different isolated prefix and repeated hash-required native installation and compatibility checks.", "model_inference_submitted": false, "usage": null},
+    {"anti_pattern": "Running a full upstream suite with an incomplete sparse checkout and no selected native CLI", "observed": "First unchanged suite returned 64 failed, 203 passed, 38 skipped in 35.87s with missing sibling fixtures and bundled CLI errors.", "correction": "Added source-pinned sdk/python-runtime, root scripts, workflows and MCP conformance fixtures; selected the published bundled CLI 0.159.2 via the upstream CODEX_EXEC_PATH contract.", "model_inference_submitted": false, "usage": null},
+    {"anti_pattern": "Giving a native lifecycle suite a 60-second processing timeout", "observed": "The next attempt was terminated by context-mode after 60000ms before returning a result.", "exit_code": null, "correction": "Ran the same native suite with a resumable host process and its own private log. Preserved the timeout rather than declaring zero failures.", "model_inference_submitted": false, "usage": null},
+    {"anti_pattern": "Treating a cumulative native thread counter as an additive per-turn observation", "observed": "The resumed native receipt reports input=52206 and total=52286 including the earlier start snapshot (total=26045).", "correction": "Use the final snapshot once; mark all returned SDK usage and bounded observation metadata with usage_scope=native_thread_cumulative. Retain numeric upstream counters unchanged.", "model_inference_submitted": false, "usage": null},
+    {"condition": "Publication check before registering changed owned files", "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py", "exit_code": 1, "observed": "SHA-256/byte-count mismatches for six changed SDK files and two unregistered evidence files.", "correction": "Register only owned files through scripts/host_receipts.py::register_file and rerun the validator. Keep the hash index in the branch's final commit.", "model_inference_submitted": false, "usage": null}
+  ],
+  "limits": [
+    "No global Codex or Claude settings, native account store, existing prefix or compressed gateway lane was changed.",
+    "No accepted default SDK change: the preregistered full comparison and task-quality gates remain separate.",
+    "Native configured-model checks and successful inference do not independently attest every gateway request or account route.",
+    "The upstream full suite retains one reproducible formatter assertion failure; 38 opt-in tests were skipped.",
+    "A separate gateway observer, interrupt/reconnect live trial and complete attempt usage reconciliation remain required for the broader runtime acceptance."
+  ]
+}
