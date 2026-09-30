@@ -1,0 +1,76 @@
+{
+ "kind": "pra_u2_shell_parts_property",
+ "seed": 20260929,
+ "bash": "GNU bash, version 5.2.21",
+ "generated": {
+  "generated": 2000,
+  "bash_valid": 2000,
+  "bash_rejected": 0,
+  "agree": 2000,
+  "disagree": 0,
+  "threw": 0,
+  "disagree_by_class": {},
+  "agree_by_class": {
+   "substitution": 130,
+   "parameter_braces": 145,
+   "heredoc": 1218,
+   "arithmetic": 134,
+   "quoted_heredoc_operator": 142,
+   "quoted_hash": 153,
+   "subshell": 141,
+   "double_quotes": 121,
+   "less_and": 153,
+   "heredoc_in_quoted_substitution": 168,
+   "and_greater": 143,
+   "here_string": 151,
+   "comment": 522,
+   "plain": 408,
+   "heredoc_left_open_by_its_substitution": 131,
+   "brace_expansion": 150,
+   "fd_duplication": 142,
+   "escapes": 145,
+   "newline_in_substitution": 161,
+   "newline_in_substitution_before_a_body": 111,
+   "line_continuation": 138,
+   "single_quotes": 120,
+   "brace_group": 119,
+   "quote_in_substitution": 148,
+   "arithmetic_command": 131,
+   "word_hash": 149,
+   "clobber": 153,
+   "backquotes": 144,
+   "heredoc_in_substitution": 136,
+   "nested_subshell": 121
+  },
+  "max_ms": 0.47
+ },
+ "random": {
+  "strings": 2000,
+  "null": 1889,
+  "parts": 111,
+  "threw": 0,
+  "max_ms": 0.34
+ },
+ "scaling": [
+  {
+   "parts": 2000,
+   "characters": 46676,
+   "ms": 7.1
+  },
+  {
+   "parts": 4000,
+   "characters": 93369,
+   "ms": 11.1
+  },
+  {
+   "parts": 8000,
+   "characters": 186659,
+   "ms": 20.4
+  },
+  {
+   "parts": 16000,
+   "characters": 373317,
+   "ms": 43.1
+  }
+ ]
+}
