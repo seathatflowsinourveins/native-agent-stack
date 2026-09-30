@@ -253,10 +253,10 @@ Codex parity is a template only, not applied by any installer; B1 applies no Cod
 B1 is the host-apply unit that follows this change.
 `adoption/templates/codex.hooks.template.json` holds the one group that would run the same script under Codex, and
 it can only be used by hand-appending that group after ai-memory's one SessionStart group in the user `hooks.json`.
-The config template's `trusted_hash` for key `session_start:1:0` is computed from that template, not recorded on a
-host, so it matches only at that position: a hand-append after two or more groups gets key `session_start:2:0` or
-later, which the config template does not list, and stays untrusted until reviewed in `/hooks` (measured for the
-third position with Codex 0.157.1 and 0.159.2; see Sources).
+The config template ships no trust entry for it: Codex keys a hand-appended group by its position
+(`session_start:1:0` after ai-memory's one SessionStart group, `session_start:2:0` or later after more), and at
+every position the handler stays untrusted, and is skipped, until it is reviewed in `/hooks` (Codex's trust rule
+for hooks; the keys were measured for the second and third positions with Codex 0.157.1 and 0.159.2; see Sources).
 
 The hook prints only `summary_line`, and prints nothing for a missing or stale (over 8 days) due-file. It also
 prints nothing for a malformed or unreadable file, one more than a day ahead, one that is not a regular file, or one
@@ -324,7 +324,9 @@ take the sentence in one follow-up after this change and F4 merge, so that the t
   handler `session_start:1:0` when the group followed ai-memory's one SessionStart group. Both reported the
   template's hash and listed the handler as trusted with the config entry. With a second group ahead of it, both
   keyed the handler `session_start:2:0` and listed it untrusted under that same config entry, and trusted once an
-  entry existed for the reported key (not retained as a receipt).
+  entry existed for the reported key (not retained as a receipt). The probe's trust entry was a template entry of
+  the r2 head and has since been removed: the measurement stands as the evidence for the keys and positions, and
+  the shipped template trusts nothing.
 - Blind-role bindings, read in the tree at `11227bfd`: `evidence/artifacts/token-adoption-e2e-20260926/README.md`
   L237 and `preregistration.json` L2263-2393; `tools/token-e2e/judge.py` L48 and L697-707;
   `scripts/landscape.py` L434 and L459-492 with `tools/sota-convergence/record_verdicts.py` L185; and
