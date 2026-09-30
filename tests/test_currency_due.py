@@ -812,6 +812,12 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertTrue(line.endswith(f"; details: {cd.XDG_POINTER}"), line)
         self.assertLessEqual(len(line), 160)
         self.assertEqual(cd.XDG_POINTER, 'cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json')
+        # With nothing runnable that fits, the run fails rather than emit a non-runnable or over-long line.
+        with self.assertRaises(cd.CheckError):
+            cd.summary_line(due, too_long, pointers=[long_pointer])
+        # Nothing due never needs a command.
+        self.assertEqual(cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0), too_long, pointers=[long_pointer]),
+                         "stack currency: nothing due")
 
     def test_a_long_xdg_state_home_gives_the_symbolic_pointer_that_runs_from_anywhere(self):
         # A 140-character XDG_STATE_HOME basename (the review's case) with a long checkout path: the writer exits 0,
@@ -836,19 +842,36 @@ class DetailsCommandTests(unittest.TestCase):
             command = self.literal_command(checkout, document)
             self.assertEqual(self.run_elsewhere(checkout, command)["due"], document["due"])
 
-    def test_an_explicit_state_directory_too_long_for_any_runnable_pointer_is_refused_up_front(self):
-        # No runnable command that prints the due-file fits the line, so the run is refused as a usage error
-        # (exit 2) before any check runs, and nothing is written.
-        checkout = Checkout(self, "c" * 110)
+    def test_a_long_explicit_state_directory_keeps_the_primary_command_when_it_fits(self):
+        # A short checkout with a 140-character state-directory basename: the primary command fits, so the
+        # notice is written normally and its literal command runs from an unrelated directory.
+        checkout = Checkout(self)
         checkout.something_due()
         base = checkout.state.parent / ("s" * 140)
-        stderr = io.StringIO()
-        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as raised:
-            cd.main(["--root", str(checkout.root), "--now", NOW, "--state-dir", str(base)])
-        self.assertEqual(raised.exception.code, 2)
-        self.assertIn("too long for the notice line", stderr.getvalue())
-        self.assertFalse(base.exists())
-        self.assertIsNone(checkout.recorded(STALENESS))
+        code, _, stderr = checkout.run("--state-dir", str(base))
+        self.assertEqual(code, 0, stderr)
+        checkout.state = base
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertTrue(document["summary_line"].endswith(f"; details: {checkout.command()}"),
+                        document["summary_line"])
+        self.assertEqual(self.reproduced(checkout, document)["due"], document["due"])
+
+    def test_no_runnable_command_at_all_fails_the_due_run_and_still_clears_a_stale_notice(self):
+        # A long checkout path with a long explicit state directory: nothing runnable fits the line, so a run with
+        # something due fails (exit 2, nothing written) instead of emitting a non-runnable line, while a run with
+        # nothing due still removes an obsolete due-file.
+        checkout = Checkout(self, "c" * 110)
+        base = checkout.state.parent / ("s" * 140)
+        base.mkdir(mode=0o700)
+        (base / "currency-due.json").write_text('{"earlier": true}\n', encoding="utf-8")
+        code, _, stderr = checkout.run("--state-dir", str(base))
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse((base / "currency-due.json").exists())
+        checkout.something_due()
+        code, _, stderr = checkout.run("--state-dir", str(base))
+        self.assertEqual(code, 2, stderr)
+        self.assertIn("no runnable details command fits", stderr)
+        self.assertFalse((base / "currency-due.json").exists())
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.

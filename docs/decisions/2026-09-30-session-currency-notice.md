@@ -129,10 +129,12 @@ installed and no host file was written: the timer and the service are drafted te
    command and whose `root` field names the checkout; when the resolved path is too long for that and the state
    directory came from `XDG_STATE_HOME`, the line ends with the symbolic
    `cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json`, which the session that prints the line resolves
-   with the same variable the hook used to find the file; an explicit `--state-dir` too long for any runnable
-   pointer is refused as a usage error before the checks run (the unit passes none). Every emitted line ends with
-   a runnable command, never a cwd-relative one, and the writer refuses (exit 2) rather than write a line over 160
-   characters (GPT-6 review rounds 3 to 5). A `stack-currency` launcher on the
+   with the same variable the hook used to find the file. The primary command is always considered first, so a
+   long explicit `--state-dir` beside a short checkout path changes nothing. Only when something is due and no
+   runnable form fits (a long checkout path with a long explicit `--state-dir`; the unit passes none) does the
+   run fail with exit 2 and write nothing, and a run with nothing due still removes an obsolete due-file. Every
+   emitted line ends with a runnable command, never a cwd-relative one, and never exceeds 160 characters (GPT-6
+   review rounds 3 to 6). A `stack-currency` launcher on the
    ecosystem `PATH` would make the command short on every host; it is not part of this change because installing
    it is a host step of the full-profile bootstrap. The document's keys are now `generated_at`, `root`, `due`,
    `summary_line`, `details_command` and `details`. The option is bounded to 36500 to keep the line short. The unit passes neither, so its

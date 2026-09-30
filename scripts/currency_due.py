@@ -39,8 +39,10 @@ absolute command would leave the counts no room in the line, the line ends with 
 command that prints this document, whose details_command field carries the full command and whose root field names
 the checkout; when the resolved path is too long for that and the state directory came from XDG_STATE_HOME, the
 symbolic `cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json` is used (the hook that prints the line resolves
-the same variable); an explicit --state-dir too long for any runnable form is refused before the checks run. Every
-emitted line ends with a runnable command, never a cwd-relative one, and never exceeds 160 characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
+the same variable). When something is due and no runnable form fits (a long checkout path with a long explicit
+--state-dir), the run fails with exit 2 and writes nothing; a run with nothing due still removes an obsolete
+due-file. Every emitted line ends with a runnable command, never a cwd-relative one, and never exceeds 160
+characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
 starts in when the file exists and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.md).
 
   python3 scripts/currency_due.py                    # write or remove the due-file; one line for the journal
@@ -249,25 +251,26 @@ def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = Tru
     count and a check that could not answer, the line says so rather than "nothing due". When ``command`` leaves
     the counts less than MIN_COUNTS_ROOM characters, the first of ``pointers`` (``cat <due-file>``, then the
     symbolic XDG form; the document carries the command in its details_command field) that leaves them that room
-    takes its place, else the last pointer with the counts shortened; the line never names a cwd-relative command
-    and never exceeds SUMMARY_LIMIT."""
+    takes its place; when none does, the run fails (CheckError) rather than emit a line without a runnable
+    command or over SUMMARY_LIMIT."""
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due[key]]
     if not parts:
         return ("stack currency: nothing due" if complete else
                 "stack currency: nothing known due, skill check incomplete")
     prefix = "stack currency: "
-    suffix = f"; details: {command}"
-    for candidate in pointers:
-        if SUMMARY_LIMIT - len(prefix) - len(suffix) >= MIN_COUNTS_ROOM:
-            break
+    for candidate in (command, *pointers):
         suffix = f"; details: {candidate}"
-    counts, room = ", ".join(parts), SUMMARY_LIMIT - len(prefix) - len(suffix)
+        room = SUMMARY_LIMIT - len(prefix) - len(suffix)
+        if room >= MIN_COUNTS_ROOM:
+            break
+    else:
+        raise CheckError(f"no runnable details command fits the {SUMMARY_LIMIT}-character notice line "
+                         f"(the checkout path and the state directory are both too long); use XDG_STATE_HOME "
+                         f"or a shorter --state-dir")
+    counts = ", ".join(parts)
     if len(counts) > room:
-        counts = counts[:max(room, 3) - 3] + "..."
-    line = prefix + counts + suffix
-    if len(line) > SUMMARY_LIMIT:
-        raise CheckError(f"summary line of {len(line)} characters exceeds {SUMMARY_LIMIT}: {line!r}")
-    return line
+        counts = counts[:room - 3] + "..."
+    return prefix + counts + suffix
 
 
 def due_file_pointers(due_file: Path | None, from_xdg: bool) -> list[str]:
@@ -280,12 +283,6 @@ def due_file_pointers(due_file: Path | None, from_xdg: bool) -> list[str]:
         pointers.append(XDG_POINTER)
     return pointers
 
-
-def fits_with_a_pointer(due_file: Path, from_xdg: bool) -> bool:
-    """Whether some runnable pointer leaves the smallest count text room in the line; an explicit --state-dir that
-    does not is refused before the checks run, since no runnable command could name it."""
-    prefix_and_smallest = len("stack currency: ") + MIN_COUNTS_ROOM + len("; details: ")
-    return any(prefix_and_smallest + len(pointer) <= SUMMARY_LIMIT for pointer in due_file_pointers(due_file, from_xdg))
 
 
 def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT,
@@ -504,9 +501,6 @@ def main(argv: list[str] | None = None) -> int:
     if state == root or root in state.parents:
         parser.error(f"--state-dir must be outside the checkout ({root}); the due-file never goes into it")
     from_xdg = args.state_dir is None and os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
-    if not fits_with_a_pointer(state / DUE_FILE, from_xdg):
-        parser.error(f"--state-dir {state} is too long for the notice line: no runnable command that prints the "
-                     f"due-file fits in {SUMMARY_LIMIT} characters; use XDG_STATE_HOME or a shorter path")
     if not 0 <= args.sweep_cadence_days <= MAX_SWEEP_CADENCE_DAYS:
         parser.error(f"--sweep-cadence-days must be between 0 and {MAX_SWEEP_CADENCE_DAYS}")
     if args.now is None:
