@@ -657,7 +657,8 @@ The file follows the rule of `frozen_checks.private_create` on main (a02ff13f,
 **Dependency.** Until PR-A U2's kernel is merged with this tool, `child-usage.mjs` exports no `callLedger`.
 `--call-ledger` then exits 2 with "the measurement kernel exports no callLedger" and writes nothing, and
 the five real-kernel tests of `CodexCallLedger` skip. On a scratch tree of this branch with U2's kernel at
-b2dd1eb7, all 13 ledger tests passed, after failing first. The host run of that tree is in
+b2dd1eb7, the class's 13 tests failed first (at 00c458ba) and all 14 pass at 45a5c0c1, the 14th being the
+`--out` refusal added later. The host run of that tree is in
 [pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md).
 
 ## Verify the bundle
