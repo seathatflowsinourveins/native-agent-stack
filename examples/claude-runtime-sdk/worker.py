@@ -115,12 +115,18 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
     auth_token = "omniroute-no-auth"
     if args.gateway_token_env is not None:
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.gateway_token_env):
-            raise ValueError("gateway-token-env must name an application environment variable")
+            raise ValueError(
+                "gateway-token-env must name an application environment variable"
+            )
         if args.gateway_token_env.startswith("ANTHROPIC_"):
-            raise ValueError("use a gateway-specific token binding, separate from native Anthropic credentials")
+            raise ValueError(
+                "use a gateway-specific token binding, separate from native Anthropic credentials"
+            )
         auth_token = os.environ.get(args.gateway_token_env)
         if not auth_token or not auth_token.strip():
-            raise ValueError("the explicit gateway token environment binding is missing or empty")
+            raise ValueError(
+                "the explicit gateway token environment binding is missing or empty"
+            )
     return ClaudeAgentOptions(
         system_prompt={"type": "preset", "preset": "claude_code"},
         model=args.model,
@@ -458,7 +464,9 @@ def main() -> int:
         if args.result_output is not None and args.result_output.exists():
             raise ValueError("result-output must be a new private file")
         # This CLI process is the owned worker child, not the native coordinator.
-        configuration["native_anthropic_env_keys_removed"] = prepare_worker_environment()
+        configuration["native_anthropic_env_keys_removed"] = (
+            prepare_worker_environment()
+        )
         observation = anyio.run(
             lambda: run_worker(
                 options,
