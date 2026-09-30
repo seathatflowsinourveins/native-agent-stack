@@ -475,7 +475,10 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
     the `yaml` package that `skills-yaml.pin.json` pins: 2.9.0, the version and npm integrity of the CLI's lockfile.
     It installs nothing and runs only the installed files whose sha256 the pin lists, after checking the install's
     `package-lock.json` integrity. Install it with the pin's command; the directory comes from `--skills-yaml`, then
-    `LANDSCAPE_SWEEP_SKILLS_YAML`, then the pin's default under HOME. A copy the CLI skips (no `name` or
+    `LANDSCAPE_SWEEP_SKILLS_YAML`, then the pin's default under HOME. CI's `validate` job
+    (`.github/workflows/validate.yml`) installs it before the suite, as it does the tree-sitter-bash pin, and
+    `tests/test_landscape_sweep_skills.py` fails an Actions job without it (the macOS and weekly freshness jobs are
+    recorded gaps, where the reader tests skip). A copy the CLI skips (no `name` or
     `description`, one that is not a string, a YAML parse error) is recorded in `observed.skipped_skill_md` with the
     warning the CLI prints, so it never claims the name. `observed.skill_md_reader` records the package, its
     integrity and the pin file's sha256;
@@ -483,8 +486,16 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
     copy when node or a verified install is missing; a copy whose frontmatter holds a line break other than LF or
     CRLF (the `yaml` package and the CLI's pattern break lines only there, while libyaml, which Codex's serde_yaml
     uses, also breaks at a lone CR, U+0085, U+2028 and U+2029); and a copy whose bytes are not the regular-file blob
-    the tree lists (a symlink, content gh does not return, other bytes). A symlinked folder is not followed: the
-    trees API lists it as one blob, and the CLI's clone would walk it;
+    the tree lists (a symlink, content gh does not return, other bytes);
+  - symlinks: the CLI walks a search location through a symlink at or above it (`readdir` follows it,
+    `dist/cli.mjs` lines 1339-1370) and skips a symlinked skill folder inside one (its directory entry is not a
+    directory, `src/skills.ts` lines 284-298), while the git tree lists a symlink as one blob and nothing below it.
+    A search location at or below a symlink, a folder whose `SKILL.md` is a symlink with skill folders below it (the
+    CLI walks below it only when the link's target is not a file), and `.claude-plugin` manifests behind a symlink or
+    without verified bytes leave what the CLI finds there unknown: reached before the pick is decided, such a
+    location stops the survivor; after it, it cannot change the pick, since the CLI keeps the first skill of a name;
+  - the bytes read are the blobs'. The CLI reads its clone's checkout, where `.gitattributes` can change them
+    (`filter=lfs`, eol and text normalization, `working-tree-encoding`), and the review does not read `.gitattributes`;
   - npm resolves the CLI's `yaml` dependency (`^2.8.3`) when the CLI is installed, so an install made on 2026-09-30
     runs yaml 2.9.1, as does this host's install from the manifest. On that day yaml 2.9.0 and 2.9.1 gave the same
     verdict, name, description and warning for all 2,455 `SKILL.md` files of the catalog's GitHub sources at their

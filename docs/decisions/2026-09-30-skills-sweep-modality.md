@@ -123,6 +123,14 @@ The packaged sweep gains `modality: "skills"`.
     install is missing, when its frontmatter holds a line break other than LF or CRLF, and when its bytes are not the
     regular-file blob the tree lists (a symlink, content gh does not return, or other bytes). So does a `SKILL.md` gh
     cannot read.
+  - The CLI walks a search location through a symlink at or above it (`readdir` follows it) and skips a symlinked
+    skill folder inside one, while the git tree lists a symlink as one blob. A search location at or below a
+    symlink, a folder whose `SKILL.md` is a symlink with skill folders below it, and `.claude-plugin` manifests behind
+    a symlink or without verified bytes are unknown locations: one reached before the pick is decided stops the
+    survivor, since the CLI may take a copy there first or skip its recursive search because of what it finds.
+  - CI's `validate` job installs the yaml pin before the suite, as it does the tree-sitter-bash pin, so the reader
+    tests run there; `tests/test_landscape_sweep_skills.py` fails an Actions job without the verified install, and
+    fails the suite when the provisioning step is missing, late, retyped, unexported or skippable.
   - A copy's name is compared as the CLI matches `--skill` against it: the name `sanitizeMetadata` records, or the
     folder's name when that is empty (`getSkillDisplayName`).
   - It records the reader (`skill_md_reader`: package, integrity, the pin file's sha256) and the skill folder's git
@@ -152,8 +160,10 @@ The packaged sweep gains `modality: "skills"`.
 
 **Residuals.**
 
-- **Resolver limits.** A folder's name stands for the skill's name field, which the specification requires to match:
-  a folder named otherwise whose name field is `<name>` is not found. The CLI's `skills-lock.json` rule is not
+- **Resolver limits.** A folder's name stands for the skill's name field, which the specification requires to match.
+  `add` keeps the first skill of each name and drops a later one (`dist/cli.mjs` line 1352; only the update paths,
+  lines 7382 and 7588, keep duplicates), so when an earlier folder named otherwise declares `<name>` the CLI installs
+  that folder, and the review can name a later copy the CLI throws away. The CLI's `skills-lock.json` rule is not
   emulated: it skips installed copies under agent folders. In `agents/openai.yaml`, type errors outside
   `policy.allow_implicit_invocation` (in `interface`, `dependencies` or `products`), which also make Codex ignore
   the file, are not checked.
@@ -171,14 +181,26 @@ The packaged sweep gains `modality: "skills"`.
     own verdict is definite, because libyaml-based readers such as Codex's serde_yaml break lines there. When the
     CLI's frontmatter pattern does not match a file that starts with `---`, the whole file counts as frontmatter, so
     such a break in its body also leaves it without a verdict.
-  - **Symlinks and other bytes.** A symlinked `SKILL.md` has no verdict. A symlinked folder is not followed: the git
-    trees API lists it as one blob, while the CLI's clone would walk it. A `.claude-plugin` manifest whose bytes are
-    not the regular-file blob the tree lists stops the review, since the manifests decide where the CLI searches.
+  - **Symlinks and other bytes.** A symlinked `SKILL.md` has no verdict. The CLI walks a search location through a
+    symlink at or above it (`readdir` follows it, `dist/cli.mjs` lines 1339-1370) and skips a symlinked skill folder
+    inside one (`entry.isDirectory()` is false, `src/skills.ts` lines 284-298 and 141-149); the git trees API lists
+    a symlink as one blob and nothing below it. The review does not resolve link targets: a location at or below a
+    symlink, a `SKILL.md` symlink with skill folders below it and manifests behind a symlink or without verified
+    bytes are unknown, and one reached before the pick is decided stops the survivor, even where the target is an
+    earlier location the CLI has already walked (a common agent-folder layout). At the catalog pins, 3 of the 22
+    GitHub sources hold a symlinked search location (`.agents/skills` in getsentry/skills, `.opencode/skills` in
+    addyosmani/agent-skills and microsoft/skills) and none a symlinked `SKILL.md`; every pick the resolver makes in
+    the 22 sources is decided before any symlinked location, so the rule stops none of them
+    ([receipt](../../evidence/artifacts/skills-md-reader-20260930/README.md), `symlinks` step).
+  - **`.gitattributes`.** The review reads each file's blob. The CLI reads its clone's checkout, where
+    `.gitattributes` can change the bytes (`filter=lfs` leaves a pointer or fetches the object, eol and text
+    normalization, `working-tree-encoding`); the review does not read `.gitattributes`.
   - **Claude Code's parser.** `disable_model_invocation` applies Claude Code's documented boolean rule to the value as
     the `yaml` package types it; Claude Code's own frontmatter parser was not run.
-  - **CI.** No workflow installs the pinned yaml yet, so the tests that run `skill_md.mjs` skip there with a named
-    reason (as the tree-sitter lane tests did before `validate.yml` provisioned their pin); the fail-closed and
-    pre-reader tests run everywhere.
+  - **CI.** `validate.yml`'s `validate` job installs the pin, so the reader tests run there. The two other jobs that
+    run the whole suite, `adoption-bootstrap.yml` `validate-macos` and `catalog-freshness.yml` `freshness`, do not
+    yet (the tree-sitter pin records the same two gaps): their reader tests skip, and the tripwire stands down there
+    by name.
 - **Stricter reviews.** A survivor whose discovery worker could not compute `skill_md_sha256` (the schema allows null
   for a worker that cannot run commands) can no longer be reviewed, so its layer stops until a rerun supplies it.
 - **Not run.** No model was called, and no sweep was measured. The evidence is this repository's synthetic-fixture
@@ -242,7 +264,12 @@ and edge cases (rerun its comparison), or when the manifest starts pinning the C
     `yaml@2.9.0`); the published tarball's `dist/cli.mjs` (sha256 `fde68534…6701c`) imports `parse` from `"yaml"`;
   - `src/sanitize.ts`: `stripTerminalEscapes` (lines 18-52) and `sanitizeMetadata` (lines 61-65), the name recorded;
   - `src/plugin-manifest.ts` `getPluginSkillPaths`, and `src/constants.ts` `DEFAULT_SKILL_CONTAINER_DEPTH`;
-  - `src/add.ts`: `--skill` includes internal skills, and a GitHub source is cloned before discovery;
+  - `src/add.ts`: `--skill` includes internal skills; a GitHub source named with a ref (`owner/repo#<ref>`, as the
+    adjudicated pin would be installed) is cloned before discovery, because the blob-install fast path returns null for
+    a ref (published `dist/cli.mjs` lines 4101-4102). Without a ref, sources of the vercel, vercel-labs, heygen-com and
+    remotion-dev owners and the listed repositories try that path first (lines 5190-5212): it reads the tree from the
+    API, and when it succeeds it installs a downloaded snapshot without running `discoverSkills` (lines 4101-4174);
+    when it returns null the source is cloned as well;
   - `src/blob.ts` `PRIORITY_PREFIXES` (lines 306-342), which lists the code's locations, and
     `getSkillFolderHashFromTree` (lines 277-301): a skill's `skillFolderHash` is its folder's GitHub tree id (the
     root tree's for a root SKILL.md);
@@ -273,7 +300,12 @@ and edge cases (rerun its comparison), or when the manifest starts pinning the C
   reader either way.
 - The tree-sitter-bash pin (`examples/claude-native/workflows/shell-parser.pin.json` and `child-usage.mjs`
   `loadShellParser`), whose pattern `skills-yaml.pin.json` and `skill_md.mjs` follow: a pinned npm install, verified
-  file by file and by lockfile integrity, never vendored, and nothing parsed without it.
+  file by file and by lockfile integrity, never vendored, and nothing parsed without it. Its CI provisioning step in
+  `.github/workflows/validate.yml` and its fail-closed tests (`tests/test_shell_parser_ci.py`: runtime tripwire,
+  structure checks, ratchet over whole-suite jobs, mutation controls) are the pattern of the yaml pin's step and of
+  the CI tests in `tests/test_landscape_sweep_skills.py`. The step was run with npm 10.9.8 and the reader under
+  Node.js 22.23.2, the versions of the ubuntu-24.04 runner image, and the install verified; the pin's 75 file hashes
+  are the bytes of the registry tarball whose sha512 is the pinned integrity.
 - Git's object ids ([Pro Git, Git Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects)): the tests
   compare `git_blob_id` and `git_tree_id` with `git write-tree` and `git ls-tree` output.
 - `tools/sota-convergence/landscape-sweep/README.md` (Evidence contract, Skills modality), and
