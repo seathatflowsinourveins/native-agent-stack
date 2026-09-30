@@ -37,9 +37,10 @@ working directory, stays short and names the checkout it inspected), plus the op
 that running it prints the details of the notice. A checkout without the script is named by --root instead. When the
 absolute command would leave the counts no room in the line, the line ends with "cat <due-file>" instead, a short
 command that prints this document, whose details_command field carries the full command and whose root field names
-the checkout; when even that does not fit (a pathological state-directory path) the line ends with a constant
-pointer to the due-file in the state directory. The line never falls back to a cwd-relative command and never
-exceeds 160 characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
+the checkout; when the resolved path is too long for that and the state directory came from XDG_STATE_HOME, the
+symbolic `cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json` is used (the hook that prints the line resolves
+the same variable); an explicit --state-dir too long for any runnable form is refused before the checks run. Every
+emitted line ends with a runnable command, never a cwd-relative one, and never exceeds 160 characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
 starts in when the file exists and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.md).
 
   python3 scripts/currency_due.py                    # write or remove the due-file; one line for the journal
@@ -76,10 +77,10 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
           "reopen_triggers": ("layer with reopen triggers", "layers with reopen triggers")}
 SUMMARY_LIMIT = 160
 # The smallest count text is "1 pin behind"; a command that leaves the counts less room than that gives way to
-# "cat <due-file>" (the document carries the command in full), and that to a constant pointer when a state-directory
-# path is too long even for that.
+# "cat <due-file>" (the document carries the command in full), and that to the symbolic XDG form when the state
+# directory came from XDG_STATE_HOME. The last pointer is used even when it leaves the counts less room.
 MIN_COUNTS_ROOM = len("1 pin behind")
-LAST_RESORT_POINTER = "currency-due.json in the state directory"
+XDG_POINTER = f'cat "$XDG_STATE_HOME"/{STATE_NAME}/{DUE_FILE}'
 DETAILS_SCRIPT = "scripts/currency_due.py"
 DETAILS_COMMAND = f"python3 {DETAILS_SCRIPT} --dry-run"
 # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly"; 30 days is also
@@ -243,34 +244,52 @@ def details_command(root: Path, network: bool, cadence_days: int) -> str:
 
 
 def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = True,
-                 pointer: str | None = None) -> str:
+                 pointers: list[str] = ()) -> str:
     """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters. With no
     count and a check that could not answer, the line says so rather than "nothing due". When ``command`` leaves
-    the counts less than MIN_COUNTS_ROOM characters, ``pointer`` (``cat <due-file>``; the document carries the
-    command in its details_command field) takes its place, and LAST_RESORT_POINTER when the pointer does not fit
-    either; the line never names a cwd-relative command and never exceeds SUMMARY_LIMIT."""
+    the counts less than MIN_COUNTS_ROOM characters, the first of ``pointers`` (``cat <due-file>``, then the
+    symbolic XDG form; the document carries the command in its details_command field) that leaves them that room
+    takes its place, else the last pointer with the counts shortened; the line never names a cwd-relative command
+    and never exceeds SUMMARY_LIMIT."""
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due[key]]
     if not parts:
         return ("stack currency: nothing due" if complete else
                 "stack currency: nothing known due, skill check incomplete")
     prefix = "stack currency: "
-    fallbacks = ([pointer] if pointer is not None else []) + [LAST_RESORT_POINTER]
     suffix = f"; details: {command}"
-    for candidate in fallbacks:
+    for candidate in pointers:
         if SUMMARY_LIMIT - len(prefix) - len(suffix) >= MIN_COUNTS_ROOM:
             break
         suffix = f"; details: {candidate}"
     counts, room = ", ".join(parts), SUMMARY_LIMIT - len(prefix) - len(suffix)
     if len(counts) > room:
-        counts = counts[:room - 3] + "..."
+        counts = counts[:max(room, 3) - 3] + "..."
     line = prefix + counts + suffix
     if len(line) > SUMMARY_LIMIT:
         raise CheckError(f"summary line of {len(line)} characters exceeds {SUMMARY_LIMIT}: {line!r}")
     return line
 
 
+def due_file_pointers(due_file: Path | None, from_xdg: bool) -> list[str]:
+    """The runnable commands that print the document, shortest last: ``cat`` of the resolved path (notice_path),
+    then the symbolic XDG form when the state directory came from XDG_STATE_HOME."""
+    if due_file is None:
+        return []
+    pointers = [join_command(["cat", notice_path(due_file)])]
+    if from_xdg:
+        pointers.append(XDG_POINTER)
+    return pointers
+
+
+def fits_with_a_pointer(due_file: Path, from_xdg: bool) -> bool:
+    """Whether some runnable pointer leaves the smallest count text room in the line; an explicit --state-dir that
+    does not is refused before the checks run, since no runnable command could name it."""
+    prefix_and_smallest = len("stack currency: ") + MIN_COUNTS_ROOM + len("; details: ")
+    return any(prefix_and_smallest + len(pointer) <= SUMMARY_LIMIT for pointer in due_file_pointers(due_file, from_xdg))
+
+
 def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT,
-              due_file: Path | None = None) -> dict:
+              due_file: Path | None = None, from_xdg: bool = False) -> dict:
     """The due-file document from the checks' reports (their JSON shapes; see the module docstring)."""
     details: list[dict] = []
 
@@ -373,8 +392,9 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers}
     command = details_command(root, skills is not None, cadence_days)
-    line = summary_line(due, command, skills_complete is not False,
-                        join_command(["cat", notice_path(due_file)]) if due_file is not None else None)
+    if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
+        due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
+    line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
             "details_command": command, "details": details}
 
@@ -483,6 +503,10 @@ def main(argv: list[str] | None = None) -> int:
     state = (args.state_dir if args.state_dir is not None else default_state_dir()).expanduser().resolve()
     if state == root or root in state.parents:
         parser.error(f"--state-dir must be outside the checkout ({root}); the due-file never goes into it")
+    from_xdg = args.state_dir is None and os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
+    if not fits_with_a_pointer(state / DUE_FILE, from_xdg):
+        parser.error(f"--state-dir {state} is too long for the notice line: no runnable command that prints the "
+                     f"due-file fits in {SUMMARY_LIMIT} characters; use XDG_STATE_HOME or a shorter path")
     if not 0 <= args.sweep_cadence_days <= MAX_SWEEP_CADENCE_DAYS:
         parser.error(f"--sweep-cadence-days must be between 0 and {MAX_SWEEP_CADENCE_DAYS}")
     if args.now is None:
@@ -497,7 +521,7 @@ def main(argv: list[str] | None = None) -> int:
     now_text = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
         document = aggregate(collect(root, now_text, args.network), now, now_text, args.sweep_cadence_days, root,
-                             state / DUE_FILE)
+                             state / DUE_FILE, from_xdg)
         action = "dry run"
         if not args.dry_run:
             if any(document["due"].values()):

@@ -126,10 +126,13 @@ installed and no host file was written: the timer and the service are drafted te
    without the script is named by `--root`. When the absolute command would leave the counts fewer than 12
    characters, the line ends with `cat <due-file>` (`cat ~/.local/state/native-agent-stack/currency-due.json` by
    default), a short runnable command that prints the document, whose `details_command` field carries the full
-   command and whose `root` field names the checkout; when even that does not fit (a state-directory path of more
-   than about a hundred characters) the line ends with the constant `currency-due.json in the state directory`.
-   The line never falls back to a cwd-relative command, and the writer refuses (exit 2) rather than write a line
-   over 160 characters (GPT-6 review rounds 3 and 4). A `stack-currency` launcher on the
+   command and whose `root` field names the checkout; when the resolved path is too long for that and the state
+   directory came from `XDG_STATE_HOME`, the line ends with the symbolic
+   `cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json`, which the session that prints the line resolves
+   with the same variable the hook used to find the file; an explicit `--state-dir` too long for any runnable
+   pointer is refused as a usage error before the checks run (the unit passes none). Every emitted line ends with
+   a runnable command, never a cwd-relative one, and the writer refuses (exit 2) rather than write a line over 160
+   characters (GPT-6 review rounds 3 to 5). A `stack-currency` launcher on the
    ecosystem `PATH` would make the command short on every host; it is not part of this change because installing
    it is a host step of the full-profile bootstrap. The document's keys are now `generated_at`, `root`, `due`,
    `summary_line`, `details_command` and `details`. The option is bounded to 36500 to keep the line short. The unit passes neither, so its

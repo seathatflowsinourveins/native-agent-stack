@@ -662,8 +662,10 @@ class DetailsCommandTests(unittest.TestCase):
         self.addCleanup(shutil.rmtree, elsewhere, True)
         tail = summary.split("; details: ", 1)[1]
         if tail.startswith("cat "):
-            # The literal printed command, as a process from the unrelated directory: it prints the document.
-            words = [os.path.expanduser(word) if word.startswith("~/") else word for word in shlex.split(tail)]
+            # The literal printed command, as a process from the unrelated directory: it prints the document. A
+            # shell expands a word-initial ~ and a quoted $XDG_STATE_HOME; subprocess does not.
+            words = [os.path.expandvars(os.path.expanduser(word)) if word.startswith(("~/", "$XDG_STATE_HOME"))
+                     else word for word in shlex.split(tail)]
             self.assertEqual(words[0], "cat")
             result = subprocess.run(words, cwd=elsewhere, capture_output=True, text=True, check=False)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -681,9 +683,12 @@ class DetailsCommandTests(unittest.TestCase):
         cwd, chooses the checkout (the SessionStart hook prints the line in whatever project a session starts in)."""
         elsewhere = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, elsewhere, True)
-        # A shell expands a word-initial ~ (the script's path and a --root value); subprocess does not.
+        # A shell expands a word-initial ~ (the script's path and a --root value); subprocess does not. A checkout
+        # whose state directory comes from XDG_STATE_HOME (state None) passes no --state-dir: the process inherits
+        # the variable, as the session that prints the line has it.
         words = [os.path.expanduser(word) if word.startswith("~/") else word for word in command[1:]]
-        result = subprocess.run([sys.executable, *words, "--json", "--now", NOW, "--state-dir", str(checkout.state)],
+        state = ["--state-dir", str(checkout.state)] if checkout.state is not None else []
+        result = subprocess.run([sys.executable, *words, "--json", "--now", NOW, *state],
                                 cwd=elsewhere, capture_output=True, text=True, check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
@@ -796,44 +801,54 @@ class DetailsCommandTests(unittest.TestCase):
         due["pins_behind"] = 1
         pointer = "cat ~/.local/state/native-agent-stack/currency-due.json"
         fits = "python3 /checkout/scripts/currency_due.py --dry-run"
-        self.assertEqual(cd.summary_line(due, fits, pointer=pointer),
+        self.assertEqual(cd.summary_line(due, fits, pointers=[pointer]),
                          f"stack currency: 1 pin behind; details: {fits}")
         too_long = "python3 " + "/c" * 60 + "/scripts/currency_due.py --dry-run"
-        self.assertEqual(cd.summary_line(due, too_long, pointer=pointer),
+        self.assertEqual(cd.summary_line(due, too_long, pointers=[pointer]),
                          f"stack currency: 1 pin behind; details: {pointer}")
-        # A pointer that does not fit either gives way to the constant last resort; the line never exceeds 160.
+        # A resolved path too long for cat gives way to the symbolic XDG pointer; the line never exceeds 160.
         long_pointer = "cat " + "/s" * 70 + "/currency-due.json"
-        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 6), too_long, pointer=long_pointer)
-        self.assertTrue(line.endswith(f"; details: {cd.LAST_RESORT_POINTER}"), line)
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 6), too_long, pointers=[long_pointer, cd.XDG_POINTER])
+        self.assertTrue(line.endswith(f"; details: {cd.XDG_POINTER}"), line)
         self.assertLessEqual(len(line), 160)
+        self.assertEqual(cd.XDG_POINTER, 'cat "$XDG_STATE_HOME"/native-agent-stack/currency-due.json')
 
-    def test_a_long_state_directory_keeps_the_line_within_its_limit(self):
-        # A valid 140-character state-directory basename (the review's case) and a long XDG_STATE_HOME: the writer
-        # still exits 0, writes the file, and the line stays within 160 characters with the last-resort pointer.
-        for label, extra, variables in (("--state-dir", ["--state-dir"], {}),
-                                        ("XDG_STATE_HOME", [], {"XDG_STATE_HOME": None})):
-            with self.subTest(label):
-                checkout = Checkout(self, "c" * 110)
-                checkout.something_due()
-                base = checkout.state.parent / ("s" * 140)
-                if extra:
-                    arguments = [*extra, str(base)]
-                    due_file = base / "currency-due.json"
-                else:
-                    arguments = []
-                    variables = {"XDG_STATE_HOME": str(base)}
-                    due_file = base / "native-agent-stack" / "currency-due.json"
-                with mock.patch.dict(os.environ, variables):
-                    stdout, stderr = io.StringIO(), io.StringIO()
-                    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                        code = cd.main(["--root", str(checkout.root), "--now", NOW, *arguments])
-                self.assertEqual(code, 0, stderr.getvalue())
-                document = json.loads(due_file.read_text(encoding="utf-8"))
-                self.assertLessEqual(len(document["summary_line"]), 160)
-                self.assertTrue(document["summary_line"].endswith(f"; details: {cd.LAST_RESORT_POINTER}"),
-                                document["summary_line"])
-                self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts"))
-                self.assertEqual(document["root"], str(checkout.root))
+    def test_a_long_xdg_state_home_gives_the_symbolic_pointer_that_runs_from_anywhere(self):
+        # A 140-character XDG_STATE_HOME basename (the review's case) with a long checkout path: the writer exits 0,
+        # writes the file, and the line ends with the symbolic pointer, which the literal-command replay runs from
+        # an unrelated directory with the variable set (as the session that prints the line has it).
+        checkout = Checkout(self, "c" * 110)
+        checkout.something_due()
+        base = checkout.state.parent / ("s" * 140)
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": str(base)}):
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = cd.main(["--root", str(checkout.root), "--now", NOW])
+            self.assertEqual(code, 0, stderr.getvalue())
+            due_file = base / "native-agent-stack" / "currency-due.json"
+            document = json.loads(due_file.read_text(encoding="utf-8"))
+            self.assertLessEqual(len(document["summary_line"]), 160)
+            self.assertTrue(document["summary_line"].endswith(f"; details: {cd.XDG_POINTER}"),
+                            document["summary_line"])
+            self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts"))
+            self.assertEqual(document["root"], str(checkout.root))
+            checkout.state = None  # the replay inherits XDG_STATE_HOME instead of naming the long directory
+            command = self.literal_command(checkout, document)
+            self.assertEqual(self.run_elsewhere(checkout, command)["due"], document["due"])
+
+    def test_an_explicit_state_directory_too_long_for_any_runnable_pointer_is_refused_up_front(self):
+        # No runnable command that prints the due-file fits the line, so the run is refused as a usage error
+        # (exit 2) before any check runs, and nothing is written.
+        checkout = Checkout(self, "c" * 110)
+        checkout.something_due()
+        base = checkout.state.parent / ("s" * 140)
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as raised:
+            cd.main(["--root", str(checkout.root), "--now", NOW, "--state-dir", str(base)])
+        self.assertEqual(raised.exception.code, 2)
+        self.assertIn("too long for the notice line", stderr.getvalue())
+        self.assertFalse(base.exists())
+        self.assertIsNone(checkout.recorded(STALENESS))
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.
