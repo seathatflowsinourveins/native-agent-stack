@@ -384,8 +384,8 @@ Gate A owner (session native-agent-stack-2d) chose 0.159.2 as the candidate froz
 relayed. The record above and the 2026-09-28 addendum are unchanged; this section records what changed on 2026-09-29
 and 2026-09-30 and what it does to the three Codex rows of the table above. The routing contract itself (coordinator,
 worker and child defaults, Astra escalation triggers, routing records) is
-[`2026-09-30-sol-primary-quality-defaults.md`](2026-09-30-sol-primary-quality-defaults.md), written by the user's
-Codex coordinator lane and folded into the same branch; this addendum carries its release, client-gate and gateway
+[`2026-09-30-sol-primary-quality-defaults.md`](2026-09-30-sol-primary-quality-defaults.md), pre-existing uncommitted changes
+observed in the main checkout (original author not established), folded into the same branch; this addendum carries its release, client-gate and gateway
 evidence.
 
 **What changed.**
