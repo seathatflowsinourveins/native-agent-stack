@@ -12,7 +12,8 @@ branch of the rule decided it.
 
 Derived from evidence/artifacts/terminal-experience-20260928/alert_probe.py (sha256 prefix 1282ff2b at the derivation): the code after its module docstring is the same except for the
 `push` kind (prompt, observer matcher, observation window), `--bell-hook`, `--no-user-settings`, `--sleep`, `--no-focus-report`, the focus-out report and its timing lines, and Haiku as the
-model. Raw hook payloads (session ids, paths) go to a private temporary directory that is removed even when the probe fails; only counts, types and timings are printed.
+model. Raw hook payloads (session ids, paths) go to a private temporary directory that is removed on success, on a failure and on SIGINT, SIGTERM or SIGHUP; only counts, types, message
+lengths and timings are printed (the terminal screen tail only with --show-screen, and never into a receipt).
 
 usage:
   push_notification_probe.py push --no-user-settings                        arm A: no user-scope settings, only the observers, focus-out sent (the event must fire, nothing may ring)
@@ -22,7 +23,7 @@ usage:
   push_notification_probe.py push --no-user-settings --no-focus-report --sleep 15   arm E: no focus report and 15 s (the user counts as present: no event, nothing rings)
   push_notification_probe.py --selftest                                     check the BEL counter against split, doubled, interrupted and string-embedded cases
 """
-import argparse, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
+import argparse, codecs, contextlib, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 from pathlib import Path
 
 
@@ -35,10 +36,14 @@ class BelCounter:
 
     def __init__(self):
         self.state = "ground"  # ground | escape | esc_int | csi | osc | osc_term | string
+        self.decoder = codecs.getincrementaldecoder("utf-8")("replace")  # the terminal parses decoded characters, not bytes
 
     def feed(self, data):
         bare = 0
-        for byte in data:
+        for char in self.decoder.decode(data):
+            byte = ord(char)
+            if 0x80 <= byte <= 0x9F:                      # C1 controls are ignored by the output engine (AcceptC1 off): no state change (stateMachine.cpp L1855-1868)
+                continue
             if byte in (0x18, 0x1A):                      # CAN, SUB: from anywhere back to ground
                 self.state = "ground"
             elif byte == 0x1B and self.state != "osc":    # ESC interrupts every state except an OSC string, where it starts ST
@@ -101,6 +106,183 @@ class BelCounter:
         return bare
 
 
+DRIVER = r"""
+import importlib.util, os, signal, subprocess, sys, time
+from pathlib import Path
+path, kind, pidfile = sys.argv[1:4]
+spec = importlib.util.spec_from_file_location("probe", path)
+probe = importlib.util.module_from_spec(spec)
+sys.modules["probe"] = probe
+spec.loader.exec_module(probe)
+real_popen = subprocess.Popen
+
+
+class ClientThenSignal(real_popen):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        deadline = time.time() + 10
+        while not Path(pidfile).exists() and time.time() < deadline:   # the stand-in client has really started
+            time.sleep(0.05)
+        os.kill(os.getpid(), signal.SIGTERM)                          # the client exists and the probe has not recorded it yet
+
+
+subprocess.Popen = ClientThenSignal
+sys.argv = [path, kind] + (["--no-user-settings"] if kind == "push" else [])
+sys.exit(probe.main())
+"""
+
+
+def blocked_mask(pid):
+    """The SigBlk mask of a process as read from /proc (a hex string), or None when it cannot be read. Read from OUTSIDE the stand-in: a shell script clears its own mask at startup, the exec'd program does not."""
+    try:
+        for line in (Path("/proc") / str(pid) / "status").read_text().splitlines():
+            if line.startswith("SigBlk:"):
+                return line.split()[1]
+    except OSError:
+        pass
+    return None
+
+
+def stand_in_script(kind, pidfile, unique):
+    """The stand-in `claude`: publishes its PID, then becomes `sleep <unique>` (exec keeps the PID). `trust` first enables focus reporting (the push probe waits for it) and prints the text that makes the probe abort by itself after about 6 s; `true` exits at once."""
+    if kind == "true":
+        return "#!/bin/sh\nexit 0\n"
+    text = "printf '\\033[?1004hDo you trust the files in this folder?\\n'\n" if kind == "trust" else ""   # focus reporting on (the push probe waits for it), then the trust text
+    return f"#!/bin/sh\necho $$ > {pidfile}\n{text}exec sleep {unique}\n"
+
+
+def signal_case(kind, signals=1, stand_in="sleep", signum=signal.SIGTERM, delay=1.0):
+    """End to end: a stand-in `claude` first on PATH that publishes its PID, the real probe as a child with its own TMPDIR, `signals` signals of one kind 100 ms apart `delay` seconds after the stand-in is
+    running: the probe must be running when the first lands and exit with that signal's status, the private directory must be gone and the recorded stand-in (exactly `sleep <unique>`) must be gone.
+    stand_in="true" starts a client that exits at once: the case must then FAIL (a client that never ran proves nothing); stand_in="trust" makes the probe leave by itself after about 6 s, so a `delay` of
+    about 6.5 s lands the signal in the first second of the probe's normal-exit cleanup, the part in which an interruption leaves the client behind. Returns (ok, detail); ok is None when the probe's working directory does not exist on this machine."""
+    if not (Path.home() / "code/native-agent-stack").is_dir():
+        return None, "skipped (the probe's working directory does not exist on this machine)"
+    with tempfile.TemporaryDirectory(prefix="sigcase-") as raw:
+        root = Path(raw)
+        bindir, tmp, pidfile = root / "bin", root / "tmp", root / "stand-in.pid"
+        bindir.mkdir()
+        tmp.mkdir()
+        unique = f"3137{os.getpid() % 100000}"
+        (bindir / "claude").write_text(stand_in_script(stand_in, pidfile, unique))
+        (bindir / "claude").chmod(0o755)
+        env = {**os.environ, "PATH": f"{bindir}:{os.environ['PATH']}", "TMPDIR": str(tmp)}
+        proc = subprocess.Popen([sys.executable, "-B", str(Path(__file__).resolve()), kind, *(["--no-user-settings"] if kind == "push" else [])], env=env,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        client = None
+
+        def stand_in_alive():
+            if client is None:
+                return False
+            try:
+                state = (Path("/proc") / str(client) / "stat").read_text().rsplit(")", 1)[1].split()[0]
+                argv = (Path("/proc") / str(client) / "cmdline").read_bytes().split(b"\0")
+            except (OSError, IndexError):
+                return False
+            return state != "Z" and argv[:2] == [b"sleep", unique.encode()]   # our stand-in, not a process that reused the PID
+
+        deadline = time.time() + (30 if stand_in != "true" else 5)
+        while time.time() < deadline:
+            if pidfile.exists() and pidfile.read_text().strip().isdigit():
+                client = int(pidfile.read_text().strip())
+                if stand_in_alive():
+                    break
+            time.sleep(0.2)
+        client_ran = stand_in_alive()
+        mask = blocked_mask(client) if client_ran else None
+        clean_mask = mask == "0" * 16   # the client must not inherit a blocked signal from the probe
+        time.sleep(delay)
+        probe_running = proc.poll() is None
+        for number in range(signals):
+            if number:
+                time.sleep(0.1)
+            if proc.poll() is None:
+                proc.send_signal(signum)
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+        time.sleep(0.5)
+        left_dirs = list(tmp.glob("alert-probe-*"))
+        alive = stand_in_alive()
+        exit_ok = proc.returncode == 128 + signum
+        if alive:
+            os.kill(client, signal.SIGKILL)   # a failing case must not leave its stand-in behind (alive means the recorded PID is still exactly our `sleep`)
+        detail = (f"stand-in client ran {client_ran} with signal mask {mask}, probe running when signaled {probe_running}, probe exit {proc.returncode} (expected {128 + signum}), "
+                  f"private directory left {bool(left_dirs)}, stand-in client still alive {alive}")
+        return client_ran and clean_mask and probe_running and exit_ok and not left_dirs and not alive, detail
+
+
+def client_boundary_case(kind):
+    """A signal that arrives while the client is being created (the child exists, the probe has not recorded it yet) must still stop the client and remove the private directory. The probe runs as a child
+    that imports this file, wraps subprocess.Popen so that SIGTERM is sent to it right after the stand-in client is running, and calls main()."""
+    if not (Path.home() / "code/native-agent-stack").is_dir():
+        return None, "skipped (the probe's working directory does not exist on this machine)"
+    with tempfile.TemporaryDirectory(prefix="boundary-") as raw:
+        root = Path(raw)
+        bindir, tmp, pidfile = root / "bin", root / "tmp", root / "stand-in.pid"
+        bindir.mkdir()
+        tmp.mkdir()
+        unique = f"3137{os.getpid() % 100000}"
+        (bindir / "claude").write_text(stand_in_script("sleep", pidfile, unique))
+        (bindir / "claude").chmod(0o755)
+        env = {**os.environ, "PATH": f"{bindir}:{os.environ['PATH']}", "TMPDIR": str(tmp)}
+        driver = subprocess.Popen([sys.executable, "-B", "-c", DRIVER, str(Path(__file__).resolve()), kind, str(pidfile)], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        mask, deadline = None, time.time() + 30
+        while mask is None and driver.poll() is None and time.time() < deadline:   # read the client's mask while it lives: the probe's cleanup keeps it for at least a second
+            if pidfile.exists() and pidfile.read_text().strip().isdigit():
+                mask = blocked_mask(int(pidfile.read_text().strip()))
+            time.sleep(0.05)
+        try:
+            driver.wait(timeout=120)
+        except subprocess.TimeoutExpired:
+            driver.kill()
+            driver.wait()
+        run = driver
+        time.sleep(0.5)
+        client = int(pidfile.read_text().strip()) if pidfile.exists() and pidfile.read_text().strip().isdigit() else None
+        alive = False
+        if client is not None:
+            try:
+                alive = (Path("/proc") / str(client) / "stat").read_text().rsplit(")", 1)[1].split()[0] != "Z" and (Path("/proc") / str(client) / "cmdline").read_bytes().split(b"\0")[:2] == [b"sleep", unique.encode()]
+            except (OSError, IndexError):
+                alive = False
+        left_dirs = list(tmp.glob("alert-probe-*"))
+        if alive:
+            os.kill(client, signal.SIGKILL)   # a failing case must not leave its stand-in behind
+        ok = client is not None and mask == "0" * 16 and run.returncode == 128 + signal.SIGTERM and not left_dirs and not alive
+        return ok, (f"stand-in client ran {client is not None} with signal mask {mask}, probe exit {run.returncode} (expected {128 + signal.SIGTERM}), private directory left {bool(left_dirs)}, "
+                    f"stand-in client still alive {alive}")
+
+
+def cleanup_phase_case():
+    """In-process: a SIGTERM that arrives at the very start of the final cleanup (the work returned normally) must wait until the private directory is gone, and the previous handler then receives it."""
+    seen, delivered = [], []
+    real_rmtree = shutil.rmtree
+
+    def terminating(number, _frame):
+        delivered.append(number)
+        raise SystemExit(128 + number)   # what the default action does, as an exception this case can catch
+
+    def hostile_rmtree(path, *args, **kwargs):
+        os.kill(os.getpid(), signal.SIGTERM)   # a signal at the very start of the cleanup
+        return real_rmtree(path, *args, **kwargs)
+
+    outer = signal.signal(signal.SIGTERM, terminating)
+    shutil.rmtree = hostile_rmtree
+    try:
+        try:
+            with_private_dir(lambda private: seen.append(private))
+        except SystemExit:
+            pass
+    finally:
+        shutil.rmtree = real_rmtree
+        signal.signal(signal.SIGTERM, outer)
+    left = bool(seen) and seen[0].exists()
+    return len(seen) == 1 and not left and delivered == [signal.SIGTERM], f"private directory left {left}, the signal reached the previous handler afterwards {delivered == [signal.SIGTERM]}"
+
+
 def selftest():
     cases = [
         ("plain BEL", [b"\x07"], 1),
@@ -125,6 +307,12 @@ def selftest():
         ("BEL after an escape intermediate sequence", [b"\x1b(B\x07"], 1),
         ("OSC ended by ST, split between ESC and backslash, then BEL", [b"\x1b]0;t\x1b", b"\\", b"\x07"], 1),
         ("NUL, TAB and LF are C0 controls but not bells", [b"\x00\t\n\r"], 0),
+        ("UTF-8 C1 character inside an escape sequence is ignored, so ESC ] still opens an OSC that the BEL ends", [b"\x1b\xc2\x80]\x07"], 0),
+        ("the same split between the two UTF-8 bytes", [b"\x1b\xc2", b"\x80]\x07"], 0),
+        ("the same split before the continuation byte and after the bracket", [b"\x1b\xc2\x80", b"]", b"\x07"], 0),
+        ("a C1 character in ground does not hide a following bell", [b"\xc2\x9b\x07"], 1),
+        ("a two-byte character above C1 ends the escape state like any printable", [b"\x1b\xc3\xa9]\x07"], 1),
+        ("an invalid UTF-8 byte is a printable replacement character", [b"\x1b\xff]\x07"], 1),
     ]
     bad = 0
     for label, reads, expected in cases:
@@ -133,12 +321,17 @@ def selftest():
         ok = got == expected
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + label + f": expected {expected}, got {got}")
-    for label, error in (("private directory removed after an interruption", KeyboardInterrupt), ("private directory removed after a failure", RuntimeError)):
+    for label, error in (("private directory removed after an interruption", KeyboardInterrupt), ("private directory removed after a failure", RuntimeError),
+                         ("private directory removed after SIGTERM", SystemExit), ("private directory removed after SIGHUP", SystemExit)):
         seen = []
 
-        def boom(private, error=error):
+        def boom(private, error=error, label=label):
             seen.append(private)
             (private / "events.log").write_text("stand-in for a raw hook payload")
+            if label.endswith("SIGTERM"):
+                os.kill(os.getpid(), signal.SIGTERM)
+            elif label.endswith("SIGHUP"):
+                os.kill(os.getpid(), signal.SIGHUP)
             raise error()
 
         try:
@@ -148,7 +341,35 @@ def selftest():
         ok = len(seen) == 1 and not seen[0].exists()
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + label)
+    for label, given, expected in (("exit status: an observed tool call and no BEL passes", (1.0, False, 0), 0), ("exit status: a hooks-disabled control with a dialog and no BEL passes", (1.0, True, 0), 0),
+                                   ("exit status: a hooks-disabled control that saw a BEL fails", (1.0, True, 1), 1), ("exit status: a control whose dialog never opened fails", (None, True, 0), 2),
+                                   ("exit status: a run whose tool call was never observed fails", (None, False, 0), 2)):
+        got = exit_status(*given)
+        bad += 0 if got == expected else 1
+        print(("PASS " if got == expected else "FAIL ") + label + f": expected {expected}, got {got}")
+    for label, function, expected in (
+            ("one SIGTERM", lambda: signal_case("push"), True),
+            ("two SIGTERMs 100 ms apart", lambda: signal_case("push", signals=2), True),
+            ("two SIGINTs 100 ms apart", lambda: signal_case("push", signals=2, signum=signal.SIGINT), True),
+            ("one SIGTERM while the probe's own normal-exit cleanup runs", lambda: signal_case("push", stand_in="trust", delay=6.5), True),
+            ("a signal while the client is being created", lambda: client_boundary_case("push"), True),
+            ("a signal at the start of the final cleanup waits until the directory is gone", cleanup_phase_case, True),
+            ("negative control: a client that never starts is rejected", lambda: signal_case("push", stand_in="true"), False)):
+        ok, detail = function()
+        if ok is None:
+            print(f"SKIP end to end, {label}: {detail}")
+            continue
+        good = ok == expected
+        bad += 0 if good else 1
+        print(("PASS " if good else "FAIL ") + f"end to end, {label}: {detail}")
     return 1 if bad else 0
+
+
+def exit_status(t_open, control, bel_total):
+    """0 when the run reached the observation point (the tool call or dialog was observed) and, for the hooks-disabled control, no BEL byte appeared; 2 when it never reached it; 1 when the control saw a BEL."""
+    if t_open is None:
+        return 2
+    return 1 if control and bel_total else 0
 
 
 def main():
@@ -157,6 +378,7 @@ def main():
     parser.add_argument("--no-user-settings", action="store_true", help="push only: load no user-scope settings (--setting-sources local) and start in bypassPermissions, so only this probe's own hooks exist")
     parser.add_argument("--sleep", type=int, default=45, help="push only: seconds the model waits (a shell sleep) before it calls the tool")
     parser.add_argument("--no-focus-report", action="store_true", help="push only: never answer the client's focus reporting with a focus-out report")
+    parser.add_argument("--show-screen", action="store_true", help="also print the last 260 characters of the terminal screen (contents of the session: never put them in a receipt)")
     parser.add_argument("--bell-hook", action="store_true", help="push only: add a Notification hook that emits one BEL for the type push_notification")
     parser.add_argument("--control", action="store_true")
     parser.add_argument("--permission-mode", choices=["default", "acceptEdits", "bypassPermissions"],
@@ -182,13 +404,44 @@ def main():
         print("raw payload directory removed:", bool(used) and not used[0].exists())
 
 
+HANDLED = (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)
+SPAWN = {"active": False, "signal": None}   # while the client is being created a signal only waits here, so the client is recorded before the exit it starts (a signal MASK would be inherited by the client)
+
+
+def leave(signum, _frame=None):
+    """Turn a signal into an exit. The first signal wins (later ones are ignored); one that arrives while the client is being created waits until the client is recorded."""
+    if SPAWN["active"]:
+        SPAWN["signal"] = signum
+        return
+    for number in HANDLED:
+        signal.signal(number, signal.SIG_IGN)   # the first signal wins: the exit it starts must not be cut short by a second one
+    raise SystemExit(128 + signum)
+
+
+@contextlib.contextmanager
+def deferred_signals():
+    """The signals the probe turns into an exit wait until the block ends and are delivered then: a cleanup must not be cut short. Only for work that spawns nothing: a child inherits the mask."""
+    saved = signal.pthread_sigmask(signal.SIG_BLOCK, HANDLED)
+    try:
+        yield
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, saved)
+
+
 def with_private_dir(work):
-    """Run work(private_dir) and remove the private directory afterwards on success, failure and interruption alike."""
+    """Run work(private_dir) and remove the private directory afterwards on success, failure and interruption alike. SIGINT, SIGTERM and SIGHUP become SystemExit for the duration, so the finally
+    blocks run for them too, the one that stops the child process group included; the first signal wins (later ones are ignored), and the cleanup runs with the signals deferred until it is done, so
+    none of them can cut it short."""
     private = Path(tempfile.mkdtemp(prefix="alert-probe-"))
+
+    previous = {number: signal.signal(number, leave) for number in HANDLED}
     try:
         return work(private)
     finally:
-        shutil.rmtree(private, ignore_errors=True)
+        with deferred_signals():
+            shutil.rmtree(private, ignore_errors=True)
+            for number, handler in previous.items():   # the previous handlers come back only after the cleanup is done
+                signal.signal(number, handler)
 
 
 def measure(args, private):
@@ -225,48 +478,55 @@ def measure(args, private):
     master, slave = pty.openpty()
     fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 45, 140, 0, 0))
     mode_flags = ["--permission-mode", mode] if mode else []
-    proc = subprocess.Popen(["claude", "--model", "haiku" if args.kind == "push" else "sonnet", *mode_flags, "--setting-sources", sources,
-                             "--settings", json.dumps(overlay), "-n", f"alert-probe-{args.kind}"],
-                            stdin=slave, stdout=slave, stderr=slave, env=env, cwd=cwd, start_new_session=True, close_fds=True)
-    os.close(slave)
-
-    ansi = re.compile(r"\x1b\[[0-9;?<>=]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b[()][A-Z0-9]|\x1b[=>MNOP78]")
-    counter = BelCounter()
-    bel_events = []  # (epoch seconds, bare BEL bytes in that read)
-    buf = b""
-    events = []
-    state = "startup"
-    sent_focus_out = False
-    focus_reporting_enabled = False
-    t_focus_out = None
-    t_enter = None
-    t_open = None
-    t0 = time.time()
-
-    def pump(timeout=0.2):
-        nonlocal buf
-        ready, _, _ = select.select([master], [], [], timeout)
-        if not ready:
-            return
-        try:
-            chunk = os.read(master, 65536)
-        except OSError:
-            return
-        buf += chunk
-        bare = counter.feed(chunk)
-        if bare:
-            bel_events.append((time.time(), bare))
-        if b"\x1b[6n" in chunk:
-            os.write(master, b"\x1b[1;1R")
-        if b"\x1b[c" in chunk or b"\x1b[0c" in chunk:
-            os.write(master, b"\x1b[?62;c")
-        if b"\x1b]11;?" in chunk:
-            os.write(master, b"\x1b]11;rgb:0000/0000/0000\x1b\\")
-
-    def log_lines():
-        return [ln for ln in log.read_text().splitlines() if ln.strip()]
-
+    proc = None
     try:
+        SPAWN["active"], SPAWN["signal"] = True, None   # a signal while the client is created waits until the client is recorded (a mask would be inherited by the client)
+        try:
+            proc = subprocess.Popen(["claude", "--model", "haiku" if args.kind == "push" else "sonnet", *mode_flags, "--setting-sources", sources,
+                                     "--settings", json.dumps(overlay), "-n", f"alert-probe-{args.kind}"],
+                                    stdin=slave, stdout=slave, stderr=slave, env=env, cwd=cwd, start_new_session=True, close_fds=True)
+        finally:
+            SPAWN["active"] = False
+        if SPAWN["signal"] is not None:
+            leave(SPAWN["signal"])   # the client is recorded and the guard is active: leave now
+        os.close(slave)
+
+        ansi = re.compile(r"\x1b\[[0-9;?<>=]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b[()][A-Z0-9]|\x1b[=>MNOP78]")
+        counter = BelCounter()
+        bel_events = []  # (epoch seconds, bare BEL bytes in that read)
+        buf = b""
+        events = []
+        state = "startup"
+        sent_focus_out = False
+        focus_reporting_enabled = False
+        t_focus_out = None
+        t_enter = None
+        t_open = None
+        t0 = time.time()
+
+        def pump(timeout=0.2):
+            nonlocal buf
+            ready, _, _ = select.select([master], [], [], timeout)
+            if not ready:
+                return
+            try:
+                chunk = os.read(master, 65536)
+            except OSError:
+                return
+            buf += chunk
+            bare = counter.feed(chunk)
+            if bare:
+                bel_events.append((time.time(), bare))
+            if b"\x1b[6n" in chunk:
+                os.write(master, b"\x1b[1;1R")
+            if b"\x1b[c" in chunk or b"\x1b[0c" in chunk:
+                os.write(master, b"\x1b[?62;c")
+            if b"\x1b]11;?" in chunk:
+                os.write(master, b"\x1b]11;rgb:0000/0000/0000\x1b\\")
+
+        def log_lines():
+            return [ln for ln in log.read_text().splitlines() if ln.strip()]
+
         while time.time() - t0 < (260 if args.kind == "push" else 200):
             pump()
             now = time.time()
@@ -316,23 +576,25 @@ def measure(args, private):
                 break
         screen_tail = ansi.sub("", buf.decode("utf-8", "replace"))[-300:].replace("\n", " ")
     finally:
-        for key in (b"\x1b", b"\x03"):
-            try:
-                os.write(master, key)
-                time.sleep(0.5)
-            except OSError:
-                pass
-        try:
-            os.killpg(proc.pid, signal.SIGTERM)
-            time.sleep(0.8)
-            os.killpg(proc.pid, signal.SIGKILL)
-        except (ProcessLookupError, OSError):
-            pass
-        try:
-            proc.wait(timeout=5)
-        except Exception:
-            pass
-        os.close(master)
+        with deferred_signals():   # the client's cleanup must not be cut short; a signal that arrives meanwhile is delivered when it is done
+            if proc is not None:
+                for key in (b"\x1b", b"\x03"):
+                    try:
+                        os.write(master, key)
+                        time.sleep(0.5)
+                    except OSError:
+                        pass
+                try:
+                    os.killpg(proc.pid, signal.SIGTERM)
+                    time.sleep(0.8)
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, OSError):
+                    pass
+                try:
+                    proc.wait(timeout=5)
+                except Exception:
+                    pass
+            os.close(master)
 
     notifications = []
     for line in log_lines():
@@ -360,13 +622,19 @@ def measure(args, private):
     else:
         print(f"Notification events: {len(notifications)}")
     for stamp, ntype, message in notifications[:4]:
-        print(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message={message}")
+        print(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message length={len(message)}")
+    total = 0
     if t_open:
         after = [(round(t - t_open, 1), n) for t, n in bel_events if t >= t_open - 0.5]
         total = sum(n for _, n in after)
         print(f"bare BEL bytes after the dialog opened: {total}  (seconds after open, bytes per read: {after})")
-    print("screen tail (ANSI stripped):", screen_tail[-260:])
-    return 0
+    if args.show_screen:
+        print("screen tail (ANSI stripped):", screen_tail[-260:])
+    if t_open is None:
+        print("measurement failed: the tool call was never observed, so nothing above is a result")
+    elif args.control and total:
+        print("a hooks-disabled control saw a BEL byte: the BEL is not attributable to the notification hook")
+    return exit_status(t_open, args.control, total)
 
 
 if __name__ == "__main__":

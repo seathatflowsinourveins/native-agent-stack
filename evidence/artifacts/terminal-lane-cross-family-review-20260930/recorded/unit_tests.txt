@@ -1,0 +1,17 @@
+.....................................................................................................................................................................s.................................................Backed up /tmp/tmpfwryryb_/settings.json -> /tmp/tmpfwryryb_/settings.json.bak.20260930T074721Z
+Wrote /tmp/tmpfwryryb_/settings.json
+.Wrote /tmp/tmp7lvliyvd/nested/settings.json
+.Backed up /tmp/tmp1jmz1q6j/settings.json -> /tmp/tmp1jmz1q6j/settings.json.bak.20260930T074721Z
+Wrote /tmp/tmp1jmz1q6j/settings.json
+Backed up /tmp/tmp1jmz1q6j/settings.json -> /tmp/tmp1jmz1q6j/settings.json.bak.20260930T074721Z.1
+Wrote /tmp/tmp1jmz1q6j/settings.json
+..Backed up /tmp/tmp8xzlsm01/settings.json -> /tmp/tmp8xzlsm01/settings.json.bak.20260930T074721Z
+Wrote /tmp/tmp8xzlsm01/settings.json
+...................
+----------------------------------------------------------------------
+Ran 238 tests in 28.792s
+
+OK (skipped=1)
+{
+  "model": "opus[1m]"
+}

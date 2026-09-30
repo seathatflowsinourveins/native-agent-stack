@@ -3536,7 +3536,8 @@
         "Codex --strict-config does not validate the [tui] notifications kind strings; the three kinds were compared with type_name() at rust-v0.157.1 and the host check asserts the exact list.",
         "The toast watch by release ancestry can miss a backport (release tags sit on servicing branches and report diverged); the decision record adds a direct probe of the tag's profiles.schema.json BellStyle enum (false on both tags, true on main, measured 2026-09-28).",
         "Agent view (claude agents, --bg) was not probed in this change; the pass criteria are in the decision record.",
-        "Excluding idle_prompt also silences a question asked in prose and then left waiting."
+        "Excluding idle_prompt also silences a question asked in prose and then left waiting.",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the BEL counter of alert_probe.py now decodes UTF-8 and ignores C1 control characters like the pinned output engine; the probe exits 2 when its dialog never opened and 1 when its hooks-disabled control saw a BEL, cleans up after SIGINT, SIGTERM and SIGHUP (the first signal wins, the cleanups run with the signals deferred, and the client is created under a spawn flag), and prints message lengths (the screen only with --show-screen); color_capture.py counts SGR sequences only, reads colon sub-parameter groups as the pinned Windows Terminal parser does and counts what it cannot classify apart (a native rerun gives the counts recorded here); check-terminal-profiles.py in the practice repository now accepts a bellSound only as exactly a measured file in C:\\Windows\\Media that exists; the sentence that tmux through 3.6 lacks synchronized output was false (tmux has a sync feature) and the bell icon clears after about 2 s on a focused tab. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/terminal-experience-20260928.json"
     },
@@ -3549,7 +3550,7 @@
       ],
       "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The reproduction was re-run after the bounded re-check with the client's temporary state redirected to a short private directory beside each throwaway home (TMPDIR and CLAUDE_CODE_TMPDIR): the real /tmp and /tmp/claude-<uid> gained no top-level entry during the recorded run apart from /tmp/inline-comments-buffer.jsonl, which was absent before, appeared during the run and was removed by the script, the real home's placeholder names were unchanged, and the arm counts were 0 empty files with no variable, 27 with it in the stock home and 26 with a real hand-off file. A control run whose socket path (121 bytes, from a 99-byte private path) exceeded the client's own 103-byte cap on `<dir>/cc-socks/<pid>.sock` put the messaging-socket directory into a fixed /tmp/cc-socks-<uid> directory in the real /tmp instead, so the redirect holds only while the private path is short (under about 81 bytes with a 7-digit pid) and XDG_RUNTIME_DIR stays unset. The native `claude doctor` warned 3 times with the sandbox off and 4 times with it enabled and a planted stale mask file; it named the planted file (the warning is live) and named the scrub-created ~/.bash_profile, a writable 0644 file outside the warning's documented scope of 0-byte read-only placeholders, in neither run. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag (rust-v0.159.0 at the re-run).",
       "limitations": [
-        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The Polaris distro's profiles (Librarium, Phoyo) were not measured. Another host collects its own evidence.",
+        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The second distro's two per-project Claude profiles were not measured (that distro was later unregistered). Another host collects its own evidence.",
         "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
         "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
         "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
@@ -3557,7 +3558,8 @@
         "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.159.0 (the newest stable at the re-run) was not run. The candidate notifiers were compared by repository head and latest release only, not run. The three candidates agent-deck, ccmanager and zellij were first recorded by the refresh script on 2026-09-29, so their heads have no earlier pin to be compared with.",
         "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (50 entries in the stock-home arm in the first run, 49 in the re-runs); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` was run in one throwaway home with the scrub-created file, with the sandbox off and with it enabled plus a planted stale mask file. That planted file shows the warning is live; it is not a positive control for the scrub placeholder, which the warning's documented scope (0-byte read-only placeholders at settings paths) does not cover, so the doctor's silence about ~/.bash_profile follows from that scope and is not evidence about the file.",
         "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session.",
-        "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began."
+        "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began.",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): login_shell_check_controls.py (and the practice repository's doctor) now needs an answer for every command and an end marker, probes with type -P and accepts a name only when the printed path is an executable regular file (a stale hashed pathname and a non-executable file are refused), and lets only the first startup file bash reads shadow ~/.profile (eleven homes); login_path_digest.py reads the PATH from a nonce-framed record and exits 1 on a measurement error (a rerun on this host gives 13 entries; the digest value of 2026-09-29 was not recorded, so no digest comparison is claimed); scrub_placeholder_probe.py compares 19 named files of the real home by lstat (a native rerun with the revised script is recorded in the 2026-09-30 receipt) and reads its PATH the same nonce-framed way; landscape_refresh.py compares the whole notification and terminal-title definitions, multi-line attributes and the default of notifications included, and answers null when a part is missing. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/login-shell-contract-20260929.json"
     },
@@ -3601,7 +3603,8 @@
         "The host practice repository has no remote (commits fcd291f, 396d1c1, 9500656, c14e8c3, 9f615ad and d0c7d9c); its check and controls are recorded here as results only. The Windows Terminal settings patch and the second distro's merge were host operations on private files, recorded as values.",
         "The second distro's Claude Code is 2.1.283, one release before this host's. A scan of the installed binaries (this host's 2.1.282, 2.1.283 and 2.1.284, and that distro's 2.1.283) found the `notifications_disabled` and `terminalSequence` literals and `worker_permission_prompt` emitted from the same two team-inbox call sites in each (the second distro's binary is byte-identical to this host's 2.1.283 by SHA-256 prefix, and its occurrence counts by `grep -a -o` equal this host's scan), so the whole matcher is live there. The changelog dates `terminalSequence` to 2.1.141 and has no entry for `notifications_disabled`, which the settings reference documents. The hook was run in that distro.",
         "The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a Notification hook that already runs the bell command: after a later matcher change the old group must be edited or removed first. The acceptance script checks the group count and the matcher for that reason, and a unit test proves it refuses a catch-all group and an older matcher.",
-        "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac."
+        "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac.",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): codex_tui_strict_check.py counts a run as loaded only with Codex's session banner and exits 1 unless the template loaded and both configuration controls were refused; overlay_noop_check.py also requires disableAllHooks not to be true and labels its verdict as a check of the user settings file only; login_shell_bash_truth.py and the 512-combination test now also compare first_read; the platform page's advice about profiles.defaults was corrected (Windows Terminal ranks a profile's own value, then profiles.defaults, then a fragment's profile). The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json"
     },
@@ -3614,14 +3617,15 @@
       "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
       "limitations": [
         "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
-        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; the function that raises the permission dialog's notification is a plain fixed-delay timer with no presence check in it, and its callers and the other dialog types' timers were not each read. Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; in a terminal session the permission prompt's notification is timed by inactivity (source read: the terminal path compares the time with the later of the prompt's appearance and the last interaction; the fixed-delay timer is the Agent SDK path). Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
         "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
         "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
         "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
         "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
         "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
         "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
-        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day (its hash moved, see the sha256 prefix in the dry-run output; the cause is not established here); the bell group is unchanged (the dry run)."
+        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day (its hash moved, see the sha256 prefix in the dry-run output; the cause is not established here); the bell group is unchanged (the dry run).",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the presence rule and the agentPushNotifEnabled check apply to a local session only (a remote workspace skips both); the permission prompt's notification in a terminal is timed by inactivity (the fixed-delay timer the earlier wording took for it is the Agent SDK path); notification_types_scan.py now resolves the catalog's spread identifier to its single array assignment (nine reader tests, eight mutants; a member assignment of the same short name is not the catalog's array, and the scope limit is stated); replace_bell_group.py compares the live file with the bytes it read before the backup and right before the rename (a save between the last comparison and the rename is still lost and is in neither file: a documented residual with a case of its own), refuses keys beyond matcher and hooks on the bell group, names no matcher value in a refusal and has no second-distro target (27 controls, 15 mutants); the tmux and push probes' verdicts, signal handling and printing were repaired (the tmux verdict now requires all five arms, the tmux sockets live inside the probes' private directories, and the derived push probe's hooks-disabled control exits 1 on a BEL). The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/notification-types-20260929.json"
     },
@@ -3665,6 +3669,26 @@
         "One workstation, Linux x86_64 under WSL2, Node v24.21.0 only. Other platforms, upstream's Electron and Docker artifacts, and other Node versions are not covered. The registry returned no gitHead for 3.8.51, so the tie of the tarball to upstream's tag commit rests on the provenance attestation, not on registry metadata."
       ],
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json"
+    },
+    {
+      "id": "cross-family-review-terminal-lane-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "claude-code"
+      ],
+      "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 238 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 8 reader mutants, selftests of the two pty probes (44 and 44 passes, each with seven end-to-end signal cases) and 12 mutants (six per probe, and the two unmutated probes) showing that each signal case fails without its guard, the colour counter (14 cases; a native rerun gives the counts recorded in 2026-09-28), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock.",
+      "limitations": [
+        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). No live Windows Terminal or interactive Claude Code session was run: the reviewers and the verifiers read code, upstream sources and ran scripts, synthetic homes and private tmux servers; the bell, the tab icon and focus reports in Windows Terminal remain unobserved.",
+        "One review model (gpt-6.1-sol, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus). The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the 23 graded findings are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
+        "Twelve findings were checked by the coordinator, not by a verifier (eight against the code or upstream source, three concerning the removed second-distro target, one convention). The removed target's code was not run before it was removed.",
+        "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). One bounded re-check followed them (33 findings, all repaired in a fifth round); the fifth-round repairs were checked by controls, mutants and native reruns and were not read again by a reviewer, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
+        "Residuals of the fifth round: a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope (stated, not triggered by the three release binaries); the colour counter counts an incomplete 38;2 group as unclassified where the terminal applies missing components as 0; and the probes' case that lands a signal inside the normal-exit cleanup (about 1.8 s wide) is timing-dependent and fails loudly rather than passing when the probe is slow. The second re-check model is a second GPT-6 model, not another vendor.",
+        "Some claims rest on source reading only and were not run: the remote-workspace branch of the PushNotification tool (installed client 2.1.285, `CLAUDE_CODE_REMOTE` or a thin-client session), Windows Terminal's parent order of profiles.defaults and fragment profiles (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`), and Tab.cpp's two-second indicator timer for a focused tab.",
+        "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave and 11 after it, 22 after the re-check; other sessions may have used points in between."
+      ],
+      "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
     }
   ],
   "files": [
@@ -4055,8 +4079,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "6319b70436d4c6d649d662131104c710fb2670f12df1b3734073233ae5da51f2",
-      "bytes": 22519
+      "sha256": "fc3fbca8192cb407eca61dd361287250fc5b0acac54a5ea22c3f043c7a9fbb66",
+      "bytes": 23624
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -14746,8 +14770,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "990c4760132ca26bd72a8b3f256925519680d2758b45ba61d6647e169dcc092a",
-      "bytes": 63504
+      "sha256": "1ac411e93b94a92092b02a1e79a21504cffee52f3246bd75315346861268bbdb",
+      "bytes": 79421
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -14906,8 +14930,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "0da5409d42adb063e2c3cc549feeaccf2c4b7c454af72f915bff0265712bb68a",
-      "bytes": 82073
+      "sha256": "24f470c7123b272d1c10ecf412bd672b770e40ba8b39e8a50e055b3beb39490c",
+      "bytes": 85765
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -32201,8 +32225,8 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/README.md",
-      "sha256": "97fc3a22e79c67e692be998e42404958e66b5f017b283d2c6386249c5ee0a7b3",
-      "bytes": 5980
+      "sha256": "1d61cf443097415d9f452ab7848e75c5f15811cea913badb46e6728089729e29",
+      "bytes": 7850
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/agents_json_probe.py",
@@ -32211,23 +32235,23 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
-      "sha256": "6e36f4368d67e130a75577e94d6d1cee77a8e257137a4ce457023758ff2af11e",
-      "bytes": 8758
+      "sha256": "eca24a283ba0aafdc07e62d73ebbf8e3d40dcd8459c5e0f6fec5426a3457aeed",
+      "bytes": 17945
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
-      "sha256": "c6106a9ac19976ab64befddf3be762690bcca27ede1a25be2b5ab4537d720af9",
-      "bytes": 1472
+      "sha256": "eaf9f04c0fbb11d65d2e700a82d36e7e0d341132326bb38918eb33765d007c38",
+      "bytes": 7349
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
-      "sha256": "e7cdc7776a671c2654a5f2805977769120ff117df971f30e7bbef9f10b6910d4",
-      "bytes": 4458
+      "sha256": "87bc71151933814abc4e4891d3ff5a799e15512ccc0f4f86a31b45c62fa001bf",
+      "bytes": 9109
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
-      "sha256": "cd9ad8e51fd842bf8a0f9cf79e3376b59ad9015d4ab3b0fa255c67f628e5b56c",
-      "bytes": 13152
+      "sha256": "dd5c32aedcafc2f2ac9c7cfc9d2d7a1d5b94ce6871f81d9717610876a0adb37f",
+      "bytes": 19269
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/socket_path_fallback_probe.py",
@@ -34401,18 +34425,23 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
-      "sha256": "5c1d0bc5932bb85de78576d74bcccad274c6170473608384914e357bac0ab878",
-      "bytes": 7198
+      "sha256": "d504981582d7147037e3ca7edf3a96c09ad6176c199f9bee31b446c078e3000e",
+      "bytes": 10110
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/concurrent_writer_harness.py",
+      "sha256": "8814497dd509d66063969c9572c3b1d063fb8c2b9d7b705b647d06fad23472db",
+      "bytes": 3973
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
-      "sha256": "12a9bbb1ac0cd8a3b0eb9a12014d19871ca248a91da9fe0d1b10eb8947bfd99a",
-      "bytes": 7328
+      "sha256": "2cc772a459a592341a79c0f2a2ad7a11a8ae959ba020c414f31e239b011064a1",
+      "bytes": 9549
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
-      "sha256": "1ac0cf1f950e34527308f2916180399dd1f3fb043c4c81f2d2981a82b4f978ba",
-      "bytes": 21057
+      "sha256": "943f1e1eff93e40eb7cca9140a765b66760da275811f6a2160e6667f13d65ac7",
+      "bytes": 37812
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
@@ -34476,28 +34505,28 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/replace_bell_group.py",
-      "sha256": "df63e6f3c271701e004003dab01d3dff5c86c37f0b24dace2a006ec58bb8679a",
-      "bytes": 11162
+      "sha256": "d81fb29c550ccd23a58bc977f2eaa043934597d07b2527a17514a4ca00ed3cbc",
+      "bytes": 11341
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py",
-      "sha256": "bed9b093aeca9bf4ec530a508ec515f2b05face915a546f86b080167dcd0615a",
-      "bytes": 10980
+      "sha256": "697df1bd3ac2fb70dc3209d4112a5052fc1143381c3fe0e58671917f3258ba00",
+      "bytes": 18938
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py",
-      "sha256": "f488c5ce2e7e26ecd82990b1edaf66219353be116e537ee3d79e833664671015",
-      "bytes": 4617
+      "sha256": "a68ff879d5d612f817ed1ef6caa25cf85f841010705cde4ac1bd376a930a04df",
+      "bytes": 7739
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/scan_reader_mutants.py",
-      "sha256": "016da24f2723f6bc29a73780b5e1a1e6008103b9ca4f4cc3479963b07ed2480f",
-      "bytes": 3868
+      "sha256": "2789a826b7215ea498ed00e8100a70d71001e71748e1037cd28fc87610961620",
+      "bytes": 5047
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
-      "sha256": "5ef02fa27e168c7310c0083d51c68683ca32084d49c0c63f25db64e2a67a4153",
-      "bytes": 3708
+      "sha256": "fece02bcc71ddd3639638554afb6c52619a32cdd947522d220272c5c1810ace7",
+      "bytes": 5214
     },
     {
       "path": "evidence/artifacts/observability-dashboard.png",
@@ -40891,23 +40920,28 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/README.md",
-      "sha256": "71334203bec2880f69e3ad4aa27c55baeb1ec766068b23a2210abb07656987e1",
-      "bytes": 4214
+      "sha256": "e95e523c38f4450b8ab8c7c36f31ee266f120e743bc52caead353661f5020741",
+      "bytes": 6455
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
-      "sha256": "1282ff2b8dbb987671677c39381e62d8e6ce00b9a7a1d52976c276ab986e2246",
-      "bytes": 17612
+      "sha256": "0ec0615506411acd98003b814e66019f73a659ef985805737b65bc9b603b7c30",
+      "bytes": 34193
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
-      "sha256": "05a24ea6135598b24e5786286b57cab54f7d48f590dd76b00aa029c4edf622c3",
-      "bytes": 2792
+      "sha256": "ae919915302844e8d64812f01dfd9a614238f2aea97f303b7d03484cbaac3346",
+      "bytes": 7855
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/fragment_check_mutants.py",
       "sha256": "34e674a815e443b33b2a6bded2dffde50532cf8b546c6f856fa438c9c1d8db4f",
       "bytes": 4207
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+      "sha256": "50504ffb0c32557a052d81ba5a80934dfb488e3b07f564d5ee42e0a35c8e06e1",
+      "bytes": 7022
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/validate_fragment.py",
@@ -40928,6 +40962,251 @@
       "path": "evidence/artifacts/terminal-experience-20260928/wt_tab_titles.ps1",
       "sha256": "9ec4658b06baab2f3fe8429ddd0e1d1e4a740a0f433053cd47071e72b4e3133d",
       "bytes": 1283
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+      "sha256": "fb248fb51e3b04f439a62111b1c23f36dc9ceacbbac923f0e066b66027833ee4",
+      "bytes": 6685
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_findings_record.py",
+      "sha256": "11a16084820ee6e489e97bdf34b476902a08c329cd17911ef866f1371008767f",
+      "bytes": 12615
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_recheck_prompts.py",
+      "sha256": "46cc5f3858da3ba57b1009353cfbcf602122547ef37b279014fcb7df4d2610f0",
+      "bytes": 10314
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_recheck_record.py",
+      "sha256": "39a8616f6696b75ffd94c72412d1e9abf10c1d979f8edc0134623c39760f428b",
+      "bytes": 11201
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_review_prompts.py",
+      "sha256": "b10bd83881d2d58a1cb4b0bf551d8a30da2f9c6526a3a1ba579f1afdca28a5ce",
+      "bytes": 22665
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/collect_reviews.py",
+      "sha256": "ca464631cc1133690ac485fd40b427983160248f28c560264f48d964407f6189",
+      "bytes": 3110
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/findings.json",
+      "sha256": "650fd30a66082c4d7c3911a833fc24fe84855153579a87a622e1293a1a09f73e",
+      "bytes": 22746
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/make_verify_briefs.py",
+      "sha256": "e4dffde4dca7892831218ab761e50ac7b26976d562cc2604e4f1036e99aeafce",
+      "bytes": 1924
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/prompts_sha256.txt",
+      "sha256": "884d4fc460afa2b7a6d62db41fb1b773b16f4dc9ea87aff9232447ef39809e0d",
+      "bytes": 849
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck-findings.json",
+      "sha256": "711965fad4edcd54bbbc69afbf6154b561d3b25892e8763a561688cb2c1f2646",
+      "bytes": 17822
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck-results.json",
+      "sha256": "e70d41a44966bc58c156c575983135d5cea817dc241daa076a1858249003d6d3",
+      "bytes": 119555
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck-verification.json",
+      "sha256": "6ca67fad1a1dcdfc57b4d44555aeb15090be710ebae78c01360316a72f78d6be",
+      "bytes": 61360
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recheck_prompts_sha256.txt",
+      "sha256": "85ff9a12e2fd5fa27f3e7e871535f9aea77b40aa51b021a8907f02c7dc21a18c",
+      "bytes": 292
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/alert_probe_selftest.txt",
+      "sha256": "29a61d35e10f112fad61ac6e59c541c78571f41b22a9fc8983418cb285091aaa",
+      "bytes": 4089
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_tui_strict_check.txt",
+      "sha256": "24cb0c8e49056418d0a4a1956dfafed461ee021efe9e002c7dc8615360c918ce",
+      "bytes": 1417
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_tui_strict_check_selftest.txt",
+      "sha256": "3b6b2c35d2a7aa383fc07cc9a019e52a07e25f39ff5291811f134fab6b585ca4",
+      "bytes": 39
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/color_capture.txt",
+      "sha256": "d6065302dd7de9584fa73ccdfd63bbade19c2ef0bffed3cfc4c6c0b2b2475df2",
+      "bytes": 320
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/color_capture_selftest.txt",
+      "sha256": "6e03dab8c68b62f922f676bc08bae3da0d6ec30c1fad49eef4b7644858e6503c",
+      "bytes": 31
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/exit_codes.txt",
+      "sha256": "4472255d754526c802d375cd208e3b1dd679b902671a7f3e22f109cb848aeffc",
+      "bytes": 2199
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/landscape_refresh_selftest.txt",
+      "sha256": "7f9042143dc6fca2905fb382ef48b3131bd580ebf2adecb55fb461ca9ebba790",
+      "bytes": 40
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/login_path_digest.txt",
+      "sha256": "77adba676507e0aa894087002bfc6bdc9a44528340a97644953e70afcf4eafd7",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/login_path_digest_selftest.txt",
+      "sha256": "bde9dd2162074409e52b3021263f8c621f841929ef6cdc60b922aae43add0c0c",
+      "bytes": 39
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/login_shell_bash_truth.txt",
+      "sha256": "186fb6c8c0c64cd7709027eda1a8f72d98b379f0e468309624b2621a43ba554b",
+      "bytes": 503
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/login_shell_check_controls.json",
+      "sha256": "a59e65c34ddb5bfc5abab2c30eb0770c661555a7c52eafe19cf5e693a634a50a",
+      "bytes": 3737
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.283.json",
+      "sha256": "e3e6722fea7ca42fb031c9cce0f089c52a0270cdf7153e882400898ddb54be38",
+      "bytes": 4243
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.284.json",
+      "sha256": "2003ed2a3f7bed0b4f6e3521ec7711cb69f21c772bb67001d048529ec7663e74",
+      "bytes": 4243
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.285.json",
+      "sha256": "8190a620bb309da850865f31d2318d4dc3479e87f41d6d1459a9b4de0506775e",
+      "bytes": 4243
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/overlay_noop_check.txt",
+      "sha256": "376e04bcb7871f6123c5189ead72210932af975850a96806fa334964d0ae193b",
+      "bytes": 534
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_check_terminal_profiles.txt",
+      "sha256": "a5d6a4547ccf677f1b65d2b289c80304fad79e3ca7048262cb711c9b74cbbdb0",
+      "bytes": 288
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_check_terminal_profiles_controls.txt",
+      "sha256": "b2fbc1a686b60621c6724d3974efcc16bba717dea8575367e0b8312fbc9bf806",
+      "bytes": 2898
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_doctor_login_shell_path.txt",
+      "sha256": "d19c1a236ae3a20c35578aee5391594efee1ff00b5099cf0747cf473bc7baeeb",
+      "bytes": 146
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_repository_commits.txt",
+      "sha256": "21d66fb970f3223060b24682de84e77c0c15f96e981985b4e7f5c11b9e7ddfcb",
+      "bytes": 666
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_alert.txt",
+      "sha256": "ff3894cca926336352f86cc9cf95f7ca76d7cde5c722bbb8f3714c4b773458a8",
+      "bytes": 665
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_push.txt",
+      "sha256": "926e4e8be8e961f863afb42ab1ea6073bf33a01bdd16ea6119e25e2503645d4e",
+      "bytes": 658
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/push_notification_probe_selftest.txt",
+      "sha256": "609bd2812599f3b826c061b583f729f527ef6057c8d200276661d8aa3d6435a3",
+      "bytes": 4103
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/replace_bell_group_controls.txt",
+      "sha256": "235d3cea35df6ba4679e2406f0ea800d9f954ac9d886478d1bf41fe1347527f1",
+      "bytes": 2916
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/replace_bell_group_mutants.txt",
+      "sha256": "308138d176b7b791da1ef0c82e5802dcccb1cb5c1b833c56f9a21444bd819de8",
+      "bytes": 1777
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scan_reader_mutants.txt",
+      "sha256": "c88df293f5e650423b6903d5dee847b9aac22d541f63438f9feb512ae3a9a741",
+      "bytes": 2146
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scrub_placeholder_probe.txt",
+      "sha256": "9c38179774ee2f56b31e88e996fd88081d9248c72aec738a8144ef5f167affb3",
+      "bytes": 5680
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scrub_placeholder_probe_selftest.txt",
+      "sha256": "102a48c23821eaf9a4d28dc1ac78f340736564c75e0eb5b11d94c2de5b001561",
+      "bytes": 1083
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe.txt",
+      "sha256": "f66422aef1845a2f80bd0943cf815ace8dec09accd1a0387b6e2236192c122b4",
+      "bytes": 484
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe_selftest.txt",
+      "sha256": "e183609b706493aa41c492c7b51fe803502328d0d929b357c762d7867134403c",
+      "bytes": 31
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_sync_probe.txt",
+      "sha256": "224e7a72c24285d17b44f7e867adf2f18eb1d475a776b972173d84427f1de654",
+      "bytes": 216
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/unit_tests.txt",
+      "sha256": "e03e4498a92c6bded9374a0d0bc8ba2de39e5adb07c8aae9a27a28c7f1b7909b",
+      "bytes": 955
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
+      "sha256": "2627ad7cf6dd0a60c998e7741b9db45512dd928a6f2a7cd1ae3e6c9658ee5cac",
+      "bytes": 212539
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/sanitize_results.py",
+      "sha256": "cf070162259a2626a379536e2cfc370215e20fa0bdc8c9138d33c0d18eb80058",
+      "bytes": 2509
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/stage_review_lane.py",
+      "sha256": "f921b25c18e7ae24004133c8d5b29f8d1979c68543ff2fa3a2a086ef535cd3d9",
+      "bytes": 2523
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+      "sha256": "57871c3c33087f1073d94a8e46f14734e0ea3e2e93a654a8e6d7288c57f2e915",
+      "bytes": 2699
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verification.json",
+      "sha256": "91d8315dc5f5457b1e6181e7acc0c8031ca0e857c29c29222d0ac1d16c0cf676",
+      "bytes": 75925
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
@@ -41791,8 +42070,8 @@
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/README.md",
-      "sha256": "01e5536e1cbdbe9c0f83855bab85d26fc6f817cb2ca5b82e2dc58880e5c10896",
-      "bytes": 3535
+      "sha256": "4416d422a5ec3064dd14f7c27a9b09191a5568f1b7c8bade742f0bc351089d27",
+      "bytes": 4408
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/claude_binary_notification_scan.py",
@@ -41801,18 +42080,18 @@
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py",
-      "sha256": "9660ea362bed9fa6ebc642adfab1b5cf7348b76f5a0cf4bb664a6b4370bcd00d",
-      "bytes": 3392
+      "sha256": "dbec52ef2d008953ea0f7828c23751c57b041895fb0db63a5302ab1897eb5cee",
+      "bytes": 5742
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py",
-      "sha256": "fc2bd10af1b87aea10cc652f57140cd83695bffeeefb5c484236a22346fc9db5",
-      "bytes": 6082
+      "sha256": "678513311b5801ce37d541a2a927a556e633b6f809734126c87e2e827eac8534",
+      "bytes": 6761
     },
     {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py",
-      "sha256": "d664484902a07ee14c4ed2f412726baa3fdd3ff0920ed1f3ffe3725b3400682b",
-      "bytes": 2702
+      "sha256": "78e0b12d865b945f06c2e4c1e819defdce591b8eb90651f52107a500ab4d9fc5",
+      "bytes": 4142
     },
     {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--ai-memory--use--20260925.json",
@@ -42880,6 +43159,11 @@
       "bytes": 28885
     },
     {
+      "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
+      "sha256": "9ff157fd88e6a895b85546373927b653204838e7a0f19d95643741040e05b838",
+      "bytes": 22567
+    },
+    {
       "path": "evidence/receipts/current-session-observation-20260920.json",
       "sha256": "6f699d8fa92af16f9f70214c89469e8e60fb50fc0aa262c52410fccbbd2c296a",
       "bytes": 55987
@@ -42981,8 +43265,8 @@
     },
     {
       "path": "evidence/receipts/login-shell-contract-20260929.json",
-      "sha256": "c72ca272d69e34bf34b20a0c73f0f001aa389744fc612a2b765873a122b97fd6",
-      "bytes": 32904
+      "sha256": "cf9d8b902c58bda0648c284ed7743c78d3b09cb09c6ee64743ccf12a241e25a3",
+      "bytes": 34225
     },
     {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
@@ -43241,8 +43525,8 @@
     },
     {
       "path": "evidence/receipts/notification-types-20260929.json",
-      "sha256": "b221f8fde6a52107b2eed9db804165dc03410dd3fd35f6e6a53f86392ce686e1",
-      "bytes": 22885
+      "sha256": "0e478de88f3b4ebe07f82ddf39e84bee91082cd789d9e36f6542fcc4ee863e86",
+      "bytes": 24500
     },
     {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
@@ -43331,8 +43615,8 @@
     },
     {
       "path": "evidence/receipts/terminal-experience-20260928.json",
-      "sha256": "1975f87640e986ca29681bd2819a9deb582a5675e8325d37bdf6cea0be40bb47",
-      "bytes": 16066
+      "sha256": "3acc39f8cd3864fd92404074c7a9357bef3db755598341ef80f229a75bfc4f09",
+      "bytes": 17308
     },
     {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
@@ -43426,8 +43710,8 @@
     },
     {
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json",
-      "sha256": "f1b6dcfc195e0aa2381169676b5b981441ab4000be6411f5714c4a70f6a3ad82",
-      "bytes": 14628
+      "sha256": "5747e6c7323ed3ed94aca51dce6984e823b8950c8a2854576b1627280744dd33",
+      "bytes": 15471
     },
     {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
@@ -44056,8 +44340,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "923a0a3610f3325fefb666b7037d6ae38d6d8125c271c08a9143ddcb60c0de5e",
-      "bytes": 38777
+      "sha256": "ccbf77a332e8ffed8b612c0c42800badbd4399762cb25a4d24fb1556d78721a4",
+      "bytes": 39561
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -44496,8 +44780,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "e2e9f6354eb2f62e1d9dc0a26748ded0c4e3d02de857fad4ac2121831c35e9da",
-      "bytes": 134212
+      "sha256": "adbcc445252da784791733fdc14647b8b5478aeeb69726291515e0251ee384c5",
+      "bytes": 134643
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -45241,8 +45525,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "c749503c0c8bd2a737075bb1b50a16329f491e726939e1472594f97fea4823e1",
-      "bytes": 21173
+      "sha256": "087656b0fc864eff23780f6c1182689ef0074157ba830f15b5dd727af734a2fd",
+      "bytes": 29980
     },
     {
       "path": "tests/test_worker_recovery.py",

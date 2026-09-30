@@ -9,26 +9,27 @@ too), in at most one group. That group is replaced only when it holds nothing el
 says which. The copy is then compared with the original: only the bell group and the overlay's own top-level keys (`$schema`, `preferredNotifChannel`) may differ, and those two only
 when the original lacks them (the merge tool would overwrite a value the person set, so the script refuses that too). With --apply it installs the copy after a backup that is never
 overwritten (the merge tool's own `write_backup`) through the merge tool's own `atomic_write` (a fresh random staging name in the same directory; the local file must not be a
-symlink, as the merge tool also refuses), and a failed write or a read-back that differs exits nonzero. "Nothing to do" is reported only when the bell group equals the overlay's
-and merging the overlay would change nothing. Prints booleans, counts and key names only, never a settings value.
-usage: replace_bell_group.py <checkout> local|polaris [--apply]"""
+symlink, as the merge tool also refuses), and a failed write or a read-back that differs exits nonzero. The client and other tools also save this file, so the tool installs only
+over the bytes it read: it compares the live file with its read before the backup, the backup with its read, and the live file again right before the replace, and refuses (nothing
+installed) when another writer saved before the last of those comparisons. A save that lands after the last comparison and before the rename is lost, and it is in neither the installed
+file nor the backup (which holds what was read): the window is the time between one read and one rename, and closing it needs a lock that the client does not take. "Nothing to do" is reported only when the bell group equals the overlay's and
+merging the overlay would change nothing. Prints booleans, counts and key names only, never a settings value (a refusal counts the matcher types it would drop and does not name them).
+The former second-distro target (`polaris`) is gone: that distro was unregistered on 2026-09-29 and its write path could no longer be run.
+usage: replace_bell_group.py <checkout> local [--apply]"""
 import copy, hashlib, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
-USAGE = "usage: replace_bell_group.py <checkout> local|polaris [--apply]"
+USAGE = "usage: replace_bell_group.py <checkout> local [--apply]"
 _flags = [a for a in sys.argv[1:] if a.startswith("--")]
 _positional = [a for a in sys.argv[1:] if not a.startswith("--")]
-if len(_positional) != 2 or _positional[1] not in ("local", "polaris") or any(f != "--apply" for f in _flags):
+if len(_positional) != 2 or _positional[1] != "local" or any(f != "--apply" for f in _flags):
     sys.exit(USAGE)
 WORKTREE = Path(_positional[0]).resolve()
 TARGET = _positional[1]
 APPLY = "--apply" in _flags
 OVERLAY = WORKTREE / "adoption/templates/claude.settings.linux-wsl2.overlay.json"
 TOOL = WORKTREE / "tools/adoption/apply_claude_settings.py"
-POLARIS_BACKUP = "settings.json.bak-20260929-push-notification"
 OVERLAY_KEYS = ("$schema", "preferredNotifChannel")
-WSL = "/mnt/c/Windows/System32/wsl.exe"
-env = {**os.environ, "WSL_UTF8": "1"}
 sys.path.insert(0, str(WORKTREE / "tools/adoption"))
 import apply_claude_settings as acs  # noqa: E402  (the merge tool's own helpers, so holders are found and files written the way the tool does it)
 
@@ -54,32 +55,21 @@ def holds_bell(group):
                for h in acs.hook_list(group))
 
 
-def wsl(*args, stdin=None):
-    return subprocess.run([WSL, "-d", "Polaris", "--exec", *args], stdin=stdin, capture_output=True, timeout=120, env=env, cwd=str(Path.home()))
-
-
 work = Path(tempfile.mkdtemp(prefix="rb"))
 os.chmod(work, 0o700)
 try:
-    if TARGET == "local":
-        live_path = Path.home() / ".claude/settings.json"
-        if live_path.is_symlink():
-            refuse("the local settings file is a symlink (the merge tool refuses it too)")
-        original = live_path.read_bytes()
-        mode = live_path.stat().st_mode & 0o777
-    else:
-        read = wsl("/bin/sh", "-c", '[ ! -L "$HOME/.claude/settings.json" ] && cat "$HOME/.claude/settings.json"')
-        if read.returncode != 0 or not read.stdout:
-            refuse("could not read the second distro's settings (missing, empty or a symlink)")
-        original = read.stdout
-        mode = 0o600
+    live_path = Path.home() / ".claude/settings.json"
+    if live_path.is_symlink():
+        refuse("the local settings file is a symlink (the merge tool refuses it too)")
+    original = live_path.read_bytes()
+    mode = live_path.stat().st_mode & 0o777
     try:
         before = json.loads(original)
     except ValueError:
         refuse("the settings file is not valid JSON")
     if not isinstance(before, dict):
         refuse("the settings file does not hold a JSON object")
-    print(TARGET, "| read", len(original), "bytes | sha256 prefix", hashlib.sha256(original).hexdigest()[:12], "| top-level keys", len(before))
+    print("local | read", len(original), "bytes | sha256 prefix", hashlib.sha256(original).hexdigest()[:12], "| top-level keys", len(before))
     hooks_before = before.get("hooks", {})
     groups = hooks_before.get("Notification", []) if isinstance(hooks_before, dict) else None
     if groups is None or not isinstance(groups, list) or not all(isinstance(g, dict) for g in groups):
@@ -93,6 +83,9 @@ try:
         refuse("more than one group holds the bell command")
     if holders:
         holder = holders[0]
+        extra_group_keys = sorted(set(holder) - {"matcher", "hooks"})
+        if extra_group_keys:
+            refuse(f"the bell group has {len(extra_group_keys)} key(s) beyond matcher and hooks, which replacing it would lose; edit that file by hand")
         if len(acs.hook_list(holder)) != 1:
             refuse("the bell group also holds another hook, which removing the group would lose; edit that file by hand")
         extra_keys = sorted(set(acs.hook_list(holder)[0]) - {"type", "command"})
@@ -102,10 +95,8 @@ try:
         held_types = frozenset(held.split("|")) if isinstance(held, str) and held else None
         if held_types is None or not held_types <= want_types:
             beyond = sorted(held_types - want_types) if held_types is not None else []
-            names = [t for t in beyond if re.fullmatch(r"[a-z_]+", t)]
-            refuse("the bell group's matcher " + ("is absent or empty (rings for every type)" if held_types is None else
-                   f"names {len(beyond)} type(s) the overlay's matcher does not ({', '.join(names)}{' and other patterns' if len(names) < len(beyond) else ''})")
-                   + ", which replacing it would drop; edit that file by hand")
+            refuse("the bell group's matcher " + ("is absent or empty (rings for every type)" if held_types is None else f"names {len(beyond)} type(s) the overlay's matcher does not")
+                   + ", which replacing it would drop; compare it with the overlay's matcher and edit that file by hand")
     trimmed = copy.deepcopy(before)
     if holders:
         trimmed["hooks"]["Notification"] = [g for g in groups if g not in holders]
@@ -142,19 +133,17 @@ try:
         sys.exit(0)
     new_bytes = copy_path.read_bytes()
     try:
-        if TARGET == "local":
-            acs.refuse_symlink(live_path)
-            backup = acs.write_backup(live_path)
-            print("backup written:", backup.name)
-            acs.atomic_write(live_path, new_bytes.decode("utf-8"), mode)
-            installed, write_ok = live_path.read_bytes(), True
-        else:
-            script = ('set -e; umask 077; d="$HOME/.claude"; f="$d/settings.json"; [ ! -L "$f" ]; [ -f "$f" ]; '
-                      f'(set -C; cat "$f" > "$d/{POLARIS_BACKUP}"); t=$(mktemp "$d/.settings.json.XXXXXX"); trap \'rm -f "$t"\' EXIT; cat > "$t"; chmod 600 "$t"; mv -f "$t" "$f"')
-            push = wsl("/bin/sh", "-c", script, stdin=open(copy_path, "rb"))
-            write_ok = push.returncode == 0
-            print("write back exit:", push.returncode)
-            installed = wsl("/bin/sh", "-c", 'cat "$HOME/.claude/settings.json"').stdout
+        acs.refuse_symlink(live_path)
+        if live_path.read_bytes() != original:
+            refuse("the settings file changed since it was read (another writer saved it); nothing was written, run the tool again")
+        backup = acs.write_backup(live_path)
+        print("backup written:", backup.name)
+        if backup.read_bytes() != original:
+            refuse("the settings file changed while it was backed up; the backup holds the newer content and nothing was installed, run the tool again")
+        if live_path.read_bytes() != original:
+            refuse("the settings file changed after it was backed up; the backup holds the bytes that were read and nothing was installed, run the tool again")
+        acs.atomic_write(live_path, new_bytes.decode("utf-8"), mode)
+        installed, write_ok = live_path.read_bytes(), True
     except (OSError, acs.ApplyError) as error:
         sys.exit(f"the write failed: {type(error).__name__}")
     matches = json.loads(installed) == after
