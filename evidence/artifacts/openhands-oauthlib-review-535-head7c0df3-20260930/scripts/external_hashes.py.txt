@@ -1,0 +1,44 @@
+"""Hashes of external sources the PR 535 receipt binds, recomputed from their primary locations (read-only network access), plus the workflow-file binding check.
+Run from the root of a checkout of the PR head. Usage: external_hashes.py <receipt path> <git dir of a repository holding the commits named below> <main commit> <pre-merge base commit>"""
+import hashlib
+import io
+import json
+import subprocess
+import sys
+import tarfile
+import urllib.request
+from pathlib import Path
+
+receipt_path, git_dir, main_commit, base_commit = sys.argv[1:5]
+receipt = json.loads(Path(receipt_path).read_text(encoding="utf-8"))
+
+
+def git_show(ref, path):
+    return subprocess.run(["git", "-C", git_dir, "show", f"{ref}:{path}"], capture_output=True, check=True).stdout
+
+
+workflow = ".github/workflows/security-scan.yml"
+bound = {entry["path"]: entry for entry in receipt["bound_files"]}[workflow]
+head_file = Path(workflow).read_bytes()
+print(f"receipt binds {workflow}: sha256 {bound['sha256']}, {bound['bytes']} bytes")
+for label, blob in ((f"at the pre-merge base {base_commit[:8]}", git_show(base_commit, workflow)), (f"on main {main_commit[:8]}", git_show(main_commit, workflow)), ("in the checkout (the PR head)", head_file)):
+    print(f"  {label}: sha256 {hashlib.sha256(blob).hexdigest()}, {len(blob)} bytes")
+print("  the PR head's workflow equals main's:", head_file == git_show(main_commit, workflow), "| the receipt's binding equals the pre-merge base's:", hashlib.sha256(git_show(base_commit, workflow)).hexdigest() == bound["sha256"])
+
+info = json.load(urllib.request.urlopen("https://pypi.org/pypi/PyJWT/2.15.0/json", timeout=30))
+sdist = next(f for f in info["urls"] if f["filename"].endswith(".tar.gz"))
+data = urllib.request.urlopen(sdist["url"], timeout=60).read()
+print(f"PyJWT sdist {sdist['filename']}: sha256 {hashlib.sha256(data).hexdigest()}, equals the PyPI digest: {hashlib.sha256(data).hexdigest() == sdist['digests']['sha256']}; uploaded {sdist['upload_time_iso_8601']}")
+tf = tarfile.open(fileobj=io.BytesIO(data), mode="r:gz")
+members = {m.name.split("/", 1)[1]: m for m in tf.getmembers() if m.isfile() and "/" in m.name}
+for item in receipt["source_archive_and_test_bindings"]["tag_sdist_selected_test_inputs"]:
+    digest = hashlib.sha256(tf.extractfile(members[item["path"]]).read()).hexdigest()
+    print(f"  {item['path']}: sdist {digest[:16]} | receipt {item['sha256'][:16]} | {'EQUAL' if digest == item['sha256'] else 'DIFFERENT'}")
+
+pins = json.loads(Path("blueprints/runtime-workers/openhands/pins.json").read_text(encoding="utf-8"))
+url = pins["source_archive"]["url"]
+archive = urllib.request.urlopen(url, timeout=120).read()
+print(f"SDK archive {url.rsplit('/', 1)[-1][:12]}: {len(archive)} bytes, sha256 {hashlib.sha256(archive).hexdigest()} | pins.json {pins['source_archive']['sha256']} | receipt {receipt['resolution']['sdk_archive_sha256']}")
+tf = tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz")
+lock = next(m for m in tf.getmembers() if m.isfile() and m.name.count("/") == 1 and m.name.endswith("/uv.lock"))
+print(f"  uv.lock inside: sha256 {hashlib.sha256(tf.extractfile(lock).read()).hexdigest()} | receipt {receipt['resolution']['sdk_upstream_uv_lock_sha256']}")

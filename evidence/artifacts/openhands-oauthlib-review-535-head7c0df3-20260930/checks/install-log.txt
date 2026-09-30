@@ -1,0 +1,36 @@
+[2026-09-30T19:28:31Z] uv uv 0.12.17 (x86_64-unknown-linux-gnu)
+[2026-09-30T19:28:32Z] venv
+Creating virtual environment at: <REVIEW-SCRATCH>/venv
+Activate with: source <REVIEW-SCRATCH>/venv/bin/activate
+venv exit: 0
+[2026-09-30T19:28:32Z] build lock
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build lock install exit: 0
+[2026-09-30T19:28:32Z] candidate lock
+ + wrapt==1.17.3
+ + yarl==1.22.0
+ + zipp==3.23.0
+candidate lock install exit: 0
+[2026-09-30T19:28:32Z] pip check
+Using Python 3.13.15 environment at: <REVIEW-SCRATCH>/venv
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
+[2026-09-30T19:28:32Z] sdk import
++----------------------------------------------------------------------+
+|  OpenHands SDK v1.50.0                                               |
+|                                                                      |
+|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |
+|  Get help: openhands.dev/joinslack                                   |
+|  Scale up: openhands.dev/product/sdk                                 |
+|                                                                      |
+|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |
++----------------------------------------------------------------------+
+
+SDK/tools 1.50.0 imports passed; no model request
+sdk import exit: 0
+installed: urllib3 2.8.0 | PyJWT 2.15.0 | oauthlib 3.3.1 | requests-oauthlib 2.0.0 | google-auth-oauthlib 1.2.2 | requests 2.33.0 | httpx 0.28.1 | openhands-sdk 1.50.0 | openhands-tools 1.50.0
+distributions installed: 178
+[2026-09-30T19:28:41Z] done
