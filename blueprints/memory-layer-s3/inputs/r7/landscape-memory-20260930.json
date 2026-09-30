@@ -1,0 +1,648 @@
+{
+ "checked_at_utc": "2026-09-30T15:09:53Z",
+ "candidates": [
+  {
+   "name": "agentmemory",
+   "repo": "https://github.com/rohitg00/agentmemory",
+   "latest_release": "v0.9.29 observed in changelog; latest release tag not independently confirmed",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Native Claude Code and Codex plugins, lifecycle hooks, skills and MCP.",
+   "published_eval": "Committed LongMemEval-S retrieval evaluation: R@5 95.2%, R@10 98.6%; also coding-agent-life-v1. Retrieval results are not answer accuracy.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Direct coding-agent integration and local lexical/vector retrieval. Provisional until default-branch activity is verified.",
+   "sources": [
+    "https://github.com/rohitg00/agentmemory"
+   ]
+  },
+  {
+   "name": "Hindsight",
+   "repo": "https://github.com/vectorize-io/hindsight",
+   "latest_release": "v0.10.2",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "hindsight-coding-agents supports Claude Code and Codex; bank-scoped MCP endpoint.",
+   "published_eval": "Published LongMemEval results; hindsight-system-evals provides evaluation code. Published configurations must be distinguished from the proposed local configuration.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Strong evaluated memory architecture; local PostgreSQL, embeddings and compatible LLM providers supported. Maintenance admission remains provisional.",
+   "sources": [
+    "https://github.com/vectorize-io/hindsight"
+   ]
+  },
+  {
+   "name": "OpenViking",
+   "repo": "https://github.com/volcengine/OpenViking",
+   "latest_release": "v0.4.22",
+   "last_commit_utc": "2026-09-29",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code and Codex plugins/hooks and MCP integration.",
+   "published_eval": "Repository benchmark material covers LoCoMo and tau2-bench. Reported improvements used an earlier version and Doubao models; they do not establish local-model performance.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Maintained filesystem-oriented memory and document RAG contender. Count once, with separate memory and document workloads.",
+   "sources": [
+    "https://github.com/volcengine/OpenViking"
+   ]
+  },
+  {
+   "name": "cognee",
+   "repo": "https://github.com/topoteretes/cognee",
+   "latest_release": "GitHub tag unverified; PyPI 1.6.2 observed",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "MCP integration; exact Claude Code/Codex lifecycle parity not verified.",
+   "published_eval": "Published knowledge-graph memory research. A reproducible current-version result on the requested memory benchmarks was not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Current keyless local extraction/search changes materially improve suitability. Pin graph, vector and optional LLM stages; maintenance admission provisional.",
+   "sources": [
+    "https://github.com/topoteretes/cognee"
+   ]
+  },
+  {
+   "name": "MemPalace",
+   "repo": "https://github.com/MemPalace/mempalace",
+   "latest_release": "v3.10.0",
+   "last_commit_utc": "unverified; default branch observed as develop",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code and Codex plugin directories, MCP and agent transcript ingestion.",
+   "published_eval": "Committed LongMemEval retrieval results and benchmark documentation. Headline near-perfect recall involves different reranking/held-out protocols; it is not end-to-end QA accuracy.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Useful local retrieval baseline. Preregister the exact untouched test split and retrieval configuration; verify activity on develop.",
+   "sources": [
+    "https://github.com/MemPalace/mempalace"
+   ]
+  },
+  {
+   "name": "basic-memory",
+   "repo": "https://github.com/basicmachines-co/basic-memory",
+   "latest_release": "v0.23.2",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "MCP and Claude Code/Codex plugin integrations.",
+   "published_eval": "Benchmark code exists; a published reproducible result on the requested memory QA benchmarks was not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Markdown/SQLite control with optional local semantic search. Maintenance admission provisional.",
+   "sources": [
+    "https://github.com/basicmachines-co/basic-memory"
+   ]
+  },
+  {
+   "name": "memsearch",
+   "repo": "https://github.com/zilliztech/memsearch",
+   "latest_release": "unverified; supplied v0.4.21 exceeds stale indexed release page",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code plugin; Codex integration through supported hooks/skills.",
+   "published_eval": "Published bilingual optional-reranker evaluation; requested longitudinal memory benchmark reproduction not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Local embeddings and Markdown-backed retrieval are relevant. Disable optional hosted reranking for the local arm; verify release and activity.",
+   "sources": [
+    "https://github.com/zilliztech/memsearch"
+   ]
+  },
+  {
+   "name": "ai-memory",
+   "repo": "https://github.com/akitaonrails/ai-memory",
+   "latest_release": "unverified; supplied v2.4.2, indexed release page still v2.4.1",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "First-party Claude Code/Codex support, MCP and capture hooks.",
+   "published_eval": "Repository evaluation material exists; a comparable requested-benchmark score was not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Coding handoffs, Git-backed memory and local search provide a useful distinct baseline. Release and maintenance checks remain provisional.",
+   "sources": [
+    "https://github.com/akitaonrails/ai-memory"
+   ]
+  },
+  {
+   "name": "engram",
+   "repo": "https://github.com/Gentleman-Programming/engram",
+   "latest_release": "v2.2.1",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code plugin and Codex setup command/MCP.",
+   "published_eval": "Requested-benchmark evaluation and reproducible result not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Small SQLite/FTS memory control requiring neither embeddings nor a memory LLM. Maintenance admission provisional.",
+   "sources": [
+    "https://github.com/Gentleman-Programming/engram"
+   ]
+  },
+  {
+   "name": "Graphiti",
+   "repo": "https://github.com/getzep/graphiti",
+   "latest_release": "v0.30.2",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Repository MCP server usable by Claude Code and Codex.",
+   "published_eval": "Temporal-graph/Zep research is published; managed Zep results do not establish performance of this exact Graphiti release and local stack.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Temporal graph architecture merits comparison. Use maintained supported graph storage and compatible local models; verify default-branch activity.",
+   "sources": [
+    "https://github.com/getzep/graphiti"
+   ]
+  },
+  {
+   "name": "supermemory local",
+   "repo": "https://github.com/supermemoryai/supermemory",
+   "latest_release": "server-v0.0.8",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code/Codex integrations advertised; their routing to the local server needs verification.",
+   "published_eval": "MemoryBench harness linked; reported LongMemEval retrieval recall must be separated from answer accuracy.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Local server supports local embeddings and compatible LLM endpoints. Before admission, verify source-build reproducibility, local plugin routing and activity.",
+   "sources": [
+    "https://github.com/supermemoryai/supermemory"
+   ]
+  },
+  {
+   "name": "qmd",
+   "repo": "https://github.com/tobi/qmd",
+   "latest_release": "v2.8.3",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "rag-document",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Local CLI, MCP server and Claude Code integration; Codex can use MCP.",
+   "published_eval": "Requested memory-benchmark evaluation not verified. Evaluate as a document-retrieval baseline.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Fully local BM25, dense retrieval, expansion and reranking. Freeze model files and retrieval settings; maintenance admission provisional.",
+   "sources": [
+    "https://github.com/tobi/qmd"
+   ]
+  },
+  {
+   "name": "LightRAG",
+   "repo": "https://github.com/HKUDS/LightRAG",
+   "latest_release": "v1.5.7",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "rag-document",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Local server/API; a first-party Claude Code/Codex capture plugin was not verified.",
+   "published_eval": "Published LightRAG paper, reproduction material and RAGAS evaluation support; document QA rather than demonstrated coding-agent longitudinal memory.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Relevant graph/document RAG architecture with local compatible models. Fix the adapter and pipeline recipe; verify activity.",
+   "sources": [
+    "https://github.com/HKUDS/LightRAG"
+   ]
+  },
+  {
+   "name": "llama_index hybrid",
+   "repo": "https://github.com/run-llama/llama_index",
+   "latest_release": "v0.14.25",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "rag-document",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Library/API integration; exact coding-agent MCP adapter not verified.",
+   "published_eval": "Numerous retrieval/evaluation components; 'hybrid' does not identify a single reproducible submitted system.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Preregister one upstream-supported BM25/vector/fusion/reranking recipe, component versions and storage backend. Maintenance admission provisional.",
+   "sources": [
+    "https://github.com/run-llama/llama_index"
+   ]
+  },
+  {
+   "name": "agent-memory-benchmark",
+   "repo": "https://github.com/vectorize-io/agent-memory-benchmark",
+   "latest_release": "unverified",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "benchmark-harness",
+   "self_hostable_local": false,
+   "claude_code_or_codex_integration": "Evaluation harness, not a coding-agent integration.",
+   "published_eval": "Published benchmark code, prompts and evaluation workflow. Documented setup uses Gemini credentials; fully local reader/judge routing was not verified.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Retain conditionally as a harness; admission requires activity verification and a supported local/gateway reader and judge configuration.",
+   "sources": [
+    "https://github.com/vectorize-io/agent-memory-benchmark"
+   ]
+  },
+  {
+   "name": "LongMemEval-V2",
+   "repo": "https://github.com/xiaowu0162/LongMemEval-V2",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-08-09",
+   "archived": false,
+   "category": "benchmark-harness",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Includes Codex and AgentRunbook-C adapters; not a drop-in memory layer.",
+   "published_eval": "2026 paper and released evaluation code/data; repository documents local Qwen reader/embedding configurations and compatible endpoints.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Maintained recent benchmark with longer agent trajectories. Preserve chronological ingestion and prevent question/gold leakage.",
+   "sources": [
+    "https://github.com/xiaowu0162/LongMemEval-V2/commits"
+   ]
+  },
+  {
+   "name": "MemoryAgentBench",
+   "repo": "https://github.com/HUST-AI-HYZ/MemoryAgentBench",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-09-25",
+   "archived": false,
+   "category": "benchmark-harness",
+   "self_hostable_local": false,
+   "claude_code_or_codex_integration": "Memory-agent evaluation implementations; no native coding-agent plugin.",
+   "published_eval": "ICLR 2026 benchmark and reproducible repository covering retrieval, test-time learning, long-range understanding and selective forgetting.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Maintained capability coverage beyond recall. Fully local execution of every reader/judge path was not verified.",
+   "sources": [
+    "https://github.com/HUST-AI-HYZ/MemoryAgentBench/commits"
+   ]
+  },
+  {
+   "name": "MTEB",
+   "repo": "https://github.com/embeddings-benchmark/mteb",
+   "latest_release": "2.21.9",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "benchmark-harness",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Embedding evaluation only.",
+   "published_eval": "Published benchmark, datasets, task implementations and reproducible local-model evaluation.",
+   "in_current_list": true,
+   "recommendation": "keep",
+   "reason": "Use to choose and freeze embeddings; its scores do not measure longitudinal agent memory or coding outcomes.",
+   "sources": [
+    "https://github.com/embeddings-benchmark/mteb/commits"
+   ]
+  },
+  {
+   "name": "SimpleMem",
+   "repo": "https://github.com/aiming-lab/SimpleMem",
+   "latest_release": "v0.3.0, latest indexed release",
+   "last_commit_utc": "2026-07-24",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Self-hosted MCP server; Docker configuration supports Ollama and compatible endpoints.",
+   "published_eval": "2026 SimpleMem paper; LoCoMo F1 43.24% under its protocol, with repository benchmark/reproduction scripts. This is not comparable to LLM-judge accuracy percentages.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Maintained compression-and-planning architecture with reproducible research and a local deployment path; substantial omission.",
+   "sources": [
+    "https://github.com/aiming-lab/SimpleMem/commits"
+   ]
+  },
+  {
+   "name": "ReMe",
+   "repo": "https://github.com/agentscope-ai/ReMe",
+   "latest_release": "v0.4.1.4, latest indexed release",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code MCP/skills and capture hook; Codex MCP/skills, with capture lifecycle requiring separate verification.",
+   "published_eval": "Repository LongMemEval harness reports 89.4% on cleaned S500; BEAM results cover specified 100K/1M subsets, not automatically the entire benchmark.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Recent maintained entrant combining episodic/procedural reuse and local file memory. Normalize its comparatively large reader-token budgets.",
+   "sources": [
+    "https://github.com/agentscope-ai/ReMe/commits"
+   ]
+  },
+  {
+   "name": "MemMachine",
+   "repo": "https://github.com/MemMachine/MemMachine",
+   "latest_release": "v0.3.9, latest indexed release",
+   "last_commit_utc": "2026-09-25",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "MCP server and REST/SDK interfaces usable by both agents.",
+   "published_eval": "April 2026 paper reports LoCoMo and LongMemEval-S results; evaluation directory documents reproduction and legacy/current API differences.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Evaluated episodic/profile memory architecture; Docker setup explicitly supports Ollama embeddings and OpenAI-compatible LLMs.",
+   "sources": [
+    "https://github.com/MemMachine/MemMachine/commits"
+   ]
+  },
+  {
+   "name": "Mem0 OSS core",
+   "repo": "https://github.com/mem0ai/mem0",
+   "latest_release": "v2.2.1",
+   "last_commit_utc": "2026-09-25",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Self-hosted core SDK/API; do not substitute the cloud-only coding-agent plugin. Exact supported local capture adapter requires qualification.",
+   "published_eval": "Published Mem0 research; upstream memory-benchmarks documents self-hosted Mem0/Qdrant evaluation on LoCoMo, LongMemEval and BEAM.",
+   "in_current_list": true,
+   "recommendation": "add_primary",
+   "reason": "Correct the exclusion: the plugin's cloud dependency does not exclude the maintained OSS core, which supports local models and storage.",
+   "sources": [
+    "https://github.com/mem0ai/mem0/commits"
+   ]
+  },
+  {
+   "name": "claude-mem",
+   "repo": "https://github.com/thedotmack/claude-mem",
+   "latest_release": "v13.24.23, latest indexed release",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Native Claude Code lifecycle capture; current repository also ships Codex integration.",
+   "published_eval": "Comparable published LongMemEval/LoCoMo/BEAM result with a reproducible harness was not verified.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Highly relevant coding-session capture contender despite missing verified benchmark results. Source exposes a configurable compatible provider base URL.",
+   "sources": [
+    "https://github.com/thedotmack/claude-mem/commits"
+   ]
+  },
+  {
+   "name": "mcp-memory-service",
+   "repo": "https://github.com/doobidoo/mcp-memory-service",
+   "latest_release": "v11.13.0 observed in upstream documentation",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Local MCP/REST service with Claude Code and Codex integration documentation.",
+   "published_eval": "Checked-in LongMemEval, LoCoMo and DevBench retrieval scripts; LongMemEval R@5 80.4%, R@10 90.4%. These are retrieval metrics.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Maintained local SQLite/vector/embedding service with direct agent relevance and reproducible retrieval evaluation.",
+   "sources": [
+    "https://github.com/doobidoo/mcp-memory-service/commits"
+   ]
+  },
+  {
+   "name": "MemOS",
+   "repo": "https://github.com/MemTensor/MemOS",
+   "latest_release": "v2.0.33 announced upstream; latest GitHub release tag unverified",
+   "last_commit_utc": "2026-09-22",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Verified local plugin adapters target OpenClaw, Hermes and DeepSeek Harness. Claude Code/Codex Cloud CLI exists; equivalent local adapter not verified.",
+   "published_eval": "Published LoCoMo/LongMemEval results and OmniMemEval framework. Cloud/core results cannot be assigned to the local plugin automatically.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Major omission and maintained local implementation, but target-agent adapter and benchmark-to-implementation identity need qualification.",
+   "sources": [
+    "https://github.com/MemTensor/MemOS/commits"
+   ]
+  },
+  {
+   "name": "EverOS / EverMemOS lineage",
+   "repo": "https://github.com/EverMind-AI/EverOS",
+   "latest_release": "unverified for current rewrite; v1.2.1 indexed for the lineage",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Coding-assistant integrations/community MCP ecosystem; exact current Claude Code/Codex capture adapter not verified.",
+   "published_eval": "EverMemOS 2026 paper reports strong LoCoMo results. Current EverOS has benchmark/run-spec material, but is a rewritten Markdown/SQLite/LanceDB runtime.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Important maintained research lineage. Reproduce the current implementation before transferring predecessor scores or promoting to primary.",
+   "sources": [
+    "https://github.com/EverMind-AI/EverOS/commits"
+   ]
+  },
+  {
+   "name": "SuperLocalMemory",
+   "repo": "https://github.com/qualixar/superlocalmemory",
+   "latest_release": "v4.0.1, latest indexed release",
+   "last_commit_utc": "2026-09-12",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code plugin and Codex/MCP/skills integrations.",
+   "published_eval": "August 2026 preprint; reproducible current-version head-to-head on the requested benchmark suite not verified.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Recent local memory-control architecture with no-LLM and Ollama modes; promising, but evaluation evidence needs qualification.",
+   "sources": [
+    "https://github.com/qualixar/superlocalmemory/commits"
+   ]
+  },
+  {
+   "name": "memU",
+   "repo": "https://github.com/NevaMind-AI/memU",
+   "latest_release": "unverified; changelog documents 2.0.0-beta.0",
+   "last_commit_utc": "2026-09-21",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Current host adapters/skills support Claude Code and Codex; verify version-specific capture behavior.",
+   "published_eval": "Comparable reproducible current-version result on the requested benchmarks not verified.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Maintained file/skill memory with local storage and configurable embedding endpoints. Significant implementation changes complicate score transfer.",
+   "sources": [
+    "https://github.com/NevaMind-AI/memU/commits"
+   ]
+  },
+  {
+   "name": "Memori",
+   "repo": "https://github.com/MemoriLabs/Memori",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-09-18",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": false,
+   "claude_code_or_codex_integration": "Documented Claude Code/Codex MCP setup uses api.memorilabs.ai and a Memori API key.",
+   "published_eval": "March 2026 research reports LoCoMo results; full OSS self-hosted augmentation reproduction was not verified.",
+   "in_current_list": false,
+   "recommendation": "exclude",
+   "reason": "Maintained, but the verified current SDK/MCP path depends on hosted services. BYODB and commercial on-premises claims do not establish a fully local OSS pipeline.",
+   "sources": [
+    "https://github.com/MemoriLabs/Memori/commits"
+   ]
+  },
+  {
+   "name": "Memobase",
+   "repo": "https://github.com/memodb-io/memobase",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-01-11",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Self-hosted API/SDK; target-agent plugin parity not verified.",
+   "published_eval": "Current reproducible evaluation was not qualified because the maintenance exclusion already applies.",
+   "in_current_list": false,
+   "recommendation": "exclude",
+   "reason": "Default-branch head is older than the 2026-07-02 cutoff, violating the specified 90-day rule.",
+   "sources": [
+    "https://github.com/memodb-io/memobase/commits"
+   ]
+  },
+  {
+   "name": "MemoryOS",
+   "repo": "https://github.com/BAI-LAB/MemoryOS",
+   "latest_release": "unverified",
+   "last_commit_utc": "unverified; cached page shows 2025-07-29 but was crawled 1.2 years ago",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Repository MCP implementation; target-agent capture hooks not verified.",
+   "published_eval": "EMNLP 2025 oral paper with LoCoMo evaluation scripts in eval/.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Research-backed candidate, but not admitted as maintained: stale commit evidence cannot establish its present head or justify a definitive exclusion.",
+   "sources": [
+    "https://github.com/BAI-LAB/MemoryOS/commits"
+   ]
+  },
+  {
+   "name": "AgentMem",
+   "repo": "https://github.com/JaceHo/AgentMem",
+   "latest_release": "unverified",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "agent-memory",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Claude Code/Codex MCP and hook integrations advertised.",
+   "published_eval": "Repository advertises LongMemEval retrieval and answer-evaluation scripts; protocol equivalence and reported results were not independently qualified.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Relevant local Redis-backed entrant. Requires license, release, maintenance and benchmark qualification before admission.",
+   "sources": [
+    "https://github.com/JaceHo/AgentMem"
+   ]
+  },
+  {
+   "name": "HippoRAG / HippoRAG 2",
+   "repo": "https://github.com/OSU-NLP-Group/HippoRAG",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-09-03",
+   "archived": false,
+   "category": "rag-document",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Python library; native Claude Code/Codex MCP integration not verified.",
+   "published_eval": "Published HippoRAG/HippoRAG 2 research and reproducible multi-hop document QA evaluation.",
+   "in_current_list": false,
+   "recommendation": "add_primary",
+   "reason": "Maintained graph/PageRank retrieval architecture missing from document RAG coverage. Explicit local LLM and embedding endpoint support.",
+   "sources": [
+    "https://github.com/OSU-NLP-Group/HippoRAG/commits"
+   ]
+  },
+  {
+   "name": "RAGFlow",
+   "repo": "https://github.com/infiniflow/ragflow",
+   "latest_release": "v1.0.0-rc1 observed; stable v0.27.2",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "rag-document",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Self-hosted retrieval API; exact first-party coding-agent integration not verified.",
+   "published_eval": "Comparable reproducible result on the requested conversational memory benchmarks not verified.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Maintained document-processing/RAG platform with local models; larger deployment and parsing scope may exceed the intended lightweight layer comparison.",
+   "sources": [
+    "https://github.com/infiniflow/ragflow/commits"
+   ]
+  },
+  {
+   "name": "Serena",
+   "repo": "https://github.com/oraios/serena",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-09-24",
+   "archived": false,
+   "category": "rag-code",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "MCP integration explicitly supports Claude Code and Codex.",
+   "published_eval": "Requested memory-benchmark reproduction not verified; evaluate symbol retrieval and coding outcomes separately.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Important local language-server/symbol retrieval control with persistent project memories, complementary to document/vector RAG.",
+   "sources": [
+    "https://github.com/oraios/serena/commits"
+   ]
+  },
+  {
+   "name": "GitNexus",
+   "repo": "https://github.com/abhigyanpatwari/GitNexus",
+   "latest_release": "unverified",
+   "last_commit_utc": "unverified for canonical upstream",
+   "archived": false,
+   "category": "rag-code",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Canonical README search describes local code knowledge graphs and MCP support for Claude Code/Codex.",
+   "published_eval": "Reproducible coding-outcome or requested memory-benchmark result not verified.",
+   "in_current_list": false,
+   "recommendation": "add_reserve",
+   "reason": "Search-only upstream lead, not admitted as maintained. Correction: nxpatterns/gitnexus is a fork; its September 9 date was not transferred to upstream. Canonical page could not be opened within budget.",
+   "sources": []
+  },
+  {
+   "name": "Letta, current Letta Code runtime",
+   "repo": "https://github.com/letta-ai/letta-code",
+   "latest_release": "unverified",
+   "last_commit_utc": "2026-09-30",
+   "archived": false,
+   "category": "other",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Own coding-agent runtime/App Server; a drop-in memory layer for Claude Code/Codex was not verified.",
+   "published_eval": "Relevant memory-agent research exists; exact current-runtime benchmark reproduction was not qualified.",
+   "in_current_list": true,
+   "recommendation": "exclude",
+   "reason": "Scope exclusion, not blanket retirement: V1 is retired, but the maintained successor supports a local backend. Compare separately because it changes the agent runtime.",
+   "sources": [
+    "https://github.com/letta-ai/letta-code/commits"
+   ]
+  },
+  {
+   "name": "beads",
+   "repo": "https://github.com/gastownhall/beads",
+   "latest_release": "v1.3.0 stable; v1.3.1-rc.1 prerelease observed in search",
+   "last_commit_utc": "unverified",
+   "archived": false,
+   "category": "other",
+   "self_hostable_local": true,
+   "claude_code_or_codex_integration": "Coding-agent task/dependency tracking integrations.",
+   "published_eval": "Long-term memory/RAG benchmark reproduction not qualified.",
+   "in_current_list": true,
+   "recommendation": "exclude",
+   "reason": "Retain task-tracker scope exclusion. Search-only metadata; canonical project moved from steveyegge/beads to gastownhall/beads, and no page budget remained.",
+   "sources": []
+  }
+ ],
+ "missing_from_list_summary": "The list has substantial omissions, but this bounded audit does not certify exhaustive completeness or all admission metadata. Add_primary: SimpleMem, ReMe, MemMachine, Mem0 OSS core, claude-mem, mcp-memory-service, and HippoRAG. Add_reserve: MemOS, EverOS/EverMemOS lineage, SuperLocalMemory, memU, MemoryOS, AgentMem, RAGFlow, Serena, and the unqualified GitNexus lead. Memobase definitively fails the 90-day rule; Memori's verified current integration fails the no-mandatory-cloud requirement. Reconsidering Mem0 corrects the cloud-plugin/core conflation. Letta remains excluded by comparison scope, while its current local runtime is active. in_current_list includes names explicitly listed as excluded. Forty distinct URLs were attempted; no load exceeded one minute. The GitHub API endpoint and incorrectly guessed LadybugDB/GitNexus URL failed. GitHub CLI authentication and shell networking were unavailable. Many repository root pages omitted dynamic commit metadata, so their keep recommendations are provisional, not verified maintenance admissions. Commit dates have day precision, without verified UTC timestamps; tags are latest observed primary-source/indexed releases, not a guarantee against indexing lag. archived=false reflects inspected repository presentation, not authenticated API verification. Local capability is documentation/source-based and was not installation-tested; false for harnesses means a fully local reader/judge path was not verified. Search-only GitNexus and beads have empty sources rather than unopened URLs. Remaining unqualified discovery frontier includes LangMem, LightMem, MIRIX, A-MEM, Haystack, RAG-Anything, PageIndex, Code-RAG, and broader RAG applications. Additional harness leads include mem0ai/memory-benchmarks, supermemoryai/memorybench, MemTensor/OmniMemEval, MemoryArena, and EverMemBench; their release/activity metadata was not qualified within the page budget. Before freezing the preregistration, resolve unknown activity against the 2026-07-02 cutoff, pin exact implementations/adapters, separate retrieval recall from answer accuracy, and normalize reader/judge models, ingestion and retrieval token budgets. Current local implementations must be rerun rather than inheriting scores from cloud products, predecessors or different benchmark subsets."
+}

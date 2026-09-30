@@ -1,0 +1,360 @@
+{
+ "checked_at_utc": "2026-09-30T16:30:31Z",
+ "window_start_utc": "2026-07-02T16:30:31Z",
+ "commands": [
+  "gh api repos/OWNER/REPO",
+  "gh api repos/OWNER/REPO/commits?since=SINCE&per_page=100&page=N",
+  "gh api repos/OWNER/REPO/releases/latest",
+  "gh api repos/OWNER/REPO/commits/TAG"
+ ],
+ "discovery_input": "inputs/r7/landscape-memory-20260930.json",
+ "repositories": [
+  {
+   "repository": "thedotmack/claude-mem",
+   "archived": false,
+   "default_branch": "main",
+   "head": "a077975ebd41643902f53e538e9bdf36c8367a0a",
+   "last_commit_utc": "2026-09-30T11:09:49Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v13.28.0",
+    "commit": "57c38303734482a596b3e2a052b969b30584be0d",
+    "published_utc": "2026-09-26T18:37:19Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "primary (3.1)",
+    "basis": "official local install and official integrations with both clients",
+    "locators": [
+     "thedotmack/claude-mem@57c38303:docs/public/installation.mdx:27",
+     "thedotmack/claude-mem@57c38303:docs/public/installation.mdx:55",
+     "thedotmack/claude-mem@57c38303:src/services/integrations/CodexCliInstaller.ts:221",
+     "thedotmack/claude-mem@57c38303:src/services/integrations/CodexCliInstaller.ts:507"
+    ]
+   }
+  },
+  {
+   "repository": "doobidoo/mcp-memory-service",
+   "archived": false,
+   "default_branch": "main",
+   "head": "9079737b8e6da0b3e9d4d3f8e24979b56ec00079",
+   "last_commit_utc": "2026-09-30T13:32:51Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v11.14.0",
+    "commit": "bed24ef7214192bfe59ad46f6852165678735a77",
+    "published_utc": "2026-09-25T09:44:09Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "primary (3.1)",
+    "basis": "official local install; Claude Code stdio registration; Codex CLI documented as a supported client",
+    "locators": [
+     "doobidoo/mcp-memory-service@bed24ef7:README.md:111",
+     "doobidoo/mcp-memory-service@bed24ef7:README.md:252",
+     "doobidoo/mcp-memory-service@bed24ef7:docs/integration/multi-client.md:172"
+    ]
+   }
+  },
+  {
+   "repository": "MemMachine/MemMachine",
+   "archived": false,
+   "default_branch": "main",
+   "head": "d57f5cb36a357c01085f571a0cdd2dfbc9882f89",
+   "last_commit_utc": "2026-09-25T19:15:26Z",
+   "commits_in_window": 28,
+   "latest_release": {
+    "tag": "v0.3.9",
+    "commit": "1d3e0ce2782b83571e1974198c4d317e601cb263",
+    "published_utc": "2026-05-18T02:22:52Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "primary (3.1), at the latest release v0.3.9; the deployment spec was read at main 899ace1a, 31 commits ahead, so its locators are re-read at 1d3e0ce2 before freeze",
+    "basis": "official local install; Claude Code MCP through .mcp.json; Codex skill installer",
+    "locators": [
+     "MemMachine/MemMachine@1d3e0ce2:docs/install_guide/integrate/claude_code_mcp.mdx:62",
+     "MemMachine/MemMachine@1d3e0ce2:packages/skills/README.md:22"
+    ]
+   }
+  },
+  {
+   "repository": "agentscope-ai/ReMe",
+   "archived": false,
+   "default_branch": "main",
+   "head": "81c16d3e2c1010c2ec3ed6eede114d3c3ac882d1",
+   "last_commit_utc": "2026-09-30T10:30:36Z",
+   "commits_in_window": 174,
+   "latest_release": {
+    "tag": "v0.4.1.12",
+    "commit": "4f7c8786e3975b6ff1b20685ed56c3ccbaa4ed9f",
+    "published_utc": "2026-09-14T05:03:54Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "primary (3.1)",
+    "basis": "official local install; Claude Code plugin to a shared HTTP MCP server; Codex through the official ReMe Memory skill",
+    "locators": [
+     "agentscope-ai/ReMe@4f7c8786:integrations/claude_code/README.md:23",
+     "agentscope-ai/ReMe@4f7c8786:README.md:188"
+    ]
+   }
+  },
+  {
+   "repository": "aiming-lab/SimpleMem",
+   "archived": false,
+   "default_branch": "main",
+   "head": "db80b6a7c591e0ea730a058e9f5fc4eb06572299",
+   "last_commit_utc": "2026-07-24T07:40:38Z",
+   "commits_in_window": 14,
+   "latest_release": {
+    "tag": "v0.3.0",
+    "commit": "c830efa3fd2614bc4eb0b4a80bc5836ece9ded96",
+    "published_utc": "2026-05-21T16:02:50Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "out on fit (3.3): no official Codex integration",
+    "basis": "no Codex setup in any Markdown document at the latest release c830efa3 or at main db80b6a7; the Claude path is a skill copy",
+    "locators": [
+     "aiming-lab/SimpleMem@c830efa3:SKILL/README.md:13"
+    ]
+   }
+  },
+  {
+   "repository": "mem0ai/mem0",
+   "archived": false,
+   "default_branch": "main",
+   "head": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+   "last_commit_utc": "2026-09-25T17:34:12Z",
+   "commits_in_window": 234,
+   "latest_release": {
+    "tag": "ts-v3.3.1",
+    "commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+    "published_utc": "2026-09-25T17:36:35Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "3.3 exclusion retained; the landscape's add-primary recommendation is not adopted",
+    "basis": "the official Codex plugin core posts to Platform routes; the pinned tree has no self-hosted OpenMemory directory, and OpenMemory remains only in changelog entries and documentation redirects",
+    "locators": [
+     "mem0ai/mem0@94c3fe9f:integrations/codex-plugin/core/memory_core.py:1996",
+     "mem0ai/mem0@94c3fe9f:docs/docs.json:1182"
+    ]
+   }
+  },
+  {
+   "repository": "OSU-NLP-Group/HippoRAG",
+   "archived": false,
+   "default_branch": "main",
+   "head": "398bfdc388692795c105c1b903db60031975b669",
+   "last_commit_utc": "2026-09-29T14:00:48Z",
+   "commits_in_window": 21,
+   "latest_release": {
+    "tag": "v1.0.0",
+    "commit": "b144c46df14cabe5f5822d8caded4bec5f709461",
+    "published_utc": "2025-02-27T17:29:48Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "document-RAG candidate (8.3) at a dated default-branch pin exception, not the memory family",
+    "basis": "Python SDK only, with no Claude Code or Codex integration, MCP or HTTP service. The latest GitHub release v1.0.0 (b144c46d) is the legacy HippoRAG 1 code (README cites arXiv 2405.14831; no hipporag package in its tree); HippoRAG 2 is the default branch, package 2.0.0a5, unreleased; PyPI's newest hipporag is in 'pypi' below",
+    "locators": [
+     "OSU-NLP-Group/HippoRAG@398bfdc3:README.md:105",
+     "OSU-NLP-Group/HippoRAG@398bfdc3:README.md:110",
+     "OSU-NLP-Group/HippoRAG@398bfdc3:pyproject.toml:7",
+     "OSU-NLP-Group/HippoRAG@b144c46d:README.md:5"
+    ]
+   }
+  },
+  {
+   "repository": "qualixar/superlocalmemory",
+   "archived": false,
+   "default_branch": "main",
+   "head": "5bfa47c941b6329b23f93b17f3dce7f6d70a2b9a",
+   "last_commit_utc": "2026-09-12T19:07:09Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v4.1.17",
+    "commit": "5bfa47c941b6329b23f93b17f3dce7f6d70a2b9a",
+    "published_utc": "2026-09-12T19:12:11Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 4 (3.2)",
+    "basis": "landscape-reported integrations with both clients; release present"
+   }
+  },
+  {
+   "repository": "NevaMind-AI/memU",
+   "archived": false,
+   "default_branch": "main",
+   "head": "2c050bc9681a4c0aff1af211a000e73d14f33356",
+   "last_commit_utc": "2026-09-21T11:45:36Z",
+   "commits_in_window": 133,
+   "latest_release": {
+    "tag": "v1.5.1",
+    "commit": "357aefc8012705bfde723f141d52f675fe712bed",
+    "published_utc": "2026-03-23T07:38:28Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 5 (3.2)",
+    "basis": "landscape-reported integrations with both clients; release present"
+   }
+  },
+  {
+   "repository": "JaceHo/AgentMem",
+   "archived": false,
+   "default_branch": "main",
+   "head": "0770f5d861142486a6e8d57599ae36db7ddd93be",
+   "last_commit_utc": "2026-08-31T04:12:09Z",
+   "commits_in_window": 3,
+   "latest_release": {
+    "tag": null,
+    "commit": null,
+    "published_utc": null,
+    "prerelease": null
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 6 (3.2)",
+    "basis": "landscape-reported integrations with both clients; no GitHub release to pin"
+   }
+  },
+  {
+   "repository": "MemTensor/MemOS",
+   "archived": false,
+   "default_branch": "main",
+   "head": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+   "last_commit_utc": "2026-09-22T01:51:03Z",
+   "commits_in_window": 264,
+   "latest_release": {
+    "tag": "v2.0.34",
+    "commit": "41bf5c7fa89ee08ebedf3c662638b06fc29aca8d",
+    "published_utc": "2026-09-23T05:24:20Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 8 (3.2)",
+    "basis": "local adapters target other agents; Claude Code/Codex local path unverified"
+   }
+  },
+  {
+   "repository": "EverMind-AI/EverOS",
+   "archived": false,
+   "default_branch": "main",
+   "head": "6aff7351bc4aebf92aa92217858ac4bf736eef28",
+   "last_commit_utc": "2026-09-30T12:02:41Z",
+   "commits_in_window": 83,
+   "latest_release": {
+    "tag": "v1.4.1",
+    "commit": "462ebf9fd59b55c03fefb8eec855c62500f2a3cf",
+    "published_utc": "2026-09-24T10:33:18Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 7 (3.2)",
+    "basis": "Claude Code/Codex capture adapter unverified"
+   }
+  },
+  {
+   "repository": "BAI-LAB/MemoryOS",
+   "archived": false,
+   "default_branch": "main",
+   "head": "587ed7755c7aed179965792830ff1b5ad9a6fa92",
+   "last_commit_utc": "2026-07-07T12:32:18Z",
+   "commits_in_window": 2,
+   "latest_release": {
+    "tag": "V1.2",
+    "commit": "cbb4c74c7b8005f29d9bb363f93d966ed7f82452",
+    "published_utc": "2025-07-18T07:21:44Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "memory reserve 9 (3.2)",
+    "basis": "MCP implementation; capture hooks unverified; oldest release"
+   }
+  },
+  {
+   "repository": "infiniflow/ragflow",
+   "archived": false,
+   "default_branch": "main",
+   "head": "9766c8c5483b10d923acbbf2ba5e25b14819be19",
+   "last_commit_utc": "2026-09-30T12:08:16Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v1.0.0-rc1",
+    "commit": "14bb02ee4584c1ab18f0c722c48beecd6bbf9860",
+    "published_utc": "2026-09-29T05:52:57Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "document-RAG reserve (8.3)",
+    "basis": "self-hosted document RAG platform; no coding-client integration"
+   }
+  },
+  {
+   "repository": "abhigyanpatwari/GitNexus",
+   "archived": false,
+   "default_branch": "main",
+   "head": "acb65b95b62647b19781caa60afd17d3bed23d4a",
+   "last_commit_utc": "2026-09-29T13:49:44Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v1.6.12",
+    "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+    "published_utc": "2026-09-12T21:40:04Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "outside S3: a candidate for the Harbor token-tool E2E's next round; no S3 arm",
+    "basis": "local code graph with MCP for both clients (landscape report, unverified at a pin); not in the Harbor run"
+   }
+  },
+  {
+   "repository": "oraios/serena",
+   "archived": false,
+   "default_branch": "main",
+   "head": "8a3ce35cae29a93748842ba463231d6c78d181e7",
+   "last_commit_utc": "2026-09-29T10:49:50Z",
+   "commits_in_window": "300+",
+   "latest_release": {
+    "tag": "v1.7.0",
+    "commit": "949a27ef1e5fda1a6e7b561e777bcece345c6ffd",
+    "published_utc": "2026-08-09T18:38:06Z",
+    "prerelease": false
+   },
+   "verdict": "ACTIVE",
+   "screen": {
+    "route": "outside S3: code-retrieval tools are measured as token tools in the separate Harbor E2E; no S3 change",
+    "basis": "the landscape listed it as a code-retrieval reserve; S3 has no code-retrieval comparison"
+   }
+  }
+ ],
+ "pypi": [
+  {
+   "package": "hipporag",
+   "latest_version": "2.0.0a4",
+   "latest_upload_utc": "2025-06-24T21:02:54.727514Z",
+   "source": "https://pypi.org/pypi/hipporag/json",
+   "checked_utc": "2026-09-30T17:03:07Z"
+  }
+ ],
+ "screen_revised_utc": "2026-09-30T17:03:07Z",
+ "screen_revision_note": "screen annotations corrected before first publication: reserve 7/8 order by the stated basis, HippoRAG release identity, Mem0 OpenMemory wording, Serena and GitNexus layer routes; PyPI observation added; gate data unchanged"
+}
