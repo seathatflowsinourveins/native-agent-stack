@@ -1,0 +1,208 @@
+{
+ "schema": "omniroute-rebuild-receipt/1",
+ "id": "omniroute-rebuild-20260930",
+ "host": {
+  "name": "nativestack-5975wx-20260925",
+  "profile": "linux-wsl2-x86_64",
+  "scope": "one workstation; the two user units below"
+ },
+ "subject": "Both OmniRoute gateways rebuilt on upstream release/v3.8.51 2f42a9ac1 with #13788 (both) and the local affinity patch (20128), Codex 0.159.1 announced, token-save settings applied, then the 20129 compression settings moved to upstream's per-engine settings with ten of the twelve shipped engines enabled (master on) on the user's direction; not upstream's shipped state",
+ "status": "switched 2026-09-30T00:02:41Z-00:03:00Z; settings applied 00:06:04Z-00:06:11Z (T01-T09) and 00:43:52Z (T10); the owner record taken at 00:48:58Z is the one the Gate A owner told the coordinator it froze (the freeze itself is not in this artifact)",
+ "recordings": {
+  "read_back_files": [
+   "host-readback-20260930.json",
+   "apply-logs/"
+  ],
+  "qualification": "qualification-extract.json",
+  "units": {
+   "omniroute.service": "899e4fdb06775216",
+   "omniroute-fw.service": "fbdace7eeec524e3"
+  },
+  "owner_record_script": {
+   "path": "tools/omniroute/gateway_record.py",
+   "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6"
+  },
+  "checks": {
+   "recorded_outputs": "checks/recorded-outputs.txt (the applier's checks as printed during the apply, plus two fresh read-only runs)",
+   "effective_plan": "checks/effective-plan-20260930.json (the gateway's plan resolver on the live settings, live build's modules)",
+   "lite_probe": "checks/lite-whitespace-probe-20260930.json (dry-run preview on 20129 and an offline Codex-shape probe)",
+   "real_bodies": "checks/real-codex-bodies-lane-probe-20260930.json (the gateway's compression step run offline on eight real Codex request bodies, counts only)"
+  }
+ },
+ "evidence_classes": {
+  "unchanged_upstream_check": "upstream's own scripts, unchanged, on our builds: check:pack-artifact, check:pack-boot, test:unit",
+  "our_integration_check": "our own runs: boot smoke, targeted tests, failure classification, applier read-backs, post-apply checks, effective-plan verifier, live probes' HTTP results",
+  "live_model_call": "requests that reached the ChatGPT backend through the gateways (one synthetic payload each; the token-effect payloads' input sizes, 595 to 8,573 tokens, are in qualification-extract.json)",
+  "synthetic_fixture": "one synthetic payload per line, through the live gateways; token counts are not savings figures",
+  "source_review": "reading upstream source at named commits",
+  "registry_or_api_read": "npm registry or GitHub API reads"
+ },
+ "units": {
+  "20128": {
+   "unit": "omniroute.service",
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
+   "build_sha": "ae5539a56",
+   "main_pid": 950031,
+   "n_restarts": 0,
+   "tarball_sha256": "0239e52b1ac33e79a65569646cd00958255ec9a914a04f66fa1b19b7c833f370",
+   "unit_sha256_prefix": "899e4fdb06775216",
+   "compression": "master off, codex/* excluded (unchanged)"
+  },
+  "20129": {
+   "unit": "omniroute-fw.service",
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788",
+   "build_sha": "87c4c488d",
+   "main_pid": 945817,
+   "n_restarts": 0,
+   "tarball_sha256": "117a625b70e0c67bede41f10fb79d2bf57caeae46c1886c543b85643b068a340",
+   "unit_sha256_prefix": "fbdace7eeec524e3",
+   "compression": "master ON, ten of twelve engines ON at upstream's per-engine settings (headroom off in the engines map only, omniglyph off), headerless lane [session-dedup, ccr, lite]; upstream ships the master off and every engine disabled; see configuration_20129"
+  },
+  "both": {
+   "upstream": "release/v3.8.51 2f42a9ac19d1a247ec9ce5473b790843724b3061",
+   "carries": {
+    "#13788": [
+     "24bbadbad",
+     "6c7990058"
+    ],
+    "affinity_20128_only": "045aa81f3"
+   },
+   "codex_client_version": "0.159.1 (literal in both unit files; installed Codex is 0.157.1)"
+  }
+ },
+ "switch": {
+  "time_utc": "2026-09-30T00:02:41Z",
+  "order": [
+   "20129 restart 00:02:42Z",
+   "hindsight-live restart",
+   "20128 restart 00:02:58Z (interim drop-in absorbed and removed)"
+  ],
+  "tool": "scripts/switch_gateways.py.txt (edits only Description=, the PATH prefix, ExecStart and Environment=CODEX_CLIENT_VERSION=; verifies health and running prefix + BUILD_SHA; rolls back on failure)",
+  "rollback_material": "prior unit files and the drop-in text in a private switch directory; verified SQLite online-backup copies of both stores taken 00:02:33Z (migrations 190 to 193 rows are not undone by repointing)"
+ },
+ "configuration_20129": {
+  "T01-T09": "context_length override, three stored combos (gpt6-agent-safe, gpt6-memory-safe, gpt6-safe-lossy), sharedgw interception rule, prompt-cache declaration and 1200000 ms hop timeout, fixed hop headers, compression settings (plan.json.txt, PLAN.md) (T05, the Codex app-server flag off, is a 20128 step: see configuration_20128)",
+  "T10_delta": "compression settings moved to upstream's per-engine settings with ten of the twelve shipped engines enabled, on the user's direction (plan-delta.json.txt; its title calls this 'upstream defaults', which it is not: upstream ships the master off, defaultMode off and every engine disabled): master ON; engines ON session-dedup, ccr, lite, rtk minimal, codex-responses, relevance, caveman lite, aggressive, llmlingua, ultra; OFF headroom, omniglyph; outputStyles []; liveZone off; cacheMinutes 5; sessionDedup.minBlockChars 512 and lite.compressToolResults false kept as defect mitigations",
+  "headerless_plan": "stacked [session-dedup, ccr, lite], derived by upstream's code from our engines map (upstream's default pipeline is [session-dedup, lite]; ccr is lossless so the derivation adds it); off gives no engine; lossy engines only with a header or combo (upstream lossyRequestPolicy); lite folds whitespace in code-bearing text (residual below; checks/lite-whitespace-probe-20260930.json)",
+  "stored_combos": "ours from T04: gpt6-agent-safe, gpt6-memory-safe, gpt6-safe-lossy; peer-owned rows: allow-lossy, fw-ccr, fw-codex-responses, fw-headroom, fw-lite, fw-rtk, fw-session-dedup; seeded: Standard Savings [session-dedup, lite] (not marked default). A header that names a stored combo selects it, so the header allow-lossy selects the peer combo of that name (eleven engines including headroom), not the ten engines of the engines map. headroom still runs in gpt6-safe-lossy (step minRows 16), allow-lossy and fw-headroom (global minRows 8 since T10) for a caller that names them; 20128 has only Standard Savings"
+ },
+ "configuration_20128": {
+  "T05": "OMNIROUTE_CODEX_APP_SERVER_ENABLED=false (plan item GC8, a confinement write: no Codex connection uses the app-server transport); upstream's default is \"true\" (featureFlagDefinitions.ts:564-570)",
+  "otherwise": "unchanged when the record was frozen: master off, codex/* excluded"
+ },
+ "standing_state": {
+  "20128": "master off, codex/* excluded, Codex app-server flag false, session affinity 4 h, no output style",
+  "gateway_record": "tools/omniroute/gateway_record.py prints the owner record; the record published as after_delta in host-readback-20260930.json is the one the Gate A owner told the coordinator it froze, and a fresh record equals it on every path but taken_utc (checks/recorded-outputs.txt, section F)"
+ },
+ "decision": "docs/decisions/2026-09-30-omniroute-rebuild.md",
+ "claims": [
+  {
+   "id": "C1",
+   "class": [
+    "unchanged_upstream_check"
+   ],
+   "text": "upstream check:pack-artifact and check:pack-boot exit 0 on both builds (A2 on its third attempt; attempts 1 and 2 failed, their causes are not established, and are retained)",
+   "at": "qualification-extract.json builds"
+  },
+  {
+   "id": "C2",
+   "class": [
+    "unchanged_upstream_check",
+    "our_integration_check"
+   ],
+   "text": "upstream test:unit on the pristine tip and on the 20128 build: stage 1 exits 1 on both with 14 and 18 failing tests; every failure only the 20128 build shows is classified (one from the #13788 carry, two built-tree artifacts, one timing flake); the pristine run prints 41 more result lines than the 20128 run (115 only it printed, less 57 only the 20128 run printed, less 17 carry tests); the 172 non-carry lines are results one full run did not print, attributed to --test-force-exit and identical when the 18 files run alone in two batches per tree: 654 result lines each, 0 failing",
+   "at": "qualification-extract.json upstream_test_unit_stage1 (full_suite_reconciliation)"
+  },
+  {
+   "id": "C3",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "both installed prefixes boot to health 200 in 3-4 s and stop cleanly; 69/69 and 62/62 targeted unit tests pass",
+   "at": "qualification-extract.json builds"
+  },
+  {
+   "id": "C4",
+   "class": [
+    "our_integration_check",
+    "registry_or_api_read"
+   ],
+   "text": "the carries equal their sources by git patch-id; the installed artifacts contain the alpha/search route (6 built files in each prefix) and only the 20128 build contains the affinity function (pickMoreAvailableOAuthPeer: 23 occurrences in 11 built files, 0 in the 20129 build)",
+   "at": "qualification-extract.json carries and carries.installed_check"
+  },
+  {
+   "id": "C5",
+   "class": [
+    "live_model_call",
+    "our_integration_check"
+   ],
+   "text": "after the switch cx/gpt-6.1-sol answers 200 on 20128 and through sharedgw on 20129; a request carrying the 0.157.1 UA and Version header answers 200 with nine response.* event types parsed; a made-up id answers 400",
+   "at": "qualification-extract.json live_probes_after_switch"
+  },
+  {
+   "id": "C6",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "ten steps applied, each with capture, precondition, read-back and a rollback (values-free logs in apply-logs/); as printed: pre-apply checks checks=36 failed=0 (00:05:47Z), gateway_apply.py plan.json --verify T01-T09 OK exit 0 and post-apply checks=36 failed=0 (00:06:17Z), the delta's --verify T10 OK (00:44:04Z, 00:46:17Z and a fresh run at the time of this record's review); no live rollback has been run",
+   "at": "checks/recorded-outputs.txt sections A-E; negative controls: the offline module's test_verify_detects_drift and test_failed_readback_rolls_back_exactly_and_stops (scripts/test_gateway_apply.py.txt), which run against the applier as it stands, not the unretained version that printed the T01-T09 results"
+  },
+  {
+   "id": "C7",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "effective plan after the delta, from the gateway's own plan resolver on the live settings (live build's modules, row-for-row identical to the table computed earlier from the c19983a66 source, the head of the earlier 20128 candidate's scratch worktree): 20129 headerless stacked [session-dedup, ccr, lite] (source default) without an output style; off gives none; the header allow-lossy selects the peer-owned stored combo of that name (eleven engines including headroom, source request-header), not the ten-engine plan of the engines map; 20128 as running resolves every header to off, and with the master on and the exclusion removed a headerless request would still resolve to off (engine:lite and Standard Savings would resolve to their engines) until its engines map is stored",
+   "at": "checks/effective-plan-20260930.json; the plan file's own table in PLAN.md states the superseded [ccr]-only lane and is not evidence for this claim"
+  },
+  {
+   "id": "C8",
+   "class": [
+    "synthetic_fixture",
+    "live_model_call"
+   ],
+   "text": "session-dedup rewrites a duplicate tool read in history (2712 to 1464 and 2675 to 1427 prompt tokens) and never the current turn; gpt6-agent-safe took a 480-line retry loop from 8573 to 1745 tokens with the answer intact; one payload each",
+   "at": "qualification-extract.json token_effect_synthetic"
+  },
+  {
+   "id": "C9",
+   "class": [
+    "source_review"
+   ],
+   "text": "CODEX_CLIENT_VERSION is used for the catalog query, the gateway's own backend calls and callers that report no Codex version; a Codex client that reports its own version keeps it on inference",
+   "at": "open-sse/executors/codex.ts buildHeaders (unchanged between a58000c7 and 2f42a9ac1; the file changed only in #15119, the /v1/responses subpath), open-sse/config/codexClient.ts and src/shared/constants/codexClient.ts (byte-identical), src/app/api/providers/[id]/models/discovery/codex.ts:82 (the catalog query)"
+  },
+  {
+   "id": "C10",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the headerless lane's lite step (lite.ts:50-53) strips trailing spaces and tabs and collapses three or more newlines to two in every string message content; on a Codex-shaped Responses body it rewrote the shell and shell_command function_call_output strings (9 to 5 blank lines, trailing spaces 2 to 0) and left apply_patch calls, parts-array message items and instructions untouched; a dry-run preview on 20129 shows the same on diffs, fenced code and tool results; the offline body's tool outputs are plain strings, and the pi-practice session reports that real GPT-6 Codex sessions send content-part arrays (not reproduced here)",
+   "at": "checks/lite-whitespace-probe-20260930.json"
+  },
+  {
+   "id": "C11",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "on eight real Codex 0.159.2 request bodies (captured by the pi-practice session, private, not published), the headerless lane changed 0 items and 0 tokens, and the gpt6-safe-lossy lane saved 908 of 265,483 tokens (0.34%; live: 0.36% over 55 rows, reported by that session) while losing, by our regex count, 47 file-path occurrences, 1 hex id and 1 error line, with the gateway's own validation printing 'inline code changed or missing' in all four; so compression on the 20128 Codex lane is not applied",
+   "at": "checks/real-codex-bodies-lane-probe-20260930.json"
+  }
+ ],
+ "residuals": [
+  "Provenance: the applier, plan and check scripts that ran T01-T09 are not retained and the published scripts are later text (a stopped workflow stage's edits); T10 ran through an unreviewed edit of the applier. The read-backs are the evidence, not the scripts. See provenance.",
+  "post_apply_checks.py: its post phase now encodes T01-T15 (drafts that were never applied) and its later phases encode the superseded T09 settings, so it no longer reproduces the recorded 36/36; checks/recorded-outputs.txt keeps what it printed. plan.json.txt is the current file, edited after the apply, and drops its post_apply key; the stage's drafted T10-T15 (an output-mode flag; compression on 20128) were never applied and are excluded. 'T10' names the applied delta here and a different, never-applied draft in the scripts.",
+  "lite folds whitespace in code-bearing text (claim C10). It is part of upstream's own default lane and saved 192 of 413,153 input tokens across 28 real pi tasks on 20129 (reported by the pi-practice session, not reproduced here). The pi-practice session's later 3-arm measurement on real Codex 0.159.2 jobs (reported, not reproduced) found 0 compressed tokens in 115 rows and 9 of 9 first-try apply_patch hunks over two blank context lines with the lane off and on, because GPT-6 Codex sessions send tool output as content-part arrays, which lite does not rewrite; string-content shell outputs (older models) are untested through the gateway, and the offline probe of claim C10 used string outputs. The earlier plan screen had moved lite to opt-in for this reason; the upstream-direction delta put it back.",
+  "headroom is off in the engines map but still runs where a stored combo names it: gpt6-safe-lossy (ours, step minRows 16; its description says it can round large-JSON numbers), and the peer combos allow-lossy and fw-headroom (global minRows 8 since T10). The header allow-lossy therefore selects the peer combo of that name, not the engines-map plan. Narrowing this (restore minRows 16 globally, or drop headroom from those combos) is a gateway write needing the Gate A owner's timing and the peers' consent.",
+  "Rollback: no live rollback has been run (only the offline module exercises it). A rollback writes back prior values for keys that had no row, so a GET is identical afterwards but exact row absence returns only from the store copy, and T01's rollback check compares the whole override list including refreshedAt, so it can print NOT-VERIFIED after a correct restore. A store restore discards the T01-T10 settings, usage logs and any rotated OAuth tokens; a stale refresh token can force a native re-sign-in.",
+  "gateway_record.py cannot see what T05-T08 wrote (20128's digests did not change across T05); a settings change outside compression, combos, overrides and resilience does not void a window.",
+  "Open user decisions: compression on 20128 (the user's conditional yes of 2026-09-30, relayed, is not applied: neither the headerless lane nor the gpt6-safe-lossy header lane shows a saving without lost exact values on real Codex traffic, claims C10 and C11 and the decision record); blockedProviders and noAuthFallbackDisabledProviders (not expressible in the apply contract).",
+  "The 0.159.x announcement enabling gpt-6.1-sol rests on two observations (the live catalog with 0.157.1 announced and with 0.159.1 announced); max effort on gpt-6.1-sol clamps to xhigh; the live canary waits for Codex capacity; upstream e2e and integration suites were not run.",
+  "The #13788 carry's credential lookup in src/app/api/v1/alpha/search/route.ts (lines 92-103: getProviderCredentialsWithQuotaPreflight for the selected search provider, used server-side for the upstream search call, the same shape as /v1/search; the carry's own test asserts auth through enforceApiKeyPolicy like /v1/search) is the site upstream's hard-lease inventory test reports as unclassified: the classification is missing from the carry, and it is not shown to be unsafe.",
+  "Two internal identifiers per plan file are shortened to eight hex characters; route and unit digests in host-readback-20260930.json are full length as printed; no credential value, host path or user name is stored here."
+ ],
+ "provenance": {
+  "operation_scripts": "T01-T09 (00:05:57Z-00:06:17Z) ran through gateway_apply.py, plan.json and post_apply_checks.py as they stood at 00:05:53Z; those versions are NOT retained (no script digest was logged). The published scripts/*.txt and plan.json.txt are later text: a design workflow's fix stage rewrote gateway_apply.py at 00:33:23Z and edited it five times between 00:43:06Z and 00:43:19Z, rewrote post_apply_checks.py at 00:40:42Z, and edited plan.json and test_gateway_apply.py until 00:45:44Z. T10, the delta (dry run 00:43:38Z, apply 00:43:52Z), ran through that unreviewed edit of the applier 19 s and 33 s after its last write; the offline module ran on it at 00:46:17Z (20 tests, OK). plan-delta.json was built by the coordinator at 00:43:32Z from T09's step and the pi-practice session's delta-20260930-upstream-defaults.json.",
+  "evidence_of_the_settings": "read-backs against the consuming gateway (apply-logs/, checks/recorded-outputs.txt), not the scripts' text"
+ }
+}

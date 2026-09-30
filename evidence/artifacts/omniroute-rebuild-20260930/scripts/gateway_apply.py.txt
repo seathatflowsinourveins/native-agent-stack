@@ -1,0 +1,531 @@
+#!/usr/bin/env python3
+"""Contract-driven applier for OmniRoute management writes (plan.json version 1).
+
+Our integration script for a host operation, not an upstream tool. It only calls management routes the plan names,
+each captured before it is written, verified after, and rolled back exactly when a read-back fails.
+
+  gateway_apply.py PLAN --check                          static contract check, no network
+  gateway_apply.py PLAN --dry-run [--steps A,B]          captures + preconditions + digests, no write
+  gateway_apply.py PLAN --apply   [--steps A,B]          execute in order; the first failure stops (and rolls that step back)
+  gateway_apply.py PLAN --verify  [--steps A,B] [--expect-applied A,B]
+                                                         applied steps: re-run the read-back (OK / DRIFT);
+                                                         other steps: NOT-APPLIED, precondition re-evaluated as information
+  gateway_apply.py PLAN --rollback A,B [--force]         roll back steps recorded as applied, reverse order, from their
+                                                         apply-time captures
+
+State lives under STATE_DIR (0700 dirs, 0600 files), never in a checkout:
+  captures/<id>.json            apply-time capture (the rollback source), written only after the step's precondition
+                                passed, immediately before its write
+  captures-unapplied/<id>.json  captures of dry runs and of apply attempts stopped by their precondition (never read by
+                                --verify or --rollback)
+  status/<id>.json              the step's recorded state: write-attempted, applied, readback-failed, write-refused,
+                                rolled-back (+ rollback restored / NOT-VERIFIED)
+  log-<mode>-<ts>.json, digests-<tag>.json (+ a timestamped copy per run)
+Whether a step is applied is decided from status/ (else, for state dirs written before round F, from the apply and
+rollback logs; a capture file counts only when the directory holds no log at all), never from a capture file's mere
+existence. A step recorded as applied is skipped by --apply and --dry-run, so its rollback capture is never overwritten.
+A step's optional "requires" list names earlier steps that must be recorded as applied before --apply writes it, and
+--rollback refuses a step while a step that requires it is still applied (roll back in reverse order, or --force).
+Secret handling: a GET capture of a route that can return credentials must list "keep" paths and only those are
+retained; no response body is ever printed; sqlite captures run mode=ro with query_only and refuse credential columns.
+"""
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import re
+import sqlite3
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+STATE_DIR = Path(os.environ.get("TOKENSAVE_STATE_DIR", str(Path.home() / ".local/state/native-agent-stack/omniroute-tokensave-20260929")))
+STORES = {"20128": Path.home() / ".local/share/omniroute/storage.sqlite", "20129": Path.home() / ".local/share/omniroute-fw/storage.sqlite"}
+METHODS = {"PATCH", "PUT", "POST", "DELETE"}
+# Routes that can return credential material: a GET capture must name "keep" paths and nothing else is retained.
+SECRET_GET = re.compile(r"^/api/(settings|providers|providers/client|providers/[^/]+|keys|keys/[^/]+)$")
+CREDENTIAL_SQL = re.compile(r"api_?key|access_?token|refresh_?token|id_?token|key_hash|secret|password|cookie|bearer|oauth|_token\b", re.I)
+ALLOWED_PSD = re.compile(r"json_(?:extract|type)\(\s*provider_specific_data\s*,\s*'\$\.(timeoutMs|customHeaders|apiType|baseUrl|chatPath|requestDefaults(\.[A-Za-z0-9_]+)?|cache(\.[A-Za-z0-9_]+)?|openaiStoreEnabled)'\s*\)", re.I)
+FORBIDDEN_WRITES = [(re.compile(r"^/api/keys(/|$)"), "key routes are a separate apply"), (re.compile(r"^/api/(shutdown|db-backups|settings/database|settings/import-json|settings/export-json)"), "never")]
+APPLIED, NOT_APPLIED, UNKNOWN = "applied", "not-applied", "unknown"
+
+
+def now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def private_dir(path):
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path, 0o700)
+
+
+def write_private(path, data):
+    private_dir(path.parent)
+    fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, "w") as handle:
+        handle.write(json.dumps(data, indent=1, sort_keys=True))
+
+
+def load_json(path):
+    return json.loads(Path(path).read_text())
+
+
+def call(base, method, route, body=None):
+    data = None if body is None else json.dumps(body).encode()
+    request = urllib.request.Request(base + route, data=data, method=method)
+    if data is not None:
+        request.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            raw = response.read()
+            return response.status, (json.loads(raw) if raw else None)
+    except urllib.error.HTTPError as error:
+        text = error.read().decode(errors="replace")[:300]
+        try:
+            return error.code, json.loads(text)
+        except Exception:
+            return error.code, {"_raw": "unparseable"}
+
+
+def dig(value, path):
+    """Dotted path lookup; returns (found, value). Array indexes are plain integers."""
+    current = value
+    for part in [p for p in path.split(".") if p != ""]:
+        if isinstance(current, list):
+            if not part.isdigit() or int(part) >= len(current):
+                return False, None
+            current = current[int(part)]
+        elif isinstance(current, dict):
+            if part not in current:
+                return False, None
+            current = current[part]
+        else:
+            return False, None
+    return True, current
+
+
+def classify(result, rollback):
+    if result == "applied":
+        return APPLIED
+    if result in ("readback-failed", "write-refused", "rolled-back"):
+        return NOT_APPLIED if rollback == "restored" else UNKNOWN
+    if result == "write-attempted":
+        return UNKNOWN
+    return NOT_APPLIED
+
+
+def recorded_state(sid):
+    """(state, detail) of one step from STATE_DIR: status/ first, then legacy logs, then (no log at all) a capture."""
+    status_path = STATE_DIR / "status" / f"{sid}.json"
+    if status_path.exists():
+        status = load_json(status_path)
+        suffix = f"/{status.get('rollback')}" if status.get("rollback") else ""
+        return classify(status.get("result"), status.get("rollback")), f"status {status.get('result')}{suffix} at {status.get('at')}"
+    logs = sorted(STATE_DIR.glob("log-*.json"))
+    events = []
+    for log_path in logs:
+        try:
+            log = load_json(log_path)
+        except Exception:
+            continue
+        record = (log.get("steps") or {}).get(sid)
+        if log.get("mode") in ("apply", "rollback") and record:
+            events.append((log.get("started", ""), log_path.name, log.get("mode"), record))
+    state, detail = None, None
+    for _started, name, mode, record in sorted(events, key=lambda e: (e[0], e[1])):
+        if mode == "apply":
+            result = record.get("result")
+            if result not in ("applied", "readback-failed", "write-refused"):
+                continue  # precondition-failed, dry-run-ok, already-applied: no state change
+            state = classify(result, record.get("rollback"))
+        else:
+            if record.get("rollback") in (None, "REFUSED"):
+                continue
+            state = NOT_APPLIED if record.get("rollback") == "restored" else UNKNOWN
+        detail = f"log {name}"
+    if state:
+        return state, detail
+    if not logs and (STATE_DIR / "captures" / f"{sid}.json").exists():
+        return APPLIED, "capture file in a state dir with no log (pre-round-F behaviour)"
+    return NOT_APPLIED, "no apply recorded"
+
+
+class Run:
+    def __init__(self, plan, mode):
+        self.plan = plan
+        self.mode = mode
+        self.bases = plan["gateways"]
+        self.captures = {}
+        self.log = {"started": now(), "mode": mode, "steps": {}}
+
+    # ------------------------------------------------------------ plan contract
+    def check_plan(self):
+        problems = []
+        plan = self.plan
+        if plan.get("version") != 1:
+            problems.append("version must be 1")
+        seen = set()
+        for step in plan.get("steps", []):
+            sid = step.get("id", "?")
+            if sid in seen:
+                problems.append(f"{sid}: duplicate step id")
+            requires = step.get("requires", [])
+            if not isinstance(requires, list) or any(r not in seen for r in requires):
+                problems.append(f"{sid}: requires must list ids of earlier steps")
+            seen.add(sid)
+            for key in ("id", "gateway", "captures", "write", "readback", "rollback", "rollback_verify", "source", "features"):
+                if key not in step:
+                    problems.append(f"{sid}: missing {key}")
+            if step.get("gateway") not in self.bases:
+                problems.append(f"{sid}: unknown gateway")
+            write = step.get("write", {})
+            if write.get("method") not in METHODS or not str(write.get("route", "")).startswith("/api/"):
+                problems.append(f"{sid}: bad write method/route")
+            for pattern, why in FORBIDDEN_WRITES:
+                if pattern.search(str(write.get("route", ""))):
+                    problems.append(f"{sid}: write route refused ({why})")
+            rb = step.get("rollback", {})
+            if rb.get("method") not in METHODS or not str(rb.get("route", "")).startswith("/api/"):
+                problems.append(f"{sid}: bad rollback method/route")
+            if str(step.get("write", {}).get("route", "")).startswith("/api/settings/feature-flags") and rb.get("method") == "DELETE":
+                problems.append(f"{sid}: DELETE on feature-flags clears every override")
+            names = {c.get("name") for c in step.get("captures", [])}
+            for label, spec in (("write", write), ("rollback", rb)):
+                if "body_from_capture" in spec and spec["body_from_capture"].get("capture") not in names:
+                    problems.append(f"{sid}: {label} references an unknown capture")
+                if "body_overrides" in spec:
+                    overrides = spec["body_overrides"]
+                    if "body_from_capture" not in spec:
+                        problems.append(f"{sid}: {label} body_overrides needs body_from_capture")
+                    elif not isinstance(overrides, dict) or not overrides:
+                        problems.append(f"{sid}: {label} body_overrides must be a non-empty object")
+                    elif set(overrides) & set(spec["body_from_capture"].get("paths", [])):
+                        problems.append(f"{sid}: {label} body_overrides repeats a body_from_capture path")
+            for cap in step.get("captures", []):
+                if cap.get("type") == "get":
+                    if SECRET_GET.match(cap.get("route", "")) and not cap.get("keep"):
+                        problems.append(f"{sid}: capture of {cap.get('route')} needs 'keep' paths")
+                elif cap.get("type") == "sqlite_ro":
+                    problems += [f"{sid}: {p}" for p in self.sql_problems(cap.get("sql", ""))]
+                else:
+                    problems.append(f"{sid}: unknown capture type")
+        return problems
+
+    @staticmethod
+    def sql_problems(sql):
+        out = []
+        text = sql.strip()
+        if not re.match(r"^select\b", text, re.I) or ";" in text.rstrip(";"):
+            out.append("sql must be one SELECT")
+        if CREDENTIAL_SQL.search(text):
+            out.append("sql names a credential column")
+        stripped = ALLOWED_PSD.sub("", text)
+        if re.search(r"provider_specific_data", stripped, re.I):
+            out.append("provider_specific_data only via json_extract of an allowed non-secret path")
+        return out
+
+    # ------------------------------------------------------------ primitives
+    def resolve(self, value):
+        if isinstance(value, dict):
+            if set(value) == {"$capture", "path"} or set(value) == {"$capture"}:
+                ok, found = dig(self.captures.get(value["$capture"]), value.get("path", ""))
+                if not ok:
+                    raise KeyError(f"capture {value['$capture']} path {value.get('path')} missing")
+                return found
+            return {k: self.resolve(v) for k, v in value.items()}
+        if isinstance(value, list):
+            return [self.resolve(v) for v in value]
+        return value
+
+    def capture(self, step, cap):
+        base = self.bases[step["gateway"]]
+        if cap["type"] == "get":
+            status, body = call(base, "GET", cap["route"])
+            if status != 200:
+                raise RuntimeError(f"capture {cap['name']}: HTTP {status}")
+            keep = cap.get("keep")
+            if keep:
+                kept = {}
+                for path in keep:
+                    ok, found = dig(body, path)
+                    kept[path] = found if ok else {"$absent": True}
+                # 'keep' captures are flat maps path -> value; expose them for dotted lookup by re-nesting
+                nested = {}
+                for path, val in kept.items():
+                    cursor = nested
+                    parts = path.split(".")
+                    for part in parts[:-1]:
+                        cursor = cursor.setdefault(part, {})
+                    cursor[parts[-1]] = val
+                self.captures[cap["name"]] = nested
+            else:
+                self.captures[cap["name"]] = body
+        else:
+            store = STORES[cap["gateway_store"]]
+            connection = sqlite3.connect(store.resolve().as_uri() + "?mode=ro", uri=True, timeout=5)
+            try:
+                connection.execute("PRAGMA query_only = ON")
+                rows = connection.execute(cap["sql"]).fetchall()
+            finally:
+                connection.close()
+            self.captures[cap["name"]] = {"rows": rows}
+
+    def assertions(self, step, blocks):
+        base = self.bases[step["gateway"]]
+        results = []
+        for block in blocks:
+            status, body = call(base, "GET", block["route"])
+            secret = bool(SECRET_GET.match(block["route"]))
+            for spec in block["asserts"]:
+                found, actual = dig(body, spec["path"]) if status == 200 else (False, None)
+                op = spec["op"]
+                expected = self.resolve(spec.get("value"))
+                if op == "equals":
+                    ok = found and actual == expected
+                elif op == "absent":
+                    ok = not found
+                elif op == "contains":
+                    ok = found and (expected in actual if isinstance(actual, (list, str, dict)) else False)
+                elif op == "gte":
+                    ok = found and isinstance(actual, (int, float)) and actual >= expected
+                elif op == "lte":
+                    ok = found and isinstance(actual, (int, float)) and actual <= expected
+                elif op == "len_equals":
+                    ok = found and hasattr(actual, "__len__") and len(actual) == expected
+                else:
+                    ok = False
+                shown = None if secret else (actual if (isinstance(actual, (int, float, bool)) or actual is None or (isinstance(actual, str) and len(actual) < 80)) else "<value>")
+                results.append({"route": block["route"], "path": spec["path"], "op": op, "ok": bool(ok), "http": status,
+                                "actual": shown if not ok else "<match>"})
+        return results
+
+    def write(self, step, spec, body_key="body"):
+        base = self.bases[step["gateway"]]
+        if "body_from_capture" in spec:
+            source = spec["body_from_capture"]
+            captured = self.captures[source["capture"]]
+            body = {}
+            for path in source["paths"]:
+                ok, found = dig(captured, path)
+                if ok and not (isinstance(found, dict) and found.get("$absent")):
+                    body[path] = found
+            # Fixed values written together with the captured ones (e.g. engines {} returns the engines map to
+            # "no usable row", which a captured value cannot express).
+            body.update(self.resolve(spec.get("body_overrides") or {}))
+        elif spec.get(body_key) is not None:
+            body = self.resolve(spec[body_key])
+        else:
+            body = None
+        status, response = call(base, spec["method"], spec["route"], body)
+        return status, response
+
+    def digests(self, tag):
+        out = {}
+        for port, base in self.bases.items():
+            out[port] = {}
+            for route in self.plan.get("digest_routes", []):
+                status, body = call(base, "GET", route)
+                out[port][route] = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest() if status == 200 else f"http-{status}"
+        record = {"taken": now(), "digests": out}
+        write_private(STATE_DIR / f"digests-{tag}.json", record)
+        write_private(STATE_DIR / f"digests-{tag}-{record['taken']}.json", record)  # the fixed name is overwritten per run
+        return out
+
+    @staticmethod
+    def set_status(sid, result, rollback=None):
+        write_private(STATE_DIR / "status" / f"{sid}.json", {"result": result, "rollback": rollback, "at": now()})
+
+    # ------------------------------------------------------------ steps
+    def run_step(self, step, apply):
+        sid = step["id"]
+        record = {"title": step.get("title"), "gateway": step["gateway"], "started": now()}
+        self.log["steps"][sid] = record
+        state, detail = recorded_state(sid)
+        record["recorded_state"] = [state, detail]
+        if state == APPLIED:
+            record["result"] = "already-applied"  # skipped: re-capturing now would overwrite the rollback source
+            return True
+        if state == UNKNOWN and apply:
+            record["result"] = "state-unknown"  # an earlier write was not resolved; verify or roll back first
+            return False
+        missing = [r for r in step.get("requires", []) if recorded_state(r)[0] != APPLIED]
+        if missing:
+            record["requires_unapplied"] = missing
+            if apply:  # a dry run still evaluates the precondition, which carries the same guard as values
+                record["result"] = "requires-unapplied"
+                record["recorded_state"] = [state, f"requires {','.join(missing)} recorded as applied first"]
+                return False
+        for cap in step["captures"]:
+            self.capture(step, cap)
+        pre = self.assertions(step, step.get("precondition", []))
+        record["precondition"] = pre
+        passed = all(item["ok"] for item in pre)
+        if not apply or not passed:
+            write_private(STATE_DIR / "captures-unapplied" / f"{sid}.json", self.captures_for(step))
+            record["result"] = "dry-run-ok" if (passed and not apply) else "precondition-failed"
+            return passed
+        write_private(STATE_DIR / "captures" / f"{sid}.json", self.captures_for(step))
+        self.set_status(sid, "write-attempted")
+        status, _ = self.write(step, step["write"])
+        record["write_http"] = status
+        if status not in (200, 201, 204):
+            record["result"] = "write-refused"
+            self.rollback_step(step, record, note="write returned non-2xx")
+            self.set_status(sid, "write-refused", record.get("rollback"))
+            return False
+        result = self.assertions(step, step["readback"])
+        record["readback"] = result
+        if all(item["ok"] for item in result):
+            record["result"] = "applied"
+            record["finished"] = now()
+            self.set_status(sid, "applied")
+            return True
+        record["result"] = "readback-failed"
+        self.rollback_step(step, record, note="read-back failed")
+        self.set_status(sid, "readback-failed", record.get("rollback"))
+        return False
+
+    def captures_for(self, step):
+        return {cap["name"]: self.captures.get(cap["name"]) for cap in step["captures"]}
+
+    def rollback_step(self, step, record, note=""):
+        status, _ = self.write(step, step["rollback"])
+        record["rollback_http"] = status
+        verify = self.assertions(step, step.get("rollback_verify", []))
+        record["rollback_verify"] = verify
+        record["rollback"] = "restored" if status in (200, 201, 204) and all(item["ok"] for item in verify) else "NOT-VERIFIED"
+        record["rollback_note"] = note
+
+    def load_captures(self, step):
+        path = STATE_DIR / "captures" / f"{step['id']}.json"
+        self.captures.update(load_json(path))
+
+    def rollback_applied(self, step, force=False):
+        """Manual rollback of one step recorded as applied (or in an unknown state) from its apply-time capture."""
+        sid = step["id"]
+        record = self.log["steps"].setdefault(sid, {})
+        state, detail = recorded_state(sid)
+        record["recorded_state"] = [state, detail]
+        if state == NOT_APPLIED and not force:
+            record["rollback"], record["rollback_note"] = "REFUSED", f"not applied ({detail}); nothing to roll back"
+            return False
+        dependents = [s["id"] for s in self.plan["steps"] if sid in s.get("requires", [])
+                      and recorded_state(s["id"])[0] != NOT_APPLIED]
+        if dependents and not force:
+            record["rollback"] = "REFUSED"
+            record["rollback_note"] = f"{','.join(dependents)} still applied and require {sid}; roll them back first"
+            return False
+        if not (STATE_DIR / "captures" / f"{sid}.json").exists():
+            record["rollback"], record["rollback_note"] = "REFUSED", "no apply-time capture"
+            return False
+        self.load_captures(step)
+        self.rollback_step(step, record, note="manual rollback" + (" (forced)" if force else ""))
+        self.set_status(sid, "rolled-back", record.get("rollback"))
+        return record.get("rollback") == "restored"
+
+    def verify_step(self, step):
+        """(label, counts_as_ok, failed_paths, detail) for one step."""
+        sid = step["id"]
+        state, detail = recorded_state(sid)
+        if state in (APPLIED, UNKNOWN):
+            try:
+                self.load_captures(step)
+                results = self.assertions(step, step["readback"])
+            except Exception as error:  # a missing capture or $capture path: the state cannot be confirmed
+                return "UNKNOWN", False, [f"read-back not evaluated: {type(error).__name__}"], detail
+            failed = [f"{r['route']}:{r['path']}" for r in results if not r["ok"]]
+            if state == UNKNOWN:
+                return "UNKNOWN", False, failed, detail
+            return ("OK" if not failed else "DRIFT"), not failed, failed, detail
+        try:
+            for cap in step["captures"]:
+                self.capture(step, cap)
+            pre = self.assertions(step, step.get("precondition", []))
+            failed = [f"{r['route']}:{r['path']}" for r in pre if not r["ok"]]
+            label = "NOT-APPLIED (precondition holds now)" if not failed else "NOT-APPLIED (precondition fails now)"
+        except Exception as error:
+            failed, label = [], f"NOT-APPLIED (precondition not evaluated: {type(error).__name__})"
+        return label, True, failed, detail
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("plan")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--check", action="store_true")
+    group.add_argument("--dry-run", action="store_true")
+    group.add_argument("--apply", action="store_true")
+    group.add_argument("--verify", action="store_true")
+    group.add_argument("--rollback", metavar="IDS")
+    parser.add_argument("--steps")
+    parser.add_argument("--expect-applied", metavar="IDS", help="--verify: these steps must be recorded as applied")
+    parser.add_argument("--force", action="store_true", help="--rollback: also roll back a step not recorded as applied")
+    args = parser.parse_args()
+    plan = load_json(args.plan)
+    run = Run(plan, "check" if args.check else "dry-run" if args.dry_run else "apply" if args.apply else "verify" if args.verify else "rollback")
+    problems = run.check_plan()
+    for problem in problems:
+        print("PLAN PROBLEM:", problem)
+    if args.check:
+        print("steps:", [s["id"] for s in plan["steps"]], "| problems:", len(problems))
+        sys.exit(1 if problems else 0)
+    if problems:
+        sys.exit(2)
+    ids = {s["id"] for s in plan["steps"]}
+    for option in (args.steps, args.expect_applied, args.rollback):
+        unknown = sorted(set((option or "").split(",")) - ids - {""})
+        if unknown:
+            print("UNKNOWN STEP IDS:", unknown)
+            sys.exit(2)
+    private_dir(STATE_DIR)
+    wanted = set(args.steps.split(",")) if args.steps else None
+    steps = [s for s in plan["steps"] if wanted is None or s["id"] in wanted]
+    if args.rollback:
+        chosen = args.rollback.split(",")
+        bad = 0
+        for step in reversed([s for s in plan["steps"] if s["id"] in chosen]):
+            ok = run.rollback_applied(step, force=args.force)
+            record = run.log["steps"][step["id"]]
+            bad += 0 if ok else 1
+            print(step["id"], record.get("rollback"), "http", record.get("rollback_http"), "|", record.get("rollback_note", ""))
+        write_private(STATE_DIR / f"log-rollback-{now()}.json", run.log)
+        sys.exit(1 if bad else 0)
+    if args.verify:
+        expected = set((args.expect_applied or "").split(",")) - {""}
+        bad = 0
+        for step in steps:
+            label, ok, failed, detail = run.verify_step(step)
+            if step["id"] in expected and label.startswith("NOT-APPLIED"):
+                ok = False
+                label += " but expected applied"
+            bad += 0 if ok else 1
+            print(step["id"], label, failed[:6], "|", detail)
+        sys.exit(1 if bad else 0)
+    before = run.digests("before" if args.apply else "before-dry")
+    print("digests before:", {p: {r.rsplit('/', 1)[-1]: h[:12] for r, h in d.items()} for p, d in before.items()})
+    exit_code = 0
+    for step in steps:
+        ok = run.run_step(step, apply=args.apply)
+        record = run.log["steps"][step["id"]]
+        print(f"{step['id']} [{step['gateway']}] {record.get('result')}", "write_http", record.get("write_http"), "|", step.get("title", "")[:70])
+        if record.get("result") in ("already-applied", "state-unknown", "requires-unapplied"):
+            print("    recorded:", record["recorded_state"][1])
+        failed = [f"{r['route']}:{r['path']} {r['op']} got {r['actual']}" for key in ("precondition", "readback") for r in record.get(key, []) if not r["ok"]]
+        for line in failed[:8]:
+            print("    FAILED:", line)
+        if record.get("rollback"):
+            print("    rollback:", record["rollback"], "(", record.get("rollback_note"), ")")
+        if not ok:
+            exit_code = 1
+            break
+    after = run.digests("after" if args.apply else "after-dry")
+    print("digests after :", {p: {r.rsplit('/', 1)[-1]: h[:12] for r, h in d.items()} for p, d in after.items()})
+    run.log["finished"] = now()
+    write_private(STATE_DIR / f"log-{run.mode}-{now()}.json", run.log)
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

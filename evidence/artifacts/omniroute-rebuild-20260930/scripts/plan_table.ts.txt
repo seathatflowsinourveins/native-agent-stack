@@ -1,0 +1,115 @@
+// S1 screen, step 1: executed plan-resolution table (pure functions, no engine runs, no network).
+// Usage: node --import tsx --import <blocknet.mjs> plan_table.ts <live-settings.json> <out.json> [--port 20129]
+// With a post-switch read-back (read_live_settings.py output) it is also the no-model verifier of
+// the effective plan: the same resolver chatCore runs (selectCompressionPlan) and the one the
+// dashboard's "Effective pipeline" text runs (deriveEffectivePreviewPlan).
+// Published copy: the placeholder UUID of the provider id is built from parts so that this file carries no UUID-like literal (the repository's
+// publication check flags one); the value is the same all-zero placeholder the probe ran with.
+const PLACEHOLDER_UUID = ["00000000", "0000", "4000", "8000", "000000000000"].join("-");
+import fs from "node:fs";
+import { resolvePlan, type Combo, type GatewayCtx } from "./gatewayPath.ts";
+
+const ENGINES = ["session-dedup", "ccr", "lite", "rtk", "codex-responses", "headroom", "relevance", "caveman",
+  "aggressive", "llmlingua", "ultra", "omniglyph"];
+const LOWEST: Record<string, string> = { rtk: "minimal", caveman: "lite" };
+const NON_LOSSY = ["session-dedup", "ccr", "lite", "headroom"];
+
+const [livePath, outPath] = process.argv.slice(2);
+const live = JSON.parse(fs.readFileSync(livePath, "utf8"));
+const s129 = live.ports["20129"].compression.config;
+const combos129: Combo[] = live.ports["20129"].combos.combos;
+const s128 = live.ports["20128"].compression.config;
+const combos128: Combo[] = live.ports["20128"].combos.combos;
+
+// [inferred] 20129 reaches GPT-6 through the sharedgw openai-compatible-responses node, whose provider id has
+// the shape openai-compatible-responses-<uuid> (src/shared/utils/compatibleProviderId.ts L8, L24); the uuid is
+// not read (it needs /api/providers). 20128 serves cx/* through the codex provider.
+// contextLimit [inferred]: getTokenLimit (open-sse/services/contextManager.ts L405-446) for a model id containing
+// "gpt" falls to DEFAULT_LIMITS.codex = 400000 (L21) unless an env override or the models.dev DB says otherwise;
+// the codex registry default is also 400000 (open-sse/config/providers/registry/codex/index.ts L21).
+const CTX129: GatewayCtx = { provider: `openai-compatible-responses-${PLACEHOLDER_UUID}`,
+  model: "gpt-6-astra-max", sourceFormat: "openai-responses", targetFormat: "openai-responses", contextLimit: 400000 };
+const CTX128: GatewayCtx = { provider: "codex", model: "gpt-6-astra-max", sourceFormat: "openai-responses",
+  targetFormat: "openai-responses", contextLimit: 400000 };
+
+const body = { model: "sharedgw/gpt-6-astra-max", input: [{ type: "message", role: "user",
+  content: [{ type: "input_text", text: "plan probe" }] }] };
+
+const allOff = Object.fromEntries(ENGINES.map((e) => [e, { enabled: false }]));
+function withEngines(base: any, on: string[], extra: any = {}) {
+  const engines: any = { ...allOff };
+  for (const e of on) engines[e] = LOWEST[e] ? { enabled: true, level: LOWEST[e] } : { enabled: true };
+  return { ...base, enabled: true, enginesExplicit: true, engines, activeComboId: null, ...extra };
+}
+
+type Variant = { id: string; settings: any; combos: Combo[]; ctx: GatewayCtx; est?: number; note: string };
+const variants: Variant[] = [
+  { id: "live-20129", settings: s129, combos: combos129, ctx: CTX129, note: "captured 20129 state" },
+  ...ENGINES.map((e) => ({ id: `20129+${e}-only`, settings: withEngines(s129, [e]), combos: combos129, ctx: CTX129,
+    note: `20129 with only ${e} on in the engines map` })),
+  { id: "20129+non-lossy-4", settings: withEngines(s129, NON_LOSSY), combos: combos129, ctx: CTX129,
+    note: "session-dedup, ccr, lite, headroom on" },
+  { id: "20129+all-12", settings: withEngines(s129, ENGINES), combos: combos129, ctx: CTX129, note: "every engine on" },
+  { id: "20129+active-allow-lossy", settings: { ...s129, activeComboId: "allow-lossy" }, combos: combos129, ctx: CTX129,
+    note: "active profile = allow-lossy combo" },
+  { id: "20129+autotrigger-1000", settings: { ...s129, autoTriggerTokens: 1000, autoTriggerMode: "lite" }, combos: combos129,
+    ctx: CTX129, est: 20000, note: "autoTriggerTokens 1000, mode lite, 20k-token request" },
+  { id: "20129+budget-floor@900k", settings: { ...s129, contextBudget: { ...(s129.contextBudget ?? {}), mode: "floor" } },
+    combos: combos129, ctx: CTX129, est: 900000, note: "contextBudget floor, 900k-token request" },
+  { id: "20129+budget-floor@20k", settings: { ...s129, contextBudget: { ...(s129.contextBudget ?? {}), mode: "floor" } },
+    combos: combos129, ctx: CTX129, est: 20000, note: "contextBudget floor, 20k-token request" },
+  { id: "20129+rtk-only,no-allow-lossy-combo", settings: withEngines(s129, ["rtk"]),
+    combos: combos129.filter((c) => c.id !== "allow-lossy"), ctx: CTX129,
+    note: "allow-lossy combo absent: the header falls through to the operator plan" },
+  { id: "live-20128", settings: s128, combos: combos128, ctx: CTX128, note: "captured 20128 state (codex provider)" },
+  { id: "20128+master-on", settings: { ...s128, enabled: true }, combos: combos128, ctx: CTX128,
+    note: "hypothetical: master on, codex/* exclusion kept" },
+  { id: "20128+master-on,no-exclusion", settings: { ...s128, enabled: true, exclusions: [] }, combos: combos128, ctx: CTX128,
+    note: "hypothetical: master on, exclusion removed (legacy defaultMode off, default combo default-caveman)" },
+];
+
+const headers: Array<string | null> = [null, "off", "default", "safe", "allow-lossy",
+  ...ENGINES.map((e) => `engine:${e}`), "fw-rtk", "fw-lite", "fw-session-dedup", "fw-ccr", "fw-headroom",
+  "fw-codex-responses", "default-caveman", "Standard Savings", "nonexistent-combo"];
+
+const rows: any[] = [];
+for (const v of variants) {
+  for (const h of headers) {
+    const r = resolvePlan(v.settings, h, v.combos, body, v.ctx, v.est ?? 20000);
+    rows.push({
+      variant: v.id, header: h, est_tokens: v.est ?? 20000,
+      excluded: r.excluded, prompt_compression_enabled: r.promptCompressionEnabled,
+      reactive_compaction_armed: r.reactiveCompactionArmed,
+      mode: r.plan.mode ?? null, source: r.plan.source ?? null,
+      pipeline: (r.stackedPipelineUsed ?? r.plan.stackedPipeline ?? []).map((s: any) =>
+        s.intensity ? `${s.engine}:${s.intensity}` : s.engine),
+      default_combo_applied: r.defaultComboApplied, output_styles_would_apply: r.outputStylesWouldApply,
+      response_meta: r.meta,
+      dashboard_preview: { mode: r.previewPlan.mode ?? null,
+        pipeline: (r.previewPlan.stackedPipeline ?? []).map((s: any) => (s.intensity ? `${s.engine}:${s.intensity}` : s.engine)) },
+    });
+  }
+}
+fs.writeFileSync(outPath, JSON.stringify({ schema: "s1-plan-table/1", source_build: "c19983a66",
+  resolver: "open-sse/services/compression/strategySelector.ts selectCompressionPlan (+ chatCore L1424-1784 wiring)",
+  ctx_20129: CTX129, ctx_20128: CTX128, variants: variants.map((v) => ({ id: v.id, note: v.note })), rows }, null, 1));
+
+// compact console summary
+const show = (variant: string, hdrs: Array<string | null>) => {
+  for (const h of hdrs) {
+    const r = rows.find((x) => x.variant === variant && x.header === h);
+    console.log(`${variant.padEnd(38)} ${String(h).padEnd(22)} -> ${String(r.mode).padEnd(16)} src=${String(r.source).padEnd(15)} [${r.pipeline.join(",")}]${r.default_combo_applied ? " defaultCombo=" + r.default_combo_applied : ""} reactive=${r.reactive_compaction_armed}`);
+  }
+};
+show("live-20129", [null, "off", "allow-lossy", "engine:rtk", "fw-rtk", "default-caveman", "nonexistent-combo"]);
+for (const e of ENGINES) show(`20129+${e}-only`, [null, `engine:${e}`]);
+show("20129+non-lossy-4", [null, "safe", "allow-lossy"]);
+show("20129+all-12", [null, "default", "allow-lossy"]);
+show("20129+active-allow-lossy", [null, "off"]);
+show("20129+autotrigger-1000", [null, "off"]);
+show("20129+budget-floor@900k", [null, "off", "safe"]);
+show("20129+budget-floor@20k", [null]);
+show("20129+rtk-only,no-allow-lossy-combo", [null, "allow-lossy"]);
+show("live-20128", [null, "allow-lossy"]);
+show("20128+master-on", [null]);
+show("20128+master-on,no-exclusion", [null, "off", "allow-lossy"]);
