@@ -649,9 +649,9 @@ The file follows the rule of `frozen_checks.private_create` on main (a02ff13f,
 - A new parent directory is made 0700.
 - A path inside any git work tree (a `.git` entry beside it or above it) is refused, as is an existing
   path.
-- Every refusal comes before the scan: the path, `--out` inside this checkout, and a kernel that exports
-  no `callLedger`. The file is written before the report is written or printed, so a refusal or a failed
-  write exits 2 with neither.
+- Every refusal comes before the scan: the path, `--out` inside this checkout, `--out` naming the same
+  file (the report would be written over the ledger), and a kernel that exports no `callLedger`. The file
+  is written before the report is written or printed, so a refusal or a failed write exits 2 with neither.
 - Without the flag nothing is probed or written.
 
 **Dependency.** Until PR-A U2's kernel is merged with this tool, `child-usage.mjs` exports no `callLedger`.
