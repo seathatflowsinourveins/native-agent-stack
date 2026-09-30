@@ -340,6 +340,7 @@ class Flow:
                     self.readers[key.fd](data)
                     if not data:
                         self._drop(key.fd)
+        self.selector.close()
 
     def abandon(self) -> None:
         for fd in list(self.readers):
@@ -1103,6 +1104,10 @@ class Scan:
             hook("after_handoff", rel)
             head = os.pread(fd, SNIFF, 0)
             kind, fmt = classify(head, name, store)
+            if store is not None and b"/objects/" in family.get("path", b"") and len(head) >= 2 \
+                    and head[0] & 15 == 8 and int.from_bytes(head[:2], "big") % 31 == 0 \
+                    and not store.payload(family["path"]):
+                kind, fmt = "unaccounted", "container"
             path_class = {"sqlite": "sqlite", "wal": "wal"}.get(kind, path_class)
             raw = self.declare("M1", "raw", obj, path_class, 1 + len(self.m1_controls(False)), info.st_size)
             self.file_view(raw, fd, False, info.st_size)
@@ -1571,7 +1576,8 @@ class Store:
                     if not line.strip() or line.startswith(b"#"):
                         continue
                     target = os.path.normpath(os.path.join(self.path + b"/objects", line.strip()))
-                    if not any(under(target, root) for root in covered):
+                    if not any(under(target, root) for root in covered) or any(
+                            under(target, os.fsencode(rule["path"])) for rule in self.scan.plan["exclude"]):
                         return "git_alternate_unplanned"
                     self.alternates = True
         except FileNotFoundError:
@@ -1581,6 +1587,8 @@ class Store:
                 config = handle.read().lower()
             if b"promisor" in config or b"partialclone" in config:
                 return "git_promisor_unsupported"
+            if b"[include" in config or b"alternaterefscommand" in config:
+                return "git_indirection_unplanned"
         except FileNotFoundError:
             pass
         if self.odd:
@@ -1746,7 +1754,7 @@ def setup_controls(scan: Scan) -> None:
     scan.wire.emit(END, status=STATUS["complete" if ok else "incomplete"], seal=scan.seal)
 
 
-def run_text(scan: Scan, argv: list, stdin=subprocess.DEVNULL, cwd=None, stderr=True) -> str:
+def run_text(scan: Scan, argv: list, stdin=subprocess.DEVNULL, cwd=None, stderr=True, raw=False):
     """A short contained helper's stdout (and stderr when asked, for --version texts), bounded by the setup budget."""
     child, _in, out, err = spawn(scan, argv, stdin=stdin, cwd=cwd)
     flow, output, diagnostics = Flow(time.monotonic() + budget(30, cap=30)), bytearray(), bytearray()
@@ -1767,7 +1775,36 @@ def run_text(scan: Scan, argv: list, stdin=subprocess.DEVNULL, cwd=None, stderr=
         raise
     finally:
         flow.selector.close()
-    return output.decode("ascii", "replace")
+    return bytes(output) if raw else output.decode("ascii", "replace")
+
+
+def export_entries(data: bytes) -> list:
+    """systemd v255 JOURNAL_EXPORT_FORMATS: binary fields have uint64 LE lengths; delimiters inside them are data."""
+    entries, fields, offset = [], {}, 0
+    while offset < len(data):
+        end = data.find(b"\n", offset)
+        if end < 0:
+            raise Stop("unparseable_output")
+        line, offset = data[offset:end], end + 1
+        if not line:
+            entries.append(fields)
+            fields = {}
+            continue
+        name, separator, value = line.partition(b"=")
+        if not re.fullmatch(rb"[A-Z0-9_]+", name):
+            raise Stop("unparseable_output")
+        if not separator:
+            if offset + 8 > len(data):
+                raise Stop("unparseable_output")
+            length = struct.unpack_from("<Q", data, offset)[0]
+            offset += 8
+            if length > len(data) - offset - 1 or data[offset + length] != 10:
+                raise Stop("unparseable_output")
+            value, offset = data[offset:offset + length], offset + length + 1
+        fields[name] = value
+    if fields:
+        raise Stop("unparseable_output")
+    return entries
 
 
 def journal_anchor(scan: Scan, anchor: bytes):
@@ -1781,9 +1818,8 @@ def journal_anchor(scan: Scan, anchor: bytes):
         os.close(read_end)
     for _attempt in range(20):
         text = run_text(scan, [scan.exe("journalctl"), "--user", "-o", "export", "--no-pager",
-                               "SYSLOG_IDENTIFIER=canary-proof"], stderr=False).encode("ascii", "replace")
-        for entry in text.split(b"\n\n"):
-            fields = dict(line.split(b"=", 1) for line in entry.split(b"\n") if b"=" in line)
+                               "SYSLOG_IDENTIFIER=canary-proof"], stderr=False, raw=True)
+        for fields in export_entries(text):
             if fields.get(b"MESSAGE") == anchor and CURSOR.fullmatch(fields.get(b"__CURSOR", b"")):
                 return fields[b"__CURSOR"]
         time.sleep(0.25)
@@ -1849,7 +1885,11 @@ def dump(control_fd: int) -> int:
     virtual = {row[1] for row in schema if row[0] == b"table"
                and (row[3] or b"").lstrip().upper().startswith(b"CREATE VIRTUAL TABLE")}
     tables = [row[1] for row in schema if row[0] == b"table" and row[1] not in virtual]
-    if any(not any(table.startswith(name + b"_") for table in tables) for name in virtual):
+    try:
+        shadows = {row[1] for row in connection.execute("PRAGMA main.table_list") if row[2] == b"shadow"}
+    except sqlite3.Error:
+        return 12
+    if any(not any(table.startswith(name + b"_") for table in shadows) for name in virtual):
         return 12
     try:
         for table in tables:
@@ -1879,6 +1919,7 @@ def main(argv: list) -> int:
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     if argv[:1] == ["sqlite-dumper"] and len(argv) == 2:
         try:
+            SCOPE_CHECK()
             return dump(int(argv[1]))
         except Exception:  # noqa: BLE001 - a fixed code, never a traceback
             return 1

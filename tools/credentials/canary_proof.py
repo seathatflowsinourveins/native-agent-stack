@@ -609,6 +609,7 @@ def homes(run: Run) -> list:
 
 
 TASKS_ROOT = "/tmp/claude-{uid}"  # A10's glob parent, /tmp/claude-<uid>/*/*/tasks (a test launcher points elsewhere)
+PRIMARY_CHECKOUT = str(ROOT)
 
 
 def sink_roots(home: str, uid: int, codex: list, cursor: str) -> dict:
@@ -619,7 +620,7 @@ def sink_roots(home: str, uid: int, codex: list, cursor: str) -> dict:
         "A3": [("dir", f"{h}/.cache/claude-cli-nodejs")], "A4": [("dir", path) for path in codex],
         "A9": [("dir", f"{h}/.local/share/codex-ecosystem/observability/collector")],
         "A10": [("tasks", TASKS_ROOT.format(uid=uid))], "A11": [("journal", cursor)],
-        "A12": [("git", f"{h}/code/native-agent-stack-live"), ("git", f"{h}/code/native-agent-stack")],
+        "A12": [("git", f"{h}/code/native-agent-stack-live"), ("git", PRIMARY_CHECKOUT)],
         "U1": [("dir", f"{h}/.omniroute"), ("dir", f"{h}/.local/share/omniroute-fw"), ("dir", f"{h}/.local/share/omniroute")],
         "U2": [("dir", f"{h}/.local/share/docker/containers"), ("file", f"{h}/.docker/config.json")],
         "U3": [("dir", f"{path}/shell_snapshots") for path in codex], "U4": [("environment", "-")],
@@ -972,7 +973,7 @@ def setup_child(run: Run, op: str, executables: dict, extra: dict) -> Session:
             "child_path": CHILD_PATH, **extra}
     session = Session(run, plan, "setup", SCOPE_SECONDS["setup"])
     session.run_worker()
-    if session.end is None or session.bad:
+    if session.end is None or session.bad or session.end.status != wire.STATUS["complete"]:
         raise Refused("setup_failed" if not session.reasons or session.reasons[-1] == "protocol_error"
                       else session.reasons[-1])
     return session
@@ -1035,7 +1036,7 @@ def prepare(args, env) -> int:
         if executables[name] and record.seal != wire.keyed(run.key, b"exe", name, executables[name][1]):
             raise Refused("tool_changed")
     for record in fact(session, "pointer_binding"):
-        if record.observed == 2:
+        if record.observed not in (0, 1):
             raise Refused("pointer_target_not_file")
     presence = {record.object.hex(): record.observed == 1 for record in fact(session, "root_presence")}
     checkout = fact(session, "checkout")
@@ -1380,6 +1381,8 @@ def classify(events: list, now_codes=(), masking=None) -> dict:
             codes.append(event["code"])
         elif event["event"] == "clock_stepped":
             codes.append("clock_stepped")
+        elif event["event"] == "cleaned" and not event["absent_verified"]:
+            codes.append("store_absence_unverified")
     requests, latest, arms = {}, {}, {}
     for event in events:
         kind = event["event"]
@@ -1574,7 +1577,9 @@ def claim(run: Run, result: dict) -> str:
             f"{'declined transcripts, ' if prepared['transcripts'] == 'exclude' else ''}"
             f"{'' if user else 'U1-U8 and agentsview arrival, '}key homes, pointer targets, declared links and special"
             f" file content, X categories, unsupported transformed forms, freed SQLite pages and superseded WAL frames, "
-            f"process memory, remote copies, future client versions, adversarial agents, the quiescence residuals, "
+            f"process memory, remote copies, future client versions, adversarial agents, backward clock excursions "
+            f"beyond the hour margin undone between checks, deferred shared-mapping timestamps, privileged/direct-disk "
+            f"or same-uid tampering, writes after the final check, "
             f"and the scan-side worker, dumper and ripgrep, which hold sink bytes by design (C12). "
             f"Session attribution {'known' if prepared['session_known'] else 'unknown (reduced assurance)'}.")
 
@@ -1598,11 +1603,28 @@ def publish(run: Run, result: dict) -> str:
                "requests": {f"{e['phase']}_{e['group']}": e["request"] for e in run.events
                             if e["event"] == "scan_requested"},
                "session_known": prepared["session_known"], "transcripts": prepared["transcripts"],
+               "not_covered": not_covered(run, result),
                "loki": "not_covered:proxy_unverified", "claim": claim(run, result)}
     data = json.dumps(receipt, indent=2, sort_keys=True).encode("ascii")
     check_output(data, run.secrets())
     boot.write_receipt(directory, receipt, receipt_id)
     return receipt_id
+
+
+def not_covered(run: Run, result: dict) -> list:
+    rows = ["key_homes", "pointer_targets", "declared_links", "special_content", "X", "transformed_forms",
+            "loki:proxy_unverified"]
+    for sink, roots in run.events[0]["roots"].items():
+        final = result["user"] if sink.startswith("U") else result["final"]
+        observed = (final or {"sinks": {}})["sinks"].get(sink, {})
+        if final is None:
+            rows.append(sink + ":not_requested")
+        for root, present in roots:
+            if not present or root in observed.get("absent", []):
+                rows.append(sink + ":absent:" + root)
+    if run.events[0]["transcripts"] == "exclude":
+        rows.append("transcripts:user_scope_declined")
+    return rows
 
 
 def say(run, text: str) -> None:
@@ -1683,8 +1705,8 @@ def main(argv: list) -> int:
         code = str(refusal) if isinstance(refusal, Refused) and re.fullmatch(r"[a-z_]+", str(refusal)) else "refused"
         os.write(2, f"canary_proof: refused ({code})\n".encode("ascii"))
         return EXIT["refused"]
-    except Exception as error:  # noqa: BLE001 - a fixed class name only, never a message or a traceback
-        os.write(2, f"canary_proof: failed ({type(error).__name__})\n".encode("ascii"))
+    except Exception:  # noqa: BLE001 - fixed code only, never a message or a traceback
+        os.write(2, b"canary_proof: failed (internal_error)\n")
         return EXIT["refused"]
 
 
