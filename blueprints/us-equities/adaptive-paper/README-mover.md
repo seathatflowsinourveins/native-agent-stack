@@ -155,11 +155,15 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   ledger cap, the largest position exits (`gross_cap_guard`). The ledger halts
   permanently above its cap, and a rising mover would otherwise trip it.
 - **Reconciliation.** It runs at start (flat, no open orders), every 30 s while nothing
-  is in flight, and at the end: flat, and cash delta equal to this trial's fills. The
-  baseline is this trial's own starting cash. The engine's between-trial cash check is
-  kept as an observation rather than a refusal: the receipt carries
-  `inter_trial_cash_changed`, and the private `trial.json` holds the delta. Quote-driven
-  orders are suspended while a snapshot is in flight.
+  is in flight, and at the end: flat, and cash delta equal to this trial's fills plus
+  the broker FEE activities recorded from the snapshot. The baseline is this trial's
+  own starting cash, so the paper and recover transports read FEE activities created
+  after this trial's start (`current_trial_started_at`; a fee posted earlier is already
+  in the baseline). The receipt and the recovery receipt report `fees_recorded` (count,
+  total and sub-types, no ids); see README-safety.md, "Broker FEE activities". The
+  engine's between-trial cash check is kept as an observation rather than a refusal:
+  the receipt carries `inter_trial_cash_changed`, and the private `trial.json` holds
+  the delta. Quote-driven orders are suspended while a snapshot is in flight.
 
 ## Recovery
 

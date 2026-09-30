@@ -78,10 +78,18 @@ cumulative state never moves back. `fill_activities(order_id)` returns one order
 executions from `GET /v2/account/activities/FILL` filtered by the documented
 `order_id` parameter (ascending, 100 per page, the last activity id as `page_token`),
 each with its own `qty` and `price` and the order's `cum_qty` after it, and requires
-them to tile the filled quantity from zero. It is the only activities read the
-guarded session allows: another activity type, filter, page size or method is refused
-before any request. An activity id is `<timestamp>::<uuid>`; its 36-character UUID is
-the native trade id.
+them to tile the filled quantity from zero. The guarded session allows exactly one
+other activities read (2026-09-30): `GET /v2/account/activities/FEE` with `after` (a
+UTC `YYYY-MM-DDTHH:MM:SSZ` instant) and `direction` `asc`, plus an optional
+`page_size` 1-100 and activity-id `page_token`. Another activity type, filter, page
+size or method is refused before any request. `snapshot()` lists `"fees"`, the FEE
+activities created after the transport's `fee_history_start` (default
+`history_start`; the caller passes its ledger's cash-baseline instant), normalized by
+`normalize_fee_activity` to `{id, date, net_amount, sub_type}` without the
+`description` field, read after the account, bounded by `max_snapshot_pages`; a
+fee-read failure makes the snapshot incomplete. `fee_activities(...)` is the same
+read on a fresh read-only client (see README-safety.md, "Broker FEE activities"). An
+activity id is `<timestamp>::<uuid>`; its 36-character UUID is the native trade id.
 
 ## Pre-submission order-contract boundary
 
