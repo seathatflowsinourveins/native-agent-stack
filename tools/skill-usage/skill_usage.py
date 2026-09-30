@@ -1590,6 +1590,10 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 has_output = output is not None
             elif kind == "Extension" and item.get("kind") == "web.search":
                 action = item.get("action") or {}
+                # A web.search item has no status field (WebSearchItem is {id, query, action, results}, openai/codex rust-v0.157.1
+                # protocol/src/items.rs:372-381) and no result is emitted for it, so its item_completed event is its completion.
+                if item_states.get(key) is None:
+                    item_states[key] = "completed"
                 use(r, at, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
                 used = True
             if used and attributed:

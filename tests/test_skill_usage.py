@@ -3346,6 +3346,25 @@ class CodexCallLedger(unittest.TestCase):
                          {("codex-call-ledger/1", LEDGER_THREAD, "exec", None, "paginated")})
 
     @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_nested_web_search_item_reads_completed_because_its_event_is_its_completion(self):
+        # A web.search Extension item has no status field (WebSearchItem is {id, query, action, results}, openai/codex
+        # rust-v0.157.1 protocol/src/items.rs:372-381) and the adapter emits no result for it, so its item_completed event is
+        # its completion: the adapter supplies native_status 'completed' and the kernel reads the call succeeded, not
+        # cancelled_or_unfinished (all 3,650 such rows, 7.4% of the host ledger of the U3 census, read that way before).
+        ledger = measure_ledger(ledger_meta(), exec_call("call_priv_w1", EXEC_FETCH_JS),
+                                codex_row("event_msg", {"type": "item_completed", "item": {
+                                    "type": "Extension", "id": "ws_priv_w1", "kind": "web.search",
+                                    "action": {"type": "openPage", "url": "https://example.org/w"}}}),
+                                codex_row("event_msg", {"type": "item_completed", "item": {
+                                    "type": "Extension", "id": "ws_priv_w2", "kind": "web.search",
+                                    "action": {"type": "search", "query": "ledger-secret-query"}}}),
+                                exec_output("call_priv_w1"))
+        self.assertEqual(ledger_view(ledger, "call_id", "tool", "state", "native_status", "sandbox"),
+                         [("call_priv_w1", "exec", "succeeded", None, False),
+                          ("ws_priv_w1", "WebFetch", "succeeded", "completed", True),
+                          ("ws_priv_w2", "WebSearch", "succeeded", "completed", True)])
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
     def test_a_paginated_direct_exec_command_is_one_call_with_its_item_status(self):
         # A paginated rollout persists the call's CommandExecution item under the call's own id: one call, not two.
         ledger = measure_ledger(ledger_meta(), *exec_command_call(
