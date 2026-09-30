@@ -1703,8 +1703,9 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 3. In `~/.codex/config.toml`, remove the 16 name-keyed tables of the newly enabled skills, and the retired skill's
    table once its folder is gone. The Codex template never carried them. Add `[skills] max_context_tokens = 6000` and
    the path-keyed `skill-creator` table that `install_skills.py --print-codex-config` prints, and remove any
-   name-keyed `skill-creator` table, which would also hide Codex's own copy. `tools/adoption/apply_codex_lane.py`
-   writes neither key at `8fc86119`.
+   name-keyed `skill-creator` table, which would also hide Codex's own copy. Restart Codex afterwards (the Codex
+   skills page, "Enable or disable local Codex skills"). `tools/adoption/apply_codex_lane.py` writes neither key at
+   `1f2cdce5`.
 4. Read back with `skills_status.py --json` (every `codex_disable` `ok`, `codex_within_budget` true), `/skill-doctor`
    and the measurement plan above.
 

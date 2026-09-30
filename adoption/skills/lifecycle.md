@@ -139,8 +139,11 @@ retired selection.
   resolves it (`~`, a path relative to the config folder, symlinks), and fails a
   `name` table for a name Codex's bundled skills carry (`imagegen`, `openai-docs`,
   `review-agent`, `skill-creator` and `skill-installer` at `rust-v0.159.2`).
-  Codex detects changed and newly installed skills; check the new listing and use
-  in a fresh turn or session, and restart Codex only if the change is missing.
+  Restart Codex after changing `config.toml`, as the
+  [Codex skills page](https://developers.openai.com/codex/skills) says for these
+  tables. Codex detects changed and newly installed skills; check the new listing
+  and use in a fresh turn or session, and restart Codex only if the change is
+  missing.
 
 Installation does not override these policies or make a disabled skill available.
 
