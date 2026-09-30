@@ -300,7 +300,7 @@ class TemplateTests(unittest.TestCase):
 
     def test_profile_template(self):
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
-        self.assertEqual(profile["model"], "gpt-6-astra")
+        self.assertEqual(profile["model"], "gpt-6.1-sol")
         # max, the effort of #359's control arm; ultra (the user default) turns on proactive delegation.
         self.assertEqual(profile["model_reasoning_effort"], "max")
         self.assertEqual(profile["web_search"], "live")
@@ -1634,7 +1634,7 @@ class ProveVerdictTests(unittest.TestCase):
         # A project .codex/config.toml outranks the profile file and `-c` outranks both (config_layer_source.rs at
         # rust-v0.157.1), so the launch itself carries the profile's model, effort and web search.
         pins = lane.worker_pins()
-        self.assertEqual(pins, ["-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"'])
+        self.assertEqual(pins, ["-m", "gpt-6.1-sol", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"'])
         for profile in (True, False):
             argv = prove.exec_argv("codex", "prompt", profile)
             self.assertEqual(argv[:2], ["codex", "exec"])
@@ -1642,10 +1642,10 @@ class ProveVerdictTests(unittest.TestCase):
             joined = " ".join(argv)
             self.assertIn(" ".join(pins), joined)
             self.assertIn("-s read-only", joined)
-        self.assertEqual(lane.worker_command(), "codex exec -p stack-worker -m gpt-6-astra "
+        self.assertEqual(lane.worker_command(), "codex exec -p stack-worker -m gpt-6.1-sol "
                          "-c 'model_reasoning_effort=\"max\"' -c 'web_search=\"live\"' -s <sandbox> ... < /dev/null")
         recipe = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
-        self.assertIn('codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live"',
+        self.assertIn('codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live"',
                       recipe)
 
     def test_prove_json_declares_local_integration_and_retention_limits(self):

@@ -12,6 +12,8 @@ Every default below runs on the [token practice](token-practice.md). Keep always
 
 ## Decide from the task and evidence
 
+The [Sol-primary quality defaults](decisions/2026-09-30-sol-primary-quality-defaults.md) define the user-selected Codex coordinator and worker routes, observable Astra escalation triggers and the unchanged native Claude policy. This is a routing contract with scoped acceptance, not a universal model-quality ranking.
+
 Start from the requested outcome, the current repository state and a concrete acceptance condition. Verify changed behavior with relevant upstream or project checks, inspect original source, and obtain independent review for substantive changes. Resolve supported findings before claiming completion; distinguish measured results, simulations and untested boundaries. More tools, more reasoning and reviewer agreement alone do not prove quality.
 
 Select only the foundation layers needed for the task. Reuse accepted receipts while their inputs, version, platform and scope still match. Resolve a demonstrated missing dependency or broken connection directly; a healthy environment does not need another installation sweep.

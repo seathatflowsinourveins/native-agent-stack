@@ -382,7 +382,11 @@ also moves the Linux Codex pin to 0.159.2 with
 [`codex-01592-qualification-20260930.json`](../../evidence/receipts/codex-01592-qualification-20260930.json); the
 Gate A owner (session native-agent-stack-2d) chose 0.159.2 as the candidate frozen Codex version, as the coordinator
 relayed. The record above and the 2026-09-28 addendum are unchanged; this section records what changed on 2026-09-29
-and 2026-09-30 and what it does to the three Codex rows of the table above.
+and 2026-09-30 and what it does to the three Codex rows of the table above. The routing contract itself (coordinator,
+worker and child defaults, Astra escalation triggers, routing records) is
+[`2026-09-30-sol-primary-quality-defaults.md`](2026-09-30-sol-primary-quality-defaults.md), written by the user's
+Codex coordinator lane and folded into the same branch; this addendum carries its release, client-gate and gateway
+evidence.
 
 **What changed.**
 - **Release.** The Codex changelog entry of 2026-09-29, "GPT-6.1 Sol in Codex and ChatGPT Work", reads "GPT-6.1 Sol
@@ -409,13 +413,16 @@ and 2026-09-30 and what it does to the three Codex rows of the table above.
   2026-09-30T04:18:47Z, 610 IDs) lists exactly two 6.1 IDs, `cx/gpt-6.1-sol` and `codex/gpt-6.1-sol`.
 - **The client's own default moved, and the template now names 6.1 Sol itself.** From 0.159.1 a `codex` launch that
   names no model starts on GPT-6.1 Sol, at the catalog's default effort (`low` for this model). The template no
-  longer relies on the catalog: `adoption/templates/codex.config.template.toml` lines 2-3 now read
-  `model = "gpt-6.1-sol"` and `model_reasoning_effort = "ultra"` (they read `gpt-6-astra` and `ultra` before). Every
-  lane still names its own model: the stack-worker profile (`gpt-6-astra` at `max`, lines 12 and 17 of
-  `adoption/templates/codex.stack-worker.config.toml`), `tools/sota-convergence/landscape-sweep/codex_job.py` (`-m`,
-  lines 455-457), the lane's `worker_pins` (`tools/adoption/apply_codex_lane.py` lines 295-301) and the OmniRoute
-  profile (`cx/gpt-6-astra` at `max`). A host's own `config.toml` changes only when the template is rendered or applied
-  on it again.
+  longer relies on the catalog: `adoption/templates/codex.config.template.toml` lines 5-6 now read
+  `model = "gpt-6.1-sol"` and `model_reasoning_effort = "ultra"` (they read `gpt-6-astra` and `ultra` before), and
+  its `[agents]` table sets `default_subagent_model = "gpt-6.1-sol"` with `default_subagent_reasoning_effort = "max"`
+  (lines 27-28). The stack-worker profile moves to `gpt-6.1-sol` at `max` (lines 13 and 17 of
+  `adoption/templates/codex.stack-worker.config.toml`), so the lane's `worker_pins`
+  (`tools/adoption/apply_codex_lane.py` lines 295-301, read from that profile) now pass `-m gpt-6.1-sol`. Lanes that
+  name Astra keep it: `tools/sota-convergence/landscape-sweep/codex_job.py` (`-m`, lines 455-457), the OmniRoute
+  profile (`cx/gpt-6-astra` at `max`), the Codex role carriers under `adoption/agents/codex` and the Gate A runbook and
+  preregistration arms, which pass `-m gpt-6-astra` explicitly. A host's own `config.toml` changes only when the
+  template is rendered or applied on it again.
 - **Ultra.** The models page gives the effort range "from Light to Ultra" and says "Ultra mode goes beyond a
   single-agent run. It uses subagents to accelerate complex work, making it useful for larger tasks that can be split
   across subagents." The 0.159.2 bundled catalog lists `ultra` among `gpt-6.1-sol`'s efforts, as it does for
@@ -432,20 +439,24 @@ and 2026-09-30 and what it does to the three Codex rows of the table above.
 
 | Lane and role | Current | Latest available (release date) | Action | Sources |
 | --- | --- | --- | --- | --- |
-| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive and main-worker default | `gpt-6.1-sol` at `ultra` (the template, lines 2-3) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the user's decision | the user's decision above; changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
-| Codex CLI 0.159.2: complex-workflow tasks | `gpt-6-astra` at `ultra`, chosen per task (`codex -m gpt-6-astra` over the template's `ultra`) | GPT-6 Astra (2026-09-03), "Our most capable model for complex work across code, apps, and research" (models page) | the user's decision above | the user's decision above; models page |
-| Codex CLI 0.159.2: judgment lanes (research, discovery, refutation, review, verdicts, sweep votes, cross-family reviews) | `gpt-6-astra` at their recorded efforts: `max` in the stack-worker profile, the landscape-sweep lane, `prove_codex_lane.py` and the OmniRoute profile (`cx/gpt-6-astra`) | as above | keep | the Codex judgment row above |
+| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive default and coordinator | `gpt-6.1-sol` at `ultra` (the template, lines 5-6) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the user's decision | the user's decision above; the routing record; changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
+| Codex CLI 0.159.2: primary workers and generic children | `gpt-6.1-sol` at `max`: the stack-worker profile and the worker command (`-m gpt-6.1-sol`), and `agents.default_subagent_model` with `default_subagent_reasoning_effort` in the template | as above | switched from `gpt-6-astra` at `max` by the routing record | the routing record; `rust-v0.159.2` `core/src/agent/child_config.rs` (cited there) |
+| Codex CLI 0.159.2: complex-workflow tasks and escalation | `gpt-6-astra`, chosen per task: `ultra` to coordinate a complex workflow (the user's decision; Ultra sends `xhigh` and delegates proactively), `max` for an Astra worker or an escalation on the routing record's triggers | GPT-6 Astra (2026-09-03), "Our most capable model for complex work across code, apps, and research" (models page) | the user's decision above and the routing record | the user's decision above; the routing record; models page |
+| Codex CLI 0.159.2: judgment lanes that name Astra (the landscape sweep's votes, cross-family reviews, the Codex role carriers, the Gate A runbook and preregistration arms) | `gpt-6-astra` at their recorded efforts: `max` in the landscape-sweep lane and the OmniRoute profile (`cx/gpt-6-astra`), the role carriers' own pins | as above | keep | the Codex judgment row above |
 | Codex CLI 0.159.2: mechanical, deterministically scored extraction | `gpt-6-sol` at `medium`, the #359 binding | GPT-6.1 Sol (2026-09-29), unmeasured on this task | keep until the comparison below | the #359 decision |
 
-**Decision.** The interactive and main-worker default is `gpt-6.1-sol` at `ultra`, and a task that needs a complex
-workflow runs `gpt-6-astra` at `ultra`, both by the user's decision. The judgment lanes keep their recorded
-`gpt-6-astra` bindings and the mechanical tier keeps `gpt-6-sol` at `medium`: no same-task measurement on this stack
-compares 6.1 Sol with them, and Gate A's model set is frozen by its owner. Through the gateway's `cx/` route an
-`ultra` request for 6.1 Sol is sent at `xhigh` (the clamp above), so a gateway session does not get the default's
-effort; the native client does.
+**Decision.** The interactive default and coordinator is `gpt-6.1-sol` at `ultra` and primary workers and generic
+children run `gpt-6.1-sol` at `max`; a task that needs a complex workflow runs `gpt-6-astra` at `ultra`, and Astra
+workers and escalations run at `max` on the routing record's triggers. These follow the user's decision and the
+routing record. The judgment lanes that name Astra keep their recorded bindings and the mechanical tier keeps
+`gpt-6-sol` at `medium`: no same-task measurement on this stack compares 6.1 Sol with them, and Gate A's model set is
+frozen by its owner. Through the gateway's `cx/` route an `ultra` or `max` request for 6.1 Sol is sent at `xhigh` (the
+clamp above), so a gateway session does not get the configured effort; the native client does.
 
-**Overturn.** The interactive default and the complex-workflow choice follow the user's decisions and change with the
-next one. For the lane tiers the overturn path is a preregistered comparison, described next.
+**Overturn.** The interactive default, the worker default and the complex-workflow choice follow the user's decisions
+and the routing record, and change with the next one or with the routing record's own reopening condition (a
+comparable workload showing better accepted resolution or lower complete task cost at the same acceptance bar). For
+the lane tiers that keep Astra or GPT-6 Sol the overturn path is a preregistered comparison, described next.
 
 **The preregistered comparison.** A frozen same-task comparison in the style of
 [#359](../../blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md), re-frozen for codex-cli 0.159.2
@@ -461,8 +472,9 @@ rule measures extraction only; none exists yet.
 
 **Still open.** The Unresolved line "No code pin sets `-m gpt-6-sol -c model_reasoning_effort=medium`" still holds at
 `origin/main@f77612b6` (only a comment in `tools/sota-convergence/adjudicate.py` and a seed string in the landscape
-sweep name the model), and apart from the template's default no lane, profile or code names `gpt-6.1-sol`.
-`tools/adoption/apply_codex_lane.py` still pins
+sweep name the model). `gpt-6.1-sol` is named by the two Codex templates, the worker command in `recipes/README.md`
+and `tools/adoption/prove_codex_lane.py`'s live-worker description; no measured run of those Sol routes is recorded
+here (the routing record lists the acceptance it still requires). `tools/adoption/apply_codex_lane.py` still pins
 `CODEX_VERSION = "0.157.1"` (line 114), so its dry run in a scratch home reports `[fail] codex version: codex-cli
 0.159.2 (pin 0.157.1)` and its apply refuses on a 0.159.2 host; moving that constant and its fixtures in
 `tests/test_codex_worker_lane.py` is a separate unit. Live 0.159.2 behaviour on this stack (role spawn through

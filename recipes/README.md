@@ -191,11 +191,11 @@ The 2026-09-27 custom-agent and worker-profile update adds `CHUB_TELEMETRY = "0"
 Start every worker with the profile **and** the model, effort and web search on its command line, with stdin closed:
 
 ```sh
-codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" -s read-only ... < /dev/null
+codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live" -s read-only ... < /dev/null
 ```
 
-The flags are needed because a project `.codex/config.toml` outranks a profile file and `-c` outranks both (`codex-rs/config/src/config_layer_source.rs` at `rust-v0.157.1`: profile 21, project 25, session flags 30). The profile alone cannot hold these values in a checkout that sets them; it still carries the tool settings. Each value matters:
-- **`max`, not the user default `ultra`.** For `gpt-6-astra`, `ultra` sends `xhigh`: the bundled catalog's `multi_agent_reasoning_effort` (`codex debug models --bundled`), applied by `resolve_reasoning_effort` in `codex-rs/protocol/src/openai_models/reasoning_effort.rs`. `ultra` also adds a developer message that tells the model to delegate to sub-agents on its own. At `max`, Codex sends `max` and tells the model not to spawn sub-agents unless asked; `codex debug prompt-input` shows which of the two messages a launch gets.
+Primary workers use Sol/Max under the [current routing contract](../docs/decisions/2026-09-30-sol-primary-quality-defaults.md); an Astra judgment worker substitutes `-m gpt-6-astra`. Explicit task model choices and role definitions take precedence. The flags are needed because a project `.codex/config.toml` outranks a profile file and `-c` outranks both ([`config_layer_source.rs` at `rust-v0.159.2`](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/config/src/config_layer_source.rs): profile 21, project 25, session flags 30). The profile alone cannot hold these values in a checkout that sets them; it still carries the tool settings. Each value matters:
+- **Worker effort `max`.** For both selected Codex models, `ultra` sends `xhigh`: the bundled catalog's `multi_agent_reasoning_effort` (`codex debug models --bundled`), applied by `resolve_reasoning_effort` in `codex-rs/protocol/src/openai_models/reasoning_effort.rs`. `ultra` also adds a developer message that tells the model to delegate to sub-agents on its own. At `max`, Codex sends `max` and tells the model not to spawn sub-agents unless asked; `codex debug prompt-input` shows which of the two messages a launch gets.
 - **`live` web search.** A read-only or workspace-write sandbox otherwise searches the cached index. A lane that must not browse passes `-c web_search="disabled"` instead.
 
 ```sh
