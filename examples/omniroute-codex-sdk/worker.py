@@ -5,11 +5,13 @@
 #     "openai-codex==0.159.2",
 # ]
 # ///
-"""One native Codex SDK turn through an invocation-scoped OmniRoute provider.
+"""One native Codex SDK turn, or metadata preflight, through OmniRoute.
 
 Derived from openai/codex rust-v0.159.2, commit
 ff6aec96948b70d94983af2641a6b67c94faeff5, sdk/python/examples/{01,05,14}_*
-and sdk/python/src/openai_codex/{api,client,_run}.py. See README.md for sources.
+and sdk/python/src/openai_codex/{api,client,_run,async_client}.py. Preflight uses
+the public typed requests in generated/v2_all.py and the native app-server
+request_processors/mcp_processor.rs. See README.md for sources.
 """
 
 from __future__ import annotations
@@ -26,6 +28,12 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from openai_codex import ApprovalMode, AsyncCodex, CodexConfig, Sandbox
+from openai_codex.async_client import AsyncCodexClient
+from openai_codex.generated.v2_all import (
+    ConfigReadResponse,
+    ListMcpServerStatusResponse,
+    SkillsListResponse,
+)
 from openai_codex.types import ReasoningEffort
 
 SDK_VERSION = "0.159.2"
@@ -126,14 +134,8 @@ def emit(value: dict) -> None:
     print(json.dumps(value, ensure_ascii=False, separators=(",", ":")), flush=True)
 
 
-async def run_worker(
-    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit
-) -> dict:
-    """Use native start/resume/turn/interrupt/close, with one overall deadline."""
-    codex = sdk_factory(config=runtime_config(args))
-    turn = None
-    phase = "initialize"
-    record = {
+def initial_record(args: argparse.Namespace) -> dict:
+    return {
         "request_id": args.request_id,
         "requested_model": args.model,
         "requested_effort": "max",
@@ -143,13 +145,180 @@ async def run_worker(
         "usage_scope": None,
         "usage": None,
     }
+
+
+def native_runtime(metadata) -> dict:
+    # Match the pinned SDK's _initialize_metadata.py normalization using public
+    # response fields. Low-level initialize() returns serverInfo=None on 0.159.2.
+    server = metadata.serverInfo
+    name = (server.name or "").strip() if server is not None else ""
+    version = (server.version or "").strip() if server is not None else ""
+    source = "serverInfo"
+    if not name or not version:
+        source = "userAgent"
+        user_agent = (metadata.userAgent or "").strip()
+        if "/" in user_agent:
+            parsed_name, parsed_version = user_agent.split("/", 1)
+        else:
+            parts = user_agent.split(maxsplit=1)
+            parsed_name = parts[0] if parts else ""
+            parsed_version = parts[1] if len(parts) == 2 else ""
+        name = name or parsed_name.strip()
+        version = version or parsed_version.strip()
+    if not name or not version or version.split()[0] != SDK_VERSION:
+        raise RuntimeError("native runtime does not match the qualified SDK pin")
+    return {"name": name, "version": version.split()[0], "metadata_source": source}
+
+
+async def run_preflight(
+    args: argparse.Namespace, *, sdk_factory=AsyncCodexClient, on_event=emit
+) -> dict:
+    """Inspect native catalogs without a thread, model turn or tool call.
+
+    The public low-level client owns a separate app-server for this invocation.
+    Native 0.159.2 ignores CLI profile selection in app-server mode; configuration
+    comes from CODEX_HOME/config.toml and supported config_overrides instead.
+    """
+    codex = sdk_factory(config=runtime_config(args))
+    phase = "initialize"
+    record = {
+        **initial_record(args),
+        "preflight": True,
+        "evidence_scope": "native_catalog_discovery",
+    }
+    try:
+        async with asyncio.timeout(args.timeout):
+            await codex.start()
+            record["native_runtime"] = native_runtime(await codex.initialize())
+            phase = "configuration_read"
+            effective = await codex.request(
+                "config/read",
+                {"cwd": str(args.workspace.resolve()), "includeLayers": False},
+                response_model=ConfigReadResponse,
+            )
+            if effective.config.model != args.model or effective.config.model_provider != PROVIDER:
+                raise RuntimeError("native configuration did not retain the requested routing")
+            # Config's public extra fields carry native MCP/agent configuration.
+            # Keep only names, enabled flags and routing metadata, never the
+            # full configuration, environment values, descriptions or paths.
+            extra = effective.config.model_extra or {}
+            configured_mcp = extra.get("mcp_servers") or {}
+            agents = extra.get("agents") or {}
+            record["agent_defaults"] = {
+                key: agents[key]
+                for key in (
+                    "enabled",
+                    "max_concurrent_threads_per_session",
+                    "default_subagent_model",
+                    "default_subagent_reasoning_effort",
+                )
+                if key in agents
+            }
+            record["configured_roles"] = [
+                {"name": name}
+                for name, role in sorted(agents.items())
+                if isinstance(role, dict)
+            ]
+            phase = "mcp_discovery"
+            servers, cursor, seen_cursors = [], None, set()
+            while True:
+                page = await codex.request(
+                    "mcpServerStatus/list",
+                    {"cursor": cursor, "limit": 100, "detail": "full"},
+                    response_model=ListMcpServerStatusResponse,
+                )
+                for server in page.data:
+                    configured = configured_mcp.get(server.name)
+                    servers.append(
+                        {
+                            "name": server.name,
+                            "configured": isinstance(configured, dict),
+                            "enabled": isinstance(configured, dict)
+                            and configured.get("enabled", True) is True,
+                            # Without threadId, native status is null. Preserve
+                            # unknown; catalog discovery is not tool execution.
+                            "runtime_status": server.runtime_status.value
+                            if server.runtime_status is not None
+                            else None,
+                            "auth_status": server.auth_status.value,
+                            "tool_names": sorted(server.tools),
+                            "tools_error": server.tools_error is not None,
+                        }
+                    )
+                cursor = page.next_cursor
+                if cursor is None:
+                    break
+                if cursor in seen_cursors:
+                    raise RuntimeError("native MCP pagination did not advance")
+                seen_cursors.add(cursor)
+            record["mcp_servers"] = sorted(servers, key=lambda server: server["name"])
+            phase = "skills_discovery"
+            listed = await codex.request(
+                "skills/list",
+                {"cwds": [str(args.workspace.resolve())], "forceReload": True},
+                response_model=SkillsListResponse,
+            )
+            record["skills"] = [
+                {"name": skill.name, "enabled": skill.enabled, "scope": skill.scope.value}
+                for entry in listed.data
+                for skill in entry.skills
+            ]
+            record["skill_error_count"] = sum(len(entry.errors) for entry in listed.data)
+            available_mcp = {
+                server["name"]
+                for server in servers
+                if server["configured"]
+                and server["enabled"]
+                and server["tool_names"]
+                and not server["tools_error"]
+            }
+            available_skills = {
+                skill["name"] for skill in record["skills"] if skill["enabled"]
+            }
+            record["requirements"] = {
+                "mcp": args.require_mcp,
+                "skills": args.require_skill,
+                "unavailable_mcp": sorted(set(args.require_mcp) - available_mcp),
+                "unavailable_skills": sorted(set(args.require_skill) - available_skills),
+            }
+            on_event({"event": "preflight_discovered", **record})
+            phase = "require_capabilities"
+            record["status"] = (
+                "unavailable"
+                if record["requirements"]["unavailable_mcp"]
+                or record["requirements"]["unavailable_skills"]
+                else "ready"
+            )
+    except (TimeoutError, asyncio.CancelledError) as exc:
+        record.update(
+            status="deadline_exceeded" if isinstance(exc, TimeoutError) else "cancelled",
+            phase=phase,
+        )
+        if isinstance(exc, asyncio.CancelledError):
+            raise
+    except Exception as exc:
+        record.update(status="failed", error_type=type(exc).__name__, phase=phase)
+    finally:
+        try:
+            await asyncio.wait_for(codex.close(), CLEANUP_TIMEOUT)
+            record["cleanup_status"] = "closed"
+        except Exception as exc:
+            record.update(status="cleanup_failed", cleanup_status=type(exc).__name__)
+    return record
+
+
+async def run_worker(
+    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit
+) -> dict:
+    """Use native start/resume/turn/interrupt/close, with one overall deadline."""
+    codex = sdk_factory(config=runtime_config(args))
+    turn = None
+    phase = "initialize"
+    record = initial_record(args)
     try:
         async with asyncio.timeout(args.timeout):
             await codex.__aenter__()
-            server = codex.metadata.serverInfo
-            if server is None or server.version.split()[0] != SDK_VERSION:
-                raise RuntimeError("native runtime does not match the qualified SDK pin")
-            record["native_runtime"] = {"name": server.name, "version": server.version}
+            record["native_runtime"] = native_runtime(codex.metadata)
             options = {
                 "cwd": str(args.workspace.resolve()),
                 "model": args.model,
@@ -218,6 +387,21 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--prompt", default="-", help="one bounded task, or - to read stdin")
     parser.add_argument("--resume", help="native thread id from an earlier invocation")
     parser.add_argument(
+        "--preflight", action="store_true", help="inspect native catalogs without model inference"
+    )
+    parser.add_argument(
+        "--require-mcp",
+        action="append",
+        default=[],
+        help="preflight requires this enabled server's native tool catalog; repeatable",
+    )
+    parser.add_argument(
+        "--require-skill",
+        action="append",
+        default=[],
+        help="preflight requires this enabled native skill name; repeatable",
+    )
+    parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
         help="explicit native/gateway model id; default Sol/max route",
@@ -264,16 +448,24 @@ def parse_args(argv=None) -> argparse.Namespace:
         parser.error("codex-home must be an existing private state directory")
     if not args.model.strip():
         parser.error("model must be nonempty")
+    if (args.require_mcp or args.require_skill) and not args.preflight:
+        parser.error("require-mcp and require-skill require --preflight")
+    if any(not name.strip() for name in [*args.require_mcp, *args.require_skill]):
+        parser.error("required capability names must be nonempty")
+    if args.preflight and (args.resume or args.native_result):
+        parser.error("preflight cannot resume a thread or retain turn items")
     return args
 
 
 def main() -> int:
     args = parse_args()
-    prompt = sys.stdin.read() if args.prompt == "-" else args.prompt
-    if not prompt.strip():
+    prompt = ""
+    if not args.preflight:
+        prompt = sys.stdin.read() if args.prompt == "-" else args.prompt
+    if not args.preflight and not prompt.strip():
         raise SystemExit("prompt must contain a bounded task")
     try:
-        result = asyncio.run(run_worker(args, prompt))
+        result = asyncio.run(run_preflight(args) if args.preflight else run_worker(args, prompt))
     except KeyboardInterrupt:
         emit(
             {
@@ -285,7 +477,7 @@ def main() -> int:
         )
         return 130
     emit({"event": "result", **result})
-    return 0 if result["status"] == "completed" else 2
+    return 0 if result["status"] in {"completed", "ready"} else 2
 
 
 if __name__ == "__main__":
