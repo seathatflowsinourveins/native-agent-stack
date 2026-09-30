@@ -3604,6 +3604,26 @@
         "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac."
       ],
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json"
+    },
+    {
+      "id": "notification-types-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
+      "limitations": [
+        "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
+        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; the function that raises the permission dialog's notification is a plain fixed-delay timer with no presence check in it, and its callers and the other dialog types' timers were not each read. Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+        "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
+        "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
+        "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
+        "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
+        "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
+        "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
+        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day (its hash moved, see the sha256 prefix in the dry-run output; the cause is not established here); the bell group is unchanged (the dry run)."
+      ],
+      "path": "evidence/receipts/notification-types-20260929.json"
     }
   ],
   "files": [
@@ -3649,8 +3669,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "3ca2064627ca1dfc068e61a17f30c47ebfb4752cfc2a07c05a42aed398a43f7f",
-      "bytes": 7748
+      "sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
+      "bytes": 7252
     },
     {
       "path": ".github/pull_request_template.md",
@@ -3994,8 +4014,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "a547db2e82f27299671f3a6361c86b7b8d962e89f1289948f54d6d7da1cf1157",
-      "bytes": 21951
+      "sha256": "6319b70436d4c6d649d662131104c710fb2670f12df1b3734073233ae5da51f2",
+      "bytes": 22519
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -4044,8 +4064,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
-      "sha256": "52042017abb798c913f3abbeb01a5c9448bfa0bca26d11ab0bb82496afee40aa",
-      "bytes": 533
+      "sha256": "691003167dc4e03cdf9dfb4bb5628ca01194d65b74bf7180179f80d822af0d77",
+      "bytes": 551
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
@@ -8785,8 +8805,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "23bb0ae8f02c4d40baf0f65f20b169808f5348b3e9010e8d3a80d9be9afd46c9",
-      "bytes": 71896
+      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
+      "bytes": 72164
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -8899,6 +8919,11 @@
       "bytes": 33599
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
+      "sha256": "f35219015f3a87d2a3d96c34c887d22500bd4b30e972aa6bc6a0b46d7c4b5cef",
+      "bytes": 20449
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
       "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
       "bytes": 24151
@@ -8990,7 +9015,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "cbefaf39340c43d2ce7f6411e93e62fb11979f29c2a09b67c7b957ea50f7c683",
+      "sha256": "c857efa5c006c709dd99cc7d5f480f9dcef649248dde89f50f8265ca80008e9d",
       "bytes": 4460
     },
     {
@@ -9010,13 +9035,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
       "bytes": 106002
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "1d47c05cfc3a1bb3541b6b80aaf4f1bed2949962a2d67115aa36cd5c07ddc2d2",
-      "bytes": 60078
+      "sha256": "fd47c2256ef363c77a7854e12bc8970e2af9cbf329f587df9a744ed19659ee88",
+      "bytes": 65936
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -14530,8 +14555,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "500dbe0030599db6cff4b76596595c581881aef8f585662fa77a9e98290ab026",
-      "bytes": 135338
+      "sha256": "bc225cb77a22953419b30f7c63a03ea0cd93a820e6e1448c9675e56e5c07f5cb",
+      "bytes": 138874
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -14665,13 +14690,18 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "5076e3d335546f2bdf17682ee7b99cad622305ad20d7d8d7a6c5ccd87d6fb7e5",
-      "bytes": 51477
+      "sha256": "990c4760132ca26bd72a8b3f256925519680d2758b45ba61d6647e169dcc092a",
+      "bytes": 63504
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
       "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
       "bytes": 15185
+    },
+    {
+      "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
+      "sha256": "f8c38f04af8a7df791d6c398f4e035aea59828336b9e257013061246e30a66af",
+      "bytes": 10361
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -34309,6 +34339,106 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/notification-types-20260929/README.md",
+      "sha256": "5c1d0bc5932bb85de78576d74bcccad274c6170473608384914e357bac0ab878",
+      "bytes": 7198
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+      "sha256": "12a9bbb1ac0cd8a3b0eb9a12014d19871ca248a91da9fe0d1b10eb8947bfd99a",
+      "bytes": 7328
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+      "sha256": "1ac0cf1f950e34527308f2916180399dd1f3fb043c4c81f2d2981a82b4f978ba",
+      "bytes": 21057
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
+      "sha256": "a83298a69680f8ecb6fbd814c8ff0466306ccaee241a807f1b1002fb8cc4dd37",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.283.json",
+      "sha256": "58a5cfeeb8782d52f95e18cf62cece20f13d8c9b7bbd54492694dc0de3fa2ceb",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.284.json",
+      "sha256": "83996b5c13657d83b5b7513cc1ec3cd8fceee670cdee50b1c3366eb05b0f93e6",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.285.json",
+      "sha256": "eb2e772ebd9d0c83e7ec4aab1584c18cb66ccc2237b921c1dfe6165126f2cef8",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/overlay_noop_check.txt",
+      "sha256": "20d67288079b69c879e72b744505f1bac5a4449d615af3f121a9caef7f7c85da",
+      "bytes": 261
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/push_probe_arms.txt",
+      "sha256": "be71ed5844000e9372d69fd03b5a514c793a090466ddcc8e20c270db27318238",
+      "bytes": 4691
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_controls.txt",
+      "sha256": "a25a6b2b63df16da25e5a687a0f45c4a0480b76fc0c2b563ecca4448b6009cd8",
+      "bytes": 1573
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_live_dry_runs.txt",
+      "sha256": "8bc2d61fe14e334c47cfb2d38ab85e1b890060b038785c4e121dbc76d68b053c",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_mutants.txt",
+      "sha256": "5c5f9784f700a3eaded9df240a9dd6f0bcec87c8fc3f04b939af952c5cbcc40f",
+      "bytes": 1075
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/scan_reader_negative_control.txt",
+      "sha256": "6885bbbc35cd35cf6d737a583d67924704abed787644fca4f52380d1c30adc27",
+      "bytes": 767
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/tmux_bell_probe.txt",
+      "sha256": "2837e6c652ea2f391344e5dcfcad6f454c07f87caabec14a803abc2c114ae55b",
+      "bytes": 581
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/unit_tests.txt",
+      "sha256": "5be8083c63db900431c9907f8855dc077dbd75894f79dbfabc9a352da0ac2755",
+      "bytes": 40
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group.py",
+      "sha256": "df63e6f3c271701e004003dab01d3dff5c86c37f0b24dace2a006ec58bb8679a",
+      "bytes": 11162
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py",
+      "sha256": "bed9b093aeca9bf4ec530a508ec515f2b05face915a546f86b080167dcd0615a",
+      "bytes": 10980
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py",
+      "sha256": "f488c5ce2e7e26ecd82990b1edaf66219353be116e537ee3d79e833664671015",
+      "bytes": 4617
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/scan_reader_mutants.py",
+      "sha256": "016da24f2723f6bc29a73780b5e1a1e6008103b9ca4f4cc3479963b07ed2480f",
+      "bytes": 3868
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+      "sha256": "5ef02fa27e168c7310c0083d51c68683ca32084d49c0c63f25db64e2a67a4153",
+      "bytes": 3708
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -42189,9 +42319,19 @@
       "bytes": 867
     },
     {
+      "path": "evidence/receipts/notification-types-20260929.json",
+      "sha256": "b221f8fde6a52107b2eed9db804165dc03410dd3fd35f6e6a53f86392ce686e1",
+      "bytes": 22885
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
+    },
+    {
+      "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
+      "sha256": "b918c8a412ef89a85b3c5c4786efb49208ef9868f1914fe81da6f16dd320c791",
+      "bytes": 27373
     },
     {
       "path": "evidence/receipts/pit-availability.json",
@@ -42985,8 +43125,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "98046ad28281c33e990c350461fe2bcd41b0a8baaa0dc2c6efb7ead0362e626b",
-      "bytes": 36542
+      "sha256": "923a0a3610f3325fefb666b7037d6ae38d6d8125c271c08a9143ddcb60c0de5e",
+      "bytes": 38777
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -43940,8 +44080,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "2024dd95dbaa0ea4e029379768af834380cce22ac1338aec303007febdf91bdc",
-      "bytes": 38050
+      "sha256": "192b167f797edde99ec08e0303339ab26d5259bcf076a786117738be998faf90",
+      "bytes": 38017
     },
     {
       "path": "tests/test_path_safety.py",
@@ -44114,6 +44254,11 @@
       "bytes": 6838
     },
     {
+      "path": "tests/test_token_e2e_grader.py",
+      "sha256": "0cc598f6cb6fb0d227fd7caed1a1d887ed75ffaffd3eddd03f564f184f05b054",
+      "bytes": 524371
+    },
+    {
       "path": "tests/test_token_e2e_preregistration.py",
       "sha256": "4e7f464773f6bf8324e7622522d64367d501e76758ebf96930f2094a5e824055",
       "bytes": 55079
@@ -44165,8 +44310,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "7eb940f52441bb02bc137658639a201da0f170a82282de4b4374f83c84d7f027",
-      "bytes": 15926
+      "sha256": "c749503c0c8bd2a737075bb1b50a16329f491e726939e1472594f97fea4823e1",
+      "bytes": 21173
     },
     {
       "path": "tests/test_worker_recovery.py",
@@ -44505,13 +44650,168 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "86227fabca32e7d7a19433c5ce3342021ee7dd19b5c35ec5560aecdf8e823ce7",
-      "bytes": 33946
+      "sha256": "5555451a8f5b8a6d80757d62205b70e00f8d59852799898a2b64848138db7bd4",
+      "bytes": 43223
+    },
+    {
+      "path": "tools/token-e2e/calibration/T0.json",
+      "sha256": "27d917b630a55bb3f563c101ed2d1f1856317e1a9bdae9bfc2cbe9dd5205fe45",
+      "bytes": 889
+    },
+    {
+      "path": "tools/token-e2e/calibration/T12.json",
+      "sha256": "786d6d70747926fe7ecad2a5994dfcbc269aa178a5d98f777d3d7375ac9b0aca",
+      "bytes": 1894
+    },
+    {
+      "path": "tools/token-e2e/calibration/T13.json",
+      "sha256": "0066dbbcc5e4fd894234516da4853a0bd36b5f02557165f9efbd9a6e7d63a985",
+      "bytes": 1789
+    },
+    {
+      "path": "tools/token-e2e/calibration/T14.json",
+      "sha256": "6d06146ab95499b96f9a869bd29e9b9ce45a6474d01e15ef74feb84e9fd79bf6",
+      "bytes": 1683
+    },
+    {
+      "path": "tools/token-e2e/calibration/T16.json",
+      "sha256": "455e9849451ad1bd23ef6cb7ed02fc40acd6ce0449a343397da38ca3da9e3438",
+      "bytes": 2529
+    },
+    {
+      "path": "tools/token-e2e/calibration/T17.json",
+      "sha256": "f20d0c7c0a59e1fa898183ba5d4ff1f5ff2ca44ece779576b8b8b2f6da8cf753",
+      "bytes": 2691
+    },
+    {
+      "path": "tools/token-e2e/calibration/T18.json",
+      "sha256": "06f9f0689d717e898184b0e52d1c735d05824a9e1d6925d635bf402b48833ae8",
+      "bytes": 2503
+    },
+    {
+      "path": "tools/token-e2e/calibration/T19.json",
+      "sha256": "42bb15a0be9d259e9ae4a147cf010dd8ec47bd7c157793c864559592893d44a4",
+      "bytes": 2360
+    },
+    {
+      "path": "tools/token-e2e/calibration/T20.json",
+      "sha256": "97a80987196045dcf7b6bfa31c58e9aea69086c83fc5986c9182ad500e027f6b",
+      "bytes": 2516
+    },
+    {
+      "path": "tools/token-e2e/calibration/T21.json",
+      "sha256": "57395d76836ac64d37b6c58ed7a471335486b2471cfa057666204a1582e709ef",
+      "bytes": 2654
+    },
+    {
+      "path": "tools/token-e2e/calibration/T22.json",
+      "sha256": "49ab6689b10c335e8e71190c5528578740d786f5d730f930b02cc89321e7ffa6",
+      "bytes": 2715
+    },
+    {
+      "path": "tools/token-e2e/calibration/T23.json",
+      "sha256": "03f1aee3e756c542b9262460419340bceefa639beda876894bbeb5429b249cb8",
+      "bytes": 2730
+    },
+    {
+      "path": "tools/token-e2e/calibration/T24.json",
+      "sha256": "a0d544f01689051ca99164163bd4d0c271dd0fc4816870c92e03aed953fb7c3a",
+      "bytes": 2854
+    },
+    {
+      "path": "tools/token-e2e/calibration/T25.json",
+      "sha256": "0d7a8439baf7a6909909c3ea90466e01d5b64a37269104af156af2082ff24ba5",
+      "bytes": 2531
+    },
+    {
+      "path": "tools/token-e2e/calibration/T28.json",
+      "sha256": "51c6f528bbccf9a6a79fe5574a641ac93302252f922b308a40c6d6ec52e8fbc3",
+      "bytes": 3195
+    },
+    {
+      "path": "tools/token-e2e/calibration/T37.json",
+      "sha256": "04cea21ba05ef337970dcd27f5d961d3f7d2ec6ee83df9d3da04cc9a28d8a9c4",
+      "bytes": 1531
+    },
+    {
+      "path": "tools/token-e2e/calibration/T4.json",
+      "sha256": "ca0beef6746a37a7554ccef331c1f74bfe604cb9e72aa2b676c078dff196cd20",
+      "bytes": 2875
+    },
+    {
+      "path": "tools/token-e2e/calibration/T5.json",
+      "sha256": "ef1af04fc82cb703721947fd26418f581e4447ec296951ccb8cd6fdc3e688cc0",
+      "bytes": 2140
+    },
+    {
+      "path": "tools/token-e2e/calibration/T6.json",
+      "sha256": "41390c8dee257492257e0ae5e1ad768e581a8445e61ad44bcd9220d6b818ad16",
+      "bytes": 4218
+    },
+    {
+      "path": "tools/token-e2e/calibration/T7.json",
+      "sha256": "40f53df3e6737c317d268cb3f3dd3ac6f6b30f392444db8bdbc5e0c7ebd2f3fe",
+      "bytes": 2329
+    },
+    {
+      "path": "tools/token-e2e/calibration/T9.json",
+      "sha256": "af77364f5657f3ac87c848eb8fff1d30623188609e681047183d3121766148b2",
+      "bytes": 850
+    },
+    {
+      "path": "tools/token-e2e/calibration/oracle-controls.json",
+      "sha256": "0c5708f48f1471f0d47930dec850d108079eb4bdee0a27489e6e1803c0d62b10",
+      "bytes": 60754
+    },
+    {
+      "path": "tools/token-e2e/evidence.py",
+      "sha256": "c09d210c66c877e23200854b8d8183346fd976ed39364167526dccc5dc845f4e",
+      "bytes": 177088
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
       "sha256": "27e9c97f9e82b71deb27e04d933fe5752c045ac931bdc7e4432ecbc1b987acb7",
       "bytes": 126664
+    },
+    {
+      "path": "tools/token-e2e/frozen-check-judge.js",
+      "sha256": "0d78ba73e8bc251a714eb397b0501390313207b35f0a2af59e0865c3362b1cb0",
+      "bytes": 7194
+    },
+    {
+      "path": "tools/token-e2e/frozen_checks.py",
+      "sha256": "8b223c5526d85ec2b06e64949c5b3a6f30076e2224f5198eba01e46b4e2d5729",
+      "bytes": 176959
+    },
+    {
+      "path": "tools/token-e2e/grade.py",
+      "sha256": "35be55c2ff2418111f617b75a901e196bcd94fa50f9681e20c4a360204d11113",
+      "bytes": 64508
+    },
+    {
+      "path": "tools/token-e2e/grading-block.schema.json",
+      "sha256": "a03902e0a73ab4bd78e5f3a1d8a4efeb0552e53a45532fb3e6696c7be5f9876e",
+      "bytes": 11141
+    },
+    {
+      "path": "tools/token-e2e/judge-template.md",
+      "sha256": "19068ee982c74199f1ab9ff5f46b495333313cc3f28832e7c9d27657e3f94a2a",
+      "bytes": 2769
+    },
+    {
+      "path": "tools/token-e2e/judge.py",
+      "sha256": "40c3876bb68420c016f56f7bc978e7173c181b932900cc4614c1aad4316c6f45",
+      "bytes": 76685
+    },
+    {
+      "path": "tools/token-e2e/judgment.schema.json",
+      "sha256": "0ac512fd538d4d2443ee3af105c9d939994652338da9baea87eafd1e5d2103cf",
+      "bytes": 1040
+    },
+    {
+      "path": "tools/token-e2e/node_bridge.mjs",
+      "sha256": "848f576bc3c210429f9fb4f8fb31efea91c316eb6bd1285ff3807beafb0632b3",
+      "bytes": 4121
     },
     {
       "path": "tools/token-report/README.md",

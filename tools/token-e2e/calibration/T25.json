@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T25",
+ "clauses": [
+  "One primary memory store and one retrieval lane per artifact.",
+  "Historical retrieval must contain a scoped result for assuming a worker owns an independent web-search budget; compare with docs/harness-defaults.md, Anti-pattern log: The session search budget is shared across the coordinator and its workers."
+ ],
+ "sources": [
+  {
+   "label": "catalogs/us-equities/foundation-memory.md lines naming the facts",
+   "text": "Keep one primary memory store, one retrieval lane per artifact and the existing compatible local embedding service."
+  },
+  {
+   "label": "anti-pattern log row",
+   "text": "| 2026-09-26 | Assuming each worker has its own tool budget | Claude Code allows one session at most a fixed number of WebSearch calls, counted across the coordinator, every subagent and every workflow child |"
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The catalog keeps one primary memory store and one retrieval lane per artifact. The earlier decision (record 3fa9c2d41b7e0a55) matches the log row: the web-search allowance is one budget for the session, shared by the coordinator and every worker.\n\nSource excerpt: Keep one primary memory store, one retrieval lane per artifact and the existing compatible local embedding service.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Policy is a single main memory store and a single retrieval route for each artifact. From the stored decision (record 3fa9c2d41b7e0a55) and the log: search calls are counted once per session across the coordinator and all its workers, so workers do not get separate budgets.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The catalog runs three memory stores side by side and lets each artifact use every retrieval lane. The budget decision matches the log.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "One primary memory store and one retrieval lane per artifact. The earlier decision says every worker has its own independent web-search budget.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

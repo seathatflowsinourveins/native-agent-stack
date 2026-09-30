@@ -1,0 +1,18 @@
+isolated an old matcher in a lone bell group is replaced (dry run): exit 0, expected 0
+isolated a hand-requoted bell command is still found (quotes and backslashes ignored): exit 0, expected 0
+isolated a file with no bell group gets one: exit 0, expected 0
+isolated a file that already equals the overlay has nothing to do: exit 0, expected 0
+isolated an equal bell group is not 'nothing to do' while the overlay's own keys are missing: exit 0, expected 0
+isolated another hook in the bell group is refused, not lost: exit 1, expected nonzero
+isolated a bell hook with a key beyond type and command is refused: exit 1, expected nonzero
+isolated a matcher naming a type the overlay's does not is refused, not dropped: exit 1, expected nonzero
+isolated an absent matcher is refused: exit 1, expected nonzero
+isolated an existing different preferredNotifChannel is refused, not overwritten: exit 1, expected nonzero
+isolated two bell groups are refused: exit 1, expected nonzero
+isolated an unrelated Notification group is kept beside the new bell group: exit 0, expected 0
+isolated an unknown target is refused: exit 1, expected nonzero
+isolated an unknown flag is refused: exit 1, expected nonzero
+isolated --apply installs the merged copy after a backup equal to the original, keeps the mode, leaves no staging file: exit 0, expected 0
+isolated --apply does not follow a symlink at the old fixed staging name: exit 0, expected 0
+isolated a symlinked settings file is refused, also with --apply, and the real file is untouched: exit 1, expected nonzero
+17 cases, 0 problems

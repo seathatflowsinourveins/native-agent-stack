@@ -53,17 +53,17 @@ IGNORE_SCOPES = {
     # nltk: no patched release, so every version is affected.
     "GHSA-8mgp-746c-j5xp": {"package": "nltk", "fixed": None},
     "GHSA-h35f-9h28-mq5c": {"package": "setuptools", "fixed": (83, 0, 0)},
-    # oauthlib 4.0.0 fixes both oauthlib advisories and PyJWT 2.14.0 the JWK Set one (GitHub and OSV records, 2026-09-29).
+    # oauthlib 4.0.0 fixes both oauthlib advisories (GitHub and OSV records, 2026-09-29).
     "GHSA-hj66-6f7g-4r5v": {"package": "oauthlib", "fixed": (4, 0, 0)},
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
-    "GHSA-w6j9-cwv2-h6wq": {"package": "pyjwt", "fixed": (2, 14, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock: its owner's relock onto oauthlib 4.0.0 and PyJWT 2.14.0 deletes this entry in the same change.
+    # Live recipe lock, relocked onto PyJWT 2.14.0 on 2026-09-30. Its receipt carries the 2026-09-29 oauthlib review
+    # forward at this sha256; the relock onto oauthlib 4.0.0 deletes this entry in the same change.
     "blueprints/runtime-workers/openhands/requirements.lock": {
-        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv", "GHSA-w6j9-cwv2-h6wq"],
-        "sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
-        "evidence": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
+        "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+        "evidence": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
     },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.
