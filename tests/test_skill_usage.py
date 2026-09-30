@@ -3037,5 +3037,315 @@ class CodexRtkReplay(unittest.TestCase):
                           "all_covered_calls": 0, "status": "measured"})
 
 
+# PR-A U3, binding correction 1 of the build (gap G1 of the U11 design): --call-ledger PATH writes the private per-call Codex
+# ledger, records codex-call-ledger/1 {thread_id, call_id, owner_kind, tool, server, state, cause, native_status, sandbox,
+# code_mode, history_mode}, through the kernel's callLedger, PR-A U2's export (claude/pra-u2-kernel-measures-2d-20260929 at
+# b2dd1eb7, examples/claude-native/workflows/child-usage.mjs:2793-2820; U2 design 4.5). A call id is the response_item call_id,
+# or the item_completed item.id of a CommandExecution or McpToolCall: a nested exec_command inside code mode is a call of its
+# own (the 2026-09-29 join rehearsal). The tests that need the kernel's callLedger run only where the kernel exports it; the
+# others answer the bridge's callLedger request with kernel_ledger_double, a stand-in for that contract.
+def kernel_exports(name: str) -> bool:
+    """The tests' own probe of the kernel's exports, independent of skill_usage."""
+    script = ("import * as kernel from " + json.dumps(S.MEASUREMENT_MODULE.as_uri())
+              + "; process.stdout.write(typeof kernel[" + json.dumps(name) + "])")
+    probe = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True, check=False)
+    return probe.returncode == 0 and probe.stdout == "function"
+
+
+KERNEL_CALL_LEDGER = kernel_exports("callLedger")
+NO_KERNEL_CALL_LEDGER = "the measurement kernel exports no callLedger (PR-A U2 is not merged into this tree)"
+LEDGER_FIELDS = ("schema", "thread_id", "call_id", "owner_kind", "tool", "server", "state", "cause", "native_status", "sandbox",
+                 "code_mode", "history_mode")
+LEDGER_THREAD = "u3-ledger-thread-priv"
+LEDGER_CHILD = "u3-ledger-child-priv"
+
+
+def kernel_ledger_double(rows, window):
+    """The kernel's callLedger contract as PR-A U2 states it (child-usage.mjs:2793-2820 at b2dd1eb7): tool_use blocks
+    deduplicated by id over the rows before until, one record for each whose row is inside [since, until), in the order of
+    their rows, with session_id and owner null for a Codex bridge row. Its state is a marker that the Codex mapping must pass
+    through unchanged."""
+    calls = {}
+    for row in rows:
+        at = S.parse_iso(row["timestamp"]).timestamp() * 1000
+        if at >= window["until"]:
+            continue
+        for block in row["message"]["content"]:
+            if row["type"] == "assistant" and block.get("type") == "tool_use" and block["id"] not in calls:
+                calls[block["id"]] = (block, at)
+    return [{"session_id": None, "owner": None, "tool_use_id": block["id"], "tool": block["name"],
+             "server": block["name"].split("__")[1] if block["name"].startswith("mcp__") else None,
+             "state": "double:" + block["name"], "cause": None, "native_status": block.get("native_status"),
+             "background": False, "sandbox": bool(block.get("sandbox")), "code_mode": bool(block.get("code_mode")),
+             "m15_class": None}
+            for block, at in calls.values() if at >= window["since"]]
+
+
+def ledger_double(case) -> list:
+    """Answer the bridge's callLedger requests with kernel_ledger_double and pass every other request on to the kernel. Returns
+    the keyword arguments of every request."""
+    real, requests = S._measurement_bridge, []
+
+    def bridge(payload, **kwargs):
+        requests.append(kwargs)
+        if kwargs.get("ledger"):
+            return kernel_ledger_double(payload["rows"], payload["options"]["window"])
+        return real(payload, **kwargs)
+    case.enterContext(mock.patch.object(S, "_measurement_bridge", side_effect=bridge))
+    return requests
+
+
+def ledger_meta(history_mode="paginated", thread=LEDGER_THREAD, source="exec"):
+    payload = {"id": thread, "source": source, "cli_version": "0.157.1"}
+    if history_mode is not None:
+        payload["history_mode"] = history_mode
+    return codex_row("session_meta", payload)
+
+
+def ledger_child(own_rows):
+    """A forked sub-agent rollout (start ordinal 3): its own session_meta, paginated as its spawn made it, the parent's meta
+    (legacy here) and a parent call copied below the start ordinal, then its own rows."""
+    rows = [u3_row("session_meta", {"id": LEDGER_CHILD, "source": {"subagent": {"thread_spawn": {
+                "parent_thread_id": LEDGER_THREAD, "depth": 1}}}, "history_mode": "paginated", "cli_version": "0.157.1",
+                "subagent_history_start_ordinal": 3}, "2026-10-20T02:00:00Z", 0),
+            u3_row("session_meta", {"id": LEDGER_THREAD, "source": "exec", "history_mode": "legacy", "cli_version": "0.157.1"},
+                   "2026-10-20T02:00:00Z", 1),
+            u3_row("response_item", {"type": "function_call", "call_id": "call_priv_copied", "name": "exec_command",
+                                     "arguments": json.dumps({"cmd": "ls"})}, "2026-10-20T02:00:01Z", 2)]
+    return rows + [dict(row, timestamp="2026-10-20T02:00:02Z", ordinal=3 + index) for index, row in enumerate(own_rows)]
+
+
+def measure_ledger(*rows) -> list:
+    ledger = []
+    S.measure_codex_records(list(rows), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), call_ledger=ledger)
+    return ledger
+
+
+def ledger_view(ledger, *fields) -> list:
+    return [tuple(record.get(field) for field in fields) for record in ledger]
+
+
+class CodexCallLedger(unittest.TestCase):
+    """The private Codex call ledger (binding correction 1, above). It is written only behind --call-ledger, as a new file of
+    mode 0600 (create-only, O_EXCL and O_NOFOLLOW, a new parent directory 0700) outside every git work tree: the rule of
+    frozen_checks.private_create on main (a02ff13f, tools/token-e2e/frozen_checks.py:1309-1369) and of U2's ledgerTarget
+    (child-usage.mjs:2821-2844 at b2dd1eb7). Every refusal (the path, --out inside this checkout, a kernel without callLedger)
+    comes before the scan, and the file is created before the report is written or printed. The report stays ID-free."""
+
+    SECRETS = ("item_priv_r1", "call_priv_r2", "call_priv_c1", LEDGER_THREAD, LEDGER_CHILD, "ledger-secret-query",
+               "ledger-secret-pattern")
+
+    def setUp(self):
+        self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def run_cli(self, *extra):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = S.main(["--manifest", str(FIXTURES / "manifest.json"), "--now", NOW, *extra])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def lanes_cli(self, root, *extra):
+        return self.run_cli("--lanes", "--codex-root", str(root), "--since", LANES_SINCE, "--until", LANES_UNTIL, "--json",
+                            *extra)
+
+    def ledger_root(self) -> Path:
+        """A root exec session (a code-mode exec whose JavaScript ran a command, then a direct exec_command) and its forked
+        sub-agent, whose own call fails."""
+        return write_rollouts(self.tmp / "root", {
+            "rollout-2026-10-20T02-00-00-u3-ledger-root.jsonl": [
+                ledger_meta(), codex_row("response_item", developer(CATALOG)),
+                *code_mode_command("item_priv_r1", ["bash", "-lc", "qmd search ledger-secret-query"], "completed", 0, "hits"),
+                *exec_command_call("call_priv_r2", "git status --short", exec_response("Process exited with code 0", "M a"))],
+            "rollout-2026-10-20T02-00-01-u3-ledger-child.jsonl": ledger_child(exec_command_call(
+                "call_priv_c1", "rg ledger-secret-pattern", exec_response("Process exited with code 1", "")))})
+
+    # ---- the Codex side, with the stand-in for the kernel's callLedger
+
+    def test_each_call_keeps_its_response_item_or_item_id(self):
+        # One row per call the bridge measured in the window, in row order: the outer exec's call_id, the nested command's
+        # item id and a direct call's call_id; a call with no id (the adapter's missing-N key) has none; a call before since
+        # has no row. The kernel's fields pass through unchanged; session_id, owner, background and m15_class are left out.
+        requests = ledger_double(self)
+        early = exec_command_call("call_priv_early", "date", exec_response("Process exited with code 0", "x"))
+        ledger = measure_ledger(ledger_meta(), *(dict(row, timestamp="2026-10-19T23:00:00Z") for row in early),
+                                *code_mode_command("item_priv_s1", ["bash", "-lc", "ls"], "completed", 0, "a"),
+                                *exec_command_call("call_priv_s2", "pwd", exec_response("Process exited with code 0", "/w")),
+                                codex_row("response_item", {"type": "function_call", "name": "exec_command",
+                                                            "arguments": json.dumps({"cmd": "true"})}))
+        self.assertEqual(ledger_view(ledger, "call_id", "tool", "state", "native_status", "sandbox", "code_mode"),
+                         [("item_priv_s1_exec", "exec", "double:exec", None, False, True),
+                          ("item_priv_s1", "Bash", "double:Bash", "completed", True, False),
+                          ("call_priv_s2", "Bash", "double:Bash", None, False, False),
+                          (None, "Bash", "double:Bash", None, False, False)])
+        self.assertEqual([tuple(record) for record in ledger], [LEDGER_FIELDS] * 4)
+        self.assertEqual(set(ledger_view(ledger, "schema", "thread_id", "owner_kind", "server", "cause", "history_mode")),
+                         {("codex-call-ledger/1", LEDGER_THREAD, "exec", None, None, "paginated")})
+        self.assertEqual([bool(kwargs.get("ledger")) for kwargs in requests], [False, True])
+
+    def test_owner_kind_and_history_mode_come_from_the_first_session_meta(self):
+        # history_mode is the one the measurement reads: paginated, else legacy (a meta without it is legacy,
+        # protocol.rs:772-779, and so are rows without a meta). A sub-agent's rows take its own first meta, never the
+        # parent's copied second one, and a copied call (ordinal below the start) has no row.
+        ledger_double(self)
+        call = exec_command_call("call_priv_o1", "ls", exec_response("Process exited with code 0", "x"))
+        cases = [(ledger_meta(history_mode=None), (LEDGER_THREAD, "exec", "legacy")),
+                 (ledger_meta(history_mode="legacy"), (LEDGER_THREAD, "exec", "legacy")),
+                 (ledger_meta(source="cli"), (LEDGER_THREAD, "other", "paginated")),
+                 (None, (None, None, "legacy"))]
+        for meta, expected in cases:
+            with self.subTest(meta=meta and meta["payload"]):
+                rows = ([meta] if meta else []) + call
+                self.assertEqual(ledger_view(measure_ledger(*rows), "thread_id", "owner_kind", "history_mode"), [expected])
+        child = measure_ledger(*ledger_child(exec_command_call("call_priv_c1", "pwd", "/w")))
+        self.assertEqual(ledger_view(child, "thread_id", "call_id", "owner_kind", "history_mode"),
+                         [(LEDGER_CHILD, "call_priv_c1", "subagent", "paginated")])
+
+    def test_the_cli_writes_the_ledger_once_with_mode_0600_and_an_id_free_report(self):
+        ledger_double(self)
+        self.enterContext(mock.patch.object(S, "kernel_exports", return_value=True))
+        root = self.ledger_root()
+        target = self.tmp / "private" / "codex-calls.jsonl"
+        code, out, err = self.lanes_cli(root, "--call-ledger", str(target))
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual((target.stat().st_mode & 0o777, target.parent.stat().st_mode & 0o777), (0o600, 0o700))
+        rows = [json.loads(line) for line in target.read_text().splitlines()]
+        self.assertEqual(ledger_view(rows, "actor_ordinal", "thread_id", "owner_kind", "call_id", "history_mode"),
+                         [(1, LEDGER_THREAD, "exec", "item_priv_r1_exec", "paginated"),
+                          (1, LEDGER_THREAD, "exec", "item_priv_r1", "paginated"),
+                          (1, LEDGER_THREAD, "exec", "call_priv_r2", "paginated"),
+                          (2, LEDGER_CHILD, "subagent", "call_priv_c1", "paginated")])
+        self.assertEqual([tuple(row) for row in rows], [(*LEDGER_FIELDS, "actor_ordinal")] * 4)
+        report = json.loads(out)
+        self.assertEqual([(actor["ordinal"], actor["kind"]) for actor in report["actors"]], [(1, "exec"), (2, "subagent")])
+        assert_id_free_report(self, report, [*self.SECRETS, str(root), str(target)])
+        text = target.read_text()
+        self.assertEqual([secret for secret in ("ledger-secret-query", "ledger-secret-pattern", "git status", str(root))
+                          if secret in text], [])
+        # Create-only: a second run to the same path is refused and leaves the first ledger as it was.
+        code, out, err = self.lanes_cli(root, "--call-ledger", str(target))
+        self.assertEqual((code, out, target.read_text()), (2, "", text))
+        self.assertIn("--call-ledger: refusing an existing path", err)
+
+    def test_no_ledger_is_asked_for_and_no_kernel_probed_by_default(self):
+        requests = ledger_double(self)
+        probe = self.enterContext(mock.patch.object(S, "kernel_exports", side_effect=AssertionError("probed")))
+        code, _, _ = self.lanes_cli(self.ledger_root())
+        self.assertEqual(code, 0)
+        self.assertEqual([kwargs for kwargs in requests if kwargs.get("ledger")], [])
+        probe.assert_not_called()
+
+    def test_the_cli_needs_lanes_for_a_ledger(self):
+        target = self.tmp / "calls.jsonl"
+        code, out, err = self.run_cli("--call-ledger", str(target))
+        self.assertEqual((code, out, target.exists()), (2, "", False))
+        self.assertIn("--call-ledger needs --lanes", err)
+
+    def test_the_cli_refuses_a_ledger_path_before_the_scan(self):
+        root = self.ledger_root()
+        work_tree = self.tmp / "work-tree"
+        (work_tree / "sub").mkdir(parents=True)
+        (work_tree / ".git").write_text("gitdir: elsewhere\n")  # a linked worktree's .git is a file
+        existing = self.tmp / "existing.jsonl"
+        existing.write_text("kept\n")
+        checkout = ROOT / "tools" / "skill-usage" / "_ledger_should_never_be_written.jsonl"
+        self.enterContext(mock.patch.object(S, "kernel_exports", return_value=True))
+        self.enterContext(mock.patch.object(S, "scan_codex_lanes", side_effect=AssertionError("scanned")))
+        try:
+            for target, reason in ((work_tree / "sub" / "calls.jsonl", "a path inside a git work tree"),
+                                   (checkout, "a path inside a git work tree"), (existing, "an existing path")):
+                with self.subTest(target=target.name):
+                    code, out, err = self.lanes_cli(root, "--call-ledger", str(target))
+                    self.assertEqual((code, out), (2, ""))
+                    self.assertIn("--call-ledger: refusing " + reason, err)
+            self.assertEqual((work_tree / "sub" / "calls.jsonl").exists(), False)
+            self.assertEqual((checkout.exists(), existing.read_text()), (False, "kept\n"))
+        finally:
+            if checkout.exists():
+                checkout.unlink()
+
+    def test_the_cli_refuses_a_ledger_when_the_kernel_has_no_call_ledger(self):
+        target = self.tmp / "calls.jsonl"
+        self.enterContext(mock.patch.object(S, "kernel_exports", return_value=False))
+        self.enterContext(mock.patch.object(S, "scan_codex_lanes", side_effect=AssertionError("scanned")))
+        code, out, err = self.lanes_cli(self.ledger_root(), "--call-ledger", str(target))
+        self.assertEqual((code, out, target.exists()), (2, "", False))
+        self.assertIn("--call-ledger: the measurement kernel exports no callLedger", err)
+
+    def test_the_cli_refuses_an_out_inside_the_checkout_before_the_ledger(self):
+        refused = ROOT / "tools" / "skill-usage" / "_lanes_should_never_be_written.json"
+        target = self.tmp / "calls.jsonl"
+        self.enterContext(mock.patch.object(S, "kernel_exports", return_value=True))
+        self.enterContext(mock.patch.object(S, "scan_codex_lanes", side_effect=AssertionError("scanned")))
+        try:
+            code, out, err = self.lanes_cli(self.ledger_root(), "--call-ledger", str(target), "--out", str(refused))
+            self.assertEqual((code, out, target.exists(), refused.exists()), (2, "", False, False))
+            self.assertIn("refusing --out inside the repository checkout", err)
+        finally:
+            if refused.exists():
+                refused.unlink()
+
+    # ---- through the kernel's callLedger (PR-A U2)
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_code_mode_exec_and_its_nested_command_are_two_calls(self):
+        # The outer exec reads succeeded as the normalization reads it (its output returned; a rollout output carries no
+        # success flag, models.rs:2173-2182), and the nested command takes its state from its item.
+        ledger = measure_ledger(ledger_meta(), *code_mode_command(
+            "item_priv_n1", ["bash", "-lc", "curl https://example.org/n1"], "failed", 7, "curl: (7) Failed to connect"))
+        self.assertEqual(ledger_view(ledger, "call_id", "tool", "state", "cause", "native_status", "sandbox", "code_mode"),
+                         [("item_priv_n1_exec", "exec", "succeeded", None, None, False, True),
+                          ("item_priv_n1", "Bash", "failed", None, "failed", True, False)])
+        self.assertEqual([tuple(record) for record in ledger], [LEDGER_FIELDS] * 2)
+        self.assertEqual(set(ledger_view(ledger, "schema", "thread_id", "owner_kind", "server", "history_mode")),
+                         {("codex-call-ledger/1", LEDGER_THREAD, "exec", None, "paginated")})
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_paginated_direct_exec_command_is_one_call_with_its_item_status(self):
+        # A paginated rollout persists the call's CommandExecution item under the call's own id: one call, not two.
+        ledger = measure_ledger(ledger_meta(), *exec_command_call(
+            "call_priv_d1", "git diff", exec_response("Process exited with code 0", "ok")),
+            command_item("call_priv_d1", ["bash", "-lc", "git diff"], "completed", 0, "ok"))
+        self.assertEqual(ledger_view(ledger, "call_id", "tool", "state", "native_status", "sandbox", "code_mode"),
+                         [("call_priv_d1", "Bash", "succeeded", "completed", False, False)])
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_legacy_exec_command_reads_its_header_and_an_unknown_state_stays(self):
+        ledger = measure_ledger(ledger_meta(history_mode=None), *exec_command_call(
+            "call_priv_h1", "make test", exec_response("Process exited with code 2", "fail")),
+            *exec_command_call("call_priv_h2", "sleep 1", "plain text without the unified exec header"))
+        self.assertEqual(ledger_view(ledger, "call_id", "state", "native_status", "history_mode"),
+                         [("call_priv_h1", "failed", None, "legacy"), ("call_priv_h2", "unknown", None, "legacy")])
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_sub_agent_owns_its_own_calls_with_its_history_mode(self):
+        ledger = measure_ledger(*ledger_child(exec_command_call(
+            "call_priv_c1", "pwd", exec_response("Process exited with code 0", "/w"))))
+        self.assertEqual(ledger_view(ledger, "thread_id", "call_id", "owner_kind", "state", "history_mode"),
+                         [(LEDGER_CHILD, "call_priv_c1", "subagent", "succeeded", "paginated")])
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_the_cli_ledger_has_one_row_per_attempted_call_and_the_report_no_id(self):
+        root = self.ledger_root()
+        target = self.tmp / "private" / "codex-calls.jsonl"
+        code, out, err = self.lanes_cli(root, "--call-ledger", str(target))
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+        rows = [json.loads(line) for line in target.read_text().splitlines()]
+        self.assertEqual(ledger_view(rows, "actor_ordinal", "owner_kind", "call_id", "tool", "state", "sandbox"),
+                         [(1, "exec", "item_priv_r1_exec", "exec", "succeeded", False),
+                          (1, "exec", "item_priv_r1", "Bash", "succeeded", True),
+                          (1, "exec", "call_priv_r2", "Bash", "succeeded", False),
+                          (2, "subagent", "call_priv_c1", "Bash", "failed", False)])
+        report = json.loads(out)
+        for actor in report["actors"]:  # the kernel's call_states count the same calls, by state (U2)
+            with self.subTest(actor=actor["ordinal"]):
+                mine = [row for row in rows if row["actor_ordinal"] == actor["ordinal"]]
+                states = actor["measurement"]["call_states"]
+                self.assertEqual(len(mine), states["attempted"])
+                self.assertEqual(collections.Counter(row["state"] for row in mine),
+                                 +collections.Counter({state: states[state] for state in {row["state"] for row in mine}}))
+        assert_id_free_report(self, report, [*self.SECRETS, str(root), str(target)])
+
+
 if __name__ == "__main__":
     unittest.main()
