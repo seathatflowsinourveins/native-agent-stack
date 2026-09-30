@@ -24,8 +24,11 @@ account fingerprint, broker order id or ref, activity id, execution id or host p
   sources and `mover-early-entry/mover_scan.py`, whose hashes are in `receipt.json` (`code.engine_sources_sha256`).
 - On 2026-09-30 the clone was still at `b528bb55`, `git status --porcelain` was empty and `sha256sum -c` passed
   again. The other 138 files were not hashed at run time.
-- The offline gate passed 402 tests with exit 0 (2026-09-29, 05:05:52Z-05:08:34Z), as the freeze notes record. The
-  gate log no longer exists, so this receipt does not re-check it.
+- The offline gate passed 402 tests with exit 0 (2026-09-29, 05:05:52Z-05:08:34Z), as the freeze notes record. On
+  2026-09-30 this receipt re-checked the private gate log (sha256 `1efd458e…`): it reads `Ran 402 tests in
+  160.774s` and `OK`, with no FAIL or ERROR line, and the gate's rc record (sha256 `1e5ee31a…`) reads rc 0 for the
+  same window. The gate copy's SUMS before and after the run equal the committed SUMS. Both files sit in a temporary
+  directory and are cited by hash only.
 
 **Runtime.** NautilusTrader LiveNode 2.0.0rc5, alpaca-py 0.44.0, numpy 2.5.3 and requests 2.34.2 on CPython 3.12.3,
 from the pinned adaptive-paper virtual environment. The engine name comes from the trial receipts. The package
@@ -182,8 +185,9 @@ Recorded, not thresholded, as the freeze asks:
 - **Request and submit peaks.** 23, 23, 21, 22, 21 and 21 requests in the busiest 60 s (cap 150); 5, 5, 3, 4, 3 and
   3 submits (cap 130). The lowest `x-ratelimit-remaining` in the receipts was 187 of 200.
 - **Websocket reconnects, gaps and recoveries.** Trials 1 and 4 logged one trading-stream restart line; the others
-  one data-stream and one trading-stream line. All were normal closes, no engine log has a data-stream gap line, and
-  no recovery ran.
+  one data-stream and one trading-stream line. The 6 trading-stream lines completed the closing handshake; the 4
+  data-stream lines sent close code 1000 but received no close frame ([Errors](#errors-rejects-and-retries)). No
+  engine log has a data-stream gap line, and no recovery ran.
 - **`paper_compare.py`.** Not run (decision 11: the tool is not checked against `b528bb55` receipts).
 
 ## Series totals
@@ -208,8 +212,10 @@ endpoint. Its stdout is kept byte-identical as `reconcile-rth-20260929.stdout.js
 nothing to redact.
 - **Tool.** `reconcile_ext_series.py` from [`ext-20260928`](../ext-20260928/README.md) (sha256 `50b9da4c…`), cited
   by path and hash rather than copied. It ran from a byte-identical private copy with the pinned adaptive-paper
-  interpreter (alpaca-py 0.44.0, Python 3.12.3), with `--env-file "$PAPER_ENV_FILE"` under `/bin/bash -ic`. The
-  ledger path went through a shell variable and is not recorded.
+  interpreter; the stdout records alpaca-py 0.44.0 and Python 3.12.3. The command line is not recorded. The
+  coordinator's brief routes the credential as `--env-file "$PAPER_ENV_FILE"` under `/bin/bash -ic`, and the tool
+  requires `--env-file` and `--ledger` and prescribes passing both through shell variables, so that neither path
+  appears on a recorded command line.
 - **Window.** From 2026-09-29T14:00Z (10:00 ET) to 20:20Z, prefix `mvr-rth-20260929-`.
 
 The tool reads the ledger first (sqlite `mode=ro`), then the broker's orders (`status=all`), FILL activities (2
@@ -261,8 +267,15 @@ independent of the engine but not of the broker.
 - **Retries.** None. Every trial started on its first attempt, with no `benchmark_quotes_not_ready` refusal.
 - **HTTP.** 0 HTTP 429 and no transport `rate_limited` mark. The receipts hold 505, 505, 501, 507, 501 and 353 HTTP
   observations, all 200, and every scan's 33 pages returned 200.
-- **Websocket lines.** All normal closes (`sent 1000 (OK)`). The logs carry no timestamps. An isolation check on
-  2026-09-23 found such lines only after the engine's `stop()`; this series neither confirms nor rules that out.
+- **Websocket lines.** alpaca-py logs every websocket exception as a restart line, clean closes included
+  (`websocket_lines` in `receipt.json`).
+  - The 6 trading-stream lines read `sent 1000 (OK); then received 1000 (OK)`: the closing handshake completed.
+  - The 4 data-stream lines, one each in trials 2, 3, 5 and 6, read `sent 1000 (OK); no close frame received`: the
+    client sent close code 1000 but no close frame came back, which websockets 17.1 raises as
+    `ConnectionClosedError`. The closing handshake did not complete, so `websocket_lines_without_close_frame` is 1 in
+    those trials and 0 in trials 1 and 4.
+  - The logs carry no timestamps. The 2026-09-23 isolation check's committed output recorded both forms only after
+    the engine's `stop()`, 0.016 s and 0.018 s after it; this series neither confirms nor rules that out.
 - **Quote handling.** Crossed quotes were dropped and counted: 819 (444 of them IOVA), 523, 316, 227, 382 and 106.
 - **Request counts.** From each trial start the ledger holds exactly the engine-reported requests: 484 reads and 10
   submits, 484 and 10, 484 and 6, 488 and 8, 484 and 6, and 336 and 6.
@@ -279,17 +292,19 @@ independent of the engine but not of the broker.
   series index (written 05:20:57Z). `FREEZE.md` names the driver arguments and `retry-benchmark.sh` but hashes no
   script.
 
-## Units (systemd user journal)
+## Units (systemd user journal and manager)
 
-| Unit | Start (UTC) | Stop (UTC) | Journal result |
+| Unit | Start (UTC) | Stop (UTC) | Result |
 |---|---|---|---|
-| `paper-rth-20260929` | 14:00:05 | 19:44:16 | no exit record; success inferred |
+| `paper-rth-20260929` | 14:00:05 | 19:44:16 | `success`, exit status 0 (manager); no journal exit record |
 
 The journal was queried on 2026-09-30 with `journalctl --user -o json USER_UNIT=<unit>.service` (systemd 255).
 - The unit has start records and a resource-accounting record only: no `EXIT_STATUS`, `EXIT_CODE` or `UNIT_RESULT`
   record and no success record.
-- Its success is inferred from the absence of a failure record, not observed. The driver's last console line reads
-  `series ends: past last start 1540 ET`, its exit-0 path.
+- The systemd user manager still held its result when read with `systemctl --user show` on 2026-09-30 at 18:57Z:
+  `Result=success`, `ExecMainCode=1` (the process exited on its own) and `ExecMainStatus=0`, with the same start
+  and stop times. The manager has run since 2026-09-24, so this is the run's own result, but a manager restart would
+  clear it. The driver's last console line reads `series ends: past last start 1540 ET`, its exit-0 path.
 - The unit and timer files are hashed in `receipt.json`, and each hash matches the private series index.
 
 The broker listing shows no order without the series prefix on account 1 in the window.

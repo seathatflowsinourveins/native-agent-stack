@@ -28,13 +28,17 @@ fingerprint, broker order id or ref, activity id, execution id or host path is r
   sources and `mover-early-entry/mover_scan.py`, whose hashes are in `receipt.json` (`code.engine_sources_sha256`).
 - On 2026-09-30 the clone was still at `b528bb55`, `git status --porcelain` was empty and `sha256sum -c` passed
   again. The other 138 files were not hashed at run time.
-- The offline gate passed 402 tests with exit 0 (2026-09-29, 05:05:52Z-05:08:34Z), as the freeze notes record. The
-  gate log no longer exists, so this receipt does not re-check it.
+- The offline gate passed 402 tests with exit 0 (2026-09-29, 05:05:52Z-05:08:34Z), as the freeze notes record. On
+  2026-09-30 this receipt re-checked the private gate log (sha256 `1efd458e…`): it reads `Ran 402 tests in
+  160.774s` and `OK`, with no FAIL or ERROR line, and the gate's rc record (sha256 `1e5ee31a…`) reads rc 0 for the
+  same window. The gate copy's SUMS before and after the run equal the committed SUMS. Both files sit in a temporary
+  directory and are cited by hash only.
 
 **Runtime.** NautilusTrader LiveNode 2.0.0rc5, alpaca-py 0.44.0, numpy 2.5.3 and requests 2.34.2 on CPython 3.12.3,
 from the pinned adaptive-paper virtual environment. The engine name comes from the trial receipts. The package
-versions were read from the same environment on 2026-09-30 and match the freeze's record; they were not observed at
-run time.
+versions were read from the same environment on 2026-09-30. `FREEZE.md` takes the runtime "as in `rth-20260929`"
+and names no version; `rth-20260929`'s freeze note and the private series index record these versions. They were not
+observed at run time.
 
 **Credential route.** The 0600 env file store through the `$PAPER_ENV_FILE_2` pointer
 ([docs/secret-storage.md](../../../../../docs/secret-storage.md)). The unit launched through `/bin/bash -ic`, whose
@@ -165,8 +169,19 @@ Recorded, not thresholded, as the freeze asks:
 - **Quote-freshness waits and stream gaps.** Trial 4 skipped SSTI with `no_fresh_quote`, and its IOVA exit waited on
   `no_fresh_quote` until the handoff. Trials 2, 3 and 4 each logged one data-stream gap line.
 - **Websocket reconnects.** Trial 1 logged one data-stream and one trading-stream restart line, trial 2 one and two,
-  trial 3 one and one, trial 4 two and three. One trading-stream line in trial 2 and one in trial 4 had no close
-  frame ("no close frame received or sent"); the rest were normal closes.
+  trial 3 one and one, trial 4 two and three. alpaca-py logs every websocket exception this way, clean closes
+  included (`websocket_lines` in `receipt.json`).
+  - All 5 data-stream lines read `sent 1000 (OK); no close frame received`: the client sent close code 1000 but no
+    close frame came back, which websockets 17.1 raises as `ConnectionClosedError` (the closing handshake did not
+    complete).
+  - Of the 7 trading-stream lines, 5 read `sent 1000 (OK); then received 1000 (OK)`, a completed closing handshake.
+    One line in trial 2 and one in trial 4 read `no close frame received or sent`: no close frame either way.
+  - So `websocket_lines_without_close_frame` is 1, 2, 1 and 3, and the subset with no close frame either way
+    (`websocket_lines_no_close_frame_either_way`) is 0, 1, 0 and 1. The recover command's log for trial 4 adds one
+    more data-stream line of the first kind.
+  - The logs carry no timestamps. The 2026-09-23 isolation check's committed output recorded a completed
+    trading-stream handshake and a data-stream line without a close frame only after the engine's `stop()`, 0.016 s
+    and 0.018 s after it. It has no line with no close frame either way.
 - **Benchmark refusals.** 0.
 - **Request peaks.** 19, 22, 20 and 21 requests in the busiest 60 s (cap 150); 5, 4, 2 and 3 submits (cap 130). The
   lowest `x-ratelimit-remaining` in the receipts was 190 of 200.
@@ -209,8 +224,10 @@ byte-identical as `reconcile-ext-20260929.stdout.json` and `reconcile-rec-ext-20
 private-detail check found nothing to redact.
 - **Tool.** `reconcile_ext_series.py` from [`ext-20260928`](../ext-20260928/README.md) (sha256 `50b9da4c…`), cited
   by path and hash rather than copied. It ran from a byte-identical private copy with the pinned adaptive-paper
-  interpreter (alpaca-py 0.44.0, Python 3.12.3), with `--env-file "$PAPER_ENV_FILE_2"` under `/bin/bash -ic`. The
-  ledger path went through a shell variable and is not recorded.
+  interpreter; both stdouts record alpaca-py 0.44.0 and Python 3.12.3. The command lines are not recorded. The
+  coordinator's brief routes the credential as `--env-file "$PAPER_ENV_FILE_2"` under `/bin/bash -ic`, and the tool
+  requires `--env-file` and `--ledger` and prescribes passing both through shell variables, so that neither path
+  appears on a recorded command line.
 - **Window.** From 2026-09-29T20:00Z (16:00 ET) to 2026-09-30T00:10Z, prefixes `mvr-ext-20260929-` and
   `rec-ext-20260929-`.
 
@@ -325,19 +342,21 @@ None found.
 - The IOVA residual was handled as the freeze's boundary disposition provides: it stays open and is recorded, and
   `recover` ran again at the next pre-market. The disposition does not make trial 4 a pass.
 
-## Units (systemd user journal)
+## Units (systemd user journal and manager)
 
-| Unit | Start (UTC) | Stop (UTC) | Journal result |
+| Unit | Start (UTC) | Stop (UTC) | Result |
 |---|---|---|---|
-| `paper-ext-20260929` | 20:00:05 | 21:11:31 | exit status 3 (`exit-code`); OnFailure alert sent |
-| `incentive-monitor-20260929` | 07:55:00 | 00:00:14 (09-30) | no exit record; success inferred |
+| `paper-ext-20260929` | 20:00:05 | 21:11:31 | exit status 3 (`exit-code`), in the journal and the manager; OnFailure alert sent |
+| `incentive-monitor-20260929` | 07:55:00 | 00:00:14 (09-30) | `success`, exit status 0 (manager); no journal exit record |
 
-The journal was queried on 2026-09-30 with `journalctl --user -o json USER_UNIT=<unit>.service` (systemd 255).
+The journal was queried on 2026-09-30 with `journalctl --user -o json USER_UNIT=<unit>.service` (systemd 255), and
+the systemd user manager with `systemctl --user show` at 18:57Z.
 - The series unit has an exit record (`EXIT_STATUS` 3, the driver's "series stopped" code) and a result record
-  (`exit-code`). It triggered its OnFailure alert unit (`paper-alert@%n.service`), which ran 17:11:31-17:11:37 ET
-  and posted to the ntfy `paper-lane` topic.
-- The incentive monitor has start records and a resource-accounting record only; its success is inferred from the
-  absence of a failure record, not observed.
+  (`exit-code`), and the manager holds the same (`Result=exit-code`, `ExecMainStatus=3`). It triggered its OnFailure
+  alert unit (`paper-alert@%n.service`), which ran 17:11:31-17:11:37 ET and posted to the ntfy `paper-lane` topic.
+- The incentive monitor has start records and a resource-accounting record only. The manager still held its result:
+  `Result=success`, `ExecMainCode=1` (the process exited on its own) and `ExecMainStatus=0`. The manager has run
+  since 2026-09-24, so both are the runs' own results, but a manager restart would clear them.
 - The unit and timer files are hashed in `receipt.json`, and each hash matches the private series index.
 
 The incentive monitor ran on account 2's key pair and is data only. Its docstring says it never places, changes or

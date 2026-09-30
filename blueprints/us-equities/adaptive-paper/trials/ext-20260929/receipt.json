@@ -21,6 +21,8 @@
   "section": "paper_e2e"
  },
  "recorded_at_utc": "2026-09-30T18:05:08Z",
+ "revised_at_utc": "2026-09-30T18:57:30Z",
+ "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed.",
  "started_at": "2026-09-29T20:00:05Z",
  "finished_at": "2026-09-29T21:11:31Z",
  "client_id_prefix": "mvr-ext-20260929-",
@@ -59,7 +61,23 @@
     "tests.test_adaptive_paper_transport",
     "tests.test_adaptive_paper_native"
    ],
-   "basis": "the three FREEZE files and the private series index; the gate ran on a scratch git archive copy whose SHA256SUMS before and after the run equal the clone's. The gate log is gone, so this is not re-checked here."
+   "basis": "the three FREEZE files and the private series index, re-checked on 2026-09-30 against the private gate log and the gate's rc record (recheck_2026_09_30); the gate ran on a scratch git archive copy whose SHA256SUMS before and after the run equal the clone's.",
+   "recheck_2026_09_30": {
+    "checked_at": "2026-09-30",
+    "gate_log_sha256": "1efd458eb9501f68f9286a061b8fd54304de7ff9c760e2b36def9d516abd074c",
+    "gate_log_bytes": 2469,
+    "gate_log_modified_at": "2026-09-29T05:08:33Z",
+    "gate_log_result_lines": [
+     "Ran 402 tests in 160.774s",
+     "OK"
+    ],
+    "gate_log_fail_or_error_lines": 0,
+    "gate_rc_record_sha256": "1e5ee31a367b334123403702d7d41ecdcffa6ede61930f0b7a49a60692b604f5",
+    "gate_rc_record": "gate rc=0 start=2026-09-29T05:05:52Z end=2026-09-29T05:08:34Z",
+    "gate_copy_sums_sha256_before_run": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+    "gate_copy_sums_sha256_after_run": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+    "note": "The gate log and rc record are private files in a temporary directory, cited by sha256 only (the log body names host paths); they may not persist. Both SUMS hashes equal frozen_sums.sha256."
+   }
   },
   "runtime": {
    "engine": "NautilusTrader LiveNode 2.0.0rc5",
@@ -69,7 +87,7 @@
    "numpy": "2.5.3",
    "requests": "2.34.2",
    "interpreter": "the pinned adaptive-paper virtual environment (adaptive-paper-20260921)",
-   "runtime_basis": "engine name from every trial receipt; package versions read from the same environment on 2026-09-30 by the builder and recorded at freeze in FREEZE.md; not observed at run time"
+   "runtime_basis": "engine name from every trial receipt; package versions read from the same environment on 2026-09-30 by the builder. FREEZE.md takes the runtime as in rth-20260929 (the pinned venv) and names no version; rth-20260929's FREEZE.md and the private series index record these five versions. Not observed at run time"
   },
   "engine_sources_sha256": [
    {
@@ -185,12 +203,17 @@
  },
  "config": {
   "sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+  "schema_version": 1,
   "mode": "mover_paper",
   "protocol": "mover-early-entry-v1-20260924",
   "endpoint": "https://paper-api.alpaca.markets",
   "feed": "sip",
+  "regular_session_only": false,
   "extended_hours_enabled": true,
   "overnight_holds": false,
+  "overnight_gross_multiple": "1.0",
+  "sessions_extended_hours": true,
+  "catalyst_orders_enabled": false,
   "benchmarks": [
    "SPY"
   ],
@@ -239,6 +262,7 @@
    20
   ],
   "leverage_policy": "leverage-schedule-v1-20260922",
+  "leverage_policy_decision_record": "agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md",
   "leverage_schedule": {
    "RTH": {
     "trend": "4",
@@ -400,7 +424,7 @@
     ],
     "scan_time": "2026-09-29T20:00:05Z",
     "age_seconds_at_trial_start": 17.728,
-    "scan_log_sha256": "3c2ec041d00d3d7e1415e83e38787d86f95d33f404ad79f0b44a47bb274c1cdc"
+    "scan_full_sha256": "3c2ec041d00d3d7e1415e83e38787d86f95d33f404ad79f0b44a47bb274c1cdc"
    },
    "check": "valid",
    "synthetic": "passed (SYN, flat)",
@@ -508,7 +532,8 @@
      "data": 1,
      "trading": 1
     },
-    "websocket_lines_without_close_frame": 0,
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
     "data_stream_gap_lines": 0
    },
    "dropped_crossed_quotes": {
@@ -639,7 +664,7 @@
     ],
     "scan_time": "2026-09-29T20:01:35Z",
     "age_seconds_at_trial_start": 15.066,
-    "scan_log_sha256": "bb8cb4069f5899d5362587a733b23b8af48651180b6cb451b9ee18892be63dd1"
+    "scan_full_sha256": "bb8cb4069f5899d5362587a733b23b8af48651180b6cb451b9ee18892be63dd1"
    },
    "check": "valid",
    "synthetic": "passed (SYN, flat)",
@@ -818,7 +843,8 @@
      "data": 1,
      "trading": 2
     },
-    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_without_close_frame": 2,
+    "websocket_lines_no_close_frame_either_way": 1,
     "data_stream_gap_lines": 1
    },
    "dropped_crossed_quotes": {
@@ -946,7 +972,7 @@
     ],
     "scan_time": "2026-09-29T20:18:32Z",
     "age_seconds_at_trial_start": 51.754,
-    "scan_log_sha256": "306ae4a2744fec641b730de2b518a28eb2d897303f6e6634338a89de740b81aa"
+    "scan_full_sha256": "306ae4a2744fec641b730de2b518a28eb2d897303f6e6634338a89de740b81aa"
    },
    "check": "valid",
    "synthetic": "completed_no_signals (SYN, flat)",
@@ -1081,7 +1107,8 @@
      "data": 1,
      "trading": 1
     },
-    "websocket_lines_without_close_frame": 0,
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
     "data_stream_gap_lines": 1
    },
    "dropped_crossed_quotes": {
@@ -1208,7 +1235,7 @@
     ],
     "scan_time": "2026-09-29T20:22:13Z",
     "age_seconds_at_trial_start": 186.687,
-    "scan_log_sha256": "cc9c9d1e1f8933d324798c68613f9b246f1313ecca37479171d000b554bd74f2"
+    "scan_full_sha256": "cc9c9d1e1f8933d324798c68613f9b246f1313ecca37479171d000b554bd74f2"
    },
    "check": "valid",
    "synthetic": "completed_no_signals (SYN, flat)",
@@ -1353,7 +1380,8 @@
      "data": 2,
      "trading": 3
     },
-    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_without_close_frame": 3,
+    "websocket_lines_no_close_frame_either_way": 1,
     "data_stream_gap_lines": 1
    },
    "dropped_crossed_quotes": {
@@ -2232,6 +2260,28 @@
   "basis": "Each ledger execution price (every one matched to a broker FILL activity on cum_qty, qty and price) compared with its order's reference quote from the engine events: the ask for a buy, the bid for a sell. Better means below the ask for a buy or above the bid for a sell. The recovery's 2 fills are compared with the ledger's bid mark instead (recovery_orders)."
  },
  "engine_receipt_average_differences": [],
+ "websocket_lines": {
+  "source": "each attempt's paper.log; the series console repeats each log's last 3 lines (run-series-trial.sh prints tail -3)",
+  "logged_by": "alpaca-py 0.44.0 logs every websockets.WebSocketException of its data and trading streams, clean closes included, as '... websocket error, restarting connection: <exception text>' (alpaca/data/live/websocket.py:468-475, alpaca/trading/stream.py:215-226)",
+  "library": "websockets 17.1 in the pinned environment",
+  "forms": {
+   "sent 1000 (OK); then received 1000 (OK)": "the closing handshake completed: close code 1000 sent and received; websockets raises ConnectionClosedOK (protocol.py:237-245)",
+   "sent 1000 (OK); no close frame received": "the client sent close code 1000 and received no close frame; websockets raises ConnectionClosedError, the closing handshake did not complete (exceptions.py:118-131 and 168-175, protocol.py:237-245; the deprecated code attribute then reads 1006, abnormal closure, exceptions.py:142-143)",
+   "no close frame received or sent": "neither side sent a close frame; websockets raises ConnectionClosedError (same source)"
+  },
+  "counters": "attempts[].errors.websocket_lines_without_close_frame counts the lines containing 'no close frame received' (both ConnectionClosedError forms); websocket_lines_no_close_frame_either_way counts the subset containing 'no close frame received or sent'. Recorded, not thresholded.",
+  "series_counts": {
+   "lines": 12,
+   "by_stream_and_form": {
+    "trading: sent 1000 (OK); then received 1000 (OK)": 5,
+    "trading: no close frame received or sent": 2,
+    "data: sent 1000 (OK); no close frame received": 5
+   },
+   "lines_without_close_frame": 7
+  },
+  "in_this_series": "every data-stream line received no close frame; of the trading-stream lines, 5 completed the closing handshake and 2 (one each in trials 2 and 4) had no close frame either way",
+  "isolation_check_20260923": "trials/20260923b-needs-attention/transport-isolation-1e2c96a.json (transport 1e2c96a, not b528bb55) recorded the trading-stream line with a completed closing handshake 0.016 s and the data-stream line with no close frame received 0.018 s after stop() was called, and no restart line before it; that directory's README names only the trading-stream line. The logs here carry no timestamps, so these runs neither confirm nor rule out the same timing. The trading-stream lines with no close frame either way have no counterpart in that check."
+ },
  "recovery_20260929": {
   "trial": 4,
   "force": {
@@ -2375,6 +2425,17 @@
    "requests_from_its_recovery_started_to_the_iova_reservation": {
     "read": 4,
     "submit": 1
+   },
+   "websocket_lines": {
+    "source": "trial 4's recover.log",
+    "restart_lines": {
+     "data": 1,
+     "trading": 0
+    },
+    "without_close_frame": 1,
+    "no_close_frame_either_way": 0,
+    "form": "data: sent 1000 (OK); no close frame received",
+    "note": "the series console repeats this line after 'recover rc=3'; attempts[3].errors counts the paper stage's log only"
    }
   },
   "iova_refusal_analysis": {
@@ -2470,7 +2531,7 @@
   "stdout": "reconcile-ext-20260929.stdout.json",
   "stdout_sha256": "e8131c7cc24a3bf69dee1ae35678527ece33ca5510c0aa71823a815273e335ba",
   "stdout_note": "byte-identical to the run's stdout; the private-detail check found nothing to redact",
-  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z with the pinned adaptive-paper interpreter, --env-file \"$PAPER_ENV_FILE_2\" under /bin/bash -ic, prefix mvr-ext-20260929- and the window below; the ledger path went through a shell variable and is not recorded",
+  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z from a byte-identical copy of the tool, with the pinned adaptive-paper interpreter (the stdout records python 3.12.3 and alpaca-py 0.44.0), prefix mvr-ext-20260929- and the window below (both in the stdout). The command line is not recorded. The coordinator's brief routes account 2's credential as the $PAPER_ENV_FILE_2 pointer passed as --env-file under /bin/bash -ic; the tool requires --env-file and --ledger (reconcile_ext_series.py:219-220), and its docstring (lines 6-8 and 12) prescribes passing both through shell variables, so that neither path appears on a recorded command line.",
   "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
   "alpaca_py": "0.44.0",
   "python": "3.12.3",
@@ -2530,6 +2591,7 @@
   "command": "journalctl --user --no-pager -o json USER_UNIT=<unit>.service",
   "journald": "systemd 255 (255.4-1ubuntu8.17)",
   "result": "The series unit has an exit record (EXIT_STATUS 3) and a result record (exit-code), and triggered its OnFailure alert unit; the incentive monitor has start records and a resource-accounting record only.",
+  "exit_results": "For incentive-monitor-20260929, which has no journal exit record, the exit status and result come from the systemd user manager's state, read with systemctl --user show on 2026-09-30 (units[].manager_state).",
   "unit_files": "the unit and timer files' sha256 (private_artifacts_sha256) equal the private series index's table on 2026-09-30"
  },
  "units": [
@@ -2551,7 +2613,20 @@
    "result": "exit-code",
    "inferred": false,
    "console_end": "17:11:31 ET series stops: ext-20260929-4 no paper=needs_attention recovery=needs_attention",
-   "on_failure": "the OnFailure alert unit (paper-alert@%n.service for this unit) ran 17:11:31-17:11:37 ET and posted to the ntfy paper-lane topic"
+   "on_failure": "the OnFailure alert unit (paper-alert@%n.service for this unit) ran 17:11:31-17:11:37 ET and posted to the ntfy paper-lane topic",
+   "manager_state": {
+    "queried_at": "2026-09-30T18:57:30Z",
+    "command": "systemctl --user show --timestamp=us+utc <unit>.service -p Result -p ExecMainCode -p ExecMainStatus -p ExecMainStartTimestamp -p ExecMainExitTimestamp -p NRestarts",
+    "result": "exit-code",
+    "exec_main_code": 1,
+    "exec_main_code_meaning": "CLD_EXITED: the main process exited on its own, not by a signal",
+    "exec_main_status": 3,
+    "exec_main_start": "2026-09-29T20:00:05.303167Z",
+    "exec_main_exit": "2026-09-29T21:11:31.653233Z",
+    "n_restarts": 0,
+    "manager_running_since": "2026-09-24T04:23:13.051772Z",
+    "note": "The systemd user manager has run since 2026-09-24, before this unit started, so this is the run's own recorded result. The manager keeps it in memory: a manager restart clears it."
+   }
   },
   {
    "unit": "incentive-monitor-20260929",
@@ -2564,11 +2639,23 @@
     "unit_starting"
    ],
    "journal_exit_records": 0,
-   "exit_status": null,
-   "result": null,
-   "inferred": true,
-   "inferred_result": "success",
-   "result_note": "The journal holds this unit's start records and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. Success is inferred from the absence of a failure record, not observed."
+   "exit_status": 0,
+   "result": "success",
+   "inferred": false,
+   "result_note": "The journal holds this unit's start records and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. The exit status and result come from the systemd user manager's state (manager_state), not from the journal.",
+   "manager_state": {
+    "queried_at": "2026-09-30T18:57:30Z",
+    "command": "systemctl --user show --timestamp=us+utc <unit>.service -p Result -p ExecMainCode -p ExecMainStatus -p ExecMainStartTimestamp -p ExecMainExitTimestamp -p NRestarts",
+    "result": "success",
+    "exec_main_code": 1,
+    "exec_main_code_meaning": "CLD_EXITED: the main process exited on its own, not by a signal",
+    "exec_main_status": 0,
+    "exec_main_start": "2026-09-29T07:55:00.308314Z",
+    "exec_main_exit": "2026-09-30T00:00:14.109305Z",
+    "n_restarts": 0,
+    "manager_running_since": "2026-09-24T04:23:13.051772Z",
+    "note": "The systemd user manager has run since 2026-09-24, before this unit started, so this is the run's own recorded result. The manager keeps it in memory: a manager restart clears it."
+   }
   }
  ],
  "series_totals": {
@@ -2895,7 +2982,7 @@
   "systemd user unit incentive-monitor-20260929.service": "007fd5ba486461e3e778984d3ae0039c5822ec0d992563df59a7d1543cafce15",
   "systemd user unit incentive-monitor-20260929.timer": "ee549de8b98c592b63183bc216abe3b04ed552d810f46f2ce2288d5d147bebd4"
  },
- "private_artifacts_note": "Hashes of retained private files that carry no account fingerprint (checked before hashing). The files in committed_copies are committed here; the rest stay private: the config and rule.txt (their content is in config and scanner_rule), the scan, check and synthetic files, the engine logs and events, the scan page ledgers, the probes, the series scripts and the systemd units. The engine ledgers, the NautilusTrader logs and the scan page caches stay private and are not hashed; the ledger snapshots are cited in ledger_snapshots. For this series they also include trial 4's recover.log, the recovery-prefix reconciliation, the 2026-09-30 recovery plan and outcome notes, and that recovery's 17 attempt receipts, their logs and its console.",
+ "private_artifacts_note": "Hashes of retained private files that carry no account fingerprint (checked before hashing). The files in committed_copies are committed here; the rest stay private: the config and rule.txt (their content is in config and scanner_rule), the scan, check and synthetic files, the engine logs and events, the scan page ledgers, the probes, the series scripts and the systemd units. The engine ledgers, the NautilusTrader logs and the scan page caches stay private and are not hashed; the ledger snapshot is cited in ledger.snapshot. For this series they also include trial 4's recover.log, the recovery-prefix reconciliation, the 2026-09-30 recovery plan and outcome notes, and that recovery's 17 attempt receipts, their logs and its console.",
  "private_notes_sha256": {
   "ext-20260929/FREEZE.md": "c72bbfedf5280a4510d96628853cd2c11182ddc4749011fccbc077febb741b0c",
   "SERIES-INDEX.md": "f53fab8bde06b4e317691c030bce74fba3661dd731ffdcc232947ed913993284"
@@ -2920,7 +3007,7 @@
    "orders[].average_fill_price": "ledger intents and the broker listing (equal); engine-receipt differences are listed in engine_receipt_average_differences",
    "orders[].reference_quote": "engine events (mover_entry_submitted ask, mover_exit_submitted bid) and each order's reference_price in the engine receipt",
    "committed_copies": "sha256 of each committed file against its private source",
-   "units[0] times": "systemd user journal and the series console",
+   "units[0] times": "systemd user journal, the manager state (units[0].manager_state.exec_main_start and exec_main_exit) and the series console",
    "series_totals.realized_pnl_usd": "per-trial engine receipts (trials 1-3), the ledger intents and executions (trial 4 and the recovery), the ledger meta minus pre-20260929's figures, and the broker recompute of both prefixes",
    "series_totals.cash_flow_usd, ledger.this_series, ledger.at_series_end": "both reconciliation stdouts, the ledger meta and positions, and pre-20260929's committed figures",
    "series_totals.gross_loss_usd": "the losing legs and the ledger meta realized_loss minus pre-20260929's 95.00",
@@ -2933,13 +3020,19 @@
    "fees.bases_recomputed_from_ledger": "account 2's ledger executions against the fee descriptions (8820.73 proceeds, 1357 shares in 38 sell executions, 81 executions)",
    "broker_reconciliation_recovery": "the recovery-prefix stdout against the ledger (asserted with the series-prefix run: 22 orders and 35 fills in the window, 0 foreign)",
    "errors_rejects_retries.source_citations": "each file:line range asserted by the builder to hold the cited code in the frozen clone (websocket.py in the pinned alpaca-py 0.44.0)",
-   "attempts[].acceptance.failed_clauses, not_evaluable_clauses": "the clause values: false is failed, null is not evaluable from the files"
+   "attempts[].acceptance.failed_clauses, not_evaluable_clauses": "the clause values: false is failed, null is not evaluable from the files",
+   "code.offline_gate": "FREEZE.md, the private series index, and the private gate log and rc record re-read on 2026-09-30 (402 tests, OK, rc 0, the same window; cited by sha256 in code.offline_gate.recheck_2026_09_30)",
+   "attempts[].scan.scan_full_sha256": "the sha256 printed in scan.log and in the series console's scan line, equal to sha256 of the private scan-full.json (private_artifacts_sha256)",
+   "scanner_rule (frozen_config_rule, rule_txt, every_attempt_argument)": "the config file, rule.txt and every attempt's scan.log, equal after the percent-points to ratio conversion (G20 is G0.20)",
+   "engine_receipt_average_differences": "each engine receipt's order average against the ledger intent and the broker listing (orders[].average_fill_price)",
+   "series_procedure.scripts_note (script sha256)": "sha256sum of each private script on 2026-09-30 and the private series index's table (equal); private_artifacts_sha256 repeats them",
+   "journal_query.unit_files": "sha256 of the private unit and timer files on 2026-09-30 and the private series index's table (equal)",
+   "units[0].exit_status, result": "the systemd user journal's exit and result records and the manager state (units[0].manager_state)"
   },
   "single_source": {
-   "config (every field)": "the config file; its sha256 is asserted above, so these are the values the engine ran, but no second source repeats them",
+   "config (every field of the config file)": "the config file; its sha256 is asserted above, so these are the values the engine ran, but no second source repeats them. Layout: mover.* and sessions.* are shown at the top level (sessions.extended_hours as sessions_extended_hours), mover.rung_schedule as rung and rung_sessions, leverage_policy.version as leverage_policy, leverage_policy.decision_record as leverage_policy_decision_record and leverage_policy.schedule as leverage_schedule",
    "frozen_acceptance text, series_procedure freeze text": "FREEZE.md, quoted verbatim (the file stays private and is cited by sha256)",
-   "code.offline_gate": "FREEZE.md and the private series index (the gate log no longer exists)",
-   "code.runtime versions": "the pinned environment read on 2026-09-30 by the builder; FREEZE.md records the same versions at freeze",
+   "code.runtime versions": "the pinned environment read on 2026-09-30 by the builder; FREEZE.md takes the runtime as in rth-20260929, whose FREEZE.md and the private series index record the same versions",
    "code.runtime.engine": "mover-paper.json native.engine",
    "attempts[].started_at, ended_at, et": "series console (ET wall times)",
    "attempts[].caps, preflight, session numbers": "mover-paper.json sizing, session and preflight",
@@ -2952,16 +3045,25 @@
    "attempts[].ledger_risk": "engine receipt ledger_risk (Decimal tails below 1e-12 USD shown as cents; the raw strings remain in the committed engine receipts)",
    "orders[].submitted_at, filled_at, type, time_in_force, extended_hours": "broker listing",
    "orders[].reason, cancel_reason": "engine receipt",
-   "broker_reconciliation (observed_at, window, pages, positions_now, open_orders_now, versions, skew)": "the committed reconciliation stdout",
-   "broker_reconciliation.run": "the coordinator's brief of 2026-09-30 (tool copy sha256, interpreter, time); the stdout records the prefix and window",
-   "units[] except the series unit's times": "systemd user journal",
+   "broker_reconciliation (observed_at, alpaca_py, python, window, prefix, orders_listed_in_window, orders_with_series_prefix, orders_without_series_prefix, order_final_status_counts, fill_activity_pages, fill_activities_in_window, fill_activities_not_joined_to_series_orders, ledger_intents, ledger_executions, ledger_intents_not_listed_by_broker, ledger_broker_ids_not_in_listing, executions_matched_on_cum_qty_qty_price, executions_matched_on_execution_id, max_ledger_vs_broker_time_skew_seconds, unconfirmed_executions, orders_agreeing_with_ledger, broker_sells_minus_buys_usd, positions_now, position_symbols_now, open_orders_now, ledger_positions_nonzero)": "the committed reconciliation stdout, under its own names where they differ (alpaca_py_version, orders_with_prefix, orders_without_prefix_in_window, status_counts, fill_activities_without_prefix_order, ledger_intents_with_prefix, ledger_executions_with_prefix, executions_matched_on_execution_id_too, max_ledger_vs_activity_time_skew_seconds, broker_recomputed_realized_pnl_usd_by_trial and _total); orders_agreeing_with_ledger counts its orders' agree flags",
+   "broker_reconciliation.run": "the coordinator's brief of 2026-09-30 (tool copy sha256, interpreter, time, credential route), the tool's argument parser and docstring (reconcile_ext_series.py:6-8, 12 and 219-220) and the stdout (prefix, window, python, alpaca_py_version); the command line itself is not recorded",
+   "units[] except the series unit's times": "systemd user journal and the manager state (units[].manager_state)",
    "ledger.peak_pnl_usd": "ledger meta peak_pnl (mark-to-market; no second source can recompute it)",
    "dry_run": "each series' dryrun-20260929 files and check-probe record",
    "fees (amounts)": "the cash-gap output (broker FEE activities)",
    "recovery_20260929.in_process_recovery": "the engine receipt of trial 4 (reconciliation.recovery) and the ledger events",
    "recovery_20260929.recover_command.reads_before_its_recovery_started": "the ledger requests table",
    "units[0].on_failure": "systemd user journal of the alert unit",
-   "errors_rejects_retries.controller_stop (setters), frozen_acceptance.known_effects_text": "the engine source at b528bb55 (cited file:line) and FREEZE.md"
+   "errors_rejects_retries.controller_stop (setters), frozen_acceptance.known_effects_text": "the engine source at b528bb55 (cited file:line) and FREEZE.md",
+   "broker_reconciliation_recovery.run": "the coordinator's brief of 2026-09-30 (tool copy sha256, interpreter, time, credential route), the tool's argument parser and docstring (reconcile_ext_series.py:6-8, 12 and 219-220) and the stdout (prefix, window, python, alpaca_py_version); the command line itself is not recorded",
+   "units[].manager_state, the exit_status and result it gives, journal_query.exit_results": "systemctl --user show --timestamp=us+utc, read-only, at manager_state.queried_at; the manager's UserspaceTimestamp (manager_running_since) predates the units",
+   "series_procedure.key_probe": "the private probe record probe-20260929T200005Z.json (hashed in private_artifacts_sha256): request, http_status, observed_at and the rate-limit headers; the series console's line 4 repeats rc=0 and http_status=200",
+   "series_procedure.scripts_note (modification times)": "stat of the private scripts, the three FREEZE files and the private series index on 2026-09-30 (modification times in UTC)",
+   "journal_query (queried_at, command, journald, result)": "the builder's journalctl --user -o json query at queried_at (the records per unit are in units[].journal_records) and systemctl --version for journald",
+   "websocket_lines (logged_by, library, forms)": "the pinned environment's websockets 17.1 (exceptions.py:118-131, 142-143 and 158-175; protocol.py:237-245) and alpaca-py 0.44.0 (alpaca/data/live/websocket.py:468-475; alpaca/trading/stream.py:215-226), read on 2026-09-30",
+   "websocket_lines.isolation_check_20260923": "the committed trials/20260923b-needs-attention/transport-isolation-1e2c96a.json (restart_log_records) and that directory's README",
+   "paper_lane_row (dashboard_lane, cites_at_branch_base)": "observability/grand-dashboard/state.json at the branch base f03f41c7 (the paper lane's title and evidence_ref)",
+   "attempts[].force_note": "the engine receipt's force fields and events, with the engine source lines each note names (errors_rejects_retries.source_citations)"
   },
   "derived": {
    "orders[].fills_at_reference_quote, fills_better_than_reference, fills_worse_than_reference, fills_at_reference_quote": "ledger execution prices against the asserted reference quotes",
@@ -2974,13 +3076,19 @@
    "recovery_20260929.recover_command.iova_sale.quote_age_at_reservation_seconds": "the IOVA intent's reservation time minus the ledger's IOVA mark time",
    "recovery_20260929.recover_command.iova_sale.seconds_after_bex_sale_filled": "the IOVA intent's reservation time minus the BEX sale's last ledger execution time",
    "series_totals.entries_submitted, exits_submitted": "the engine orders by side",
-   "series_totals.realized_pnl_usd.by_trial.4": "0.00 (BKYI) plus (40.44 - 40.37) x 24 (BEX)"
+   "series_totals.realized_pnl_usd.by_trial.4": "0.00 (BKYI) plus (40.44 - 40.37) x 24 (BEX)",
+   "attempts[].errors.websocket_lines_without_close_frame, websocket_lines_no_close_frame_either_way; websocket_lines.series_counts": "counted from each attempt's paper.log: the lines containing 'no close frame received', the subset containing 'no close frame received or sent', and each stream's lines by form; series_counts sums the attempts (each line belongs to one attempt)",
+   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries",
+   "recovery_20260929.recover_command.websocket_lines": "trial 4's recover.log, counted as for attempts[].errors",
+   "broker_reconciliation.recovery_prefix_note": "the two committed stdouts compared: each run's orders and fills without its prefix against the other run's"
   },
   "literal": {
    "units[].role, notes, labels": "the builder's descriptions",
    "attempts[].flat_basis, cleanup.proof": "text written after the asserts on the end reconciliation and the broker read",
    "residual_recovery_20260930.status, pending_text": "the coordinator's brief: the final disposition is filled in later",
-   "recovery_client_id_prefix, recovery_orders_note": "the recovery's client-id prefix as recovery.py:48 forms it, and the builder's description"
+   "recovery_client_id_prefix, recovery_orders_note": "the recovery's client-id prefix as recovery.py:48 forms it, and the builder's description",
+   "revised_at_utc, revision_note": "the builder's record of this repair",
+   "paper_lane_row (update, this_receipt_supports and the other fields)": "the builder's summary of the verdicts above"
   }
  },
  "error": null,
@@ -2990,7 +3098,7 @@
   "Alpaca paper fills are simulated by the broker from quotes. They are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
   "Mechanics only: the protocol's development study passed 0 of 768 rule-exits, so no result here evaluates a strategy.",
   "paper_compare.py was not run (decision 11: the tool is not checked against b528bb55 receipts), so no historical fill-model comparison is recorded.",
-  "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. An isolation check on 2026-09-23 (trials/20260923b-needs-attention) found normal-close restart lines only after the engine's stop(); these runs neither confirm nor rule that out.",
+  "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. The 2026-09-23 isolation check's committed output (trials/20260923b-needs-attention/transport-isolation-1e2c96a.json, transport 1e2c96a) recorded a trading-stream line with a completed closing handshake 0.016 s and a data-stream line with no close frame received 0.018 s after the engine's stop() was called, and no restart line before it; its README names only the trading-stream line. These runs neither confirm nor rule out the same timing. The trading-stream lines with no close frame either way (trials 2 and 4) have no counterpart in that check.",
   "Account designation: the series kept its own engine ledger (the new account-2 root, shared with pre-20260929) but traded broker account alpaca-paper-2, which blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 and docs/secret-storage.md:17 designate as the isolated incentive-monitor study account. Whether this use fits the forward study's isolation is referred to the forward protocol's owner, the trading lane; this receipt does not decide it.",
   "The IOVA refusal's reason is not recorded: the transport sanitizes it and the recovery keeps the exception type. The files narrow it to validate_pending's quote check or the 0.25 s hook deadline and cannot distinguish the two.",
   "The trigger of trials 2 and 3's controller_stop is not recorded; a data-stream disconnect is consistent with it but inferred, not measured.",
@@ -3007,7 +3115,7 @@
   "stdout": "reconcile-rec-ext-20260929.stdout.json",
   "stdout_sha256": "1231744eb9d746e7a5211141b48a426666cc93d22a464c83de5ac03844267047",
   "stdout_note": "byte-identical to the run's stdout; the private-detail check found nothing to redact",
-  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z with the pinned adaptive-paper interpreter, --env-file \"$PAPER_ENV_FILE_2\" under /bin/bash -ic, prefix rec-ext-20260929- and the window below; the ledger path went through a shell variable and is not recorded",
+  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z from a byte-identical copy of the tool, with the pinned adaptive-paper interpreter (the stdout records python 3.12.3 and alpaca-py 0.44.0), prefix rec-ext-20260929- and the window below (both in the stdout). The command line is not recorded. The coordinator's brief routes account 2's credential as the $PAPER_ENV_FILE_2 pointer passed as --env-file under /bin/bash -ic; the tool requires --env-file and --ledger (reconcile_ext_series.py:219-220), and its docstring (lines 6-8 and 12) prescribes passing both through shell variables, so that neither path appears on a recorded command line.",
   "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
   "alpaca_py": "0.44.0",
   "python": "3.12.3",
