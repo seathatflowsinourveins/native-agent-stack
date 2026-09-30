@@ -1,0 +1,42 @@
+# Drafted, not run: no host has loaded, enabled or started this unit (the worktree that authored it made no host
+# changes). stack-currency.timer starts it once a day. It has no [Install] section, matching this directory's
+# timer-triggered oneshot convention (codex-broker-reaper.service, host-requests-workstation.service). Why a timer
+# and a due-file rather than a check at session start: docs/decisions/2026-09-30-session-currency-notice.md.
+#
+# @REPOSITORY@ is the checkout that holds scripts/currency_due.py. On the workstation that is the live clone,
+# %h/code/native-agent-stack-live, as for credential-boot-receipt.service; never the working checkout, whose
+# revision moves, and never a build worktree, which a merge deletes. Substitute it before installing, as for the
+# other @REPOSITORY@ templates in this directory, and verify both units together (adoption/lifecycle.md):
+#   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/stack-currency.service > ~/.config/systemd/user/stack-currency.service
+#   cp adoption/templates/systemd/stack-currency.timer ~/.config/systemd/user/
+#   systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+#
+# The run makes no network call and writes nothing into the checkout. scripts/currency_due.py runs
+# receipt_staleness.py, adoption_status.py --pinned-versions and saturation_ledger.py --report, then writes
+# $XDG_STATE_HOME/native-agent-stack/currency-due.json (~/.local/state/... when XDG_STATE_HOME is unset; mode 0600)
+# when something is due and removes it otherwise. Its --network option (runtime-worker skill pins through gh api)
+# stays off here.
+#
+# PATH: adoption_status.py --pinned-versions finds each version probe with shutil.which, and the user manager's own
+# PATH lacks the ecosystem bin directory, so without this line every probe would be reported unchecked and
+# pins_behind would read 0 (on the workstation on 2026-09-30 all six exec probes of the default profile resolved
+# only there). On another host, use the directories that hold its pinned tools.
+# PYTHONDONTWRITEBYTECODE=1 keeps this interpreter and the three it starts from writing __pycache__ into the
+# checkout; -B on ExecStart would not reach the child interpreters.
+# TimeoutStartSec= covers the script's own per-check bounds (120 s + 120 s + 600 s for the version probes); a
+# oneshot has no start timeout by default (systemd.service(5)). UMask=0077 and NoNewPrivileges=true follow this
+# directory's other oneshots.
+[Unit]
+Description=Write the stack currency due-file for the next session (read-only checks, no network)
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=900
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/currency_due.py
