@@ -381,7 +381,7 @@
     },
     {
       "id": "token-efficiency",
-      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "label": "Accepted 2026-09-30 as the selection, per docs/decisions/2026-09-30-task-model-routing.md: the token-efficiency practice and its Claude Code and Codex wiring",
       "required_commands": [
         "codex",
         "claude",
@@ -395,7 +395,10 @@
         "serena",
         "socraticode",
         "ai-memory",
-        "mcporter"
+        "mcporter",
+        "jcodemunch-mcp",
+        "codebase-memory-mcp",
+        "ast-grep"
       ],
       "component_ids": [
         "codex",
@@ -411,13 +414,17 @@
         "serena",
         "socraticode",
         "ai-memory",
-        "mcporter"
+        "mcporter",
+        "jcodemunch-mcp",
+        "codebase-memory-mcp",
+        "ast-grep"
       ],
       "recipe_paths": [
         "docs/token-efficiency-stack.md",
         "docs/token-session-handbook.md",
         "recipes/README.md",
-        "recipes/native-upgrades-20260921.md"
+        "recipes/native-upgrades-20260921.md",
+        "docs/decisions/2026-09-30-task-model-routing.md"
       ]
     }
   ],

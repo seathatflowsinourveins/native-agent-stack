@@ -2265,8 +2265,11 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
               "mcp-surfaces")
     CURRENT_CHOICE = {"RTK": "rtk", "Context Mode": "context-mode", "Repomix": "repomix", "Headroom": "headroom",
                       "TOON": "toon", "ccusage": "ccusage"}
-    OPTIONAL = {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub", "agentsview", "claude-hud",
-                "otel-tui", "omniroute"}
+    # The code-navigation layer's current choice names these three as its task-selected tools; the profile has carried
+    # them since 2026-09-30 (docs/decisions/2026-09-30-task-model-routing.md). They are not that layer's winners.
+    NAVIGATION_CHOICE = {"ast-grep": "ast-grep", "codebase-memory": "codebase-memory-mcp",
+                         "jCodeMunch": "jcodemunch-mcp"}
+    OPTIONAL = {"context-hub", "agentsview", "claude-hud", "otel-tui", "omniroute"}
 
     @staticmethod
     def load(relative: str):
@@ -2294,22 +2297,25 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
         self.assertEqual(selected - self.rows, {"codex", "claude-code"})
         choice = layers["token-efficiency"]["current_choice"]
         self.assertTrue(all(name in choice for name in self.CURRENT_CHOICE), choice)
+        navigation = layers["code-navigation"]["current_choice"]
+        self.assertTrue(all(name in navigation for name in self.NAVIGATION_CHOICE), navigation)
         winners = {winner["component_id"] for layer_id in self.LAYERS for winner in layers[layer_id]["winners"]}
-        self.assertEqual(selected & self.rows, (winners & self.rows) | set(self.CURRENT_CHOICE.values()),
+        expected = ((winners & self.rows) | set(self.CURRENT_CHOICE.values())
+                    | set(self.NAVIGATION_CHOICE.values()))
+        self.assertEqual(selected & self.rows, expected,
                          "a token row these layers now select (or drop) must join (or leave) the profile")
         self.assertEqual(selected & self.OPTIONAL, set())
         self.assertLessEqual(self.OPTIONAL, self.rows)
 
-    def test_the_sixteen_subagent_tools_are_ten_profile_rows_and_six_optional_rows(self):
+    def test_the_sixteen_subagent_tools_are_thirteen_profile_rows_and_three_optional_rows(self):
         # docs/token-efficiency-stack.md, "Inside Ultracode subagents": the 16 tools that run used are not the
-        # profile's 14 component_ids. Ten are profile rows; six are optional rows; the profile's other four are the
-        # two clients, ccusage (not run) and MCPorter (there only as Headroom's bridge).
+        # profile's 17 component_ids. Thirteen are profile rows; three are optional rows; the profile's other four are
+        # the two clients, ccusage (not run) and MCPorter (there only as Headroom's bridge).
         receipt = self.load("evidence/artifacts/token-e2e-ultracode-20260925/receipt.json")
         tools = {tool["component_id"] for tool in receipt["tools"]}
         selected = set(self.profile["component_ids"])
-        self.assertEqual((len(tools), len(selected), len(tools & selected)), (16, 14, 10))
-        self.assertEqual(tools - selected, {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub",
-                                            "agentsview", "otel-tui"})
+        self.assertEqual((len(tools), len(selected), len(tools & selected)), (16, 17, 13))
+        self.assertEqual(tools - selected, {"context-hub", "agentsview", "otel-tui"})
         self.assertLessEqual(tools - selected, self.OPTIONAL)
         self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
 
