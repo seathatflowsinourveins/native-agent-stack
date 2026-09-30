@@ -6,18 +6,31 @@ the primary worker and an invocation-scoped OmniRoute Responses provider.
 The existing Codex integration remains the incumbent; this example does not
 select a winner in the separate SDK comparison.
 
-## Run one bounded task
+## Call from a native Claude coordinator
 
 The PEP 723 scripts and adjacent locks pin `openai-codex==0.159.2`, including
-its matching native CLI. Use the existing selected gateway and a task worktree.
-Run from the repository root:
+its matching native CLI. In the native Claude session, use its `Bash` tool to run
+the following command from the repository root. `WORKER_PROJECT` is the owned
+task worktree with the selected project `.agents/skills`; `PRIVATE_WORKER_HOME`
+is an existing independent private Codex configuration/state directory prepared
+through the selected adoption recipe. `WORKER_TASK` contains the bounded task
+and its artifact/test contract. Pass only that task, not the coordinator's whole
+conversation. `PRIVATE_NATIVE_RESULT` names a new private artifact path.
 
 ```sh
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
-  --prompt -
+  --prompt "$WORKER_TASK" \
+  --native-result "$PRIVATE_NATIVE_RESULT"
 ```
+
+This subprocess contract scopes the provider to the SDK worker; native Claude
+and Codex coordinator sessions retain their account routes and configuration.
+Source: [Claude native Bash/tool usage](https://code.claude.com/docs/en/overview),
+the official SDK launch contract and the provider sources below. A source-backed
+caller recipe is distinct from observing an actual Claude `Bash` invocation;
+retain that native invocation before claiming Claude-side execution acceptance.
 
 The default endpoint is the selected loopback gateway at port 20128. An owned
 reverse observer can be supplied with `--base-url`; the worker never changes
