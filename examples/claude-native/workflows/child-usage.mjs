@@ -2282,9 +2282,15 @@ const afterGitOptions = (rest, text) => {
   const pattern = new RegExp(rest, 'y')
   return gitSubcommandStarts(text).some((at) => { pattern.lastIndex = at; return pattern.test(text) })
 }
-let nativeCheck = null
-function rtkChecker() {
-  if (nativeCheck) return nativeCheck
+// One native checker per replay agent (PR-A U3 10d): `rtk hook check --agent <agent>` answers as that agent's hook would. rtk-ai/rtk
+// v0.50.0 maps codex to InProcess(Host::Codex), which has no RTK-side permission rules, and claude to Host::Claude, which merges the
+// project's and the home's .claude/settings(.local).json Bash rules, so a claude answer depends on the working directory and HOME
+// while a codex one does not; the rewrite decision is the same for both (src/hooks/decision.rs:61-97, :196-204;
+// src/hooks/permissions.rs:56-67, :141-175). The claude checker is unchanged, so Claude output is byte-identical.
+const RTK_AGENTS = ['claude', 'codex']
+const nativeChecks = new Map()
+function rtkChecker(agent = 'claude') {
+  if (nativeChecks.has(agent)) return nativeChecks.get(agent)
   const version = spawnSync('rtk', ['--version'], { encoding: 'utf8' })
   if (process.platform !== 'linux' || version.status !== 0 || !/^rtk 0\.50\.0\s*$/.test(version.stdout)) return null
   const dir = mkdtempSync(join(tmpdir(), 'rtk-measure-'))
@@ -2292,9 +2298,9 @@ function rtkChecker() {
   writeFileSync(join(dir, 'rtk', 'config.toml'), '[hooks]\nexclude_commands = [\n' + FIVE_EXCLUSIONS.map((p) => "'" + p + "'").join(',\n') + '\n]\n', { mode: 0o600 })
   process.once('exit', () => rmSync(dir, { recursive: true, force: true }))
   const cache = new Map()
-  nativeCheck = (command) => {
+  const check = (command) => {
     if (!cache.has(command)) {
-      const p = spawnSync('rtk', ['hook', 'check', '--agent', 'claude', command], {
+      const p = spawnSync('rtk', ['hook', 'check', '--agent', agent, command], {
         encoding: 'utf8', timeout: 10000, maxBuffer: 1024 * 1024,
         env: { ...process.env, XDG_CONFIG_HOME: dir, RTK_DB_PATH: join(dir, 'history.db') },
       })
@@ -2303,9 +2309,10 @@ function rtkChecker() {
     }
     return cache.get(command)
   }
-  // A native behavior probe catches the upstream silent invalid-config fallback.
-  if (['jq . f', 'diff a b', 'git branch -a', 'git show HEAD:a', 'git -C . show HEAD:a'].some((c) => nativeCheck(c).rewrite !== null)) { nativeCheck = null; return null }
-  return nativeCheck
+  // A native behavior probe, per agent, catches the upstream silent invalid-config fallback.
+  if (['jq . f', 'diff a b', 'git branch -a', 'git show HEAD:a', 'git -C . show HEAD:a'].some((c) => check(c).rewrite !== null)) return null
+  nativeChecks.set(agent, check)
+  return check
 }
 export function sensitivePart(text) {
   if (FIVE_EXCLUSIONS.some((p) => p.startsWith(GIT_OPTIONS) ? afterGitOptions(p.slice(GIT_OPTIONS.length), text)
@@ -2335,14 +2342,30 @@ const finishRtk = (out, status = rtkStatus(out)) => {
   return { ...out, status, unknown_call_share: checked ? share(out.unknown_calls, out.calls) : null,
     coverage: checked ? share(out.observed_covered_parts, out.eligible_parts) : null, call_coverage: checked ? share(out.observed_all_covered_calls, out.eligible_calls) : null }
 }
-function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
-  const out = emptyRtk(), check = enabled ? rtkChecker() : null
-  if (!check) return finishRtk(out, enabled ? 'unavailable' : 'not_measured')
+// rtk_parts.d7 (PR-A U3 10d, Codex replay only): D7's RTK-eligible class, the fixed-config eligible parts less the log and find parts
+// whose digest-bound rtk_log_find review says requires_raw, prefixed or not (adoption/templates/codex.AGENTS.template.md lists git
+// log and find as conditional exceptions; the unconditional ones, git show REV:path, diff, git branch, jq, and cd, export or source,
+// are already ineligible under the five exclusions or have no rewrite). An unreviewed log or find part stays and leaves d7
+// incomplete, as does an unknown call. covered_parts are observed: an explicit rtk prefix in what ran, since the Codex hook is held.
+// wrapped_exceptions inherits the fixed-config explicit_rtk_on_excluded_or_sensitive, M6c's zero counter (README "PR-A measurement
+// fields"), and adds wrapped_requires_raw_parts, the prefixed parts a review says required raw output.
+const D7_COUNTS = ['eligible_parts', 'covered_parts', 'eligible_calls', 'all_covered_calls', 'wrapped_exceptions', 'wrapped_requires_raw_parts',
+  'log_find_permitted_parts', 'log_find_requires_raw_parts', 'log_find_unresolved_parts']
+const finishD7 = (d7, status) => ({ ...d7, coverage: share(d7.covered_parts, d7.eligible_parts), call_coverage: share(d7.all_covered_calls, d7.eligible_calls), status })
+function rtkParts(calls, rewrites, enabled, exceptions, results = new Map(), agent = 'claude') {
+  const out = emptyRtk(), check = enabled ? rtkChecker(agent) : null
+  const d7 = agent === 'codex' ? Object.fromEntries(D7_COUNTS.map((k) => [k, 0])) : null
+  if (!check) {
+    const status = enabled ? 'unavailable' : 'not_measured'
+    return { ...finishRtk(out, status), ...(d7 ? { d7: finishD7(d7, status) } : {}) }
+  }
   for (const c of calls) {
     if (c.name !== 'Bash') continue
     out.calls++
     const command = String(c.input?.command || ''), parts = shellParts(command)
     if (!parts) { out.unknown_calls++; continue }
+    const review = exceptions[c.id]
+    const dispositionOf = (i) => validReview(review) && validLogFindReview(review) ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
     // What a part says about explicit rtk use needs only the command's own parts, so it counts for every call whose parts parse, including one
     // M-R1 cannot classify below: M-R3 and M6c's zero counter must not lose a violation to a replay that could not be read.
     const views = parts.map((part, i) => {
@@ -2363,18 +2386,18 @@ function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
       if (explicit && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
       if (explicit && logFindPart(raw)) {
         out.explicit_rtk_log_find_advisory++
-        const review = exceptions[c.id]
-        const disposition = validReview(review) && validLogFindReview(review)
-          ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
+        const disposition = dispositionOf(i)
         out[disposition === 'permitted' ? 'log_find_permitted_parts' : disposition === 'requires_raw' ? 'log_find_requires_raw_parts' : 'log_find_unresolved_parts']++
       }
-      return { raw, rawPipeline, pipelineConsumer }
+      return { raw, explicit, rawPipeline, pipelineConsumer }
     })
     // M-R1 reads a call whole: its native replay, the command the hook ran and every part's standalone check. A call any of them fails for is
     // one unknown call, whatever its number of parts, and adds nothing to the part counters (B8: out of the eligible-part denominators).
     const replay = check(command), executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
     if (!executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
-    let eligible = 0, ineligible = 0, observed = 0, covered = 0, unknown = false
+    let eligible = 0, ineligible = 0, observed = 0, covered = 0, unknown = false, kept = 0, keptObserved = 0
+    // D7's per-call counters are held until the call is known to be readable: an unknown call adds nothing to any part counter (B8).
+    const callD7 = { permitted: 0, requires_raw: 0, unresolved: 0, wrapped_raw: 0 }
     for (const [i, view] of views.entries()) {
       if (!view) continue
       // Query EVERY standalone part, even exclusions; the native hook decides eligibility.
@@ -2382,10 +2405,23 @@ function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
       if (alone.error) { unknown = true; break }
       if (view.rawPipeline || view.pipelineConsumer || !alone.rewrite) { ineligible++; continue }
       eligible++
-      if (/^rtk\s+(?!proxy\b)/.test(executed[i].text)) observed++
+      const ran = /^rtk\s+(?!proxy\b)/.test(executed[i].text)
+      if (ran) observed++
       if (/^rtk\s+(?!proxy\b)/.test(predicted[i].text)) covered++
+      if (d7) {
+        const disposition = logFindPart(view.raw) ? dispositionOf(i) ?? 'unresolved' : null
+        if (disposition) callD7[disposition]++
+        if (disposition === 'requires_raw') { if (view.explicit) callD7.wrapped_raw++; continue }
+        kept++
+        if (ran) keptObserved++
+      }
     }
     if (unknown) { out.unknown_calls++; continue }
+    if (d7) {
+      d7.log_find_permitted_parts += callD7.permitted; d7.log_find_requires_raw_parts += callD7.requires_raw; d7.log_find_unresolved_parts += callD7.unresolved
+      d7.wrapped_requires_raw_parts += callD7.wrapped_raw; d7.eligible_parts += kept; d7.covered_parts += keptObserved
+      if (kept) { d7.eligible_calls++; d7.all_covered_calls += keptObserved === kept ? 1 : 0 }
+    }
     out.eligible_parts += eligible; out.ineligible_parts += ineligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
     if (!eligible) continue
     out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0
@@ -2394,7 +2430,10 @@ function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
     if (m.executed) states.executed++
     if (observed && m.state === 'succeeded') out.observed_covered_succeeded_calls++
   }
-  return finishRtk(out)
+  const done = finishRtk(out)
+  if (!d7) return done
+  d7.wrapped_exceptions = out.explicit_rtk_on_excluded_or_sensitive + d7.wrapped_requires_raw_parts
+  return { ...done, d7: finishD7(d7, done.status !== 'measured' || d7.log_find_unresolved_parts ? 'incomplete' : 'measured') }
 }
 // Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12 row: blind evidence
 // needs 0 hook_additional_context rows from any hook event); its content array holds one entry per hook whose context Claude Code delivered
@@ -2663,7 +2702,9 @@ function aggregateFinalReturns(items) {
   return out
 }
 
-export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER } = {}) {
+export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER, rtkAgent = 'claude' } = {}) {
+  // rtkAgent: the agent whose hook the replay asks rtk about (rtkChecker); the Codex bridge (tools/skill-usage) passes codex.
+  if (!RTK_AGENTS.includes(rtkAgent)) throw new TypeError('rtkAgent must be one of ' + RTK_AGENTS.join(', '))
   const calls = new Map(), results = new Map(), rewrites = new Map()
   const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
   for (const [index, row] of transcript.entries()) {
@@ -2788,7 +2829,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
-    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results, rtkAgent),
     usage: transcriptUsage(transcript, window), final_return: finalReturn(transcript, window),
     hook_context: hookContext,
     call_states: callStates, m15: finishM15(m15),
@@ -2875,6 +2916,10 @@ export function aggregateMeasurements(items) {
   // actors' statuses; otherwise the one status every actor has (unavailable or not_measured), or incomplete for a mix.
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
   const rtkChecked = rtkStates.length > 0 && rtkStates.every((s) => s === 'measured' || s === 'incomplete')
+  // rtk_parts.d7 is summed over the measurements that carry it (Codex replay), and its status follows rtk_parts' rule.
+  const d7s = items.map((m) => m.rtk_parts.d7).filter(Boolean), d7States = [...new Set(d7s.map((d) => d.status))]
+  const d7 = d7s.length ? finishD7(Object.fromEntries(D7_COUNTS.map((k) => [k, d7s.reduce((n, d) => n + d[k], 0)])),
+    d7States.length === 1 ? d7States[0] : 'incomplete') : null
   // actors_with_insertion counts the actors with at least one insertion row; loaded_actors and loaded_not_called_actors count, per server,
   // the actors with at least one such reference: the unit of the historical 'Loaded, never called' baseline row (children per server).
   const hooks = { ...Object.fromEntries(HOOK_SCALARS.map((k) => [k, 0])), actors_with_insertion: 0, ...Object.fromEntries(HOOK_MAPS.map((k) => [k, counter()])) }
@@ -2947,7 +2992,7 @@ export function aggregateMeasurements(items) {
     bytes_complete: items.length > 0 && items.every((m) => m.bytes_complete && !m.parse_errors),
     invalid_exceptions: items.reduce((n, m) => n + m.invalid_exceptions, 0),
     calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
-    rtk_parts: finishRtk(rtk, rtkChecked ? rtkStatus(rtk) : rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured'),
+    rtk_parts: { ...finishRtk(rtk, rtkChecked ? rtkStatus(rtk) : rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured'), ...(d7 ? { d7 } : {}) },
     ...(items.every((m) => m.usage) ? { usage: aggregateUsage(items.map((m) => m.usage)) } : {}) }
 }
 // Usage over actors (a measurement without usage, such as a Codex one whose provider_usage replaces it, leaves the aggregate without usage):

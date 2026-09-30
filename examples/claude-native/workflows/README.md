@@ -843,6 +843,22 @@ self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
 temporary five-exclusion configuration from
 [the adopted recipe](../../../recipes/README.md#native-context-mode-and-hooks),
 and native `rtk hook check --agent claude` on every simple part and whole call.
+`measureTranscript`'s `rtkAgent` option names the agent instead: `claude` by default,
+or `codex`, which the Codex bridge (`tools/skill-usage/skill_usage.py --lanes`) passes
+since PR-A U3; any other value is refused. rtk 0.50.0 maps `codex` to
+`InProcess(Host::Codex)`, which has no RTK-side permission rules, while `claude`
+merges the Bash rules of the project's and the home's `.claude/settings(.local).json`,
+so a Claude replay depends on the working directory and HOME and a Codex one does not
+([decision.rs:196-204](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/decision.rs#L196-L204),
+[permissions.rs:141-175](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/permissions.rs#L141-L175)).
+Each agent has its own checker and five-exclusion probe; the `claude` checker is
+unchanged, and Claude output was byte-identical across the change with `--rtk-check`
+([pra-u3-differential-20260929](../../../evidence/artifacts/pra-u3-differential-20260929/README.md)).
+On the claude path rtk 0.50.0 prints a once-a-day "No hook installed" warning on
+stderr when a Claude directory registers no rtk hook
+([hook_check.rs:26-35, :88-135](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/hook_check.rs#L88-L135)).
+The probe then reads that answer as an error, and the replay is `unavailable` for
+that process.
 No transcript command executes. Sources:
 [native check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
 [lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
@@ -905,6 +921,23 @@ position among all command segments. M-R3/M6c's deterministic zero is not full
 exception clearance while advisory parts are unresolved or require raw output.
 These semantic adjudications never change the fixed-config eligible denominator.
 
+With `rtkAgent: 'codex'`, `rtk_parts` also carries `d7`, the Codex-only view of
+D7's RTK-eligible class; Claude output has no `d7` and its fields are unchanged.
+
+- `d7` starts from the fixed-config eligible parts and drops each `git log` or `find`
+  part, prefixed or not, whose `rtk_log_find` review says `requires_raw`.
+- A `permitted` part stays. An unreviewed part stays too, but sets `d7.status` to
+  `incomplete`, as an unknown call does.
+- `covered_parts`, `coverage`, `eligible_calls`, `all_covered_calls` and
+  `call_coverage` read the kept parts as the fixed-config fields read theirs.
+- `wrapped_exceptions` is `explicit_rtk_on_excluded_or_sensitive` plus
+  `wrapped_requires_raw_parts`, the prefixed parts a review says required raw
+  output. M6c's zero counter therefore keeps its classes, which are broader than
+  the [deployed exception list](../../../adoption/templates/codex.AGENTS.template.md).
+- `aggregateMeasurements` sums `d7` over the measurements that carry it; its status
+  follows the rule of `rtk_parts`.
+- Which view M6c grades from, the fixed-config fields or `d7`, is the M6c owner's call.
+
 Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
 eligible population, including an otherwise eligible `git diff --stat`.
 `rtk_parts` and `proxy_parts` keep their prefix rule (a part that starts with
@@ -954,7 +987,12 @@ success, failure and unfinished calls; persisted Codex item status supplies stat
 when result bytes are absent. `sandbox_operations` counts normalized nested
 code-mode operations, whose results return to code. They contribute M4/RTK/MCP
 state observations but no M3/M5 context bytes or missing-context-result counts.
-The outer exec return is measured once as carrier `code_mode`.
+The outer exec return is measured once as carrier `code_mode`, and so is the output
+of a code-mode `wait` call that resumes a running cell. The Codex adapter decides
+which operations are nested: since PR-A U3, an item without a model call id is nested
+when an own `exec` call came earlier in its turn. It also counts
+`measurement.code_mode` and marks legacy-mode spans it cannot observe
+([Codex side](../../../tools/skill-usage/README.md)).
 `loaded_not_called` counts loaded server
 references without an attempted call by that actor. These implement PR-A's
 review controls; the per-call reconciliation ledger for rejected, cancelled and
