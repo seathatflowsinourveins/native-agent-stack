@@ -1,5 +1,10 @@
 # Native Codex SDK worker through OmniRoute
 
+For task-selected MCP, native child agents and automation, use the
+[native enhancement kit](enhancements.md) and its metadata readiness gate.
+The [bounded live acceptance](../../evidence/receipts/omniroute-runtime-enhancements-20260930.json)
+covers selected skill/MCP use, one Astra/Max judge and a completed Dagu graph.
+
 This foundation worker can be called from a native Claude coordinator. It uses
 the maintained Codex harness through the official Python SDK, with Sol/max as
 the primary worker and an invocation-scoped OmniRoute Responses provider.

@@ -69,7 +69,7 @@
     ],
     "sources": [
       {
-        "path": "examples/omniroute-codex-sdk/worker.py",
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
         "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651"
       },
       {
@@ -83,7 +83,7 @@
         "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
       },
       {
-        "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
         "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5"
       }
     ],
@@ -93,7 +93,7 @@
         "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
       },
       {
-        "path": "examples/omniroute-codex-sdk/test_worker.py",
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
         "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a"
       },
       {
@@ -730,7 +730,8 @@
     "Source/evaluation artifacts pin the final formatting-equivalent implementation; exact pre-format live worker bytes are retained in native commits named in the receipt.",
     "The 136-skill native installation and check are separate from per-task quality. Upstream source suites, authored local fixtures and actual provider execution remain separate.",
     "The new native Claude parent reports list-price cost and its own usage scope, separate from the external SDK child. The new child contributes 31,005 tokens once; distinct successful SDK threads now total 259,749. Parent usage is not added to that SDK total. Original independent transport reconciliation covers only the earlier 228,744 direct-trial tokens.",
-    "The first callsite record check rejected receipt kind native_model_e2e as an observation evidence_class. The published observation class was corrected to the validator-supported model_task_execution, matching retained provider trials; no run or receipt outcome changed. Independent review also corrected allowed Bash/Read/Skill versus actually invoked Read/Bash."
+    "The first callsite record check rejected receipt kind native_model_e2e as an observation evidence_class. The published observation class was corrected to the validator-supported model_task_execution, matching retained provider trials; no run or receipt outcome changed. Independent review also corrected allowed Bash/Read/Skill versus actually invoked Read/Bash.",
+    "Pre-enhancement source, test and dispatcher bytes from public commit ef90678c199a53bb43344fedec2fbcd5b6bf5c58 are archived under evidence/artifacts/omniroute-runtime-workers-20260930. Frozen-input paths now point to those unchanged bytes, preserving historical hashes after the separately recorded enhancement work."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",

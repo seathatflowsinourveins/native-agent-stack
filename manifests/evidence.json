@@ -3728,6 +3728,29 @@
         "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave and 11 after it, 22 after the re-check; other sessions may have used points in between."
       ],
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
+    },
+    {
+      "id": "omniroute-runtime-enhancements-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode",
+        "serena",
+        "dagu"
+      ],
+      "claim": "A scoped native Codex SDK Sol-Max worker completed skill use, selected Context Mode/Serena MCP calls, one Astra-Max native judge and an unchanged oracle through OmniRoute in a successful bounded Dagu graph.",
+      "limitations": [
+        "One unchanged arithmetic fixture and bounded integration; no universal highest-quality model, framework or SDK ranking.",
+        "169 enabled skills were visible through native discovery. This run read using-superpowers and exercised three selected MCP calls; it does not qualify every installed skill, tool, language server, plugin or hook.",
+        "Native hook support and live web search are configured, but their execution is unmeasured here. No scheduler, schedule, hook or global account configuration was installed by this kit.",
+        "Native parent and child cumulative usage are separate scopes. Cached input and reasoning are subsets; observer response counters corroborate the same usage and must not be added. Failed/interrupted and complete provider usage, billing and token savings remain unknown.",
+        "Each observed completed stream also has an unclassified flow_error record. Native results completed; transport is not described as error-free, and requested model/provider labels are not backend identity attestation.",
+        "The separate Claude SDK Devin bridge retains its failed/unqualified status. Earlier native Claude-to-SDK acceptance is a historical separate callsite, not a rerun against this source.",
+        "The follow-up native Claude cooperation session was stopped after no confirmed SendMessage/final packet; no peer approval or new owner-contact count is claimed.",
+        "The isolated kit is a scoped private worker configuration. Live owners retain shared worker policy, host-wide catalogs/defaults and dashboard checkpoint ownership."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
     }
   ],
   "files": [
@@ -3738,8 +3761,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
-      "bytes": 2248
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
+      "bytes": 2565
     },
     {
       "path": ".gitattributes",
@@ -5563,9 +5586,14 @@
       "bytes": 56660
     },
     {
+      "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+      "sha256": "c412bb23594de1003e8aae0e9fad3cf9379de4e5ef63ca09303c36c233ef61f2",
+      "bytes": 29593
+    },
+    {
       "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
-      "sha256": "b95c7e1feecf8bdc2a9d315d1dd12551b1636f9ab68ed7ca0b18158efc84a17c",
-      "bytes": 29454
+      "sha256": "6d4812ea4906789e2f55cf206d03863af6116c7137d667d542d2395ac985ce31",
+      "bytes": 29902
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -35268,6 +35296,46 @@
       "bytes": 23100
     },
     {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt",
+      "sha256": "b9032a013f9d5b050a0940a2c8142d75ff75d6e560e88e77c58383d4c94fc679",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt",
+      "sha256": "82dd567b9e0fd8cc300b516fed535584472a499f63431ddeb030a36065c91426",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt",
+      "sha256": "5c023dcf0c9c80a3aaf303dda47a268250c61b054551e3f8ccf213033609c72e",
+      "bytes": 2183
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt",
+      "sha256": "46cab557d04fcb6bc5ad1be96c5b46d4dd82a8bfc25fe719fb095deb64a7e756",
+      "bytes": 1282
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
+      "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+      "bytes": 11517
+    },
+    {
       "path": "evidence/artifacts/omniroute-sol-max-20260930/README.md",
       "sha256": "ecd66ad007aca5ec24223805e98035b5da99284671a65a62dbf799f4aaba2084",
       "bytes": 2800
@@ -43803,6 +43871,11 @@
       "bytes": 6238
     },
     {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06",
+      "bytes": 27429
+    },
+    {
       "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
       "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
       "bytes": 17754
@@ -44234,8 +44307,18 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "17316922e6eddf158641d3cf76294c9a4a6ffb43b33ee6bd5630a0e0b1091ab3",
-      "bytes": 10526
+      "sha256": "b1b48386e9ae9cd9f11841eb08765ad7cf5b68da65fab18a259ac7e487b469df",
+      "bytes": 10848
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94",
+      "bytes": 1889
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55",
+      "bytes": 1053
     },
     {
       "path": "examples/omniroute-codex-sdk/checks.json",
@@ -44243,9 +44326,29 @@
       "bytes": 4632
     },
     {
+      "path": "examples/omniroute-codex-sdk/enhancements.md",
+      "sha256": "05b325ac018d6cb3124bc519d69a667f5d1b6c5a7390098803680c79bbccc394",
+      "bytes": 9333
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/rerun-plan.json",
+      "sha256": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730",
+      "bytes": 1813
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4",
+      "bytes": 1294
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6",
+      "bytes": 3027
+    },
+    {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a",
-      "bytes": 12585
+      "sha256": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8",
+      "bytes": 26008
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
@@ -44254,8 +44357,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
-      "bytes": 11517
+      "sha256": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074",
+      "bytes": 22008
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
@@ -46434,6 +46537,7 @@
     }
   ],
   "convergence_records": [
+    "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",

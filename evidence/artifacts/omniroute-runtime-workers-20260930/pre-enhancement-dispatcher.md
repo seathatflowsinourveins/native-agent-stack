@@ -9,9 +9,7 @@ Bash tool. The primary route is `cx/gpt-6.1-sol-max`, with native Max effort.
 The coordinator retains its native Claude account and model route.
 
 Give a writing worker its own worktree, bounded file ownership, an executable
-acceptance condition and a configured private Codex home. For MCP, native agents
-or automation, follow `examples/omniroute-codex-sdk/enhancements.md` and pass its
-readiness check before dispatch. Tell it other workers
+acceptance condition and an existing private Codex home. Tell it other workers
 are present and that it must preserve their edits. Feed the task on stdin:
 
 ```sh
@@ -26,9 +24,7 @@ Use the selected gateway's native Responses lane at loopback port 20128. Keep
 native caches, tools and project skill discovery intact; load only task-relevant
 skill bodies. Install selected skills through the existing runtime-worker skill
 recipe, rather than importing the entire catalog into the task prompt. Optional
-MCP services use their native configuration and task-specific readiness checks.
-Use the coordinator's selected native workflow roles for research, implementation
-and verification, and the bounded Dagu graph when the task needs automation.
+MCP services require their own configuration and acceptance.
 
 Keep returned thread IDs private and use `--resume` for continuation. The latest
 thread usage snapshot includes previous turns; count it once. A deadline invokes
