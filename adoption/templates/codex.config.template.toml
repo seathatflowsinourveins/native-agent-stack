@@ -176,6 +176,16 @@ trusted_hash = "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8
 [hooks.state."${HOME}/.codex/hooks.json:session_start:0:0"]
 trusted_hash = "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
 
+# Pre-computed trust for the stack-currency notice group of adoption/templates/codex.hooks.template.json, which is
+# a template only, not applied by any installer; B1 applies no Codex hook. The key is the position the group takes
+# when it is hand-appended after ai-memory's one SessionStart group in the user hooks.json (group 1); after two or
+# more groups it gets key session_start:2:0 or later and stays untrusted until it is reviewed in /hooks. Unlike the
+# recorded entries around it, this hash is computed from the template (scripts/adoption_status.py
+# codex_hook_hashes, the rust-v0.157.1 hook hash), so it holds on every host; tests/test_currency_due_notice.py
+# recomputes it.
+[hooks.state."${HOME}/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:f5bab0c673ee8ada58e2b1618bdda0f57592f293d1cb753fd09fd56f0a16b3e0"
+
 [hooks.state."${HOME}/.codex/hooks.json:session_end:0:0"]
 trusted_hash = "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
 

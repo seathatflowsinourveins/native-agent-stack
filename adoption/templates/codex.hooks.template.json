@@ -1,0 +1,17 @@
+{
+  "description": "This file is a template only, not applied by any installer; B1 applies no Codex hook. It shows the SessionStart group that would run the native-agent-stack session-start currency notice in Codex (adoption/hooks/claude/currency-due-notice.py, which the Claude profile's guard step installs under ~/.claude/hooks). By hand, append this group after the one SessionStart group already in the user hooks.json in the Codex home (ai-memory's installer writes it): Codex then keys it session_start:1:0 and the matching trusted_hash in adoption/templates/codex.config.template.toml applies. After two or more groups the key is session_start:2:0 or later, and Codex lists the handler as untrusted until it is reviewed in /hooks. Used as is: $HOME is expanded by the shell Codex runs the command in.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/currency-due-notice.py\" 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
