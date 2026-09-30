@@ -12,7 +12,8 @@ sweep's return) or the bare return. The lane defaults to the return's `sweep`. W
                  {lost: true}); failures/<layer> (the layer's retained failures); skills_usage; gpt6_usage
   lanes.json     {lanes: [{lane, result: {layers, calls, limits}, proposals}], critic, lost} for build_manifest.py
   layers.json    ledger layer entries whose refs start with @RETURNS@ (make_result.py puts in the returns path)
-  survivors.json [{layer_id, repository}] for source_reviews.py
+  survivors.json [{layer_id, repository}] for source_reviews.py; a skills survivor adds its proposal's pin and
+                 skill_md_sha256, the commit and SKILL.md the refuters judged
 Survival: the facts refuter AND the Claude fit refuter AND the GPT-6 fit refuter did not refute (the fit vote is
 two-family: refuted when either family refutes). A vote refutes unless it says refuted: false, so a missing or
 malformed vote counts as refuted and is noted. When a later round proposes a repository again, that round's proposal
@@ -481,7 +482,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             if not survives and not ((facts_refuted and fv) or (claude_refuted and cv) or (gpt6_refuted and gv)):
                 absent.append((repo_slug, [role for role, _ in VOTE_ROLES if not row[role]]))
             if survives:
-                survivors.append({"layer_id": layer_id, "repository": repository})
+                survivor = {"layer_id": layer_id, "repository": repository}
+                if catalog == SKILLS_CATALOG:  # the commit and SKILL.md the refuters judged, which source_reviews.py checks
+                    survivor.update(pin=p.get("pin"), skill_md_sha256=p.get("skill_md_sha256"))
+                survivors.append(survivor)
             new_candidates.append({"repository": repository, "source": f"{lane}: {p.get('source', '')}"[:600],
                                    "demonstrated_gap": p.get("demonstrated_gap"), "proposed_label": p.get("proposed_label"),
                                    "comparison_that_would_overturn": p.get("comparison_that_would_overturn"),
