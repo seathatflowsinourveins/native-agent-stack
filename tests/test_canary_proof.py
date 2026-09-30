@@ -268,6 +268,8 @@ def act(spec):
             open(spec["once"], "w").close()
         kind = spec["do"]
         if kind == "block":
+            if spec.get("ready"):
+                open(spec["ready"], "w").close()
             with open(spec["path"], "rb") as handle:
                 handle.read()
         elif kind == "sleep":
@@ -656,7 +658,7 @@ class IntegratedTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         first = json.loads(receipts[0].read_text())
         result = host.tool("cleanup", "--run", host.run_id)
-        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.returncode, 0, "C4-cleanup-clean")  # cleanup's own absence fact stales nothing
         receipts = sorted((host.state / "native-agent-stack" / "canary-proof").glob("*.json"))
         second = json.loads(receipts[-1].read_text())
         for key in ("verdict", "codes", "claim", "hits"):
@@ -747,6 +749,16 @@ class UnitTests(unittest.TestCase):
             parser.close(1)
             self.assertEqual(check.reason, "ok" if name == "planned" else "unparseable_output", "M1-grammar " + name)
 
+    def test_scanner_settle_fails_exit_2_and_a_deadline_itself(self):
+        """The worker's own rule, independent of the coordinator's refusal to trust a complete RESULT with a bad exit:
+        only exit 0 or 1 settles a scanner check; exit 2 is scanner_exit and a missed deadline is deadline (10.3)."""
+        for code, reason in ((0, "ok"), (1, "ok"), (2, "scanner_exit"), (None, "deadline")):
+            check = wire.Check(1, "M1", "raw", "other", bytes(16), 0)
+            child = type("Child", (), {"finish": lambda self, deadline, code=code: code})()
+            parser = type("Parser", (), {"close": lambda self, files: None})()
+            wire.Scan.settle(None, check, child, parser, 0.0, 1)
+            self.assertEqual(check.reason, reason, f"M1-settle exit {code}")
+
 
 @needs_tools
 class ProbeTests(unittest.TestCase):
@@ -833,9 +845,9 @@ class StoreTests(unittest.TestCase):
     def test_arm_and_disarm_never_list_the_store(self):
         host = self.armed_host()
         result = host.tool("arm", "--run", host.run_id, "subagent", forbid_list=host.store)
-        self.assertEqual(result.returncode, 0, ("S-no-list", result.stderr))
+        self.assertEqual(result.returncode, 0, "S-no-list")
         result = host.tool("disarm", "--run", host.run_id, forbid_list=host.store)
-        self.assertEqual(result.returncode, 0, ("S-no-list disarm", result.stderr))
+        self.assertEqual(result.returncode, 0, "S-no-list disarm")
 
     def test_foreign_inode_is_never_removed_and_absence_is_verified(self):
         host = self.armed_host()
@@ -1153,15 +1165,16 @@ class BoundaryTests(unittest.TestCase):
         os.close(reader)
         self.assertIn("protocol_error", partial.reasons, "B4-partial-frame")
         # A lying worker: its END's counts all match, yet one declared check never terminated (check completion), or a
-        # RESULT calls itself complete while it counted stderr bytes (the coordinator never trusts that).
-        for name, results in (("unterminated-check", [(1, 0)]), ("stderr-count", [(1, 0), (2, 3)])):
+        # RESULT calls itself complete while it counted stderr bytes or carries exit 2 (the coordinator trusts neither).
+        for name, results in (("unterminated-check", [(1, 0, 0)]), ("stderr-count", [(1, 0, 0), (2, 3, 0)]),
+                              ("exit-status", [(1, 0, 0), (2, 0, 2)])):
             lying = cp.Session(None, {"subpass": 0, "controls": None}, "A1", 5, "r", [(2, 1)], set(), [root])
             lying.nonce, lying.seal, obj = nonce, os.urandom(16), os.urandom(16)
             frames = [dict(kind=wire.BEGIN, seal=lying.seal), dict(kind=wire.BEGIN, seal=lying.seal, object=root)]
             frames += [dict(kind=wire.INVENTORY, check=check, sink=1, mode=1, view=1, expected=1, object=obj)
                        for check in (1, 2)]
             frames += [dict(kind=wire.RESULT, check=check, sink=1, mode=1, view=1, status=1, observed=1, expected=1,
-                            object=obj, aux=stderr) for check, stderr in results]
+                            object=obj, aux=stderr, exit=status) for check, stderr, status in results]
             frames += [dict(kind=wire.RESULT, check=0, sink=1, status=1),
                        dict(kind=wire.END, sink=1, status=1, observed=2, expected=2)]
             for fields in frames:
@@ -1245,6 +1258,7 @@ class BoundaryTests(unittest.TestCase):
         for name, spec in cases.items():
             with self.subTest(name=name):
                 host = Host(self)
+                host.constants["AGENT_SINKS"] = ["A1"]  # one worker: no later worker's start re-reads the union
                 (host.home / ".claude" / "a.txt").write_text("plain\n")
                 host.prepare()
                 spec = dict(spec)
@@ -1424,6 +1438,8 @@ class RequestTests(Shared, unittest.TestCase):
     def test_r1_a_kill_before_the_plan_supersedes_the_passing_final(self):
         for point in ("after_request", "before_mkdir", "before_union", "before_plan"):
             with self.subTest(point=point):
+                # Each kill point faces a passing final, never an earlier point's unfinished request.
+                self.assertEqual(self.host.scan("final").returncode, 0, f"R1-passing-before {point}")
                 result = self.host.scan("final", hooks={point: {"do": "kill"}})
                 self.assertEqual(result.returncode, -9)
                 code, verdict, codes = self.host.verdict()
@@ -1796,9 +1812,35 @@ def blocked_program(host, name, phase=None, prefix=""):
             f"if sys.argv[1:] == ['--version']:\n    os.execv({real!r}, [{real!r}, '--version'])\n")
     if phase:
         code += f"if {phase!r} not in sys.argv:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n"
-    code += prefix + f"\nopen({str(fifo)!r}, 'rb').read()\n"
+    ready = host.root / f"ready-{name}"  # created just before it blocks, so an observer knows the child is running
+    code += prefix + f"\nopen({str(ready)!r}, 'w').close()\nopen({str(fifo)!r}, 'rb').read()\n"
     host.script(name, code)
     return fifo
+
+
+def scopes_of(pids) -> set:
+    """The ecosystem-job scope cgroups (kernel paths) these processes belong to, other than this test process's own
+    (a suite may itself run inside a bounded job): the independent scope observer."""
+    found = set()
+    for pid in [*pids, "self"]:
+        try:
+            with open(f"/proc/{pid}/cgroup", "rb") as handle:
+                lines = handle.read().splitlines()
+        except OSError:
+            continue
+        scopes = {line[3:].decode() for line in lines
+                  if line.startswith(b"0::/") and re.search(rb"/ecosystem-job-\d+-\d+-\d+\.scope$", line)}
+        found = found - scopes if pid == "self" else found | scopes
+    return found
+
+
+def wait_scopes_gone(paths, seconds: float) -> list:
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        if not any(os.path.isdir("/sys/fs/cgroup" + path) for path in paths):
+            return []
+        time.sleep(0.25)
+    return sorted(path for path in paths if os.path.isdir("/sys/fs/cgroup" + path))
 
 
 @needs_tools
@@ -2032,6 +2074,15 @@ class ModeTests(unittest.TestCase):
             self.assertEqual(host.scan().returncode, 5, "M2-each-compressor " + suffix)
             self.assertTrue(any(e["mode"] == 2 and e["view"] == 4 for e in hits(host)), "M2-decoded-bom " + suffix)
             self.assertTrue(any(e["mode"] == 2 and e["view"] == 3 for e in hits(host)), "M2-decoded-raw " + suffix)
+            self.assertEqual(host.finished()["status"], "complete", "M2-every-branch-complete " + suffix)
+            # A compressed UTF-16 canary alone: only the BOM-first, same-encoding branch of that one decoder sees it.
+            alone = self.fixture()
+            alone.prepare()
+            (alone.home / ".claude" / ("le." + suffix)).write_bytes(
+                compress(b"\xff\xfe" + alone.canary().encode("utf-16-le")))
+            self.assertEqual(alone.scan().returncode, 5, "M2-utf16-only-in-bom-view " + suffix)
+            self.assertEqual({(e["mode"], e["view"]) for e in hits(alone)}, {(2, 4)}, "M2-utf16-only-in-bom-view "
+                             + suffix)
         host = self.fixture()
         host.prepare()
         value = host.canary()
@@ -2089,10 +2140,14 @@ class ModeTests(unittest.TestCase):
         other.journal_add(anchor)
         self.assertEqual(other.scan().returncode, 5, "M3-vacuum-retains-first-hit")
         self.assertIn("journal_cursor_missing", sink_reasons(other, "A11"), "M3-first-cursor-required")
+        # The bound first entry survives with its own cursor, but its anchor text is gone: only the anchor rule fails.
         third = self.fixture("A11")
         third.prepare()
-        third.journal.write_text(json.dumps([journal_entry(1, "no anchor")]))
+        entries = json.loads(third.journal.read_text())
+        entries[0] = [[name, "not the anchor" if name == "MESSAGE" else value] for name, value in entries[0]]
+        third.journal.write_text(json.dumps(entries))
         self.assertEqual(third.scan().returncode, 3, "M3-anchor-required")
+        self.assertNotIn("journal_cursor_missing", sink_reasons(third, "A11"), "M3-anchor-required cursor kept")
 
     def test_m4_real_discovered_and_configured_stores_keep_and_duplicates(self):
         for configured in (False, True):
@@ -2315,6 +2370,7 @@ class ContainmentTests(unittest.TestCase):
         else:
             (host.home / ".claude/sample").write_bytes(b"old")
         host.prepare()
+        ready = host.root / f"ready-{kind}"
         if kind not in ("worker", "sqlite"):
             blocked_program(host, kind, phase="fsck" if kind == "git" else "--user" if kind == "journalctl" else None,
                             prefix="os.write(1, b'\\xff\\xfe' + b'x\\x00' * 300)" if kind == "gzip" else "")
@@ -2324,16 +2380,17 @@ class ContainmentTests(unittest.TestCase):
             os.mkfifo(fifo)
             target = host.dumper if kind == "sqlite" else host.worker
             target["hooks"]["after_identity" if kind == "sqlite" else "after_prewalk"] = {
-                "do": "block", "path": str(fifo)}
+                "do": "block", "path": str(fifo), "ready": str(ready)}
         process = host.tool("scan", "--run", host.run_id, "--phase", "baseline", background=True)
         self.addCleanup(self.reap, host, process)
-        deadline = time.monotonic() + 10
-        while time.monotonic() < deadline:
-            owned = processes_with(str(host.root))
-            if len(owned) >= (2 if kind == "worker" else 3):
-                break
+        deadline = time.monotonic() + 30  # the blocked child itself says it is running, then the kill comes
+        while not ready.exists() and time.monotonic() < deadline:
             time.sleep(0.05)
+        self.assertTrue(ready.exists(), "C-blocked-child-running " + kind)
+        owned = processes_with(str(host.root))
         self.assertGreaterEqual(len(owned), 2, "C-owned-process-started")
+        host.scopes = scopes_of(owned)
+        self.assertEqual(bool(host.scopes), host.real_scope, "C-scope-observed " + kind)
         return host, process
 
     def reap(self, host, process):
@@ -2352,6 +2409,7 @@ class ContainmentTests(unittest.TestCase):
                 process.kill()
                 process.communicate(timeout=20)
                 self.assertEqual(wait_gone(str(host.root), 20), [], "C2-direct-parent-death " + kind)
+                self.assertEqual(wait_scopes_gone(host.scopes, 20), [], "C1-scope-gone " + kind)
                 self.assertIn("baseline_unfinished", host.verdict()[2], "C2-unfinished " + kind)
 
     def test_c3_worker_death_direct_scanner_and_decoder(self):
@@ -2359,13 +2417,16 @@ class ContainmentTests(unittest.TestCase):
         candidates = []
         for pid in processes_with(str(host.root)):
             with open(f"/proc/{pid}/cmdline", "rb") as handle:
-                cmdline = handle.read()
-            if b"worker" in cmdline.split(b"\0"):
+                args = handle.read().split(b"\0")
+            # The worker itself: a python3 whose arguments hold "worker". The real runner's bash carries the same
+            # arguments after its own name, and killing it instead would leave the worker running.
+            if args[0].endswith(b"python3") and b"worker" in args:
                 candidates.append(pid)
         self.assertTrue(candidates, "C3-worker-observed")
         os.kill(candidates[0], signal.SIGKILL)
         process.communicate(timeout=20)
         self.assertEqual(wait_gone(str(host.root), 20), [], "C3-direct-children-gone")
+        self.assertEqual(wait_scopes_gone(host.scopes, 20), [], "C3-scope-gone")
         self.assertNotEqual(host.verdict()[1], "clean", "C3-incomplete")
 
     def test_c5_handled_signals_and_exception_reap_children(self):
@@ -2478,6 +2539,8 @@ class ContainmentRealScopeTests(ContainmentTests):
         self.addCleanup(self.reap, host, process)
         time.sleep(1.5)
         owned = processes_with(str(host.root))
+        scopes = scopes_of(owned)
+        self.assertTrue(scopes, "C4-scope-observed")
         process.kill()
         for pid in owned:
             with open(f"/proc/{pid}/cmdline", "rb") as handle:
@@ -2485,6 +2548,27 @@ class ContainmentRealScopeTests(ContainmentTests):
                     os.kill(pid, signal.SIGKILL)
         process.communicate(timeout=20)
         self.assertEqual(wait_gone(str(host.root), 30), [], "C4-before-pdeath-arming-backstop")
+        self.assertEqual(wait_scopes_gone(scopes, 30), [], "C4-before-pdeath-arming-scope-gone")
+
+    def test_c7_every_scan_side_child_runs_inside_the_enforced_finite_scope(self):
+        """Each rg the worker starts records its own cgroup and limits: an ecosystem-job scope with the runner's
+        memory.max (6 GiB), pids.max (256) and cpu.max (200% of one CPU) actually in force (contract 11, C7)."""
+        host = Host(self, real_scope=True)
+        (host.home / ".claude/sample").write_text("old")
+        host.prepare()
+        record = host.root / "limits"
+        wrapper(host, "rg", prefix=(
+            "group = [line for line in open('/proc/self/cgroup') if line.startswith('0::/')][0][3:].strip()\n"
+            "limits = [open('/sys/fs/cgroup' + group + '/' + name).read().strip() for name in "
+            "('memory.max', 'pids.max', 'cpu.max')]\n"
+            f"open({str(record)!r}, 'a').write('|'.join([group] + limits) + '\\n')"))
+        FifoTests.repin(self, host, "rg")
+        self.assertEqual(host.scan().returncode, 0, "C7-real-scope-scan")
+        rows = {tuple(line.split("|")) for line in record.read_text().splitlines()}
+        self.assertTrue(rows, "C7-children-observed")
+        for group, memory, pids, cpu in rows:
+            self.assertTrue(re.search(r"/ecosystem-job-\d+-\d+-\d+\.scope$", group), "C7-inside-scope")
+            self.assertEqual((memory, pids, cpu), (str(6 << 30), "256", "200000 100000"), "C7-enforced-limits")
 
     def test_c4_simultaneous_coordinator_runner_death_and_setsid_backstop(self):
         host = Host(self, real_scope=True)
@@ -2498,6 +2582,8 @@ class ContainmentRealScopeTests(ContainmentTests):
         self.addCleanup(self.reap, host, process)
         time.sleep(2)
         owned = processes_with(str(host.root))
+        scopes = scopes_of(owned)
+        self.assertTrue(scopes, "C4-scope-observed")
         process.kill()
         for pid in owned:
             with open(f"/proc/{pid}/cmdline", "rb") as handle:
@@ -2505,6 +2591,7 @@ class ContainmentRealScopeTests(ContainmentTests):
                     os.kill(pid, signal.SIGKILL)
         process.communicate(timeout=20)
         self.assertEqual(wait_gone(str(host.root), 30), [], "C4-scope-backstop-kernel-observer")
+        self.assertEqual(wait_scopes_gone(scopes, 30), [], "C4-scope-gone")
 
 
 @needs_tools

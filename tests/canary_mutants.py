@@ -74,8 +74,7 @@ MUTANTS = [
     mutant("D2-05", "rg exit 2 accepted", WORKER,
            [("        if code not in (0, 1):\n            check.fail(\"scanner_exit\")",
              "        if False:\n            check.fail(\"scanner_exit\")")],
-           "ModeTests.test_m1_scanner_exit_stderr_stats_and_unknown_records",
-           "M1-invalid-output-incomplete exit2-valid-output"),
+           "UnitTests.test_scanner_settle_fails_exit_2_and_a_deadline_itself", "M1-settle exit 2"),
     mutant("D2-06", "Scanner stderr ignored", WORKER,
            [("flow.read(err, lambda data: self.stderr(check, data, \"scanner_stderr\"))",
              "flow.read(err, lambda data: None)")],
@@ -200,9 +199,9 @@ MUTANTS = [
            [("            if child == os.fsencode(rule[\"path\"]):",
              "            if os.path.basename(child) == os.path.basename(os.fsencode(rule[\"path\"])):")],
            "StabilityTests.test_st7_exact_exclusions_and_unreadable_entries", "ST7-ordinary-auth-scanned"),
-    mutant("D2-33", "Key home not excluded (Claude's credentials file)", PROOF,
-           [("(f\"{h}/.gnupg\", \"key\"), (f\"{h}/.claude/.credentials.json\", \"key\"),",
-             "(f\"{h}/.gnupg\", \"key\"),")],
+    mutant("D2-33", "Key home not excluded (the Claude daemon key; Claude's credentials file is also an inventory "
+           "path, so dropping it alone is caught twice)", PROOF,
+           [("(f\"{h}/.claude/daemon/control.key\", \"key\"), ", "")],
            "StabilityTests.test_st7_exact_exclusions_and_unreadable_entries", "ST7-K-U-never-opened"),
     mutant("D2-34", "TTY gate removed", PROOF,
            [("    if args.user_run and not (os.isatty(0) and os.isatty(1) and not env.get(\"CLAUDECODE\")):\n",
@@ -354,8 +353,17 @@ MUTANTS = [
              "                first = requests[event[\"request\"]][\"requested\"]\n"
              "                latest[(first[\"phase\"], first[\"group\"])] = event[\"request\"]\n")],
            "RequestTests.test_r1_a_kill_before_the_plan_supersedes_the_passing_final", "R1-after_request"),
-    mutant("G6-03", "Omitted final re-walk reconciliation", WORKER,
-           [("            before.reconcile(after)\n", "            before.state = before.state\n")],
+    mutant("G6-03", "Omitted final re-walk (no post-walk; the END seal from the pre-walk)", WORKER,
+           [("        final = [Walk(self, root) for root in self.plan[\"roots\"]]\n"
+             "        for before, after in zip(walks, final):\n"
+             "            after.selected = before.selected\n"
+             "            after.traverse(\"post\")\n"
+             "            before.reconcile(after)\n"
+             "            self.result(before.name_check, before.named, before.named)\n"
+             "        self.finish(keyed(self.key, b\"inventory\", *(walk.canonical() for walk in final)))\n",
+             "        for before in walks:\n"
+             "            self.result(before.name_check, before.named, before.named)\n"
+             "        self.finish(keyed(self.key, b\"inventory\", *(walk.canonical() for walk in walks)))\n")],
            "StabilityTests.test_st1_replacement_before_and_after_held_handoff", "ST1-retry-finds-replacement"),
     mutant("G6-04", "ctime omitted from same-inode identity checks", WORKER,
            [("    return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns",
@@ -389,7 +397,7 @@ MUTANTS = [
     mutant("G6-10", "ASCII control prepended before the decoded BOM", WORKER,
            [("self.flow.send(self.bom_fd, head[:2] + (control + b\"\\n\").decode(\"ascii\").encode(self.encoding))",
              "self.flow.send(self.bom_fd, control + b\"\\n\" + head[:2])")],
-           "ModeTests.test_m2_every_compressor_endian_concat_and_physical_header", "M2-decoded-bom gz"),
+           "ModeTests.test_m2_every_compressor_endian_concat_and_physical_header", "M2-utf16-only-in-bom-view gz"),
     mutant("G6-11", "Schema SQL and names omitted from the dump", WORKER,
            [("    for row in schema:\n        for value in row:\n            if isinstance(value, bytes):\n"
              "                out.write(value + b\"\\n\")\n", "")],
@@ -425,6 +433,9 @@ MUTANTS = [
            [("            if r.check not in self.checks or r.check in self.completed:",
              "            if r.check not in self.checks:")],
            "BoundaryTests.test_b4_every_kind_field_and_order_rule", "B4-duplicate"),
+    mutant("X-07", "Scanner exit status trusted in a complete RESULT (the coordinator's half of D2-05)", PROOF,
+           [("result.exit not in (0, 1) or result.aux or result.reason", "result.aux or result.reason")],
+           "BoundaryTests.test_b4_every_kind_field_and_order_rule", "B4-exit-status"),
     # ---- Continuation repairs (this build) --------------------------------------------------------------------------
     mutant("C-01", "A regular file turned special absorbed by the stability retry", WORKER,
            [("                self.state = \"changed_type\"\n        elif any(",
@@ -434,8 +445,7 @@ MUTANTS = [
            [("    arm_events = [event for event in events if event[\"event\"] in (\"arming\", \"armed\", \"disarmed\")]",
              "    arm_events = [event for event in events if event[\"event\"] in (\"arming\", \"armed\", \"disarmed\", "
              "\"cleaned\")]")],
-           "IntegratedTests.test_full_sequence_is_clean_and_cleanup_receipt_matches_verdict",
-           "C4-cleanup-receipt verdict"),
+           "IntegratedTests.test_full_sequence_is_clean_and_cleanup_receipt_matches_verdict", "C4-cleanup-clean"),
 ]
 
 
