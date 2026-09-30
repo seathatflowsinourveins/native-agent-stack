@@ -22,7 +22,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | 5 | `recovery`: Selected application-state recovery | `restic`, `ai-memory`, `qdrant` |
 | 6 | `macos-arm64-foundation`: Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon | `codex`, `claude-code`, `context-mode`, `ai-memory`, `mcporter`, `llama-cpp`, `qdrant`, `socraticode` |
 | 7 | `trading-nautilus`: Selected north-star Nautilus engine with separate broker boundaries | `nautilus-trader`, `alpaca-py` |
-| 8 | `token-efficiency`: Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
+| 8 | `token-efficiency`: Accepted on source host through dated native evidence; draft PR561 review pending; other hosts need their own acceptance | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
 
 ## Hosts and hardware tiers
 
@@ -62,7 +62,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested, bootstrap 2.8.3 | foundation-cpu, token-efficiency | 5 / 7 |
 |  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.8 | untested, bootstrap 0.1.8 | token-efficiency |  |
 |  |  | `poppler` | 26.09.0 | local_integration | host_verified | untested | — |  |
-| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
+| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.4.0) | native_proven | host_verified, bootstrap 2.4.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 | source_review | host_verified | host_verified | — | 11 / 12 |
 |  |  | `candidate:cli-cli` | unpinned | source_review | not_established, bootstrap 2.101.0 | untested, bootstrap 2.101.0 | — |  |
 |  |  | `difftastic` | 0.71.0 | source_review | host_verified | untested | — |  |
@@ -105,7 +105,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 / 15 |
-|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
+|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.4.2 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
 |  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
 | Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | host_verified | untested | research-runtime |  |

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "kind": "native_ci_portability_correction",
+  "date": "2026-09-30",
+  "evidence_class": "original_native_ci_returns_and_local_integration_checks",
+  "failing_revision": "938b737f67d9382227a40910479bf62533873862",
+  "source_pins": {
+    "serena": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "local_validation_and_host_generator": "938b737f67d9382227a40910479bf62533873862"
+  },
+  "failed_native_ci": {
+    "run_id": 36776670600,
+    "job_id": 110096205464,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36776670600/job/110096205464",
+    "reader_exit_code": 0,
+    "native_step_exit_code": 1,
+    "native_return": {
+      "status": "failed",
+      "commands": 259,
+      "checks": 80,
+      "failures": [
+        {
+          "component": "serena",
+          "error": "serena-tools-list-byte-parity-with-the-pinned-install"
+        }
+      ],
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    },
+    "artifact_id": 11125634437,
+    "artifact_digest": "sha256:7e469b1f864af6a7aa8bc58a7b68c7f5f86e17895ac4e22b106e56731cdcb1bb",
+    "original_receipt_bytes": 729934,
+    "original_receipt_sha256": "9fd96f88c400ba2926c303c1cac9e58a03f4719ce16d2b6187c4cf9558f45815",
+    "original_job_log_sha256": "c8a9487abaa6642f30c9104c2818c5ca175bd3dc8ca61d80c6183f7addc979e2"
+  },
+  "failed_validation_ci": {
+    "run_id": 36776670547,
+    "job_id": 110096206204,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36776670547/job/110096206204",
+    "reader_exit_code": 0,
+    "native_step_exit_code": 1,
+    "native_error": "catalogs/foundation/decisions.json: checked_at differs from manifest",
+    "original_job_log_sha256": "c0deba9a3146490c620fee31be9f86b2cfa4aebd9bdbbd569ba9ceb5e67a98ee"
+  },
+  "correction": {
+    "wrong_claim": "Earlier local Claude preimage had no active project",
+    "verified_cause": "Ancestor activation enabled single-project exclusion of activate_project/get_current_config",
+    "contract": "Omit --project-from-cwd and use a new empty scoped SERENA_HOME",
+    "comparison": "All21 shared Claude objects identical; initialize/Codex bytes unchanged",
+    "exact_oracle_preserved": true,
+    "fresh_observation_path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/acceptance-observation.json"
+  },
+  "local_returns": [
+    {
+      "command": "python3 scripts/validate_foundation.py --root . --json",
+      "before_exit_code": 1,
+      "after_exit_code": 0
+    },
+    {
+      "command": "python3 scripts/new_host_grand_list.py --check",
+      "before_exit_code": 1,
+      "after_exit_code": 0,
+      "repair": "Maintained build()/render_md() functions produced the exact generated rows."
+    },
+    {
+      "command": "python3 -m unittest tests.test_native_token_ci",
+      "initial_repair_exit_code": 1,
+      "initial_failure": "Second frozen test hash still named inherited-project bytes",
+      "after_exit_code": 0,
+      "tests": 48
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_claude_profile",
+      "exit_code": 0,
+      "tests": 77,
+      "skipped": 3
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py --root . blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json --json",
+      "exit_code": 0,
+      "observations": 26,
+      "scope": "Declared historical consistency only; no new provider execution."
+    }
+  ],
+  "astra_review": {
+    "trigger": "Conflicting local and clean CI primary tool-list bytes; independent review of strict oracle correction",
+    "status": "accepted",
+    "verdict": "Fresh explicit no-project streams match clean CI exactly; source explains activation; complete byte equality and negative rejection preserved",
+    "independently_observed_native_exits": [
+      0,
+      0
+    ],
+    "independent_generator_check_exit_code": 0,
+    "independent_test_rerun": false
+  },
+  "limits": [
+    "Earlier clean host execution remains dated ai-memory2.4.1 scope; failed CI used current2.4.2.",
+    "Fixture/control checks are local integration checks, not unchanged upstream tests.",
+    "No new model-provider usage or token-saving comparison; missing usage stays unknown.",
+    "Corrected full CI rerun pending; preceding259/80 execution is not a pass."
+  ],
+  "preserved_validation_attempts": [
+    {
+      "command": "python3 scripts/validate_convergence.py --root . --record <record>",
+      "exit_code": 2,
+      "error": "unrecognized arguments: --record",
+      "correction": "Records are positional; use the installed help/parser contract."
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py --root . <record> --json",
+      "exit_code": 1,
+      "error": "record.frozen_inputs.evaluation[0]: SHA-256 mismatch",
+      "correction": "Archived the exact original test file and changed only its frozen path; retained the historical hash."
+    }
+  ],
+  "frozen_evaluation_archive": {
+    "revision": "938b737f67d9382227a40910479bf62533873862",
+    "source_path": "tests/test_native_token_ci.py",
+    "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-tests-938b737f.py",
+    "native_git_show_exit_code": 0,
+    "bytes": 108181,
+    "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a"
+  }
+}

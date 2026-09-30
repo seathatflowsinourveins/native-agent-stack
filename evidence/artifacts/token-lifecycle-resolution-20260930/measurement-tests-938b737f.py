@@ -1315,10 +1315,10 @@ class NativeTokenCIContracts(unittest.TestCase):
     def test_serena_verified_native_preimages_require_exact_tool_schemas(self):
         # Exact independently observed native responses from the immutable upstream pin.
         # This replay exercises our parity gate; it is not a new server run or upstream test.
-        evidence = SCRIPT.parents[1] / "evidence/artifacts/token-profile-completion-20260930/serena-no-project"
-        transcripts = {context: (evidence / f"{context}.stdout.txt").read_bytes().splitlines(keepends=True)
+        evidence = SCRIPT.parents[1] / "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair"
+        transcripts = {context: (evidence / "independent" / f"{context}.stdout.txt").read_bytes().splitlines(keepends=True)
                        for context in ("claude-code", "codex")}
-        frozen_hashes = {"claude-code": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083",
+        frozen_hashes = {"claude-code": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0",
                          "codex": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"}
         for context, lines in transcripts.items():
             self.assertEqual(len(lines), 2)
@@ -1367,7 +1367,7 @@ class NativeTokenCIContracts(unittest.TestCase):
             "serena-state-inside-run",
         )
         frozen_initialize = "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
-        frozen_tools = {"claude-code": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083",
+        frozen_tools = {"claude-code": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0",
                         "codex": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"}
         self.assertEqual(ci.SERENA_INITIALIZE_SHA256, frozen_initialize)
         self.assertEqual(ci.SERENA_TOOLS_LIST_SHA256, frozen_tools)
@@ -1422,7 +1422,7 @@ class NativeTokenCIContracts(unittest.TestCase):
                     context = argv[argv.index("--context") + 1]
                     self.assertEqual(label, f"serena-{context}-initialize-and-tools-list")
                     self.assertEqual(argv, ["/stub/serena", "start-mcp-server", "--context", context,
-                                            "--enable-web-dashboard", "false",
+                                            "--project-from-cwd", "--enable-web-dashboard", "false",
                                             "--open-web-dashboard", "false"])
                     self.assertEqual(requests, [("tools/list", {})])
                     home = Path(kwargs["env"]["SERENA_HOME"])

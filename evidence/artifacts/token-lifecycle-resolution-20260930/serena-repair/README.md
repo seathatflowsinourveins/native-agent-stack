@@ -85,3 +85,12 @@ No language server, active project, credentials, model or provider runs in this
 repair. All temporary state is removed. This evidence covers Serena's scoped native
 MCP operation and local integration gate; full-stack acceptance remains the
 coordinator's separate rerun.
+
+## Subsequent scope correction from clean CI
+
+The local Claude preimage above inherited an ancestor project through
+`--project-from-cwd`; its earlier "no active project" statement was incorrect.
+The native bytes and results remain historical evidence. Explicit no-project
+commands, exact 23-tool preimages and rejected single-field controls are in
+[the later correction](../../token-profile-completion-20260930/serena-no-project/README.md).
+The original failed CI return is retained separately.

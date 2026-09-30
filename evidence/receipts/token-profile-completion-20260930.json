@@ -80,7 +80,10 @@
     "Codex Context Mode own-root access denials and replaced host-scoped ccusage attempt",
     "Two tokenizer/source mismatches before the actual installed service passed with canonical4.0.0",
     "Hindsight installer --help exit1 and native named Codex MCP lookup exit1; no live backend acceptance",
-    "Native hook refresh invalidated seven persisted Codex hashes; complete false before source-backed native trust repair, complete true afterward. First guarded path filter selected0 and made no mutation."
+    "Native hook refresh invalidated seven persisted Codex hashes; complete false before source-backed native trust repair, complete true afterward. First guarded path filter selected0 and made no mutation.",
+    "Clean Linux native CI:259commands/80checks, strict Serena inherited-project reference mismatch; cleanup passed",
+    "Foundation CI paired catalog date mismatch; local generated host list stale",
+    "First no-project regression repair retained a second stale frozen test hash; corrected before48-test pass"
   ],
   "limitations": [
     "This is composed native acceptance on the existing host, not a fresh physical machine/WSL installation or new sign-in. Per-platform bootstrap pins do not confer acceptance on macOS.",
@@ -104,5 +107,10 @@
     "merged": false,
     "integrated_upstream_main": "4720b202f1d9795754bf59bb42892193eb87693f",
     "upstream_evidence_preserved": "codex-01592-qualification-20260930"
+  },
+  "ci_portability_correction": {
+    "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
+    "exact_native_preimages": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/",
+    "status": "Bounded repair independently accepted; corrected full CI rerun pending"
   }
 }

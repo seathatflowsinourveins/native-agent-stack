@@ -152,7 +152,7 @@
     ],
     "evaluation": [
       {
-        "path": "tests/test_native_token_ci.py",
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-tests-938b737f.py",
         "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a"
       },
       {

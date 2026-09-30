@@ -148,3 +148,12 @@ prefix passed 259 commands and 82 integration checks at ai-memory 2.4.1. The
 the updated sixteen-tool recipe has not been relabeled as a fresh 259-command
 run. Upstream RTK inline tests and unchanged Hindsight installer tests remain
 distinct from locally authored integration checks.
+
+Clean Linux CI subsequently exposed an inherited-project assumption in Serena
+(the earlier Claude preimage had 21 tools). Explicit no-project runs expose 23 tools
+with all shared schemas unchanged and retain the complete byte oracle.
+The [native correction and rejected controls](../../evidence/artifacts/token-profile-completion-20260930/serena-no-project/README.md)
+and [failed CI returns](../../evidence/artifacts/token-profile-completion-20260930/ci-repair.json)
+preserve that correction. Independent Astra review accepted the source and byte
+verification. Paired catalog dates and the generated host guide were also repaired
+through their maintained validator and generator contracts.

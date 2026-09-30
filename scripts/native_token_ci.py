@@ -206,13 +206,15 @@ RTK_EXACT_JQ_ROWS = 60
 RTK_EXACT_JQ_FILTER = '.[] | "\\(.id) \\(.name) \\(.note)"'
 RTK_JQ_MAX_LINES, RTK_JQ_MAX_WIDTH = 40, 120  # rtk 0.50.0 src/filters/jq.toml
 # Exact native response lines, including their terminating newline, to initialize (id 1) and
-# tools/list (id 2), with no project active. The Claude golden was corrected on 2026-09-30 against
-# immutable upstream c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source, matching fresh and existing
-# native executions and a separate stdio observer. The previous Claude hash has no retained
-# preimage; its origin remains unknown. Initialize and Codex goldens remain unchanged.
-# Sources and raw response preimages: evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/.
+# tools/list (id 2), with no project active. Do not pass --project-from-cwd: upstream cli.py
+# searches ancestors, and agent.py enables single-project exclusions after activation. Earlier
+# local probes inherited a project and exposed 21 Claude tools; clean CI and fresh explicit
+# no-project probes expose 23. Shared schemas are identical. Initialize/Codex stay unchanged.
+# Source pin: c6fbd1c5932df2494ffa0020af5a9fbe80b82143, cli.py#L369-L383,
+# agent.py#L699-L701 and #L839-L848. Exact no-project response preimages and failure controls:
+# evidence/artifacts/token-profile-completion-20260930/serena-no-project/.
 SERENA_INITIALIZE_SHA256 = "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
-SERENA_TOOLS_LIST_SHA256 = {"claude-code": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0",
+SERENA_TOOLS_LIST_SHA256 = {"claude-code": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083",
                             "codex": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"}
 # Each context's own exclusion (src/serena/resources/config/contexts/{claude-code,codex}.yml at the
 # commit): claude-code drops search_for_pattern and codex drops replace_content.
@@ -1609,7 +1611,7 @@ def serena_fixture(run: Run) -> None:
     for context in SERENA_TOOLS_LIST_SHA256:
         answers[context] = mcp_stdio_session(
             run, f"serena-{context}-initialize-and-tools-list",
-            [binary, "start-mcp-server", "--context", context, "--project-from-cwd",
+            [binary, "start-mcp-server", "--context", context,
              "--enable-web-dashboard", "false", "--open-web-dashboard", "false"],
             [("tools/list", {})], cwd=cwd, env={"SERENA_HOME": str(run.work / f"data/serena-{context}")})
     names = {context: serena_tool_names(lines[1]) for context, lines in answers.items()}

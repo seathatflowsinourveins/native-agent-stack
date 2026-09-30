@@ -109,7 +109,7 @@
     {
       "order": 8,
       "profile": "token-efficiency",
-      "label": "Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring",
+      "label": "Accepted on source host through dated native evidence; draft PR561 review pending; other hosts need their own acceptance",
       "component_ids": [
         "codex",
         "claude-code",
@@ -725,7 +725,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.4.1"
+              "bootstrap_version": "2.4.2"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -2211,7 +2211,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.4.1"
+              "bootstrap_version": "2.4.2"
             },
             "macos-arm64": {
               "e2e_state": "untested",
