@@ -13856,8 +13856,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
-      "sha256": "0dfae4d9c590f4f5ab1a64409862c6bd8bec918c81615f98fffd36444037d008",
-      "bytes": 24388
+      "sha256": "bbdbad012df99ae2c6a2384865c9acd8a5241db32d2596e6f904525be40fe74b",
+      "bytes": 24591
     },
     {
       "path": "blueprints/us-equities/workers/policy.md",
@@ -38141,8 +38141,13 @@
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
-      "sha256": "a394962b516cd9b45c30888c2337e6f5bee2ace99f8ded50f3aece9488253f1a",
-      "bytes": 13447
+      "sha256": "4e3be5cffa768e37b0b1867fef503d519a5cfa102506d1bfe3086f664812e745",
+      "bytes": 14646
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20260930/usage-scope-receipt.json",
+      "sha256": "5097ef817a0e16275cf86deebb9b8d34e48606e4a1c78eea05752bfd8074b8e4",
+      "bytes": 11603
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
@@ -43876,8 +43881,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "97a53277a98bac686103037f936474f4ecb14bc8a16ee979ac601b93c810f55d",
-      "bytes": 38772
+      "sha256": "6e476fbf535971627466ec7b39b99b1952d938464ab894c231d59e7c0e2f0f55",
+      "bytes": 41579
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -43896,8 +43901,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "27b3a97a5684b2250258a7968c273a8fcb34308abfd86ba494254e9fecd3b41b",
-      "bytes": 24871
+      "sha256": "3394aa992c06ed4d60d588c70112eb345695fdf8e7d3d7c13a277bf9b8666612",
+      "bytes": 24911
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -44955,6 +44960,11 @@
       "bytes": 1341
     },
     {
+      "path": "tests/test_native_worker_route.py",
+      "sha256": "624904c7e25458cfd5662e032e98159d52989458665701f84fdd3d538c2e379d",
+      "bytes": 4189
+    },
+    {
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
@@ -44966,8 +44976,8 @@
     },
     {
       "path": "tests/test_observability.py",
-      "sha256": "4e6d644382bb315483c38e9281ff2b99e7e7072d5cb102ed54ba526ceeba07dd",
-      "bytes": 6065
+      "sha256": "ea9b9c80b3c9484954077236fdf21bff8286efcecffc08f999d70bbb71b7c9f2",
+      "bytes": 7534
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
@@ -45118,6 +45128,11 @@
       "path": "tests/test_saturation_ledger.py",
       "sha256": "a446a451a6244819a7d601e29a82e1d81c8825e02c487ee4910dd24134f35a5b",
       "bytes": 61882
+    },
+    {
+      "path": "tests/test_sdk_usage_scope.py",
+      "sha256": "7e47c3b4cede14ce7e664daf5fe379f16bb173d845b6feafd4a9b82ba758c352",
+      "bytes": 9712
     },
     {
       "path": "tests/test_secret_path_guard.py",
