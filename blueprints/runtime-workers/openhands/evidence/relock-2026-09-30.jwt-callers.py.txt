@@ -1,0 +1,66 @@
+"""Which packages of the relocked OpenHands recipe venv import PyJWT, where they call its decode API, and whether anything outside the
+importing package reaches those decodes. Static text search of the installed .py files (a name assembled at run time would not match).
+Usage: jwt_callers_final.py <venv site-packages> <recipe directory>"""
+import collections
+import re
+import sys
+from pathlib import Path
+
+SITE = Path(sys.argv[1])
+RECIPE = Path(sys.argv[2])
+SKIP = ("jwt", "pip", "setuptools", "pkg_resources", "_distutils_hack")
+IMPORT = re.compile(r"^\s*(?:import jwt\b|from jwt\b)", re.M)
+DECODE = re.compile(r"\bjwt\.decode\s*\(|\bdecode_complete\s*\(|PyJWT\(\)\.decode|jwt_decode\s*\(")
+
+
+def package_of(path):
+    return path.relative_to(SITE).parts[0].split("-")[0]
+
+
+def line_of(text, index):
+    return text.count("\n", 0, index) + 1
+
+
+files = []
+for path in SITE.rglob("*.py"):
+    if package_of(path) not in SKIP:
+        files.append((path, path.read_text(encoding="utf-8", errors="replace")))
+print("python files searched (installed packages other than jwt and installer tooling):", len(files))
+
+print("\n# PyJWT importers and the decode-style lines in the files that import it")
+importers = collections.defaultdict(list)
+for path, text in files:
+    if IMPORT.search(text):
+        importers[package_of(path)].append((path, text))
+for package, entries in sorted(importers.items()):
+    print(f"{package}: {len(entries)} file(s) import PyJWT")
+    for path, text in entries:
+        hits = [f"{line_of(text, m.start())}: {text.splitlines()[line_of(text, m.start()) - 1].strip()[:80]}" for m in DECODE.finditer(text)]
+        print(f"    {'/'.join(path.relative_to(SITE).parts[1:])}: {len(hits)} decode-style line(s) {hits[:2]}")
+
+print("\n# callers outside the importing package")
+CALLEES = {
+    "oauthlib (verify_signed_token)": ("oauthlib", r"\bverify_signed_token\b"),
+    "redis (auth.token, JWToken)": ("redis", r"\bJWToken\b|redis\.auth\.token"),
+    "google (the id_token module)": ("google", r"google\.oauth2\.id_token|from google\.oauth2 import [^\n]*\bid_token\b|from google\.oauth2\.id_token import"),
+}
+for label, (package, pattern) in CALLEES.items():
+    outside = collections.defaultdict(list)
+    for path, text in files:
+        if package_of(path) == package:
+            continue
+        for match in re.finditer(pattern, text):
+            outside[package_of(path)].append(f"{'/'.join(path.relative_to(SITE).parts[1:])[:60]}:{line_of(text, match.start())}")
+    print(f"{label}: {dict((k, v[:3]) for k, v in outside.items()) or 'no reference outside ' + package}")
+
+print("\n# redis's decode")
+token = SITE / "redis/auth/token.py"
+for number, line in enumerate(token.read_text(encoding="utf-8").splitlines(), 1):
+    if re.search(r"import jwt|jwt\.decode|verify_signature", line):
+        print(f"redis/auth/token.py:{number}: {line.strip()[:110]}")
+
+print("\n# the recipe's own code")
+imports = [p.name for p in sorted(RECIPE.glob("*.py")) if re.search(r"^\s*(?:import redis|from redis)\b", p.read_text(encoding="utf-8"), re.M)]
+print("recipe .py files importing redis:", imports or "none")
+imports = [p.name for p in sorted(RECIPE.glob("*.py")) if re.search(r"^\s*(?:import jwt|from jwt)\b", p.read_text(encoding="utf-8"), re.M)]
+print("recipe .py files importing jwt:", imports or "none")

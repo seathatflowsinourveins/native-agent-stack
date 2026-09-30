@@ -1,9 +1,12 @@
 # OpenHands recipe runtime lock: PyJWT 2.14.0 relock (2026-09-30)
 # Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and
-# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. Each '$' line is the command as run (a line marked '(abridged)' is
-# shortened for reading; the builder script keeps the full text) and the lines under it are its output as printed, with host paths shown
-# as <scratch> and <worktree>. A line that starts with '(derived)' is computed from files or from several commands, not one command's
-# stdout; sections A, E and F are excerpts selected by grep, and the outputs of
+# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. A line that starts with '$ ' is a command as run, or, when it says
+# '(abridged)', a command shortened for reading (the builder keeps the full text); the lines under it are its output as printed, except
+# where a line starts with '(derived)' (computed from files or several commands) or '#' (a comment of this file). Sections A, E and F
+# are excerpts selected by grep. Host paths are shown as <scratch> and <worktree>, and the home directory as ~. The builder that wrote
+# this file is evidence/relock-2026-09-30.builder.sh.txt (paths as placeholders) and the section K script is
+# evidence/relock-2026-09-30.jwt-callers.py.txt. Window times elsewhere in the record are 7 days after the later of a release's file
+# upload times on PyPI, fractional seconds rounded up to the next second. Outputs of
 # an earlier scratch pair of relocks (the 2026-09-27 reproduction, then a second lock with the pyjwt upgrade) are not retained;
 # only their resulting digests are quoted in section C.
 
@@ -42,7 +45,7 @@ version = "2.13.0"
 ##    environments line of research.md; all five upgrades in one command)
 $ uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0
 Using CPython 3.13.15
-Resolved 412 packages in 170ms
+Resolved 412 packages in 364ms
 Updated anyio v4.11.0 -> v4.14.2
 Updated click v8.1.8 -> v8.5.0
 Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
@@ -93,8 +96,9 @@ $ diff <previous requirements.lock, git show e45328d3:...> requirements.lock
 >     --hash=sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
 
 ## D. The new PyJWT hashes against PyPI (JSON API https://pypi.org/pypi/pyjwt/2.14.0/json)
-pypi pyjwt 2.14.0: pyjwt-2.14.0-py3-none-any.whl ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc 2026-09-11T13:11:53.409243Z not-yanked
-pypi pyjwt 2.14.0: pyjwt-2.14.0.tar.gz 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 2026-09-11T13:11:54.638995Z not-yanked
+$ python3 -c 'import json,urllib.request; d=json.load(urllib.request.urlopen("https://pypi.org/pypi/pyjwt/2.14.0/json")); [print(f["filename"], f["digests"]["sha256"], f["upload_time_iso_8601"], "yanked" if f.get("yanked") else "not-yanked") for f in d["urls"]]'
+pyjwt-2.14.0-py3-none-any.whl ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc 2026-09-11T13:11:53.409243Z not-yanked
+pyjwt-2.14.0.tar.gz 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 2026-09-11T13:11:54.638995Z not-yanked
 $ grep -n -A2 "^pyjwt==" requirements.lock
 530:pyjwt==2.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
 531-    --hash=sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 \
@@ -127,7 +131,7 @@ Total 1 package affected by 10 known vulnerabilities (1 Critical, 5 High, 4 Medi
 
 ### E2. The CI command over the inventory, on this tree (no PyJWT ignore remains in .github/osv-scanner.toml)
 $ osv-scanner scan source --config .github/osv-scanner.toml --no-resolve <49 inventory lockfiles>
-observed_utc: 2026-09-30T03:27:54Z
+observed_utc: 2026-09-30T03:46:13Z
 exit: 0
 Filtered 175 local/unscannable package/s from the scan.
 Filtered 7 vulnerabilities from output
@@ -175,7 +179,7 @@ $ find pyjwt-2.14.0 -type f | wc -l     # the sdist tree
 88
 $ grep -rIc oauthlib pyjwt-2.14.0 | awk -F: '{s+=$2} END {print s+0}'
 0
-$ the same three commands on the wheel of requests-oauthlib 2.0.0 (the artifact the 2026-09-29 review searched): the positive control, which must hit
+# the same commands on the wheel of requests-oauthlib 2.0.0 (the artifact the 2026-09-29 review searched): the positive control, which must hit
 $ sha256sum requests_oauthlib-2.0.0-py2.py3-none-any.whl | cut -c1-64     # 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 in the 2026-09-29 record
 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36
 $ find requests_oauthlib-2.0.0-py2.py3-none-any -type f | wc -l
@@ -185,6 +189,7 @@ $ grep -rIc oauthlib requests_oauthlib-2.0.0-py2.py3-none-any | awk -F: '{s+=$2}
 
 ## H. Fix versions of the ten advisories against GitHub and OSV records, and the PyJWT 2.14.0 changelog
 $ gh api /advisories/<id> --jq '[.ghsa_id, .published_at, (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .vulnerable_version_range), (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .first_patched_version)] | @tsv'     # once per id of the ten; tab-separated output
+# one line per advisory, in the order of the loop below (the ten of the receipt)
 GHSA-2gx3-rcp4-g85q	2026-09-29T23:11:51Z	<= 2.13.0	2.14.0
 GHSA-8wjv-2p76-3863	2026-09-29T23:43:06Z	>= 2.13.0, < 2.14.0	2.14.0
 GHSA-9j54-fg26-wv3r	2026-09-29T23:43:19Z	>= 2.13.0, < 2.14.0	2.14.0
@@ -233,14 +238,14 @@ $ python -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fi
 ...F.......F............................................................ [ 97%]
 ..                                                                       [100%]
 =================================== FAILURES ===================================
-E   AssertionError: 1790742482 != 1790742482.223825 within 2 places (0.22382497787475586 difference)
-~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790742482 != 1790742482.223825 within 2 places (0.22382497787475586 difference)
-E   AssertionError: 1790825282 != 1790825282.2317255 within 2 places (0.23172545433044434 difference)
-~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790825282 != 1790825282.2317255 within 2 places (0.23172545433044434 difference)
+E   AssertionError: 1790743581 != 1790743580.6092503 within 2 places (0.3907496929168701 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790743581 != 1790743580.6092503 within 2 places (0.3907496929168701 difference)
+E   AssertionError: 1790826381 != 1790826380.61758 within 2 places (0.38242006301879883 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790826381 != 1790826380.61758 within 2 places (0.38242006301879883 difference)
 =========================== short test summary info ============================
 FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
 FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
-2 failed, 72 passed in 0.50s
+2 failed, 72 passed in 0.47s
 exit: 1
 ### oauthlib 4.0.0
 $ uv pip list --python <venv>/bin/python | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "
@@ -259,12 +264,50 @@ $ python -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fi
 ...F.......F............................................................ [ 97%]
 ..                                                                       [100%]
 =================================== FAILURES ===================================
-E   AssertionError: 1790742484 != 1790742483.722941 within 2 places (0.27705907821655273 difference)
-~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790742484 != 1790742483.722941 within 2 places (0.27705907821655273 difference)
-E   AssertionError: 1790825284 != 1790825283.7308333 within 2 places (0.2691667079925537 difference)
-~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790825284 != 1790825283.7308333 within 2 places (0.2691667079925537 difference)
+E   AssertionError: 1790743582 != 1790743582.0914166 within 2 places (0.09141659736633301 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790743582 != 1790743582.0914166 within 2 places (0.09141659736633301 difference)
+E   AssertionError: 1790826382 != 1790826382.0996687 within 2 places (0.09966874122619629 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790826382 != 1790826382.0996687 within 2 places (0.09966874122619629 difference)
 =========================== short test summary info ============================
 FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
 FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
-2 failed, 72 passed in 0.78s
+2 failed, 72 passed in 0.47s
 exit: 1
+
+## K. Which installed packages of the relocked venv import PyJWT and call its decode API, and who reaches those decodes (static text search)
+$ python3 relock-2026-09-30.jwt-callers.py <venv site-packages> <recipe directory>     # the venv of section F
+python files searched (installed packages other than jwt and installer tooling): 10746
+
+# PyJWT importers and the decode-style lines in the files that import it
+google: 1 file(s) import PyJWT
+    oauth2/id_token.py: 1 decode-style line(s) ['153: return jwt.decode(']
+litellm: 7 file(s) import PyJWT
+    proxy/proxy_server.py: 1 decode-style line(s) ['13614: return jwt.decode(']
+    proxy/auth/handle_jwt.py: 3 decode-style line(s) ['154: claims = jwt.decode(', '942: return jwt.decode(']
+    proxy/management_endpoints/ui_sso.py: 3 decode-style line(s) ['755: access_token_payload = jwt.decode(access_token_str, options={"verify_signature":', '3701: userinfo = jwt.decode(id_token, options={"verify_signature": False})']
+    proxy/management_endpoints/mcp_management_endpoints.py: 0 decode-style line(s) []
+    proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py: 1 decode-style line(s) ['458: payload: Dict[str, Any] = jwt.decode(raw_token, signing_jwk.key, **decode_kwargs']
+    proxy/_experimental/mcp_server/byok_oauth_endpoints.py: 1 decode-style line(s) ['106: payload = jwt.decode(']
+    proxy/_experimental/mcp_server/outbound_credentials/envelope.py: 1 decode-style line(s) ['323: payload = jwt.decode(']
+mcp: 1 file(s) import PyJWT
+    client/auth/extensions/client_credentials.py: 0 decode-style line(s) []
+oauthlib: 3 file(s) import PyJWT
+    common.py: 1 decode-style line(s) ["221: return jwt.decode(token, public_pem, algorithms=['RS256'])"]
+    oauth1/rfc5849/signature.py: 0 decode-style line(s) []
+    oauth2/rfc6749/clients/service_application.py: 0 decode-style line(s) []
+redis: 1 file(s) import PyJWT
+    auth/token.py: 1 decode-style line(s) ['89: self._decoded = jwt.decode(']
+
+# callers outside the importing package
+oauthlib (verify_signed_token): no reference outside oauthlib
+redis (auth.token, JWToken): no reference outside redis
+google (the id_token module): no reference outside google
+
+# redis's decode
+redis/auth/token.py:83: import jwt
+redis/auth/token.py:89: self._decoded = jwt.decode(
+redis/auth/token.py:91: options={"verify_signature": False},
+
+# the recipe's own code
+recipe .py files importing redis: none
+recipe .py files importing jwt: none

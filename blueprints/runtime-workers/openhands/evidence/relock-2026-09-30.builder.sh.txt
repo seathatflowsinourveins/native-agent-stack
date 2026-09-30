@@ -1,0 +1,180 @@
+#!/bin/bash
+# Published copy of the script that wrote relock-2026-09-30.txt (2026-09-30). Host paths are placeholders: <worktree> is a checkout
+# of this repository at the relocked commit, <scratch> holds the downloaded SDK archive (sdk-fcc102a.tar.gz), the pinned osv-scanner
+# 2.6.0 binary (osv/), the previous lock (control/old-requirements.lock), the scratch venv of section F (venv-new), the extracted
+# PyJWT and requests-oauthlib artifacts (pyjwt-src/, wheels/) and the oauthlib pre-check tree (oauthlib4/); <scripts> holds
+# relock-2026-09-30.jwt-callers.py.txt saved as a .py file. It is documentation of what ran, not a supported tool: it needs those
+# inputs and network access, and section A needs a GitHub login.
+# Assemble evidence/relock-2026-09-30.txt from the returned outputs of the relock commands (the cheap ones re-run against the
+# final tree, the relock itself re-run in a fresh extraction so its exit codes are printed). No line is truncated. Host paths
+# are shown as <scratch> and <worktree>; lines that start with "(derived)" are computed from files, not a command's stdout.
+R="<scratch>"
+W="<worktree>"
+OH=blueprints/runtime-workers/openhands
+OUT=$W/$OH/evidence/relock-2026-09-30.txt
+SCR="<scripts>"
+export UV_CACHE_DIR=$R/uv-cache
+clean() { sed -e "s#$W#<worktree>#g" -e "s#$R#<scratch>#g" -e "s#$HOME#~#g"; }
+cd "$W" || exit 1
+
+# a fresh extraction and the single-command relock, exit codes captured
+F2=$R/final2
+rm -rf "$F2" && mkdir -p "$F2" && (cd "$F2" && tar -xzf "$R/sdk-fcc102a.tar.gz" --strip-components=1 \
+  && sed -i "/^\[tool\.uv\]\$/a environments = [\"sys_platform == 'linux' and platform_machine == 'x86_64'\"]" pyproject.toml)
+(cd "$F2" && uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 \
+  --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 > lock.out 2>&1; echo "exit: $?" >> lock.out
+  uv lock --check > check.out 2>&1; echo "exit: $?" >> check.out
+  uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace > export.txt 2> export.err; echo "exit: $?" > export.rc
+  jq -r '.wheels | to_entries[] | "\(.key) @ \(.value.url) \\\n    --hash=sha256:\(.value.sha256)"' "$W/$OH/pins.json" > wheels.txt
+  cat export.txt wheels.txt > requirements.lock.repro)
+
+{
+echo "# OpenHands recipe runtime lock: PyJWT 2.14.0 relock (2026-09-30)"
+echo "# Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and"
+echo "# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. A line that starts with '\$ ' is a command as run, or, when it says"
+echo "# '(abridged)', a command shortened for reading (the builder keeps the full text); the lines under it are its output as printed, except"
+echo "# where a line starts with '(derived)' (computed from files or several commands) or '#' (a comment of this file). Sections A, E and F"
+echo "# are excerpts selected by grep. Host paths are shown as <scratch> and <worktree>, and the home directory as ~. The builder that wrote"
+echo "# this file is evidence/relock-2026-09-30.builder.sh.txt (paths as placeholders) and the section K script is"
+echo "# evidence/relock-2026-09-30.jwt-callers.py.txt. Window times elsewhere in the record are 7 days after the later of a release's file"
+echo "# upload times on PyPI, fractional seconds rounded up to the next second. Outputs of"
+echo "# an earlier scratch pair of relocks (the 2026-09-27 reproduction, then a second lock with the pyjwt upgrade) are not retained;"
+echo "# only their resulting digests are quoted in section C."
+echo
+echo "## A. The failure this relock answers (CI run 36657687493, pull_request, required check osv-scanner)"
+echo '$ gh run view 36657687493 --log-failed | grep -E "<result lines>" | sed ...     (abridged: the result lines of the osv-scanner step)'
+gh run view 36657687493 --log-failed 2>&1 \
+  | grep -E '\| https://osv\.dev|\| OSV URL|Total 1 package|vulnerabilities can be fixed|Filtered 8 vulnerabilities|Process completed with exit code' \
+  | sed -E 's/^osv-scanner\t[^\t]*\t[^ ]+Z //'
+echo '$ gh run view <id> --json databaseId,event,headBranch,headSha,conclusion,createdAt --jq "[...] | @tsv"     # the run above and the three main push runs listed by gh run list (logs of the push runs not read)'
+for id in 36657687493 36645830933 36646406088 36647290868; do
+  gh run view $id --json databaseId,event,headBranch,headSha,conclusion,createdAt --jq '[.databaseId,.event,.headBranch,.headSha,.conclusion,.createdAt] | @tsv'
+done
+echo
+echo "## B. Source digests (a fresh extraction of pins.json source_archive)"
+echo '$ sha256sum sdk-fcc102a.tar.gz     # pins.json source_archive.sha256 = 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8'
+sha256sum "$R/sdk-fcc102a.tar.gz" | clean
+echo '$ tar -xzOf sdk-fcc102a.tar.gz <archive>/uv.lock | sha256sum     # pins.json uv_lock.sha256 = d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910'
+tar -xzOf "$R/sdk-fcc102a.tar.gz" software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/uv.lock | sha256sum
+echo '$ tar -xzOf sdk-fcc102a.tar.gz <archive>/uv.lock | grep -A1 "^name = \"pyjwt\""     # the image build'"'"'s lock, unchanged by this relock'
+tar -xzOf "$R/sdk-fcc102a.tar.gz" software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/uv.lock | grep -A1 '^name = "pyjwt"'
+echo
+echo "## C. Relock (uv 0.12.17, run without UV_NO_CONFIG, in a fresh extraction whose [tool.uv] table gained the one"
+echo "##    environments line of research.md; all five upgrades in one command)"
+echo '$ uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0'
+clean < "$F2/lock.out"
+echo '$ sha256sum uv.lock     # the 2026-09-27 reproduction, from the earlier scratch pair: 30e608b1fdb091db1609e8261a787020df12e0350911079cc2177c772a9ccffd'
+sha256sum "$F2/uv.lock" | clean
+echo '$ diff <uv.lock of the 2026-09-27 reproduction, earlier scratch pair> uv.lock     # only the pyjwt package entry differs'
+diff "$R/ws-repro/uv.lock" "$F2/uv.lock"
+echo '$ uv lock --check'
+clean < "$F2/check.out"
+echo '$ uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace > export.txt'
+cat "$F2/export.rc"
+echo "(derived) export lines: $(wc -l < "$F2/export.txt"); pins.json wheel entries appended: $(wc -l < "$F2/wheels.txt") lines; committed requirements.lock lines: $(wc -l < "$W/$OH/requirements.lock")"
+echo '$ cat export.txt wheels.txt > requirements.lock.repro; cmp requirements.lock.repro requirements.lock; sha256sum requirements.lock.repro requirements.lock'
+cmp "$F2/requirements.lock.repro" "$W/$OH/requirements.lock"; echo "cmp exit: $?"
+sha256sum "$F2/requirements.lock.repro" "$W/$OH/requirements.lock" | clean
+echo '$ diff <previous requirements.lock, git show e45328d3:...> requirements.lock'
+git show "e45328d3951417c5ae69676f2ac2cc8896948f81:$OH/requirements.lock" | diff - "$W/$OH/requirements.lock"
+echo
+echo "## D. The new PyJWT hashes against PyPI (JSON API https://pypi.org/pypi/pyjwt/2.14.0/json)"
+echo '$ python3 -c '"'"'import json,urllib.request; d=json.load(urllib.request.urlopen("https://pypi.org/pypi/pyjwt/2.14.0/json")); [print(f["filename"], f["digests"]["sha256"], f["upload_time_iso_8601"], "yanked" if f.get("yanked") else "not-yanked") for f in d["urls"]]'"'"''
+python3 -c 'import json,urllib.request; d=json.load(urllib.request.urlopen("https://pypi.org/pypi/pyjwt/2.14.0/json")); [print(f["filename"], f["digests"]["sha256"], f["upload_time_iso_8601"], "yanked" if f.get("yanked") else "not-yanked") for f in d["urls"]]'
+echo '$ grep -n -A2 "^pyjwt==" requirements.lock'
+grep -n -A2 '^pyjwt==' "$W/$OH/requirements.lock"
+echo
+echo "## E. OSV-Scanner 2.6.0 (binary sha256 checked against OSV_SCANNER_SHA256 in .github/workflows/security-scan.yml)"
+echo '$ sha256sum osv-scanner'
+sha256sum "$R/osv/osv-scanner" | clean
+"$R/osv/osv-scanner" --version 2>&1 | head -3
+echo
+echo "### E1. Control: the previous lock (sha256 $(sha256sum "$R/control/old-requirements.lock" | cut -c1-64)) with the repository config"
+echo '$ osv-scanner scan source --config <worktree>/.github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:old-requirements.lock'
+(cd "$R/control" && "$R/osv/osv-scanner" scan source --config "$W/.github/osv-scanner.toml" --no-resolve --lockfile=requirements.txt:old-requirements.lock > "$R/control/scan-old-final.txt" 2>&1; echo "exit: $?")
+grep -E '^(Total|Filtered )|vulnerabilities can be fixed|^\| ' "$R/control/scan-old-final.txt" | clean
+echo
+echo "### E2. The CI command over the inventory, on this tree (no PyJWT ignore remains in .github/osv-scanner.toml)"
+mapfile -t lockfiles < <(jq -r '.lockfiles[] | "--lockfile=\(.parser // ""):\(.path)"' .github/osv-scanner-lockfiles.json)
+echo "\$ osv-scanner scan source --config .github/osv-scanner.toml --no-resolve <${#lockfiles[@]} inventory lockfiles>"
+echo "observed_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+"$R/osv/osv-scanner" scan source --config .github/osv-scanner.toml --no-resolve "${lockfiles[@]}" > "$R/osv/scan-final.txt" 2>&1
+echo "exit: $?"
+grep -E '^(Total|No issues|Filtered )|^\| ' "$R/osv/scan-final.txt" | clean
+echo "(derived) per-lock 'filtered out' lines in that output:"
+grep -oE '^GHSA-[0-9a-z-]+' "$R/osv/scan-final.txt" | sort | uniq -c | sed -e 's/^ *//' -e 's/^\([0-9]*\) /  \1x /'
+echo "(derived) the tool's 'Filtered N vulnerabilities' count exceeds the number of those lines; the two counts were not reconciled."
+echo
+echo "## F. The recipe's install sequence (install-container.sh, UV_NO_CONFIG=1) on the new lock, in a scratch CPython 3.13.15 venv"
+echo "##    (run on the host network, not in a no-network sandbox: the SDK import can trigger litellm's remote model-cost fetch, which"
+echo "##    falls back offline; the 2026-09-27 import check ran under bwrap --unshare-net)"
+grep -E 'exit:|^Installed|^Checked|All installed|imports passed|^pyjwt' "$R/install.log" | clean
+grep -E '^ \+ (anyio|click|cryptography|oauthlib|pyjwt|pypdf|soupsieve)==' "$R/install.log"
+echo
+echo "## G. The PyJWT 2.14.0 artifacts: no reference to oauthlib (the installer uses the wheel; the sdist is searched too)"
+echo '$ sha256sum pyjwt-2.14.0-py3-none-any.whl | cut -c1-64     # equal to the lock'"'"'s wheel hash'
+(cd "$R/wheels" && sha256sum pyjwt-2.14.0-py3-none-any.whl | cut -c1-64)
+echo '$ sha256sum pyjwt-2.14.0.tar.gz | cut -c1-64     # equal to the lock'"'"'s sdist hash'
+(cd "$R/pyjwt-src" && sha256sum pyjwt-2.14.0.tar.gz | cut -c1-64)
+echo '$ python3 -m zipfile -e pyjwt-2.14.0-py3-none-any.whl pyjwt-2.14.0-py3-none-any     (run earlier; the sdist was extracted earlier with tar -xzf)'
+echo '$ find pyjwt-2.14.0-py3-none-any -type f | wc -l'
+find "$R/wheels/pyjwt-2.14.0-py3-none-any" -type f | wc -l
+echo '$ grep -rIc oauthlib pyjwt-2.14.0-py3-none-any | awk -F: '"'"'{s+=$2} END {print s+0}'"'"'     # sum of the per-file match counts'
+grep -rIc oauthlib "$R/wheels/pyjwt-2.14.0-py3-none-any" | awk -F: '{s+=$2} END {print s+0}'
+echo '$ find pyjwt-2.14.0 -type f | wc -l     # the sdist tree'
+find "$R/pyjwt-src/pyjwt-2.14.0" -type f | wc -l
+echo '$ grep -rIc oauthlib pyjwt-2.14.0 | awk -F: '"'"'{s+=$2} END {print s+0}'"'"''
+grep -rIc oauthlib "$R/pyjwt-src/pyjwt-2.14.0" | awk -F: '{s+=$2} END {print s+0}'
+echo '# the same commands on the wheel of requests-oauthlib 2.0.0 (the artifact the 2026-09-29 review searched): the positive control, which must hit'
+echo '$ sha256sum requests_oauthlib-2.0.0-py2.py3-none-any.whl | cut -c1-64     # 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 in the 2026-09-29 record'
+(cd "$R/wheels" && sha256sum requests_oauthlib-2.0.0-py2.py3-none-any.whl | cut -c1-64)
+echo '$ find requests_oauthlib-2.0.0-py2.py3-none-any -type f | wc -l'
+find "$R/wheels/requests_oauthlib-2.0.0-py2.py3-none-any" -type f | wc -l
+echo '$ grep -rIc oauthlib requests_oauthlib-2.0.0-py2.py3-none-any | awk -F: '"'"'{s+=$2} END {print s+0}'"'"''
+grep -rIc oauthlib "$R/wheels/requests_oauthlib-2.0.0-py2.py3-none-any" | awk -F: '{s+=$2} END {print s+0}'
+echo
+echo "## H. Fix versions of the ten advisories against GitHub and OSV records, and the PyJWT 2.14.0 changelog"
+echo '$ gh api /advisories/<id> --jq '"'"'[.ghsa_id, .published_at, (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .vulnerable_version_range), (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .first_patched_version)] | @tsv'"'"'     # once per id of the ten; tab-separated output'
+echo '# one line per advisory, in the order of the loop below (the ten of the receipt)'
+for id in GHSA-2gx3-rcp4-g85q GHSA-8wjv-2p76-3863 GHSA-9j54-fg26-wv3r GHSA-9v7f-9g4p-ffgj GHSA-ffc3-869f-jxw9 GHSA-hxm8-2xgr-2p9m GHSA-p4g4-x82p-q773 GHSA-r6x4-923q-g947 GHSA-w2cx-738m-mc7w GHSA-w6j9-cwv2-h6wq; do
+  gh api "/advisories/$id" --jq '[.ghsa_id, .published_at, (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .vulnerable_version_range), (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .first_patched_version)] | @tsv' 2>&1
+done
+echo '$ gh api /advisories/<id> --jq .ghsa_id     # the two ids the 2.14.0 changelog names besides the ten'
+for id in GHSA-pxh4-856f-4h89 GHSA-mvj7-wp6q-v59j; do printf '%s: ' "$id"; gh api "/advisories/$id" --jq .ghsa_id 2>&1 | head -1; done
+echo '$ curl -s -o /dev/null -w "%{http_code}" https://api.osv.dev/v1/vulns/<id>     # the same two ids'
+for id in GHSA-pxh4-856f-4h89 GHSA-mvj7-wp6q-v59j; do printf '%s: ' "$id"; curl -s -o /dev/null -w "%{http_code}\n" "https://api.osv.dev/v1/vulns/$id"; done
+echo "(derived) ids of the ten named in the 2.14.0 CHANGELOG.rst (section G's sdist): $(sed -n '/^`v2.14.0/,/^`v2.13.0/p' "$R/pyjwt-src/pyjwt-2.14.0/CHANGELOG.rst" | grep -oE 'GHSA-[0-9a-z-]+' | sort -u | grep -E 'GHSA-(2gx3-rcp4-g85q|8wjv-2p76-3863|9j54-fg26-wv3r|9v7f-9g4p-ffgj|ffc3-869f-jxw9|hxm8-2xgr-2p9m|p4g4-x82p-q773|r6x4-923q-g947|w2cx-738m-mc7w|w6j9-cwv2-h6wq)' | tr '\n' ' ')"
+echo "(derived) the changelog does not name GHSA-9j54-fg26-wv3r; its 'Fixed' section has: $(sed -n '/^`v2.14.0/,/^`v2.13.0/p' "$R/pyjwt-src/pyjwt-2.14.0/CHANGELOG.rst" | grep -A2 'Reject empty HMAC keys' | tr -s ' \n' ' ')"
+echo
+echo "## I. The grader venv's lock (install-grader.sh syncs OpenHands/benchmarks@405bae7 uv.lock; not part of this relock)"
+echo '$ sha256sum uv.lock     # pins.json grader.uv_lock_sha256 = 287a42d2157d044ca0f5e723fe3a05c1e4bdf6413049370360226374db6d7e8c'
+sha256sum "$R/wheels/benchmarks-uv.lock" | cut -c1-64
+echo '$ grep -A1 "^name = \"pyjwt\"" uv.lock'
+grep -A1 '^name = "pyjwt"' "$R/wheels/benchmarks-uv.lock"
+echo
+echo "## J. Pre-check for the planned oauthlib 4.0.0 relock (not applied): requests-oauthlib 2.0.0's own unit tests (unchanged upstream test code) under oauthlib 3.3.1 and 4.0.0"
+echo "##    (scratch CPython 3.13.15 venvs; tests/examples needs selenium and is not run)"
+RO=$R/oauthlib4/requests-oauthlib-2.0.0
+echo '$ sha256sum ro-2.0.0.tar.gz | cut -c1-64     # the requests-oauthlib 2.0.0 sdist whose tests/ directory is run'
+(cd "$R/oauthlib4" && sha256sum ro-2.0.0.tar.gz | cut -c1-64)
+echo "(derived) that sdist hash appears $(grep -c "$(cd "$R/oauthlib4" && sha256sum ro-2.0.0.tar.gz | cut -c1-64)" "$W/$OH/requirements.lock") time(s) in the OpenHands requirements.lock (the lock lists requests-oauthlib 2.0.0's hashes)"
+for V in 3.3.1 4.0.0; do
+  D=$R/oauthlib4/venv-$V; rm -rf "$D"
+  UV_NO_CONFIG=1 uv venv --python 3.13 "$D" > /dev/null 2>&1
+  UV_NO_CONFIG=1 uv pip install --python "$D/bin/python" "oauthlib==$V" "requests-oauthlib==2.0.0" "google-auth-oauthlib==1.2.2" requests pytest requests-mock mock "pyjwt[crypto]==2.14.0" > "$D/install.log" 2>&1
+  echo "### oauthlib $V"
+  echo '$ uv pip list --python <venv>/bin/python | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "'
+  UV_NO_CONFIG=1 uv pip list --python "$D/bin/python" 2>/dev/null | grep -E '^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) '
+  echo '$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('"'"'imports OK'"'"')"'
+  "$D/bin/python" -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')" 2>&1 | tail -2
+  echo '$ python -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output'
+  (cd "$RO" && "$D/bin/python" -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py > "$D/pytest.out" 2>&1; echo "$?" > "$D/pytest.rc")
+  clean < "$D/pytest.out"
+  echo "exit: $(cat "$D/pytest.rc")"
+done
+echo
+echo "## K. Which installed packages of the relocked venv import PyJWT and call its decode API, and who reaches those decodes (static text search)"
+echo '$ python3 relock-2026-09-30.jwt-callers.py <venv site-packages> <recipe directory>     # the venv of section F'
+python3 -B "$SCR/relock-2026-09-30.jwt-callers.py.txt" "$R/venv-new/lib/python3.13/site-packages" "$W/$OH" 2>&1 | clean
+} > "$OUT" 2>&1
+echo "wrote $OUT ($(wc -c < "$OUT") bytes)"
