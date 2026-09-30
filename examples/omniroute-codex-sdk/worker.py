@@ -61,7 +61,9 @@ def request_id(value: str) -> str:
 def positive_seconds(value: str) -> float:
     seconds = float(value)
     if not 0 < seconds <= 3600:
-        raise argparse.ArgumentTypeError("timeout must be greater than zero and at most 3600 seconds")
+        raise argparse.ArgumentTypeError(
+            "timeout must be greater than zero and at most 3600 seconds"
+        )
     return seconds
 
 
@@ -103,7 +105,9 @@ def runtime_config(args: argparse.Namespace) -> CodexConfig:
 
 def result_record(result) -> dict:
     """Retain native snapshots; total is cumulative and last is not a turn sum."""
-    kinds = Counter(item.model_dump(mode="json", by_alias=True).get("type") for item in result.items)
+    kinds = Counter(
+        item.model_dump(mode="json", by_alias=True).get("type") for item in result.items
+    )
     return {
         "status": result.status.value,
         "turn_id": result.id,
@@ -112,7 +116,9 @@ def result_record(result) -> dict:
         "item_counts": dict(kinds),
         "usage_status": "reported" if result.usage is not None else "unknown",
         "usage_scope": "native_thread_cumulative" if result.usage is not None else None,
-        "usage": result.usage.model_dump(mode="json", by_alias=True) if result.usage is not None else None,
+        "usage": result.usage.model_dump(mode="json", by_alias=True)
+        if result.usage is not None
+        else None,
     }
 
 
@@ -120,7 +126,9 @@ def emit(value: dict) -> None:
     print(json.dumps(value, ensure_ascii=False, separators=(",", ":")), flush=True)
 
 
-async def run_worker(args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit) -> dict:
+async def run_worker(
+    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit
+) -> dict:
     """Use native start/resume/turn/interrupt/close, with one overall deadline."""
     codex = sdk_factory(config=runtime_config(args))
     turn = None
@@ -179,7 +187,10 @@ async def run_worker(args: argparse.Namespace, prompt: str, *, sdk_factory=Async
                     json.dump(native, output, ensure_ascii=False, indent=2)
                     output.write("\n")
     except (TimeoutError, asyncio.CancelledError) as exc:
-        record.update(status="deadline_exceeded" if isinstance(exc, TimeoutError) else "cancelled", phase=phase)
+        record.update(
+            status="deadline_exceeded" if isinstance(exc, TimeoutError) else "cancelled",
+            phase=phase,
+        )
         if turn is not None:
             try:
                 await asyncio.wait_for(turn.interrupt(), CLEANUP_TIMEOUT)
@@ -206,17 +217,46 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
     parser.add_argument("--prompt", default="-", help="one bounded task, or - to read stdin")
     parser.add_argument("--resume", help="native thread id from an earlier invocation")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help="explicit native/gateway model id; default Sol/max route")
+    parser.add_argument(
+        "--model",
+        default=DEFAULT_MODEL,
+        help="explicit native/gateway model id; default Sol/max route",
+    )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)
     parser.add_argument("--timeout", type=positive_seconds, default=300.0)
-    parser.add_argument("--sandbox", choices=[Sandbox.read_only.value, Sandbox.workspace_write.value], default=Sandbox.workspace_write.value)
-    parser.add_argument("--approval-mode", choices=[mode.value for mode in ApprovalMode], default=ApprovalMode.deny_all.value)
-    parser.add_argument("--codex-bin", type=Path, help="explicit native 0.159.2 binary; defaults to the pinned SDK bundle")
-    parser.add_argument("--codex-home", type=Path, help="optional private worker config/state; inherited when omitted")
-    parser.add_argument("--api-key-env", help="optional gateway credential variable name; no credential value is accepted")
-    parser.add_argument("--no-provider-retries", action="store_true", help="disarm native request/stream retries for a measured attempt")
-    parser.add_argument("--native-result", type=Path, help="retain full native items in a new private 0600 file")
+    parser.add_argument(
+        "--sandbox",
+        choices=[Sandbox.read_only.value, Sandbox.workspace_write.value],
+        default=Sandbox.workspace_write.value,
+    )
+    parser.add_argument(
+        "--approval-mode",
+        choices=[mode.value for mode in ApprovalMode],
+        default=ApprovalMode.deny_all.value,
+    )
+    parser.add_argument(
+        "--codex-bin",
+        type=Path,
+        help="explicit native 0.159.2 binary; defaults to the pinned SDK bundle",
+    )
+    parser.add_argument(
+        "--codex-home",
+        type=Path,
+        help="optional private worker config/state; inherited when omitted",
+    )
+    parser.add_argument(
+        "--api-key-env",
+        help="optional gateway credential variable name; no credential value is accepted",
+    )
+    parser.add_argument(
+        "--no-provider-retries",
+        action="store_true",
+        help="disarm native request/stream retries for a measured attempt",
+    )
+    parser.add_argument(
+        "--native-result", type=Path, help="retain full native items in a new private 0600 file"
+    )
     args = parser.parse_args(argv)
     if not args.workspace.is_dir():
         parser.error("workspace must be an existing directory")
@@ -235,7 +275,14 @@ def main() -> int:
     try:
         result = asyncio.run(run_worker(args, prompt))
     except KeyboardInterrupt:
-        emit({"event": "cancelled", "request_id": args.request_id, "usage_status": "unknown", "usage": None})
+        emit(
+            {
+                "event": "cancelled",
+                "request_id": args.request_id,
+                "usage_status": "unknown",
+                "usage": None,
+            }
+        )
         return 130
     emit({"event": "result", **result})
     return 0 if result["status"] == "completed" else 2
