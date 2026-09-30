@@ -3,15 +3,19 @@
 docs/decisions/2026-09-30-task-model-routing.md maps each task class to a client, a model, an effort and the place that
 enforces the assignment today. These are integration checks of the repository's own record against its own files, not
 upstream acceptance and not a model run. Every value the record's table quotes from a file ("`path:line` says `value`")
-must still be in that file, at least once for each distinct line the table quotes it from, and every `path:line` the
-table cites must exist. The record reads its line numbers at its base revision, so an edit that only moves a quoted
-value passes here, while a change to an agent's frontmatter, a settings template key, a Codex profile or a lane constant
-fails until the record is restated. GPT-6.1 Sol stays listed only as pending qualification, and no routing file binds
-it as a model; a mention in prose is not a binding.
+must still be in that file as a whole value, not as the tail or head of a longer name, at least once for each distinct
+line the table quotes it from, and every `path:line` the table cites must exist. The record reads its line numbers at
+the revisions it names, so an edit that only moves a quoted value passes here, while a change to an agent's
+frontmatter, a settings template key, a Codex profile or a lane constant fails until the record is restated.
+GPT-6.1 Sol is routed where the Sol-primary routing record of unit D4 (#542) routes it and nowhere else: the table's
+Sol rows are the Codex coordinator, the primary workers and the generic children, the Codex user template renders on
+each pinned platform the model the coordinator row names for it, and every routing file that binds a GPT-6.1 model is
+cited by a Sol row. A mention in prose is not a binding.
 """
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 import unittest
@@ -33,22 +37,35 @@ CARRIER_LANES = ("mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodem
 SECTIONS = ["Context", "Alternatives", "Decision", "Overturn condition", "Sources"]
 HEADER = ["Task class", "Client", "Model", "Effort", "Enforced today", "Rule source"]
 # The task classes the routing brief names (research split into breadth and judgment, building split by whether a
-# written contract's tests exist), matched case-insensitively against the table's first column.
+# written contract's tests exist), matched case-insensitively against the table's first column, and the two Astra
+# classes the Sol-primary routing record adds (a complex workflow's coordination, a single consequential judgment).
 TASK_CLASSES = ("coordinator", "design", "research, first-pass breadth", "research, judgment",
                 "build with a written contract's tests", "build without a written contract's tests",
                 "review from source", "security review", "verification", "adjudication", "synthesis",
                 "exact extraction", "command wrappers", "cross-family review", "sweep", "mechanical",
-                "interactive codex")
+                "interactive codex", "complex-workflow", "consequential judgment")
 EXTENSIONS = r"(?:md|json|toml|py|js|mjs|sh|yml)"
 CITE = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)`")
 # A quoted value runs from "says" to the next ";" or the end of the cell, one or more backticked strings.
 SAYS = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+)(?:-(\d+))?` says ([^;]+)")
-PENDING = "pending unit D4 qualification (Codex >= 0.159.x pin)"
-ROUTING_PLACES = (".claude/agents", "adoption/templates", "tools/adoption", "tools/sota-convergence/landscape-sweep",
-                  "examples/claude-native/workflows")
-# A model binding of GPT-6.1: a model key or constant assigned the ID (TOML, JSON, YAML, Python, JavaScript) or a CLI
-# model flag, with an optional gateway prefix such as `cx/`.
-BINDS_GPT_6_1 = re.compile(r"""(?:model["'`]?\s*[:=]\s*["'`]?|(?<![\w-])-m\s+["'`]?|--model(?:\s+|=)["'`]?)"""
+# GPT-6.1 Sol's routes as docs/decisions/2026-09-30-sol-primary-quality-defaults.md sets them: Sol/Ultra coordinates
+# Codex, and Sol/Max runs the primary workers and the generic children. Each key is part of one row's task class, and
+# the value is the effort that row names.
+SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max", "generic codex children": "max"}
+USER_TEMPLATE = "adoption/templates/codex.config.template.toml"
+PLACEHOLDER = "${CODEX_MODEL}"
+RENDER_CONFIG = ROOT / "tools" / "adoption" / "render_config.py"
+# The coordinator row's statement of what the user template renders on one platform: "`<platform>` renders `<model>`".
+RENDERS = re.compile(r"`([a-z0-9]+-[a-z0-9_]+)` renders `([\w.-]+)`")
+ROUTING_PLACES = (".claude/agents", "adoption/agents", "adoption/templates", "tools/adoption",
+                  "tools/sota-convergence/landscape-sweep", "examples/claude-native/workflows", "recipes")
+# Generated folders are not routing files. A full test run leaves tools/adoption/__pycache__/prove_codex_lane.*.pyc,
+# whose bytecode carries the module's help text, `-m gpt-6.1-sol` included (the `validate` job of #540, 2026-09-30).
+GENERATED = {"__pycache__", "node_modules"}
+# A model binding of GPT-6.1: a model key or constant assigned the ID (TOML, JSON, YAML, Python, JavaScript, including
+# a constant whose name continues past "model", such as CODEX_MODEL_CURRENT) or a CLI model flag, with an optional
+# gateway prefix such as `cx/`.
+BINDS_GPT_6_1 = re.compile(r"""(?:model\w*["'`]?\s*[:=]\s*["'`]?|(?<![\w-])-m\s+["'`]?|--model(?:\s+|=)["'`]?)"""
                            r"""(?:[\w.-]+/)?gpt-6\.1""", re.IGNORECASE)
 
 
@@ -64,6 +81,11 @@ def table(text: str) -> tuple[list[str], list[list[str]]]:
 
 def lines(path: str) -> list[str]:
     return (ROOT / path).read_text(encoding="utf-8").splitlines()
+
+
+def effort(row: list[str]) -> str:
+    """The effort a row names, without the explanation that may follow a colon."""
+    return row[3].split(":", 1)[0]
 
 
 class TaskModelRoutingRecordTests(unittest.TestCase):
@@ -86,6 +108,8 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
     def test_every_quoted_value_is_in_its_cited_file(self):
         # Look each value up in the whole file, once for every distinct line the table quotes it from, so that two
         # stages binding the same value are both held and a sibling change that only moves lines does not fail here.
+        # A value counts only as a whole: `model = "${CODEX_MODEL}"` inside `default_subagent_model = "${CODEX_MODEL}"`
+        # is not the template's model line.
         cited: dict[tuple[str, str], set[str]] = {}
         for row in self.rows:
             for path, first, last, said in SAYS.findall(row[4]):
@@ -96,7 +120,8 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
         self.assertGreaterEqual(sum(map(len, cited.values())), 30, "the table quotes its enforcement points")
         for (path, quote), spans in sorted(cited.items()):
             with self.subTest(cited=path, quote=quote):
-                found = (ROOT / path).read_text(encoding="utf-8").count(quote)
+                whole = re.compile(rf"(?<![\w.-]){re.escape(quote)}(?![\w.-])")
+                found = len(whole.findall((ROOT / path).read_text(encoding="utf-8")))
                 self.assertGreaterEqual(found, len(spans), sorted(spans))
 
     def test_every_cited_line_exists(self):
@@ -120,14 +145,53 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                 self.assertEqual(alias.group(1), quoted.group(1))
                 self.assertEqual(row[3], "max")
 
-    def test_gpt_6_1_sol_is_listed_only_as_pending_and_routed_nowhere(self):
-        [row] = [row for row in self.rows if "gpt-6.1" in " ".join(row)]
-        self.assertEqual((row[2], row[3], row[4]), ("`gpt-6.1-sol`", "n/a", PENDING))
+    def test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else(self):
+        # The table's Sol rows are the record's three routes, each a Codex row at the record's effort.
+        sol = [row for row in self.rows if "`gpt-6.1-sol`" in row[2]]
+        self.assertEqual(len(sol), len(SOL_ROUTES), [row[0] for row in sol])
+        for route, wanted in SOL_ROUTES.items():
+            with self.subTest(route=route):
+                [row] = [row for row in sol if route in row[0].lower()]
+                self.assertEqual((row[1], effort(row)), ("Codex CLI", wanted))
+        # Nowhere else: a routing file that binds a GPT-6.1 model is an enforcement point that a Sol row cites. The
+        # stack-worker profile's literal binding must be found, so a scan that matches nothing cannot pass.
+        bound = set()
         for place in ROUTING_PLACES:
             for path in sorted((ROOT / place).rglob("*")):
-                if path.is_file():
-                    with self.subTest(path=path.relative_to(ROOT).as_posix()):
-                        self.assertIsNone(BINDS_GPT_6_1.search(path.read_text(encoding="utf-8", errors="replace")))
+                if (path.is_file() and not GENERATED & set(path.relative_to(ROOT).parts)
+                        and BINDS_GPT_6_1.search(path.read_text(encoding="utf-8", errors="replace"))):
+                    bound.add(path.relative_to(ROOT).as_posix())
+        self.assertIn("adoption/templates/codex.stack-worker.config.toml", bound)
+        cited = {path for row in sol for path, _spans in CITE.findall(row[4])}
+        self.assertEqual(bound - cited, set(), "bound to GPT-6.1 but cited by no Sol row")
+        # Each Sol row cites a file that names the model, literally or through the user template's placeholder.
+        for row in sol:
+            with self.subTest(row=row[0]):
+                naming = [path for path, _spans in CITE.findall(row[4])
+                          if path in bound or PLACEHOLDER in (ROOT / path).read_text(encoding="utf-8")]
+                self.assertTrue(naming, row[4])
+
+    def test_the_user_template_renders_on_each_platform_the_model_its_rows_name(self):
+        # The coordinator and generic-children rows quote the template's placeholder lines, while a host runs the
+        # render. Render the template through tools/adoption/render_config.py for every platform that has a pin file,
+        # as tests/test_render_config.py's CodexModelTests do, and hold both rows to the result.
+        import tomllib  # Python 3.11+, as the Codex wiring check already requires
+
+        [coordinator] = [row for row in self.rows if "interactive codex" in row[0].lower()]
+        [children] = [row for row in self.rows if "generic codex children" in row[0].lower()]
+        stated = dict(RENDERS.findall(coordinator[2]))
+        platforms = sorted(path.name[len("pins-"):-len(".json")] for path in (ROOT / "adoption").glob("pins-*.json"))
+        self.assertEqual(sorted(stated), platforms)
+        spec = importlib.util.spec_from_file_location("render_config_for_the_routing_record", RENDER_CONFIG)
+        renderer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(renderer)
+        values = {key: f"example-{key.lower()}" for key in renderer.REQUIRED_KEYS}
+        for platform_id, model in sorted(stated.items()):
+            with self.subTest(platform=platform_id):
+                config = tomllib.loads(renderer.render_one(ROOT / USER_TEMPLATE, values, platform_id))
+                self.assertEqual((config["model"], config["model_reasoning_effort"]), (model, effort(coordinator)))
+                self.assertEqual((config["agents"]["default_subagent_model"],
+                                  config["agents"]["default_subagent_reasoning_effort"]), (model, effort(children)))
 
     def test_the_token_efficiency_profile_is_accepted_by_this_record_and_leaves_the_three_tools_out(self):
         # The Decision's "Profile acceptance" and "Three tools stay outside the profile" paragraphs make claims about
