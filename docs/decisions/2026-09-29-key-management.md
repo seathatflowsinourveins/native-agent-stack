@@ -1046,7 +1046,7 @@ and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). The
 inherited implementation already exceeded the implementation ceilings; at the
 continuation's head the coordinator is 1,720 lines and the worker 1,968, about
 twice the aggregate ceiling, while the probe (110), workflow (28), wrapper (25)
-and tests (2,710 of 2,800) stay within theirs. This continuation retains explicit checks rather
+and tests (under their 2,800) stay within theirs. This continuation retains explicit checks rather
 than compressing statements or dropping obligations; the deviation is reported
 in the handoff for the coordinator's decision under amendment C13. The mutation
 runner is allowed separately and excluded from the test-line ceiling.
