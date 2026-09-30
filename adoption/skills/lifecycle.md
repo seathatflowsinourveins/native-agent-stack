@@ -48,8 +48,10 @@ Record in [the manifest](manifest.json) the immutable tree URL and 40-hex `ref`,
 `path`, `tree_sha` (the git tree of the skill folder, which the Skills CLI stores
 as `skillFolderHash`), `skill_md_sha256`, `skill_md_bytes`, `description_chars`
 (the manifest's `description_chars_method`), the upstream
-`disable-model-invocation` flag, `claude_listing` and `codex_enabled`. Then update
-the budget sums and the runtime-worker `reuse_ref` copies.
+`disable-model-invocation` flag, `upstream_allow_implicit_invocation: false` when the
+skill's `agents/openai.yaml` sets `allow_implicit_invocation: false`, `claude_listing`
+and `codex_enabled`. Then update the budget sums and the runtime-worker `reuse_ref`
+copies.
 
 Verify each pin from a blobless clone of its source repository
 (`git clone --filter=blob:none --no-checkout <repository>`, then
@@ -98,8 +100,9 @@ listing savings. A skill whose upstream frontmatter sets
 `disable-model-invocation: true` stays `user-invocable-only` for Claude (hidden
 from the model, `/name` only), and its upstream `agents/openai.yaml`
 `allow_implicit_invocation: false` limits Codex to an explicit `$name`. The pinned
-`skill-creator` stays off for Codex, which ships its own `.system/skill-creator`.
-`name-only` (name without description) remains available, and `off` marks a
+`skill-creator` stays off for Codex, which ships its own `.system/skill-creator`;
+the table that turns the pinned copy off names its path, so Codex's own copy stays
+on. `name-only` (name without description) remains available, and `off` marks a
 retired selection.
 
 - **Claude.** The settings template's `skillOverrides` carries each state, and
@@ -109,9 +112,35 @@ retired selection.
   session started, and `/reload-plugins` for plugin hooks, MCP or agent changes.
   These are different operations.
 - **Codex.** Disabled selections are the `[[skills.config]]` tables that
-  `tools/adoption/install_skills.py --print-codex-config` prints. Codex detects
-  changed and newly installed skills; check the new listing and use in a fresh
-  turn or session, and restart Codex only if the change is missing.
+  `tools/adoption/install_skills.py --print-codex-config` prints for
+  `~/.codex/config.toml` (`$CODEX_HOME/config.toml`). Each selects the installed
+  copy by the absolute path of its `SKILL.md`, never by name:
+
+  ```toml
+  [[skills.config]]
+  path = "<home>/.agents/skills/skill-creator/SKILL.md"
+  enabled = false
+  ```
+
+  Codex applies a `name` rule to every loaded skill of that name, its bundled
+  `.system` skills included, and a `path` rule only to the skill whose canonical
+  `SKILL.md` it names
+  ([`skills_config.rs` L94-125](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/config/src/skills_config.rs#L94-L125),
+  [`host_outcome.rs` L52-54](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/ext/skills/src/host_outcome.rs#L52-L54)).
+  A global install leaves a Codex skill only in the canonical
+  `~/.agents/skills/<name>`
+  ([`installer.ts` L392-402](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L392-L402)),
+  which Codex loads from its `$HOME/.agents/skills` root
+  ([`host_roots.rs` L103-108](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/ext/skills/src/host_roots.rs#L103-L108)).
+  The installer prints paths under `--home`; for a project-scoped manifest it
+  requires `--project-dir` and names `<project>/.agents/skills/<name>/SKILL.md`,
+  and the table still goes in the user config, the only file layer Codex reads
+  rules from. `scripts/skills_status.py` accepts the path form, resolved as Codex
+  resolves it (`~`, a path relative to the config folder, symlinks), and fails a
+  `name` table for a name Codex's bundled skills carry (`imagegen`, `openai-docs`,
+  `review-agent`, `skill-creator` and `skill-installer` at `rust-v0.159.2`).
+  Codex detects changed and newly installed skills; check the new listing and use
+  in a fresh turn or session, and restart Codex only if the change is missing.
 
 Installation does not override these policies or make a disabled skill available.
 
@@ -148,10 +177,17 @@ and [Claude structured output](https://code.claude.com/docs/en/headless).
 - **Manifest.** `budget.claude_on_description_chars` stays within
   `trial.on_description_char_cap`, and `budget.codex_enabled_description_chars`
   counts every Codex-enabled description; the manifest tests recompute both.
+  `budget.codex_catalog_description_chars` counts the descriptions Codex shows the
+  model, leaving out `upstream_allow_implicit_invocation: false` skills;
+  `budget.codex_configured_budget_tokens` equals the Codex template's
+  `max_context_tokens`; and `codex_fallback_budget_chars` keeps the 8,000-character
+  fallback as metadata, not a cap. `skills_status.py` estimates the shown catalog
+  in tokens as `render.rs` charges it, each line and its newline at
+  ceil(bytes / 4), and reports the estimate beside the configured budget.
 
 Sources: the Claude [skills](https://code.claude.com/docs/en/skills) and
 [environment variables](https://code.claude.com/docs/en/env-vars) references, and
-`codex-rs/ext/skills/src/render.rs` L19-24 and L126-152 at
+`codex-rs/ext/skills/src/render.rs` L19-25, L126-160 and L258-267 at
 [rust-v0.159.2](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/ext/skills/src/render.rs).
 
 ## Update and recover

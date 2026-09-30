@@ -56,7 +56,8 @@ The listing budget constrains the change:
   unknown. A set `[skills] max_context_tokens` is capped at 10,000 tokens (`codex-rs/ext/skills/src/render.rs` L17-20
   and L123-149).
 
-The manifest had carried Codex's 8,000 as `codex_default_budget_chars`, which is the fallback, not the default.
+The manifest had carried Codex's 8,000 as `codex_default_budget_chars`, which is the fallback, not the default, and
+`scripts/skills_status.py` measured the Codex-enabled description characters against it.
 
 `skill-creator` was excluded as a duplicate of the synced `anthropic-skills:skill-creator` and Codex's
 `.system/skill-creator`. The sync ended on 2026-09-26 ([skills-trial record](2026-09-25-skills-trial-and-usage.md),
@@ -86,7 +87,10 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
    - (a) **Enable the pinned copy as well.** Codex dedupes skills by SKILL.md path only
      (`ext/skills/src/loader/host_merge.rs` L232-233), so two entries named `skill-creator` would list. It would also
      leave no manifest skill disabled for Codex, which `tests/test_install_skills.py` `ReuseRefGateTests` needs.
-   - (b) **Disable it by name, as the brief's gate does.** Chosen, with the residual under Decision, point 3.
+   - (b) **Disable it by name.** Rejected: a name rule disables every loaded skill of that name
+     (`codex-rs/config/src/skills_config.rs` L109-119), so it would hide Codex's own `.system/skill-creator` as well.
+   - (c) **Disable the installed copy by path.** Chosen (Decision, point 3): a path rule disables only the skill whose
+     canonical `SKILL.md` it names.
 
 ## Decision
 
@@ -110,11 +114,16 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
      `critical`, 1 alert: a LOW Anomaly in `eval-viewer/viewer.html`. Rule 3 reads the labels, and a Warn is not a Fail.
    - It is `on` for Claude and disabled for Codex, which ships `.system/skill-creator`.
    - `excluded[]` keeps only the `openai/skills` copy, still Gen Agent Trust Hub Fail on 2026-09-30.
-   - **Residual.** The embedded Codex copy is also named `skill-creator` (`samples/skill-creator/SKILL.md` L2).
-     `install_skills.py --print-codex-config` prints only name-keyed tables, and a name selector disables every skill of
-     that name (`codex-rs/config/src/skills_config.rs` L109-119). A host that applies the printed table hides Codex's
-     own copy too, until the installer and `scripts/skills_status.py` take a path selector. Until then the host batch
-     uses a path-keyed table for the pinned copy, as the skills-trial addendum's host steps describe.
+   - **Disabled by path, not by name.** The embedded Codex copy is also named `skill-creator`
+     (`samples/skill-creator/SKILL.md` L2), and a name selector disables every loaded skill of that name
+     (`codex-rs/config/src/skills_config.rs` L109-119). `install_skills.py --print-codex-config` therefore prints a
+     path-keyed table, `path = "<home>/.agents/skills/skill-creator/SKILL.md"` with `enabled = false`, which Codex
+     matches against each loaded skill's canonical `path_to_skills_md` (`host_service.rs` L366-371, `host_outcome.rs`
+     L52-54). A global install leaves the Codex copy only in that canonical folder (skills CLI `src/installer.ts`
+     L392-402), which Codex loads from `$HOME/.agents/skills` (`host_roots.rs` L103-108).
+   - `scripts/skills_status.py` accepts that table and fails a name-keyed `skill-creator` table as hiding Codex's own
+     copy. The project-scoped runtime-worker manifest prints only with `--project-dir`, whose installed paths the
+     tables name.
 4. **`find-skills`** becomes model-invoked registry discovery.
    - Its install-count and star thresholds guide discovery only. `AGENTS.md:3` says stars, installs and popularity are
      not evidence.
@@ -135,10 +144,16 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
    - The Codex template sets `[skills] max_context_tokens = 6000`. That fixes the catalog budget above the 5,440-token
      default of `gpt-6-astra` and `gpt-6.1-sol` (both a 272,000-token `context_window` at `rust-v0.159.2`) and makes it
      independent of a child's model.
-   - The 25 catalog-visible skills render to about 11,900 bytes with a 28-character skills root, about 2,980 tokens by
-     `render.rs`'s 4-bytes-per-token estimate (L25 at `rust-v0.159.2`; line format from `render_with_description`).
-     The 26 visible before the fold computed the same way to 11,889 bytes.
-   - The manifest's `budget.client_budgets` records the fallback-versus-default labels.
+   - The 25 catalog-visible skills render to 11,904 bytes with a 28-character skills root. `render.rs` charges each line
+     and its newline at ceil(bytes / 4) (L154-160 and L25 at `rust-v0.159.2`; line format L258-267), 2,987 tokens in
+     all, under half the configured 6,000. The 26 visible before the fold rendered to 11,889 bytes.
+   - The manifest records `codex_configured_budget_tokens` (6,000, kept equal to the template by
+     `tests/test_skills_manifest.py`), `codex_catalog_description_chars` (9,872) and `codex_fallback_budget_chars`
+     (8,000, metadata only), which replaces `codex_default_budget_chars`; `upstream_allow_implicit_invocation: false`
+     marks the two skills Codex keeps to an explicit `$name`. `scripts/skills_status.py` estimates the catalog the same
+     way from the manifest and compares the estimate with the configured budget. It counts `description_chars` as the
+     description's bytes; four descriptions carry one 3-byte character each, so it reports 2,985 tokens for the root
+     above. `budget.client_budgets` records the labels.
 6. **Prune rule.**
    - Zero use no longer demotes a listing: the review keeps a zero-use trial skill or removes it through a dated
      decision record.
@@ -148,9 +163,12 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
    - `security-audit`'s exclusion met its overturn condition and became a `reuse_ref` entry (scenario `security`,
      roles `coding` and `orchestration`).
    - Its `skill-creator` became a `reuse_ref` at main's pin.
-8. **Same-day source review and one lifecycle document.** The main checkout held pre-existing uncommitted changes
-   (original author not established) from a source review of the selected skills; this branch folds them, keeping the
-   [native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) as the attributed record.
+8. **Same-day source review and one lifecycle document.** A source review of the selected skills came from
+   pre-existing uncommitted changes observed in the main checkout; original author not established (snapshot r2,
+   `tracked.diff` sha256 `314bd1b260da0939`). The fold briefs' earlier attribution to the Codex coordinator lane rested
+   on a process census of file writes, which does not establish document authorship, and the lane concerned asked for
+   this neutral wording. This branch folds the review and keeps the
+   [native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) as its record.
    - Six re-pins, each re-verified from a blobless clone of its source repository: `search-first` to
      `affaan-m/ECC@c70874fa`; `diagnosing-bugs`, `tdd`, `codebase-design` and `improve-codebase-architecture` to
      `mattpocock/skills@d81f3a18`; `semgrep` to `trailofbits/skills@82fe8226`. All 28 selected pins match their
@@ -178,8 +196,9 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
   - a Claude Code release changes the listing budget, the `skillOverrides` states or the absent-key default;
   - Codex changes its catalog budget or `allow_implicit_invocation`;
   - a new pin changes a description or adds `disable-model-invocation`.
-- **Path selector.** The installer and `scripts/skills_status.py` gain a path selector for `[[skills.config]]`. Then
-  disable only the pinned `skill-creator` copy for Codex, by path.
+- **Codex selector semantics.** A Codex release changes how a `[[skills.config]]` path or name rule matches
+  (`skills_config.rs` L94-125), where it loads user skills from, or which bundled skills it ships. Then change the
+  installer's table form and `scripts/skills_status.py`'s `CODEX_BUNDLED_SKILL_NAMES` together.
 - **Upstream user-only skills.** An upstream revision of `grill-me` or `improve-codebase-architecture` drops
   `disable-model-invocation`, or unit D1/D2 qualifies a model-invocable replacement. Then re-pin or replace it through
   the manifest.
@@ -248,6 +267,29 @@ Read 2026-09-30 unless dated otherwise. Page hashes are of the fetched markdown.
   - <https://developers.openai.com/codex/skills> (sha256 `d1579156…`; L129, L172-173, L180-185 and L215: automatic
     detection with restart fallback, `[[skills.config]]`, `allow_implicit_invocation`) and the Claude skills page as
     fetched then (sha256 `adc20053…`; L290-294: watcher, `/reload-skills`, `/reload-plugins`).
-- Repository: `tools/adoption/install_skills.py` L500-507, `scripts/skills_status.py` L389-408 and L425-444,
-  `tools/adoption/apply_claude_settings.py` L141-177, and the
+- Review repair for PR #553, read 2026-09-30:
+  - `openai/codex` at `rust-v0.159.2` (commit `ff6aec96`, blobless clone): `codex-rs/config/src/skills_config.rs`
+    L70-125 (a name rule selects every loaded skill of the name, a path rule one canonical document path) and L150-210
+    (rules only from the user and session-flag layers; an entry with both selectors, neither or a blank name is
+    ignored; a name is trimmed); `codex-rs/ext/skills/src/host_service.rs` L366-371 and `host_outcome.rs` L52-54
+    (`path_to_skills_md` is the matched path); `host_roots.rs` L95-113 (`$CODEX_HOME/skills`, `$HOME/.agents/skills`
+    and the `.system` cache as user and system roots); `loader/host.rs` L192-196 (skill paths canonicalized);
+    `codex-rs/utils/absolute-path/src/lib.rs` L28-58 and L392-406 with `absolutize.rs` L22-45 (`~` expansion, the
+    base folder, lexical normalization); `codex-rs/config/src/loader/mod.rs` L573-582 and L1424-1447 (a layer's
+    paths resolve against its config folder); `codex-rs/core/config.schema.json` L4082-4105 (`SkillConfig`: `enabled`
+    required, `name` and `path`); `codex-rs/skills/src/lib.rs` L55-67 and `src/assets/samples/` (bundled `imagegen`,
+    `openai-docs`, `review-agent`, `skill-creator` and `skill-installer`; `rust-v0.157.1` also ships
+    `plugin-creator`); `codex-rs/ext/skills/src/render.rs` L154-160, L258-267 and L1158-1174, `catalog.rs` L261-263,
+    `provider/host.rs` L129-149, `codex-rs/skills/src/model.rs` L22-28 and `codex-rs/utils/string/src/truncate.rs`
+    L71-74 (the catalog line, its token charge and the implicit-invocation default);
+  - the same Codex skills page, L180-186: `[[skills.config]]` with `path = "/path/to/skill/SKILL.md"` and
+    `enabled = false`;
+  - `vercel-labs/skills@7407f389`: `src/agents.ts` L224-232 and L907-912 (Codex is a universal agent) and
+    `src/installer.ts` L128-131, L151-159 and L392-402 (a global install leaves it only the canonical
+    `~/.agents/skills/<name>`);
+  - each pin's `agents/openai.yaml` in the blobless clones: `policy.allow_implicit_invocation: false` only for
+    `grill-me` and `improve-codebase-architecture`; four descriptions (`property-based-testing`, `sarif-parsing`,
+    `fp-check`, `variant-analysis`) carry one em dash each.
+- Repository: `tools/adoption/install_skills.py` L512-536 and L605-614, `scripts/skills_status.py` L104-116, L420-483
+  and L499-553, `tools/adoption/apply_claude_settings.py` L141-177, and the
   [skills-trial record](2026-09-25-skills-trial-and-usage.md) L360-415, L444-449 and L1128-1166.

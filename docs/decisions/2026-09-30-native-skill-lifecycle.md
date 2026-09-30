@@ -1,9 +1,12 @@
 # Native skill maintenance and lifecycle, 2026-09-30
 
 Provenance: pre-existing uncommitted changes observed in the main checkout; original
-author not established (snapshot r2, `tracked.diff` sha256 `314bd1b260da0939`). Folded
-unchanged below these two paragraphs; every re-pin it describes was re-verified from blobless
-clones of the source repositories. Its `convergence.json` was not folded: it froze the
+author not established (snapshot r2, `tracked.diff` sha256 `314bd1b260da0939`). The fold
+briefs' earlier attribution to the Codex coordinator lane rested on a process census of
+file writes, which does not establish document authorship, and the lane concerned asked
+for this neutral wording. Folded unchanged below these two paragraphs; every re-pin it
+describes was re-verified from blobless clones of the source repositories. Its
+`convergence.json` was not folded: it froze the
 hashes of that uncommitted tree, which no commit reproduces, so
 `scripts/validate_convergence.py --all-recorded` could not accept it.
 

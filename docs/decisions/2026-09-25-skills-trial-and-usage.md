@@ -1540,10 +1540,12 @@ upstream sources and the overturn conditions. This addendum records the trial-si
   ([listing state and agent preload](#addendum-2026-09-26-listing-state-and-agent-preload)). No agent's preload
   changes.
 
-**Same-day source review, folded.** The main checkout held pre-existing uncommitted changes (original author not
-established) that re-pinned skills and retired one; the
-[native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) keeps that work, attributed. Each pin was
-re-verified here from a blobless clone of its source repository: tree SHA, SKILL.md sha256 and bytes, PyYAML
+**Same-day source review, folded.** The re-pins and the retirement below come from pre-existing uncommitted changes
+observed in the main checkout; original author not established (snapshot r2, `tracked.diff` sha256
+`314bd1b260da0939`). The fold briefs' earlier attribution to the Codex coordinator lane rested on a process census of
+file writes, which does not establish document authorship, and the lane concerned asked for this neutral wording. The
+[native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) keeps that work with the same provenance. Each
+pin was re-verified here from a blobless clone of its source repository: tree SHA, SKILL.md sha256 and bytes, PyYAML
 description length and the `disable-model-invocation` flag, for all 28 selected skills, and every selected path is
 unchanged at its repository's HEAD on 2026-09-30.
 
@@ -1582,12 +1584,20 @@ unchanged at its repository's HEAD on 2026-09-30.
   another record.
 - `budget.codex_enabled_description_chars` moves from 2,829 to 10,048. Codex keeps `grill-me` and
   `improve-codebase-architecture` out of the model's catalog, so 9,872 of those characters reach it.
-- `budget.client_budgets` relabels Codex's 8,000 characters as the fallback for an unknown context window. The default
-  is 2% of the window (`codex-rs/ext/skills/src/render.rs` L19-22 and L126-152 at `rust-v0.159.2`, the same rule as
-  L17-20 and L123-149 at `rust-v0.157.1`). `codex_default_budget_chars` keeps its key, which
-  `scripts/skills_status.py` (L432) reads.
+- Codex's 8,000 characters are the fallback for an unset budget and an unknown context window, not a default; the
+  default is 2% of the window (`codex-rs/ext/skills/src/render.rs` L19-22 and L126-152 at `rust-v0.159.2`, the same
+  rule as L17-20 and L123-149 at `rust-v0.157.1`). `budget.codex_default_budget_chars` is renamed
+  `codex_fallback_budget_chars` and kept as metadata.
 - The Codex template sets `[skills] max_context_tokens = 6000`, above the 5,440-token default of `gpt-6-astra` and
   `gpt-6.1-sol` (both a 272,000-token `context_window` in `models-manager/models.json` at `rust-v0.159.2`).
+  `budget.codex_configured_budget_tokens` records it, and `tests/test_skills_manifest.py` keeps the two equal.
+- `budget.codex_catalog_description_chars` records the 9,872 characters of the 25 skills Codex shows the model;
+  `upstream_allow_implicit_invocation: false` marks the two it keeps to an explicit `$name`.
+  `scripts/skills_status.py` estimates that catalog as `render.rs` charges it, each line
+  `- name: description (file: <path>/SKILL.md)` and its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and
+  compares the estimate with the configured 6,000 tokens: about 2,990 tokens with a 28-character skills root. It no
+  longer measures the 10,048 Codex-enabled characters against the 8,000-character fallback, which reported the catalog
+  over a cap the template does not set.
 
 **Budget-fraction measurement plan: measure, then lower.** This change runs none of these steps.
 
@@ -1666,16 +1676,20 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 - On Claude, `writing-for-agents` again shares its skill-editing trigger with a loaded skill-creator. The confound its
   gap names applies on both clients once more.
 
-**Residual: the Codex name collision.**
+**The Codex name collision: the pinned copy is disabled by path.**
 
 - Codex's embedded copy is also named `skill-creator` (`codex-rs/skills/src/assets/samples/skill-creator/SKILL.md` L2).
-- A name-keyed `[[skills.config]]` table disables every skill of that name (`codex-rs/config/src/skills_config.rs`
-  L109-119). It is the only form `install_skills.py --print-codex-config` prints and `scripts/skills_status.py` checks.
-  The printed table would therefore also hide Codex's own copy.
-- Until those two scripts take a path selector, the host batch disables the pinned copy with a path-keyed table instead:
-  `path` is the absolute path of `~/.agents/skills/skill-creator/SKILL.md` and `enabled` is false. Codex matches a rule
-  against each loaded skill's `path_to_skills_md` (`codex-rs/ext/skills/src/host_service.rs` L366-370). The host batch
-  records `skills_status.py`'s `missing_disable_entry` for that one skill as a known false result.
+- A name-keyed `[[skills.config]]` table disables every loaded skill of that name (`codex-rs/config/src/skills_config.rs`
+  L109-119 at `rust-v0.159.2`), Codex's own copy included, so `install_skills.py --print-codex-config` prints
+  path-keyed tables only: `path` is the absolute path of the installed `~/.agents/skills/skill-creator/SKILL.md` and
+  `enabled` is false. Codex matches a path rule against each loaded skill's canonical `path_to_skills_md`
+  (`codex-rs/ext/skills/src/host_service.rs` L366-371, `host_outcome.rs` L52-54). A global install leaves the Codex
+  copy only in that canonical folder (`vercel-labs/skills@7407f389` `src/installer.ts` L392-402), which Codex loads
+  from its `$HOME/.agents/skills` root (`host_roots.rs` L103-108).
+- `scripts/skills_status.py` accepts the path-keyed table, resolving `~`, a path relative to the config folder and
+  symlinks as Codex does, and fails a name-keyed `skill-creator` table as `name_entry_hides_bundled_skill`.
+- For the project-scoped runtime-worker manifest the installer now prints only with `--project-dir`, naming
+  `<project>/.agents/skills/<name>/SKILL.md`; without it no absolute path exists to name.
 
 **Host steps after the merge.** This change runs none of them. They follow
 [Apply the skills manifest](../../adoption/update.md#apply-the-skills-manifest).
@@ -1688,8 +1702,11 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
    `skillListingBudgetFraction`. Template scalars win (`deep_merge_dict`, L141-177).
 3. In `~/.codex/config.toml`, remove the 16 name-keyed tables of the newly enabled skills, and the retired skill's
    table once its folder is gone. The Codex template never carried them. Add `[skills] max_context_tokens = 6000` and
-   the path-keyed `skill-creator` table above. `tools/adoption/apply_codex_lane.py` writes neither key at `11227bfd`.
-4. Read back with `skills_status.py --json`, `/skill-doctor` and the measurement plan above.
+   the path-keyed `skill-creator` table that `install_skills.py --print-codex-config` prints, and remove any
+   name-keyed `skill-creator` table, which would also hide Codex's own copy. `tools/adoption/apply_codex_lane.py`
+   writes neither key at `8fc86119`.
+4. Read back with `skills_status.py --json` (every `codex_disable` `ok`, `codex_within_budget` true), `/skill-doctor`
+   and the measurement plan above.
 
 **Evidence class.**
 
@@ -1697,6 +1714,7 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 | --- | --- | --- |
 | Listing states, gates, budget sums, template keys and runtime-worker reuse | our-integration | `tests/test_skills_manifest.py` (`LlmNativeListingTests`, `ListingBudgetTemplateTests`) and `tests/test_runtime_worker_skills.py` (`test_security_audit_is_reused_since_main_promoted_it`) each failed against the unchanged `e45328d3` data first |
 | The retirement and its explicit `"off"` | our-integration | `tests/test_skills_manifest.py` `test_a_retired_entry_names_one_unselected_skill_and_its_date` and the derived `skillOverrides` equality each failed first against the pre-fold data |
+| Path-keyed Codex tables, the bundled-name failure and the catalog token estimate | our-integration | `tests/test_install_skills.py` `PrintCodexConfigTests`, `tests/test_skills_status.py` (path selector, `name_entry_hides_bundled_skill`, catalog estimate) and the `tests/test_skills_manifest.py` budget tests each failed first against the code and data before the PR #553 review repair; the Codex matching rules they model are upstream source at `rust-v0.159.2`, not a Codex run |
 | Pins, trees, SKILL.md hashes and frontmatter | upstream-unchanged (identity) | Blobless clones of the nine source repositories on 2026-09-30: all 28 pins match, each ref is on its default branch, and each selected path is unchanged at HEAD |
 | Lifecycle guide commands | upstream source and local `--help` | `install_skills.py` and `skills_status.py` `--help`; Skills CLI v1.7.0 `src/cli.ts`, `src/list.ts` and `src/remove.ts`; not executed on a host here |
 | Claude Code docs, Codex source and schema lines | upstream wording or source | Cited with read date, page sha256 or tag and line in the decision record; not executed here |
