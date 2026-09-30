@@ -28,7 +28,7 @@ The main worker and named `source-reviewer` each receive their own configured
 Sol/Max model. A native harness profile disables implicit general-purpose
 subagents and the `execute` tool. Native `ToolCallLimitMiddleware` limits `task`
 to one call per run and raises on excess calls; configuration caps concurrency
-at two and graph recursion at 24. Keep SQLite outside the model-visible
+at two and graph recursion at 32. Keep SQLite outside the model-visible
 workspace, with one local writer, and enable `LANGGRAPH_STRICT_MSGPACK=true`.
 Filesystem virtual paths do not provide OS confinement; the pinned
 [`FilesystemBackend` warning](https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/deepagents/backends/filesystem.py#L132-L136)
@@ -140,7 +140,7 @@ exit **0**. Its first attempt rejected the `.lock` filename (exit **127**); the
 successful attempt scanned a byte-identical private `requirements.txt` copy.
 Both original attempts remain in the private preparation logs. These results
 establish their named offline checks only; live provider, skill/delegation and
-continuation acceptance await the frozen model trial.
+continuation acceptance require the frozen model trial and its controls.
 
 Native offline `SkillsMiddleware.before_agent` found exactly `research` under
 `/skills`, with zero load errors. The absent `/absent-skills` control returned no
@@ -152,3 +152,22 @@ reasoning `max`; a patched HTTP transport rejected any attempted network call.
 exit **0**. These checks establish discovery and configuration only. The earlier
 hardcoded endpoint and incorrect skill root are retained as failed review
 conditions rather than passed provider evidence.
+
+The initial frozen model trial used a recursion override of **24** and failed
+with native `GraphRecursionError`, exit **1**, after approximately **325 seconds**.
+It produced both artifacts and one returned specialist task. The unchanged
+oracle also rejected a **262-character** SQLite quote: it was an exact source
+substring but exceeded the frozen **240-character** bound. Original events,
+state, artifacts, usage and failures remain retained; no synthetic completion
+event replaces the failed run.
+
+The bounded repair raises only the native graph step override to **32**.
+Upstream [`graph.py` sets 9,999](https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/deepagents/graph.py#L974-L976)
+and an unchanged
+[`subagent test` exercises a 5,000-step native configuration](https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/tests/unit_tests/test_subagents.py#L871-L954).
+The repaired process uses the existing SQLite/thread and one new coordinator
+instruction, with no new specialist task or marker read. Keep the same source
+fixture and oracle, record the changed prompt/configuration before execution,
+and retain the 600-second deadline and all other bounds. Trial acceptance awaits
+the repair and independent continuation controls; no comparative efficiency or
+complete provider-billing claim follows from these checks.

@@ -117,7 +117,7 @@ def main():
     args = parser.parse_args()
     config = {
         "configurable": {"thread_id": args.thread_id},
-        "recursion_limit": 24,
+        "recursion_limit": 32,
         "max_concurrency": 2,
     }
     if args.describe:
