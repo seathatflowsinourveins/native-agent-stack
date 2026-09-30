@@ -3669,8 +3669,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "cf608e69d99df3e0f434a43fbd0eb84fbc29afe5a228e9baacf71e8640aba376",
-      "bytes": 7043
+      "sha256": "8880ec4de663c35e2b447dab97faa2a293662b5989346b69689a6699ab11ca2a",
+      "bytes": 7170
     },
     {
       "path": ".github/pull_request_template.md",
@@ -8805,8 +8805,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "968b0e00d340a7b029269e557c3c30555348d588a64b7e77d74ed098efc3a108",
-      "bytes": 72023
+      "sha256": "bf0af64da414d6f0403d352f8cbb22d711c318f5e560c67798cce212f0d9027c",
+      "bytes": 72132
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -8920,8 +8920,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
-      "sha256": "afe4d3dec47ebb6ca7fbfe84095afd6427bb6ef66a3fb95eaae2c73e96d2c77a",
-      "bytes": 10698
+      "sha256": "1b7ceadaa4f6d86aef53aa8ec90d9880512a49d805a5eb2d27a68e6b9f9b3304",
+      "bytes": 16787
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
@@ -9040,8 +9040,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "435b5be7ea3576470d23861f8233f445ea720d0f67ceff575e3767a42fdb46e6",
-      "bytes": 62967
+      "sha256": "127d3536af54b649f9bb5be2fd0f1fbd98e014509241022a56a9bb626e41767d",
+      "bytes": 64498
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -14555,8 +14555,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "9142179d83fad9517004d2d018a5b466e752334d92ced14fb593c736a0a2b414",
-      "bytes": 137054
+      "sha256": "f42e620c353b00c11fc5ed11ee0fa54d037719f0d753044791840de2e63f4660",
+      "bytes": 138365
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -42330,8 +42330,8 @@
     },
     {
       "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
-      "sha256": "85fa647b11b4038ac3152a33f7fb91abca0dd9eb5dda92b423387d589973d87a",
-      "bytes": 17266
+      "sha256": "3b4465f166847b6229e3ffb962b7d5b9418cc1608895796abcc71e9db04a4500",
+      "bytes": 23559
     },
     {
       "path": "evidence/receipts/pit-availability.json",
