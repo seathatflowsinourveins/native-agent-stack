@@ -5587,8 +5587,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
-      "sha256": "005582b16d21b0ad7cfa85857d222baf598badc74d929a82b3da7c2b0dd39d55",
-      "bytes": 29633
+      "sha256": "819124da985301f216fd0e3178d7b1aa4986e0c3812d18a75505723d85dbdfcc",
+      "bytes": 29678
     },
     {
       "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
@@ -35324,6 +35324,11 @@
       "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
       "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
       "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+      "bytes": 186305
     },
     {
       "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
