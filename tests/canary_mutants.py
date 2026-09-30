@@ -364,7 +364,7 @@ MUTANTS = [
              "        for before in walks:\n"
              "            self.result(before.name_check, before.named, before.named)\n"
              "        self.finish(keyed(self.key, b\"inventory\", *(walk.canonical() for walk in walks)))\n")],
-           "StabilityTests.test_st1_replacement_before_and_after_held_handoff", "ST1-retry-finds-replacement"),
+           "StabilityTests.test_st4_new_file_directory_and_task_glob_are_reconciled", "ST4-new-entry-after-scan-pass"),
     mutant("G6-04", "ctime omitted from same-inode identity checks", WORKER,
            [("    return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns",
              "    return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns")],
@@ -397,7 +397,7 @@ MUTANTS = [
     mutant("G6-10", "ASCII control prepended before the decoded BOM", WORKER,
            [("self.flow.send(self.bom_fd, head[:2] + (control + b\"\\n\").decode(\"ascii\").encode(self.encoding))",
              "self.flow.send(self.bom_fd, control + b\"\\n\" + head[:2])")],
-           "ModeTests.test_m2_every_compressor_endian_concat_and_physical_header", "M2-utf16-only-in-bom-view gz"),
+           "ModeTests.test_m2_every_compressor_endian_concat_and_physical_header", "M2-every-branch-complete gz"),
     mutant("G6-11", "Schema SQL and names omitted from the dump", WORKER,
            [("    for row in schema:\n        for value in row:\n            if isinstance(value, bytes):\n"
              "                out.write(value + b\"\\n\")\n", "")],

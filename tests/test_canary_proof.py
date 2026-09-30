@@ -1672,6 +1672,13 @@ class StabilityTests(unittest.TestCase):
                 "data": host.canary().encode().hex(), "once": str(host.root / "once")}}})
             self.assertEqual(result.returncode, 5, "ST4-retry-finds-new-entry")
             self.assertEqual(host.finished()["sinks"]["A10" if task else "A1"]["subpass"], 1, "ST4-entry-list")
+        # Created after the scan pass had listed its parent and scanned its neighbour: no held descriptor or scan-pass
+        # listing sees it, only the final re-walk's entry-list comparison does.
+        host, _path = self.fixture()
+        result = host.scan(worker={"hooks": {"after_file_scan": {"do": "create", "target": str(host.home / ".claude/late"),
+            "data": host.canary().encode().hex(), "once": str(host.root / "once"), "when": "sample"}}})
+        self.assertEqual(result.returncode, 5, "ST4-new-entry-after-scan-pass")
+        self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "ST4-new-entry-after-scan-pass")
 
     def test_st5_changes_in_both_subpasses_are_incomplete(self):
         host, path = self.fixture()
