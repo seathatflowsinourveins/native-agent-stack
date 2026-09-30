@@ -8,6 +8,7 @@
     "Each task's source_ids come from the SKILL.md folder names at those pins (gh api repos/<owner>/<repo>/git/trees/<pin>?recursive=1), matched by task keyword and reviewed: product-scoped matches (Azure, Notion, Figma, trading) were dropped, and the registry and the curated list serve every task.",
     "skills-sh-registry is searched with the manifest's pinned CLI, DISABLE_TELEMETRY=1 npx skills@1.7.0 find <query> (vercel-labs/skills README.md at v1.7.0, lines 150 and 170-182). The registry has no commit, so its pin is the commit of the CLI's v1.7.0 tag.",
     "openai-skills is the Codex curated skill source that developers.openai.com/codex/skills links (skills/.curated in github.com/openai/skills).",
+    "Maintenance was checked on 2026-09-30 for all 22 GitHub sources under the landscape sweep's common maintenance rule (templates.json common: stale when archived or with no commit on the default branch in the last 90 days, established with gh api repos/<owner>/<repo>/commits?since=<date 90 days ago>&per_page=1, not from pushed_at): gh api repos/<owner>/<repo>/commits?sha=<default branch>&since=2026-07-02T00:00:00Z&per_page=1. None is archived, and only openai-skills returned no commit, so it alone carries a maintenance record. Its four installed skills stay pinned and listed; the tasks they serve name the stale source as an open gap.",
     "The manifest's excluded source 'various' (Lark/Feishu, Azure, genmedia and other vendor packs) names no single repository, so it is not a source here.",
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
@@ -28,7 +29,7 @@
     {"source_id": "microsoft-playwright-cli", "kind": "github-skills-repo", "url": "https://github.com/microsoft/playwright-cli", "pin": "b85c7a736bb473bf55b584e54a09ffa698d6d871"},
     {"source_id": "microsoft-skills", "kind": "github-skills-repo", "url": "https://github.com/microsoft/skills", "pin": "3495f50ae0d7b69dcb19c6922db9f80aab6cf79c"},
     {"source_id": "obra-superpowers", "kind": "github-skills-repo", "url": "https://github.com/obra/superpowers", "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d"},
-    {"source_id": "openai-skills", "kind": "github-skills-repo", "url": "https://github.com/openai/skills", "pin": "49f948faa9258a0c61caceaf225e179651397431"},
+    {"source_id": "openai-skills", "kind": "github-skills-repo", "url": "https://github.com/openai/skills", "pin": "49f948faa9258a0c61caceaf225e179651397431", "maintenance": {"status": "stale", "checked_at": "2026-09-30", "evidence": "gh api 'repos/openai/skills/commits?sha=main&since=2026-07-02T00:00:00Z&per_page=1' returned no commit; the last main commit, 49f948faa9258a0c61caceaf225e179651397431, is dated 2026-06-24T02:36:12Z, 98 days before 2026-09-30. The repository is not archived, and its pushed_at of 2026-09-08 counts a push to another branch."}},
     {"source_id": "semgrep-skills", "kind": "github-skills-repo", "url": "https://github.com/semgrep/skills", "pin": "68177b8830f96cd9d10dacbb14dde2566360503d"},
     {"source_id": "skills-sh-registry", "kind": "registry", "url": "https://skills.sh", "pin": "7407f3893ad4dceab546ac002c3ef806e4000c73"},
     {"source_id": "superagent-ai-skills", "kind": "github-skills-repo", "url": "https://github.com/superagent-ai/skills", "pin": "0da315b873ed141025fa601ed6e0ebe0c878d5af"},
@@ -65,7 +66,7 @@
     {
       "layer_id": "skills-design-intake",
       "lifecycle_task": "design-intake",
-      "requirement": "Interrogate requirements before building: stress-test an ambiguous request or plan (assumptions, open decisions, acceptance) before implementation starts. The skill must be model-invocable (no disable-model-invocation: true in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml), so a worker or the main session can run it without a user trigger, and it must not make intake, brainstorming or a planning approval mandatory for bounded work (AGENTS.md; the manifest's obra/superpowers exclusion).",
+      "requirement": "Interrogate requirements before building: stress-test an ambiguous request or plan (assumptions, open decisions, acceptance) before implementation starts. The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml), so a worker or the main session can run it without a user trigger, and it must not make intake, brainstorming or a planning approval mandatory for bounded work (AGENTS.md; the manifest's obra/superpowers exclusion).",
       "installed": ["grill-me"],
       "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "bgauryy-octocode", "openai-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
@@ -76,7 +77,7 @@
     {
       "layer_id": "skills-architecture",
       "lifecycle_task": "architecture",
-      "requirement": "Improve codebase architecture: review a grown module and propose deeper modules and narrower interfaces, with a shared module/interface vocabulary for refactoring the large single-file validators (scripts/validate.py, scripts/landscape.py). The skill must be model-invocable (no disable-model-invocation: true in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml).",
+      "requirement": "Improve codebase architecture: review a grown module and propose deeper modules and narrower interfaces, with a shared module/interface vocabulary for refactoring the large single-file validators (scripts/validate.py, scripts/landscape.py). The skill must be model-invocable (no true-valued disable-model-invocation (true/yes/on/1) in SKILL.md and no allow_implicit_invocation: false in agents/openai.yaml).",
       "installed": ["improve-codebase-architecture", "codebase-design"],
       "source_ids": ["mattpocock-skills", "affaan-m-ecc", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
@@ -139,7 +140,8 @@
       "source_ids": ["openai-skills", "trailofbits-skills", "cloudflare-security-audit-skill", "semgrep-skills", "superagent-ai-skills", "getsentry-skills", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
         "security-audit's stage-only use is a usage policy that no setting enforces, and its M5c bake-off against /security-review decides its promotion (the manifest's security-audit row).",
-        "Seven of the nine are disabled in Codex (codex_enabled false); only security-best-practices and security-threat-model are enabled there."
+        "Seven of the nine are disabled in Codex (codex_enabled false); only security-best-practices and security-threat-model are enabled there.",
+        "Stale source: replacement via this sweep. security-best-practices and security-threat-model come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen security-review tasks with known true and false positives shows a candidate with higher precision and recall than the installed skill it would replace at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed, relicensed or fails a later audit."
     },
@@ -150,7 +152,8 @@
       "installed": ["gh-fix-ci", "gh-address-comments", "resolving-merge-conflicts"],
       "source_ids": ["openai-skills", "mattpocock-skills", "getsentry-skills", "obra-superpowers", "addyosmani-agent-skills", "trailofbits-skills", "superagent-ai-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "resolving-merge-conflicts is disabled in Codex (codex_enabled false)."
+        "resolving-merge-conflicts is disabled in Codex (codex_enabled false).",
+        "Stale source: replacement via this sweep. gh-fix-ci and gh-address-comments come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-check, review-thread and rebase-conflict tasks shows a candidate resolving more of them correctly than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed."
     },

@@ -26,12 +26,14 @@ instead, one per lifecycle task, keyed by skill (owner/repo@name) rather than re
   build_inputs.py --work-dir W --modality skills [--scope W/scope.json] [--seeds seeds.json] [--repo-root .]
 
 --skills-scope prints the frozen scope in saturation_ledger.py --scope's format for the skills catalog (whose --scope
-covers research-state.json's layers only): each task's requirement_sha256, the sha256 of the canonical JSON of its
-lifecycle_task, requirement and overturn_when, under "skills/<layer_id>", and the platform-profile hash, both with
-the ledger's own functions. A skills layer input carries modality "skills", the task, the installed skills'
-adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins, and known_skills (the
-manifest's installed skills by repository and its excluded skills by source, as it states them). No freshness
-manifest is read. A run covers one modality.
+covers research-state.json's layers only): each task's requirement_sha256 (saturation_ledger.skills_requirement_sha256:
+the sha256 of the canonical JSON of its lifecycle_task, requirement and overturn_when) under "skills/<layer_id>", and
+the platform-profile hash, both with the ledger's own functions. A skills layer input carries modality "skills", the
+task, the installed skills' adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins
+(and a stale source's maintenance record), and known_skills (the manifest's installed skills by repository, and its
+excluded skills by the manifest's own source text, each comma-separated name kept whole). The task's text, its open
+gaps and the installed skills' gap fields are passed whole, never cut. No freshness manifest is read. A run covers
+one modality.
 """
 
 from __future__ import annotations
@@ -41,6 +43,7 @@ import json
 import os
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -56,14 +59,20 @@ SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
 SKILLS = "skills"
 SOURCE_KINDS = ("github-skills-repo", "registry", "awesome-list")
-# A skills layer's frozen requirement: these fields of its task, hashed as saturation_ledger.py hashes a
-# research-state row (sha256 of the canonical JSON).
+SOURCE_FIELDS = ("source_id", "kind", "url", "pin")
+# A source's optional maintenance record: the common block's maintenance rule applied when the catalog was checked
+# (status stale: archived, or no default-branch commit in the 90 days before checked_at), with the API fact.
+MAINTENANCE_FIELDS = ("status", "checked_at", "evidence")
+MAINTENANCE_STATUSES = ("stale",)
+# A skills layer's frozen requirement: these fields of its task (saturation_ledger.SKILLS_REQUIREMENT_FIELDS, whose
+# skills_requirement_sha256 computes the hash).
 SKILLS_REQUIREMENT_FIELDS = ("lifecycle_task", "requirement", "overturn_when")
 # What a skills layer input shows of each installed skill's adoption/skills/manifest.json row.
 INSTALLED_FIELDS = ("name", "source", "ref", "path", "skill_md_sha256", "description_chars", "status",
                     "upstream_disable_model_invocation", "claude_listing", "codex_enabled", "gap")
 TASK_FIELDS = ("layer_id", "lifecycle_task", "requirement", "installed", "source_ids", "open_gaps", "overturn_when")
 HEX40 = re.compile(r"[0-9a-f]{40}")
+DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
@@ -172,14 +181,22 @@ def check_skills_catalog(catalog: dict, manifest: dict) -> list[str]:
     source_ids = []
     for position, source in enumerate(catalog.get("sources") or []):
         label = f"sources[{position}] {source.get('source_id') if isinstance(source, dict) else source!r}"
-        if not isinstance(source, dict) or sorted(source) != ["kind", "pin", "source_id", "url"]:
-            problems.append(f"skills catalog {label}: needs exactly source_id, kind, url and pin")
+        if not isinstance(source, dict) or set(source) - {"maintenance"} != set(SOURCE_FIELDS):
+            problems.append(f"skills catalog {label}: needs exactly source_id, kind, url and pin (and optionally "
+                            "maintenance)")
             continue
         source_ids.append(source["source_id"])
         if source["kind"] not in SOURCE_KINDS:
             problems.append(f"skills catalog {label}: kind {source['kind']!r} is not one of {list(SOURCE_KINDS)}")
         if not HEX40.fullmatch(str(source["pin"])):
             problems.append(f"skills catalog {label}: pin must be a 40-hex commit")
+        record = source.get("maintenance")
+        if "maintenance" in source and not (
+                isinstance(record, dict) and sorted(record) == sorted(MAINTENANCE_FIELDS)
+                and record["status"] in MAINTENANCE_STATUSES and valid_date(record["checked_at"])
+                and isinstance(record["evidence"], str) and record["evidence"].strip()):
+            problems.append(f"skills catalog {label}: maintenance must be {{status: one of "
+                            f"{list(MAINTENANCE_STATUSES)}, checked_at: YYYY-MM-DD, evidence: the API fact}}")
     repeated = sorted({sid for sid in source_ids if source_ids.count(sid) > 1})
     if repeated:
         problems.append(f"skills catalog: source ids repeat: {repeated}")
@@ -208,11 +225,28 @@ def check_skills_catalog(catalog: dict, manifest: dict) -> list[str]:
     return problems
 
 
+def valid_date(value) -> bool:
+    try:
+        date.fromisoformat(str(value))
+    except ValueError:
+        return False
+    return bool(DATE.fullmatch(str(value)))
+
+
 def skills_scope(catalog: dict, adoption: dict, led) -> dict:
-    """The frozen scope of the skills layers in saturation_ledger.py --scope's format, with the ledger's functions."""
+    """The frozen scope of the skills layers in saturation_ledger.py --scope's format, with the ledger's functions
+    (the requirement hash is saturation_ledger.skills_requirement_sha256, which --report and --append recompute)."""
     return {"platform_profiles_sha256": led.platform_profiles_sha256(adoption),
-            "requirement_sha256": {f"{SKILLS}/{task['layer_id']}": led.sha256_bytes(led.canonical(
-                {field: task.get(field) for field in SKILLS_REQUIREMENT_FIELDS})) for task in catalog["tasks"]}}
+            "requirement_sha256": {f"{SKILLS}/{task['layer_id']}": led.skills_requirement_sha256(task)
+                                   for task in catalog["tasks"]}}
+
+
+def excluded_names(value) -> list[str]:
+    """The skill names of one adoption/skills/manifest.json excluded entry. The committed manifest states them as one
+    comma-separated string ("systematic-debugging, test-driven-development"); a list is taken item by item. Each name,
+    or phrase ("reddit-automation and vendor-specific packs"), is stripped and kept whole."""
+    items = value if isinstance(value, list) else str(value or "").split(",")
+    return [name for name in (str(item).strip() for item in items) if name]
 
 
 def known_skills(manifest: dict) -> dict:
@@ -225,7 +259,7 @@ def known_skills(manifest: dict) -> dict:
             installed.setdefault(str(entry.get("source")), set()).add(str(entry["name"]))
     for entry in manifest.get("excluded") or []:
         if isinstance(entry, dict):
-            excluded.setdefault(str(entry.get("source")), set()).update(str(name) for name in entry.get("skills") or [])
+            excluded.setdefault(str(entry.get("source")), set()).update(excluded_names(entry.get("skills")))
     return {"installed": {source: sorted(names) for source, names in sorted(installed.items())},
             "excluded": {source: sorted(names) for source, names in sorted(excluded.items())}}
 
@@ -251,11 +285,13 @@ def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict
             "catalog": SKILLS, "layer_id": layer_id, "title": f"Skills: {task['lifecycle_task']}", "modality": SKILLS,
             "lifecycle_task": task["lifecycle_task"], "requirement": task["requirement"],
             "requirement_sha256": requirement, "platform_profiles_sha256": scope.get("platform_profiles_sha256"),
-            "installed": [{field: (pinned[name][field][:300] if field == "gap" else pinned[name][field])
-                           for field in INSTALLED_FIELDS if field in pinned[name]} for name in task["installed"]],
+            # Whole text: the catalog and the manifest are this repository's reviewed files, and a cut gap or overturn
+            # condition would hide part of the requirement from the workers (repository layers keep their caps).
+            "installed": [{field: pinned[name][field] for field in INSTALLED_FIELDS if field in pinned[name]}
+                          for name in task["installed"]],
             "sources": [dict(sources[source_id]) for source_id in task["source_ids"]],
-            "open_gaps": [gap[:300] for gap in (task.get("open_gaps") or [])[:5]],
-            "overturn_when": (task.get("overturn_when") or "")[:600],
+            "open_gaps": list(task.get("open_gaps") or []),
+            "overturn_when": task.get("overturn_when") or "",
             "skills_catalog_checked_at": catalog.get("checked_at"),
             "skills_manifest_checked_at": manifest.get("checked_at"),
             "previous_sweep": previous.get((SKILLS, layer_id), {}),

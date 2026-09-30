@@ -97,7 +97,7 @@ class CatalogTests(unittest.TestCase):
                                             "requirement", "source_ids"], task["layer_id"])
             self.assertIn("skill-creator", task["overturn_when"], task["layer_id"])
         for source in catalog["sources"]:
-            self.assertEqual(sorted(source), ["kind", "pin", "source_id", "url"])
+            self.assertEqual(sorted(set(source) - {"maintenance"}), ["kind", "pin", "source_id", "url"])
             self.assertIn(source["kind"], build_inputs.SOURCE_KINDS)
             self.assertRegex(source["pin"], HEX40)
         kinds = {source["source_id"]: source["kind"] for source in catalog["sources"]}
@@ -135,11 +135,41 @@ class CatalogTests(unittest.TestCase):
         broken["tasks"][2]["layer_id"] = "skills-other"
         broken["sources"][0]["pin"] = "main"
         broken["sources"][1]["kind"] = "blog"
+        broken["sources"][2]["maintenance"] = {"status": "unmaintained", "checked_at": "2026-09-30", "evidence": "x"}
+        broken["sources"][3]["maintenance"] = {"status": "stale", "checked_at": "30 Sep", "evidence": "x"}
+        broken["sources"][4]["notes"] = "an unknown field"
         broken["tasks"].append(copy.deepcopy(broken["tasks"][3]))
         problems = "\n".join(build_inputs.check_skills_catalog(broken, self.manifest))
         for fragment in ("not-a-pinned-skill", "no-such-source", "skills-other", "40-hex", "blog",
-                         "skills-architecture"):
+                         "skills-architecture", f"{broken['sources'][2]['source_id']!r}: maintenance must be",
+                         f"{broken['sources'][3]['source_id']!r}: maintenance must be",
+                         f"{broken['sources'][4]['source_id']!r}: needs exactly"):
             self.assertIn(fragment, problems)
+
+    def test_a_stale_source_is_marked_and_kept_for_its_installed_skills(self):
+        # openai/skills has no main commit since 2026-06-24 (98 days before 2026-09-30): stale under the common
+        # block's 90-day maintenance rule. It stays a source and keeps its four installed skills; the tasks they serve
+        # say so as an open gap, and the discover template labels a stale source's skills not_adopted.
+        sources = {source["source_id"]: source for source in self.catalog["sources"]}
+        record = sources["openai-skills"]["maintenance"]
+        self.assertEqual((record["status"], record["checked_at"]), ("stale", "2026-09-30"))
+        for fact in ("since=2026-07-02T00:00:00Z", "49f948faa9258a0c61caceaf225e179651397431", "2026-06-24T02:36:12Z",
+                     "pushed_at"):
+            self.assertIn(fact, record["evidence"])
+        self.assertEqual([source_id for source_id, source in sources.items() if "maintenance" in source],
+                         ["openai-skills"])
+        openai = sorted(skill["name"] for skill in self.manifest["skills"] if skill["source"] == "openai/skills")
+        self.assertEqual(openai, ["gh-address-comments", "gh-fix-ci", "security-best-practices",
+                                  "security-threat-model"])
+        tasks = {task["lifecycle_task"]: task for task in self.catalog["tasks"]}
+        for name in ("ci-pr", "security"):
+            self.assertTrue(any(gap.startswith("Stale source: replacement via this sweep.")
+                                for gap in tasks[name]["open_gaps"]), name)
+        served = sorted(name for task in self.catalog["tasks"] for name in task["installed"] if name in openai)
+        self.assertEqual(served, openai)
+        self.assertEqual(sorted(task["lifecycle_task"] for task in self.catalog["tasks"]
+                                if "openai-skills" in task["source_ids"]),
+                         ["browser", "ci-pr", "design-intake", "security", "skill-lifecycle"])
 
 
 # --------------------------------------------------------------------------- the strict return schema
@@ -237,13 +267,16 @@ def skills_repo(case) -> Path:
     skill = {"source": "o/skills", "ref": "e" * 40, "path": "skills/diag", "skill_md_sha256": "f" * 64,
              "description_chars": 100, "status": "trial", "upstream_disable_model_invocation": False,
              "claude_listing": "on", "codex_enabled": True, "license": "MIT"}
+    # excluded[].skills as the committed manifest states it (one comma-separated string), plus one list-shaped entry.
     write_json(repo / "adoption/skills/manifest.json", {"checked_at": "2026-09-28", "skills": [
         {"name": "diag", **skill, "gap": "x" * 400},
         {"name": "grill", **skill, "path": "skills/grill", "upstream_disable_model_invocation": True,
          "claude_listing": "user-invocable-only", "codex_enabled": False, "gap": "user only"}],
-        "excluded": [{"source": "o/skills, p/more", "skills": ["old-debug", "the other skills"], "reason": "dup",
+        "excluded": [{"source": "o/skills, p/more", "skills": "old-debug, the other skills", "reason": "dup",
                       "overturn": "never"},
-                     {"source": "various", "skills": ["Lark/Feishu"], "reason": "off-domain", "overturn": "x"}]})
+                     {"source": "various", "skills": "Lark/Feishu, reddit-automation and vendor-specific packs",
+                      "reason": "off-domain", "overturn": "x"},
+                     {"source": "o/skills", "skills": ["listed-debug"], "reason": "list-shaped", "overturn": "x"}]})
     write_json(repo / "adoption/manifest.json", {"platform_profiles": [{"id": "linux-x86_64", "os": "linux"}]})
     write_json(repo / "catalogs/saturation/ledger.json", {"sweeps": []})
     return repo
@@ -285,20 +318,24 @@ class SkillsInputTests(unittest.TestCase):
         self.assertEqual((debug["catalog"], debug["modality"], debug["lifecycle_task"]), ("skills", "skills", "debug"))
         self.assertEqual((debug["requirement_sha256"], debug["platform_profiles_sha256"]),
                          (scope["requirement_sha256"]["skills/skills-debug"], scope["platform_profiles_sha256"]))
+        # The installed skill's gap, the task's open gaps and its overturn condition pass whole (the first round cut
+        # the gap at 300 characters without a marker).
         self.assertEqual(debug["installed"], [{
             "name": "diag", "source": "o/skills", "ref": "e" * 40, "path": "skills/diag", "skill_md_sha256": "f" * 64,
             "description_chars": 100, "status": "trial", "upstream_disable_model_invocation": False,
-            "claude_listing": "on", "codex_enabled": True, "gap": "x" * 300}])
+            "claude_listing": "on", "codex_enabled": True, "gap": "x" * 400}])
         self.assertEqual(debug["sources"], [
             {"source_id": "o-skills", "kind": "github-skills-repo", "url": "https://github.com/o/skills", "pin": "c" * 40},
             {"source_id": "skills-sh-registry", "kind": "registry", "url": "https://skills.sh", "pin": "d" * 40}])
         # Installed skills by repository; excluded skills by the manifest's own source text, since an excluded entry can
-        # name several repositories and phrases: no owner/repo@name pair is invented from it.
+        # name several repositories and phrases: no owner/repo@name pair is invented from it. Each comma-separated name
+        # stays whole, and a list-shaped entry is taken item by item.
         self.assertEqual(debug["known_skills"], {
             "installed": {"o/skills": ["diag", "grill"]},
-            "excluded": {"o/skills, p/more": ["old-debug", "the other skills"], "various": ["Lark/Feishu"]}})
+            "excluded": {"o/skills": ["listed-debug"], "o/skills, p/more": ["old-debug", "the other skills"],
+                         "various": ["Lark/Feishu", "reddit-automation and vendor-specific packs"]}})
         self.assertEqual(debug["seeded_candidates"], ["acme/agent-skills@debug-kit"])
-        self.assertEqual((debug["previous_sweep"], len(debug["open_gaps"][0])), ({}, 300))
+        self.assertEqual((debug["previous_sweep"], debug["open_gaps"], debug["overturn_when"]), ({}, ["g" * 400], "never"))
         self.assertEqual((debug["skills_catalog_checked_at"], debug["skills_manifest_checked_at"]),
                          ("2026-09-30", "2026-09-28"))
         intake = json.loads((self.work / "inputs/skills-design-intake.json").read_text())
@@ -325,6 +362,36 @@ class SkillsInputTests(unittest.TestCase):
         done = self.build("--work-dir", self.work)
         self.assertEqual(done.returncode, 2)
         self.assertIn("--freshness-manifest", done.stderr)
+
+    def test_inputs_built_from_the_committed_catalog_and_manifest_name_whole_skills(self):
+        # The committed manifest states each excluded entry's skills as one comma-separated string; the first round
+        # iterated its characters, so known_skills.excluded held 363 single characters.
+        work = temp_dir(self)
+        scope = run([sys.executable, HARNESS / "build_inputs.py", "--skills-scope"])
+        self.assertEqual(scope.returncode, 0, scope.stderr)
+        write_json(work / "scope.json", json.loads(scope.stdout))
+        done = run([sys.executable, HARNESS / "build_inputs.py", "--work-dir", work, "--modality", "skills"])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+        manifest = json.loads(SKILLS_MANIFEST.read_text(encoding="utf-8"))
+        for task in catalog["tasks"]:
+            known = json.loads((work / "inputs" / f"{task['layer_id']}.json").read_text(encoding="utf-8"))["known_skills"]
+            values = [name for group in known.values() for names in group.values() for name in names]
+            self.assertTrue(values, task["layer_id"])
+            self.assertEqual([value for value in values if len(value) == 1], [], task["layer_id"])
+        known = json.loads((work / "inputs/skills-debug.json").read_text(encoding="utf-8"))["known_skills"]
+        self.assertIn("systematic-debugging", known["excluded"]["obra/superpowers"])
+        self.assertIn("code-review", known["excluded"]["mattpocock/skills"])
+        for entry in manifest["excluded"]:
+            self.assertIsInstance(entry["skills"], str, entry["source"])
+            for name in entry["skills"].split(","):
+                self.assertIn(name.strip(), known["excluded"][entry["source"]], entry["source"])
+        # Each installed skill's gap passes whole: security-audit's is over 1,000 characters.
+        security = json.loads((work / "inputs/skills-security.json").read_text(encoding="utf-8"))
+        pinned = {skill["name"]: skill["gap"] for skill in manifest["skills"]}
+        gaps = {skill["name"]: skill["gap"] for skill in security["installed"]}
+        self.assertEqual(gaps, {name: pinned[name] for name in gaps})
+        self.assertGreater(len(gaps["security-audit"]), 1000)
 
 
 # --------------------------------------------------------------------------- templates a skills-* layer resolves to
