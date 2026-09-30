@@ -1324,10 +1324,14 @@ holds the evidence, alternatives and overturn comparison for each item.
 - **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
-  vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
-  (a required check in branch ruleset 23739774). Off PRs it keeps its SARIF as
-  an artifact that the tool-free `osv-sarif-upload` job uploads (category
-  `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
+  vulnerability not ignored in `.github/osv-scanner.toml`; the inventory entries
+  that name `.github/osv-scanner-frozen-macos.toml` (today the one frozen macOS
+  lock) are scanned in an invocation of their own under that config alone,
+  because an explicit `--config` applies to every input of one invocation. It
+  runs on every PR (a required check in branch ruleset 23739774). Off PRs it
+  keeps both SARIF reports as one artifact that the tool-free
+  `osv-sarif-upload` job uploads (categories `osv-scanner` and
+  `osv-scanner-frozen-macos`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
   a deliberately vulnerable test fixture, with a reason and an evidence path;
   today it lists three gap-wave-2 DVC-lock evidence fixtures under

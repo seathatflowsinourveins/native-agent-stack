@@ -1,0 +1,16 @@
+# OSV-Scanner configuration for the frozen macOS application variant lock,
+# evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml, and for nothing else.
+#
+# OSV-Scanner 2.6.0 applies an explicit --config to every input of its invocation (docs/configuration.md and
+# internal/config/manager.go, Manager.Get), so an exception added to .github/osv-scanner.toml would hide the same
+# advisory in every lockfile of the inventory. security-scan.yml therefore scans the inventory entries that name this
+# file in a separate invocation under this config alone, and every other entry under .github/osv-scanner.toml, which
+# holds no entry for the advisory below. tests/test_osv_lockfile_coverage.py binds this file to that one lock and its
+# sha256, enforces the same fields and 90-day bound as for the other config, and checks that the inventory split is
+# exhaustive and disjoint (docs/decisions/2026-09-22-github-automation-closure.md, "urllib3 and PyJWT relock and a
+# frozen macOS lock (2026-09-30)").
+
+[[IgnoredVulns]]
+id = "GHSA-vcvr-r3jv-pc5j"
+ignoreUntil = 2026-12-24
+reason = "next 16.2.0 through 16.3.5 (fixed in 16.3.6): the Node.js ImageResponse of next/og renders values that application code places into SVG content, attributes or styles, and attacker-controlled values there lead to remote code execution (GitHub advisory GHSA-vcvr-r3jv-pc5j, OSV record published 2026-09-30T14:48Z; the Edge implementation and applications that pass no such values are not affected, per the advisory). This config is applied only to the frozen macOS variant evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml, which pins 16.3.5 and of which the repository keeps only package.json and this lock (two files, no application source). At 11227bfd, outside the artifact directory itself, git grep finds it only in the scan inventory, in the experiment record blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json and in the evidence manifest (this change's tests, receipt and evidence name it too), and no workflow, script or recipe installs, builds or serves it, so no route can reach ImageResponse from anything this repository runs. The live Next/React recipe lock, blueprints/convergence-practice/application-delivery/pnpm-lock.yaml, pins 16.3.6, which the advisory does not affect, and is scanned under the other config, which has no exception for this advisory. The frozen lock cannot be bumped: its bytes are hash-bound evidence. Evidence: evidence/receipts/osv-urllib3-next-20260930.json."
