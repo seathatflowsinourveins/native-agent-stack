@@ -47,7 +47,9 @@
       {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
       {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
       {"pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
-      {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "5adcc3a4"}}
+      {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "5adcc3a4"}},
+      {"pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md", "pull_request": 575, "commit": "bbee2a8e"}},
+      {"pending_source": {"path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json", "pull_request": 575, "commit": "bbee2a8e"}}
     ]
   },
   "rows": [
@@ -88,7 +90,8 @@
         {"text": "The layer verdict selects Claude Code and Codex with native-proven evidence and names five alternatives with their dispositions.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The pins of record moved past the verdict pins 2.1.278 and 0.155.1: the stack records claude-code 2.1.284 as a Linux floor and codex 0.159.2.", "source_path": "manifests/stack.json"},
         {"text": "Codex 0.159.2 was qualified on its CLI surface and npm provenance without a live model call; its upstream cargo tests were not run.", "source_path": "evidence/receipts/codex-01592-qualification-20260930.json"},
-        {"text": "SDKs enter only for a demonstrated application need; interactive and worker sessions stay in the native clients.", "source_path": "catalogs/foundation/manifest.json"}
+        {"text": "SDKs enter only for a demonstrated application need; interactive and worker sessions stay in the native clients.", "source_path": "catalogs/foundation/manifest.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -166,7 +169,8 @@
       "reasons": [
         {"text": "Canonical project instructions (CLAUDE.md and AGENTS.md) carry the rules; selected skills load progressively, installed through the upstream skills CLI from a pinned manifest.", "source_path": "catalogs/foundation/manifest.json"},
         {"text": "The skills manifest pins every installed skill to a commit and installs it for both clients through tools/adoption/install_skills.py.", "source_path": "adoption/skills/manifest.json"},
-        {"text": "The weakest evidence class across the winners is local integration; no receipt is an unchanged upstream test.", "source_path": "catalogs/landscape/foundation.json"}
+        {"text": "The weakest evidence class across the winners is local integration; no receipt is an unchanged upstream test.", "source_path": "catalogs/landscape/foundation.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/instructions-skills.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -222,7 +226,8 @@
       "reasons": [
         {"text": "The verdict keeps Claude native workers and Worktrunk owned-worktree lifecycle, with a preregistered comparison still required.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The research state marks the layer comparison_required.", "source_path": "catalogs/landscape/research-state.json"},
-        {"text": "The worker fixture is author-written and has no runner; a rerun needs a fresh owned repository and a prompt built on its base commit.", "source_path": "blueprints/convergence-practice/native-worker/README.md"}
+        {"text": "The worker fixture is author-written and has no runner; a rerun needs a fresh owned repository and a prompt built on its base commit.", "source_path": "blueprints/convergence-practice/native-worker/README.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -278,7 +283,8 @@
       },
       "reasons": [
         {"text": "Owned worktrees isolate edits; the sandbox runtime enforces a filesystem and network boundary only per task.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "The on-demand isolation recipe proves the boundary on an owned fixture: an allowed write succeeds, a blocked read and a protected write fail.", "source_path": "recipes/README.md"}
+        {"text": "The on-demand isolation recipe proves the boundary on an owned fixture: an allowed write succeeds, a blocked read and a protected write fail.", "source_path": "recipes/README.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/isolation.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -352,7 +358,8 @@
       "reasons": [
         {"text": "Serena is the layer winner for exact symbols and references; ast-grep, codebase-memory-mcp and jCodeMunch are conditional lanes, and a known-source read with rg comes first.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The token-efficiency profile carries Serena; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes until each has a reviewed pin on both platforms.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}}
+        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/code-navigation.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -426,7 +433,8 @@
       "reasons": [
         {"text": "QMD BM25 search followed by a get of the original body is the document lane; MarkItDown converts base HTML only and Poppler's pdftotext handles born-digital PDFs.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "BM25 search uses no model weights; query and embed are separate, model-enabled choices.", "source_path": "recipes/README.md"},
-        {"text": "The layer declares local integration for its winners; no unchanged upstream test and no live-provider run is recorded.", "source_path": "catalogs/landscape/foundation.json"}
+        {"text": "The layer declares local integration for its winners; no unchanged upstream test and no live-provider run is recorded.", "source_path": "catalogs/landscape/foundation.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/document-retrieval.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -509,7 +517,8 @@
       "reasons": [
         {"text": "SocratiCode with Qdrant and a pinned local vLLM embedding service answers conceptual code questions; the Hugging Face CLI fetches the revision-pinned model.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "On the source host, one real query per native client, a finite 2048-dimension embedding and watcher add, update and delete of about 3 s each are recorded (historical, not repeated).", "source_path": "evidence/receipts/native-rag.json"},
-        {"text": "vLLM 0.30.0 replaced 0.25.0 on 2026-09-25 under a resolver cutoff that the recipe does not repeat.", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"}
+        {"text": "vLLM 0.30.0 replaced 0.25.0 on 2026-09-25 under a resolver cutoff that the recipe does not repeat.", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -559,7 +568,8 @@
       "reasons": [
         {"text": "ai-memory is the shared durable-memory lane for both clients; its hooks capture bounded observations, not complete transcripts.", "source_path": "recipes/README.md"},
         {"text": "The layer winner was recorded at 2.3.2; the stack and the Linux bootstrap install 2.4.1, which migrates an existing store forward only when serve first opens it.", "source_path": "manifests/stack.json"},
-        {"text": "The research state requires a representative comparison for this layer.", "source_path": "catalogs/landscape/research-state.json"}
+        {"text": "The research state requires a representative comparison for this layer.", "source_path": "catalogs/landscape/research-state.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort ultra; verdict corrected, 3 corrections to the layer records). It names 5 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -627,7 +637,8 @@
       "reasons": [
         {"text": "Web search, fetch and extraction use free native lanes first (Claude Code WebSearch and WebFetch, Context Mode fetch-and-index, Codex live web search); a paid keyed search API is not used for new work while a free lane does the job.", "source_path": "docs/harness-defaults.md"},
         {"text": "The pinned CLIs cover bounded search and extraction, owned browser fixtures and literature discovery; Tavily keeps its key in its store file, never in ~/.tavily/config.json.", "source_path": "recipes/tavily.md"},
-        {"text": "The layer declares local integration for all three winners.", "source_path": "catalogs/landscape/foundation.json"}
+        {"text": "The layer declares local integration for all three winners.", "source_path": "catalogs/landscape/foundation.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/web-research.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -724,7 +735,8 @@
         {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
-        {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"}
+        {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -793,7 +805,8 @@
         {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
         {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
-        {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"}
+        {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/quality-evaluation.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -861,7 +874,8 @@
       },
       "reasons": [
         {"text": "zizmor analyses the workflows offline and is a required CI gate; Syft inventories installed packages without a vulnerability verdict; actions/attest attests the published catalog archive and SBOM.", "source_path": "catalogs/foundation/automation.json"},
-        {"text": "Hosted CI runs and consumer-side attestation verification are recorded as independent observations of the published artifacts.", "source_path": "docs/catalog-provenance.md"}
+        {"text": "Hosted CI runs and consumer-side attestation verification are recorded as independent observations of the published artifacts.", "source_path": "docs/catalog-provenance.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/ci-supply-chain.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -919,7 +933,8 @@
         {"text": "Dagu gives workflow run history, cancel and checkpointed step retry; the systemd user manager gives deadlines, control-group kill and descendant cleanup.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "systemd is the Ubuntu 24.04 distribution package; the stack pins the package version and cites upstream v255 source for semantics only.", "source_path": "manifests/stack.json"},
         {"text": "Dagu 2.16.6 failed its preregistered SIGKILL recovery case: without a scheduler, all retries within the 150 s bound were refused; it recovered (about 182 s) only in a post-hoc variant with a scheduler started after the kill, labelled a deviation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
-        {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}}
+        {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -984,7 +999,8 @@
       "reasons": [
         {"text": "FastAPI, Next.js and a source-built PostgreSQL are the layer winners; React is an overlap recorded with the UI server.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The application-delivery blueprint pins every tool and runs `make verify` on synthetic data only.", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
-        {"text": "Next.js 16.3.8 (2026-09-30) fixes a High-severity advisory, server-side request forgery in image optimization (GHSA-cjq9-62q9-8jv4), and five Medium ones; the winner entry (16.3.5) and the lock (16.3.6) are both below it (release page read 2026-10-01).", "url": "https://github.com/vercel/next.js/releases/tag/v16.3.8"}
+        {"text": "Next.js 16.3.8 (2026-09-30) fixes a High-severity advisory, server-side request forgery in image optimization (GHSA-cjq9-62q9-8jv4), and five Medium ones; the winner entry (16.3.5) and the lock (16.3.6) are both below it (release page read 2026-10-01).", "url": "https://github.com/vercel/next.js/releases/tag/v16.3.8"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/hosting-services.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -1040,7 +1056,8 @@
       "reasons": [
         {"text": "Owned native install and rollback recipes plus application-native backups (ai-memory, Qdrant) carry recovery; Restic covers selected application state.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The research state marks this layer new_host_required: its remaining evidence is a recovery on another host.", "source_path": "catalogs/landscape/research-state.json"},
-        {"text": "Restic's off-host recovery is recorded as native operation on synthetic fixtures, with unchanged upstream tests.", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"}
+        {"text": "Restic's off-host recovery is recorded as native operation on synthetic fixtures, with unchanged upstream tests.", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/recovery-portability.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -1104,7 +1121,8 @@
         {"text": "The catalog selects loopback native telemetry and scoped history; a local model and the gateway are optional trials.", "source_path": "catalogs/foundation/manifest.json"},
         {"text": "Per-subagent tool-use evidence has two routes and no record compares them: native OTel (Codex logs agent_name on its tool results and spawn edges; Claude carries agent_id on trace spans only) and transcript analysis over saved session directories.", "source_path": "docs/decisions/2026-09-26-tool-invoke-rates.md"},
         {"text": "The skill-usage tool rejects the OTel route on the assumption that OTEL_LOG_TOOL_DETAILS is off, which the 2026-09-26 decision turned on.", "source_path": "tools/skill-usage/README.md"},
-        {"text": "The merged Gate A kernel (PR #528) is analysis code over saved session directories, including subagents/agent-*.jsonl; it is not the instrument of record until the routes are compared.", "source_path": "examples/claude-native/workflows/README.md"}
+        {"text": "The merged Gate A kernel (PR #528) is analysis code over saved session directories, including subagents/agent-*.jsonl; it is not the instrument of record until the routes are compared.", "source_path": "examples/claude-native/workflows/README.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -1163,7 +1181,8 @@
       "reasons": [
         {"text": "The layer selects the Codex SDK and CLI; an SDK enters only for a demonstrated application need.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The Python SDK and its bundled CLI binary are pinned at 0.154.0 while the native CLI is at 0.159.2.", "source_path": "adoption/sdk/accepted-constraints.txt"},
-        {"text": "No unchanged upstream test is recorded for the SDK or the CLI.", "source_path": "evidence/receipts/codex-01592-qualification-20260930.json"}
+        {"text": "No unchanged upstream test is recorded for the SDK or the CLI.", "source_path": "evidence/receipts/codex-01592-qualification-20260930.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -1218,7 +1237,8 @@
       },
       "reasons": [
         {"text": "Native project MCP configuration is the policy; MCPorter and the Inspector inspect and bridge servers without replacing the clients' own MCP handling.", "source_path": "catalogs/foundation/decisions.json"},
-        {"text": "@wong2/mcp-cli 2.0.0 lost the executed head-to-head against mcporter and the Inspector on every list and call operation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"}
+        {"text": "@wong2/mcp-cli 2.0.0 lost the executed head-to-head against mcporter and the Inspector on every list and call operation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/mcp-surfaces.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -1264,7 +1284,8 @@
         {"text": "Native sign-ins stay native; keys live in per-provider 0600 files under a 0700 directory outside every worktree, and nothing is read or printed by an agent.", "source_path": "docs/secret-storage.md"},
         {"text": "Authentication never transfers between hosts: the adoption policy is native login on the target only.", "source_path": "adoption/manifest.json"},
         {"text": "gitleaks is the pre-publication secret scan; its hook check has a discriminating control (a planted generated key fails).", "source_path": "docs/acceptance-evidence-policy.md"},
-        {"text": "Upstream declares gitleaks feature complete: future releases are security patches only, and its maintainer's focus moved to Betterleaks (README read 2026-10-01).", "url": "https://github.com/gitleaks/gitleaks"}
+        {"text": "Upstream declares gitleaks feature complete: future releases are security patches only, and its maintainer's focus moved to Betterleaks (README read 2026-10-01).", "url": "https://github.com/gitleaks/gitleaks"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 1 remaining gap, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/secrets-credentials.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -1328,7 +1349,8 @@
       },
       "reasons": [
         {"text": "Owned worktrees for edits, gh for API, ruleset and pull-request operations, and difftastic for structural diffs.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "gh installs with every bootstrap run behind a fail-closed sha256 check against the release checksums.", "source_path": "adoption/pins-linux-x86_64.json"}
+        {"text": "gh installs with every bootstrap run behind a fail-closed sha256 check against the release checksums.", "source_path": "adoption/pins-linux-x86_64.json"},
+        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/git-github-automation.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [

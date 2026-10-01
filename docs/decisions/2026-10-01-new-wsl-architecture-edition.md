@@ -132,6 +132,11 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
   when the edition was written.
 - The cross rows had no closure assessment; their closure items rest on this edition's reading, and items it
   cannot establish are `unknown`.
+- Item 4 for the foundation rows: the Codex lane's cross-family review of all 20 layers (PR #575 at `bbee2a8e`,
+  gpt-6.1-sol) was performed on 2026-10-01 and names remaining gaps in every layer. Each foundation row cites its
+  review; the item cells keep the closure assessment's reading until the layer records are re-recorded. The same
+  pull request carries the crosswalk from the guide's ten themes to the 32 layers, which this edition references
+  and does not duplicate, and each repository's upstream-documented install command, none of them run.
 - Subordinate ids for the Harbor harness: the recipe allocates 65,536, Docker's documented minimum. A wider
   range is an image-set need, added only when a pull fails with `lchown <FILE>: invalid argument`; the
   workstation's 262,144 for six matplotlib SWE-bench images is recorded in the Harbor receipt of PR #570.
@@ -176,6 +181,8 @@ Write a new edition, or update this one in the change that causes it, when any o
 - PR #570 at `cd7db158`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
 - PR #573 at `5adcc3a4`: `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
   `evidence/artifacts/layer-closure-assessment-20261001/`
+- PR #575 at `bbee2a8e`: `evidence/artifacts/new-wsl-layer-reviews-20261001/` (the 20 foundation reviews),
+  `catalogs/foundation/new-wsl-layer-crosswalk-20261001.json`
 - Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js
   v16.3.8 release page (read 2026-10-01)
 - PR #358 at `b0eb7a11`: `catalogs/us-equities/convergence-20260926.json`
