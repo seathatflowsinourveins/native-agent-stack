@@ -423,10 +423,11 @@ to 50-55 a day later.
 ### Alternatives
 
 - **All five roles in `adoption/agents/codex/`, installed by default.** Deferred, not rejected.
-  `tests/test_codex_agents.py:338-339` (that folder holds exactly the two carriers), `:342-349` (two `SHA256SUMS`
-  rows) and `:544-545` (`ROLE_FILES`, `ROLES`), and `tests/test_codex_worker_lane.py:1001` (an apply leaves exactly
+  `tests/test_codex_agents.py:366-367` (that folder holds exactly the two carriers), `:370-377` (two `SHA256SUMS`
+  rows) and `:572-573` (`ROLE_FILES`, `ROLES`), and `tests/test_codex_worker_lane.py:1043` (an apply leaves exactly
   the two files) pin the pair as the frozen E2E's carriers, outside this unit's paths, and a default install would
-  change every arm's `spawn_agent` text. The flip list is below.
+  change every arm's `spawn_agent` text. These lines, and the flip list's below, are as read at round 2's head. The
+  flip list is below.
 - **The builder at `gpt-6-astra`, as round 1 bound it.** Replaced in round 2. The Sol-primary routing record runs
   primary workers at Sol/Max and keeps Astra for judgment roles and per-task escalation, which no file binds
   (`docs/decisions/2026-09-30-task-model-routing.md`, rows "Complex-workflow coordination" and "Escalation to a single
@@ -463,10 +464,10 @@ to 50-55 a day later.
 
 ### Flip list for the Gate A owner
 
-Installing the worker roles by default needs changes outside this unit's paths: `tests/test_codex_agents.py:338-339,
-342-349,544-545`; `tests/test_codex_worker_lane.py:140,1001`; `examples/codex-native/README.md:8-16,28-31` and its
+Installing the worker roles by default needs changes outside this unit's paths: `tests/test_codex_agents.py:366-367,
+370-377,572-573`; `tests/test_codex_worker_lane.py:144,1043`; `examples/codex-native/README.md:8-16,28-31` and its
 2026-09-29 section; the `roles` row of `tools/adoption/prove_codex_lane.py:149-173`, which counts
-`codex_roles.ROLE_FILES`; `scripts/adoption_status.py:194` (`STACK_ROLE_FILES`); `tools/token-e2e/freeze_snapshot.py:108`
+`codex_roles.ROLE_FILES`; `scripts/adoption_status.py:224` (`STACK_ROLE_FILES`); `tools/token-e2e/freeze_snapshot.py:108`
 (`CODEX_ROLE_FILES`); and, while the window is open, a dated amendment of the E2E preregistration.
 
 ### Evidence
