@@ -93,6 +93,17 @@ coordinator's. One is the user's and carries a default until it is answered.
    `--configure-full-profile` unless the checkout's HEAD equals `origin/main`. A new release tag is cut after the
    merge train lands, and each receipt names the commit it installed from. Overturn: a release tag at the pins of
    record exists and the bootstrap accepts it.
+5. **What decides a selection on the new distro (the user, 2026-10-01).** The user's rule, verbatim: "make sure evl only on the reps quality itself,such as: if hindsight repo itself is better , then don't shape  the next wsl architecture into the legacy baises of our own".
+   A layer's winner on the new distro is what the repositories' own quality supports: upstream evidence and a
+   head-to-head on the same frozen tasks, each arm installed fresh by its upstream command. The source host's pins,
+   installed state and bookkeeping, and holds that came from its own integration, are not evidence for or against
+   a repository; such a hold is re-tested on the clean install. This amends decision 3 for layers that need a
+   comparison: stage 2 installs the comparison arms there, each with a fresh store, the comparison runs on the new
+   distro, and its result selects; the recorded selection is one arm and is not installed first as the default.
+   Where no head-to-head exists the merit winner is recorded as undetermined, and an incumbent is not swapped for a
+   challenger without the comparison either. The architecture edition labels its winners column as the source
+   host's selection of record. Overturn: the user restores the provisional install of the recorded selection as the
+   default.
 
 ## Phases
 

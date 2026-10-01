@@ -84,9 +84,30 @@ trials. Upstream and user-side gates are gates.
 install default but marks it contested), `comparison_required` (from the research state or the row's owner),
 `new_host_required` (the remaining evidence needs another host) and `no_selection` (no pin of record exists).
 The research-state status maps directly; `on_requirement_change` becomes `selection_of_record_open`.
-Token efficiency is `provisional` on the Gate A owner's call. Scheduling and supervision is
+Token efficiency was `provisional` on the Gate A owner's call and reads `comparison_required` since the merit
+update below: the accepted profile is one arm and the Gate A E2E decides. Scheduling and supervision is
 `comparison_required` on the program record's call (PR #573, decision 1): its selected Dagu 2.16.6 failed the
 preregistered SIGKILL case.
+
+**The merit rule (the user, 2026-10-01).** The user's instruction, verbatim: "make sure evl only on the reps quality itself,such as: if hindsight repo itself is better , then don't shape  the next wsl architecture into the legacy baises of our own".
+The winners column of this edition was defined as the selection of record at its pin of record. That is the source
+host's bookkeeping: what the catalogs select and what this host's stack pins or installs. It is not a merit result,
+and the column is labelled as the source host's selection of record. A layer's winner on the new distribution is
+what the repositories' own quality supports: upstream evidence and a head-to-head on the same frozen tasks, each
+arm installed fresh by its upstream command. This host's pins and installed state, a missing pin, and holds that
+came from this host's own integration are not evidence for or against a repository; such a hold is re-tested on
+the clean install. Where a comparison is required the merit winner is undetermined: the row says so, names the
+arms, and the comparison's result selects. No incumbent is swapped for a challenger without that comparison, which
+would be the same bias in the other direction. What changed with this rule: the durable-memory row names
+ai-memory as the reference arm, not a default, adds agentmemory with the one matched harness result on record
+(recall_all@5 0.821 against 0.570 on LongMemEval-S, Mac, descriptive) and MemPalace as arms, and no longer frames
+Hindsight by this host's integration holds; the verdict winners that had been listed as alternatives for lacking a
+stack pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) are winners of their layers, in the trading
+lane owner's words; token efficiency reads `comparison_required` with the lean base as an arm of equal standing,
+in the Gate A owner's words; and the runtime-worker candidates without a repository pin are candidates, not
+exclusions. The Codex lane's second-family reviews select different component sets in 20 of the 32 layers; under
+this rule that difference is resolved by the repositories' results in the re-record pass, with the recorded
+selection as one arm and not as the default.
 
 **Evidence classes.** The six classes of `docs/acceptance-evidence-policy.md:26-33`, plus `source_review` and
 `none_recorded`, two levels below the table: AGENTS.md keeps metadata, pinned source review and native
@@ -99,10 +120,11 @@ of the 119 winner acceptance classes overstated, 13 commands that were only vers
 it could not settle; this revision corrects them. 55 of the 119 entries changed (32 classes, 48 commands and 31
 cited sources); the lane owners re-cited their winners to the files that record the runs; 13 `none_recorded`
 entries got their check to run back; restic is cited to its off-host receipt in four rows; and three rows that had
-no winner gained six. The edition now has 125 winner entries: 72 `upstream_example_or_native_operation`, 24
-`local_integration_check`, 14 `structural_validation`, 1 `independent_observation` and 14 `none_recorded`, 11 of
-which name the check to run. Row classes: 13 `local_integration_check`, 10 `none_recorded`, 7
-`structural_validation`, 6 `upstream_example_or_native_operation` and 1 `independent_observation`. The six policy
+no winner gained six; the merit update added five verdict winners. The edition now has 130 winner entries: 73
+`upstream_example_or_native_operation`, 24 `local_integration_check`, 14 `structural_validation`, 1
+`independent_observation` and 18 `none_recorded`, 15 of which name the check to run. Row classes: 13
+`none_recorded`, 12 `local_integration_check`, 6 `upstream_example_or_native_operation`, 5
+`structural_validation` and 1 `independent_observation`. The six policy
 classes have no defined order, so the build enforces what can be enforced:
 when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
 one that at least one winner's acceptance carries, and where the winners carry several, the edition records the
@@ -131,12 +153,14 @@ reordered research state fails the build instead of showing each row's states be
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
 **This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 20
-`selection_of_record_open`, 14 `comparison_required`, 2 `new_host_required`, 1 `provisional` and no
+`selection_of_record_open`, 15 `comparison_required`, 2 `new_host_required`, and no `provisional` or
 `no_selection`. Every assessed row has at least one closure item unmet or partial, and no review item
 (c4) is met. The twelve us-equities rows follow the trading closure assessment: their winners are the components
 the layer's current choice names that have a pin of record (runtime-target.json for the engine, the brokers
-and the adaptive paper engine; stack pins for profile components), while the 2026-09-22 verdict winners
-without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) stay alternatives.
+and the adaptive paper engine; stack pins for profile components). The 2026-09-22 verdict winners without
+such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) were first listed as alternatives; under the
+merit rule they are winners of their layers at the verdict's baseline version, because a missing stack pin means
+not installed on the source host, never not selected.
 The trading lane owner's verdicts of 2026-10-01 call every trading layer "selection of record, open". Two
 layers had no selection of record for the layer itself (research-factors-ml and security-supply-chain). After a
 cross-family adjudication in the Codex lane's reviews, the owner recorded one for each the same day (PR #578):
