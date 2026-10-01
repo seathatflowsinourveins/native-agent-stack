@@ -70,10 +70,11 @@ def running_tree(repo, study_path: str = STUDY_PATH) -> str:
 
     Review round 18, second repair (R2-2): git status alone does not show that the working copy is HEAD's. It reports
     no change to a tracked file whose index entry is marked assume-unchanged or skip-worktree (git-update-index(1)),
-    nor one that a clean filter maps back to the committed bytes. So an index entry with either flag is refused, and
-    every file of the tree returned must be a regular file whose own bytes hash to its blob, read without the index
-    and without filters. Both checks run here, once, when a run builds its context: a file changed later in the same
-    run is not seen."""
+    nor one that a clean filter maps back to the committed bytes, nor files that match a tree which a replace ref puts
+    in place of HEAD's (git-replace(1)). So an index entry with either flag is refused, and every file of the tree
+    returned must be a regular file whose own bytes hash to its blob: the tree is read without replace refs, and the
+    files without the index and without filters. Both checks run here, once, when a run builds its context: a file
+    changed later in the same run is not seen."""
     dirty = git(repo, "status", "--porcelain", "--untracked-files=all", "--", study_path)
     if dirty:
         raise Refused("the study tree has uncommitted changes; a run executes a committed tree only")
@@ -86,7 +87,7 @@ def running_tree(repo, study_path: str = STUDY_PATH) -> str:
     if masked:
         raise Refused(f"the study tree holds index entries that hide a file's changes from git status: {masked[:5]}; "
                       "a run executes a committed tree only")
-    tree = git(repo, "rev-parse", f"HEAD:{study_path}")
+    tree = git(repo, "--no-replace-objects", "rev-parse", f"HEAD:{study_path}")
     unverified = _unverified_files(repo, tree, study_path)
     if unverified:
         raise Refused(f"the study tree's files are not all regular files that hold the committed bytes, although git "
@@ -115,8 +116,9 @@ def _unverified_files(repo, tree: str, study_path: str) -> list:
     problem. An entry must be a regular-file blob: a symbolic link or submodule entry is refused, because the tree hash
     covers a link's text and not the file it names. Its working file must be a regular file, and its bytes must hash to
     the entry's blob. One git hash-object --no-filters --stdin-paths call hashes the files themselves, so the result
-    depends on no index entry (its flags or its cached stat data) and on no clean filter."""
-    out = subprocess.check_output(["git", "-C", str(repo), "ls-tree", "-r", "-z", tree])
+    depends on no index entry (its flags or its cached stat data) and on no clean filter. The tree is listed with git
+    --no-replace-objects, so the blobs are its own and not those of a tree that a replace ref puts in its place."""
+    out = subprocess.check_output(["git", "-C", str(repo), "--no-replace-objects", "ls-tree", "-r", "-z", tree])
     problems, paths, blobs = [], [], []
     for row in out.split(b"\0"):
         if not row:

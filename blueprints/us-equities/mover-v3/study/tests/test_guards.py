@@ -123,6 +123,55 @@ class RunningTreeContent(unittest.TestCase):
             with self.assertRaisesRegex(guards.Refused, re.escape(f"{link} is a symbolic link or submodule entry")):
                 guards.running_tree(repo)
 
+    def test_running_tree_refuses_files_that_match_a_replacement_of_heads_tree(self):
+        """The blobs compared are those of the tree returned, read without replace refs (git-replace(1); git
+        --no-replace-objects). With a replace ref on HEAD's study tree object, git reads another tree in its place:
+        git status reports nothing for files that match that other tree, no index flag is set, and git ls-tree lists
+        its blobs under the id of HEAD's tree. At 28fafe84 the content check compared the files with those blobs and
+        running_tree returned HEAD's tree."""
+        from tests import fixture_repo as FR
+        with self.study_repo() as (repo, _):
+            head, tree = sh(repo, "rev-parse", "HEAD"), sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
+            (repo / TRANSPORT).write_text("HOST = 'changed'\n")
+            FR.commit_push(repo, "2026-10-01T22:00:00+00:00", "another tree")
+            sh(repo, "replace", tree, sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"))
+            sh(repo, "reset", "-q", "--soft", head)         # HEAD names the first tree; the files are the second's
+            self.assertEqual(sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
+            self.assertEqual((status(repo), (repo / TRANSPORT).read_text()), ("", "HOST = 'changed'\n"))
+            self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"H {TRANSPORT}")
+            with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} differs from HEAD's blob")):
+                guards.running_tree(repo)
+
+    def test_running_tree_refuses_a_file_name_that_one_line_cannot_carry(self):
+        """git hash-object --stdin-paths reads one path per line, so a tracked file whose name holds a control
+        character (here a line break) is refused by name, before any path is handed to it."""
+        from tests import fixture_repo as FR
+        with self.study_repo() as (repo, _):
+            FR.write(repo / STUDY_PATH / "core" / "two\nlines.py", "y = 1\n")
+            FR.commit_push(repo, "2026-10-01T22:00:00+00:00", "a line break in a file name")
+            self.assertEqual(status(repo), "")
+            with self.assertRaisesRegex(guards.Refused, "lines.py' has a control character in its name"):
+                guards.running_tree(repo)
+
+    def test_running_tree_refuses_when_git_does_not_hash_every_file(self):
+        """The content check fails closed: if git hash-object exits with an error, or prints fewer hashes than the
+        files it was given, the tree is refused, whatever the hashes it did print."""
+        real = subprocess.run
+
+        def altered(change):
+            def run(command, *args, **kwargs):
+                done = real(command, *args, **kwargs)
+                return change(done) if "hash-object" in command else done
+            return run
+        cases = {"an_error_exit": lambda done: subprocess.CompletedProcess(done.args, 128, done.stdout, b"fatal: x"),
+                 "one_hash_short": lambda done: subprocess.CompletedProcess(
+                     done.args, 0, done.stdout.split(b"\n", 1)[0] + b"\n", done.stderr)}
+        for case, change in cases.items():
+            with self.subTest(case=case), self.study_repo() as (repo, _):
+                with mock.patch.object(guards.subprocess, "run", altered(change)), \
+                        self.assertRaisesRegex(guards.Refused, "git hash-object could not read every tracked file"):
+                    guards.running_tree(repo)
+
 
 class Guards(unittest.TestCase):
     def test_require_frozen_and_matching_tree(self):
