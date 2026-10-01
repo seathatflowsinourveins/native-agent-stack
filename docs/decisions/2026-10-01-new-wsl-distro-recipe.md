@@ -398,6 +398,32 @@ Each one stays open until a host run records the observation named here.
    ids when `/etc/subuid` exists, and the image ships both; F5 records which tool wrote the range.
 5. **The 26.04.1 comparison.** The bounded unit of Alternatives 1.
 
+## Completeness critic (2026-10-01)
+
+The unit closed without the critic that the repository rule requires; a review thread on PR #569 pointed it out. An
+independent researcher (Claude Opus, read-only, primary sources fetched 2026-10-01) then asked what the unit did not
+look at: candidate classes, kinds of evidence and unread sources. It read about 30 sources and found 11 items. None
+overturns the selection. Four change what must happen before stage 1, and they are queued as a follow-up to this
+recipe; until that follow-up lands, do not run stage 1 without the checks of items 1 to 4.
+
+| # | What the unit missed | Source read 2026-10-01 | Disposition |
+| --- | --- | --- | --- |
+| 1 | No dry run. Stage 1 and first boot have never run anywhere; a rehearsal on a throwaway name and location stays inside this record's host-wide rules | this record, "Evidence classes" | Queued before stage 1: a rehearsal that also collects items 2, 3 and 4 |
+| 2 | The claim that WSL 2.7.14 and 3.0.1 "change nothing about install, import or first run" is broader than what was checked. `2.7.13...3.0.1` is 677 commits ahead, and listed commits touch first run, import and termination. One of them fixes microsoft/WSL#40941: after the first-run setup, a file created from Windows is owned by 0:0 until the next `wsl --shutdown`, which this recipe forbids. Whether 2.7.13 has the fix is known only negatively | https://github.com/microsoft/WSL/compare/2.7.13...3.0.1 ; https://github.com/microsoft/WSL/issues/40941 | Open question; measured in the rehearsal (create a file from Windows under the user's home, read its owner, terminate the distribution, relaunch, read it again) |
+| 3 | The issue tracker was not searched for the selected path. microsoft/WSL#41482 reports continuous `hv_storvsc` read errors and systemd boot timeouts on Ubuntu 24.04 with kernel 6.18.33.2, this host's kernel; the maintainer's workaround needs `swap=0` and `wsl --shutdown`, both ruled out here | https://github.com/microsoft/WSL/issues/41482 | Open question; a read-only pre-check in the current distribution (`journalctl -k` for `hv_storvsc`) before stage 1, since both share the kernel |
+| 4 | Whether linger keeps the distribution running. microsoft/WSL#13416 (open: WSL shuts down despite an active systemd service, still reproduced on 2.7.3) and #9968 (open) bear on open question 2 | https://github.com/microsoft/WSL/issues/13416 ; https://github.com/microsoft/WSL/issues/9968 | Open question; observed in the rehearsal with no client attached, because stage 2's user services depend on it |
+| 5 | Two upstream verification steps are skipped: Canonical's how-to validates the user data with `sudo cloud-init schema --system`, and `SHA256SUMS.gpg` exists and is never verified (the repository's 2026-09-21 precedent verified Ubuntu's signed sums) | https://documentation.ubuntu.com/wsl/stable/howto/cloud-init/ ; https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg | Queued before stage 1: both become recipe steps in the follow-up |
+| 6 | Other base images were not weighed. Microsoft's distribution list also carries Debian, Fedora, Arch, AlmaLinux, openSUSE, SLE and Kali; stage 2 accepts only `ID=ubuntu` or `debian` (`adoption/bootstrap-linux.sh:175-178`) | https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json | Debian feeds the layer's next landscape sweep; the others are out of scope while stage 2 rejects their `ID` |
+| 7 | WSL containers, generally available with 3.0.1 (one VM, network and disk per session, OCI images), were not weighed for disposable clean-install tests | https://devblogs.microsoft.com/commandline/wslc-architecture-deep-dive/ | Feeds the layer's next landscape sweep; unlikely to host stage 2 |
+| 8 | The reason given for dismissing `wsl --install Ubuntu-24.04` ("verifies no hash the operator can see") is incomplete: 2.7.13 carries a hash-mismatch message, and a local manifest can be pinned through `DistributionListUrl` | https://raw.githubusercontent.com/microsoft/WSL/2.7.13/localization/strings/en-US/Resources.resw ; https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro | Open question; the selection stands because the online path resolves the list at install time and the registry key is host-wide; the follow-up corrects the stated reason |
+| 9 | Creation routes not weighed: a golden copy (`wsl --export`, then `--import-in-place` of a provisioned disk), a Docker-exported root file system, a custom first-run command in `/etc/wsl-distribution.conf`, Ubuntu Pro for WSL | https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro ; https://docs.cloud-init.io/en/latest/reference/datasources/wsl.html | The golden copy feeds the next sweep; a self-built image is out of scope (it breaks the upstream-install rule) and Ubuntu Pro needs a subscription and a server |
+| 10 | Package updates between the image build and today were not checked. They are harmless today: `wsl-setup` is unchanged, and cloud-init 26.2 is only proposed | Launchpad, published sources of both packages on noble | Feeds the next sweep |
+| 11 | Citation hygiene in a sample of eight: one Microsoft page is dated by a value that matches neither of its metadata dates, the cloud-init datasource page is cited at `latest` (26.2 today) while the image runs 26.1, and W5's expected console lines have no cited source | the pages' own metadata | Open question; the follow-up pins each page by its revision and cites the lines |
+
+Not checked by the critic: file-level WSL source diffs (the comparison view is truncated), whether `wsl --terminate`
+clears the ownership bug, the contents of the other images, upstream test suites and community runbooks. Its issue
+searches were samples of eight results per query, not sweeps.
+
 ## Evidence classes
 
 - **Read today (source review).** The WSL source at tag 2.7.13; `ubuntu/wsl-setup` at
