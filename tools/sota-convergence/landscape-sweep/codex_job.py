@@ -1106,6 +1106,11 @@ def wait(base: Path, job: str, seconds: float) -> int:
     end = time.monotonic() + seconds
     while not (directory / "done").exists():
         if not running(directory):
+            # The runner writes done before it releases the job lock (flock(2): the lock goes when its last
+            # descriptor closes). A free lock therefore means finished, never started or dead, and done says which:
+            # a job that finishes between the check above and the lock check is done, not "not running".
+            if (directory / "done").exists():
+                break
             # Never started (a refused start) or its runner died: nothing will write done.
             print("done exit=none (the job is not running)")
             return 0
