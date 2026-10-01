@@ -581,6 +581,15 @@ def architecture_row(row, known_layers, stack_versions, cite, pin_source):
     require((verdict == "closed") == all_met, "a closed architecture verdict requires all five closure items met")
     require(bool(closure["missing"].strip()) != all_met,
             "an open architecture row must name what is missing, and a closed row nothing")
+    # `missing` names exactly the open items: it starts with one "cN: ..." segment per item that is not met
+    # (segments separated by "; cN:") and has none for a met item; a trailing sentence without a cN: prefix
+    # belongs to the last segment.
+    items_pattern = "|".join(map(re.escape, ARCHITECTURE_CLOSURE_ITEMS))
+    named = re.findall(rf"(?:^|;\s*)({items_pattern}):", closure["missing"])
+    require(sorted(named) == [item for item in ARCHITECTURE_CLOSURE_ITEMS if closure[item] != "met"]
+            and (all_met or bool(re.match(rf"(?:{items_pattern}):", closure["missing"]))),
+            "architecture closure missing must name each item that is not met in its own cN: segment, "
+            "and no met item")
     winners = row.get("winners")
     require(isinstance(winners, list) and (verdict == "no_selection") == (not winners),
             "a no_selection architecture row carries no winners, and every other row has one")
@@ -628,6 +637,15 @@ def architecture_row(row, known_layers, stack_versions, cite, pin_source):
                                      "source": acceptance_source},
                       "upstream_currency": {key: currency.get(key, "") for key in
                                             ("latest_release", "checked_at", "pin_is_latest", "url")}})
+    # The six policy classes have no defined order, so the row's class floor is what can be enforced: a row with
+    # a none_recorded winner is none_recorded, and otherwise its class is one that a winner's acceptance carries.
+    # A row without winners keeps its owner's class.
+    carried = {item["acceptance"]["evidence_class"] for item in items}
+    if carried:
+        require("none_recorded" not in carried or row["evidence_class"] == "none_recorded",
+                "architecture row evidence class must be none_recorded when any winner's acceptance is none_recorded")
+        require(row["evidence_class"] in carried,
+                "architecture row evidence class must be one that at least one winner's acceptance carries")
     reasons = row.get("reasons")
     require(isinstance(reasons, list) and bool(reasons)
             and all(isinstance(reason, dict) and isinstance(reason.get("text"), str) and bool(reason["text"].strip())

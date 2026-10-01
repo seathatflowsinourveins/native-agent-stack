@@ -1645,9 +1645,10 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         return {"layer_id": layer_id, "catalog": catalog, "title": "Title " + layer_id,
                 "winners": [self.architecture_winner()], "verdict": "selection_of_record_open",
                 "closure": {"c1": "met", "c2": "partial", "c3": "unmet", "c4": "unmet", "c5": "partial",
-                            "missing": "c2: candidate set not frozen; c3: no new-distro run"},
+                            "missing": "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; "
+                                       "c5: no closure record"},
                 "reasons": [{"text": "Recorded verdict winner", **source}],
-                "evidence_class": "local_integration_check",
+                "evidence_class": "upstream_test",
                 "alternatives": [{"name": "Other client", "verdict": "refuted on fit", **source}],
                 "new_host_steps": ["Install the pinned client", "Sign in natively"],
                 "gates": [{"text": "Native sign-in on the new distro", "kind": "user_side", **source}],
@@ -1665,7 +1666,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                          self.architecture_row("backtesting-engine", "us-equities", verdict="no_selection",
                                                winners=[], evidence_class="none_recorded",
                                                closure={**{item: "unknown" for item in ("c1", "c2", "c3", "c4", "c5")},
-                                                        "missing": "assessment pending"}),
+                                                        "missing": "; ".join(item + ": assessment pending" for item
+                                                                             in ("c1", "c2", "c3", "c4", "c5"))}),
                          self.architecture_row("cross:credential-practice", "cross",
                                                reasons=[{"text": "Recipe lands with its pull request",
                                                          "pending_source": pending}],
@@ -1735,20 +1737,42 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             self.write(self.ARCHITECTURE, edition)
         self.assert_check_digest_changes(reword_a_reason)
 
-    def test_architecture_text_is_inert_public_data(self):
-        self.use_real_template()
-        hostile = '</script><script src="https://invalid.example/steal.js"></script>'
+    ARCHITECTURE_HOSTILE = '</script><script src="https://invalid.example/steal.js"></script>'
+
+    def write_hostile_architecture(self):
+        hostile = self.ARCHITECTURE_HOSTILE
         edition = self.architecture_edition()
         row = edition["rows"][0]
         row["title"] = row["notes"] = row["reasons"][0]["text"] = hostile
         row["new_host_steps"] = [hostile]
         self.write_architecture(edition)
+        return hostile
+
+    def test_architecture_text_is_inert_public_data(self):
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
         page, _ = self.build()
         self.assertEqual(len(page.scripts), 2)
         self.assertEqual(page.external_assets, [])
         embedded = json.loads(page.data)["architecture"]["rows"][0]
         self.assertEqual((embedded["title"], embedded["notes"], embedded["reasons"][0]["text"],
                           embedded["new_host_steps"]), (hostile, hostile, hostile, [hostile]))
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_hostile_architecture_text_as_text(self):
+        """The renderer writes text nodes only: the harness elements have no markup parser, so a renderer that
+        wrote the string as markup would lose it from textContent and this test would fail."""
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        table = observed["architecture"]
+        for expected in (hostile + "foundation/native-clients", hostile + " (" + self.ARCHITECTURE_SOURCE + ") ↗",
+                         "Notes: " + hostile, "New-host steps, in order" + hostile + "Gates"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, table)
+        self.assertEqual(table.count(hostile), 4)
 
     def test_architecture_edition_rejects_each_invalid_contract(self):
         def winner(edition):
@@ -1818,6 +1842,28 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             (lambda e: e["rows"][0]["gates"][0].update(kind="defect"),
              "architecture gates need their text and a known kind (user_side, upstream or lane)"),
             (lambda e: e["rows"].append(e["rows"][0]), "architecture layer_id must be unique"),
+            # The reverse direction of each "if and only if" rule.
+            (lambda e: e["rows"][0]["closure"].update(c2="met", c3="met", c4="met", c5="met", missing=""),
+             "a closed architecture verdict requires all five closure items met"),
+            (lambda e: e["rows"][0].update(winners=[]),
+             "a no_selection architecture row carries no winners, and every other row has one"),
+            (lambda e: e["rows"][0].update(verdict="closed", closure={
+                **{item: "met" for item in ("c1", "c2", "c3", "c4", "c5")}, "missing": "c1: nothing"}),
+             "an open architecture row must name what is missing, and a closed row nothing"),
+            # recipes/search.md has five lines, so :5-3 fails on its order, not on the file's bounds.
+            (lambda e: winner(e).update(pin_source="recipes/search.md:5-3"),
+             "architecture winner pin_source line range must fall inside the file"),
+            (lambda e: e["rows"][2].update(catalog="foundation"), "architecture row catalog must match its layer"),
+            (lambda e: winner(e)["install"].update(kind="none_recorded"),
+             "architecture install needs a known kind and a command unless none is recorded"),
+            # A path escape at each architecture call site.
+            (lambda e: reason(e).update(source_path="../outside.md"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: winner(e).update(pin_source="../manifests/stack.json:1"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(
+                pending_source={"path": "../pending-recipe.md", "pull_request": 569})),
+             "source path must be canonical and confined to the repository"),
         )
         for mutate, message in cases:
             with self.subTest(message=message):
@@ -1833,6 +1879,66 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             self.assertNotEqual(result.returncode, 0, result.stdout)
             self.assertIn("architecture closure items must be the five close_only_when items of the research state",
                           result.stdout)
+
+    def assert_architecture_cases(self, cases):
+        """Each case mutates a fresh fixture edition; None expects a passing --check, a string that failure."""
+        for name, mutate, message in cases:
+            with self.subTest(case=name):
+                edition = self.architecture_edition()
+                mutate(edition)
+                self.write_architecture(edition)
+                result = self.run_generator("--check")
+                if message is None:
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(message, result.stdout)
+
+    def recorded_winner(self, evidence_class):
+        """A second, name-keyed winner whose acceptance carries the given class."""
+        winner = self.architecture_winner(name="ripgrep", pin="14.1.1", acceptance={
+            "command": "" if evidence_class == "none_recorded" else "rg --version",
+            "evidence_class": evidence_class, "source_path": self.ARCHITECTURE_SOURCE})
+        winner.pop("component_id")
+        return winner
+
+    def test_architecture_row_class_is_the_floor_its_winners_reach(self):
+        """No order is defined among the six policy classes, so the build enforces what it can: a row with a
+        none_recorded winner is none_recorded, and otherwise its class is one that a winner's acceptance carries."""
+        floor = "architecture row evidence class must be none_recorded when any winner's acceptance is none_recorded"
+        carried = "architecture row evidence class must be one that at least one winner's acceptance carries"
+
+        def with_second(evidence_class, row_class):
+            def mutate(edition):
+                edition["rows"][0]["winners"].append(self.recorded_winner(evidence_class))
+                edition["rows"][0]["evidence_class"] = row_class
+            return mutate
+        self.assert_architecture_cases((
+            ("a none_recorded winner under a recorded row class", with_second("none_recorded", "upstream_test"), floor),
+            ("a row class no winner carries", lambda e: e["rows"][0].update(evidence_class="local_integration_check"),
+             carried),
+            ("a none_recorded winner under a none_recorded row", with_second("none_recorded", "none_recorded"), None),
+            ("a row class one of two winners carries", with_second("local_integration_check", "local_integration_check"),
+             None),
+            ("a row without winners keeps its owner's class",
+             lambda e: e["rows"][1].update(evidence_class="local_integration_check"), None)))
+
+    def test_architecture_missing_names_exactly_the_open_items(self):
+        """`missing` is one "cN: ..." segment per item that is not met (segments separated by "; cN:"), none for a
+        met item; a trailing sentence without a cN: prefix belongs to the last segment."""
+        message = "architecture closure missing must name each item that is not met in its own cN: segment"
+
+        def missing(text):
+            return lambda edition: edition["rows"][0]["closure"].update(missing=text)
+        named = "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; c5: no closure record"
+        self.assert_architecture_cases((
+            ("open items without a segment", missing("c2: candidate set not frozen"), message),
+            ("free text only", missing("TBD"), message),
+            ("free text before the segments", missing("TBD; " + named), message),
+            ("a met item with a segment", missing("c1: already met; " + named), message),
+            ("an open item named twice", missing(named + "; c5: and again"), message),
+            ("a trailing sentence without a prefix", missing(named + "; the owner re-reads this row next edition."),
+             None)))
 
     @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
     def test_the_generated_page_script_renders_the_architecture_tab(self):
@@ -1863,7 +1969,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         for expected in ("Foundation layers", "US-equities layers", "Cross-cutting rows",
                          "LayerWinners (pin)VerdictEvidence classReasonsInstall on the new distro",
                          "Title native-clientsfoundation/native-clientsResearch state: on requirement change",
-                         "search ↗1.0", "Label of local_integration_check",
+                         "search ↗1.0", "Meaning of selection_of_record_openLabel of upstream_test",
                          "Recorded verdict winner (" + self.ARCHITECTURE_SOURCE + ") ↗",
                          "Recipe lands with its pull request (docs/pending-recipe.md · pull request #569 at eabe7654, "
                          "not on main at this edition's base) ↗",
@@ -1875,7 +1981,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                          "Install the pinned clientSign in natively",
                          "user side gate: Native sign-in on the new distro", "upstream gate: Upstream fix pending",
                          "Gate source: https://github.com/example/search/issues/7 ↗",
-                         "Missing: assessment pending", "Owner lane: foundation"):
+                         "Missing: c1: assessment pending; c2: assessment pending", "Owner lane: foundation"):
             with self.subTest(expected=expected[:60]):
                 self.assertIn(expected, table)
 
@@ -1891,9 +1997,10 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertIn("Nothing missing: all five closure items hold.", observed["architecture"])
 
     @unittest.skipUnless(shutil.which("git"), "Tracked-file check needs git")
-    def test_the_repository_architecture_edition_covers_every_layer_and_cites_tracked_files(self):
-        """The real edition, not the fixture: the generator's own validation passes, every catalog layer has a
-        row, and every file the edition cites (and the generator hashes) is tracked by git in this checkout."""
+    def test_the_repository_architecture_edition_validates_and_cites_tracked_files(self):
+        """The real edition, not the fixture: the generator's own validation passes and every file the edition
+        cites (and the generator hashes) is tracked by git in this checkout. A catalog layer without a row is
+        listed on the page, not a failure, so this test does not require every layer to have a row."""
         sys.path.insert(0, str(ROOT / "scripts"))
         try:
             import build_ecosystem
@@ -1909,7 +2016,6 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             ROOT, "https://github.com/example/public-stack", read(build_ecosystem.STACK), read, hashed.add,
             lambda path: "https://github.com/example/public-stack/blob/main/" + path, set())
         self.assertIsNotNone(architecture)
-        self.assertEqual(architecture["missing_layers"], [])
         tracked = set(subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
                                      check=True).stdout.decode().split("\0"))
         self.assertGreater(len(hashed), 3)

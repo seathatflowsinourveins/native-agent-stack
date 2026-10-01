@@ -87,7 +87,9 @@ preregistered SIGKILL case.
 
 **Evidence classes.** The six classes of `docs/acceptance-evidence-policy.md:26-33`, plus `source_review` and
 `none_recorded`, two levels below the table: AGENTS.md keeps metadata, pinned source review and native
-execution apart. A row's class is the one every winner reaches (the weakest across its winners); stronger
+execution apart. The six policy classes have no defined order, so the build enforces what can be enforced:
+when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
+one that at least one winner's acceptance carries. A row without winners keeps its owner's class. Stronger
 evidence for one winner stays in the reasons. Every class describes source-host history; a new distribution
 collects its own evidence.
 
@@ -97,7 +99,10 @@ exactly one of `component_id` (a `manifests/stack.json` component, whose recorde
 links; a `pin_source` of one repository file with an optional line range inside it; every `source_path` a
 repository file, hashed into the page inputs and linked at the publication ref; enums for verdicts, evidence
 classes, closure states, install kinds and gate kinds; `closed` if and only if all five items are `met`; a
-non-empty `missing` for every open row; `no_selection` if and only if there are no winners. A catalog layer
+non-empty `missing` for every open row and an empty one for a closed row; a `missing` that starts with one
+`cN: ...` segment for each item that is not `met` (segments separated by `; cN:`) and has none for a `met` item,
+a trailing sentence without a `cN:` prefix staying allowed; the row's evidence class rule above;
+`no_selection` if and only if there are no winners. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
 **This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 19

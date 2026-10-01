@@ -4,7 +4,7 @@
   "edition": {
     "date_utc": "2026-10-01",
     "base_commit": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
-    "scope": "The install manifest for a new WSL2 distribution: one row per layer of the two maintained catalogs (the 20 foundation layers of catalogs/foundation/manifest.json and the 12 us-equities layers of catalogs/landscape/research-state.json) plus cross-cutting rows for the distribution itself, the runtime workers, the GPT-6 harnesses, the credential practice and the convergence practice. Each row carries the selection of record at its pin of record, the verdict under the rules below, the evidence class that every winner of the selection reaches (the weakest across its winners; stronger evidence for one winner stays in the reasons), the reasons with their sources, and the ordered steps a session runs on the new distribution. Every evidence class describes historical evidence from the source host: a new distribution collects its own evidence, and nothing in this edition is acceptance on it. Upstream currency was read on 2026-10-01 with one bounded read per pinned winner (the GitHub releases page, or the named registry page where the project publishes no GitHub release). Paths not yet on main are cited through their pull request and are not hashed.",
+    "scope": "The install manifest for a new WSL2 distribution: one row per layer of the two maintained catalogs (the 20 foundation layers of catalogs/foundation/manifest.json and the 12 us-equities layers of catalogs/landscape/research-state.json) plus cross-cutting rows for the distribution itself, the runtime workers, the GPT-6 harnesses, the credential practice and the convergence practice. Each row carries the selection of record at its pin of record, the verdict under the rules below, the row's evidence class (none_recorded when any winner's acceptance is none_recorded, otherwise a class that at least one winner's acceptance carries; stronger evidence for one winner stays in the reasons), the reasons with their sources, and the ordered steps a session runs on the new distribution. Every evidence class describes historical evidence from the source host: a new distribution collects its own evidence, and nothing in this edition is acceptance on it. Upstream currency was read on 2026-10-01 with one bounded read per pinned winner (the GitHub releases page, or the named registry page where the project publishes no GitHub release). Paths not yet on main are cited through their pull request and are not hashed.",
     "verdict_rules": [
       "a layer is \"closed\" only when all five close_only_when items of research-state.json hold; otherwise \"selection_of_record_open\" with the missing items named",
       "the winner cell carries the pin of record only (manifests/stack.json or adoption/pins-linux-x86_64.json for stack components; catalogs/us-equities/runtime-target.json for the engine and brokers; the adoption profile recipes for install commands)",
@@ -28,7 +28,7 @@
       "independent_observation": "Independent observation: direct inspection of artifacts or state by a separate method",
       "structural_validation": "Structural validation: schema, references, hashes or contract tests; not execution",
       "source_review": "Source review or release metadata only: no execution (below the policy table; AGENTS.md keeps metadata, pinned source review and native execution apart)",
-      "none_recorded": "No evidence is recorded for this row"
+      "none_recorded": "No acceptance is recorded for this row or for at least one of its winners"
     },
     "sources": [
       {"source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"},
@@ -229,7 +229,7 @@
         {"text": "The worker fixture is author-written and has no runner; a rerun needs a fresh owned repository and a prompt built on its base commit.", "source_path": "blueprints/convergence-practice/native-worker/README.md"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "Codex native workers", "verdict": "conditional, native-proven", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "Codex for Claude companion 1.0.6", "verdict": "conditional, native-proven for review only", "source_path": "catalogs/landscape/foundation.json"},
@@ -361,7 +361,7 @@
         {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/code-navigation.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "CodeGraph", "verdict": "unqualified, README and license review only", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "scip, zoekt and universal-ctags", "verdict": "refuted on the fit lens in the 2026-09-23 sweep", "source_path": "catalogs/saturation/ledger.json"},
@@ -640,7 +640,7 @@
         {"text": "The layer declares local integration for all three winners.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/web-research.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
         {"name": "Playwright CLI 0.1.21", "verdict": "overlap: a conditional second browser lane", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "Crawl4AI", "verdict": "unqualified, source review only", "source_path": "catalogs/landscape/foundation.json"},
@@ -936,7 +936,7 @@
         {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
         {"name": "Temporal", "verdict": "conditional; deferred as a new service, source review", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "Restate", "verdict": "conditional; deferred as a new service, source review only", "source_path": "catalogs/landscape/foundation.json"},
@@ -1059,7 +1059,7 @@
         {"text": "Restic's off-host recovery is recorded as native operation on synthetic fixtures, with unchanged upstream tests.", "source_path": "evidence/receipts/native-offhost-restic-20260920.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/recovery-portability.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "mise", "verdict": "conditional; a comparison arm", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "chezmoi", "verdict": "conditional; dotfile management deferred", "source_path": "catalogs/landscape/foundation.json"},
@@ -1124,7 +1124,7 @@
         {"text": "The merged Gate A kernel (PR #528) is analysis code over saved session directories, including subagents/agent-*.jsonl; it is not the instrument of record until the routes are compared.", "source_path": "examples/claude-native/workflows/README.md"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json", "pull_request": 575, "commit": "bbee2a8e"}}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "Grafana 13.2.2", "verdict": "overlap: the display layer, an accepted use stage", "source_path": "catalogs/landscape/foundation.json"},
         {"name": "Alertmanager 0.34.1", "verdict": "conditional; loopback fixture only, no external delivery", "source_path": "catalogs/landscape/foundation.json"},
@@ -1690,7 +1690,7 @@
         {"text": "Dagu's selection, recipe and failed preregistered SIGKILL case are shared with the foundation row scheduling-supervision.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
         {"text": "The 2026-09-26 convergence record keeps Temporal, DBOS, Pueue, Dagster and Great Expectations as keep_but_compare.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "pandera 0.33.1", "verdict": "the verdict's data-check winner, installed only by the data recipe; no stack pin", "source_path": "blueprints/us-equities/data/README.md"},
         {"name": "Temporal", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2058,7 +2058,7 @@
         {"text": "The 2026-09-22 verdict winners agent-retrieval-bench 0.2.1, Inspect AI 0.3.266 and MLflow 3.16.1 are recorded but not adopted: none has a stack row.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "The foundation's quality row runs containerized E2E evaluation on Harbor with Inspect AI as its fallback, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "agent-retrieval-bench, Inspect AI and MLflow", "verdict": "the 2026-09-22 verdict winners, recorded but not adopted", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "promptfoo", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2272,7 +2272,7 @@
         {"text": "The current choice reuses the foundation's native clients, Dagu with systemd, the OpenTelemetry Collector with Prometheus, Loki and Grafana, and Restic; the landscape record leaves the layer verdict pending its lanes.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "The landscape winner pin for Prometheus is still 3.14.0 while the stack and the installer pin 3.15.0.", "source_path": "manifests/stack.json"}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "none_recorded",
       "alternatives": [
         {"name": "Temporal", "verdict": "conditional, source review only", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Prefect", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2383,7 +2383,7 @@
         {"text": "Host acceptance is open: the P0-P2 isolation probe has not run on the live topology, and a resolved official task currently exits 2, not 0.", "source_path": "blueprints/runtime-workers/openhands/README.md"},
         {"text": "Containers behind the rootless Docker network can reach host-loopback ports; a container running model-written code is an untrusted local process, which meets the overturn condition of the keyless loopback gateway.", "source_path": "docs/decisions/2026-09-29-key-management.md"}
       ],
-      "evidence_class": "structural_validation",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
         {"name": "Runtime-worker roster: OpenHands 1.50.0, GPT Researcher v3.7.0, DeerFlow v2.1.0, Crawl4AI v0.9.4, Codex Python SDK 0.159.2", "verdict": "every row pending and unaccepted", "pending_source": {"path": "blueprints/runtime-workers/README.md", "pull_request": 535, "commit": "1195e212"}},
         {"name": "AgentRelay v13.0.0 (upstream commit d8e1a188)", "verdict": "named for the production composition; no repository record pins it, so it is not a selection of record", "url": "https://github.com/AgentWorkforce/relay/releases"},
