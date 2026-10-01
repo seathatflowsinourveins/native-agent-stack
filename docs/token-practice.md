@@ -383,6 +383,8 @@ and `--since YYYYMMDD --timezone UTC` to ccusage. The
 [decision record](decisions/2026-09-29-token-spend-attribution.md) gives each lever its
 owner and overturn condition.
 
+The model and effort of each task class, and the file or instruction that enforces each today, are one table in the [task-to-model routing record](decisions/2026-09-30-task-model-routing.md).
+
 ## Shared Codex quota (2026-09-26)
 
 `scripts/codex_quota.py` reads the Codex account's usage snapshot through the

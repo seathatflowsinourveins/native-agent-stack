@@ -491,5 +491,119 @@
       "sha256": "fea86fc88b79cb12467774ecf1eb0134d7d3a9d8e3b733786bde962f02de84fd",
       "result": "byte-identical to prior qualified generated guide; ignored artifact"
     }
+  },
+  "concurrent_token_adoption_reconciliation_20261001": {
+    "main": "46365ea812c3a680b19c8c8c9c3bb198bf3b38ab",
+    "source_prs": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/540",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/557"
+    ],
+    "prior_head": "9cd7696612c59fb9621d8806fd5b648fa94fb6fd",
+    "merge_tree_native_exit": 1,
+    "merge_native_exit": 1,
+    "conflict_paths": [
+      "adoption/README.md",
+      "adoption/manifest.json",
+      "catalogs/landscape/new-host-grand-list.json",
+      "docs/harness-defaults.md",
+      "docs/new-host-grand-list.md",
+      "manifests/evidence.json"
+    ],
+    "resolution": "Keep main selection/routing acceptance and both decision recipe paths, plus dated source-host qualification and other-host boundary. Preserve both anti-pattern logs, all14components and ai-memory2.4.2. Keep jcodemunch/codebase-memory/ast-grep optional.",
+    "anti_pattern_log_rows": 116,
+    "duplicate_log_titles": 0,
+    "failed_patch_preflight": {
+      "native_exit": 1,
+      "returned": "AssertionError: adoption/scaffold/AGENTS.md",
+      "mutation": "none; patch was not applied",
+      "correction": "Context Mode identified both automatically combined paths: scaffold AGENTS and installer tests. Hash closure includes those live files.",
+      "usage": "unknown"
+    },
+    "second_patch_preflight": {
+      "native_exit": 1,
+      "returned": "AssertionError: eight existing live hashes changed, not nine.",
+      "mutation": "none; patch was not applied",
+      "correction": "Check registered paths before counting. Main had not registered its new routing record and test; add both explicitly and update the eight combined existing files.",
+      "usage": "unknown"
+    },
+    "large_output_correction": {
+      "step": "Conflict inspection emitted a longer anti-pattern-table block than required.",
+      "correction": "Subsequent Context Mode analysis returned row counts, duplicates, selected keys and small conflicts only.",
+      "usage": "unknown; not attributed as token savings"
+    },
+    "primary_source_research": {
+      "role": "Astra/max stack-researcher",
+      "trigger": "Concurrent primary selection/routing acceptance overlaps dated native qualification.",
+      "verdict": "Compatible; preserve both acceptance levels and the qualified ai-memory2.4.2 pin.",
+      "source": "docs/decisions/2026-09-30-task-model-routing.md at46365ea8 and native completion at9cd76966; upstream Codex rust-v0.159.2 reasoning_effort.rs/models.json/child_config.rs",
+      "scope": "No edits, tests or model reruns."
+    },
+    "scope": "Source reconciliation only; original native/provider qualification and usage boundaries retained.",
+    "label_guard_correction": {
+      "source": "scripts/adoption_status.py native profile validation; unchanged len(label)<=160",
+      "failed_combined_label_chars": 251,
+      "corrected_label_chars": 135,
+      "initial_run": {
+        "native_exit": 1,
+        "summary": "Ran 219 tests in 17.174s",
+        "result": "FAILED (failures=1, skipped=3)"
+      },
+      "original_retained_run": {
+        "native_exit": 1,
+        "summary": "Ran 219 tests in 17.048s",
+        "result": "FAILED (failures=1, skipped=3)",
+        "bytes": 7113,
+        "sha256": "25c5db3e01e4eab2fedf9d29623d8bbc1eaf6aeaf2eed3fe0d53ef9c7c6a66e7",
+        "original": "private task-owned native log; no public personal paths"
+      },
+      "returned_failure": "test_the_profile_resolves_to_its_commands_and_recipes: AssertionError: 'invalid' != 'valid'; errors=['profile label is invalid']",
+      "correction": "Shorten the label only; retain Accepted, literal routing record path, both recipe links and native host scope. Native guard unchanged.",
+      "usage": "unknown; not counted as savings",
+      "corrected_run": {
+        "command": "rtk proxy python3 -m unittest tests.test_task_model_routing tests.test_adoption_status tests.test_install_claude_profile",
+        "native_exit": 0,
+        "summary": "Ran 219 tests in 16.302s",
+        "result": "OK (skipped=3)",
+        "original_bytes": 6313,
+        "original_sha256": "44a7747e8b758937934ab933331346a85cca6e3d2c89d4f361c59d7a17b33e60",
+        "scope": "Local integration and source-contract checks; no provider/model rerun."
+      }
+    },
+    "local_consistency_checks": {
+      "validate_native_exit": 0,
+      "components": 69,
+      "hashed_files": 8771,
+      "profiles": 4,
+      "receipts": 179,
+      "convergence_native_exit": 0,
+      "records": 26,
+      "scope": "Consistency only; repeated final precommit validation follows the evidence update."
+    },
+    "independent_source_verification": {
+      "role": "Astra/max stack-verifier",
+      "trigger": "Concurrent primary routing/rule records and bounded native label correction.",
+      "verdict": "accepted; no material counterexample",
+      "native_git_exits": 0,
+      "unmerged_count": 0,
+      "native_ci_sources_matching": 17,
+      "prior_receipt_entries_preserved": 179,
+      "profile_components": 14,
+      "label_chars": 135,
+      "native_label_limit": 160,
+      "anti_pattern_unique_titles": 116,
+      "frozen_evaluation": "unchanged",
+      "F1_instruction_surfaces": "match main",
+      "installer_test_functions": "both parents retained unchanged",
+      "routing_change": "dated host-qualification paragraph only",
+      "selected_ai_memory": "2.4.2",
+      "scope": "Source-only; tests/providers not run by verifier."
+    },
+    "generated_guide": {
+      "command": "rtk proxy python3 scripts/build_ecosystem.py --write",
+      "native_exit": 0,
+      "bytes": 14393184,
+      "sha256": "5debdd1c362f2a8e1ce576152c45ea721eed0d55878b33cc9f929a4186fd7d2b",
+      "artifact": "ignored local consolidated guide"
+    }
   }
 }

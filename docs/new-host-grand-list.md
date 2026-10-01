@@ -22,7 +22,7 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 | 5 | `recovery`: Selected application-state recovery | `restic`, `ai-memory`, `qdrant` |
 | 6 | `macos-arm64-foundation`: Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon | `codex`, `claude-code`, `context-mode`, `ai-memory`, `mcporter`, `llama-cpp`, `qdrant`, `socraticode` |
 | 7 | `trading-nautilus`: Selected north-star Nautilus engine with separate broker boundaries | `nautilus-trader`, `alpaca-py` |
-| 8 | `token-efficiency`: Accepted on source host through dated native evidence; draft PR561 review pending; other hosts need their own acceptance | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
+| 8 | `token-efficiency`: Accepted 2026-09-30: docs/decisions/2026-09-30-task-model-routing.md; source host qualified (PR561); other hosts need native acceptance | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
 
 ## Hosts and hardware tiers
 

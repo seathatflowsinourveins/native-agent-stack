@@ -381,7 +381,7 @@
     },
     {
       "id": "token-efficiency",
-      "label": "Accepted on source host through dated native evidence; draft PR561 review pending; other hosts need their own acceptance",
+      "label": "Accepted 2026-09-30: docs/decisions/2026-09-30-task-model-routing.md; source host qualified (PR561); other hosts need native acceptance",
       "required_commands": [
         "codex",
         "claude",
@@ -418,7 +418,8 @@
         "docs/token-session-handbook.md",
         "recipes/README.md",
         "recipes/native-upgrades-20260921.md",
-        "docs/decisions/2026-09-30-token-profile-completion.md"
+        "docs/decisions/2026-09-30-token-profile-completion.md",
+        "docs/decisions/2026-09-30-task-model-routing.md"
       ]
     }
   ],

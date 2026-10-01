@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "kind": "source_ownership_reconciliation",
+  "recorded_at_utc": "2026-09-30T08:02:30Z",
+  "claim": "Original local Git and public GitHub observations establish stale-base source overlap and a same-id receipt collision. The isolated harness/dashboard merge retains current main, separates the root receipt identity, and records the rollout as DISARMED. Window W activity and current owner handback remain unknown.",
+  "evidence_class": "source review and local file integration; no new provider or model execution",
+  "source_revisions": {
+    "coordinator_base": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "qualified_upstream_main": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+    "requested_local_owner_snapshot": "fd42ec195ca8dd01b797636723af692ea11aaaf4",
+    "later_observed_local_owner_snapshot": "373f5defd3283e58f5a3ba8676eb1a1ad644c30d",
+    "owner_branch": "claude/sota-defaults-d4-codex-0159-20260930",
+    "observation_scope": "Bounded source snapshots. The owner branch advanced during this task; neither latest owner publication nor handback is inferred."
+  },
+  "public_and_local_observations": [
+    {
+      "command": "rtk proxy gh api repos/seathatflowsinourveins/native-agent-stack/commits/main --jq <sha/date/message fields>",
+      "exit_code": 0,
+      "returned_sha": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "committer_date": "2026-09-30T07:17:01Z",
+      "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/commit/cc1f6ce1f983721ecb42c7da27e58f0649c132f5"
+    },
+    {
+      "command": "rtk proxy git ls-remote origin refs/heads/main refs/heads/claude/sota-defaults-d4-codex-0159-20260930",
+      "exit_code": 0,
+      "stdout": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5\trefs/heads/main\n",
+      "scope": "Only main matched in this observation; no owner-branch publication is claimed."
+    },
+    {
+      "command": "rtk proxy git merge-base --is-ancestor fd42ec195ca8dd01b797636723af692ea11aaaf4 origin/main",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "rtk proxy git rev-list --left-right --count origin/main...fd42ec195ca8dd01b797636723af692ea11aaaf4",
+      "exit_code": 0,
+      "stdout": "0\t9\n",
+      "meaning": "Requested owner snapshot is nine commits ahead and zero behind the observed main."
+    },
+    {
+      "command": "rtk proxy gh api repos/seathatflowsinourveins/native-agent-stack/compare/main...fd42ec195ca8dd01b797636723af692ea11aaaf4 --jq <comparison fields>",
+      "exit_code": 1,
+      "http_status": 404,
+      "returned_message": "Not Found",
+      "scope": "Comparison endpoint did not resolve the local owner object; this is retained as a failed observation, not evidence of public acceptance."
+    },
+    {
+      "command": "rtk proxy gh pr list --repo seathatflowsinourveins/native-agent-stack --head claude/sota-defaults-d4-codex-0159-20260930 --state all --json number,state,headRefOid,mergedAt,url,baseRefName",
+      "exit_code": 0,
+      "returned": []
+    },
+    {
+      "command": "rtk proxy gh pr view 528 --repo seathatflowsinourveins/native-agent-stack --json number,state,headRefName,headRefOid,mergedAt,mergeCommit,url,title",
+      "exit_code": 0,
+      "state": "MERGED",
+      "head": "7f9263e1779086716dcd66d2a9e905d0c9af3e39",
+      "merge_commit": "6bbef3c65f69af35348297c0beefa535054fbc91",
+      "merged_at_utc": "2026-09-30T05:14:53Z",
+      "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/528"
+    }
+  ],
+  "receipt_collision": {
+    "original_path": "evidence/receipts/codex-01592-qualification-20260930.json",
+    "original_shared_id": "codex-01592-qualification-20260930",
+    "root_before_rename": {
+      "sha256": "0d41e2ea59e68c3d6b8e6ddbb20012fc34264fd9fe3a11163b0fba70c6ab41b0",
+      "bytes": 1905
+    },
+    "owner_at_requested_snapshot": {
+      "sha256": "100e3346b164022342e74c9cfa6bab67465982147f366609aea66c6c7b06f88e",
+      "bytes": 41003
+    },
+    "owner_at_later_local_snapshot": {
+      "sha256": "e9169d80c0acf187058ddab0d7cc41920796426aa68fa66f1205a0770ef7e1de",
+      "bytes": 41036,
+      "native_read_exit": 0
+    },
+    "root_after_rename": {
+      "path": "evidence/receipts/codex-01592-host-finalization-20260930.json",
+      "id": "codex-01592-host-finalization-20260930",
+      "sha256": "e55772fb5c5ba894e90fcc26f332e96f3f275d227b033d71ccf81e8babec8f13",
+      "bytes": 1909
+    },
+    "original_root_receipt_path_absent": true,
+    "resolution": "Root moved only its receipt id/path and direct registry/stack/catalog selection references to codex-01592-host-finalization-20260930. Native execution artifacts retain their exact bytes, historical ids and paths. Owner receipt bytes were neither copied nor overwritten.",
+    "native_artifacts": [
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+        "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
+        "bytes": 14536,
+        "latest_observed_owner_has_artifact": false,
+        "git_cat_file_exit": 128
+      },
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+        "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec",
+        "bytes": 12094,
+        "latest_observed_owner_has_artifact": false,
+        "git_cat_file_exit": 128
+      },
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+        "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e",
+        "bytes": 6327,
+        "latest_observed_owner_has_artifact": false,
+        "git_cat_file_exit": 128
+      }
+    ],
+    "direct_reference_updates": [
+      "manifests/evidence.json: receipts[] and files[] entries",
+      "manifests/stack.json: Codex evidence_ids",
+      "catalogs/landscape/upstream-snapshot.json: Codex selection_qualification_ref"
+    ],
+    "unchanged_artifact_reference_consumers": [
+      "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "docs/harness-defaults.md",
+      "evidence/artifacts/sota-finalization-20260930/convergence.json",
+      "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+      "adoption/pins-linux-x86_64.json"
+    ]
+  },
+  "source_overlap": {
+    "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+    "current_main_functions_missing_from_old_root_updater": [
+      "nothing_to_do",
+      "rehearse_roles",
+      "role_preconditions",
+      "role_source_problems",
+      "role_states",
+      "run_doctor"
+    ],
+    "current_main_prove_function_missing_from_old_root": "roles_row",
+    "material_paths": [
+      "tools/adoption/apply_codex_lane.py",
+      "tools/adoption/prove_codex_lane.py",
+      "tests/test_codex_worker_lane.py",
+      "scripts/adoption_status.py",
+      "adoption/agents/codex/"
+    ],
+    "integration_boundary": "Another writing worker owns Codex modules/tests/templates/pins and merges the bounded profile-migration changes onto current main. This worker owns only the isolated harness defaults, dashboard checkpoint and this source record; the coordinator owns evidence registration. Current main role/doctor behavior and its tests must remain present.",
+    "owner_branch_boundary": "The owner's additional qualification/defaults/catalog/manifest commits are local original source and not automatically imported or accepted. No owner session was contacted and no remote comment, branch or PR was written."
+  },
+  "window_w": {
+    "state": "unknown",
+    "current_owner_handback": "not independently established",
+    "native_help_observation": {
+      "command": "rtk proxy python3 tools/token-e2e/freeze_snapshot.py --help",
+      "exit_code": 0,
+      "subcommands": [
+        "capture",
+        "compare",
+        "check",
+        "list-frozen"
+      ],
+      "returned_scope": "Read-only glue over existing commands and file hashes; it decides nothing."
+    },
+    "documented_nonmutating_check": "rtk python3 tools/token-e2e/freeze_snapshot.py check CAPTURE.json --expected EXPECTED.json",
+    "check_limit": "Validates a supplied capture against the supplied owner-published seal. It does not determine whether a Window W run is active or whether an owner handed back the area. Capture writes a snapshot and is not a status-only command.",
+    "sources": [
+      {
+        "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+        "path": "tools/token-e2e/freeze_snapshot.py",
+        "lines": [
+          10,
+          12,
+          13
+        ],
+        "claim": "Owner captures at seal and publishes expectations."
+      },
+      {
+        "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+        "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
+        "lines": [
+          875,
+          876,
+          877,
+          878,
+          879
+        ],
+        "claim": "Published source lists the sealed quiet Window W among prelaunch prerequisites.",
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cc1f6ce1f983721ecb42c7da27e58f0649c132f5/evidence/artifacts/token-adoption-e2e-20260926/README.md#L875-L879"
+      },
+      {
+        "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+        "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+        "lines": [
+          99,
+          100,
+          101,
+          102,
+          103
+        ],
+        "claim": "Window W needs peer agreement and no carrier/instruction change during its run."
+      },
+      {
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/528#issuecomment-5904600203",
+        "observed_pr_state": "MERGED",
+        "claim": "Recorded handoff preserves role/carrier ownership, without proving a current seal or run."
+      }
+    ],
+    "decision": "Retain unknown activity and DISARMED rollout. The review's active-W inference is not a new permission requirement and is not promoted into an observed fact."
+  },
+  "queue_source_scope": {
+    "status": "disarmed_for_source_reconciliation",
+    "sources": [
+      "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "evidence/artifacts/sota-finalization-20260930/claude-source-verification.json"
+    ],
+    "verified_gap": "Original checksum closure omitted imported scripts/codex_quota.py. Reconciled current main also consumes a role helper and carrier resources requiring closure qualification.",
+    "recorded_native_disarm": {
+      "stop_exit": 0,
+      "observation_exit": 0,
+      "retry_timer_state": "inactive/dead",
+      "expiry_timer_state": "inactive/dead"
+    },
+    "acceptance_limit": "Disarm is recorded independently in the linked native source. This task did not rearm a timer, apply a host configuration, restart a client, or accept the source-closure repair."
+  },
+  "native_three_way_merges": [
+    {
+      "path": "docs/harness-defaults.md",
+      "source_revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "input_sha256": {
+        "root": "c03946cbd52ab976c397853c3753f38f8993b13881240779c34952cc8e87c3d7",
+        "base": "c9d239413bbcfdf4b0f437cd67bd951cacf25d2de45cdfe676993889fd361eaa",
+        "upstream": "0da5409d42adb063e2c3cc549feeaccf2c4b7c454af72f915bff0265712bb68a"
+      },
+      "merge_exit": 1,
+      "merge_stdout_bytes": 88737,
+      "merge_stdout_sha256": "d0816b086da791af4790047ab7987c0136c413fe88bcfd833b1e140d3cff343e",
+      "merge_stderr_bytes": 0,
+      "conflict_regions": 1,
+      "resolved_sha256": "19d8d795da4cb2ad116b9e352dbd592ff6b2d4b0b4b4225f92997dc77f6b46e6",
+      "resolved_bytes": 90375,
+      "command_template": "rtk proxy git merge-file -p -L current-root -L immutable-base-5cfa2400 -L upstream-cc1f6ce1 <current-root-file> <verified-base-file> <upstream-file>",
+      "resolution": "Concatenate both appended correction sets; retain all current-main rows and root additions, correct the stale active-PR label, and append two source-grounded finalization corrections."
+    },
+    {
+      "path": "observability/grand-dashboard/state.json",
+      "source_revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "input_sha256": {
+        "root": "2d8c06ee112e0d3a94a90e695ada8d3633cbfc3f43355370b1c4162688edf5d8",
+        "base": "2b5bf3226eb5018e8b9097508fee255f3b1b094c0f5143ef2b95116463b9bdd9",
+        "upstream": "b111c099bdc4ed82eb6747c043236a413d61e676077a0815dfdc855179f1d50d"
+      },
+      "merge_exit": 1,
+      "merge_stdout_bytes": 18745,
+      "merge_stdout_sha256": "fe1c4eeb34341cae2a12dda3cd574458fd133b344ddbc0e7862ec4cc89cc547b",
+      "merge_stderr_bytes": 0,
+      "conflict_regions": 1,
+      "resolved_sha256": "b18cf3b922d46126ab83b9ef3746e15227c2792ec00eb9be8e6ded11116201dc",
+      "resolved_bytes": 18728,
+      "command_template": "rtk proxy git merge-file -p -L current-root -L immutable-base-5cfa2400 -L upstream-cc1f6ce1 <current-root-file> <verified-base-file> <upstream-file>",
+      "resolution": "Preserve upstream lane/worker states and other gates, merge the root foundation gates, set an actual checkpoint timestamp, and explicitly record DISARMED rollout and unknown W activity."
+    }
+  ],
+  "readback_acceptance": {
+    "native_exit": 0,
+    "upstream_antipattern_rows_retained": 77,
+    "all_upstream_rows_retained": true,
+    "upstream_lanes_unchanged": true,
+    "upstream_workers_unchanged": true,
+    "other_upstream_gates_unchanged": true,
+    "finalization_rollout_state": "DISARMED",
+    "window_w_state": "unknown",
+    "recorded_at_utc": "2026-09-30T08:02:30Z",
+    "native_fixture": false,
+    "diff_check_exit": 0
+  },
+  "failed_preparation": [
+    {
+      "tool": "context-mode ctx_execute",
+      "exit_code": 1,
+      "cause": "Patch preparation assumed dashboard gate entries lived in lanes; exact source inspection located them in gates. No patch was applied before this assertion failed.",
+      "recovery": "Corrected the documented container, generated native three-way patches, and independently checked the resulting file structure."
+    },
+    {
+      "tool": "context-mode ctx_execute_file",
+      "exit_code": null,
+      "result": "Private isolated worktree source read was blocked by the tool's project-root boundary.",
+      "recovery": "Used authorized native exact source reads for the expressly assigned isolated worktree; no tool permission settings were changed and no private credentials or communications were read."
+    }
+  ],
+  "limitations": [
+    "Source and file-integration observations do not establish model quality, complete skill activation, a sealed Gate A run, current owner handback or production application.",
+    "Original review verdict and queue refusals remain in separate dated native artifacts; this record does not replace them.",
+    "Native merge exit 1 is the preserved conflict result. Resolution acceptance is local integration, not an unchanged upstream test suite.",
+    "The isolated dashboard timestamp is checkpoint observation time; emitter freshness and process liveness were not measured.",
+    "Receipt/source snapshots are bounded observations of active local work. Public branch absence applies only to the inspected exact ref and queries."
+  ]
+}
