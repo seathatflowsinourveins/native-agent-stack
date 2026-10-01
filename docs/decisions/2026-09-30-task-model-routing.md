@@ -105,7 +105,7 @@ literally, and `tools/adoption/apply_codex_lane.py` refuses any Codex but its `C
 (`docs/decisions/2026-09-27-model-currency.md:498-512`). Ultra selects proactive delegation and sends the model's
 `xhigh`, while Max sends `max` (`docs/decisions/2026-09-30-sol-primary-quality-defaults.md:53-57`). In the "Enforced
 today" column, "`path:line` says `value`" quotes that file. Line numbers are as read at `e45328d3`, except in the last
-six rows, restated for D4, and where a passage names `1f2cdce5`, which read that revision; the model-currency record's
+six rows, restated for D4, and where a passage names `1f2cdce5` or the head of #548 (F4), which read that revision; the model-currency record's
 lines up to its 2026-09-28 addendum are the same at both. A later edit can move a quoted value without changing it.
 
 | Task class | Client | Model | Effort | Enforced today | Rule source |
