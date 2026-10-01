@@ -1530,8 +1530,9 @@ tests retain all three review generators, require their real hook responses
 within one second, and keep K4's named rows and helper measurements below
 0.5 seconds of processor time on the workstation. Other hosts, CI included,
 scale that bound by their time for a fixed guard-independent workload
-(the standard library's shlex lexer) relative to the workstation's, never
-below 1: the hosted macOS runner is about 2.8 times slower. Each helper's
+(the standard library's shlex lexer over short words and one long quoted
+word) relative to the workstation's, never below 1: on the hosted macOS
+runner a long quoted word lexes about 2.6 times slower than here. Each helper's
 growth from 25,000 to 100,000 characters must also fit an exponent under 1.5
 (1 is linear, 2 quadratic) over the minimum of up to three rounds, the
 criterion of the child-usage linearity checks. The mutation gate counts only

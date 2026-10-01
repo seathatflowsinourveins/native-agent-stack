@@ -4403,12 +4403,16 @@ K4_CHARGE_FIXTURES = dict(K4_HELPER_FIXTURES, **{
 })
 K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, on the workstation; other hosts scale it by k4_host_factor().
 # Host speed (2026-10-01): the processor-time bounds scale by this host's time for a guard-independent reference, the standard
-# library's pure-Python shlex lexer over a fixed text (minimum of five runs), relative to the workstation's 0.0355 s, and never below 1
+# library's pure-Python shlex lexer over a fixed text (minimum of five runs), relative to the workstation's 0.188 s, and never below 1
 # (a reference-machine ratio, the way SPEC CPU reports speed against its reference machine). The hosted macOS runner measured row
 # T-STORE-PRINTF at 0.550 s and k4_runner_commands' whole check at 0.562 s where the workstation measures 0.197 s, so a fixed 0.5 s
-# judged the runner, not the guard; a quadratic regression still grows 16 times per 4 times input and fails on any host.
-K4_REFERENCE_TEXT = " ".join(f"word{i % 97} 'quoted {i % 13}' \"dq $X{i % 7}\"" for i in range(6000))
-K4_REFERENCE_SECONDS = 0.0355
+# judged the runner, not the guard; a quadratic regression still grows 16 times per 4 times input and fails on any host. The text
+# holds short words and one long quoted word: shlex builds a token by repeated string concatenation, whose cost follows the
+# platform's allocator, and on that runner short words ran at 1.03 times the workstation while the row (one 120,000-character
+# quoted word, mostly shlex) ran at 2.6 times.
+K4_REFERENCE_TEXT = (" ".join(f"word{i % 97} 'quoted {i % 13}' \"dq $X{i % 7}\"" for i in range(6000))
+                     + " printf '" + "%s" * 60000 + "'")
+K4_REFERENCE_SECONDS = 0.188
 
 
 def k4_host_scale(reference_seconds: float) -> float:
