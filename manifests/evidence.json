@@ -3829,6 +3829,93 @@
         "Evidence classes differ: the unit, mutation and suite runs were made by the coordinator on the final head outside any sandbox; the reviews are read-only cross-family reads, not proofs."
       ],
       "path": "evidence/receipts/canary-proof-verification-20261001.json"
+    },
+    {
+      "id": "seamless-native-helper-recovery-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Source-backed oneshot lifecycle correction kept a fresh isolated Hindsight backend healthy after helper completion and repeat start; production native health checks remain enabled. Codex accepted the supported Hindsight MCP timeout setting.",
+      "limitations": [
+        "These are local integration checks of native lifecycle, using a disposable backend configured with provider none; no unchanged upstream test or model-quality comparison is claimed.",
+        "Default cgroup cleanup reproduced an unavailable backend after native start exit zero. The corrected helper intentionally leaves detached backend lifecycle to the native profile manager; systemd generally discourages process mode for daemons it owns.",
+        "The isolated repeat was an explicit native service start. Production timer active/waiting was observed; physical-host reboot and forced unhealthy recovery were not tested here.",
+        "Codex per-server timeout is set to 360 seconds. A caller-supplied shorter deadline still wins, and no new model retrieval was run after this setting.",
+        "Model/provider usage and monetary cost were not collected for this lifecycle check. Native Pg0 stop uses a nonchecking SDK wrapper; independent absence of both fixture listeners is the cleanup observation."
+      ],
+      "path": "evidence/receipts/seamless-native-helper-recovery-20261001.json"
+    },
+    {
+      "id": "hindsight-cross-family-native-recall-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "A fresh native Codex session retrieved a Claude-created synthetic fact through connected Hindsight memory after an initial reflect timeout; the native command completed with exit zero.",
+      "limitations": [
+        "This is a local integration check using a disposable synthetic canary, not an unchanged upstream test or a retrieval-quality comparison.",
+        "The first reflect call timed out after 300 seconds. A second narrower call succeeded; consistently fast retrieval is not established.",
+        "The returned reflection reported original Claude-source metadata and internal recall/expand verification. This receipt retains that returned provenance; it does not independently inspect the backend's internal tool trace.",
+        "Only the explicitly mapped owned repository folders share this bank. The original checkout keeps its incumbent memory writer.",
+        "Backend provider usage, invoice cost and complete end-to-end task usage are unknown. This native client turn is a separate counter scope."
+      ],
+      "path": "evidence/receipts/hindsight-cross-family-native-recall-20261001.json"
+    },
+    {
+      "id": "seamless-local-runtime-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Owned local broker and message engine installation, native service recovery, scoped semantic retrieval, and Codex registry promotion passed within their stated scopes; managed Codex automatic push remains held after an observed unsubmitted message.",
+      "limitations": [
+        "This is local integration evidence. It does not establish complete foundation acceptance, a quality winner, physical-host reboot recovery or paper-broker acceptance.",
+        "Managed Codex PTY submission failed despite native read metadata. Neither reader status nor the successful initial peer exchange establishes ordinary automatic submission, busy delivery or offline catch-up.",
+        "The Relay native adapter was not substituted: it bundles an older Codex and disables web search by default; selected-client parity is unverified.",
+        "The unchanged Relay default test suite retains one failed lifecycle timeout. Its focused longer-timeout pass does not make that default suite green.",
+        "Hindsight capture is enabled only in the three explicitly mapped owned folders. The original checkout retains its incumbent memory writer. Cold git seeding and remaining knowledge pages have separate results.",
+        "RAG observations establish indexing and one retrieval, not retrieval-quality or financial-research acceptance. Client, backend and cache counters are not combined; monetary cost is unknown."
+      ],
+      "path": "evidence/receipts/seamless-local-runtime-20261001.json"
+    },
+    {
+      "id": "codex-01593-native-queue-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Fresh provider-backed native queue delivery succeeded while the owned daemon-backed thread was idle, while a preceding turn was busy, and after its TUI disconnected and resumed. Three official Hindsight hook definitions were individually trusted through the native UI.",
+      "limitations": [
+        "Synthetic messaging inputs qualify these native operations, not production task quality or the whole ecosystem.",
+        "No upstream Cargo test suite was run; upstream test sources were reviewed and native commands were exercised.",
+        "No daemon restart was attempted during live qualification, and no unrelated session was inspected or interrupted.",
+        "Queue delivery to a concurrently running embedded receiver, cross-family bridge delivery, cross-account isolation, remote hosts, and Hindsight retrieval/retention are outside this receipt.",
+        "Hindsight capture remained disabled during hook trust. Hook trust is not memory acceptance.",
+        "Provider monetary cost is unknown. Native usage counters do not establish improvement against another configuration."
+      ],
+      "path": "evidence/receipts/codex-01593-native-queue-20261001.json"
+    },
+    {
+      "id": "codex-01593-hindsight-native-memory-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Fresh native Codex automatic capture and independent recollection from the selected Hindsight bank passed in both headless exec and daemon-backed interactive resume/queue paths.",
+      "limitations": [
+        "Two invented canaries and their record budgets are explicitly synthetic, not project policy, market data or trading acceptance.",
+        "This is supported native command/API execution with synthetic inputs and independent observation, not an executed upstream Docker or Cargo test suite.",
+        "Headless exec and daemon-backed TUI are distinct paths; each has its own fresh provider-backed observations below.",
+        "Knowledge-page search completed but did not contain either canary. Native Hindsight reflect supplied the correct values; page population or cron refresh is not qualified here.",
+        "Backend seed/survey completion was not established. Native status reported synced=false with active operations; the coordinator separately owns seed-job recovery.",
+        "Native model token usage excludes Hindsight backend extraction/reflection usage. Backend usage and monetary cost are unknown.",
+        "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
+      ],
+      "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
     }
   ],
   "files": [
@@ -4239,8 +4326,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "4539311ef0437b9081f2811cc329bd880f33c3479c2724f7c218a63e9ff3a1b4",
-      "bytes": 32281
+      "sha256": "0dd40eea9c39e1e61ca73c9e8f55cfe0e92106d0af5cd1933318f3bf7a3a31cf",
+      "bytes": 31759
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -14895,7 +14982,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "815405acffe546d358bf318805eff1d7d995f0ddfb66685e0b8338d9e809c33c",
+      "sha256": "6fda734fa9b42d93047a948a12c59762c0a6183dee4ade3fd37fd5495cca0582",
       "bytes": 287293
     },
     {
@@ -14905,8 +14992,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "11bb805b364a93d5bdafcc70e0e0bb14136561bf695fc88ebf155ae4f17b7044",
-      "bytes": 249102
+      "sha256": "3e73d0d83537758a1d7190eb026be07d5437b503f6f6e80c407b19ad53e921a9",
+      "bytes": 251264
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15735,8 +15822,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "02a0483354e60d23152c9a8393a6fe88caa18f4f207430100f67b1fb7a9afbe9",
-      "bytes": 121960
+      "sha256": "951cbc8bc4ec259bcff2941a549293896aba136e16741a735c4523a511375c86",
+      "bytes": 127152
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15855,7 +15942,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8a9ce14b2985ffcee351a9d01f8834808e44d8dc046334be0e78bce52e141b37",
+      "sha256": "861333f50f390b0c4664e195cb83e43a5c0b60297e4a4b2f846d5b18e5482d3c",
       "bytes": 18233
     },
     {
@@ -31554,6 +31641,71 @@
       "bytes": 17286
     },
     {
+      "path": "evidence/artifacts/hindsight-live-page-recovery-20261001/receipt.json",
+      "sha256": "0f1b479a842b0ef2e5938a73e56c51cb45d47ca07f803a0ea23bd3dc2eb6eaa3",
+      "bytes": 4902
+    },
+    {
+      "path": "evidence/artifacts/hindsight-native-cap-repair-20261001/receipt.json",
+      "sha256": "123b4808013ae637244c7cdd5ddc138a20d39d5b3b2d90df11c7f04e451e239d",
+      "bytes": 15848
+    },
+    {
+      "path": "evidence/artifacts/hindsight-native-qualification-cleanup-20261001/receipt.json",
+      "sha256": "fa140e007726df14d1a45367f396d3db13cb35bcc0a99fff95122f6379ef127d",
+      "bytes": 11416
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/README.md",
+      "sha256": "493ba9157ca8eaa1cdc59985680ebfa989adcf469b7fcb64e95dbf4734fe8dae",
+      "bytes": 7201
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/client-capture-receipt.json",
+      "sha256": "f0183b3598d7af66b21099f9c7c93999342f73e43633847f28868b66b8514b9d",
+      "bytes": 13051
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/bank.json",
+      "sha256": "53ddef8bd8c0b2228bae162570a40a1b48a9f07870fa392968fdf558c23bb336",
+      "bytes": 237
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/native-claude-recall.json",
+      "sha256": "9c6f922d33f21090a12023c3d191be4b3b02c81ef0e9804138f0588fa36c6faf",
+      "bytes": 98
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/page.json",
+      "sha256": "1bc7b669d6a8c1e9c78c51fa3dad1fb29695fa27f312c4f31f47848d2074fa3c",
+      "bytes": 263
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/recall.json",
+      "sha256": "20740e1355935f194fe3eae30f0de02bf6e8045408be28969e5d8458b787bc30",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/reflect.json",
+      "sha256": "1e99314fba8c6d6f1afe294b80e520e7bf1e50adaead17834e9f052b6054a990",
+      "bytes": 214
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/retain-v1.json",
+      "sha256": "b4a1849c2e37139c32e0e0eb54764f813af27b3941b1ea99ade9c86d69a34f7b",
+      "bytes": 370
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/fixtures/retain-v2.json",
+      "sha256": "08a611f3b3f8184e864f008b2dfc84cb79ac46681233bb019bc08ff5a669f16d",
+      "bytes": 421
+    },
+    {
+      "path": "evidence/artifacts/hindsight-production-backend-20261001/receipt.json",
+      "sha256": "18154700c7016b2a3afb4be26e6eefd1532df2d9b76dc2d886fbc3864b05d728",
+      "bytes": 14697
+    },
+    {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
       "sha256": "746b8bac3212d2a1df220db6c25b203de44208a37ea4741d352fa599d4ab884c",
       "bytes": 7401
@@ -45039,6 +45191,16 @@
       "bytes": 41981
     },
     {
+      "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+      "sha256": "f2c83af21223282ade47bdf78507e82267f9ed59db040b734c8603f74d14903c",
+      "bytes": 12136
+    },
+    {
+      "path": "evidence/receipts/codex-01593-native-queue-20261001.json",
+      "sha256": "c4876159f5feaf7823075fc5085f33f254f2dce84174035ded80964eda0ae63f",
+      "bytes": 9942
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -45167,6 +45329,11 @@
       "path": "evidence/receipts/hf-memory-models-20260921.json",
       "sha256": "aed4f45ee65ac469ad7ecabf2ed7e1c2bcb028d0a6011f7f81dffdd4a00a17aa",
       "bytes": 3678
+    },
+    {
+      "path": "evidence/receipts/hindsight-cross-family-native-recall-20261001.json",
+      "sha256": "1c82340961206ac34536d36275ca77063c691b6392c1175772b639d321f5f95a",
+      "bytes": 4485
     },
     {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
@@ -45507,6 +45674,16 @@
       "path": "evidence/receipts/runtime-tools.json",
       "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
       "bytes": 1840
+    },
+    {
+      "path": "evidence/receipts/seamless-local-runtime-20261001.json",
+      "sha256": "3161b1a15ec6866c41e1b81f4363c34faf6ca6a50ecbab47c0b2f834b264866e",
+      "bytes": 10811
+    },
+    {
+      "path": "evidence/receipts/seamless-native-helper-recovery-20261001.json",
+      "sha256": "33e42baf10591177fac3ff190bcdc728d88e0b12a2ce02fbf6730ddb53c6dd56",
+      "bytes": 9704
     },
     {
       "path": "evidence/receipts/skills-listing-restore-20260928.json",
@@ -45970,8 +46147,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5cafbe8aae1895fb41a4920039231f3c8a0d91b641db67b4e21f2f88e8d4e36b",
-      "bytes": 99473
+      "sha256": "6ef88ec5bbc82d4b169c8706d465999d61fc804fe80e22da70d6bfa54de5c1e0",
+      "bytes": 99787
     },
     {
       "path": "observability/README.md",
@@ -46165,8 +46342,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "3031d75217d8d309f7d45d8bb3e45573dba034c9c56024a1a58d61cfe843880a",
-      "bytes": 18251
+      "sha256": "abab9ba4f8ec223a7ceca452917c232b951db32650c83123f34e5802e62b51b3",
+      "bytes": 21289
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -46282,6 +46459,11 @@
       "path": "recipes/saturation-sweep.md",
       "sha256": "7a02df8416e87f4d872bac10dacec9872668311ec3b0bc206420e4c28d17ad78",
       "bytes": 10508
+    },
+    {
+      "path": "recipes/seamless-local-production.md",
+      "sha256": "4b8fbc3b71976b2f40feb9317a471966a7ce7b463ccecebe03c835b10eaa33b4",
+      "bytes": 14150
     },
     {
       "path": "recipes/sota-convergence-practice.md",
@@ -46860,7 +47042,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "744568f193b67576199d97c769915eba14ab823df0c1b948baf78d832a33f1e0",
+      "sha256": "4895753c2a5a305ef23148909764278589cfb6872de82dbea333c7f89534e18c",
       "bytes": 155359
     },
     {
@@ -47550,7 +47732,7 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "bfcc3cdf9efbc2dea3c9f72f64e705ae18e2af86d0d1c2e3c15ba7da672f29a6",
+      "sha256": "9e7446dda320da39b1a5846c50c43fb634621727dd49a89a7239e21063ac7cce",
       "bytes": 80788
     },
     {
