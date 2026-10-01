@@ -854,7 +854,7 @@
     {
       "id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.78",
       "license": "Apache-2.0",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
@@ -871,8 +871,8 @@
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
       ],
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+      "freshness": "0.0.78 is the srt on the NativeStack WSL2 host since 2026-10-01 after a same-host comparison against 0.0.77, retained with the private upkeep run (same filesystem, policy-control, exit-status and loopback network outcomes; npm registry signatures and SLSA provenance verified; srt --version now prints the package version instead of the 1.0.0 fallback). 0.0.78 carries upstream PR #618, the Linux fix for a deny path another sandbox creates during setup: upstream's regression test for it (test/sandbox/deny-path-made-meanwhile.test.ts, bun 1.4.2) passed at v0.0.78 and failed against v0.0.77 on this host, a check of the generated bubblewrap arguments rather than a reproduced race. 0.0.77 is kept for rollback. The landscape winner pin stays 0.0.77 until a new verdict wave; the host use receipt at 0.0.78 is evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--sandbox-runtime--use--20261001.json."
     },
     {
       "id": "serena",

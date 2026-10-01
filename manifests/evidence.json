@@ -14821,7 +14821,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "sha256": "3555c655c7520060260875ad04b8922821826bfa911a9e5445d44ee292232485",
       "bytes": 314853
     },
     {
@@ -15356,7 +15356,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "sha256": "7711775feca87f381de4195c0019c08a0810c9abed23c70662815337105d52ef",
       "bytes": 32903
     },
     {
@@ -44555,6 +44555,11 @@
       "bytes": 11201
     },
     {
+      "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--sandbox-runtime--use--20261001.json",
+      "sha256": "00689333bca603be1bb67bee130e03dac34e18ec1c4e5cdf079c0e7a28ec5068",
+      "bytes": 11206
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--serena--install--20260925.json",
       "sha256": "ceca3b1c253f8cf6a537d60b987547383e3fe571fde88c1339fd46a1e0661205",
       "bytes": 7311
@@ -45841,8 +45846,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5cafbe8aae1895fb41a4920039231f3c8a0d91b641db67b4e21f2f88e8d4e36b",
-      "bytes": 99473
+      "sha256": "429374e40e84ab150df928387379b651c522ade76f45c6b835f5d5d69ffeea96",
+      "bytes": 100295
     },
     {
       "path": "observability/README.md",
@@ -46121,8 +46126,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2961a95fe20b829b92a9a01812bf6aa240955378674d1ee7afc8e4df727cc041",
-      "bytes": 124550
+      "sha256": "de6a06bcbdceb6b6788710bd4a682b238452c1a46075249108ecc1d7fe262354",
+      "bytes": 124848
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
