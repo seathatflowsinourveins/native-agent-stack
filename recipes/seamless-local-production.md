@@ -133,8 +133,16 @@ remains a separate gate from successful capture and reflect retrieval.
 Native capture and independent recollection passed for Codex headless and
 shared-daemon sessions and for Claude Opus/Max. The backend also passed
 extraction, correction, bank isolation, native API/PostgreSQL recovery and an
-independent export/import. One stored hourly knowledge-page cron completed
-automatically with 5,045 content characters. The
+independent export/import. One earlier stored hourly knowledge-page cron completed
+automatically with 5,045 content characters. A later live check found all five
+pages stale after their latest refreshes failed. One native manual Conventions
+refresh on the unchanged route failed at the same 300-second wall limit. Upstream
+pauses automatic refresh after failure until an explicit refresh succeeds; page
+freshness is held separately from retention and retrieval. The
+[live recovery observation](../evidence/artifacts/hindsight-live-page-recovery-20261001/receipt.json)
+retains the failed operation and the
+[upstream failure-pause contract](https://github.com/vectorize-io/hindsight/pull/4618).
+The
 [backend and Claude evidence](../evidence/artifacts/hindsight-production-backend-20261001/README.md)
 keeps these scopes distinct from the unresolved cold git seed.
 

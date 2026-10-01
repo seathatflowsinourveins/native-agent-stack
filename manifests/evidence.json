@@ -15287,8 +15287,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3edd7d41dff37fbb3bb7b28c146e63885a3be4737e96eeee28603d357fa45828",
-      "bytes": 109526
+      "sha256": "0ecf643c515b9b244dc860a9c74f282933e019b519ec5910138cdb8d416a8c82",
+      "bytes": 110296
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -31061,6 +31061,11 @@
       "bytes": 17286
     },
     {
+      "path": "evidence/artifacts/hindsight-live-page-recovery-20261001/receipt.json",
+      "sha256": "0f1b479a842b0ef2e5938a73e56c51cb45d47ca07f803a0ea23bd3dc2eb6eaa3",
+      "bytes": 4902
+    },
+    {
       "path": "evidence/artifacts/hindsight-native-cap-repair-20261001/receipt.json",
       "sha256": "123b4808013ae637244c7cdd5ddc138a20d39d5b3b2d90df11c7f04e451e239d",
       "bytes": 15848
@@ -45222,8 +45227,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "c62cf48898a95f58bbded971c6a180abf5c4443955a31bbefe8678424093f046",
-      "bytes": 20865
+      "sha256": "fb92e8716ac8728e2e80abadaff02805fac606554ca131c217175aeebddc975a",
+      "bytes": 21283
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -45342,8 +45347,8 @@
     },
     {
       "path": "recipes/seamless-local-production.md",
-      "sha256": "f35a24b6c7a9f438a188009c2847e3a5def8905b9d9a973949eb19fefa7e589e",
-      "bytes": 13577
+      "sha256": "4b8fbc3b71976b2f40feb9317a471966a7ce7b463ccecebe03c835b10eaa33b4",
+      "bytes": 14150
     },
     {
       "path": "recipes/sota-convergence-practice.md",
