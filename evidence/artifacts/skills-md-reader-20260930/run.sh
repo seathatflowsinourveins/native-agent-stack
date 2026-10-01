@@ -15,12 +15,12 @@ unset GITHUB_TOKEN GH_TOKEN
 mkdir -p "$HOME" "$TMPDIR" "$SCRATCH/out"
 cd "$SCRATCH" || exit 2
 LOG=$SCRATCH/log.txt; : > "$LOG"
-step() {  # step <name> <command...>: runs it, logs it on one line sanitized, keeps going
+step() {  # step <name> <command...>: runs it, logs it on one line sanitized and without trailing blanks, keeps going
   local name=$1; shift
   local start; start=$(date -u +%FT%TZ)
   "$@" > "out/$name.stdout" 2> "out/$name.stderr"; local status=$?
   printf '%s\t%s\t%s\texit %s\t%s\n' "$name" "$start" "$(date -u +%FT%TZ)" "$status" "$(printf '%s' "$*" | tr '\n\t' '  ')" \
-    | sed -e "s#$HERE#<receipt>#g" -e "s#$CHECKOUT#<checkout>#g" -e "s#$SCRATCH#<scratch>#g" >> "$LOG"
+    | sed -e "s#$HERE#<receipt>#g" -e "s#$CHECKOUT#<checkout>#g" -e "s#$SCRATCH#<scratch>#g" -e 's/[[:space:]]*$//' >> "$LOG"
   return 0
 }
 step versions sh -c 'node --version; npm --version; git --version; python3 --version'

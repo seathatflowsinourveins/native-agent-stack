@@ -1,6 +1,9 @@
 # SKILL.md reader agreement with the pinned skills CLI (2026-09-30)
 
-One workstation, 2026-09-30 23:56:37Z to 23:57:35Z UTC (33 steps). This receipt checks
+One workstation, 2026-10-01 00:56:03Z to 00:57:01Z UTC (33 steps). This run repeats the 2026-09-30 one (23:56:37Z to
+23:57:35Z) after `run.sh` stopped logging a command's final newline as a trailing space, which `git diff --check`
+reported on `log.txt` line 26. Every count is unchanged; only the run times, the checkout commit and the hashes of the
+raw outputs kept outside the repository differ. This receipt checks
 `tools/sota-convergence/landscape-sweep/skill_md.mjs`, the reader the landscape sweep's skills modality runs for every
 `SKILL.md` copy of a skill survivor (`source_reviews.py`), against the pinned skills CLI itself. It also records what
 `source_reviews.py`'s symlink rule changes on the catalog's sources, and checks the CI step that installs the reader's
@@ -108,7 +111,7 @@ code) are in `tests/test_landscape_sweep_skills.py`, not here.
 
 | File | What it is |
 | --- | --- |
-| `run.sh` | The whole run: `bash run.sh <checkout> <scratch>`; every step's command, UTC start and end and exit status go to `log.txt` with the checkout, scratch and receipt directories written as placeholders |
+| `run.sh` | The whole run: `bash run.sh <checkout> <scratch>`; every step's command, UTC start and end and exit status go to `log.txt` on one line, with no trailing blanks and with the checkout, scratch and receipt directories written as placeholders |
 | `corpus.py` | Fetches the catalog's GitHub sources at their pins (depth 1, partial) and writes every `SKILL.md`, checked against its git blob id |
 | `edge_cases.py` | Writes the 139 edge cases |
 | `symlink_impact.py` | The symlink rule on the sources' trees at their pins: symlinks, symlinked locations, and every pick with and without the rule |

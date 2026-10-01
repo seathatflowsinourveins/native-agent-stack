@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "checkout_commit": "6643ba60a183b1e25899295bdd9a05394e6c66ec",
+ "checkout_commit": "f74412dfaf673476a11f7b8041d3a94114ce0a16",
  "code_under_test": {
   "tools/sota-convergence/landscape-sweep/skill_md.mjs": {
    "sha256": "4fbd76f219192d629ee962d5aeeb8580cea2a903c3b03fa90c51da8cc69e5791",
@@ -15,8 +15,8 @@
    "bytes": 84195
   }
  },
- "run_start_utc": "2026-09-30T23:56:37Z",
- "run_end_utc": "2026-09-30T23:57:35Z",
+ "run_start_utc": "2026-10-01T00:56:03Z",
+ "run_end_utc": "2026-10-01T00:57:01Z",
  "tools": {
   "node": "v24.21.0",
   "npm": "11.19.0",
@@ -1286,20 +1286,20 @@
    "bytes": 571
   },
   "cli-corpus.stderr": {
-   "sha256": "7e8bd6e3a2b2a0f9a63914d0dadb2da9fce711c06a52e879032c70f5ba35f186",
-   "bytes": 551
+   "sha256": "96e3ec66a04ef52917220a5595ba2e56729d2a199366a783d29b0699e4e17df4",
+   "bytes": 547
   },
   "cli-corpus.stdout": {
-   "sha256": "c1d97cae86ad0660f8006219772b8a9926710010bdda538ecd21040acfa928c5",
-   "bytes": 475819
+   "sha256": "d44fb7ad7401f52a6a654f1f5ff7fe2a5ba448a70a4d060f41de796914f69629",
+   "bytes": 475818
   },
   "cli-edge.stderr": {
-   "sha256": "9a7a4cf7ccf394e2ab7892fe606c484a92bb2c5245a7cdea1a0ffcf7e33c2378",
-   "bytes": 13354
+   "sha256": "6da900af78fd9244da30bfe545cf9d0526c0e5137c2f4fb588e8d3eabf721122",
+   "bytes": 13278
   },
   "cli-edge.stdout": {
-   "sha256": "1616f96b2164c7497465fe471844617616a43a473264dd8436e1e66a3a08f6a4",
-   "bytes": 859
+   "sha256": "e1e801687c5abf88717ae3dd51170c3aecf671fb3708452d6c7a130b6333b1f6",
+   "bytes": 858
   },
   "cli-yaml-version.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1466,7 +1466,7 @@
    "bytes": 0
   },
   "install-skills-cli.stdout": {
-   "sha256": "11afd5b830a12e29d1fc5205e1521952b89d07ae808824e8841d1bc6f86a3286",
+   "sha256": "54e3532c53a61bb17c6ac9353ee93d273f1644b4d8bb603e7d3473717b6b5a53",
    "bytes": 90
   },
   "install-yaml-2.9.0.stderr": {
@@ -1474,7 +1474,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.0.stdout": {
-   "sha256": "16100c943f407ff905e43df2c3367f72b2ca8554e06a6f5eb5deca318c10aa62",
+   "sha256": "885a202ac038ade11a959c8ce05bbc398690121aabe992678c570b75d1a5213a",
    "bytes": 26
   },
   "install-yaml-2.9.1.stderr": {
@@ -1482,7 +1482,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.1.stdout": {
-   "sha256": "cdf5cc08d3f11b3b7cd220a83cd3ba24f1eec706d385e4b1b7d2dd4c187f7615",
+   "sha256": "075d52f618f01df7f428da630fb3df45bdfe4bce85ea5ca682c88ba533e9b4e5",
    "bytes": 26
   },
   "mutant-sanitize-edge.json": {
@@ -1510,7 +1510,7 @@
    "bytes": 29493
   },
   "oracle-290-edge.stderr": {
-   "sha256": "ffd6173262d3f31c3500ef60462ad1dd5135bea78503b33e63b95e5811a91ca2",
+   "sha256": "e2951cc52a002b062650942cac0eafc11e2517900f8f7a1d6edd980bea1bffa5",
    "bytes": 342
   },
   "oracle-290-edge.stdout": {
@@ -1534,7 +1534,7 @@
    "bytes": 29493
   },
   "oracle-cli-edge.stderr": {
-   "sha256": "f6d2de25c98bdcdc0d0f9f5a02d00bfcf132ae8145269f752875bb898e716192",
+   "sha256": "adb393b485083c92a72f021da1e4fc620917583dd2f531ac102fba41c5c4e285",
    "bytes": 342
   },
   "oracle-cli-edge.stdout": {
