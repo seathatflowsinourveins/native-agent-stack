@@ -1,0 +1,55 @@
+{
+ "layer_id": "isolation",
+ "title": "Isolation",
+ "requirement": "Separate edits and apply a real filesystem/network boundary only where a task requires enforced restrictions.",
+ "a_deciding_comparison_would_measure": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "sandbox-runtime",
+   "repository": "https://github.com/anthropics/sandbox-runtime"
+  },
+  {
+   "key": "C02",
+   "name": "e2b-dev/e2b",
+   "repository": "https://github.com/e2b-dev/E2B"
+  },
+  {
+   "key": "C03",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby"
+  },
+  {
+   "key": "C04",
+   "name": "Apple Container",
+   "repository": "https://github.com/apple/container"
+  },
+  {
+   "key": "C05",
+   "name": "gVisor",
+   "repository": "https://github.com/google/gvisor"
+  },
+  {
+   "key": "C06",
+   "name": "microsandbox",
+   "repository": "https://github.com/superradcompany/microsandbox"
+  },
+  {
+   "key": "C07",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman"
+  },
+  {
+   "key": "C08",
+   "name": "boxlite",
+   "repository": "https://github.com/boxlite-ai/boxlite"
+  },
+  {
+   "key": "C09",
+   "name": "Worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

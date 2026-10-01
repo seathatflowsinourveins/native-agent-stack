@@ -1,0 +1,55 @@
+{
+ "layer_id": "native-clients",
+ "title": "Native clients",
+ "requirement": "Run coding and bounded research with existing native accounts, client tools, model choices and resumable sessions.",
+ "a_deciding_comparison_would_measure": "Compare a native client and supported SDK only for a missing event, tool or recovery requirement; freeze identical task/account/effect checks.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "MCPorter native bridge",
+   "repository": "https://github.com/openclaw/mcporter"
+  },
+  {
+   "key": "C02",
+   "name": "Claude Code",
+   "repository": "https://github.com/anthropics/claude-code"
+  },
+  {
+   "key": "C03",
+   "name": "Letta V1 legacy server",
+   "repository": "https://github.com/letta-ai/letta"
+  },
+  {
+   "key": "C04",
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code"
+  },
+  {
+   "key": "C05",
+   "name": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python"
+  },
+  {
+   "key": "C06",
+   "name": "opencode and gemini-cli",
+   "repository": null
+  },
+  {
+   "key": "C07",
+   "name": "OpenAI Agents SDK",
+   "repository": "https://github.com/openai/openai-agents-python"
+  },
+  {
+   "key": "C08",
+   "name": "Codex",
+   "repository": "https://github.com/openai/codex"
+  },
+  {
+   "key": "C09",
+   "name": "goose, pi, jcode, maka, codex-acp, prime-agent, hermes-agent, claude-agent-acp",
+   "repository": null
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

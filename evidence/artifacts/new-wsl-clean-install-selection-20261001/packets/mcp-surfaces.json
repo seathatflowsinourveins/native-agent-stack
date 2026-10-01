@@ -1,0 +1,42 @@
+{
+ "layer_id": "mcp-surfaces",
+ "title": "MCP servers and client surfaces",
+ "requirement": "Bridge, inspect and configure Model Context Protocol servers and client surfaces without adopting an unexamined registry entry.",
+ "a_deciding_comparison_would_measure": "Review a specific MCP registry entry, such as punkpeye/awesome-mcp-servers, only against a concrete surface gap; do not adopt a new server from a registry listing alone.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter"
+  },
+  {
+   "key": "C02",
+   "name": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector"
+  },
+  {
+   "key": "C03",
+   "name": "microsoft/mcp-gateway, docker/mcp-registry, modelcontextprotocol/registry",
+   "repository": null
+  },
+  {
+   "key": "C04",
+   "name": "inspector",
+   "repository": "https://github.com/MCPJam/inspector"
+  },
+  {
+   "key": "C05",
+   "name": "Awesome MCP servers registry",
+   "repository": "https://github.com/punkpeye/awesome-mcp-servers"
+  },
+  {
+   "key": "C06",
+   "name": "@wong2/mcp-cli 2.0.0",
+   "repository": null
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "A 37-check lifecycle comparison of mcporter 0.14.1 and MCP Inspector 2.8.0 (list, call, stop, restart, forced kill and recovery): both passed 37 of 37; one ps-listing regression of mcporter 0.14.1 was recorded."
+ ],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}
