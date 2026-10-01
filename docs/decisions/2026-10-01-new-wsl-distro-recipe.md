@@ -321,6 +321,22 @@ Each one stays open until a host run records the observation named here.
 
 ## Sources
 
+Read on 2026-10-01 by the research unit only, and cited here as it reported them:
+
+- `wsl.exe --version` and `wsl.exe --help` on the Windows host: WSL 2.7.13.0, kernel 6.18.33.2-2, the command forms in
+  Context.
+- https://github.com/microsoft/WSL/releases/tag/2.7.14 (2026-09-11; backports #41524, #41540, #41557 and #41569) and
+  https://github.com/microsoft/WSL/releases/tag/3.0.1 (2026-09-29; WSL containers generally available; #41657, #41688
+  and #41689). Also the `microsoft/WSL` source at tags 2.7.13, 2.7.14 and 3.0.1, including `LxssUserSession.cpp:1597`
+  and `:1682` and `src/linux/init/main.cpp:2656-2669`.
+- https://releases.ubuntu.com/resolute/SHA256SUMS (2026-08-27) and the contents of the Ubuntu 26.04.1 image:
+  - `python3` 3.14.3;
+  - uutils coreutils;
+  - `sudo-rs` beside `sudo`;
+  - `bubblewrap` and `libatomic1` present.
+- https://cloud-images.ubuntu.com/wsl/ (WSL image publication moved to cdimages; those rootfs tarballs are not
+  general-purpose).
+
 Read on 2026-10-01 by the research unit or by unit W2:
 
 - Microsoft:
