@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T07:38:10Z",
-  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
+  "recorded_at_utc": "2026-09-30T19:05:00Z",
+  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance. This checkpoint adds the bounded GPT lifecycle gate; other recorded entities are retained. It does not assert fresh emitter or human-process liveness.",
   "lanes": [
     {
       "kind": "lane",
@@ -340,6 +340,13 @@
       "title": "Skills trial window 2026-09-25 to 2026-10-25",
       "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
       "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
+    },
+    {
+      "kind": "gate",
+      "id": "gpt-native-lifecycle-convergence",
+      "title": "Native GPT task lifecycle through OmniRoute and official GitHub Action",
+      "state": "Native review and SDK controls passed / Action143pass1skip / workflow inactive / host B1 and backend qualification open",
+      "evidence_ref": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json"
     }
   ],
   "workers": [

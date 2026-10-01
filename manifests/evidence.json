@@ -3864,8 +3864,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
-      "bytes": 32556
+      "sha256": "57df0b3f830b2c1b1fdf8d0492ff8d937b0926d329931bba2a89647525aa49b2",
+      "bytes": 33648
     },
     {
       "path": ".gitleaksignore",
@@ -15062,6 +15062,11 @@
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
+    },
+    {
+      "path": "docs/decisions/2026-09-30-gpt-lifecycle-convergence.md",
+      "sha256": "9e1da667c7d93392b509cbbb065808b2f9eadd7accb3f4a4405501dc246ce766",
+      "bytes": 24716
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -30924,6 +30929,156 @@
       "bytes": 5904
     },
     {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/action-upstream.json",
+      "sha256": "898bbb25757d162810c3b4fcd57e174e01c9390c7279dfa77a776a463e2f3af4",
+      "bytes": 9058
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/commands-sanitized.json",
+      "sha256": "80fc000931122a3eba3ab578f185514fb3ee0e32c5e7ff1204e0d5edf512a9a9",
+      "bytes": 6570
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence-first.json.failed",
+      "sha256": "2a0b46b7016a306b5489efec03860b48e884bbe8d0bced652c9dac799fd10cec",
+      "bytes": 15360
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json",
+      "sha256": "dd2ba6e914f9f355883c43ba8d82f24b1a3924c96a43a5886f730ffeb458f2fa",
+      "bytes": 15356
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/dashboard-ci-repair.json",
+      "sha256": "a4048ebad54e87ff6dd1b837de7f6c36eb05db57bd09fc0b51d7ba0593533715",
+      "bytes": 2547
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/hosted-ci-repaired.json",
+      "sha256": "c4bfbcd6dadbcc31259d968e413d7c91b0a6ebd87201d2db80db838f60bfdfff",
+      "bytes": 3692
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/independent-verification.json",
+      "sha256": "5351cef3934d69ac745268f45ec44d8217a2b8de3792e7ae5f6f59e95ba21c69",
+      "bytes": 2967
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/logs-manifest.json",
+      "sha256": "d7467ceca3d66b8f7d3cf879d85d81812fffd2a9deaa1cf6730cce2132e9b8de",
+      "bytes": 6871
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-checks.json",
+      "sha256": "df383ee359a761c82a72a2654d27a78ba922e85c97c658b95ecc22056f070748",
+      "bytes": 916
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-convergence-first.json.failed",
+      "sha256": "ed62352800a5d46526d9de50d3315f38e9369d3c0e81313d1bfef41f41ed7a42",
+      "bytes": 8693
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-convergence.json",
+      "sha256": "861afd1d013367e493259d1b4c46670d350dac97c1cdf7d4be024bf0bf5b9c9c",
+      "bytes": 9799
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-plan.json",
+      "sha256": "c2764f57933981f7a4bd0bfc382595979573ef7df8d6410e5d2f31dcb26d927d",
+      "bytes": 9349
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-verification.json",
+      "sha256": "aebd98252ad841ad4ceef3f78a581811a634b5121779f80c2f8832ae9f7e0ffe",
+      "bytes": 3966
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json",
+      "sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592",
+      "bytes": 14637
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-review.json",
+      "sha256": "0f42cc6c89b005ca9464c7984917c4a2237b6c2bf00a3d71b43f810a9d09eead",
+      "bytes": 4168
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/observer-before-thread-repair.py",
+      "sha256": "bedc306fcd5bc0f7414a6911fee7a661abcf7dd12c8ff415d96cfe54e51b1260",
+      "bytes": 3396
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/peer-completion.json",
+      "sha256": "56c3884d36e797b22ac385e148f37360a24fa904f3c42d273403e29a712db2e0",
+      "bytes": 1896
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/peer-coordination.json",
+      "sha256": "fb82485a6df35215dcadec6348d1b62072432c57063da7e101676380ca4e76bd",
+      "bytes": 2114
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/plan.json",
+      "sha256": "a42b7b6975d1d18873bde5c41b7818bf85100428d5043478e95379e9f1c385c1",
+      "bytes": 4616
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-checks.json",
+      "sha256": "78882a545c28c1dcaed909326e77fc29aec3f9b04caf3629642b5927ef252b0f",
+      "bytes": 2220
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-ci-repair.json",
+      "sha256": "eacae8acbabef9da534e6fd79c08aecc7134cd6b1786e165029ea5d395d389a1",
+      "bytes": 8334
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-secret-gate.json",
+      "sha256": "bf51d465367dbb4cb7b77961d167a2639715d837d051717e55af5358f4164e39",
+      "bytes": 2699
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-workflow-repair.json",
+      "sha256": "808926d5bfe6c8b2fa0b02f3397e9885370be86e664fc1f1ff9beb55a79d1a6f",
+      "bytes": 3057
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/receipt.json",
+      "sha256": "f71de5f2636ba3dc36214500d3c0a11541844716e8a28fc1ae26e75022f0187d",
+      "bytes": 2980
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/record-checks.json",
+      "sha256": "19fd572980e0d5455f5ceb57bdb1957eac9041e7b09fa5d591177ddffc40378e",
+      "bytes": 1167
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/resolution-20261001.json",
+      "sha256": "4bd8154633fda52c3684f9392dc74a5d0b274f74cd1a9d9d9f4f3edb1a2b10cf",
+      "bytes": 10701
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/resolution-coordination.json",
+      "sha256": "2ae7b5466eba009d44910ab2a907c013ee0602783ce3f08edfbc8066e985537a",
+      "bytes": 7971
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/source-sha256-after.json",
+      "sha256": "69d50afa398a6a3da0166c89cc5c23e4f3a752e910436bcef0f35034c5ca1f12",
+      "bytes": 2796
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/source-sha256-before.json",
+      "sha256": "69d50afa398a6a3da0166c89cc5c23e4f3a752e910436bcef0f35034c5ca1f12",
+      "bytes": 2796
+    },
+    {
+      "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/workflow-checks.json",
+      "sha256": "0f8434b1a121a61add07bcc40ff1f4d14f7e5c3bf560111b9f1a7aeee1de495a",
+      "bytes": 2989
+    },
+    {
       "path": "evidence/artifacts/gpt6-family-tiering-20260927/README.md",
       "sha256": "f4b107c50e00ac17131ce5ed89f1dba11e1537e939de1914683319de31a9683b",
       "bytes": 15786
@@ -44724,6 +44879,46 @@
       "bytes": 2139
     },
     {
+      "path": "examples/gpt-native-controls/README.md",
+      "sha256": "2bc1a898bed9149d790d0e9730fddd0555cd8b5ed1f03a7f6b9b5aa0d7460b15",
+      "bytes": 3483
+    },
+    {
+      "path": "examples/gpt-native-controls/native_controls.py",
+      "sha256": "4acd74e5301710eff1bb789d04005695d5ff69607c5b788e6f3e9997aabf701d",
+      "bytes": 17479
+    },
+    {
+      "path": "examples/gpt-native-controls/observe_controls.py",
+      "sha256": "9939b8ffc63c7caf9b75acbefd043ed90cb6f58f7e6e5d09f7284387343e598b",
+      "bytes": 4555
+    },
+    {
+      "path": "examples/gpt-native-github/README.md",
+      "sha256": "998f72dff022c98b56fd66cb15623434a1a9058d64abdcdcdaa9d2d2357de74a",
+      "bytes": 4411
+    },
+    {
+      "path": "examples/gpt-native-github/result.schema.json",
+      "sha256": "bc6204dd86bc1903aec4569ffe31c2a4045b62981f5705a087ff0631495a1fcd",
+      "bytes": 1304
+    },
+    {
+      "path": "examples/gpt-native-github/sources.json",
+      "sha256": "249c0fb905e4d324e214b2d1fbf293f55709328513d1ef865010a9ee3957285f",
+      "bytes": 1842
+    },
+    {
+      "path": "examples/gpt-native-github/task.md",
+      "sha256": "9113f9e39e2611016e491886737b283488f07c85e9595b92b8238c5c7a1958ba",
+      "bytes": 2072
+    },
+    {
+      "path": "examples/gpt-native-github/workflow.yml",
+      "sha256": "6e6bb2ad4b48922c610671679e97d5265c8e42c02aea4467745a80b5dce7a3db",
+      "bytes": 4179
+    },
+    {
       "path": "examples/mcporter.json.example",
       "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
       "bytes": 1589
@@ -45050,8 +45245,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "b111c099bdc4ed82eb6747c043236a413d61e676077a0815dfdc855179f1d50d",
-      "bytes": 18245
+      "sha256": "8b16f280c38408661560f2b97a8a52722371152edca94938af5a2a852649d7d9",
+      "bytes": 18805
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -46914,6 +47109,8 @@
     "evidence/artifacts/memory-stack-20260925/experiment.json",
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
-    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+    "evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json",
+    "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-convergence.json"
   ]
 }
