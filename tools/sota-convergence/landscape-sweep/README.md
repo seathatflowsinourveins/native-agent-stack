@@ -104,7 +104,9 @@ failure receipts. Start it again to bind valid new settings.
 
 The templates tell each role which pinned skills to use (search-first and iterative-retrieval for discovery;
 supply-chain-risk-auditor and fp-check for refutation, which takes evidence before any verdict, plus layer-specific
-skills).
+skills). skill-creator is named too, for Claude Code only: a worker reads how its paired with-skill/without-skill
+benchmark sets up a comparison it names, and never runs it. Codex ships a different skill of that name, and the
+manifest keeps the pinned copy off there.
 Each worker reports the skills it used in `skills_used`, and `returns.json` totals them in `skills_usage`.
 
 `build_args.py` refuses to stage a run when the templates name a skill that `adoption/skills/manifest.json` does not
@@ -450,7 +452,8 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
 - **Templates and schema.** `build_args.py` resolves the modality at build time:
   - A skills run's `discover` and `critic` are `discover_skills` and `critic_skills`.
   - Its `facts` and `fit` end in `modality_skills`, through the `<<MODALITY>>` placeholder.
-  - A repository run fills `<<MODALITY>>` with nothing, so its frozen templates and `prompts_sha256` are unchanged.
+  - A repository run fills `<<MODALITY>>` with nothing, so the modality leaves its frozen templates unchanged. Its
+    `prompts_sha256` moved once, when common's Skills paragraph gained skill-creator after unit F3 (#553) pinned it.
     The tests pin both runs' values.
   - Skills discovery returns `schemas/discover-skills.json`: the identity fields (`skill_ref`, `source_id`,
     `lifecycle_task`, `pin`, `skill_md_sha256`, `license`, `source`), the fit fields (`description_chars`,
@@ -514,7 +517,8 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   - the first location that holds a valid folder named `<name>` decides, so an invalid earlier copy loses to a valid
     later one, and translations under `docs/<lang>/skills/` and agent copies under `.kiro/skills/` never displace
     `skills/<name>`. On 2026-09-30 the location order matched `npx skills@1.7.0 add <repo> --list` exactly on six
-    sources, and all 28 installed skills resolve to their manifest `path`.
+    sources, and all 28 skills the manifest pinned before unit F3 (#553) resolve to their manifest `path` (F3's six
+    re-pins and its skill-creator were not rechecked).
 
   The review records the skill folder's git tree id at the pin as `observed.skill_folder_tree_sha`: the id the CLI's
   lock records as `skillFolderHash` (`src/blob.ts` `getSkillFolderHashFromTree`), checked against the bytes read (the

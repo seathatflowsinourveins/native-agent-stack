@@ -103,8 +103,10 @@ The packaged sweep gains `modality: "skills"`.
     case) and a plain `allow_implicit_invocation: false`.
   - A skill conflicts with the canonical instructions when it writes `CLAUDE.md` or `AGENTS.md` on its own
     initiative. Editing them when asked is the `skills-agent-docs` task's requirement.
-  - A repository run's frozen templates and `prompts_sha256` (`9c34fa72…f14b`) are unchanged. The tests pin both
-    runs' values.
+  - The modality leaves a repository run's frozen templates and `prompts_sha256` (`9c34fa72…f14b`) unchanged.
+    After unit F3 (#553) pinned skill-creator, which the skills templates name for its paired benchmark, common's
+    Skills paragraph names it as well, so both values moved: the repository run's to `b61956f3…726d` and the
+    skills run's to `a76ee858…b460`. The tests pin both runs' values.
 - **Schema.** `schemas/discover-skills.json` is strict. Its `comparison_that_would_overturn` must name skill-creator
   or promptfoo.
 - **Identity.** `sweep.js` merges skill proposals by `skill_ref` and carries it as the row's `repository`. A run
@@ -210,7 +212,8 @@ The packaged sweep gains `modality: "skills"`.
   suite, plus three read-only checks on 2026-09-30:
   - the resolver matched `npx skills@1.7.0 add <repo> --list` exactly on six sources (ECC 294 skills,
     microsoft/skills 13, trailofbits/skills 83, openai/skills 43, mattpocock/skills 37, vercel-labs/agent-browser 1);
-  - all 28 installed skills resolve to their manifest `path`;
+  - all 28 skills the manifest pinned before unit F3 (#553) resolve to their manifest `path` (F3's six re-pins and
+    its skill-creator were not rechecked);
   - `skill_md.mjs` gave the CLI's verdict, recorded name, description and warning for all 2,455 `SKILL.md` files of
     the catalog's 22 GitHub sources at their pins (2,452 taken, 3 skipped), against two oracles: `parseSkillMd` and
     its helpers sliced byte for byte from the published `skills@1.7.0` `dist/cli.mjs` with yaml 2.9.0 and with the

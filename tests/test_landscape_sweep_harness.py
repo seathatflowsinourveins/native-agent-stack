@@ -51,7 +51,10 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # 2026-09-30: the skills modality (docs/decisions/2026-09-30-skills-sweep-modality.md) adds discover_skills,
 # critic_skills and modality_skills to templates.json and ends facts and fit in <<MODALITY>>. build_args.fill_build
 # resolves the modality at build time, so a repository run's frozen templates, and this value, are unchanged.
-PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f25edd07f14b"
+# Later on 2026-09-30, after unit F3 (#553) pinned skill-creator, which the skills templates name for its paired
+# with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
+# Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
+PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -59,7 +62,9 @@ PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f2
 # disable-model-invocation is true/yes/on/1 in any letter case (Claude Code), Codex's allow_implicit_invocation counts
 # only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
 # CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
-PROMPTS_SHA256_SKILLS_CURRENT = "2c2efbaed4d98e80e54311579bd96775c522996dfb87f4fdd971feed3e0263d3"
+# Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
+# 2c2efbaed4d9…63d3.
+PROMPTS_SHA256_SKILLS_CURRENT = "a76ee858fe65b998dc974f8fe9cdac9562bdf14abe6f73dcd7d1778c9f95b460"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"

@@ -12,7 +12,8 @@
     "The manifest's excluded source 'various' (Lark/Feishu, Azure, genmedia and other vendor packs) names no single repository, so it is not a source here.",
     "Microsoft's product-scoped skill repositories (azure-skills, skills-for-fabric, power-platform-skills, skills-for-copilot-studio, Dataverse-skills, win-dev-skills, aspire-skills, agent365-skills and others; gh api search 'skills in:name org:microsoft', 2026-09-30) are off-domain for these tasks; microsoft-skills is Microsoft's general skill repository.",
     "alpacahq-alpaca-skills and vercel-labs-agent-skills serve no task: the paper-trading skills have the model submit orders, which deterministic code owns here, and the React/Vercel skills have no code here (the manifest's excluded reasons).",
-    "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit."
+    "Install counts, registry rank and stars are discovery guides, never evidence of quality or fit.",
+    "The installed lists and open gaps follow adoption/skills/manifest.json as unit F3 (#553) left it on 2026-09-30: skill-creator is pinned and serves skills-skill-lifecycle, resolving-merge-conflicts is retired, every skill is listed on in Claude except the user-invocable-only grill-me and improve-codebase-architecture, and every skill but skill-creator is enabled in Codex. Each layer input carries the installed skills' claude_listing and codex_enabled from the manifest itself (build_inputs.py)."
   ],
   "sources": [
     {"source_id": "addyosmani-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/addyosmani/agent-skills", "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6"},
@@ -46,20 +47,18 @@
       "requirement": "Research first, before acting: survey maintained upstream tools, skills and prior decisions before writing code or adopting a component (the AGENTS.md research-first rule), with staged, bounded retrieval that keeps subagent context small.",
       "installed": ["search-first", "iterative-retrieval"],
       "source_ids": ["affaan-m-ecc", "mattpocock-skills", "bgauryy-octocode", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [
-        "Both installed skills are kept verdict winners listed name-only in Claude, and name-only listings depress proactive invocation (the manifest's trial confound)."
-      ],
+      "open_gaps": [],
       "overturn_when": "A skill-creator paired with-skill/without-skill benchmark (or a promptfoo config) on a frozen set of research-first prompts from this repository's adopt-or-build decisions, in Claude Code and in Codex at equal model and effort, shows a candidate beating the installed skills' pass rate without a higher token or time cost; or an installed skill's upstream is archived, removed, relicensed or changes its invocation flags."
     },
     {
       "layer_id": "skills-skill-lifecycle",
       "lifecycle_task": "skill-lifecycle",
       "requirement": "Run a skill's lifecycle end to end: discover (registry and source search), evaluate (source review at a pinned commit and audits), install (pinned through adoption/skills/manifest.json only), verify (listing and invocation on each host), A/B (a paired with-skill/without-skill comparison) and record (the manifest row and a decision record). Anything a registry search finds must still be pinned in the manifest before install.",
-      "installed": ["find-skills"],
+      "installed": ["find-skills", "skill-creator"],
       "source_ids": ["vercel-labs-skills", "anthropics-skills", "openai-skills", "microsoft-skills", "obra-superpowers", "getsentry-skills", "superagent-ai-skills", "anthropics-claude-code", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "Only discovery is installed, and find-skills is user-invoked only in Claude (listing user-invocable-only) and disabled in Codex (codex_enabled false).",
-        "No pinned skill covers evaluate, verify, A/B or record: the skill-creator paired benchmark exists only as the native copies the manifest excludes as duplicates, and no pinned skill writes or verifies a manifest row."
+        "skill-creator, a trial skill unit F3 (#553) pinned on 2026-09-30, covers authoring, evaluation and the paired with-skill/without-skill A/B in Claude; the manifest keeps it off in Codex (codex_enabled false), whose own .system/skill-creator is a different skill.",
+        "No pinned skill covers verify or record: none checks a skill's listing and invocation on each host, or writes or verifies a manifest row."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on a frozen skill-adoption walk-through (discover, evaluate at a pin, install through the manifest, verify the listing, A/B, record) shows a candidate completing more steps correctly than the current procedure at no higher token or time cost, in Claude Code and in Codex; or the pinned skills CLI changes its find or install behavior."
     },
@@ -81,8 +80,7 @@
       "installed": ["improve-codebase-architecture", "codebase-design"],
       "source_ids": ["mattpocock-skills", "affaan-m-ecc", "microsoft-skills", "addyosmani-agent-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "improve-codebase-architecture is not model-invocable (upstream disable-model-invocation; Claude listing user-invocable-only).",
-        "codebase-design is model-invocable in Claude but disabled in Codex (codex_enabled false)."
+        "improve-codebase-architecture is not model-invocable (upstream disable-model-invocation; Claude listing user-invocable-only)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen refactor prompts over scripts/validate.py and scripts/landscape.py shows a model-invocable candidate producing accepted module and interface proposals more often than the installed pair at no higher token or time cost, in Claude Code and in Codex; or improve-codebase-architecture's upstream drops disable-model-invocation."
     },
@@ -93,7 +91,7 @@
       "installed": ["modern-python", "frontend-design"],
       "source_ids": ["trailofbits-skills", "anthropics-skills", "mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "Both are trial skills (the trial window's review falls after 2026-10-25, the manifest's trial block); frontend-design is disabled in Codex (codex_enabled false)."
+        "Both are trial skills (the trial window's review falls after 2026-10-25, the manifest's trial block)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen Python and HTML change requests from this repository shows a candidate passing more of the repository's own tests and checks than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed."
     },
@@ -104,8 +102,7 @@
       "installed": ["tdd", "property-based-testing"],
       "source_ids": ["mattpocock-skills", "trailofbits-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "anthropics-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "property-based-testing sets effort: low in its frontmatter, which lowers a max-effort worker's turns after it loads (tools/sota-convergence/landscape-sweep/README.md, Model roles).",
-        "property-based-testing is disabled in Codex (codex_enabled false)."
+        "property-based-testing sets effort: low in its frontmatter, which lowers a max-effort worker's turns after it loads (tools/sota-convergence/landscape-sweep/README.md, Model roles)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen test-first tasks and parser/sanitizer property tests shows a candidate producing failing-first tests that catch more seeded defects than the installed skills at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream changes its effort or invocation flags."
     },
@@ -127,7 +124,6 @@
       "installed": ["typesafe-ai", "variant-analysis"],
       "source_ids": ["typesafe-ai-skills", "trailofbits-skills", "getsentry-skills", "mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "variant-analysis is disabled in Codex (codex_enabled false).",
         "Native /code-review and /security-review cover diff review; the excluded mattpocock code-review failed its skills.sh audit (the manifest's excluded reason)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen evidence-review tasks and fixed-defect variant tasks with known answers shows a candidate finding more true issues with fewer false ones than the installed skills at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed."
@@ -139,8 +135,7 @@
       "installed": ["security-best-practices", "security-threat-model", "semgrep", "codeql", "supply-chain-risk-auditor", "agentic-actions-auditor", "sarif-parsing", "fp-check", "security-audit"],
       "source_ids": ["openai-skills", "trailofbits-skills", "cloudflare-security-audit-skill", "semgrep-skills", "superagent-ai-skills", "getsentry-skills", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "security-audit's stage-only use is a usage policy that no setting enforces, and its M5c bake-off against /security-review decides its promotion (the manifest's security-audit row).",
-        "Seven of the nine are disabled in Codex (codex_enabled false); only security-best-practices and security-threat-model are enabled there.",
+        "security-audit is listed in Claude and enabled in Codex since 2026-09-30 (unit F3, #553), so the model may load it on an ordinary security question, where it is guidance only unless a prompt asks for the full audit; its M5c bake-off against /security-review decides its promotion (the manifest's security-audit row).",
         "Stale source: replacement via this sweep. security-best-practices and security-threat-model come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen security-review tasks with known true and false positives shows a candidate with higher precision and recall than the installed skill it would replace at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed, relicensed or fails a later audit."
@@ -149,10 +144,10 @@
       "layer_id": "skills-ci-pr",
       "lifecycle_task": "ci-pr",
       "requirement": "CI and pull-request work: triage failing GitHub Actions checks across this repository's workflows and required checks, address PR review threads (the main ruleset requires their resolution), and resolve rebase conflicts on hot files (manifests/evidence.json, the docs/lanes.md hot-file protocol).",
-      "installed": ["gh-fix-ci", "gh-address-comments", "resolving-merge-conflicts"],
+      "installed": ["gh-fix-ci", "gh-address-comments"],
       "source_ids": ["openai-skills", "mattpocock-skills", "getsentry-skills", "obra-superpowers", "addyosmani-agent-skills", "trailofbits-skills", "superagent-ai-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "resolving-merge-conflicts is disabled in Codex (codex_enabled false).",
+        "No installed skill resolves rebase conflicts: resolving-merge-conflicts was retired by unit F3 (#553) on 2026-09-30, after upstream removed it in daa01d8 (the manifest's excluded entry).",
         "Stale source: replacement via this sweep. gh-fix-ci and gh-address-comments come from openai/skills, which has had no main commit since 2026-06-24 (the openai-skills source's maintenance record)."
       ],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-check, review-thread and rebase-conflict tasks shows a candidate resolving more of them correctly than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed."
@@ -160,7 +155,7 @@
     {
       "layer_id": "skills-agent-docs",
       "lifecycle_task": "agent-docs",
-      "requirement": "Maintain the agent instruction files (AGENTS.md, CLAUDE.md), which load into every Claude and Codex session and every worker that keeps project instructions: context load, a single source of truth and pruning of dated chronology. Skill authoring stays with skill-creator's native copies.",
+      "requirement": "Maintain the agent instruction files (AGENTS.md, CLAUDE.md), which load into every Claude and Codex session and every worker that keeps project instructions: context load, a single source of truth and pruning of dated chronology. Skill authoring stays with skill-creator (skills-skill-lifecycle).",
       "installed": ["writing-for-agents"],
       "source_ids": ["mattpocock-skills", "getsentry-skills", "anthropics-claude-code", "addyosmani-agent-skills", "microsoft-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
@@ -174,9 +169,7 @@
       "requirement": "Browser acceptance through the pinned agent-browser CLI (adoption/pins-*.json), with a skill that documents its commands for the pinned CLI version.",
       "installed": ["agent-browser"],
       "source_ids": ["vercel-labs-agent-browser", "microsoft-playwright-cli", "openai-skills", "anthropics-skills", "addyosmani-agent-skills", "affaan-m-ecc", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [
-        "agent-browser's 925-character description is listed name-only in Claude, and the skill is disabled in Codex (codex_enabled false)."
-      ],
+      "open_gaps": [],
       "overturn_when": "agent-browser fails a browser acceptance task that a candidate passes, measured with a skill-creator paired benchmark (or a promptfoo config) on frozen browser acceptance tasks against the pinned CLI, in Claude Code and in Codex; or the pinned agent-browser CLI stops shipping the skill."
     },
     {
@@ -185,9 +178,7 @@
       "requirement": "Build or fix the MCP servers the stack wires (adoption/mcp and the files that reference MCP servers) with a written procedure.",
       "installed": ["mcp-builder"],
       "source_ids": ["anthropics-skills", "microsoft-skills", "affaan-m-ecc", "anthropics-claude-code", "huggingface-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
-      "open_gaps": [
-        "mcp-builder is disabled in Codex (codex_enabled false)."
-      ],
+      "open_gaps": [],
       "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen MCP server build and fix tasks shows a candidate producing servers that pass their own tests and connect in Claude Code and Codex more often than mcp-builder at no higher token or time cost, in Claude Code and in Codex; or mcp-builder's upstream is archived, removed or relicensed."
     }
   ]

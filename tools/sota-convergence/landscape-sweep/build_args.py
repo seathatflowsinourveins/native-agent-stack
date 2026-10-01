@@ -71,11 +71,13 @@ SKILLS_MANIFEST = "adoption/skills/manifest.json"
 # Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". Every
 # template reaches a worker (the skills modality's discover_skills, critic_skills and modality_skills too), so
 # skills_problems scans them all: a pinned skill named in any template must be listed here and in that paragraph. A
-# test keeps this list, the paragraph and the pinned skills manifest in step.
+# test keeps this list, the paragraph and the pinned skills manifest in step. skill-creator joined on 2026-09-30 when
+# unit F3 (#553) pinned it: the skills templates name its paired with-skill/without-skill benchmark as the comparison
+# that would overturn a skills-* verdict, and the manifest keeps it off in Codex (codex_enabled false).
 TEMPLATE_SKILLS = ("search-first", "iterative-retrieval",
                    "supply-chain-risk-auditor", "fp-check", "agentic-actions-auditor", "security-threat-model",
                    "codeql", "semgrep", "sarif-parsing", "property-based-testing", "mcp-builder", "modern-python",
-                   "agent-browser")
+                   "agent-browser", "skill-creator")
 USABLE_SKILL_STATUS = ("kept", "trial")
 PROBE_PROMPT = ("Use web search. What is the latest release tag of https://github.com/ggml-org/llama.cpp and roughly "
                 "how many GitHub stars does it have? Answer only in the required JSON.")

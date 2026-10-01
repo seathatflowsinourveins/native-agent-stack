@@ -135,6 +135,34 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(sorted(served), sorted(skill["name"] for skill in self.manifest["skills"]))
         self.assertEqual(len(served), len(set(served)))
 
+    def test_open_gaps_state_the_pinned_codex_and_claude_flags(self):
+        # Each layer input carries the installed skills' codex_enabled and claude_listing from the manifest beside the
+        # task's open gaps (build_inputs.py), so a gap that states one of those flags names the skills it is about and
+        # agrees with the manifest. Unit F3 (#553) changed both flags for many skills on 2026-09-30 and left gaps here
+        # saying "disabled in Codex (codex_enabled false)" of skills it had enabled.
+        pinned = {skill["name"]: skill for skill in self.manifest["skills"]}
+        claims = {"codex_enabled": (r"codex_enabled false|disabled in Codex",
+                                    lambda skill: skill["codex_enabled"] is False),
+                  "claude_listing": (r"name-only|user-invocable-only|user-invoked only",
+                                     lambda skill: skill["claude_listing"] != "on")}
+        stated = {field: 0 for field in claims}
+        for task in self.catalog["tasks"]:
+            for gap in task["open_gaps"]:
+                named = build_args.skill_mentions(gap, pinned)
+                for field, (pattern, holds) in claims.items():
+                    if not re.search(pattern, gap):
+                        continue
+                    stated[field] += 1
+                    with self.subTest(layer=task["layer_id"], field=field, gap=gap[:80]):
+                        self.assertTrue(named, f"names no pinned skill: {gap}")
+                        for name in named:
+                            self.assertTrue(holds(pinned[name]),
+                                            f"{name} {field} is {pinned[name][field]!r} in the manifest: {gap}")
+        # Both kinds are stated today (skill-creator off in Codex; the user-invocable-only listings of grill-me and
+        # improve-codebase-architecture), so the patterns still match the catalog's wording.
+        self.assertEqual({field: count > 0 for field, count in stated.items()},
+                         {"codex_enabled": True, "claude_listing": True})
+
     def test_tasks_that_need_model_invocation_say_so(self):
         tasks = {task["lifecycle_task"]: task for task in self.catalog["tasks"]}
         for name in ("design-intake", "architecture"):
@@ -398,12 +426,14 @@ class SkillsInputTests(unittest.TestCase):
             self.assertIsInstance(entry["skills"], str, entry["source"])
             for name in entry["skills"].split(","):
                 self.assertIn(name.strip(), known["excluded"][entry["source"]], entry["source"])
-        # Each installed skill's gap passes whole: security-audit's is over 1,000 characters.
+        # Each installed skill's gap passes whole. security-audit's (930 characters in the manifest unit F3 (#553)
+        # left on 2026-09-30, over 1,000 before) is longer than the 300 and 600 characters that a repository layer's
+        # open gaps and overturn condition keep (build_inputs.py), so the equality shows that nothing was cut.
         security = json.loads((work / "inputs/skills-security.json").read_text(encoding="utf-8"))
         pinned = {skill["name"]: skill["gap"] for skill in manifest["skills"]}
         gaps = {skill["name"]: skill["gap"] for skill in security["installed"]}
         self.assertEqual(gaps, {name: pinned[name] for name in gaps})
-        self.assertGreater(len(gaps["security-audit"]), 1000)
+        self.assertGreater(len(gaps["security-audit"]), 600)
 
 
 # --------------------------------------------------------------------------- each modality's own history
