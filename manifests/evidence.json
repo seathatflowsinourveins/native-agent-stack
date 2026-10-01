@@ -35245,6 +35245,11 @@
       "bytes": 6169
     },
     {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/secret-scanner-native-comparison.json",
+      "sha256": "e747eaf9c1548df0ce16633aab81cfaecbe99cc2cecd57656cfc0cdce657ed35",
+      "bytes": 29747
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/secrets-credentials.json",
       "sha256": "6cfb40b01a94fd0c031a835571cf2f61de9042c12e91323ea5d4b31df1ce87ec",
       "bytes": 3382
@@ -35288,6 +35293,11 @@
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
       "sha256": "bc21293ecf183822914650693babe11cb247003ce90c5dfb6f05c6013d884af7",
       "bytes": 5736
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
+      "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
+      "bytes": 8224
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
