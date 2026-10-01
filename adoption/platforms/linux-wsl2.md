@@ -71,11 +71,13 @@ Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
-WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure." Do not bump this pin on a new WSL host
-without first re-testing 0.29.0 (or any newer release) startup on that host's
+WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
+host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
+failed real startup with unavailable UVA support. Preserve the accepted
+environment and model/vector data; repeating installation until the version
+number is newer would not resolve such a compatibility failure, so a new
+version is qualified on an owned instance first." Do not bump this pin on a new
+WSL host without first re-testing any newer release's startup on that host's
 actual GPU/driver combination; a newer upstream version number is not by
 itself evidence the WSL UVA gap closed.
 
