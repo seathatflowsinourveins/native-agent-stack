@@ -1106,7 +1106,7 @@ class EvidenceFileTests(unittest.TestCase):
             later.write_text(json.dumps({"http": [{"kind": "read", "headers": {"x-ratelimit-limit": "200",
                                                                                "x-ratelimit-remaining": "1"}}]}))
             files, totals, _ = evidence.observations(root)
-        self.assertEqual(totals, {"data:10000": 14, "trading:200": 705})
+        self.assertEqual(totals, {"data:10000": 16, "trading:200": 1693})
         self.assertNotIn(later.relative_to(root).as_posix(), [f["path"] for f in files])
 
 

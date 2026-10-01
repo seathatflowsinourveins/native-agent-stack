@@ -35,6 +35,8 @@ DATED_TRIAL_FILES = (
     "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/preflight.json",
     "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/paper-output.json",
     "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/recover-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/mover-paper.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/mover-paper.json",
 )
 UNATTRIBUTED = ("blueprints/us-equities/broad-universe/receipt.json",
                 "blueprints/us-equities/broad-universe/watchlist-20260921.json")
