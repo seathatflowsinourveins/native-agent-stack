@@ -3779,6 +3779,37 @@
         "Commit identity: the re-check reviewed commit 58dde8ef. Its history was then rewritten so a helper-name tuple no longer reads as a gitleaks generic-api-key match (one test line reordered in four commits), rebased onto main after K3 merged (5597f9fa), and extended by four test-only commits (runner test values drawn from letters outside the hex alphabet, fixing a chance-match flake; the timing criterion and host-scaled bound above); the guard bytes stayed d4d4bef2\u2026 through those steps and changed only with the two review-thread fixes."
       ],
       "path": "evidence/receipts/guard-k4-verification-20261001.json"
+    },
+    {
+      "id": "harbor-e2e-token-tools-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "serena",
+        "jcodemunch-mcp",
+        "headroom"
+      ],
+      "claim": "On an upstream harness (Harbor v0.23.0, built-in claude_code agent), 288 trials on 36 SWE-bench Verified tasks established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does. On the catalog protocol's own metric (complete provider tokens, paired on the tasks both arms solved) headroom used 13% fewer tokens (ratio 0.867, interval 0.775 to 0.971) without an established cost reduction, rtk is inconclusive (0.955, 0.847 to 1.078), context-mode used 18% and jcodemunch 41% more. No trial in the run spawned a subagent.",
+      "limitations": [
+        "short single-session tasks, one repetition per arm and task, Sonnet 5.5 at medium effort: not the host default (Opus at max) and not the multi-agent regime",
+        "arm wrappers and the analysis script are local integration code, labelled as such in the preregistration; the harness itself is upstream",
+        "the cost metric is a list-price estimate, not a bill and not the plan meter",
+        "context-mode and the full stack used their MCP tools in 0 of 36 and 1 of 36 trials, so their rows mostly price the presence of the tools",
+        "the shared prompt cache was neither controlled nor recorded per trial: the arm order is randomized and blocked by task and every arm's usage categories are recorded, but a cache effect on cost cannot be excluded, and the A/A control bounds the cross-phase difference only",
+        "the preregistration freeze is a local record (FREEZE.md and FREEZE.sha256, with the inputs re-hashed today), not an externally timestamped commit; the hash line at the end of PREREGISTRATION.md still holds its placeholder, the freeze hashes are in FREEZE.sha256",
+        "the resolve-rate non-inferiority result is method-sensitive on 36 tasks: headroom's preregistered lower bound is 0.017 above the margin with 2 discordant pairs, and rtk and context-mode meet the margin only under a one-sided bound",
+        "the zero-subagent scan reads the delegation tool and parent links in 308 stream logs and 308 client transcripts; its live positive control was captured at client 2.1.286 while the trials ran 2.1.285",
+        "the catalog protocol's token metric covers four of its five arms (no Repomix outline arm) and is a raw token count, not cost-weighted"
+      ],
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "host_scope": {
+        "profile": "source-host-linux-wsl",
+        "platform": "Linux/WSL",
+        "identity": "Private source-host identity omitted",
+        "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      }
     }
   ],
   "files": [
@@ -44992,6 +45023,11 @@
       "path": "evidence/receipts/guard-k4-verification-20261001.json",
       "sha256": "d852600e72600adf422c8ebd9e7a7dde0c36c39249c8002c8caa10ee701fb9d2",
       "bytes": 11220
+    },
+    {
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6",
+      "bytes": 44466
     },
     {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
