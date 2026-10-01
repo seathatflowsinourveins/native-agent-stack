@@ -401,7 +401,7 @@
       "kind": "gate",
       "id": "sdk-pair-candidate-01593-20261001",
       "title": "SDK and bundled CLI 0.159.3 pair qualification",
-      "state": "paired installation and protocol passed / native-account marker completed with native usage / active qualification moved with inventory, hash and model guards intact / 209-test module run passed with 32 skips / gateway HTTP 429 separately held, cause unknown",
+      "state": "paired protocol and native marker passed / qualified inventory and model guards intact / 209-test run passed (32 skips) / gateway HTTP 429 held - cause unknown",
       "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
     }
   ],
