@@ -29,12 +29,18 @@ import install_claude_profile as icp  # noqa: E402
 # The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
 # repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
 CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
+# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
+                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
 USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
 # A server the carrier names that the user-scope template leaves out, with a file and the phrase in it that keeps it
 # out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md; its
-# user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex.
+# user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
+# accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
+# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph).
 CARRIER_EXCEPTIONS = {
     "jcodemunch": ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)"),
 }
@@ -48,6 +54,12 @@ def carrier_servers(text: str) -> set[str]:
     """Server names of the mcp__<server>__<tool> ids a text names. A plugin's server (mcp__plugin_<plugin>_<server>__)
     comes with its plugin, not from a user-scope registration, so it is left out."""
     return {name for name in TOOL_ID.findall(text) if not name.startswith("plugin_")}
+
+
+def carrier_blocks_text(directory: Path) -> str:
+    """The text of every token-lanes-block*.md carrier block in `directory`, in name order: the union is what the
+    SubagentStart hook can hand a subagent, whichever role block it picks."""
+    return "\n".join(path.read_text(encoding="utf-8") for path in sorted(directory.glob("token-lanes-block*.md")))
 
 
 def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions: dict, read) -> list[str]:
@@ -1082,8 +1094,11 @@ class McpTemplateShapeTests(unittest.TestCase):
 
 
 class McpCarrierCoverageTests(unittest.TestCase):
-    """Every server the SubagentStart carrier names is registered at user scope, or is an exception whose reason is
-    still written in the file it cites. Structural validation of repository files; no client runs."""
+    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
+    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    written in the file each cites. Structural validation of repository files; no client runs."""
+
+    BLOCKS = ROOT / "adoption" / "hooks" / "claude"
 
     @staticmethod
     def read(path: str) -> str | None:
@@ -1091,18 +1106,40 @@ class McpCarrierCoverageTests(unittest.TestCase):
         return target.read_text(encoding="utf-8") if target.is_file() else None
 
     def test_the_carrier_names_the_lane_servers(self):
-        # Control for the parser: the carrier's own ids, context-mode's plugin server left out.
-        self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")),
-                         {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"})
+        # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
+        # name a subset of the general block's servers today, so the union is the general block's set.
+        self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
+                         sorted(CARRIER_BLOCK_NAMES))
+        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
+        self.assertEqual(carrier_servers(carrier_blocks_text(self.BLOCKS)), lanes)
+        self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")), lanes)
         self.assertEqual(carrier_servers("mcp__plugin_context-mode_context-mode__ctx_execute, mcp__qmd__get"), {"qmd"})
 
     def test_every_carrier_server_is_registered_or_a_sourced_exception(self):
         registered = set(template_server_names())
-        self.assertEqual(carrier_coverage_errors(CARRIER.read_text(encoding="utf-8"), registered,
-                                                 CARRIER_EXCEPTIONS, self.read), [])
+        carrier = carrier_blocks_text(self.BLOCKS)
+        self.assertEqual(carrier_coverage_errors(carrier, registered, CARRIER_EXCEPTIONS, self.read), [])
+        # Exactly: no server the carrier blocks do not name.
+        self.assertEqual(registered, carrier_servers(carrier) - set(CARRIER_EXCEPTIONS))
+
+    def test_a_server_named_only_by_a_role_block_is_caught(self):
+        # Control for reading every block: a server that only a role block names is invisible to the general block
+        # alone and is reported from the union.
+        with tempfile.TemporaryDirectory() as tmp:
+            blocks = Path(tmp)
+            for name in CARRIER_BLOCK_NAMES:
+                shutil.copyfile(self.BLOCKS / name, blocks / name)
+            reviewer = blocks / "token-lanes-block.reviewer.md"
+            reviewer.write_text(reviewer.read_text(encoding="utf-8") + "\nmcp__newserver__tool\n", encoding="utf-8")
+            registered = set(template_server_names())
+            self.assertEqual(carrier_coverage_errors((blocks / "token-lanes-block.md").read_text(encoding="utf-8"),
+                                                     registered, CARRIER_EXCEPTIONS, self.read), [])
+            self.assertEqual(carrier_coverage_errors(carrier_blocks_text(blocks), registered, CARRIER_EXCEPTIONS,
+                                                     self.read),
+                             ["newserver: named by the carrier, not registered at user scope and not an exception"])
 
     def test_the_check_rejects_a_gap_a_stale_exception_and_a_redundant_one(self):
-        carrier = CARRIER.read_text(encoding="utf-8")
+        carrier = carrier_blocks_text(self.BLOCKS)
         registered = set(template_server_names())
         cases = {
             "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),

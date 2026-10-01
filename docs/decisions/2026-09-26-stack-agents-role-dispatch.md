@@ -393,7 +393,8 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
    to every parent in every arm, and `tools/token-e2e/freeze_snapshot.py:108,1244` counts every role file other than
    the two carriers.
 3. **Claude user-scope MCP.** `adoption/mcp/claude-user.json` adds `socraticode`, `headroom`, `codebase-memory` and
-   `qmd`, so it registers every server the carrier names except `jcodemunch` and context-mode, whose plugin supplies
+   `qmd`, so it registers exactly the servers the carrier blocks name (all six `adoption/hooks/claude/token-lanes-block*.md`,
+   whose union is the general block's seven servers) except `jcodemunch` and context-mode, whose plugin supplies
    it. Each entry runs its Codex template entry's command, arguments and environment, except serena's `claude-code`
    context, SocratiCode's npm bin link (the Claude installer renders only `${HOME}` and `${ECO_ROOT}`, never the Codex
    template's per-platform `${SOCRATICODE_VERSION}`) and the Codex-only `PATH` and `RTK_TELEMETRY_DISABLED`.
