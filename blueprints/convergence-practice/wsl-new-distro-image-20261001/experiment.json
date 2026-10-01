@@ -24,17 +24,34 @@
     {
       "url": "https://github.com/ubuntu/wsl-setup",
       "revision": "86a561d5149a9d76ec3c9b3ce2745e7ebca5f2ad"
+    },
+    {
+      "url": "https://git.launchpad.net/ubuntu/+source/wsl-setup",
+      "revision": "74bfc89113bc7d46a4d9feb1e69cd6951fbc6908"
+    },
+    {
+      "url": "https://releases.ubuntu.com/24.04.5/SHA256SUMS",
+      "revision": "728064ecf411f4ab702d9c3ca0a938ce672771424c028a1b52b2449f7eb5a068"
+    },
+    {
+      "url": "https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg",
+      "revision": "f9be4b4a527b63f14dde0387edcb7a02ba3ac43d537b1674a5aeae19c6f23827"
+    },
+    {
+      "url": "https://github.com/microsoft/WSL/pull/40977",
+      "revision": "70f6890c83bb5e56b8ea17abdbb834b55e92dc80"
     }
   ],
   "discovery_provenance": [
     "Research unit W2 of the 2026-10-01 definitive-WSL wave, decided by coordinator session native-agent-stack-c5. The unit wrote the recipe, the templates and the test, and re-read its sources the same day. A follow-up unit added F11 and the F5 range rule. docs/decisions/2026-10-01-new-wsl-distro-recipe.md lists every source with what was read; its Sources section says they are cited as the research unit reported them.",
     "Pinned reads reported by the research unit: the 24.04.5 image streamed and hashed against Canonical's SHA256SUMS and DistributionInfo.json at 8bc98bc3; resolute SHA256SUMS of 2026-08-27 for the 26.04.1 image (sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104), which DistributionInfo.json maps to WSL's default Ubuntu; cloud-init at tag 26.1, microsoft/WSL at tag 2.7.13 and ubuntu/wsl-setup at 86a561d5 for the first-run and provisioning behaviour.",
-    "Review-repair unit of 2026-10-01, after the cross-family review of PR #569 asked for this record. It read Microsoft Learn's Basic commands for WSL (ms.date 2025-12-01) and Canonical's cloud-init on WSL page (last updated 2026-09-28) through Context Mode for W6's export before --unregister. It added the export, made the receipt example carry every recipe command, and wrote this record."
+    "Review-repair unit of 2026-10-01, after the cross-family review of PR #569 asked for this record. It read Microsoft Learn's Basic commands for WSL (ms.date 2025-12-01) and Canonical's cloud-init on WSL page (last updated 2026-09-28) through Context Mode for W6's export before --unregister. It added the export, made the receipt example carry every recipe command, and wrote this record.",
+    "Second follow-up of 2026-10-01, on the coordinator's brief: a completeness critic (11 findings) and a researcher's packet (eight answers with sources and file:line) preceded it. The unit added R1 (a rehearsal on a throwaway name), P1 to P3 (signed checksums with gpgv, cloud-init schema -c on the render, the kernel journal's hv_storvsc count), W5's cloud-init schema --system, W7 (one terminate and a file-ownership probe for microsoft/WSL#40941) and F2's idle observation; corrected three facts (WSL 3.0.1 does change the first launch; the online wsl --install checks the catalog's hash while --from-file checks none; W5's console lines come from the image's wsl-setup at Launchpad 74bfc891); and ran P1 to P3's commands in the workstation distribution as artifact checks."
   ],
   "license_and_compatibility": "License is not a selection criterion here and was not assessed. Compatibility, as the research unit read it: wsl --install --from-file needs WSL 2.4.4 or later (Microsoft), 2.4.8 (Ubuntu's announcement) or 2.4.10 (Ubuntu's install guide), and the host's wsl.exe --version printed 2.7.13. The bootstrap covers the 24.04 image's python3 3.12; 26.04.1 brings python3 3.14, uutils coreutils and sudo-rs, which no repository evidence covers yet.",
   "baseline_and_candidate": {
     "baseline": "Not selected: WSL's default, wsl --install of the catalog's Ubuntu, which DistributionInfo.json at 8bc98bc3 maps to Ubuntu 26.04.1 LTS, with the interactive first launch whose prompt needs a person. Its image is the queued bounded comparison (status: queued, not run). The decision record's Alternatives 2 keeps the interactive first launch and the in-place repair as alternatives not chosen.",
-    "candidate": "Selected by source review: Canonical's ubuntu-24.04.5-wsl-amd64.wsl (sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e), checked against both publications before install, installed with wsl --install --from-file ... --no-launch and given its default user by cloud-init on the first launch (path A). Path B is the fallback (status: documented, not run): W6 exports the failed attempt, then runs --unregister, wsl --import and a manual user."
+    "candidate": "Selected by source review: Canonical's ubuntu-24.04.5-wsl-amd64.wsl (sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e), its SHA256SUMS verified against Canonical's signature (P1) and the hash checked against both publications before install, installed with wsl --install --from-file ... --no-launch and given its default user by cloud-init on the first launch (path A), after a rehearsal on a throwaway name (R1). Path B is the fallback (status: documented, not run): W6 exports the failed attempt, then runs --unregister, wsl --import and a manual user."
   },
   "frozen_inputs": {
     "base_revision": "b72c588f17a66ba4090c23e4ceac4f7e2c667bb4",
@@ -47,7 +64,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "c8cfc6fa729c7a7a50088dff44d3e7811c8a3e6032a6bdbd2c3d99acfb3cfc85"
+        "sha256": "c33f213cdc03a22dcf5eacc9281a1e08488d2f33cee9b1e3eca73343392204eb"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -63,21 +80,21 @@
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "f2ebea4cc1007e8467f798d9305b65491037c9c88b29e87714ca3a567ce47f42"
+        "sha256": "563a677ff118f3fbfc0e5d8191ead1d23fdf52138462b131f4bb03755fd3275f"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "3895a45f2b0fcaa2d440af0722b8c6ae1b5d63fe44f52ecf8ef0bb44cb3b7622"
+        "sha256": "ecece728fbf4436bd4b5161640121678af9350069be9293ef57484e0e335606b"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "5766a6519b153a23837b89c161aca0c20050547ae4adb35ff32f790bfa2d94a2"
+        "sha256": "b09f3dd4aa3aa5796395342ef80da3facab5fcdb59bcdd30123b216e093ac2cb"
       }
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "The selection qualifies within scope only when one Windows host runs stage 1 and first boot from the pinned recipe and every proof holds: W1 to W5 on path A, or W6 on path B after the export, then F1 to F11. That run is recorded as a sanitized stage-1 receipt in the shape of the pinned receipt example, with every recipe command's exit code and output. The image switches to 26.04.1 only when its bounded comparison passes the same recipe and stage 2 (the decision record's overturn condition 1).",
-    "usage_rule": "No usage claim. The research unit's model usage (tokens, attempts and retries) was not recorded and stays unknown; this record neither estimates it nor counts it as zero. A host run executes deterministic commands; the session that runs them records its own provider usage separately. No whole-task savings claim."
+    "quality_rule": "The selection qualifies within scope only when one Windows host first passes the rehearsal of R1 on a throwaway name through F3 and removes it, and then runs stage 1 and first boot from the pinned recipe with every proof holding: P1 to P3 (a zero hv_storvsc count among them), W1 to W5 on path A, or W6 on path B after the export, then W7 with 1000:1000, then F1 to F11. That run is recorded as a sanitized stage-1 receipt in the shape of the pinned receipt example, with every recipe command's exit code and output and the rehearsal's observations. The image switches to 26.04.1 only when its bounded comparison passes the same recipe and stage 2 (the decision record's overturn condition 1).",
+    "usage_rule": "No usage claim. The research unit's model usage (tokens, attempts and retries) was not recorded and stays unknown; this record neither estimates it nor counts it as zero. The second follow-up's two research passes, as the coordinator's brief reports them: the completeness critic made about 44 HTTP requests to 37 distinct URLs against a budget of about 25, its token usage not recorded here; the researcher used 284,098 tokens and 70 tool uses and made about 85 HTTP requests against a budget of about 35. The scope of that token counter is not stated here, and nothing is summed or compared. A host run executes deterministic commands; the session that runs them records its own provider usage separately. No whole-task savings claim."
   },
   "runtime_and_platform": {
     "platform": "Planned target, not run: the existing Windows host with WSL 2.7.13 (the research unit's wsl.exe --version read) and a second WSL 2 distribution, <Name>, beside the workstation's.",
@@ -92,14 +109,20 @@
       },
       {
         "name": "cloud-init",
-        "version": "source read at tag 26.1 (8bf3567532b07e2cc15aa4c76c36ebed65ccfaec); the image's packaged version is not recorded here"
+        "version": "source read at tag 26.1 (8bf3567532b07e2cc15aa4c76c36ebed65ccfaec); the image's packaged version is not recorded here; the workstation distribution's 26.1-0ubuntu1~24.04.1 ran P2's schema check as an artifact check on 2026-10-01"
+      },
+      {
+        "name": "gpgv",
+        "version": "2.4.4-2ubuntu17.6 with ubuntu-keyring 2023.11.28.1 in the workstation distribution, for P1's artifact check on 2026-10-01"
       }
     ],
-    "isolation": "Nothing ran. For a host run, the recipe's host-wide rules apply: commands act on <Name> only; no .wslconfig change, no wsl --update and never wsl --shutdown; the only stop is wsl --terminate <Name>; the default distribution stays the workstation's; and W6 exports the failed attempt before any --unregister. WSL 2 distributions share the global .wslconfig and one network namespace, so the new distribution is not isolated from the workstation's."
+    "isolation": "No stage-1 command ran. For a host run, the recipe's host-wide rules apply: commands act on <Name> only, and the rehearsal's R1 terminates and unregisters only its own throwaway name; no .wslconfig change (W1 only reads two keys with Select-String), no wsl --update and never wsl --shutdown; the only stop is wsl --terminate <Name>; the default distribution stays the workstation's; and W6 exports the failed attempt before any --unregister. WSL 2 distributions share the global .wslconfig, one kernel and one network namespace, so the new distribution is not isolated from the workstation's; P1 to P3 run in the workstation distribution and write only into new temporary directories."
   },
   "commands": [
-    "Stage 1, W1 to W6: the PowerShell blocks of adoption/platforms/linux-wsl2-new-distro.md on the Windows host, each run as a .ps1 file inside Start-Transcript; W6 only after the W5 markers.",
-    "First boot, F1 to F11: the sh blocks of the same page inside <Name> as <WSL_USER>; F11 in a login shell after stage 2 (F9) and F10.",
+    "Rehearsal first, R1: the whole page on a throwaway name through F3, then R1's PowerShell block removes that name (its second block exports a failed rehearsal before --unregister).",
+    "Pre-checks, P1 to P3: the sh blocks of adoption/platforms/linux-wsl2-new-distro.md in the workstation distribution, before W1.",
+    "Stage 1, W1 to W7: the PowerShell blocks of the same page on the Windows host, each run as a .ps1 file inside Start-Transcript; W6 only after the W5 markers; W7 on both paths.",
+    "First boot, F1 to F11: the sh blocks of the same page inside <Name> as <WSL_USER>; F2's idle observation and F10 from the Windows side; F11 in a login shell after stage 2 (F9) and F10.",
     "python3 -m unittest tests.test_wsl_new_distro_recipe (a local consistency check of the recipe, the decision record, the templates and the receipt example; not a host run)",
     "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
   ],
@@ -111,15 +134,16 @@
     "The research unit read the sources, and the decision record cites them as it reported them. The review-repair unit re-read only Microsoft's Basic commands page and Canonical's cloud-init page on 2026-10-01; neither documents an in-place repair of a failed provisioning.",
     "Usage unknown: the research unit's model and token usage was not recorded.",
     "A new distribution on the existing WSL kernel and Windows installation is not a new physical machine, and it inherits the host-wide WSL settings.",
-    "The checker verifies declared consistency, not truth. The pinned test checks repository text and an in-memory template render; a pass is not a host run."
+    "The checker verifies declared consistency, not truth. The pinned test checks repository text and an in-memory template render; a pass is not a host run.",
+    "P1 to P3's commands ran on 2026-10-01 only as artifact checks in the workstation distribution, not as a run of the recipe: P1's signature and P2's schema passed with their negative controls failing as expected, and P3 counted 21 hv_storvsc lines (one burst of 14 distinct WRITE_10 errors about seven days earlier) in the current boot's kernel journal. By the recipe's rule P3 therefore stops stage 1 on this host until the user decides; nothing in stage 1 has run, the rehearsal included."
   ],
   "decision_and_scope": {
     "decision": "trial",
     "scope": "Ubuntu 24.04.5 from Canonical's .wsl file, path A (cloud-init) with path B as the fallback, for a second WSL 2 distribution beside the workstation's on the existing Windows host. Selected by source review; not a completed adoption until a host run and the queued comparison.",
     "qualification_run_ids": []
   },
-  "rollback": "Nothing on a host changed for this record. A host run that stops before W4 installs nothing. After W4, W6 keeps the failed attempt as an export, and wsl --unregister on the literal <Name> removes the new distribution; the workstation's distribution, the default and .wslconfig are never touched. Reverting the recipe's commits removes the documentation.",
-  "next_decision_changing_test": "Run stage 1 and first boot on one Windows host with the pinned recipe, and record the sanitized stage-1 receipt (path A, or path B with the export of the failed attempt). Then run the queued bounded comparison of Ubuntu 26.04.1 through the same recipe and stage 2: the bootstrap under python3 3.14, uutils coreutils and sudo-rs. A passing first run makes 24.04.5 with path A adoptable within that host's scope; a passing comparison switches the image (the decision record's overturn condition 1).",
+  "rollback": "Nothing on a host changed for this record. A host run that stops before W4 installs nothing. After W4, W6 keeps the failed attempt as an export, and wsl --unregister on the literal <Name> removes the new distribution; R1 removes the rehearsal's throwaway name the same way, after an export when the rehearsal failed. The workstation's distribution, the default and .wslconfig are never touched. Reverting the recipe's commits removes the documentation.",
+  "next_decision_changing_test": "First the rehearsal: once the user has decided on P3's nonzero count on this host, run the pinned recipe on a throwaway name through F3 (P1 to P3, W1 to W7, F1 to F3), record W5's cloud-init schema --system, W7's ownership probe and F2's idle observation in the receipt's rehearsal block, and remove that name with R1. Then run stage 1 and first boot on the same Windows host for the real <Name>, and record the sanitized stage-1 receipt (path A, or path B with the export of the failed attempt). Then run the queued bounded comparison of Ubuntu 26.04.1 through the same recipe and stage 2: the bootstrap under python3 3.14, uutils coreutils and sudo-rs. A passing first run makes 24.04.5 with path A adoptable within that host's scope; a passing comparison switches the image (the decision record's overturn condition 1).",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

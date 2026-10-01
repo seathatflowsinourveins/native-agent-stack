@@ -5,12 +5,13 @@
   "component_ids": [
     "systemd"
   ],
-  "claim": "<One or two sentences quoting only this run's output: the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, and F1-F3 printed running, Linger yes and a user-owned bus socket.>",
+  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's zero count; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, and F1-F3 printed running, Linger yes and a user-owned bus socket.>",
   "limitations": [
     "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
     "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
     "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host.",
-    "jcodemunch_registration records F11's state only: a registration is not evidence that a session or subagent uses jCodeMunch."
+    "jcodemunch_registration records F11's state only: a registration is not evidence that a session or subagent uses jCodeMunch.",
+    "The rehearsal block records a separate run on a throwaway name, removed by R1; its observations sit beside this run's, not in place of them."
   ],
   "recorded_at_utc": "<YYYY-MM-DDTHH:MM:SSZ>",
   "recipe": {
@@ -18,13 +19,32 @@
     "catalog_revision": "<F7: git rev-parse HEAD of the new clone>",
     "creation_path": "<A (cloud-init) or B (import and manual user)>"
   },
+  "rehearsal": {
+    "name": "<R1: the throwaway name, never the real <Name> or the workstation's>",
+    "result": "<R1: passed through F3, or the first step whose proof failed>",
+    "creation_path": "<R1: A or B for the rehearsal>",
+    "schema_system": "<R1: the rehearsal's W5 schema --system line and exit code, or skipped (path B)>",
+    "ownership_probe": "<R1: the rehearsal's W7 stat -c %u:%g output after the terminate>",
+    "idle_observation": "<R1: whether the throwaway name stayed in every F2 poll, or the time it left>",
+    "export": {
+      "file": "<R1, failed rehearsal only: Z:\\WSL\\downloads\\<Name>-rehearsal.tar; null when it passed>",
+      "sha256": "<R1: the Get-FileHash line's lower-case hash of that file; null when it passed>",
+      "bytes": "<R1: the Get-Item line's Length; null when it passed>"
+    }
+  },
+  "pre_checks": {
+    "signed_sums": "<P1: gpgv's exit code, its using RSA key and Good signature lines, and the signed SHA256SUMS line of the image>",
+    "user_data_schema": "<P2: cloud-init --version, the Valid schema line and its exit code, and the render's sha256sum, equal to W3's>",
+    "kernel_storage_errors": "<P3: the hv_storvsc count without the registration line (0 passes) and the swapon --show lines>"
+  },
   "host": {
     "wsl_version": [
       "<each line of wsl.exe --version in W1>"
     ],
     "default_distribution_before": "<starred line of wsl.exe --list --verbose in W1>",
     "default_distribution_after": "<starred line in W5; equal to the line above>",
-    "z_free_bytes": "<Free of Get-PSDrive Z in W1>"
+    "z_free_bytes": "<Free of Get-PSDrive Z in W1>",
+    "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>"
   },
   "image": {
     "file": "ubuntu-24.04.5-wsl-amd64.wsl",
@@ -36,8 +56,11 @@
   },
   "first_launch": {
     "user_prompt_marker": "<true when the W5 output contains 'Create a default Unix user account:'>",
-    "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>"
+    "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
+    "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>"
   },
+  "ownership_probe": "<W7: the stat -c %u:%g output for the file created from Windows after the terminate; 1000:1000 passes>",
+  "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
   "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
   "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
   "failed_attempt_export": {
@@ -46,6 +69,168 @@
     "bytes": "<W6: the Get-Item line's Length; null on path A>"
   },
   "steps": [
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<rehearsal passed: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Hash.ToLowerInvariant()",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-rehearsal.tar').Length",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<rehearsal failed after W4: exit code; null otherwise>",
+      "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "P1",
+      "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" https://releases.ubuntu.com/24.04.5/SHA256SUMS",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P1",
+      "cmd": "gpgv --homedir \"$SUMS_DIR\" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \"$SUMS_DIR/SHA256SUMS.gpg\" \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "<the using RSA key and Good signature lines>"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep ' \\*ubuntu-24\\.04\\.5-wsl-amd64\\.wsl$' \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "RENDER_DIR=\"$(mktemp -d)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init --version",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": 0,
+      "output_excerpt": "<the Valid schema line>"
+    },
+    {
+      "step": "P2",
+      "cmd": "sha256sum \"$RENDER_DIR/<Name>.user-data\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "exit": 1,
+      "output_excerpt": "0"
+    },
+    {
+      "step": "P3",
+      "cmd": "swapon --show",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
     {
       "step": "W1",
       "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
@@ -99,6 +284,12 @@
       "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', '^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output: section headers and the two idle keys, values only>"
     },
     {
       "step": "W1",
@@ -192,6 +383,12 @@
     },
     {
       "step": "W3",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data')).Hash.ToLowerInvariant()",
+      "exit": "<exit code>",
+      "output_excerpt": "<the hash; equal to P2's sha256sum value>"
+    },
+    {
+      "step": "W3",
       "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -SimpleMatch -Pattern '${'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
@@ -267,6 +464,12 @@
       "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system",
+      "exit": "<path A: exit code; null on path B (skipped)>",
+      "output_excerpt": "<path A: the Valid schema user-data line; null on path B>"
     },
     {
       "step": "W5",
@@ -413,6 +616,48 @@
       "output_excerpt": "<path B only: sanitized output; null on path A>"
     },
     {
+      "step": "W7",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --list --running --quiet",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output; <Name> absent>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<exit code>",
+      "output_excerpt": "<WSL_USER>"
+    },
+    {
+      "step": "W7",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "1000:1000"
+    },
+    {
+      "step": "W7",
+      "cmd": "Remove-Item -LiteralPath '\\\\wsl.localhost\\<Name>\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
       "step": "F1",
       "cmd": "systemctl is-system-running --wait",
       "exit": 0,
@@ -441,6 +686,18 @@
       "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
       "exit": 0,
       "output_excerpt": "yes"
+    },
+    {
+      "step": "F2",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F2",
+      "cmd": "foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }",
+      "exit": "<exit code>",
+      "output_excerpt": "<the twelve poll times and the running distributions after each>"
     },
     {
       "step": "F3",
