@@ -47,10 +47,12 @@ def server_identity(base):
 
 
 def server_alive(identity):
+    """True while the process that was identified is still the same running tmux: the start time must match, the name must be tmux and the state must not be `Z` (a zombie keeps its /proc entry but is dead)."""
     pid, started = identity
     try:
-        return start_time(pid) == started and (Path("/proc") / str(pid) / "comm").read_text().startswith("tmux")
-    except OSError:
+        state = (Path("/proc") / str(pid) / "stat").read_text().rsplit(")", 1)[1].split()[0]
+        return start_time(pid) == started and state != "Z" and (Path("/proc") / str(pid) / "comm").read_text().startswith("tmux")
+    except (OSError, IndexError):
         return False
 
 
@@ -120,18 +122,28 @@ def tmux_servers():
 
 
 def shutdown_control(measure):
-    """Two controls with a wrapper in place of tmux that REFUSES `kill-server`. (1) It answers honestly about the server's pid: `measure()` must still finish, having stopped its own server by that pid, and leave no
-    new tmux process and no socket directory. (2) It also lies about the pid (init's): the identity is refused, so nothing is signaled, the measurement must raise ServerNotStopped, the socket must still be there and
-    the server must still answer; the control then stops that server itself. Needs tmux; returns (ok, detail), or (None, why) without it."""
+    """Three controls with a wrapper in place of tmux that REFUSES `kill-server`. (1) It answers honestly about the server's pid: `measure()` must still finish, having stopped its own server by that pid, and leave no
+    new tmux process and no socket directory. (2) It also lies about the pid (init's): the name check refuses the identity, so nothing is signaled, the measurement must raise ServerNotStopped, the socket must still be
+    there and the server must still answer; the control then stops that server itself. (3) It answers the pid of ANOTHER private tmux server (alive, named tmux, started with a different socket): only the command-line
+    check refuses it, so that server must not be signaled (it must still answer afterwards) and the measurement must raise ServerNotStopped and keep its socket; the control then stops both servers. Needs tmux;
+    returns (ok, detail), or (None, why) without it."""
     global TMUX
     if not TMUX:
         return None, "skipped (tmux is not installed)"
     real = TMUX
     details, ok = [], True
-    for label, lie in (("kill-server refused, honest pid", False), ("kill-server refused and a false pid", True)):
+    for label, mode in (("kill-server refused, honest pid", "honest"), ("kill-server refused and a false pid", "init"), ("kill-server refused and the pid of another tmux server", "other")):
         with tempfile.TemporaryDirectory(prefix="tw", dir="/tmp") as raw:
+            other_socket = None
+            answer = ""
+            if mode == "init":
+                answer = 'case " $* " in *" display-message "*) echo 1; exit 0;; esac\n'
+            elif mode == "other":
+                other_socket = str(Path(raw) / "o.sock")
+                subprocess.run([real, "-S", other_socket, "-f", "/dev/null", "new-session", "-d", "sleep 120"], check=True, capture_output=True)
+                other_pid = int(subprocess.run([real, "-S", other_socket, "-f", "/dev/null", "display-message", "-p", "#{pid}"], capture_output=True, text=True, timeout=10).stdout.strip())
+                answer = f'case " $* " in *" display-message "*) echo {other_pid}; exit 0;; esac\n'
             wrapper = Path(raw) / "tmux"
-            answer = 'case " $* " in *" display-message "*) echo 1; exit 0;; esac\n' if lie else ""
             wrapper.write_text(f'#!/bin/sh\ncase " $* " in *" kill-server "*) exit 1;; esac\n{answer}exec {real} "$@"\n')
             wrapper.chmod(0o755)
             before = tmux_servers()
@@ -144,17 +156,21 @@ def shutdown_control(measure):
                     finished, socket = False, failure.socket
             finally:
                 TMUX = real
-            if not lie:
+            if mode == "honest":
                 good = finished and not (tmux_servers() - before)
                 details.append(f"{label}: the measurement finished {finished}, new tmux processes left {len(tmux_servers() - before)}")
             else:
                 kept = socket is not None and Path(socket).exists()
                 alive = kept and subprocess.run([real, "-S", socket, "list-sessions"], capture_output=True).returncode == 0
+                other_alive = other_socket is None or subprocess.run([real, "-S", other_socket, "list-sessions"], capture_output=True).returncode == 0
                 if socket is not None:
                     subprocess.run([real, "-S", socket, "kill-server"], capture_output=True)
                     shutil.rmtree(Path(socket).parent, ignore_errors=True)
-                good = not finished and kept and alive
-                details.append(f"{label}: the measurement raised {not finished}, the socket was kept {kept}, the server still answered {alive}, then the control stopped it")
+                if other_socket is not None:
+                    subprocess.run([real, "-S", other_socket, "kill-server"], capture_output=True)
+                good = not finished and kept and alive and other_alive
+                details.append(f"{label}: the measurement raised {not finished}, the socket was kept {kept}, the server still answered {alive}"
+                               + (f", the other server was left alone {other_alive}" if other_socket else "") + ", then the control stopped it")
             ok = ok and good
     return ok, "; ".join(details)
 
@@ -172,8 +188,11 @@ def bells(command, options, seconds=6.0):
             subprocess.run(base + ["set-option", "-g", *option.split()], check=True, capture_output=True)
         pid, fd = pty.fork()
         if pid == 0:
-            os.environ["TERM"] = "xterm-256color"
-            os.execv(TMUX, [TMUX, "-S", socket, "-f", "/dev/null", "attach"])
+            try:
+                os.environ["TERM"] = "xterm-256color"
+                os.execv(TMUX, [TMUX, "-S", socket, "-f", "/dev/null", "attach"])
+            finally:
+                os._exit(127)   # the child never returns into the parent's code (and its cleanup) when the exec fails
         collected, deadline = b"", time.time() + seconds
         while time.time() < deadline:
             ready, _, _ = select.select([fd], [], [], 0.2)
