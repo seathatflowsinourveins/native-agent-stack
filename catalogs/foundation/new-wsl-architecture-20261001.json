@@ -1971,7 +1971,7 @@
         {"text": "The IB Gateway or TWS paper sign-in is the user's own native action, as are the paper account and market-data permissions.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
       "owner_lane": "trading",
-      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, IBKR acceptance-plan steps 2-4 on rc5 after the user's IB Gateway paper sign-in. Alpaca: paper execution at engine b528bb55 (2026-09-29: 11 of 13 trials passed; receipts via #564). dca821cc has no paper execution yet, and its native-fault binding is stale until its re-run."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, IBKR acceptance-plan steps 2-4 on rc5 after the user's IB Gateway paper sign-in. Alpaca: paper execution at engine b528bb55 (2026-09-29: 11 of 13 trials passed; receipts via #564). dca821cc re-qualified the native-fault gate on 2026-10-01 (native_faults_passed, all four frozen cases, blueprints/us-equities/adaptive-paper/native-faults/receipt.json; PR #584); its first paper series ran the same day, and their receipts are not yet committed."
     },
     {
       "layer_id": "portfolio-risk",
