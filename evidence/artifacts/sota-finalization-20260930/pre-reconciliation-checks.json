@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "current_host_checks_before_upstream_reconciliation",
+  "recorded_at_utc": "2026-09-30 07:58:54 UTC",
+  "evidence_class": "local_integration_and_native_client_checks",
+  "scope": "Original root source; additive printed-command correction and later upstream integration are recorded separately.",
+  "checks": [
+    {
+      "name": "eight-module integration group",
+      "exit_code": 0,
+      "tests_run": 378,
+      "skips": 9,
+      "tests_passed": 369,
+      "seconds": 56.112,
+      "stdout_sha256": "b088a8c086d859e1d7b6acf281928b3adba26d82c8c86328a35c0d80a936c9cd",
+      "stderr_sha256": "c38030102262be1b7b4eaa531f61371e1ccbd8527a172d600132ea6ace76c5b3",
+      "scope": "Before one-line generated-command method-call correction; subsequent narrowed regression covers that delta. ResourceWarning retained."
+    },
+    {
+      "name": "narrow generated-command regression after correction",
+      "exit_code": 0,
+      "tests_run": 1,
+      "seconds": 1.102,
+      "stderr_sha256": "434efd6c5a319a4b21b9ddaaf52b31471588d3e6a3eb726a0534d1dc7d2cd4a3"
+    },
+    {
+      "name": "native config apply/byte-exact rollback and conflicts/validation/null rollback",
+      "exit_code": 0,
+      "tests_run": 2,
+      "seconds": 24.076,
+      "stderr_sha256": "e344a9c718ae03a5e13fd80ec79921b902454f8adcf1771a9b7c40d47e4859f6",
+      "scope": "NAS_CODEX_INTEGRATION=1; scratch only; no new provider/model run."
+    },
+    {
+      "name": "static native lane proof",
+      "exit_code": 0,
+      "passed": 7,
+      "failed": 0,
+      "scope": "No --live; does not attest provider-resolved model/effort."
+    },
+    {
+      "name": "evidence validation at earlier registered snapshot",
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 8117,
+      "profiles": 4,
+      "receipts": 173,
+      "scope": "Integrity only; final changed inputs require fresh validation."
+    },
+    {
+      "name": "generated guide consistency after scoped Codex freshness correction",
+      "exit_code": 0,
+      "bytes": 14134939,
+      "input_sha256": "617a393c82f15a9ca2bc36868919881b6f56593a00481ce87e93a04f01f12348",
+      "output_sha256": "331b7fd66ca1dc72d0f824e104134b2cd847b9fce396ee75707460dd63b946eb",
+      "scope": "Not a full live landscape refresh."
+    }
+  ],
+  "retained_failed_attempts": [
+    {
+      "operation": "guessed obsolete unittest module/class/method names",
+      "exit_code": 1,
+      "reason": "AttributeError; corrected from actual current source AST method enumeration; no product bug inferred."
+    },
+    {
+      "operation": "evidence validator before registration",
+      "exit_code": 1,
+      "reason": "Changed/new file registry entries stale; corrected through existing register_file."
+    },
+    {
+      "operation": "guide check before receipt index",
+      "exit_code": 1,
+      "reason": "New Codex qualification receipt missing from receipts metadata index."
+    },
+    {
+      "operation": "guide check before scoped current Codex row",
+      "exit_code": 1,
+      "reason": "Dated landscape selected version was0.157.1 while qualified current selection changed to0.159.2."
+    },
+    {
+      "operation": "convergence checker before immutable client revision fix",
+      "exit_code": 1,
+      "reason": "Tag strings were not immutable hash revisions; verified actual tag commits replaced them."
+    },
+    {
+      "operation": "large public GH metadata parse",
+      "exit_code": null,
+      "reason": "Truncated native capture caused parse failure; retained originals processed through selected-field native jq recovery, without another API read."
+    }
+  ],
+  "limits": [
+    "All listed local tests are repository integration checks, not unchanged upstream tests.",
+    "Final Claude review returned changes_required; current upstream reconciliation and disarmed rollout are separately recorded.",
+    "Actual provider billing, coordinator usage and unknown failure usage remain unknown."
+  ]
+}
