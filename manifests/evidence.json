@@ -3760,6 +3760,25 @@
         "Residuals carried to the next guard change (K4): `set 0 < /dev/null; set 0</dev/null` and nested forms are allowed by both guards because segment deduplication drops a descriptor-bearing duplicate; the module docstring and docs omit the conservative fallback for commands containing a \\x01 byte."
       ],
       "path": "evidence/receipts/guard-k3-verification-20260930.json"
+    },
+    {
+      "id": "guard-k4-verification-20261001",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "The command guard change K4 (scripts/hooks/secret_path_guard.py, sha256 33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f, 275,624 bytes) adds runner-command reading, bounded interpreter reading and OmniRoute management-route, manager-environment, store, ps and canary rules on top of the K3 guard (sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51, merged in PR #511 as 5597f9fa). On 2026-10-01 the coordinator replayed 1,524 documented repository commands through K4 against K3 and against the installed guard (sha256 f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244): 0 newly blocked, 0 loosened and 0 reason changed against each. The acceptance oracle found 0 adjusted and 0 reason mismatches over 338 cases, and a scan of 16,315 distinct lines and blocks from 9,329 tracked files found 0 newly blocked and 0 loosened against K3. The repair worker's mutation gate killed 461 of 461 mutants by failures of named permanent tests. A read-only GPT-6 re-check of the one repair round (guard sha256 d4d4bef2\u2026, before two later one-line fixes from PR review threads) found every finding of the GPT-6 verification and the Opus review fixed, apart from stale metadata in an untracked handoff, and no input that K3 refuses and K4 allows outside the contract's form F across 8,602 differential inputs. Through a real hook process the verification's two timeout generators answered in 0.20 and 0.22 s. The re-check found five further items, recorded as residuals.",
+      "limitations": [
+        "Local integration on one host plus read-only cross-family reviews, not a proof: the checks compare text heuristics on finite corpora (the repository's tables, fenced commands, tracked files, generated mutations and the reviewers' differential inputs), and a review that finds nothing does not show that nothing exists.",
+        "Evidence classes differ: the replay, the oracle, the corpus scan, the gitleaks ancestry scan and the targeted suites were run by the coordinator on the final head; the mutation gate and the differential counts come from the repair worker's and the re-check's recorded output, not from a coordinator rerun.",
+        "The targeted suites' one failure is by design: test_host_profile_copy_is_verbatim compares the installed host copy with the repository file, and the host copy stays the installed guard until K3 and K4 are merged and reinstalled after the Gate A window closes.",
+        "test_k4_timing judges each helper's growth from 25k to 100k characters by the criterion of #556 (an exponent ln((t100k + 5 ms) / (t25k + 5 ms)) / ln 4 under 1.5 over the elementwise minimum of up to three rounds), which replaced a single-sample 8x ratio after the ratio failed PR #567's hosted validate on two linear helpers at 1 to 6 % margins; with the minimum of three rounds all 67 helpers measured exponents of 0.975 or less on the workstation. Its processor-time bound is the contract's 0.5 s on the workstation and scales elsewhere by the host's time for a guard-independent shlex workload (short words and one 120,000-character quoted word) relative to the workstation's 0.188 s (never below 1), after hosted macOS runs measured linear rows at 0.522 to 0.562 s against 0.197 s here (a long quoted word lexes about 2.6 times slower there). Below about 4.4 ms at 25k a quadratic helper passes the exponent, and the host-scaled bound guards it there.",
+        "Residuals carried to the next guard change: two gateway forms that K3 and K4 both allow, a Request passed to urlopen by keyword after its body (urlopen(data=b\"x\", url=r)) and an augmented member assignment (r.full_url += \"/x\"); two false refusals K4 introduced, an incomplete computed argv item (subprocess.run([\"printenv\" + \"-safe\"]) refuses environment_dump) and a command -v lookup read as an assignment before a keyring store (keyring_store_literal); and a generated 193,560-character urllib command whose urlopen calls reuse one Request, which the re-check measured at about 1.9 s through the real hook, below the 10 s hook timeout and above the 1 s target.",
+        "The repair worker's mutation gate ran on the test file before four later test-only commits (runner-test values drawn from letters outside the hex alphabet, the growth criterion, the host-scaled bound and its long-word reference); the two mutants killed in test_k4_timing (BUDGET-DUPLICATE, CODE-CONTEXT) were killed by row verdicts and the processor-time bound, which these changes keep, and the gate was not rerun.",
+        "Two review threads on PR #567 (the Codex review bot) found two false refusals after the GPT-6 re-check: `curl -0` (HTTP/1.0) missing from the short-flag table, and `pypy3` missing from form F's interpreter expression although the contract's form-F grammar includes it. Both were fixed (guard sha256 33a11fc0\u2026, from d4d4bef2\u2026); the coordinator re-ran the replay, oracle, tracked-file scan, growth exponents and targeted suites on the fixed guard, but the GPT-6 re-check and the worker's mutation gate were not rerun on it.",
+        "Commit identity: the re-check reviewed commit 58dde8ef. Its history was then rewritten so a helper-name tuple no longer reads as a gitleaks generic-api-key match (one test line reordered in four commits), rebased onto main after K3 merged (5597f9fa), and extended by four test-only commits (runner test values drawn from letters outside the hex alphabet, fixing a chance-match flake; the timing criterion and host-scaled bound above); the guard bytes stayed d4d4bef2\u2026 through those steps and changed only with the two review-thread fixes."
+      ],
+      "path": "evidence/receipts/guard-k4-verification-20261001.json"
     }
   ],
   "files": [
@@ -4020,8 +4039,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "cd4308b79b30a40ad62397092d97f65c9cfa631dd1607c2d42fe9c53eaa02dba",
-      "bytes": 21132
+      "sha256": "e2ce60d6424c0ec97a419ae3967ad9b902a4430605e435a00371f216c5abdf56",
+      "bytes": 22661
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -4030,7 +4049,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "3480907d6379a908d20cb280ed8780c96da82121734d504cd4229873e4552859",
+      "sha256": "c1d1096255a63fe181480466a28a1344c7032b55bf24ee07d9b37e5da846549d",
       "bytes": 950
     },
     {
@@ -4215,8 +4234,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "6bb8428e632d1a4bc498fcbfc2d9c1b08a6b5a5198a85dbd2c4ba4d4f945df4a",
-      "bytes": 12854
+      "sha256": "e8c900df3e4858098e0fd64687b30831fe1f7d402f7c201cdd4a6ff5f5e7bd35",
+      "bytes": 13034
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -15596,8 +15615,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "79be428ab65dce1b08fa873d5e4cee895021e2d10084e701838b2f2466f20194",
-      "bytes": 142474
+      "sha256": "80b485f60688f2a01b468f5a22e545b8e793a7ab40269877917490f353dc4932",
+      "bytes": 163577
     },
     {
       "path": "docs/stack.md",
@@ -44520,6 +44539,11 @@
       "bytes": 6547
     },
     {
+      "path": "evidence/receipts/guard-k4-verification-20261001.json",
+      "sha256": "d852600e72600adf422c8ebd9e7a7dde0c36c39249c8002c8caa10ee701fb9d2",
+      "bytes": 11220
+    },
+    {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
       "sha256": "3a8e162765fa57f4aa6c06cb30b2a28e7ad7d32aaf0920f46720075e234b061d",
       "bytes": 9318
@@ -45706,8 +45730,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51",
-      "bytes": 123080
+      "sha256": "33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f",
+      "bytes": 275624
     },
     {
       "path": "scripts/host_receipts.py",
@@ -46240,6 +46264,11 @@
       "bytes": 4471
     },
     {
+      "path": "tests/test_credential_run.py",
+      "sha256": "9f8f8278dd1a74cc5422af9bc058778cee536180845da44e9f39a87cce937380",
+      "bytes": 128245
+    },
+    {
       "path": "tests/test_credential_status.py",
       "sha256": "3b541daf16d04b13b9a4bace798117cb485ef37c6181f3e50fe22d4e7e3df927",
       "bytes": 52288
@@ -46691,8 +46720,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "249408c23ca27fafc2c222aecf42f2662e49d3286e21d2a1d159e2ef1e7ca2a6",
-      "bytes": 204681
+      "sha256": "27f37eab1c20b0be93153831a0d533d5d93b0c3daa638b5e4fb9f368d61f4d6e",
+      "bytes": 359232
     },
     {
       "path": "tests/test_security_identity.py",
@@ -46988,6 +47017,11 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/credentials/credential_run.py",
+      "sha256": "bcab1b94a1cdf73b630b50c45c6a8a0189de089e987abb21b327e4238bd04222",
+      "bytes": 55887
     },
     {
       "path": "tools/omniroute/gateway_record.py",
