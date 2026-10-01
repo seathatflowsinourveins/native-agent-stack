@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "kind": "selected_skill_source_review",
+  "checked_at": "2026-09-30",
+  "evidence_class": "pinned_source_review",
+  "observer": "Read-only source-audit agent; primary upstream tree/blob comparisons are research evidence, not model or host execution.",
+  "scope": "28 previously selected foundation skills; source freshness does not establish tool/workflow acceptance.",
+  "core_nine": "Reuse dated September 30 source review in docs/decisions/2026-09-30-native-skill-lifecycle.md for four OpenAI skills, search-first, iterative-retrieval, diagnosing-bugs, tdd and writing-for-agents.",
+  "remaining_nineteen": {
+    "unchanged_count": 15,
+    "changed_count": 3,
+    "removed_count": 1,
+    "current_trees_truncated": false
+  },
+  "updates": [
+    {
+      "name": "codebase-design",
+      "source": "mattpocock/skills",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/codebase-design",
+      "tree_sha": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a",
+      "skill_md_sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+      "skill_md_bytes": 6446,
+      "description_chars": 265,
+      "license": "MIT",
+      "change": "Only supporting DESIGN-IT-TWICE.md changes CONTEXT.md to GLOSSARY.md; SKILL.md unchanged.",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design"
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/improve-codebase-architecture",
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
+      "description_chars": 125,
+      "license": "MIT",
+      "change": "Optional CONTEXT.md references become GLOSSARY.md; disable-model-invocation remains true.",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture"
+    },
+    {
+      "name": "semgrep",
+      "source": "trailofbits/skills",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
+      "path": "plugins/static-analysis/skills/semgrep",
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
+      "description_chars": 707,
+      "license": "CC-BY-SA-4.0",
+      "change": "Explicit 20000000-byte target limit, override/zero-unlimited support and oversized-omission reporting. Pin-only installation; preserve license.",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep"
+    }
+  ],
+  "retirement": {
+    "name": "resolving-merge-conflicts",
+    "source": "mattpocock/skills",
+    "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "decision": "Retire through supported native removal after frozen evaluations finish; no current replacement.",
+    "sources": [
+      "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md",
+      "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/docs/engineering/resolving-merge-conflicts.md"
+    ],
+    "limit": "Current HEAD removes the skill; package.json is 1.2.3 with a pending changeset. Do not infer a published 1.3.0 release."
+  },
+  "unchanged_sources": [
+    {
+      "source": "typesafe-ai/skills",
+      "ref": "65a39f393687675ce170e6094757de20370365b9",
+      "skills": [
+        "typesafe-ai"
+      ]
+    },
+    {
+      "source": "mattpocock/skills",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "skills": [
+        "grill-me"
+      ]
+    },
+    {
+      "source": "trailofbits/skills",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
+      "skills": [
+        "codeql",
+        "supply-chain-risk-auditor",
+        "agentic-actions-auditor",
+        "property-based-testing",
+        "modern-python",
+        "sarif-parsing",
+        "fp-check",
+        "variant-analysis"
+      ]
+    },
+    {
+      "source": "anthropics/skills",
+      "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "skills": [
+        "mcp-builder",
+        "frontend-design"
+      ]
+    },
+    {
+      "source": "vercel-labs/agent-browser",
+      "ref": "d01253d9db28d75080e36da3c1c31ef89454731e",
+      "skills": [
+        "agent-browser"
+      ]
+    },
+    {
+      "source": "vercel-labs/skills",
+      "ref": "3694740352eeef5cdd689af694c485f1ff62eec3",
+      "skills": [
+        "find-skills"
+      ]
+    },
+    {
+      "source": "cloudflare/security-audit-skill",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "skills": [
+        "security-audit"
+      ]
+    }
+  ],
+  "limits": [
+    "Unchanged directory content can retain its existing immutable pin.",
+    "Preserve existing supply-chain-risk-auditor scripts/uv.lock exception.",
+    "Do not update global skill inputs during frozen model evaluations.",
+    "Trial selections and listing/enable gates remain unchanged for retained skills."
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "independent-read-only-verification",
+  "recorded_at_utc": "2026-09-30T07:15:00Z",
+  "role": "stack-verifier",
+  "model_policy": "Preserved explicit verification role definition.",
+  "method": "Original private native captures and fresh immutable source reads; no model reruns or repairs.",
+  "claims": [
+    {
+      "claim": "27 selected skill metadata and three repins",
+      "verdict": "confirmed",
+      "fresh_status_exit_code": 0,
+      "fresh_status_sha256": "6a97cccc2c4a4555913d28abfcaf119f52dccf82ac256dd9d7dcf051bfdbf943",
+      "fresh_upstream_api_exit_codes": 0,
+      "source_tree_responses_truncated": false
+    },
+    {
+      "claim": "Upstream-removed skill retired locally",
+      "verdict": "confirmed",
+      "observed": "No current upstream directory or replacement; installed canonical/links/lock absent, native listing off. Package1.2.3 at reviewed source, not published1.3.0."
+    },
+    {
+      "claim": "One allowed support-file drift only",
+      "verdict": "confirmed",
+      "blobs": 13,
+      "matching": 12,
+      "allowed": "scripts/uv.lock",
+      "missing": [],
+      "extra": []
+    },
+    {
+      "claim": "Unchanged upstream test scripts and retained output",
+      "verdict": "confirmed",
+      "recorded_outer_exit_codes": [
+        0,
+        0
+      ],
+      "outputs": [
+        "104 passed, 0 failed, 104 run",
+        "65 assertions passed",
+        "66 assertions passed"
+      ],
+      "scope": "Original script/output hashes matched immutable source and exact retained private output; tests not rerun."
+    },
+    {
+      "claim": "29 native model runs and frozen inputs",
+      "verdict": "confirmed",
+      "outer_exits": "29 zero; no timeouts",
+      "original_stdout_stderr_hashes_match": true,
+      "preregistration_and_prompt_hashes_match": true
+    },
+    {
+      "claim": "Native instruction loads and negatives",
+      "verdict": "confirmed",
+      "claude_implicit_writing_loads": 4,
+      "negative_cases": 12,
+      "false_positive_invocations": 0,
+      "limits": "Four activations are not four passing outcomes; w05 keeps its failure. Original two Codex misses and three explicit observation limits remain."
+    },
+    {
+      "claim": "Original two output failures and four follow-ups",
+      "verdict": "confirmed",
+      "w05_full_words": 152,
+      "w05_artifact_words": 39,
+      "w10": "Fenced JSON fails strict parse",
+      "followups": "All4 passed; native structured_output exact; edit diffs observedexit1 and removeddisposabletargets."
+    },
+    {
+      "claim": "Matched baseline controls",
+      "verdict": "qualified",
+      "scope": "Prompt and effective controls match after removing native disable-slash-commands and normalizing per-run debug-file destination. Literal argv bytes are not identical.",
+      "enabled_pass": true,
+      "disabled_pass": true,
+      "quality_gain": false
+    },
+    {
+      "claim": "Counter scopes and retained inner failures",
+      "verdict": "confirmed",
+      "codex_runs": 14,
+      "claude_runs": 15,
+      "opus_buckets": 15,
+      "advisor_buckets": 8,
+      "tool_errors": 8,
+      "command_failures": 6,
+      "scope": "One final cumulative result per run; main/model/cache/reasoning remain separate. No coordinator usage or efficiency claim."
+    }
+  ],
+  "sources": [
+    "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design",
+    "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+    "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+    "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md",
+    "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+    "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md"
+  ],
+  "corrections": [
+    "Verifier initially used workflow.stdout; bounded discovery found upstream-semgrep-workflow.stdout with exact output hash.",
+    "Initial counter object comparison included omitted iterations metadata/absent model scopes; corrected numeric comparison found no mismatch.",
+    "Initial prompt comparison added already present whitespace; corrected frozen-byte comparison matched."
+  ]
+}
