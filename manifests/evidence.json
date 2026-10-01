@@ -15301,8 +15301,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
-      "sha256": "4135783851cc0c8cdfc26ade8cf73e8b95935898e75a8343d315822ba67c61cf",
-      "bytes": 14002
+      "sha256": "0789c867adec6122d07a91f2991ec8b83e0fa7a9ac4ce6582b4e14a923aa40d3",
+      "bytes": 14263
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -15310,9 +15310,14 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
+      "sha256": "4c30192cd65fda53282c9c0a02c8ac5e1ae7435c6ed7d7fedeaa9076909f189b",
+      "bytes": 9180
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
-      "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
-      "bytes": 8312
+      "sha256": "592d1e06dc90def7412905754459dcb025c4d41e57ee9a429e7824ab243fc2e6",
+      "bytes": 8573
     },
     {
       "path": "docs/direct-results.md",
