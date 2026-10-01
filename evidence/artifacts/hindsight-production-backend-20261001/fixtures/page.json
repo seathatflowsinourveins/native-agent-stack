@@ -1,0 +1,1 @@
+{"name":"Synthetic Meridian audit retention","source_query":"What is the current synthetic Meridian audit retention in days? Prefer the current corrected decision over an old superseded decision.","max_tokens":384,"trigger":{"refresh_after_consolidation":false}}

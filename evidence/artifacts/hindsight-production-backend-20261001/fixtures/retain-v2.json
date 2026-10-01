@@ -1,0 +1,9 @@
+{
+  "items": [{
+    "content": "Correction to synthetic Meridian decision MERIDIAN-RETENTION: the current audit retention is 34 days, superseding the old 21-day decision. This is an isolated qualification canary rather than a production policy.",
+    "document_id": "meridian-retention-decision",
+    "timestamp": "2026-09-30T22:00:00Z",
+    "tags": ["qualification:20261001", "project:meridian"]
+  }],
+  "async": true
+}

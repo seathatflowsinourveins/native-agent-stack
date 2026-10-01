@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "id": "seamless-native-helper-recovery-20261001",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-01T05:27:49Z",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "claim": "Source-backed oneshot lifecycle correction kept a fresh isolated Hindsight backend healthy after helper completion and repeat start; production native health checks remain enabled. Codex accepted the supported Hindsight MCP timeout setting.",
+  "limitations": [
+    "These are local integration checks of native lifecycle, using a disposable backend configured with provider none; no unchanged upstream test or model-quality comparison is claimed.",
+    "Default cgroup cleanup reproduced an unavailable backend after native start exit zero. The corrected helper intentionally leaves detached backend lifecycle to the native profile manager; systemd generally discourages process mode for daemons it owns.",
+    "The isolated repeat was an explicit native service start. Production timer active/waiting was observed; physical-host reboot and forced unhealthy recovery were not tested here.",
+    "Codex per-server timeout is set to 360 seconds. A caller-supplied shorter deadline still wins, and no new model retrieval was run after this setting.",
+    "Model/provider usage and monetary cost were not collected for this lifecycle check. Native Pg0 stop uses a nonchecking SDK wrapper; independent absence of both fixture listeners is the cleanup observation."
+  ],
+  "sources": [
+    "https://github.com/vectorize-io/hindsight/blob/v0.10.2/hindsight-embed/hindsight_embed/daemon_embed_manager.py#L148",
+    "https://github.com/vectorize-io/hindsight/blob/v0.10.2/hindsight-embed/hindsight_embed/daemon_embed_manager.py#L911",
+    "https://github.com/vectorize-io/hindsight/blob/v0.10.2/hindsight-embed/hindsight_embed/daemon_embed_manager.py#L1344",
+    "https://github.com/systemd/systemd-stable/blob/v255.4/man/systemd.kill.xml#L63",
+    "https://github.com/systemd/systemd-stable/blob/v255.4/man/systemd.service.xml#L207",
+    "https://github.com/systemd/systemd-stable/blob/v255.4/man/systemd.timer.xml#L50",
+    "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/config/src/mcp_types.rs#L284",
+    "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/codex-mcp/src/connection_manager.rs#L1014",
+    "https://github.com/vectorize-io/pg0/tree/v0.15.2"
+  ],
+  "observed_attempts": [
+    {
+      "id": "first-corrected-fresh-start",
+      "native_start_exit_code": 0,
+      "helper_state": "inactive/dead",
+      "kill_mode": "process",
+      "native_health": "healthy; database connected",
+      "http_status": 200,
+      "independent_listener_cgroup_matches_helper": true,
+      "native_stop_exit_code": 0
+    },
+    {
+      "id": "default-cleanup-baseline",
+      "native_start_exit_code": 0,
+      "systemd_returned": "success; main process exited with status0",
+      "native_health_curl_exit_code": 28,
+      "native_status_exit_code": 1,
+      "native_status_returned": "Daemon is not running",
+      "independent_listener_absent": true,
+      "qualification": "failed to persist after helper completion"
+    },
+    {
+      "id": "corrected-fresh-start-after-baseline",
+      "native_start_exit_code": 0,
+      "helper_properties": {
+        "Type": "oneshot",
+        "RemainAfterExit": "no",
+        "KillMode": "process",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "ExecMainStatus": 0
+      },
+      "native_health_curl_exit_code": 0,
+      "http_status": 200,
+      "native_health": "healthy; database connected",
+      "independent_listener_cgroup_matches_helper": true,
+      "explicit_native_repeat_start_exit_code": 0,
+      "same_listener_alive_after_repeat": true,
+      "independent_health_after_repeat_utc": "2026-10-01T05:19:40.979666+00:00",
+      "http_status_after_repeat": 200,
+      "native_stop_exit_code": 0
+    }
+  ],
+  "production": {
+    "native_daemon_reload_exit_code": 0,
+    "native_ensure_start_exit_code": 0,
+    "helper_result": "success",
+    "helper_main_status": 0,
+    "kill_mode": "process",
+    "remain_after_exit": "no",
+    "timer": "active/waiting",
+    "timer_result": "success",
+    "production_and_incumbent_health_after_fixture_cleanup_http_status": 200,
+    "health_observed_at_utc": "2026-10-01T05:23:39.098684+00:00"
+  },
+  "codex_timeout": {
+    "supported_setting": "mcp_servers.hindsight.tool_timeout_sec",
+    "configured_seconds": 360,
+    "native_config_parsing_command": "codex features list",
+    "native_exit_code": 0,
+    "post_setting_model_retest": false
+  },
+  "fixture_cleanup": {
+    "native_api_stop_exit_code": 0,
+    "native_pg0_sdk_stop_python_exit_code": 0,
+    "native_pg0_sdk_stop_exit_evidence": "Direct coordinator exec_command result, retained as a verbatim result copy; the SDK output files are empty.",
+    "independent_api_and_database_listeners_absent": true,
+    "historical_absence_evidence": "Coordinator processing-tool observation at05:23:39Z; a later native observation is separately retained below.",
+    "later_native_fixture_absence": {
+      "observed_at_utc": "2026-10-01T05:50:58Z",
+      "command": "ss -ltn 'sport = :3713 or sport = :5436'",
+      "exit_code": 0,
+      "returned_listener_count": 0,
+      "scope": "Fresh read-only observation of current absence; no fixture restart or new provider execution."
+    },
+    "profile_delete_exit_code": 0,
+    "profile_delete_returned": "Profile deleted",
+    "empty_database_state_deleted": false
+  },
+  "private_original_artifacts": [
+    {
+      "name": "fixture-pg-stop-native-tool-completion.json",
+      "sha256": "4891a0eb73fe18634e2613cc0df61abe6954afabb92813d426f74f593d173076",
+      "bytes": 427,
+      "evidence_class": "verbatim_coordinator_tool_result_copy; historical stop, not a new stop"
+    },
+    {
+      "name": "final-fixture-listener-absence.stdout",
+      "sha256": "14f4ea5bdea2bd6f8d856ec28619243555e53de100d4bca155a751876e97a843",
+      "bytes": 64
+    },
+    {
+      "name": "final-fixture-listener-absence.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "codex-hindsight-timeout-config.stdout",
+      "sha256": "838a8f754fcbac6ee87e90874986505441bdecafb0851aeaf48e1ec69d6d813a",
+      "bytes": 9981
+    },
+    {
+      "name": "systemd-corrected-fixture-final-stop.stdout",
+      "sha256": "97fd3d9ac205e6130a973d4d79abf98cf4588d6266f0a6a10b5ace420e6f7886",
+      "bytes": 453
+    },
+    {
+      "name": "systemd-corrected-fixture-health.stdout",
+      "sha256": "a85b82873727cd478e6c17aebf7b8b6eacad6973301738c63db2ae6f9641b8c2",
+      "bytes": 138
+    },
+    {
+      "name": "systemd-corrected-fixture-listener.stdout",
+      "sha256": "1dad1d3e4ed327ec448f91c555273752c671fd44cda43506f51f0e935263711a",
+      "bytes": 8
+    },
+    {
+      "name": "systemd-corrected-fixture-properties.stdout",
+      "sha256": "447dbe2c3a05f3035eb1e7c92e4141eeed6607baff8a75d8a5f72bcb8cf4a1d0",
+      "bytes": 276
+    },
+    {
+      "name": "systemd-corrected-fixture-start.stderr",
+      "sha256": "c13c5a2a9e711f5737e5203f6e6e6dcc5db3ecda8a703fc347abe2150e996bde",
+      "bytes": 296
+    },
+    {
+      "name": "systemd-default-fixture-health.stderr",
+      "sha256": "d128c22bb4877325b3280cf3330b6e3ec0f391f7fef02e786be57dafdf399191",
+      "bytes": 69
+    },
+    {
+      "name": "systemd-default-fixture-native-status.stdout",
+      "sha256": "70a4e9a9b614ba3b29915b154914f84e993aab5f7f3bd36c5ef53a3ba8b56691",
+      "bytes": 457
+    },
+    {
+      "name": "systemd-default-fixture-properties.stdout",
+      "sha256": "0a6d9478698d8a12ad99c33d860f57cb7cafc39891867d38687b2924755d1182",
+      "bytes": 137
+    },
+    {
+      "name": "systemd-default-fixture-start.stderr",
+      "sha256": "811a91af8d3d368e7fa9160ce44526967753feeab0e4198e4e4ec31b09e2a227",
+      "bytes": 255
+    },
+    {
+      "name": "systemd-fixture-first-stop.stdout",
+      "sha256": "97fd3d9ac205e6130a973d4d79abf98cf4588d6266f0a6a10b5ace420e6f7886",
+      "bytes": 453
+    },
+    {
+      "name": "systemd-fixture-health.stdout",
+      "sha256": "bc0b3238e7c3b39f41e603688780d53b0250d03615948fe99be8d817ce37837d",
+      "bytes": 138
+    },
+    {
+      "name": "systemd-fixture-profile-create.stdout",
+      "sha256": "f7b43d1ca4ae885c81b05b6b3fb66789f82cde4562bc6e7982a06c3a1ab2d442",
+      "bytes": 197
+    },
+    {
+      "name": "systemd-fixture-profile-delete.stdout",
+      "sha256": "f4b1e5c7ebdcbce9e24587cc5d1881650e1601d986322770242b99c339015bd2",
+      "bytes": 70
+    },
+    {
+      "name": "systemd-fixture-properties.stdout",
+      "sha256": "6a8edd28d388137f580d534fb88471cd5cb7bb4190f21e854afe2e895151a774",
+      "bytes": 266
+    },
+    {
+      "name": "systemd-fixture-start.stderr",
+      "sha256": "6651ebb5c179ede3697f19b0f720b10ca00ba0fe844c3270f7b52afdae699962",
+      "bytes": 286
+    },
+    {
+      "name": "systemd-production-corrected-properties.stdout",
+      "sha256": "cd9f8aaaa8672eb533b8bf8f0e5b8041fce40b673e41aba65f0f3c25e4ad0d6a",
+      "bytes": 318
+    }
+  ],
+  "private_unit_artifacts": [
+    {
+      "name": "native-stack-production-hindsight-ensure.service",
+      "sha256": "797d076ab9a1ee979b88f5ea7a06d555e4fc3d40cb002e38c7568dc770da0563",
+      "bytes": 778
+    },
+    {
+      "name": "native-stack-production-hindsight-ensure.timer",
+      "sha256": "3512206c31b631b529ce431474533d188f4a9e9f22bf4ccba7b51bc0ec563b02",
+      "bytes": 300
+    }
+  ],
+  "sanitization": "Private paths, native profiles, process IDs, account configuration and authentication values are omitted. Nonempty actual returned outputs are hashed here; all original outputs stay outside the checkout."
+}

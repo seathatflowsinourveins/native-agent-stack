@@ -1,0 +1,9 @@
+{
+  "items": [{
+    "content": "Synthetic Meridian decision MERIDIAN-RETENTION: audit records are retained for 21 days. This is an isolated qualification canary rather than a production policy.",
+    "document_id": "meridian-retention-decision",
+    "timestamp": "2026-09-30T20:00:00Z",
+    "tags": ["qualification:20261001", "project:meridian"]
+  }],
+  "async": true
+}
