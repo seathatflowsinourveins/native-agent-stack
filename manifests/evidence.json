@@ -39942,8 +39942,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20261001/receipt.json",
-      "sha256": "75bf2a7e85e135da5c332bb4263fe8fed7bbb2a453d7fab52b394a558326b524",
-      "bytes": 6582
+      "sha256": "39d70ba2cb73913fb5efbe75ad77a6b407467003f1fa2dfc4e8deca838ffd898",
+      "bytes": 6635
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",

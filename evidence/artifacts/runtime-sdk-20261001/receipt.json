@@ -112,6 +112,7 @@
     "observed_backend_model": null,
     "observed_backend_effort": null,
     "marker_exact_match": true,
+    "observed_marker": "SDK_01593_NATIVE_CANARY_OK",
     "returned_item_types": [
       "userMessage",
       "reasoning",
