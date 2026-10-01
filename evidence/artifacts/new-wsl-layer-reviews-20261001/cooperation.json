@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "native_cross_family_coordination",
+  "checked_at": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "claim": "A native Claude lead coordinator submitted a directed handoff to the existing Claude catalog owner; the owner returned a designated bounded handoff assigning Codex independent per-layer reviews and crosswalk/gate evidence.",
+  "native_client": {
+    "version": "2.1.286",
+    "requested_model": "opus",
+    "requested_effort": "max",
+    "observed_model_usage_names": [
+      "claude-opus-5-5"
+    ],
+    "command_shape": "rtk claude -p --model opus --effort max --output-format json --no-session-persistence --allowedTools ListAgents SendMessage"
+  },
+  "native_execution": {
+    "exit_code": 0,
+    "result_subtype": "success",
+    "native_send_message_tool_result": {
+      "success": true,
+      "submission": "queued",
+      "message_identifier": "retained privately"
+    },
+    "recipient_response": "received as designated bounded handoff; this is task ownership acceptance, not architecture or layer closure"
+  },
+  "private_original_output": {
+    "file": "claude-coordination.stdout.json",
+    "bytes": 93484,
+    "sha256": "8f97a79c4e409b4931c4ee21da9eca643e9b0abf479fd3886186d6a6b09a5fa5",
+    "stderr_bytes": 0
+  },
+  "owner_response": {
+    "file": "claude-owner-response.md",
+    "bytes": 7942,
+    "sha256": "67bc29073df02d5a5c6d0e4bb94f4b0ec67fc24145f7fe70d116579cb03ef1d2"
+  },
+  "native_usage": {
+    "input_tokens": 6,
+    "cache_creation_input_tokens": 73007,
+    "cache_read_input_tokens": 125099,
+    "output_tokens": 12261,
+    "thinking_tokens_subset_of_output": 10878,
+    "native_estimated_cost_usd": 0.8543198,
+    "invoice_cost": null,
+    "counting": "Native terminal counters for this coordinator call only; cache subdivisions and thinking tokens must not be added again. The native priced estimate is not an invoice."
+  },
+  "substantive_review_handoff": {
+    "native_execution_exit_code": 0,
+    "result_subtype": "success",
+    "native_send_message_tool_result": {
+      "success": true,
+      "submission": "queued",
+      "recipient_acceptance": "not inferred from the queue acknowledgment"
+    },
+    "content": [
+      "Codex review ownership on the frozen main revision, separate from production pin upgrades",
+      "Provisional comparison installs need an explicit lifecycle before final selection",
+      "Hindsight and Codex PTY messaging failure states must remain visible in the target composition",
+      "The proposed 262144 rootless UID range requires primary-source justification; Docker documents a 65536 minimum",
+      "The user requested continuing research waves without a total wave cap"
+    ],
+    "private_original_output": {
+      "file": "claude-review-handoff.stdout.json",
+      "bytes": 36370,
+      "sha256": "fe4114724a2c77fc1e91a21bd69fd7ed488c299e743282f2efaf63d42a59af00"
+    },
+    "native_usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 52722,
+      "cache_read_input_tokens": 134944,
+      "output_tokens": 2374,
+      "thinking_tokens_subset_of_output": 1238,
+      "native_estimated_cost_usd": 0.4962688,
+      "invoice_cost": null,
+      "counting": "Separate completed native call. Do not add iteration snapshots, cache subdivisions, or thinking tokens again."
+    },
+    "deciding_sources": [
+      "docs/decisions/2026-10-01-definitive-sota-wsl-program.md at c25bf0c5c7156b0979a79712601231979c747b84",
+      "adoption/platforms/linux-wsl2-new-distro.md at eabe765492f18a368f92b0d01c7046c9969458ef",
+      "https://docs.docker.com/engine/security/rootless/",
+      "evidence/receipts/seamless-local-runtime-20261001.json at 3e6617d1ee73da9aef619cc277c624ac74e07326"
+    ]
+  },
+  "role_correction": {
+    "initial_researcher_delivery": false,
+    "reason": "The installed stack-researcher role excludes ListAgents and SendMessage. Its native report confirms neither was called.",
+    "resolution": "Use the native lead coordinator for one explicit messaging exchange; retain the researcher for source review.",
+    "researcher_output": {
+      "file": "claude-peer.stdout.json",
+      "bytes": 871686,
+      "sha256": "320bac7360eb07c19d484bbf125c2ac082b96cd6416a7c1a21f88f9dd9e8a05c"
+    }
+  },
+  "ownership": {
+    "claude": [
+      "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "scripts/build_ecosystem.py",
+      "docs/ecosystem/template.html",
+      "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
+      "adoption/platforms/linux-wsl2-new-distro.md"
+    ],
+    "codex": [
+      "evidence/artifacts/new-wsl-layer-reviews-20261001/",
+      "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
+      "sanitized existing-host gate evidence"
+    ]
+  },
+  "limitations": [
+    "Explicit Claude-side coordinator messaging is not qualification of AgentRelay automated Codex PTY submission.",
+    "Independent source review with unresolved material gaps does not satisfy closure.c4's no-gap condition.",
+    "The replacement distro does not exist; no new-host install or lifecycle acceptance is claimed.",
+    "Private original outputs preserve identifiers and actual tool results. Public metadata excludes host paths, message/session UUIDs, raw prompts/conversations and active client configuration."
+  ],
+  "sources": [
+    "recipes/claude-codex-cooperation-lanes.md",
+    "https://code.claude.com/docs/en/cli-reference",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.286"
+  ]
+}

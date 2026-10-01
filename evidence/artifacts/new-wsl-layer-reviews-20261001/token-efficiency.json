@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "token-efficiency",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No complete matched native task/attempt/provider baseline establishes causal savings while preserving answer quality.",
+      "Headroom's real-session interception/recovery benefit and child/failed-attempt coverage remain unqualified."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "pin_of_record": "0.50.0",
+      "pin_source": "manifests/stack.json:822; adoption/pins-linux-x86_64.json:102",
+      "source_pinned_url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+      "upstream_currency": "Latest v0.50.0 confirmed via releases/latest; installed rtk --version exit 0 matches.",
+      "native_install": {
+        "command": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "cargo test --all",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/.github/workflows/ci.yml",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "pin_of_record": "0.37.0",
+      "pin_source": "manifests/stack.json:515; adoption/pins-linux-x86_64.json:279",
+      "source_pinned_url": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+      "upstream_currency": "Latest v0.39.1 fixes 0.39.0 TPM refusal: https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1. New releases unqualified.",
+      "native_install": {
+        "command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "pytest tests scripts/tests",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/.github/workflows/ci.yml",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "pin_of_record": "20.0.26 @ d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "pin_source": "manifests/stack.json:164; adoption/pins-linux-x86_64.json:264",
+      "source_pinned_url": "https://github.com/ccusage/ccusage/blob/v20.0.26/README.md",
+      "upstream_currency": "Latest v20.0.26; installed ccusage --version exit 0 matches. Observing usage is not demonstrating savings.",
+      "native_install": {
+        "command": "npm install --global ccusage@20.0.26",
+        "source": "https://github.com/ccusage/ccusage/blob/v20.0.26/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "just test",
+        "source": "https://github.com/ccusage/ccusage/blob/v20.0.26/justfile",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Context Mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "verdict": "Retain scoped output processing at record/latest 1.0.169. Mixed fixed-order trials do not isolate causal provider savings; use only a sufficient information contract.",
+      "sources": [
+        "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md"
+      ]
+    },
+    {
+      "name": "Repomix",
+      "repository": "https://github.com/yamadashy/repomix",
+      "verdict": "Current/latest 1.18.1 suits explicit-file handoffs; structural compression omits implementation details. Retain originals and measure the selected representation.",
+      "sources": [
+        "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md"
+      ]
+    },
+    {
+      "name": "TOON",
+      "repository": "https://github.com/toon-format/toon",
+      "verdict": "Lossless per-artifact option; current source warns deeply nested/nonuniform data can favor compact JSON. Existing full-catalog exact counts expanded to 66815 from 59792 tokens.",
+      "sources": [
+        "https://github.com/toon-format/toon/blob/v4.1.1/README.md"
+      ]
+    },
+    {
+      "name": "Claude Token Efficient",
+      "repository": "https://github.com/drona23/claude-token-efficient",
+      "verdict": "Output-verbosity instruction with recurring input overhead; current upstream repeated-output benchmark is a lead, not this stack's complete quality/usage acceptance.",
+      "sources": [
+        "https://github.com/drona23/claude-token-efficient/blob/0d30a6db75af983b8ababf585f28faefdfc87895/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "The RTK awareness instruction's explicit prefix is always safe and behavior/output remains unchanged.",
+      "correction": "0.50.0 deliberately windows large git show blobs. Preserve native/rtk proxy exceptions for exact originals and retained exit/status defects; a recovery hint does not make a piped blob exact.",
+      "deciding_source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/src/cmds/git/git_cmd.rs#L586; evidence/receipts/rtk-050-qualification-20260925.json:11-20"
+    }
+  ],
+  "evidence_assessment": [
+    "Landscape rtk 0.49.0/ccusage 20.0.24 are historical winner identities, not current install pins; the newer record pins were verified independently.",
+    "Reuse docs/token-practice.md's mixed fixed-order Codex/Claude trials, exact artifact comparisons and failed conditions. The 11.26% lower Codex and 25.83% higher Claude pairs have uncontrolled caching/plugin conditions; neither establishes a causal effect.",
+    "RTK 0.50 qualification is local integration/synthetic hook evidence, not unchanged upstream cargo tests or whole-provider savings. Foundation gateway/lite semantic failures remain separate.",
+    "Headroom's recovery fixtures/zero native ledger calls do not establish real-session benefit. Do not sum artifact reductions, cumulative snapshots, cache/provider subsets or tool estimates.",
+    "All install/test commands are prospective; no private usage logs, savings ledger, provider run, interception or global configuration was read or changed."
+  ],
+  "failed_access": [
+    {
+      "source": "Context Mode fetch/index of ccusage README at v20.0.26 and immutable commit; TOON README at v4.1.1",
+      "result": "Reported 0.0KB/unusable content. GitHub contents API returned the complete pinned sources (13774/35504 bytes), used for bounded recovery."
+    },
+    {
+      "source": "rtk v0.50.0 guessed src/git.rs and src/diff.rs",
+      "result": "HTTP 404/exit 1; tagged tree resolved actual src/cmds/git/git_cmd.rs and diff_cmd.rs."
+    }
+  ],
+  "omissions": [
+    "No fresh total-provider baseline, automatic traffic interception or historical usage/state reads.",
+    "The current source/CLI review cannot qualify answer quality or lifetime savings."
+  ],
+  "next_wave": [
+    "For an actual optimization decision, run the maintained upstream harness with matched task/cache/client conditions, preserved originals and a failure oracle; include every attempt/child and leave unknown provider categories unknown.",
+    "Review Headroom v0.39.1's documented TPM-limiter fix and the selected CCR recovery path before an isolated candidate trial, retaining 0.37.0 rollback and no default interception."
+  ],
+  "reopen_on": [
+    "Information loss, failed source recovery, material native accounting coverage changes or a complete same-task cost/quality comparison can reopen a lane."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "layer_id": "scheduling-supervision",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Ubuntu 26.04.1 systemd package pin and user-session behavior have not been observed on the new distro.",
+      "WSL process shutdown, distro termination, Windows reboot and external provider/application effects are distinct unexecuted acceptance boundaries."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "pin_of_record": "2.16.6",
+      "pin_source": "manifests/stack.json:1333",
+      "source_pinned_url": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+      "upstream_currency": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1; unmeasured candidate",
+      "native_install": {
+        "command": "tar -xzf dagu_2.16.6_linux_amd64.tar.gz; install dagu \"$BIN_DIR/dagu\"",
+        "source": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "dagu validate --dagu-home \"$DAG_HOME\" \"$DAG\"; dagu start --context local --dagu-home \"$DAG_HOME\" --run-id \"$RUN_ID\" \"$DAG\"",
+        "source": "https://docs.dagu.sh/getting-started/installation/linux; installed validate/start --help exited 0",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "pin_of_record": "255.4-1ubuntu8.17 (historical host package)",
+      "pin_source": "manifests/stack.json:1446",
+      "source_pinned_url": "https://github.com/systemd/systemd/blob/v255/man/systemd-run.xml",
+      "upstream_currency": "https://github.com/systemd/systemd/releases/tag/v262; Ubuntu target package unresolved",
+      "native_install": {
+        "command": "sudo apt-get install systemd systemd-sysv",
+        "source": "https://github.com/systemd/systemd/blob/v255/man/systemd-run.xml",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "systemd-run --user --wait --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group \"$COMMAND\"",
+        "source": "Pinned v255 manual; https://learn.microsoft.com/en-us/windows/wsl/systemd",
+        "evidence_class": "source_only"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Prefect",
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "verdict": "Python workflow candidate; compare deployment/control semantics for a named workflow",
+      "sources": [
+        "https://github.com/PrefectHQ/prefect/blob/3.8.7/README.md"
+      ]
+    },
+    {
+      "name": "Dagster",
+      "repository": "https://github.com/dagster-io/dagster",
+      "verdict": "Data-pipeline/lineage candidate; selected local process need alone does not select a server",
+      "sources": [
+        "https://github.com/dagster-io/dagster/blob/1.13.24/README.md"
+      ]
+    },
+    {
+      "name": "Temporal",
+      "repository": "https://github.com/temporalio/temporal",
+      "verdict": "Durable execution candidate for a concrete cross-process/external-effect gap",
+      "sources": [
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+      ]
+    },
+    {
+      "name": "Restate",
+      "repository": "https://github.com/restatedev/restate",
+      "verdict": "Durable service/workflow candidate; compare actual idempotency/cancellation boundaries",
+      "sources": [
+        "https://github.com/restatedev/restate/blob/v1.7.12/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Linux service supervision also proves persistent WSL availability",
+      "correction": "Microsoft explicitly says systemd services do not keep WSL alive; distro shutdown and Windows reboot require separate observations. Historical Ubuntu package 255.4 is not the Ubuntu 26.04.1 package pin",
+      "deciding_source": "https://learn.microsoft.com/en-us/windows/wsl/systemd"
+    },
+    {
+      "claim": "Dagu auth:none is a Viewer-only observation mode",
+      "correction": "Dagu v2.16.6 documents none/basic/builtin; role restrictions belong to builtin auth. Grafana anonymous Viewer is a different component",
+      "deciding_source": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md"
+    }
+  ],
+  "evidence_assessment": [
+    "Primary v2.16.6 README/installer, v255 manual, and Microsoft WSL 3.0.1 tagged systemd architecture read. Installed Dagu2.16.6 and systemd255 version/help are reviewer-host observations only.",
+    "https://github.com/microsoft/WSL/blob/3.0.1/doc/docs/technical-documentation/systemd.md documents readiness timeout and login-based user-session synchronization.",
+    "Dagu's upstream development command is make test with race detection; not executed. Newer 2.18.1 is metadata, not measured promotion."
+  ],
+  "failed_access": [
+    "https://packages.ubuntu.com/resolute/systemd timed out; no target package version inferred."
+  ],
+  "omissions": [
+    "No service installation, lifecycle mutation, operator login or provider cancellation run."
+  ],
+  "next_wave": [
+    "Read the target distro's native package/help metadata once created; qualify process cleanup, wsl --terminate, wsl --shutdown and Windows reboot separately.",
+    "Bound one changed Dagu deployment/auth boundary or one external effect; compare a durable alternative only against that gap."
+  ],
+  "reopen_on": [
+    "Dagu2.18.1 fixes a demonstrated current workflow gap",
+    "WSL/systemd user-session or process-lifetime behavior changes",
+    "Application requires durable external effects"
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

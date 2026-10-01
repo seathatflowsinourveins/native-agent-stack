@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "layer_id": "durable-memory",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "ultra",
+    "family": "Codex",
+    "independent_source_research": "Astra/max stack-researcher; consequential cross-client memory composition"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No matched representative semantic-quality comparison establishes a superior writer across the named candidates.",
+      "Basic Memory, Letta Code, Cognee, OpenViking and Supermemory require a second tagged-source capability pass beyond release metadata.",
+      "ai-memory latest-candidate external capture ownership still requires native client lifecycle and compatibility review; the unchanged 2.5.2 POSIX hook suite passed, but Rust/full gates were not executed.",
+      "Hindsight knowledge-page freshness and cold Git seeding have preserved failed existing-host attempts.",
+      "New-host project/worktree isolation, restart, restore and capture/recall acceptance remain unknown."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin_of_record": "2.4.1",
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "pin_source": "manifests/stack.json#/components/id=ai-memory",
+      "selection_source": "catalogs/foundation/manifest.json#/layers/id=durable-memory",
+      "role": "One scoped cross-client memory store of record",
+      "installed_client_observation": {
+        "command": "rtk ai-memory --version",
+        "exit_code": 0,
+        "returned_output": "ai-memory 2.4.2",
+        "scope": "PATH executable on the existing host; this does not identify the running service or qualify an upgrade"
+      },
+      "upstream_currency": {
+        "candidate": "2.5.1",
+        "source_pin": "695805eb881fd25f6bea67a9d0ff05b9adeaab44",
+        "published_at": "2026-10-01T06:04:28Z",
+        "release_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.1",
+        "installed_version_release_checked": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2",
+        "adoption": "conditional; neither installed client currency nor release metadata promotes a candidate",
+        "later_currency_check": {
+          "latest_candidate": "2.5.2",
+          "source_pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+          "published_at": "2026-10-01T07:40:18Z",
+          "release_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+          "changelog_source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/CHANGELOG.md",
+          "delta_source": "https://github.com/akitaonrails/ai-memory/compare/v2.5.1...v2.5.2",
+          "delta": "37 commits include message-send admission, scoped related-page reads, session-start briefing keys and checkpoint wiki-index writes. The 2.5.1 capture contract source review remains dated evidence; latest-candidate qualification must include this delta.",
+          "adoption": "conditional; unchanged qualification has not run"
+        }
+      },
+      "native_install": {
+        "commands": [
+          "cargo install --locked --git https://github.com/akitaonrails/ai-memory --tag v2.5.1",
+          "ai-memory install-mcp --client codex --apply",
+          "ai-memory install-mcp --client claude-code --apply",
+          "ai-memory install-hooks --agent codex --apply",
+          "ai-memory install-hooks --agent claude-code --apply"
+        ],
+        "sources": [
+          "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.1",
+          "https://github.com/akitaonrails/ai-memory/blob/v2.5.1/docs/external-lifecycle.md",
+          "Installed ai-memory 2.4.2 install-hooks --help, exit 0; installation was not invoked"
+        ],
+        "status": "supported command shapes; candidate installation is not claimed"
+      },
+      "native_acceptance": {
+        "commands": ["cargo tf", "cargo t -E 'test(/external_capture/)'", "sh tests/hooks/test_lib.sh"],
+        "source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.1/.cargo/config.toml",
+        "contract": "cargo tf expands to nextest run --workspace -P full; cargo t expands to nextest run. Resolve the external-capture test inventory and hook-test source before execution.",
+        "status": "planned native source/tests; no new execution is claimed"
+      },
+      "evidence_class": "selection of record plus historical native integration, current installed-client observation and tagged-source review",
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "component_id": "hindsight-evaluation-composition",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin_of_record": "0.10.2 evaluation target, not the canonical stack memory selection",
+      "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "integration_repository": "https://github.com/vectorize-io/hindsight",
+      "integration_directory": "hindsight-integrations/coding-agents",
+      "integration_package": "@vectorize-io/hindsight-coding-agents",
+      "integration_pin": "0.8.0",
+      "pin_source": "evidence/receipts/seamless-local-runtime-20261001.json at 3e6617d1ee73da9aef619cc277c624ac74e07326",
+      "role": "Conditional evaluated native coding-agent memory integration",
+      "native_acceptance": {
+        "commands": ["npm ci", "npm test", "npm run test:harness-e2e"],
+        "source": "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/package.json",
+        "contract": "The ordinary test command excludes the harness E2E suite; E2E requires its native backend/provider prerequisites.",
+        "status": "historical integration is distinct from unchanged upstream tests and new-host acceptance"
+      },
+      "historical_gates": [
+        "Native capture/recall and one cross-family lookup passed on the existing host.",
+        "Five knowledge pages remain stale or failed; automatic refresh is paused after a failed latest attempt.",
+        "A fresh native conventions-page refresh failed at the backend 300-second deadline.",
+        "Cold Git seeding failed or remained unfinished and was canceled; automatic seeding remains disabled.",
+        "Owned lifecycle fixture and repeat start passed; physical host reboot was not tested."
+      ],
+      "evidence_class": "historical existing-host native integration and preserved failure states",
+      "adoption": "conditional",
+      "new_host_acceptance": "unknown"
+    }
+  ],
+  "alternatives": [
+    {"repository": "https://github.com/MemPalace/mempalace", "candidate": "3.10.0", "status": "conditional", "source": "https://github.com/MemPalace/mempalace/tree/v3.10.0", "reason": "Native short-session capture, same-name repository routing and restore require a matched comparison."},
+    {"repository": "https://github.com/thedotmack/claude-mem", "candidate": "13.28.0", "status": "conditional", "source": "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md#L153-L155", "storage_source": "https://github.com/thedotmack/claude-mem/blob/v13.28.0/docs/public/configuration.mdx#L24", "reason": "Anthropic-plan processing with local memory is a supported path; explicit provider/opt-out and noninteractive installs can skip signup. Optional signup must not be treated as a universal cloud requirement."},
+    {"repository": "https://github.com/mem0ai/mem0", "candidate": "2.2.1 Python; 0.3.3 coding plugin", "status": "conditional", "source": "https://github.com/mem0ai/mem0/blob/v2.2.1/integrations/claude-code-plugin/README.md", "reason": "The native coding plugin's Platform API contract is distinct from the stock OSS server; changing a URL does not establish parity."},
+    {"repository": "https://github.com/MemTensor/MemOS", "candidate": "2.0.34", "status": "conditional", "source": "https://github.com/MemTensor/MemOS/blob/v2.0.34/README.md", "reason": "Native cross-client hooks exist, but the cloud coding plugin's local-backend parity remains unqualified."},
+    {"repository": "https://github.com/getzep/graphiti", "candidate": "0.30.2", "status": "specialist", "source": "https://github.com/getzep/graphiti/tree/v0.30.2", "reason": "Temporal knowledge-graph MCP is complementary; Zep managed service and deprecated community server are different products."},
+    {"repository": "https://github.com/letta-ai/letta", "candidate": "0.16.8", "status": "architecture alternative", "source": "https://github.com/letta-ai/letta/tree/0.16.8", "reason": "Stateful agent runtime is distinct from a drop-in native-client memory writer."},
+    {"repository": "https://github.com/basicmachines-co/basic-memory", "candidate": "0.23.2", "status": "source pass required", "release_source": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"},
+    {"repository": "https://github.com/letta-ai/letta-code", "candidate": "0.34.1", "status": "source pass required", "release_source": "https://github.com/letta-ai/letta-code/releases/tag/v0.34.1"},
+    {"repository": "https://github.com/topoteretes/cognee", "candidate": "1.6.2", "status": "source pass required", "release_source": "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"},
+    {"repository": "https://github.com/volcengine/OpenViking", "candidate": "0.4.22", "status": "source pass required", "release_source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22"},
+    {"repository": "https://github.com/supermemoryai/supermemory", "candidate": "server-v0.0.8", "status": "source pass required", "release_source": "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"}
+  ],
+  "anti_pattern_log": [
+    {
+      "mistake": "A progress update called all 20 foundation reviews committed when only the 19 worker reviews had been committed and the coordinator's memory review remained a draft.",
+      "correction": "Nineteen committed worker reviews plus one coordinator draft comprise the current 20-layer pass; focused memory follow-up remains open.",
+      "verification_path": [
+        "Native git restore integrated six review blobs from 9dc646c9b60565cc793e9aa0651a78a4bd516e10, six from 54f2a98659b8d2d3f89907bd676a4ea4a4819c77, and seven from 1d7b4b6fd6d86b773d5fb60a9449b34f73e3b867, each exit 0.",
+        "The coordinator's durable-memory.json has not yet been committed at this observation."
+      ],
+      "lesson": "Report draft, committed, accepted and saturated states separately."
+    },
+    {
+      "mistake": "The first local draft guessed the MemPalace repository owner and placed Hindsight's coding-agent integration in a separate repository.",
+      "correction": "MemPalace is MemPalace/mempalace. Hindsight's integration is the @vectorize-io/hindsight-coding-agents package under hindsight-integrations/coding-agents in vectorize-io/hindsight.",
+      "verification_path": [
+        "Native gh api repos/MemPalace/mempalace/git/ref/tags/v3.10.0 returned exit 0.",
+        "Native gh api repos/vectorize-io/hindsight/git/ref/tags/integrations/coding-agents/v0.8.0 returned exit 0.",
+        "Read tagged hindsight-integrations/coding-agents/package.json through native gh api, exit 0; its repository, directory, package name and native test scripts agree."
+      ],
+      "lesson": "Verify exact repository and monorepo package identity before writing source citations."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "The durable-memory landscape open gap still describes 2.3.2-only acceptance and an uninstalled 2.4 upgrade.",
+      "correction": "The frozen stack selects 2.4.1 and contains a dated 2.4.1 restored-copy qualification and cutover receipt. Historical evidence remains historical; it does not establish representative semantic quality or new-host acceptance.",
+      "deciding_source": "evidence/receipts/ai-memory-241-qualification-20260925.json"
+    },
+    {
+      "claim": "ai-memory must always produce its own observations when a launched harness owns capture.",
+      "correction": "2.5.1 supports the process-scoped AI_MEMORY_CAPTURE_OWNER contract. It suppresses native observation capture/drains/backfill while preserving context, MCP and handoff identity, requires updated installed hooks, and leaves project opt-out semantics intact. It is not a Hindsight adapter or project configuration setting.",
+      "deciding_source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.1/docs/external-lifecycle.md"
+    },
+    {
+      "claim": "Claude-mem categorically requires a separate hosted provider.",
+      "correction": "Its upstream Anthropic-plan processing and local-memory path must be compared separately from optional hosted signup.",
+      "deciding_source": "https://github.com/thedotmack/claude-mem/tree/v13.28.0"
+    }
+  ],
+  "evidence_assessment": {
+    "historical_native_integration": "ai-memory 2.4.1 restored-copy comparison, schema migration, hooks and native tool calls; Hindsight capture/recall alongside failed freshness and seed attempts",
+    "representative_semantic_quality": "not established by installation, lifecycle, metadata or small recall fixtures",
+    "unchanged_upstream_tests_this_wave": "2.5.2 POSIX hook suite: 137 passed, 0 failed, exit 0; evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-upstream-hooks.json. Rust and full native gates remain unexecuted.",
+    "new_host_execution": "not executed; the replacement distro does not exist"
+  },
+  "failed_access": [],
+  "omissions": [
+    "Five named competitors still need tagged-source capability review; release metadata only has been checked.",
+    "The dated 2026-09-26 and 2026-09-29 convergence sets also name rohitg00/agentmemory, vshulcz/deja-vu, tigerless-labs/agent-memory and langchain-ai/langmem. Their deciding facts/fit votes and source revisions must be folded into the frozen set before candidate coverage can close. Existing refuted alternatives may retain their original deciding evidence where inputs still match."
+  ],
+  "next_wave": [
+    "Complete the five remaining native integration/capture/restore source reviews and fold in the four later-wave candidates, including maintained package/repository identity and retained refutation reasons.",
+    "Inspect 2.5.1 native external-capture tests and compare their contract with the one-writer composition before any adoption.",
+    "Preregister a supported native matched-corpus comparison covering short sessions, same-name repositories, worktrees, contradiction, deletion, freshness, restart and restore; retain quality failures and complete usage.",
+    "Qualify Hindsight page freshness only after a native operation completes and independent metadata confirms freshness. Preserve the backend deadline and paused state."
+  ],
+  "reopen_on": ["A tagged upstream capability materially changes the fixed memory contract", "A matched native comparison overturns the incumbent", "A target-host isolation or recovery gate fails"],
+  "new_host_acceptance": "unknown",
+  "closure": "not saturated"
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "layer_id": "isolation",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["Loopback/filesystem fixtures do not qualify TLS/SOCKS/IPv6, hostile workloads, resource limits or VM boundaries.","Worktrunk crash cleanup/model-child ownership remain unqualified.","Ubuntu 26.04/WSL namespace/AppArmor prerequisites are source-only; distro absent."]},
+  "selected_repositories": [
+    {"component_id":"worktrunk","repository":"https://github.com/max-sixty/worktrunk","pin_of_record":"0.79.0","pin_source":"manifests/stack.json:1057; no Worktrunk row in adoption/pins-linux-x86_64.json","source_pinned_url":"https://github.com/max-sixty/worktrunk/tree/5ba6f148e8505c20794f2d8bc706aa4f26335c95","upstream_currency":"Latest 0.80.0 (2026-09-27); installed 0.79.0.","native_install":{"command":"cargo install worktrunk --version 0.79.0","source":"pinned README.md Cargo installation","evidence_class":"source-only; not run"},"native_acceptance":{"command":"cargo test","source":"pinned README.md development section","evidence_class":"source-only; not run"}},
+    {"component_id":"sandbox-runtime","repository":"https://github.com/anthropics/sandbox-runtime","pin_of_record":"0.0.77","pin_source":"manifests/stack.json:855; no sandbox-runtime row in adoption/pins-linux-x86_64.json","source_pinned_url":"https://github.com/anthropics/sandbox-runtime/tree/6fa731368807419ee157f9a3fac955fefe1019c6","upstream_currency":"Latest 0.0.78 (2026-09-30); installed package 0.0.77. New test/exit-status fixes reopen review.","native_install":{"command":"npm install -g @anthropic-ai/sandbox-runtime@0.0.77","source":"pinned README.md:14; package.json","evidence_class":"source-only; not run"},"native_acceptance":{"command":"npm test","source":"pinned README.md:673 and package.json (bun test)","evidence_class":"source-only; not run"}}
+  ],
+  "alternatives": [
+    {"name":"Apple Container","repository":"apple/container","verdict":"1.5.0 requires Apple silicon/macOS 26; not a WSL runtime.","sources":["https://github.com/apple/container/blob/1.5.0/README.md"]},
+    {"name":"Podman / Quadlet","repository":"podman-container-tools/podman","verdict":"v6.1.3 Linux container alternative; boundary/service acceptance separate.","sources":["https://github.com/podman-container-tools/podman/blob/v6.1.3/README.md"]},
+    {"name":"Docker Engine / Moby","repository":"moby/moby","verdict":"docker-v29.8.2 toolkit; Docker integration/boundary separately qualified.","sources":["https://github.com/moby/moby/blob/docker-v29.8.2/README.md"]},
+    {"name":"E2B","repository":"e2b-dev/E2B","verdict":"Remote sandbox SDK; separate provider/lifecycle requirement.","sources":["https://github.com/e2b-dev/E2B/blob/f7139140d34ad440e35f4ec7d1bdd183f1b35a6e/README.md"]},
+    {"name":"gVisor","repository":"google/gvisor","verdict":"release-20260928.0 application kernel/runsc; conditional stronger boundary.","sources":["https://github.com/google/gvisor/blob/release-20260928.0/README.md"]},
+    {"name":"WSL 3.x package / Ubuntu 26.04","repository":"microsoft/WSL","verdict":"Package 3.0.1; Ubuntu docs list 26.04 on WSL 2. Package major is not architecture/acceptance.","sources":["https://github.com/microsoft/WSL/releases/tag/3.0.1","https://documentation.ubuntu.com/wsl/latest/howto/install-ubuntu-wsl2/"]}
+  ],
+  "corrections": [
+    {"claim":"Reviewer initially inferred possible drift from srt --version 1.0.0.","correction":"Pinned CLI has a 1.0.0 fallback; independent installed package metadata is 0.0.77.","deciding_source":"https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/src/cli.ts"}
+  ],
+  "evidence_assessment": [
+    "Executed installed help/package identity probes only. Worktree edit ownership is separate from runtime filesystem/network enforcement.",
+    "Read tagged platform dependencies/limitations and 0.0.78 release notes. Prior readiness failure/retries and concealed-write semantics remain bounded; no tests/receipts rerun.",
+    "Pinned README.md:558-564 documents Ubuntu 24.04+ AppArmor/userns prerequisites; no OS change."
+  ],
+  "failed_access": [
+    {"source":"Worktrunk 5ba6f148 .github/workflows/ci.yml","result":"HTTP 404; native cargo test command recovered from pinned README.md"}
+  ],
+  "omissions": [
+    "No distro/sysctl/AppArmor/container install or escape/resource trial; Quadlet service scope belongs to runtime lane."
+  ],
+  "next_wave": [
+    "Inspect 0.0.77-to-0.0.78 failure-observability diff and bound Ubuntu 26.04 namespace plus one network condition."
+  ],
+  "reopen_on": [
+    "Enforcement/exit regression, changed WSL/AppArmor prerequisite or a newly required stronger boundary."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}
