@@ -305,10 +305,10 @@ although four of the six SubagentStart carrier blocks name its tools (PR #548's 
 The assessment reads `4d11709c`, an earlier head of PR #358, because that pull request carries the trading lane's
 current records. All 12 layers are assessed and refuted, and none is final for install: no layer meets item 4 or
 item 5 in any run. The trading lane owner's verdicts of 2026-10-01 call all 12 "selection of record, open", two of
-them (research-factors-ml and security-supply-chain) with no selection of record for the layer itself, and the owner
-acknowledged the 12 trading rows of the architecture edition in PR #574. The sanitized trading assessment and the
-owner's records land in a lane:trading pull request after this one merges; the decisions, the verdict wording and the
-closure records stay with that lane.
+them (research-factors-ml and security-supply-chain) with no selection of record for the layer itself; later the same
+day the owner recorded a selection for each, which closes nothing, and corrected and re-read the 12 trading rows of
+the architecture edition in PR #574. The sanitized trading assessment and the owner's records are PR #578
+(lane:trading); the decisions, the verdict wording and the closure records stay with that lane.
 
 ## Gate A re-aim (decided by the user, 2026-10-01 03:33Z)
 

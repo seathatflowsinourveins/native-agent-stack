@@ -15610,8 +15610,8 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "21fa9fe27e1e18ff2bdb2072a296f987e92157e66da4472386c9406d7552fec2",
-      "bytes": 14383
+      "sha256": "d13d2e71db5bbf79f9133a34ffd109ba0217cb59e6fe6099f85e815998b062c1",
+      "bytes": 17975
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -15650,8 +15650,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "b54245b21caa7eb86b97e83cb473daed085660ab42dc0270198afd64e253e2c2",
-      "bytes": 115792
+      "sha256": "c61e23df300b0872bc784d5dc7926ef23009ba6d9f16acc4ae9e0f0aab8ae7d3",
+      "bytes": 125994
     },
     {
       "path": "docs/evidence.md",
@@ -16340,8 +16340,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
-      "sha256": "a5b4a0117f1ab6e949030359aeecd9560ae04cf1609fa167f5748e0849a976d5",
-      "bytes": 24412
+      "sha256": "647df6bd01449c47f600e867f2bad851a99f31b604abc01be29fb7ecbacb8e24",
+      "bytes": 24730
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/returned-output.txt",
@@ -46210,8 +46210,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "f149113c39259e3139df66c844bfbffbde01a5d154a62f1c1e0cff440efecfce",
-      "bytes": 64697
+      "sha256": "97ac2b237e905d9806160d90ddfcf8f91fb38c83f78d05d1314e427616d210a8",
+      "bytes": 87297
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -46830,8 +46830,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "bd66847310779aa1e03510931a25ea55897543b4275148715dc9d9ab49e9f8c7",
-      "bytes": 99866
+      "sha256": "8e0fbb9b579e99eb740155a9e728c43146ac61ce51fa0bbce47a344482822561",
+      "bytes": 137469
     },
     {
       "path": "tests/test_effort_default_guard.py",
