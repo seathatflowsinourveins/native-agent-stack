@@ -167,7 +167,9 @@ A winner's acceptance class describes a run that the cited source, or one file
 that source links, shows was run on a host and what it returned. A check that is
 only prescribed, planned, not run or failed is `none_recorded`. Schema, pin,
 hash and contract-test checks are `structural_validation`. A version print is
-metadata, not an acceptance. The `command` names the check the record is about.
+metadata, not an acceptance. The `command` names the check the record is about;
+on a `none_recorded` entry it names the check to run on the new host, of which
+no run is recorded.
 The build cannot read prose, so this rule is held by review, not by a validator:
 an independent review on 2026-10-01 found 32 of the 119 winner classes
 overstated, and the edition was corrected. The record of this edition is

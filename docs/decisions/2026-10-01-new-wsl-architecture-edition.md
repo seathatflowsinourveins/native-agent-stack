@@ -36,11 +36,12 @@ some cells, and no run makes a layer final. The foundation rows use the first co
 us-equities rows the last, which is the basis of that assessment's synthesis. The core files those assessments cite
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json`, `catalogs/foundation/manifest.json`) are unchanged between `3361b342` and
-this edition's base. Six pull requests carry sources that are not on main yet: the new-distribution recipe
-(PR #569, head `344a69ff`), the Harbor E2E receipt (PR #570, head `cd7db158`), the trading convergence record
-(PR #358, head `b0eb7a11`), the program record with the foundation assessment (PR #573, head `5adcc3a4`), the
-Codex lane's layer reviews and crosswalk (PR #575, head `bbee2a8e`) and the runtime-workers blueprint README
-(PR #535, head `1195e212`).
+this edition's base. Seven pull requests carried sources that were not on main at that base. Four have merged
+since: the new-distribution recipe (PR #569, merged as `ad7d645b`), the Harbor E2E receipt (PR #570, `000aae77`),
+the trading convergence record (PR #358, `326dc84b`) and the program record with the foundation assessment
+(PR #573, `25098f8a`). Three are open: the Codex lane's layer reviews and crosswalk (PR #575, head `51cb79ba`),
+the trading lane's verdict record (PR #578, head `e1f15c97`) and the runtime-workers blueprint README (PR #535,
+head `1195e212`).
 
 ## Alternatives
 
@@ -92,11 +93,17 @@ preregistered SIGKILL case.
 execution apart. A winner's acceptance class describes a run that the cited source, or one file that source
 links, shows was run on a host and what it returned. A check that is only prescribed, planned, not run or failed
 is `none_recorded`. Schema, pin, hash and contract-test checks are `structural_validation`. A version print is
-metadata, not an acceptance. The `command` names the check the record is about. An independent review on
-2026-10-01 found 32 of the 119 winner acceptance classes overstated, 13 commands that were only version or status
-prints and 6 entries it could not settle; this revision corrects them: 55 of the 119 entries changed (32 classes,
-48 commands and 31 cited sources), 20 entries are now `none_recorded` and 13 `structural_validation`, and 16 row
-classes changed. The six policy classes have no defined order, so the build enforces what can be enforced:
+metadata, not an acceptance. The `command` names the check the record is about; on a `none_recorded` entry it
+names the check to run on the new host, of which no run is recorded. An independent review on 2026-10-01 found 32
+of the 119 winner acceptance classes overstated, 13 commands that were only version or status prints and 6 entries
+it could not settle; this revision corrects them. 55 of the 119 entries changed (32 classes, 48 commands and 31
+cited sources); the lane owners re-cited their winners to the files that record the runs; 13 `none_recorded`
+entries got their check to run back; restic is cited to its off-host receipt in four rows; and three rows that had
+no winner gained six. The edition now has 125 winner entries: 70 `upstream_example_or_native_operation`, 24
+`local_integration_check`, 14 `structural_validation`, 1 `independent_observation` and 16 `none_recorded`, 13 of
+which name the check to run. Row classes: 13 `local_integration_check`, 11 `none_recorded`, 7
+`structural_validation`, 5 `upstream_example_or_native_operation` and 1 `independent_observation`. The six policy
+classes have no defined order, so the build enforces what can be enforced:
 when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
 one that at least one winner's acceptance carries, and where the winners carry several, the edition records the
 one listed last in the policy table. A row without winners keeps its owner's class. Stronger evidence for one
@@ -123,23 +130,28 @@ order with newlines, no trailing newline), recorded as the edition's `close_only
 reordered research state fails the build instead of showing each row's states beside other texts. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
-**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 19
-`selection_of_record_open`, 13 `comparison_required`, 3 `no_selection`, 1 `provisional`, 1
-`new_host_required`. Every assessed row has at least one closure item unmet or partial, and no review item
+**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 20
+`selection_of_record_open`, 14 `comparison_required`, 2 `new_host_required`, 1 `provisional` and no
+`no_selection`. Every assessed row has at least one closure item unmet or partial, and no review item
 (c4) is met. The twelve us-equities rows follow the trading closure assessment: their winners are the components
 the layer's current choice names that have a pin of record (runtime-target.json for the engine, the brokers
 and the adaptive paper engine; stack pins for profile components), while the 2026-09-22 verdict winners
-without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow, Grype) stay alternatives.
-The trading lane owner's verdicts of 2026-10-01 call every trading layer "selection of record, open" and
-two of them (research-factors-ml and security-supply-chain) open with no selection of record for the layer itself.
-On the page's six values that reads: `no_selection` for those two, whose current-choice components become
-alternatives; `comparison_required` where the research state asks for a comparison; `selection_of_record_open`
-for the rest. The owner acknowledged the twelve rows in this change's pull request (#574), and each row's
-notes carry the owner's verdict and blocking item verbatim. The keys lane corrected the credential-practice row and
-the Gate A owner confirmed its three rows the same way. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
+without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) stay alternatives.
+The trading lane owner's verdicts of 2026-10-01 call every trading layer "selection of record, open". Two
+layers had no selection of record for the layer itself (research-factors-ml and security-supply-chain). After a
+cross-family adjudication in the Codex lane's reviews, the owner recorded one for each the same day (PR #578):
+EdgarTools and skfolio for the first, which reads `comparison_required`, and Syft, Gitleaks and Grype for the
+second, which reads `selection_of_record_open`, with Grype pinned by the foundation automation catalog. Neither
+decision closes anything. The other rows read `comparison_required` where the research state asks for a
+comparison and `selection_of_record_open` otherwise. The owner corrected the trading winners' acceptance sources
+in this change's pull request (#574) and re-read the twelve rows there, and each row's notes carry the owner's
+verdict and blocking item verbatim. The keys lane corrected the credential-practice row, and the Gate A owner
+decided the acceptance entries of its three rows the same way. The backtesting-engine row carries the dispute
+recorded at PR #358's head `b0eb7a11`.
 Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
-41 entries and 39 exits filled). The cross row for the distribution is `no_selection` on main: its image,
-hash and creation path land with PR #569.
+41 entries and 39 exits filled). The cross row for the distribution is `new_host_required`: its image, hash
+and creation path are on main since PR #569, selected by source review, and nothing has run on a host; the
+recipe's follow-up with the completeness critic's pre-checks is open, and stage 1 waits for it.
 
 **Install order on the new distribution** (row `cross:wsl-distro`, each step citing the recipe of PR #569):
 stage 1 on Windows; first boot (systemd, linger, user bus, packages, subordinate ids, the login hand-off);
@@ -161,9 +173,13 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
 - The acceptance review of 2026-10-01 read one hop from each cited file (a receipt or artifact the cited file
   links directly) and no further, and it rated part of its corrections below high confidence: by entry, 10 of
   the 32 medium, 9 medium-high and 3 low.
-- Item 4 for the foundation rows: the Codex lane's cross-family review of all 20 layers (PR #575 at `bbee2a8e`,
-  gpt-6.1-sol) was performed on 2026-10-01 and names remaining gaps in every layer. Each foundation row cites its
-  review; the item cells keep the closure assessment's reading until the layer records are re-recorded. The same
+- Item 4 for the layer rows: the Codex lane's cross-family review of all 32 layers (PR #575 at `51cb79ba`,
+  gpt-6.1-sol) was performed on 2026-10-01 and names remaining gaps in every layer. Each foundation and
+  us-equities row cites its review; the item cells keep the closure assessment's reading until the layer records
+  are re-recorded. Those reviews select different component sets from this edition's winners in 20 of the 32
+  layers (by a name match, 39 names only here and 41 only there, for example the scanners of ci-supply-chain and
+  the observability components of observation-inference). This edition keeps the catalogs' selections of record
+  and the owners' decisions; the re-record pass of the program record (unit U4) reconciles the two. The same
   pull request carries the crosswalk from the guide's ten themes to the 32 layers, which this edition references
   and does not duplicate, and each repository's upstream-documented install command, none of them run.
 - Subordinate ids for the Harbor harness: the recipe allocates 65,536, Docker's documented minimum. A wider
@@ -189,9 +205,9 @@ Write a new edition, or update this one in the change that causes it, when any o
    in the Linux pins file or runtime-target.json is caught by the line-bounds check only when the line
    disappears, so re-read those rows.
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
-4. **A pending source lands.** PR #569, #570, #358, #573, #575 or #535 merges: the build hashes the landed
-   file and labels it as landed after this edition's base; move its citations to `source_path` and, for #569,
-   re-rate `cross:wsl-distro`.
+4. **A pending source lands.** PR #575, #578 or #535 merges: the build hashes the landed file and labels it as
+   landed after this edition's base. PR #569, #570, #358 and #573 have landed, and `cross:wsl-distro` was
+   re-rated when #569 did.
 5. **A lane owner changes a verdict or its wording** for one of its rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a
@@ -208,16 +224,19 @@ Write a new edition, or update this one in the change that causes it, when any o
 - `docs/acceptance-evidence-policy.md:26-33`; AGENTS.md (evidence levels)
 - `docs/decisions/2026-09-30-task-model-routing.md:9-12` (the accepted token-efficiency profile, #540)
 - `scripts/host_receipts.py` (a receipt binds only to a version that matches a winner pin)
-- PR #569 at `344a69ff`: `adoption/platforms/linux-wsl2-new-distro.md`,
+- PR #569 (merged as `ad7d645b`): `adoption/platforms/linux-wsl2-new-distro.md`,
   `docs/decisions/2026-10-01-new-wsl-distro-recipe.md`, `adoption/templates/wsl/`
-- PR #570 at `cd7db158`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
-- PR #573 at `5adcc3a4`: `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
+- PR #570 (merged as `000aae77`): `evidence/receipts/harbor-e2e-token-tools-20260930.json`
+- PR #573 (merged as `25098f8a`): `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
   `evidence/artifacts/layer-closure-assessment-20261001/`
-- PR #575 at `bbee2a8e`: `evidence/artifacts/new-wsl-layer-reviews-20261001/` (the 20 foundation reviews),
+- PR #575 at `51cb79ba`: `evidence/artifacts/new-wsl-layer-reviews-20261001/` (the 32 layer reviews and the
+  selection-gap follow-up),
   `catalogs/foundation/new-wsl-layer-crosswalk-20261001.json`
 - Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js
   v16.3.8 release page (read 2026-10-01)
-- PR #358 at `b0eb7a11`: `catalogs/us-equities/convergence-20260926.json`
+- PR #358 (merged as `326dc84b`): `catalogs/us-equities/convergence-20260926.json`
+- PR #578 at `e1f15c97`: `docs/decisions/2026-10-01-trading-layer-verdicts.md` (the trading lane owner's verdicts
+  and the two selections of 2026-10-01)
 - Upstream release pages read on 2026-10-01 (07:41Z to 08:06Z), each cited on its winner; the
   nautilus_trader issue #4983 and pull request #5041 states; the gitleaks README; the Harbor README
   (`uv tool install harbor`)
