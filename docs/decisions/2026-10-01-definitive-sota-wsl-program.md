@@ -331,8 +331,8 @@ The Gate A owner's independent audit found that the merged top rule (`AGENTS.md:
 covers the token-adoption E2E's custom runner, with no recorded exception. The owner therefore recommends path R:
 re-scope the adoption E2E onto an upstream harness (Harbor or Inspect) on the new distro, with a pilot as step zero:
 the Gate A owner's receipt of the 2026-09-29 Harbor E2E (`evidence/receipts/harbor-e2e-token-tools-20260930.json`,
-which is on PR #570's branch and not in this revision, so its figures cannot be inspected from main until that pull
-request merges: 308 claude-code logs scanned, 0 Agent or Task tool calls, 0 subagent directories) shows that none of the
+published by PR #570: 308 claude-code logs scanned, the 288 trials plus 20 smoke logs of a spare task, 0 Agent or Task
+tool calls, 0 subagent directories) shows that none of the
 trials spawned a subagent, so per-subagent attribution through Harbor is untested; the pilot forces subagent use and
 confirms that each trial's saved session directory carries per-subagent transcripts, after which the merged Gate A
 kernel serves as analysis code over those directories (analysis, not a runner). The pilot passes when, for at least
@@ -392,7 +392,7 @@ with 262,144 since the 2026-09-29 Harbor run: the images of six matplotlib SWE-b
 65,536, and the four of them in the final task set ran after the widening. The Gate A owner published the observation
 on 2026-10-01 in
 `evidence/receipts/harbor-e2e-token-tools-20260930.json` (block
-`host_prerequisite_observations.rootless_docker_subordinate_ids`), which is on PR #570's branch and not on main yet.
+`host_prerequisite_observations.rootless_docker_subordinate_ids`), published by PR #570.
 It is the workstation's value for one image set, not a default. On the new distro the range is widened only when
 that error appears, by the harness unit's owner (Gate A), who records the image, the error and the range chosen. An
 earlier text of this record stated 262,144 as a requirement; the independent review's third finding removed it.
@@ -436,7 +436,7 @@ output is not in this repository, so they are recorded as relayed, each with the
 | --- | --- | --- |
 | The selection and install cycle: the 13 `comparison_required` layers and the `new_host_required` layer cannot pass a host comparison before they are installed | A defect of the staged rule as first written | Decision 3 of "Program decisions on the criterion" |
 | The Hindsight stale and paused pages, its held cold seed and AgentRelay's held automatic Codex PTY submission belong in the manifest rows; a new distro fixes neither a provider-route timeout nor an adapter's semantics | The Codex lane's own host observations; its receipts are not published yet | Gates on the durable-memory row and the cross rows of the install manifest, cited once the receipts are on that lane's branch |
-| The record required 262,144 subordinate ids while the recipe proves 65,536 | Docker's two pages, fetched 2026-10-01, and the Harbor receipt on PR #570's branch | "Subordinate ids"; the requirement is withdrawn |
+| The record required 262,144 subordinate ids while the recipe proves 65,536 | Docker's two pages, fetched 2026-10-01, and the Harbor receipt published by PR #570 | "Subordinate ids"; the requirement is withdrawn |
 
 The same lane took the second independent review of item 4 for all 32 layers (unit U6), the crosswalk from the
 guide's ten themes to the 32 layers, and sanitized receipts for what it qualified on the current host. Its first
