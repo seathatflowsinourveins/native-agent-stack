@@ -141,10 +141,11 @@ class RunningTreeContent(unittest.TestCase):
             self.assertEqual(sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
             self.assertEqual((status(repo), (repo / TRANSPORT).read_text()), ("", "HOST = 'changed'\n"))
             self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"H {TRANSPORT}")
-            self.assertEqual(guards.git(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
-            self.assertIn(TRANSPORT, guards.git(repo, "status", "--porcelain", "--", STUDY_PATH))
             with self.assertRaisesRegex(guards.Refused, "^the study tree has uncommitted changes"):
                 guards.running_tree(repo)
+            # the module's own git names the same tree and, unlike plain git status above, reports the file
+            self.assertEqual(guards.git(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
+            self.assertIn(TRANSPORT, guards.git(repo, "status", "--porcelain", "--", STUDY_PATH))
 
     def test_running_tree_refuses_a_file_name_that_one_line_cannot_carry(self):
         """git hash-object --stdin-paths reads one path per line, so a tracked file whose name holds a control
