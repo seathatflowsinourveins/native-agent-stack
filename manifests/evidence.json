@@ -3845,6 +3845,41 @@
         "No new-host install ran: that is unit U10 on the new distribution. Provider usage of the builder is unknown."
       ],
       "path": "evidence/receipts/nextjs-1638-qualification-20261001.json"
+    },
+    {
+      "id": "codex-01593-native-queue-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Fresh provider-backed native queue delivery succeeded while the owned daemon-backed thread was idle, while a preceding turn was busy, and after its TUI disconnected and resumed. Three official Hindsight hook definitions were individually trusted through the native UI.",
+      "limitations": [
+        "Synthetic messaging inputs qualify these native operations, not production task quality or the whole ecosystem.",
+        "No upstream Cargo test suite was run; upstream test sources were reviewed and native commands were exercised.",
+        "No daemon restart was attempted during live qualification, and no unrelated session was inspected or interrupted.",
+        "Queue delivery to a concurrently running embedded receiver, cross-family bridge delivery, cross-account isolation, remote hosts, and Hindsight retrieval/retention are outside this receipt.",
+        "Hindsight capture remained disabled during hook trust. Hook trust is not memory acceptance.",
+        "Provider monetary cost is unknown. Native usage counters do not establish improvement against another configuration."
+      ],
+      "path": "evidence/receipts/codex-01593-native-queue-20261001.json"
+    },
+    {
+      "id": "codex-01593-hindsight-native-memory-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Fresh native Codex automatic capture and independent recollection from the selected Hindsight bank passed in both headless exec and daemon-backed interactive resume/queue paths.",
+      "limitations": [
+        "Two invented canaries and their record budgets are explicitly synthetic, not project policy, market data or trading acceptance.",
+        "This is supported native command/API execution with synthetic inputs and independent observation, not an executed upstream Docker or Cargo test suite.",
+        "Headless exec and daemon-backed TUI are distinct paths; each has its own fresh provider-backed observations below.",
+        "Knowledge-page search completed but did not contain either canary. Native Hindsight reflect supplied the correct values; page population or cron refresh is not qualified here.",
+        "Backend seed/survey completion was not established. Native status reported synced=false with active operations; the coordinator separately owns seed-job recovery.",
+        "Native model token usage excludes Hindsight backend extraction/reflection usage. Backend usage and monetary cost are unknown.",
+        "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
+      ],
+      "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
     }
   ],
   "files": [
@@ -4255,8 +4290,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "4539311ef0437b9081f2811cc329bd880f33c3479c2724f7c218a63e9ff3a1b4",
-      "bytes": 32281
+      "sha256": "0dd40eea9c39e1e61ca73c9e8f55cfe0e92106d0af5cd1933318f3bf7a3a31cf",
+      "bytes": 31759
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4295,17 +4330,17 @@
     },
     {
       "path": "adoption/sdk/README.md",
-      "sha256": "752c8b04283f13454c9814968d33c39d5b07d3eaf405c875fab9b0fc4ce35667",
-      "bytes": 3896
+      "sha256": "351bd9d5893b7f7b596946b184200d0b29f0303082164cde373695f4c6e2b861",
+      "bytes": 4383
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
-      "sha256": "fa07277447a51e0eb313739a47642493330ac864bebee756d473629b98c88a29",
+      "sha256": "80ab416bbe2accea98d259150952a7abf6b3c882e3315da23dab5fd42edf2aaa",
       "bytes": 961
     },
     {
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
-      "sha256": "bfde2fa953c8b755b4d1cf499574ebceb8bcad8aa16cab215e0cc0b483e37039",
+      "sha256": "9e215b2c85823b33b881ae1ff38a2c666ebd46d75d34568f5e8747d350f8ef74",
       "bytes": 77578
     },
     {
@@ -9611,8 +9646,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "3eea8aecc2617e9e073e7ba4026f70c1fb72613db1aa47a93faa76321b82b9ea",
-      "bytes": 482973
+      "sha256": "cafdde5e9aabfbe9d61bc138e4201596e2b0436f978b4dd8a8039eaed70dcd32",
+      "bytes": 483389
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14726,7 +14761,7 @@
     },
     {
       "path": "blueprints/us-equities/workers/requirements.txt",
-      "sha256": "c048be05b41417f77cd8b4fd6e3179909782c9f3bfb59fa46d7fe4bcd18a48ff",
+      "sha256": "d3c2fabc8a13457e448dcdb4880e341a2fc96a4115302e416075637d8c22e241",
       "bytes": 96
     },
     {
@@ -14951,7 +14986,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "815405acffe546d358bf318805eff1d7d995f0ddfb66685e0b8338d9e809c33c",
+      "sha256": "6fda734fa9b42d93047a948a12c59762c0a6183dee4ade3fd37fd5495cca0582",
       "bytes": 287293
     },
     {
@@ -14961,8 +14996,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "ad12f1093b71dd922ac8e8a7de7e4b774ce99aaedc0e378786288f01fe5a6fee",
-      "bytes": 249102
+      "sha256": "2217a36d560e887b651aaf57028580175e1644c45134c6ef3d8208913998b02c",
+      "bytes": 251264
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15796,8 +15831,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3dd8cb415617d6b3b7c5299da6dc46d68750bb25b0bffe5175cee49ba04fe958",
-      "bytes": 123009
+      "sha256": "6cdbf83785a788bbae6fe46c36a8df156b605d80d10024403fc62642bbed7de8",
+      "bytes": 126065
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15916,7 +15951,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8a9ce14b2985ffcee351a9d01f8834808e44d8dc046334be0e78bce52e141b37",
+      "sha256": "861333f50f390b0c4664e195cb83e43a5c0b60297e4a4b2f846d5b18e5482d3c",
       "bytes": 18233
     },
     {
@@ -39965,6 +40000,11 @@
       "bytes": 11603
     },
     {
+      "path": "evidence/artifacts/runtime-sdk-20261001/receipt.json",
+      "sha256": "4878a634b1b6dcd910150583fd701a2997b7233313f66256ac3673c7062a2cb4",
+      "bytes": 7684
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
       "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
       "bytes": 169217
@@ -45505,6 +45545,16 @@
       "bytes": 41981
     },
     {
+      "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
+      "sha256": "f2c83af21223282ade47bdf78507e82267f9ed59db040b734c8603f74d14903c",
+      "bytes": 12136
+    },
+    {
+      "path": "evidence/receipts/codex-01593-native-queue-20261001.json",
+      "sha256": "c4876159f5feaf7823075fc5085f33f254f2dce84174035ded80964eda0ae63f",
+      "bytes": 9942
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -46441,8 +46491,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b8bedf66f627c68411774f08781bcee4a05c92266810a4d82bfeda9d8882dddc",
-      "bytes": 99692
+      "sha256": "b10693331a67883d86a47ec40b6345f5f48d80aa287a991e20df4b40355ed72a",
+      "bytes": 100006
     },
     {
       "path": "observability/README.md",
@@ -46636,8 +46686,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a4d1679756a39715056869d20958d1ada1bee8858589dd06fb28a4bdcf5ec286",
-      "bytes": 18246
+      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
+      "bytes": 19333
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -47161,12 +47211,12 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "1ee0d6f15418f69d2055d6c71679fabb50bcd2b972377ebcc84865b64713791c",
-      "bytes": 228127
+      "sha256": "8dd9d881d0ae3472eddf91c9be6da13a5ee891983fe70367dce22d798ae3cfb7",
+      "bytes": 228097
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "80f7c47eb64a554fe1b38bd637cd58f5b0e1b9af8368b6a85686948992ee4b48",
+      "sha256": "adf4af9443a046733c7382442e870c99209c092178ab37ac51b5cb47bff09a1a",
       "bytes": 24092
     },
     {
@@ -47331,7 +47381,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "744568f193b67576199d97c769915eba14ab823df0c1b948baf78d832a33f1e0",
+      "sha256": "4895753c2a5a305ef23148909764278589cfb6872de82dbea333c7f89534e18c",
       "bytes": 155359
     },
     {
@@ -47791,7 +47841,7 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "4bf7510e9b1a65ababcfb24380b68d6ce652929ba3173e1c34afb76e3b0a5ae0",
+      "sha256": "6f1ecd5731cb676c0b50ee54a15375eeea4858742b460723046211b756ea3448",
       "bytes": 43257
     },
     {
@@ -48021,7 +48071,7 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "bfcc3cdf9efbc2dea3c9f72f64e705ae18e2af86d0d1c2e3c15ba7da672f29a6",
+      "sha256": "9e7446dda320da39b1a5846c50c43fb634621727dd49a89a7239e21063ac7cce",
       "bytes": 80788
     },
     {
