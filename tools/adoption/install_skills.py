@@ -74,8 +74,20 @@ Reference: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
 
 A manifest marked "scope": "project" (the runtime-worker manifest) is refused
-without --project-dir; --print-codex-config, which only prints, still runs. A
-skill whose status is pruned is never installed, in either mode.
+without --project-dir, and so is --print-codex-config for it, which only prints
+but names each skill by its installed path in the project. A skill whose status
+is pruned is never installed, in either mode.
+
+--print-codex-config prints one `[[skills.config]]` table with `enabled = false` for
+every codex_enabled: false skill, selecting the installed SKILL.md by `path`, never by
+`name`: Codex applies a name rule to every loaded skill of that name, the bundled
+.system skills it ships included (openai/codex rust-v0.159.2
+codex-rs/config/src/skills_config.rs L109-119; codex-rs/skills/src/lib.rs L55-67), and
+a path rule to the one skill whose canonical path_to_skills_md it names
+(codex-rs/ext/skills/src/host_service.rs L366-371, host_outcome.rs L52-54). The path is
+the canonical copy the CLI writes (canonical_skill_dir), which is where a global install
+leaves a Codex skill (skills@7407f389 src/installer.ts:392-402) and which Codex loads
+from its $HOME/.agents/skills root (codex-rs/ext/skills/src/host_roots.rs L103-108).
 
 A manifest entry with `reuse_ref` ("adoption/skills/manifest.json") is resolved
 when the manifest is read, against the one adoption skill of the same name: its pin
@@ -497,13 +509,30 @@ def node_path_join(*parts: str) -> Path:
     return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
-def print_codex_config(skills: list[dict]) -> None:
-    """The `[[skills.config]]` tables that turn every codex_enabled: false
-    manifest skill off in Codex's ~/.codex/config.toml (no path needed)."""
-    blocks = [
-        f'[[skills.config]]\nname = "{skill["name"]}"\nenabled = false'
-        for skill in skills if isinstance(skill, dict) and skill.get("codex_enabled") is False
-    ]
+def toml_basic_string(value: str) -> str:
+    """value as a TOML basic string: the quotation mark, the backslash and every control character but none other
+    escaped (TOML 1.0.0, "String"). Raises InstallError for a value that is not valid Unicode text."""
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        raise InstallError("a skill path is not valid UTF-8 and cannot be written as a TOML string") from None
+    escaped = "".join("\\" + char if char in '"\\' else
+                      f"\\u{ord(char):04X}" if ord(char) < 0x20 or ord(char) == 0x7F else char for char in value)
+    return f'"{escaped}"'
+
+
+def print_codex_config(skills: list[dict], home: Path, project_dir: Path | None = None) -> None:
+    """The `[[skills.config]]` tables that turn every codex_enabled: false manifest skill off in Codex's
+    config.toml, each selecting its installed SKILL.md by path (see the module docstring), never by name."""
+    blocks = []
+    for skill in skills:
+        if not isinstance(skill, dict) or skill.get("codex_enabled") is not False:
+            continue
+        name = skill.get("name")
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", name):
+            raise InstallError(f"codex_enabled: false skill {name!r} is not one path component")
+        path = canonical_skill_dir(home, name, project_dir) / "SKILL.md"
+        blocks.append(f"[[skills.config]]\npath = {toml_basic_string(str(path))}\nenabled = false")
     print("\n\n".join(blocks))
 
 
@@ -531,9 +560,10 @@ def build_parser() -> argparse.ArgumentParser:
                               "match the manifest, or an unmanaged project Claude target "
                               "(default: refuse it as local-modified)")
     parser.add_argument("--print-codex-config", action="store_true",
-                         help="Print [[skills.config]] name/enabled=false lines for every "
+                         help="Print a [[skills.config]] path/enabled=false table for every "
                               "codex_enabled: false manifest skill (a reuse_ref entry takes the "
-                              "adoption manifest's value), then exit")
+                              "adoption manifest's value), selecting its installed SKILL.md under "
+                              "--home, or --project-dir for a project-scoped manifest, then exit")
     parser.add_argument("--json", action="store_true",
                          help="Print a compact, value-free {skill: status} summary instead of prose")
     return parser
@@ -573,7 +603,15 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if args.print_codex_config:
-        print_codex_config(all_skills)
+        if scope == PROJECT_SCOPE and project_dir is None:
+            print(f'install-skills failed: this manifest is scoped to projects ("scope": "{PROJECT_SCOPE}"); '
+                  f"pass --project-dir, whose installed SKILL.md paths the Codex tables name", file=sys.stderr)
+            return 1
+        try:
+            print_codex_config(all_skills if isinstance(all_skills, list) else [], Path(args.home), project_dir)
+        except InstallError as error:
+            print(f"install-skills failed: {error}", file=sys.stderr)
+            return 1
         return 0
 
     if scope == PROJECT_SCOPE and project_dir is None:

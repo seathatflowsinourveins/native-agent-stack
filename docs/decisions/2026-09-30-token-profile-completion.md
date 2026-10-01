@@ -46,6 +46,50 @@ subagent lifecycle. The earlier saved-workflow continuation reused completed
 readers, and the ordinary Agent continuation completed through native handback.
 Neither restarting a caller nor replaying a receipt counts as a new model run.
 
+The clients subsequently advanced concurrently to Claude Code 2.1.286 and
+Codex 0.159.3. The table above retains the versions actually qualified by those
+operations. Codex's [exact release delta](https://github.com/openai/codex/compare/rust-v0.159.2...rust-v0.159.3)
+leaves the selected core, hook and app-server protocol files unchanged; this is
+source compatibility, not another provider run. Claude's
+[2.1.286 changelog](https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md#L32)
+changes Workflow recovery and foreground task behavior. Its first two fresh
+probes completed reader results and an ordinary Agent tool handback, but both
+parent processes reached their 300-second limits (native exit -15).
+Complete Workflow recovery and the role-specific carrier are not accepted by
+those attempts. The [current revision evidence](../../evidence/artifacts/token-profile-completion-20260930/ci-repair.json)
+keeps partial returns, source compatibility and bounded repairs separate.
+
+The fresh probe found a real host gap: the source-identical carrier files were
+installed, but the user SubagentStart event registered only ai-memory. The
+canonical carrier entry, including its five-second timeout, was restored with
+the existing `tools/adoption/apply_claude_settings.py` merge command. A value-free
+comparison verifies one carrier entry, all earlier hooks and other settings
+preserved, and the native backup and original file mode retained. File presence
+and installer success alone do not establish hook delivery; a fresh process must
+observe the role block.
+
+The bounded 2.1.286 repair then passed both native parents (153.538 and 27.507
+seconds, exit 0). The unchanged small fixture completed its Sonnet/max scout and
+Opus/max verifier; normal saved recovery reused both completed results without
+restarting children. A foreground source-scout Agent handed back its actual
+successful Python tool result. All three fresh children ran the persistent
+carrier successfully and received their corresponding role blocks byte-for-byte,
+without a settings override. The specific network-stall restart and unavailable
+task-tracking-tool conditions remain unqualified. These synthetic operations do
+not establish provider quality or billing savings.
+
+Native hook refresh exposed another lifecycle failure. The settings merger had
+combined the carrier with ai-memory because both used the same matcher, while
+[ai-memory's pinned ownership classifier](https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L1513)
+replaces the whole outer entry when any command belongs to it. An isolated native
+refresh reproduced the loss. The merger now preserves canonical entry boundaries
+and splits existing mixed entries into contiguous runs without changing hook
+values or order. Its 25 integration tests pass; the repaired fixture retained the
+exact carrier through two unchanged native ai-memory refreshes, with the repeated
+cycle byte-identical. The host received that structural repair through the same
+supported settings merge command. This proves the reproduced condition; the
+historical disappearance remains unattributed.
+
 ## Memory selection and activation
 
 Adopt [ai-memory 2.4.2](https://github.com/akitaonrails/ai-memory/tree/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1)
@@ -111,6 +155,14 @@ estimates; they are not a fresh MCP stats call or a complete provider lifetime.
 jCodeMunch has its own cumulative native estimate. Never add these overlapping
 scopes or cumulative snapshots. ccusage consumption, cache subsets, exact
 artifact comparisons and provider usage remain separate.
+
+The native refresh at `2026-10-01T02:15:27.984655+00:00` recorded **84,314,061**
+estimated RTK tokens saved across retained global history; its **55,390,889**
+project subset is already included. Collection issues were empty. The
+[snapshot evidence](../../evidence/artifacts/token-profile-completion-20260930/ci-repair.json)
+retains the service return and original report hashes. Context Mode, Headroom,
+jCodeMunch and the 25 exact artifact comparisons remain separate counters;
+none establishes a measured provider-billing reduction.
 
 The small lossless Repomix fixture grew from 102 to 289 bytes. This is accepted
 fidelity with no saving claim. Headroom's fixture reduced its own native count

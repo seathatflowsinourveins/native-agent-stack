@@ -892,6 +892,101 @@
     ],
     "astra_acceptance": "PASS:179 receipts8782 files26 convergence records, unique IDs/paths; main2 terminal records and topic2 token records exact; all14 topic/four main anti-pattern changes preserved; frozen token artifacts untouched;17 native source paths match e537."
   },
+  "hook_refresh_boundary_repair_20261001": {
+    "astra_trigger": "Consequential interaction between supported native settings merge and upstream memory-hook lifecycle; concrete failure reproduced after bounded host registration repair.",
+    "sources": [
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L1513",
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L1547",
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L6122",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a/adoption/templates/claude.settings.template.json#L298"
+    ],
+    "negative_control": {
+      "source_merger": "tools/adoption/apply_claude_settings.py at immutable7be865074de178dbfeaa8727d769bba0805cef89",
+      "source_sha256": "aa69bcb6adaa1cea6b6961ff3bc3366621f36ef9443047ac64fe2d232640a07a",
+      "native_initial_install_exit": 0,
+      "native_profile_merge_exit": 0,
+      "before_refresh": {"groups": 1, "hooks": 2, "carrier_present": true, "fixture_sha256": "07d2813587f5396442edc5d5057f05e1f67534fa1cd19cfb86d35b5044761481"},
+      "native_memory_refresh_exit": 0,
+      "after_refresh": {"groups": 1, "carrier_present": false, "unrelated_fixture_theme_preserved": true},
+      "original_refresh_log": {"bytes": 695, "sha256": "da0f9fed293a4e67c163e766074aa98b483416233707c46bcc1b59e28a8dfd36"},
+      "interpretation": "Native installer returned0 while the carrier was removed; this is a reproduced integration failure, not an upstream unit-test failure. Historical host removal is not attributed to this experiment."
+    },
+    "repair": {
+      "file": "tools/adoption/apply_claude_settings.py",
+      "sha256": "b80942c9e732f1c07d77f8092aa9379e07dec53c8c7efa87e5e2a2587ebaddaf",
+      "behavior": "Split existing groups by contiguous canonical-command membership before deduplication; retain every original hook, duplicate, command order, outer metadata and matcher presence. Append fresh canonical groups separately rather than coalescing equal matchers.",
+      "astra_architecture_acceptance": "Accepted against pinned upstream whole-entry ownership and canonical separate-entry template, conditional on contiguous splitting, scoped normalization and idempotence."
+    },
+    "integration_tests": {
+      "command": "rtk proxy python3 -m unittest -v tests.test_apply_claude_settings",
+      "before": {"native_exit": 1, "returned": "Ran 25 tests in 0.032s; FAILED (failures=3)", "original_bytes": 7213, "original_sha256": "aae366e316875302b056f789e586513392bde7af13e8236d6250157dbdfba5e0"},
+      "after": {"native_exit": 0, "returned": "Ran 25 tests in 0.038s; OK", "original_bytes": 4545, "original_sha256": "722e96eb372a8685c51789b017eb4fb99ccf92a6f9223ad6c0a0bd133000f9af"},
+      "scope": "Locally authored regression/integration tests, not unchanged upstream acceptance."
+    },
+    "native_acceptance": {
+      "settings_merge_command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <canonical carrier fragment> --target <synthetic settings.json>",
+      "memory_refresh_command": "rtk proxy <installed ai-memory2.4.2> --data-dir <fixture state> install-hooks --agent claude-code --apply --config-file <synthetic settings.json> --server-url http://127.0.0.1:19286",
+      "already_mixed_fixture_repair_exit": 0,
+      "groups_after_repair": 2,
+      "original_hook_values_order_and_other_settings_preserved_before_refresh": true,
+      "native_refresh_exit": 0,
+      "exact_carrier_survives": true,
+      "original_refresh_log": {"bytes": 698, "sha256": "502e335d352113b8303b4dcced5f6c2d4cf04dda2377cbbccd25ce1f4b0e03b8"},
+      "native_reapply_exit": 0,
+      "native_repeat_refresh_exit": 0,
+      "repeated_state_byte_identical": true,
+      "settings_sha256": "cf30925ac3da348c96641efa279d8ceff03ee65509fd9e2d72e335cd2378e90b",
+      "original_repeat_log": {"bytes": 689, "sha256": "4f49107fea1febeec6b66bb029b84c473fac090faddc4096e18faa729ac99f37"},
+      "scope": "Unchanged native ai-memory installer operates on synthetic configuration with fresh fixture state and explicit fixture URL. No production hook refresh, server or provider run. Upstream may append its replacement entries, so cross-owner order after its refresh is not asserted."
+    },
+    "host_structural_repair": {
+      "command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <private canonical carrier fragment>",
+      "native_exit": 0,
+      "groups": 2,
+      "value_free_readback": "Original hook objects/order preserved, all other settings and hook events unchanged; native backup exists and original mode retained.",
+      "original_log": {"bytes": 142, "sha256": "1fef70831a13303a1cbff25b597cab751ff37e9ea30e91b593c12401bc75a809"}
+    },
+    "final_independent_verification": "PASS: independent Astra source review and combined-module native rerun. The corrected assertion checks every exact-Bash group, preserves RTK count1 and requires exactly one secret guard. Merger source remains b80942c9e732f1c07d77f8092aa9379e07dec53c8c7efa87e5e2a2587ebaddaf; previous failed originals unchanged. No provider or installer replay used for this rerun.",
+    "combined_module_corrected_attempt": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed context-mode security.js> python3 -m unittest -v tests.test_apply_claude_settings tests.test_install_claude_profile",
+      "native_exit": 0,
+      "returned": "Ran 109 tests in 1.010s; OK (skipped=3)",
+      "skip_scope": "Three frontmatter checks require unavailable PyYAML; native ContextMode security assertion actually ran.",
+      "original_bytes": 26795,
+      "original_sha256": "b4310702e46b9f1a702e703f1cb08d727475ded4d196a08718dacc6da3bcf277",
+      "scope": "Focused local integration acceptance of the repaired merger and installed profile contracts. Not a new full suite or provider run."
+    },
+    "combined_module_first_attempt": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed context-mode security.js> python3 -m unittest -v tests.test_apply_claude_settings tests.test_install_claude_profile",
+      "native_exit": 1,
+      "returned": "Ran 109 tests in 0.993s; FAILED (failures=1, skipped=3)",
+      "failure": "SecretGuardProfileTests.test_apply_merge_keeps_host_rules_and_adds_the_guard assumed the guard belongs to PreToolUse[0]. Separate canonical groups preserve delivery under the same Bash matcher.",
+      "correction": "Read all exact-Bash groups; retain RTK count1 and strengthen the guard requirement to exactly one. No runtime guard or permission rule removed.",
+      "original_bytes": 27533,
+      "original_sha256": "5ed289bb67d9b481c2b90d5773d1b43cf13abd0030e8b35059d1f7b55edd461b",
+      "scope": "Locally authored integration assertion adjusted after the earlier F3 source-preservation checkpoint; not an upstream test modification."
+    },
+    "usage": "No model-run or token-savings claim; settings/installer fixtures only. Claude provider acceptance is retained separately."
+  },
+  "native_lifetime_snapshot_20261001": {
+    "generated_at": "2026-10-01T02:15:27.984655+00:00",
+    "command": "rtk proxy systemctl --user start token-report-refresh.service",
+    "native_exit": 0,
+    "native_service_result": "success",
+    "native_service_exec_main_status": 0,
+    "timer_active": true,
+    "collection_issues": [],
+    "rtk_retained_global_estimated_saved": 84314061,
+    "rtk_project_subset_estimated_saved_already_in_global": 55390889,
+    "context_mode_claude_estimated_saved_separate": 13050624,
+    "context_mode_codex_estimated_saved_separate": 27638784,
+    "headroom_30_day_estimated_saved_separate": 579852,
+    "jcodemunch_default_index_estimated_saved_separate": 10497245,
+    "exact_artifact_comparisons_separate": 25,
+    "original_manifest": {"bytes": 43649924, "sha256": "31cf0dac4aaf4bdd12a0e2d6d1c48041419d25da0c64de9d999207494b2f267b"},
+    "original_html": {"bytes": 41715165, "sha256": "c81648f382178df2d040c8cb09e2e9e4f71cb1f71ea22b9db6e1d526193dccf8"},
+    "scope": "Point-in-time native retained estimates, not a new model run or measured provider-billing reduction. Do not add overlapping scopes, cumulative snapshots or cache subsets. ContextMode lifetime uses retained events times256, Headroom is capped at30 days; the reporter retains original native returns privately."
+  },
   "later_installed_client_version_observation_20261001": {
     "native_commands": [
       {
@@ -928,7 +1023,103 @@
         "Duplicated worktree instruction loading"
       ],
       "source": "https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md#L32",
-      "acceptance": "Targeted fresh2.1.286 lifecycle probe required and underway; do not promote source/version observation into execution."
+      "acceptance": "Bounded source-derived2.1.286 repair accepted: both native parents exit0, complete tiny Workflow, unchanged cached recovery, foreground Agent handback and byte-exact persistent role-carrier delivery. Earlier large-scope probes remain partial; source/version and wrapper observations remain separate.",
+      "bounded_native_repair": {
+        "source_fixture": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt unchanged body",
+        "source_supervisor": "blueprints/convergence-practice/native-recovery/claude/run.py:77",
+        "script_sha256": "2946da47a6f5b56689706b2946d96258642d9e6db8c0212fb4093ca9782ac132",
+        "script_metadata": "Native Workflow added eight metadata lines; original fixture body unchanged.",
+        "settings_override_used": false,
+        "parent_deadline_seconds": 180,
+        "attempts": [
+          {"stage": "tiny-initial", "native_exit": 0, "elapsed_seconds": 153.538, "stream_bytes": 183106, "stream_sha256": "51c84f7aa6a794bafe1f52ea25fe62e16fdcee738111f8fb40a344f58449cee0"},
+          {"stage": "tiny-resumed", "native_exit": 0, "elapsed_seconds": 27.507, "stream_bytes": 141199, "stream_sha256": "032c73ae1a193a6e4558d91978d24e4da5a31b0e333e6f64e23dca11239a73c0"}
+        ],
+        "workflow": "Explicit Sonnet/max scout and Opus/max verifier each returned the native ContextMode result exit_code0/stdout Python3.13.15; final accepted:true.",
+        "cached_recovery": "Journal byte-identical, two starts/two results, no Workflow child restarted.",
+        "ordinary_agent": "Explicit source-scout/Sonnet foreground Agent, max from role definition; actual native successful Python tool result handed back.",
+        "carrier": "Three fresh children: actual carrier-hook exit0 and additionalContext byte-identical to each corresponding source role file.",
+        "session_sha256": "1846cfc3e4e8d43b68640f04714eb67cea6b2d8d495015da267ea7801c7f5f78",
+        "usage_scope": "Native supervisor originals retain returned usage. Final cumulative modelUsage is counted once; preceding snapshots overlap. Unknown usage of earlier interrupted parents remains separate.",
+        "limits": "Specific network-stall restart fix and unavailable task-tracking-tool condition unqualified. Normal cached recovery is not fresh child execution. No broader provider-quality or billing-savings claim."
+      },
+      "initial_native_probes": {
+        "source_script": "agent-lab readiness-audit.js, unchanged installed personal workflow",
+        "source_pin": "b31f64020ab4900cd92341cd2aa92c3d98367758",
+        "script_sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb",
+        "source": "examples/claude-native/workflows/README.md",
+        "supervisor": "Existing NativeCLI supervisor;300-second parent deadlines. Supervisor wrapper exit0 is not native client exit0.",
+        "attempts": [
+          {"stage": "initial", "started_at": "2026-10-01T03:27:43.977Z", "native_exit": -15, "elapsed_seconds": 300.953, "stream_bytes": 225983, "stream_sha256": "54b7d323dd24ca8a3d0e79c1ebed1810ad5bed58d35c1930df047ad236aff451"},
+          {"stage": "resumed", "started_at": "2026-10-01T03:35:28.882Z", "native_exit": -15, "elapsed_seconds": 300.756, "stream_bytes": 240401, "stream_sha256": "4f857a53fdf7a43f7e6b78cbeb68c2de6d4c96675ddd772db44288dd593e76b3"}
+        ],
+        "observed": "Two Sonnet reader results completed and stayed byte-identical through saved-run recovery; verifier restarted but did not finish. Ordinary foreground Agent stack-verifier/Opus returned the actual ContextMode tool result exit_code0/stdout Python3.13.15 and handed it back.",
+        "workflow_journal": {"starts": 4, "results": 2, "verifier_completed": false},
+        "subagent_token_lane_carrier_confirmed": false,
+        "network_stall_induced": false,
+        "complete_workflow_recovery_qualified": false,
+        "preflight_failures": "Supervisor import exit1 before provider execution; personal scriptPath rejected, then supported saved-name launch worked.",
+        "complete_provider_usage": "unknown; resumed zero-turn success usage and inherited model counters are not summed",
+        "carrier_registration_repair": {
+          "finding": "Installed carrier and sibling blocks match source, but selected user SubagentStart registered only ai-memory; project settings registered only PreToolUse. CWD alone could not restore delivery.",
+          "carrier_sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd",
+          "source_rule": "adoption/templates/claude.settings.template.json SubagentStart token-lanes command and timeout5",
+          "source_merge": "tools/adoption/apply_claude_settings.py merge_settings/apply, documented in adoption/bootstrap.md",
+          "command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <private canonical-carrier-settings.json>",
+          "native_exit": 0,
+          "canonical_fragment_bytes": 312,
+          "canonical_fragment_sha256": "f74d5f0586f9cb9bb7530f5dad89db9377e9e76b0c84a130ff0e34439b9810aa",
+          "original_log_bytes": 142,
+          "original_log_sha256": "dba5584909ee9e9a9fd4e1178978d5147ee1b998d92853ac976a9fafacbfdec8",
+          "independent_observation": "Exact rendered canonical fragment; one carrier registered with timeout5. All prior entries, other hook events and all other setting values preserved; native backup exists and original mode preserved.",
+          "preflight": "First authored fragment omitted the source timeout5; exact-source equality failed before any settings mutation. Corrected fragment passed before the supported native apply.",
+          "scope": "Persistent configuration repair, with fresh native delivery acceptance pending. No claim about which concurrent action removed registration."
+        },
+        "scope": "Actual synthetic native-client operations with retained private original streams, not upstream tests or a complete lifecycle pass. Supervisor termination is not a network-stall regression test."
+      }
     }
+  },
+  "concurrent_main_3361b342_reconciliation_20261001": {
+    "parent_topic": "7be865074de178dbfeaa8727d769bba0805cef89",
+    "main": "3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/commit/3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+    "native_merge": {
+      "command": "rtk proxy git merge --no-commit --no-ff 3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+      "native_exit": 1,
+      "conflicts": [
+        "manifests/evidence.json"
+      ],
+      "automerge": "tests/test_install_claude_profile.py"
+    },
+    "resolution": "Preserve accepted F3 skills-listing and MCP-timeout templates and topic workflow installer checks. AST review finds107 class methods, one module function and nine nested functions:117 definitions total. Every parent function body is preserved, with exactly one shutil import; recompute the combined test hash only in the conflict. Preserve6000 skills budget and MCP_TIMEOUT120000 source selections.",
+    "astra_trigger": "Continuation of accepted-source reconciliation in shared records.",
+    "astra_source_review": "Expected179 receipts8795 files26 convergence records; F3 changes no17 native E2E source paths. Client-template changes are outside that boundary; original native qualification retains its original scope.",
+    "native_profile_module": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed-context-mode-security.js> python3 -m unittest -v tests.test_install_claude_profile",
+      "native_exit": 0,
+      "summary": "Ran 84 tests in 1.019s",
+      "result": "OK (skipped=3)",
+      "skip_scope": "Three PyYAML frontmatter checks skipped because PyYAML is not installed; text-reader and original qualified-revision evidence remain separate.",
+      "original_bytes": 20988,
+      "original_sha256": "4e1f506bbf1d4477a0380e49a3464b8cd567b8f2b0fd8e1e16ab6e858595c128",
+      "native_context_mode_assertion": "test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path ... ok",
+      "native_security_module": {
+        "component": "context-mode1.0.169 installed npm build/security.js",
+        "bytes": 31164,
+        "sha256": "d453b53088b16c8b98b6f7bf11307ac196e81b68a969247971877c72a19943f7",
+        "scope": "Explicit fixture artifact; does not identify the artifact loaded by the active MCP connection."
+      }
+    },
+    "post_resolution_acceptance": "PASS: native integrity, convergence and deterministic ecosystem checks; independent Astra source review preserves both immutable parents, all41 skills deny rules,6000 Codex skills budget,120000 MCP timeout,179 unique receipts8795 files26 records and17/17 unchanged native E2E inputs. Source acceptance remains separate from current-head CI/provider execution.",
+    "count_correction": "Earlier shorthand116 methods was wrong. Independent AST inspection verified107 class methods, one module function and nine nested functions,117 definitions total, with every parent body preserved.",
+    "native_checks": {
+      "integrity": {"command": "rtk proxy python3 scripts/validate.py", "native_exit": 0, "components": 69, "hashed_files": 8795, "profiles": 4, "receipts": 179, "original_sha256": "4ac4b7f9240b43c4c9d2afbafacb66a58d57be3d6a0b12eede8599bff91cdb14"},
+      "convergence_before_registry_refresh": {"native_exit": 1, "returned": "record discovery: invalid, changed or empty evidence manifest", "original_sha256": "0ca95e98473a697dfa18eccf2d2420e1fe3f3055762bc23bfa8d4b506e2e3362"},
+      "convergence_after_registry_refresh": {"command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --json", "native_exit": 0, "records": 26, "observations": 142, "original_sha256": "b16bedfa410147a047342bb4422a7c7b9417971a60576c3ba81a52ded4ee979e"},
+      "ecosystem": {"command": "rtk proxy python3 scripts/build_ecosystem.py --check", "native_exit": 0, "original_sha256": "2ad57d780c2df7aa22c6573af0a9fe3d264d12c84d9b694a255fec3da2688df9"},
+      "diff": {"command": "rtk proxy git diff --check", "native_exit": 0}
+    },
+    "scope": "Source reconciliation plus84-test local integration module only. Not a new full suite, native tool E2E or provider run.",
+    "usage": "unknown; no savings attributed to source reconciliation"
   }
 }

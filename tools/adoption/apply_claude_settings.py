@@ -63,14 +63,48 @@ def command_key(cmd: str) -> str:
         return cmd
 
 
+def separate_template_hook_groups(base_groups: list, incoming_groups: list) -> list:
+    """Preserve canonical ownership boundaries without reordering hooks.
+
+    ai-memory 2.4.2 replaces a whole entry if any inner command is its own:
+    akitaonrails/ai-memory a0ca8d1, install_hooks.rs:1513-1565. The canonical
+    template therefore keeps memory and carrier commands in separate entries.
+    Repair older combined entries by splitting contiguous membership runs;
+    preserve every original hook value, matcher and other outer field.
+    """
+    membership = {}
+    for index, group in enumerate(incoming_groups):
+        if isinstance(group, dict):
+            for hook in hook_list(group):
+                cmd = hook_command(hook)
+                if cmd is not None:
+                    membership.setdefault(command_key(cmd), index)
+    result = []
+    for group in base_groups:
+        if not isinstance(group, dict) or not hook_list(group):
+            result.append(copy.deepcopy(group))
+            continue
+        previous = object()
+        for hook in hook_list(group):
+            cmd = hook_command(hook)
+            owner = membership.get(command_key(cmd)) if cmd is not None else None
+            if owner != previous:
+                part = copy.deepcopy(group)
+                part["hooks"] = []
+                result.append(part)
+                previous = owner
+            result[-1]["hooks"].append(copy.deepcopy(hook))
+    return result
+
+
 def merge_hooks(base: dict, incoming: dict) -> dict:
     """Combine hooks per event, de-duplicated by command across the event.
 
     A template hook is skipped when any base group of the same event already
-    runs the same command (by shell words). Remaining template hooks join the
-    first base group with the identical matcher (an absent matcher and "" are
-    kept distinct, so the host's structure is preserved), or form a new group.
-    Base hooks are never dropped or reordered.
+    runs the same command (by shell words). Canonical ownership boundaries
+    split existing mixed entries before deduplication; remaining template hooks
+    form their own groups even when matchers match. An absent matcher and ""
+    remain distinct. Base hook objects are never dropped or reordered.
     """
     merged: dict = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
@@ -82,6 +116,7 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
         if not isinstance(base_groups, list):
             merged[event] = copy.deepcopy(incoming_groups)
             continue
+        base_groups = separate_template_hook_groups(base_groups, incoming_groups)
         seen = {command_key(c) for g in base_groups if isinstance(g, dict)
                 for c in map(hook_command, hook_list(g)) if c is not None}
         for incoming_group in incoming_groups:
@@ -98,17 +133,9 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
                     seen.add(command_key(cmd))
             if not fresh:
                 continue
-            has_matcher = "matcher" in incoming_group
-            target = next((g for g in base_groups if isinstance(g, dict)
-                           and ("matcher" in g) == has_matcher
-                           and g.get("matcher") == incoming_group.get("matcher")
-                           and isinstance(g.get("hooks"), list)), None)
-            if target is not None:
-                target["hooks"].extend(fresh)
-            else:
-                group = copy.deepcopy(incoming_group)
-                group["hooks"] = fresh
-                base_groups.append(group)
+            group = copy.deepcopy(incoming_group)
+            group["hooks"] = fresh
+            base_groups.append(group)
         merged[event] = base_groups
     return merged
 
