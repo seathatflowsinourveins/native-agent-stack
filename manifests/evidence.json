@@ -4366,8 +4366,8 @@
     },
     {
       "path": "adoption/sdk/README.md",
-      "sha256": "d6e13e034aa0d549d675bbea6ce076d10990aa72d4e8cce22456e95b5866c8fa",
-      "bytes": 3916
+      "sha256": "351bd9d5893b7f7b596946b184200d0b29f0303082164cde373695f4c6e2b861",
+      "bytes": 4383
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
@@ -39942,8 +39942,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20261001/receipt.json",
-      "sha256": "39d70ba2cb73913fb5efbe75ad77a6b407467003f1fa2dfc4e8deca838ffd898",
-      "bytes": 6635
+      "sha256": "4878a634b1b6dcd910150583fd701a2997b7233313f66256ac3673c7062a2cb4",
+      "bytes": 7684
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
@@ -46637,8 +46637,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "3072e91c7d8134c87c38d26c649907d865afb4253d2ac42e689850471905e0a2",
-      "bytes": 21799
+      "sha256": "2b8ee058bff234543a902ed5f03409b71ad167584b3397de11b9ad773f4cc4b2",
+      "bytes": 21787
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -47172,7 +47172,7 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "80f7c47eb64a554fe1b38bd637cd58f5b0e1b9af8368b6a85686948992ee4b48",
+      "sha256": "adf4af9443a046733c7382442e870c99209c092178ab37ac51b5cb47bff09a1a",
       "bytes": 24092
     },
     {
