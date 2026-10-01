@@ -2245,8 +2245,14 @@ COUNTER (check id 1-12: selected, unselected, special, excluded_key,
 excluded_user, declined, declared_link, dangling_link, covered_link,
 excluded_link, directories, git_stores; observed is the count), class 8
 anchor, path classes 14-16 for the coordinator's own session (main, subagent,
-workflow) beside 1-3 for other sessions, and FACT 10 guard pin and 11 store
-outside a worktree. Every field a kind does not use must be zero; a partial
+workflow) beside 1-3 for other sessions, FACT 10 guard pin, 11 store
+outside a worktree, and 12 scope binding (observed worker PID, expected numeric
+scope suffix, all other optional fields zero). The coordinator binds the scope
+to its runner PID using kernel membership metadata. After END the worker waits
+for shutdown on its existing acknowledgement channel; the coordinator invokes
+the runner's native stop trap and requires the scope to be empty before reaping.
+M2 metadata checks carry the format enum and bind the per-format controls.
+Every field a kind does not use must be zero; a partial
 frame, a gap in the sequence, another nonce or an unknown value makes the
 request incomplete. Version FACTs use one formula for every executable the
 worker calls (rg, git, gzip, bzip2, xz, journalctl, systemctl, systemd-cat,
@@ -2335,13 +2341,18 @@ over incompleteness and yields 5.
 | baseline_sink_not_scanned, baseline_sink_incomplete, baseline_control_missing | 3 |
 | not_armed, not_disarmed, disarm_unverified, guard_not_pinned_at_arm, recording_missing | 3 |
 | no_final, final_unfinished, final_incomplete, final_stale, final_too_early | 3 |
-| sink_not_scanned, check_not_scanned, sink_incomplete, inventory_unreconciled, protocol_error | 3 |
-| control_missing, negative_control_matched, masking_markers_mismatch | 3 |
+| sink_not_scanned:SINK, check_not_scanned:ROOT:CHECK, sink_incomplete:SINK:REASON, inventory_unreconciled | 3 |
+| control_missing:SINK, masking_markers_mismatch | 3 |
 | user_run_unfinished, user_run_incomplete, user_run_stale, user_run_too_early | 3 |
 | user_run_sink_not_scanned, user_run_sink_incomplete, user_run_control_missing, user_arrival_missing | 3 |
 | comparison_unfinished, comparison_incomplete, comparison_stale, comparison_too_early | 3 |
 | comparison_sink_not_scanned, comparison_sink_incomplete, comparison_control_missing | 3 |
 | store_armed, arming_unresolved, store_absence_unverified | 3 |
+
+`protocol_error` and `negative_control_matched` are fixed REASON suffixes of
+`sink_incomplete:SINK:REASON`, rather than standalone verdict codes.
+`arm` prints an absolute `/usr/bin/python3 -I <checkout>/tools/credentials/...`
+probe command, which also resolves inside a user service's default directory.
 
 An agent scan covers A1 Claude state; A2 audit/bash history; A3 MCP cache;
 A4 all registered Codex homes; A9 collector file export; A10 task directories;

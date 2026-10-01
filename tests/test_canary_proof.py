@@ -106,6 +106,12 @@ import canary_proof as cp
 for name, value in config["constants"].items():
     setattr(cp, name, tuple(value) if isinstance(value, list) and name.endswith("SINKS") else value)
 audit = []
+protocol_audit = []
+original_accept = cp.Session.accept
+def accept(self, record):
+    protocol_audit.append(record)
+    return original_accept(self, record)
+cp.Session.accept = accept
 def act(spec):
     def run(*args):
         if spec.get("when") and (not args or spec["when"].encode() not in bytes(args[0], "utf-8") if isinstance(args[0] if args else b"", str) else spec["when"].encode() not in (args[0] if args else b"")):
@@ -115,6 +121,8 @@ def act(spec):
             os.kill(os.getpid(), signal.SIGKILL)
         if kind == "fail":
             raise OSError("injected")
+        if kind == "exception":
+            raise RuntimeError("synthetic exception")
         if kind == "signal":
             os.kill(os.getpid(), getattr(signal, spec["signal"]))
             time.sleep(2)
@@ -165,6 +173,21 @@ if config.get("fail_fsync"):  # the run record cannot be made durable: admission
     def failing_fsync(fd):
         raise OSError(5, "synthetic EIO")
     os.fsync = failing_fsync
+if config.get("taint_negative"):
+    original_build = cp.Request.build
+    def build(self):
+        spec = original_build(self)
+        if config["taint_negative"] == "m2":
+            for path, fmt, ident, view, expected in spec["m2"]:
+                if fmt == "gzip" and view == "negative":
+                    with open(path, "wb") as out:
+                        out.write(cp.gzip.compress(self.controls["plain"].encode()))
+        else:
+            old = spec["m6"]["negative"]
+            new = old + self.controls["plain"]
+            os.rename(old, new); spec["m6"]["negative"] = new
+        return spec
+    cp.Request.build = build
 if config.get("stdout_to"):
     _out = os.open(config["stdout_to"], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     os.dup2(_out, 1)
@@ -211,7 +234,7 @@ finally:
     if config.get("audit"):
         with real_open(config["audit"], "wb") as handle:
             handle.write(b"\n".join(bytes(item) if not isinstance(item, bytes) else item for item in audit))
-            handle.write(b"\n" + repr(cp.AUDIT).encode())
+            handle.write(b"\n" + repr(protocol_audit).encode())
 sys.exit(code)
 """
 
@@ -256,6 +279,20 @@ if config.get("stub_scope"):
     w.SCOPE_CHECK = lambda: None
 if config.get("fs_magic") is not None:
     w.fs_magic = lambda fd: config["fs_magic"]
+if config.get("drop_control"):
+    original_control = w.Scan.control
+    def control(self, check, ident, *args, **kwargs):
+        request = os.path.basename(os.path.dirname(self.plan["patterns"]))[5:]
+        if ident == w.keyed(self.key, b"control", request, config["drop_control"]):
+            return
+        return original_control(self, check, ident, *args, **kwargs)
+    w.Scan.control = control
+if config.get("drop_inband"):
+    original_inband = w.Scan.inband
+    def inband(self, name):
+        ident, value = original_inband(self, name)
+        return ident, b"missing synthetic control" if name == config["drop_inband"] else value
+    w.Scan.inband = inband
 if config.get("coarse_tuple"):  # simulates deferred timestamps (shared-mapping writes): identity without times
     w.tuple_of = lambda info: (info.st_dev, info.st_ino, info.st_size)
 def act(spec):
@@ -268,12 +305,25 @@ def act(spec):
             open(spec["once"], "w").close()
         kind = spec["do"]
         if kind == "block":
+            fd = os.open(spec["path"], os.O_RDONLY | os.O_CLOEXEC)
             if spec.get("ready"):
-                open(spec["ready"], "w").close()
-            with open(spec["path"], "rb") as handle:
-                handle.read()
+                with open(spec["ready"], "w") as handle:
+                    json.dump({"pid": os.getpid(), "fd": fd}, handle)
+            os.read(fd, 1)
         elif kind == "sleep":
             time.sleep(spec["seconds"])
+        elif kind == "fork-descendant":
+            import signal
+            pid = os.fork()
+            if pid == 0:
+                os.setsid(); signal.signal(signal.SIGTERM, signal.SIG_IGN)
+                os.closerange(0, 256)
+                time.sleep(300); os._exit(0)
+            with open(spec["ready"], "w") as handle:
+                handle.write(str(pid))
+            deadline = time.monotonic() + 20
+            while not os.path.exists(spec["release"]) and time.monotonic() < deadline:
+                time.sleep(.02)
         elif kind == "replace":
             os.replace(spec["source"], spec["target"])
         elif kind == "fifo":
@@ -443,6 +493,7 @@ class Host:
                        "runtime": str(self.run_dir)}
         self.dumper = {"constants": {}, "hooks": {}, "stub_scope": not real_scope}
         self.constants = {"CHILD_PATH": str(self.bin), "RUNNER": str(RUNNER if real_scope else self.bin / "stub-runner"),
+                          "SCOPE_REQUIRED": real_scope,
                           "PRIMARY_CHECKOUT": str(self.home / "code/native-agent-stack"),
                           "TASKS_ROOT": str(self.root / "tasks"), "SETTLE_SECONDS": 0,
                           "SCOPE_SECONDS": {**{sink: 120 for sink in wire.SINKS}, "setup": 120}}
@@ -474,12 +525,16 @@ class Host:
 
     def tool(self, *argv, hooks=None, audit=None, unsafe=None, timeout=300, env=None, tty=False, worker=None,
              dumper=None, forbid_list=None, count_pipes=None, background=False, core_pattern=None,
-             stdout_to=None, fail_fsync=False) -> subprocess.CompletedProcess:
+             stdout_to=None, fail_fsync=False, taint_negative=None) -> subprocess.CompletedProcess:
         """Run canary_proof.main(argv) in a launcher process whose module hooks and constants are set here."""
         worker_config = copy.deepcopy(self.worker)
         worker_config.update(root=str(ROOT), **(worker or {}))
         dumper_config = copy.deepcopy(self.dumper)
         dumper_config.update(root=str(ROOT), **(dumper or {}))
+        for child_config in (worker_config, dumper_config):
+            for spec in child_config["hooks"].values():
+                if spec["do"] == "block":
+                    self.test.addCleanup(os.close, os.open(spec["path"], os.O_RDWR | os.O_NONBLOCK | os.O_CLOEXEC))
         constants = dict(self.constants)
         constants["WORKER_COMMAND"] = [str(self.bin / "python3"), "-I", "-S", "-c", WORKER_LAUNCHER,
                                        json.dumps(worker_config)]
@@ -490,9 +545,18 @@ class Host:
                   "forbid_list": str(forbid_list) if forbid_list else None,
                   "count_pipes": str(count_pipes) if count_pipes else None,
                   "core_pattern": str(core_pattern) if core_pattern else None,
-                  "stdout_to": str(stdout_to) if stdout_to else None, "fail_fsync": fail_fsync}
+                  "stdout_to": str(stdout_to) if stdout_to else None, "fail_fsync": fail_fsync,
+                  "taint_negative": taint_negative}
         command = [sys.executable, "-I", "-S", "-c", COORDINATOR, json.dumps(config)]
         if background:
+            if tty:
+                import pty
+                master, slave = pty.openpty()
+                self.test.addCleanup(os.close, master)
+                process = subprocess.Popen(command, env=env or self.env(), stdin=slave, stdout=slave,
+                                           stderr=subprocess.PIPE, start_new_session=True)
+                os.close(slave)
+                return process
             return subprocess.Popen(command, env=env or self.env(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     start_new_session=True)
         if tty:
@@ -530,8 +594,14 @@ class Host:
         return result.returncode, (match.group(1).decode() if match else None), codes
 
     def arm(self, consumer: str, *extra) -> int:
+        import shlex
         result = self.tool("arm", "--run", self.run_id, consumer, *extra)
         self.test.assertEqual(result.returncode, 0, result.stderr)
+        probe = re.search(rb"^probe: (.+)$", result.stdout, re.M)
+        self.test.assertIsNotNone(probe, "CMD-emitted-probe")
+        self.test.assertEqual(shlex.split(probe.group(1).decode())[:8],
+            [PYTHON, "-I", str(ROOT / "tools/credentials/credential_run.py"), "canary-e2e", "--", PYTHON, "-I",
+             str(ROOT / "tools/credentials/canary_probe.py")], "CMD-emitted-absolute-probe")
         return int(re.search(rb"--attempt (\d+)", result.stdout).group(1))
 
     def consume(self, consumer: str, attempt: int) -> tuple:
@@ -1017,7 +1087,8 @@ class BoundaryTests(unittest.TestCase):
                                                           ("git", "hf_"), ("sqlite", "sk-ant-"), ("keep", "npm_"))}
         host.prepare("--transcripts", "confirmed")
         canary = host.canary("fresh-claude-session")
-        (claude / "notes.txt").write_bytes(s["header"][:24].encode() + b" " + canary.encode() + b"\n")
+        s["header"] = s["header"][:24]
+        (claude / "notes.txt").write_bytes(s["header"].encode() + b" " + canary.encode() + b"\n")
         name_form = next(form for form in cp.forms(canary) if "/" not in form)
         (claude / f"{s['name']}-{name_form}").write_bytes(b"")
         os.symlink(f"/nonexistent/{s['target']}/{canary}", claude / "dangling")
@@ -1340,6 +1411,39 @@ class RequestTests(Shared, unittest.TestCase):
         from unittest import mock
         with mock.patch.object(cp, "SETTLE_SECONDS", settle):  # the launcher's patched settle (contract 13.7)
             return cp.classify(events, masking=self.masking)
+
+    def test_r3_baseline_user_and_comparison_rows_and_partial_ledgers(self):
+        for phase, group, name in (("baseline", "agent", "baseline"), ("final", "user", "user_run"),
+                                   ("comparison", "user", "comparison")):
+            if group == "user":
+                self.assertEqual(self.host.scan(phase, "--user-run", tty=True).returncode, 0)
+                events = self.host.events()
+            else:
+                events = self.events
+            request = latest(events, "scan_requested", phase=phase, group=group)["request"]
+            finished = latest(events, "scan_finished", request=request)
+            sink = next(iter(finished["sinks"]))
+            for case in ("missing", "deadline", "control", "ledger", "roots"):
+                with self.subTest(group=name, case=case):
+                    changed = copy.deepcopy(events)
+                    rows = latest(changed, "scan_finished", request=request)["sinks"]
+                    row = rows[sink]
+                    if case == "missing":
+                        del rows[sink]
+                        expected = name + "_sink_not_scanned:" + sink
+                    elif case in ("deadline", "control"):
+                        row.update(status="incomplete", reasons=["deadline" if case == "deadline" else "control_missing"])
+                        expected = name + ("_sink_incomplete:" + sink if case == "deadline" else "_control_missing")
+                    else:
+                        if case == "ledger":
+                            row["ledger"][0][4] = 0
+                            expected = f"{name}_check_not_scanned:{row['ledger'][0][1]}:{row['ledger'][0][0]}"
+                        else:
+                            row["roots"] = []
+                            expected = "inventory_unreconciled"
+                    result = self.codes(changed)
+                    self.assertIn(expected, result["codes"], "REPAIR-R3-group-" + case)
+                    self.assertNotEqual(result["verdict"], "clean", "REPAIR-R3-group-verdict")
 
     def test_r3_the_clean_record_and_every_classifier_code(self):
         self.assertEqual(self.codes(self.events)["verdict"], "clean", "R3-clean-base")
@@ -1810,19 +1914,52 @@ class StabilityTests(unittest.TestCase):
         self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "ST9-route-recheck")
 
 
-def blocked_program(host, name, phase=None, prefix=""):
+def blocked_program(host, name, phase=None, prefix="", occurrence=1, stream_only=False):
     """A labelled executable blocks on an owned FIFO, while --version remains the real upstream version."""
     fifo = host.root / ("blocked-" + name)
     os.mkfifo(fifo)
+    host.test.addCleanup(os.close, os.open(fifo, os.O_RDWR | os.O_NONBLOCK | os.O_CLOEXEC))
     real = REAL.get(name) or "/usr/bin/" + name
-    code = ("#!/usr/bin/python3 -I\nimport os, sys\n"
-            f"if sys.argv[1:] == ['--version']:\n    os.execv({real!r}, [{real!r}, '--version'])\n")
-    if phase:
+    code = "#!/usr/bin/python3 -I\nimport os, sys, json\n"
+    if phase != "--version":
+        code += f"if sys.argv[1:] == ['--version']:\n    os.execv({real!r}, [{real!r}, '--version'])\n"
+    if phase == "--version":
+        # A setpriv wrapper also carries the target's argv. Block its own version call only, after the outer
+        # upstream setpriv has installed PDEATHSIG; an argv substring would block the launcher before that step.
+        code += f"if sys.argv[1:] != ['--version']:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n"
+    elif phase:
         code += f"if {phase!r} not in sys.argv:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n"
+    if stream_only:
+        code += f"if '--' not in sys.argv or sys.argv[sys.argv.index('--') + 1:] != ['-']:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n"
+    counter = str(host.root / ("calls-" + name))
+    code += (f"n=int(open({counter!r}).read()) if os.path.exists({counter!r}) else 0\n"
+             f"open({counter!r}, 'w').write(str(n+1))\n"
+             f"if n+1 != {occurrence}:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n")
     ready = host.root / f"ready-{name}"  # created just before it blocks, so an observer knows the child is running
-    code += prefix + f"\nopen({str(ready)!r}, 'w').close()\nopen({str(fifo)!r}, 'rb').read()\n"
+    code += prefix + (f"\nfd=os.open({str(fifo)!r}, os.O_RDONLY)\n"
+                      f"json.dump(dict(pid=os.getpid(), fd=fd), open({str(ready)!r}, 'w'))\n"
+                      "os.read(fd, 1)\n")
     host.script(name, code)
     return fifo
+
+
+def observe_fifo(test, ready, fifo, process, seconds=20):
+    """Independent kernel observation: the intended child holds this FIFO and is sleeping in its read."""
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline and process.poll() is None:
+        try:
+            record = json.loads(ready.read_text())
+            pid, fd = record["pid"], record["fd"]
+            info, expected = os.stat(f"/proc/{pid}/fd/{fd}"), fifo.stat()
+            args = Path(f"/proc/{pid}/cmdline").read_bytes()
+            wait = Path(f"/proc/{pid}/wchan").read_text()
+            if (stat.S_ISFIFO(info.st_mode) and (info.st_dev, info.st_ino) == (expected.st_dev, expected.st_ino)
+                    and str(ready.parent).encode() in args and wait in ("pipe_read", "anon_pipe_read")):
+                return pid
+        except (OSError, ValueError, KeyError):
+            pass
+        time.sleep(.02)
+    test.assertTrue(False, "FIFO-intended-child-observed")
 
 
 def scopes_of(pids) -> set:
@@ -1866,6 +2003,14 @@ class FifoTests(unittest.TestCase):
         self.assertEqual(host.finished()["status"], "incomplete", "FIFO-incomplete-record")
         self.assertEqual(wait_gone(str(host.root), 20), [], "FIFO-kernel-processes-gone")
 
+    def blocked_scan(self, host, name, fifo=None, ready=None, extra=(), **kwargs):
+        process = host.scan("final" if extra else "baseline", *extra, background=True, **kwargs)
+        self.addCleanup(ContainmentTests.reap, self, host, process)
+        observe_fifo(self, ready or host.root / f"ready-{name}", fifo or host.root / f"blocked-{name}", process)
+        process.communicate(timeout=40)
+        self.ended(host, process)
+        self.assertIn("deadline", host.finished()["reasons"], "FIFO-required-deadline")
+
     def test_f_m1a_special_is_named_and_never_opened(self):
         host = self.fixture()
         host.prepare()
@@ -1873,7 +2018,7 @@ class FifoTests(unittest.TestCase):
         os.mkfifo(fifo)
         self.assertEqual(host.scan(worker={"forbid_paths": [str(fifo)]}).returncode, 0, "F-M1a-no-content-open")
         self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["special"], 1, "F-M1a-special-count")
-        self.assertNotEqual(host.verdict()[1], "clean", "F-M1a-walk-is-not-six-consumer-proof")
+        self.assertEqual(sink_reasons(host), [], "F-M1a-complete-special-coverage")
 
     def test_f_m1b_c_swaps_before_and_after_handoff_raw_le_be(self):
         for data in (b"plain", b"\xff\xfep\x00l\x00", b"\xfe\xff\x00p\x00l"):
@@ -1903,7 +2048,7 @@ class FifoTests(unittest.TestCase):
                     blocked_program(host, name, prefix=prefix)
                     (host.home / ".claude" / ("sample.lzma" if fmt == "lzma" else "sample")).write_bytes(compress(b"old"))
                     host.prepare()
-                    self.ended(host, host.scan())
+                    self.blocked_scan(host, name)
         host = self.fixture()
         path = host.home / ".claude" / "sample.gz"
         path.write_bytes(gzip.compress(b"old"))
@@ -1913,11 +2058,12 @@ class FifoTests(unittest.TestCase):
 
     def test_f_m2b_one_reader_stalls(self):
         import gzip
-        host = self.fixture()
-        blocked_program(host, "rg", phase="auto")
-        (host.home / ".claude" / "sample.gz").write_bytes(gzip.compress(b"\xff\xfe" + "old".encode("utf-16-le")))
-        host.prepare()
-        self.ended(host, host.scan())
+        for encoding in ("none", "auto"):
+            host = self.fixture()
+            blocked_program(host, "rg", phase=encoding, stream_only=True)
+            (host.home / ".claude" / "sample.gz").write_bytes(gzip.compress(b"\xff\xfe" + "old".encode("utf-16-le")))
+            host.prepare()
+            self.blocked_scan(host, "rg")
 
     def test_f_m3_journal_producer(self):
         host = self.fixture("A11")
@@ -1925,7 +2071,7 @@ class FifoTests(unittest.TestCase):
         # Change and rebind only the synthetic executable; this exercises the stream rather than pin refusal.
         blocked_program(host, "journalctl", phase="--user")
         self.repin(host, "journalctl")
-        self.ended(host, host.scan())
+        self.blocked_scan(host, "journalctl")
 
     def repin(self, host, name):
         events = host.events()
@@ -1940,7 +2086,7 @@ class FifoTests(unittest.TestCase):
                 git_repo(host.home / ".claude" / "plugins" / "p", {"file": b"old"})
                 blocked_program(host, "git", phase=phase)
                 host.prepare()
-                self.ended(host, host.scan())
+                self.blocked_scan(host, "git")
         host = self.fixture()
         repo = git_repo(host.home / ".claude" / "plugins" / "p", {"file": b"old"})
         keep = next(repo.glob("objects/pack/*.pack")).with_suffix(".keep")
@@ -1960,7 +2106,10 @@ class FifoTests(unittest.TestCase):
             else:
                 fifo = host.root / "dumper-fifo"
                 os.mkfifo(fifo)
-                result = host.scan(dumper={"hooks": {"after_identity": {"do": "block", "path": str(fifo)}}})
+                ready = host.root / "ready-dumper"
+                self.blocked_scan(host, "dumper", fifo, ready, dumper={"hooks": {"after_identity": {
+                    "do": "block", "path": str(fifo), "ready": str(ready)}}})
+                continue
             self.ended(host, result)
 
     def test_f_m6_name_and_link_target_are_never_opened_and_worker_deadline(self):
@@ -1971,18 +2120,22 @@ class FifoTests(unittest.TestCase):
         os.mkfifo(fifo)
         os.symlink(str(fifo), fifo.parent / "link")
         self.assertEqual(host.scan(worker={"forbid_paths": [str(fifo)]}).returncode, 5, "F-M6-name-hit")
+        self.assertEqual(sink_reasons(host), ["link_out"], "F-M6-never-opened")
+        self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["special"], 1, "F-M6-special-count")
         other = self.fixture()
         other.prepare()
         block = other.root / "m6-fifo"
         os.mkfifo(block)
-        self.ended(other, other.scan(worker={"hooks": {"before_m6": {"do": "block", "path": str(block)}}}))
+        ready = other.root / "ready-worker"
+        self.blocked_scan(other, "worker", block, ready, worker={"hooks": {"before_m6": {
+            "do": "block", "path": str(block), "ready": str(ready)}}})
 
     def test_f_u4_full_environment_producer_in_pty(self):
         host = self.fixture()
         host.constants["USER_SINKS"] = ["U4"]
         blocked_program(host, "systemctl", phase="show-environment")
         host.prepare()
-        self.ended(host, host.scan("final", "--user-run", tty=True))
+        self.blocked_scan(host, "systemctl", extra=("--user-run",), tty=True)
 
 
 @needs_tools
@@ -2005,6 +2158,12 @@ class ModeTests(unittest.TestCase):
             (root / name).write_bytes(data)
         self.assertEqual(host.scan().returncode, 5, "M1-positive-raw-and-bom")
         self.assertEqual({e["view"] for e in hits(host)}, {1, 2}, "M1-additive-views")
+        key = (host.path / "key").read_bytes()
+        for name, view in (("nul", 1), ("bomraw", 1), ("le", 2), ("be", 2)):
+            obj = wire.keyed(key, b"file", 1, 1, name.encode()).hex()
+            self.assertTrue(any(e["object"] == obj and e["view"] == view for e in hits(host)),
+                            "M1-attributed-" + name)
+        self.assertEqual(host.finished()["status"], "complete", "M1-complete-all-fixtures")
         self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["selected"], 7, "M1-empty-accounted")
         # The raw pass alone must find ASCII behind a BOM: a BOM-sniffing raw pass decodes it away (encoding none).
         alone = self.fixture()
@@ -2161,11 +2320,22 @@ class ModeTests(unittest.TestCase):
             host = self.fixture("A12" if configured else "A1")
             path = host.home / "code/native-agent-stack-live" if configured else host.home / ".claude/plugins/p"
             store = git_repo(path, {"packed": b"old"}, loose={"loose": b"old"})
+            import hashlib, zlib
+            blob = b"blob 3\0old"
+            oid = hashlib.sha1(blob).hexdigest()
+            loose_copy = store / "objects" / oid[:2] / oid[2:]
+            loose_copy.parent.mkdir(exist_ok=True)
+            loose_copy.write_bytes(zlib.compress(blob))
+            packed_ids = subprocess.check_output([REAL["git"], "verify-pack", "-v", str(next(store.glob("objects/pack/*.idx")))])
+            self.assertIn(oid.encode() + b" blob ", packed_ids, "M4-duplicate-packed-copy")
+            self.assertTrue(loose_copy.is_file(), "M4-duplicate-loose-copy")
             host.prepare()
             canary = host.canary()
             next(store.glob("objects/pack/*.pack")).with_suffix(".keep").write_text(canary)
             self.assertEqual(host.scan().returncode, 5, "M4-keep-metadata-leak")
             self.assertTrue(any(e["mode"] == 1 for e in hits(host)), "M4-keep-raw")
+            self.assertGreater(host.finished()["sinks"]["A12" if configured else "A1"]["counters"]["git_stores"],
+                               0, "M4-store-discovery-complete")
             self.assertEqual(host.finished()["status"], "complete", "M4-duplicates-physical-logical")
 
     def test_m4_orphan_index_corrupt_payload_alternate_and_promisor(self):
@@ -2515,6 +2685,26 @@ class ContainmentRealScopeTests(ContainmentTests):
     def blocked(self, kind="rg", real=True):
         return super().blocked(kind, True)
 
+    def test_complete_end_stops_scope_with_detached_descendant(self):
+        host = Host(self, real_scope=True)
+        host.constants["AGENT_SINKS"] = ["A1"]
+        host.prepare()
+        ready, release = host.root / "descendant-ready", host.root / "release"
+        process = host.scan(background=True, worker={"hooks": {"after_prewalk": {"do": "fork-descendant",
+            "ready": str(ready), "release": str(release)}}})
+        self.addCleanup(self.reap, host, process)
+        deadline = time.monotonic() + 20
+        while not ready.exists() and time.monotonic() < deadline:
+            time.sleep(.02)
+        self.assertTrue(ready.exists(), "REPAIR-NATIVE-descendant-observed")
+        scopes = scopes_of([int(ready.read_text())])
+        self.assertTrue(scopes, "REPAIR-NATIVE-scope-observed")
+        release.touch()
+        process.communicate(timeout=30)
+        self.assertEqual(process.returncode, 0, "REPAIR-NATIVE-completion")
+        self.assertEqual(wait_scopes_gone(scopes, 3), [], "REPAIR-NATIVE-scope-removed")
+        self.assertEqual(wait_gone(str(host.root), 3), [], "REPAIR-NATIVE-descendants-gone")
+
     def test_c9_real_runner_run_state_stays_in_the_planned_runtime(self):
         """Inside the real scope XDG_RUNTIME_DIR is /run/user/$UID (the runner exports it); every run and scan path
         comes from the plan, so no run or lock of this tool appears there (the runner keeps its own state)."""
@@ -2628,7 +2818,9 @@ class CommandTests(unittest.TestCase):
                            hooks={"between_sinks": {"do": "stdout-size", "path": str(sizes)}})
         self.assertEqual(result.returncode, 0, "C11-scan")
         self.assertEqual(sizes.read_text().split(), ["0", "0", "0"], "C11-output-after-all-sinks")
-        self.assertEqual(len(out.read_text().splitlines()), 3, "C11-one-line-per-sink")
+        lines = out.read_text().splitlines()
+        self.assertEqual([line.split(":", 1)[0] for line in lines], ["A1", "A2", "A3", "not_covered"],
+                         "C11-one-line-per-sink-and-coverage")
 
     def test_k4_deny_spellings_if_rule_installed(self):
         sys.path.insert(0, str(ROOT / "scripts/hooks"))
@@ -2645,7 +2837,10 @@ class CommandTests(unittest.TestCase):
         import secret_path_guard as guard
         run = "cp-20260930t120000z-abcdef"
         for consumer in cp.CONSUMERS:
-            probe_command = f"python3 -I tools/credentials/credential_run.py canary-e2e -- python3 -I tools/credentials/canary_probe.py --run {run} --consumer {consumer} --attempt 1"
+            import shlex
+            probe_command = (f"{PYTHON} -I {shlex.quote(str(ROOT / 'tools/credentials/credential_run.py'))} canary-e2e -- "
+                             f"{PYTHON} -I {shlex.quote(str(ROOT / 'tools/credentials/canary_probe.py'))} "
+                             f"--run {run} --consumer {consumer} --attempt 1")
             commands = [probe_command, f"python3 tools/credentials/canary_proof.py arm --run {run} {consumer}"]
             if consumer == "systemd-user-unit":
                 commands += [f"systemd-run --user --wait --collect --quiet -p Type=oneshot --unit=canary-proof-{run}-unit-1 " + probe_command + " --leak-check"]
@@ -2705,6 +2900,684 @@ class CommandTests(unittest.TestCase):
             self.assertNotIn(cp.VARIABLE, command, "CMD-docs-id-only")
             if "--user-run" not in command:
                 self.assertIsNone(guard.check(command), "CMD-docs-allowed " + command)
+
+
+@needs_tools
+class RepairTests(unittest.TestCase):
+    """Permanent regressions for the two independent v2 reviews; all inputs are synthetic."""
+
+    def host(self, sink="A1"):
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = [sink]
+        host.prepare()
+        return host
+
+    def test_incomplete_end_never_becomes_complete(self):
+        for changes in ({"status": 2}, {"aux": 1}, {"observed": 1}, {"expected": 1}):
+            session = cp.Session(None, {"controls": None}, "A1", 5)
+            session.completed[0] = wire.unpack(wire.pack(kind=wire.RESULT, status=1))
+            session.end = wire.unpack(wire.pack(kind=wire.END, **{"status": 1, **changes}))
+            self.assertEqual(session.outcome()["status"], "incomplete", "REPAIR-END-rejected")
+
+    def test_discovered_git_indirections_and_damaged_stores(self):
+        for kind in ("gitfile", "missing-head", "missing-refs", "gitfile-damaged-both"):
+            with self.subTest(kind=kind):
+                host = self.host()
+                repo_path = (host.root / "outside") if kind == "gitfile" else host.home / ".claude/p"
+                repo = git_repo(repo_path, {"file": host.canary().encode()}, pack=kind == "gitfile")
+                (repo_path / "file").unlink()  # only compressed Git objects retain the canary
+                if kind == "gitfile":
+                    inside = host.home / ".claude/worktree"
+                    inside.mkdir()
+                    (inside / ".git").write_text("gitdir: " + str(repo) + "\n")
+                elif kind == "missing-head":
+                    (repo / "HEAD").unlink()
+                elif kind == "missing-refs":
+                    shutil.rmtree(repo / "refs")
+                else:
+                    renamed = repo_path / "broken-store"
+                    repo.rename(renamed)
+                    (renamed / "HEAD").unlink(); shutil.rmtree(renamed / "refs")
+                    (repo_path / ".git").write_text("gitdir: broken-store\n")
+                result = host.scan()
+                self.assertNotEqual(result.returncode, 0, "REPAIR-GIT-no-false-clean")
+                self.assertEqual(host.finished()["status"], "incomplete", "REPAIR-GIT-incomplete")
+
+    def test_wal_requires_a_valid_scanned_sqlite_main(self):
+        for kind in ("plain", "directory", "symlink", "missing"):
+            with self.subTest(kind=kind):
+                host = self.host()
+                main = host.home / ".claude/family"
+                if kind == "plain":
+                    main.write_text("not SQLite")
+                elif kind == "directory":
+                    main.mkdir()
+                elif kind == "symlink":
+                    os.symlink("/nonexistent", main)
+                main.with_name("family-wal").write_bytes(b"\x37\x7f\x06\x82" + host.canary().encode("utf-16-le"))
+                main.with_name("family-shm").write_bytes(b"synthetic")
+                self.assertEqual(host.scan().returncode, 3, "REPAIR-WAL-invalid-main")
+                self.assertIn("sqlite_uri_identity", sink_reasons(host), "REPAIR-WAL-logical-required")
+
+    def test_symlink_to_unselected_tasks_file_is_not_covered(self):
+        host = self.host()
+        host.constants["AGENT_SINKS"] = ["A1", "A10"]
+        target = host.root / "tasks/unscanned.txt"
+        target.write_text(host.canary())
+        os.symlink(target, host.home / ".claude/link")
+        self.assertEqual(host.scan().returncode, 3, "REPAIR-LINK-selection")
+        self.assertIn("link_out", sink_reasons(host), "REPAIR-LINK-out")
+
+    def test_journal_cursor_substitution_is_rejected(self):
+        host = self.host("A11")
+        original = (host.path / "child-cursor").read_bytes()
+        host.journal_add(host.canary().encode())
+        host.journal_add((host.path / "anchor").read_bytes().strip())
+        last = dict(json.loads(host.journal.read_text())[-1])["__CURSOR"]
+        (host.path / "child-cursor").write_text(last + "\n")
+        self.assertEqual(host.scan().returncode, 3, "REPAIR-CURSOR-bound")
+        self.assertIn("journal_cursor_missing", sink_reasons(host, "A11"))
+        (host.path / "child-cursor").write_bytes(original)
+        self.assertEqual(host.scan().returncode, 5, "REPAIR-CURSOR-original-observes-leak")
+
+    def test_journal_unterminated_final_entry_is_rejected(self):
+        host = self.host("A11")
+        host.journal_add(b"ordinary final entry")
+        script = host.bin / "journalctl"
+        code = script.read_text().replace('out = sys.stdout.buffer', 'import io\nout = io.BytesIO()')
+        script.write_text(code + '\nsys.stdout.buffer.write(out.getvalue()[:-1])\n')
+        FifoTests.repin(self, host, "journalctl")
+        self.assertEqual(host.scan().returncode, 3, "REPAIR-JOURNAL-final-separator")
+        self.assertIn("unparseable_output", sink_reasons(host, "A11"))
+
+    def test_virtual_table_shadow_ownership_is_exact(self):
+        host = self.host()
+        sqlite_file(host.home / ".claude/state", [("CREATE VIRTUAL TABLE a USING dbstat", ()),
+                                                   ("CREATE VIRTUAL TABLE a_b USING fts5(v)", ())])
+        self.assertEqual(host.scan().returncode, 3, "REPAIR-SHADOW-owner")
+        self.assertIn("sqlite_table_error", sink_reasons(host))
+
+    def test_runner_cleanup_preserves_leader_and_stops_after_end(self):
+        for exited in (True, False):
+            host = Host(self)
+            pidfile = host.root / "descendant"
+            code = ("import os,time,sys,signal\nchild=os.fork()\n"
+                    "if child == 0:\n signal.signal(signal.SIGTERM,signal.SIG_IGN)\n"
+                    " open(sys.argv[1],'w').write(str(os.getpid()))\n time.sleep(300);sys.exit(0)\n"
+                    "while not os.path.exists(sys.argv[1]): time.sleep(.01)\n" +
+                    ("os._exit(0)\n" if exited else "time.sleep(300)\n"))
+            process = subprocess.Popen([PYTHON, "-I", "-c", code, str(pidfile)], start_new_session=True)
+            self.addCleanup(lambda p=process: p.poll() is None and p.kill())
+            deadline = time.monotonic() + 5
+            while not pidfile.exists() and time.monotonic() < deadline:
+                time.sleep(.02)
+            self.assertTrue(pidfile.exists())
+            descendant = int(pidfile.read_text())
+            def reap_fixture():
+                try: os.kill(descendant, signal.SIGKILL)
+                except ProcessLookupError: pass
+                if process.poll() is None:
+                    process.kill()
+                process.wait(timeout=5)
+            self.addCleanup(reap_fixture)
+            if exited:
+                os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
+            session = cp.Session(None, {}, "A1", 5)
+            session.process = process
+            session.end = wire.unpack(wire.pack(kind=wire.END, status=1))
+            session.stop()
+            self.assertEqual(wait_gone(str(host.root), 3), [], "REPAIR-CLEANUP-descendants")
+
+    def test_scope_stop_failure_cannot_complete(self):
+        from unittest import mock
+        import itertools
+        for populated in (True, False):
+            session = cp.Session(None, {}, "A1", 5)
+            session.process = object(); session.scope = Path("/synthetic-scope")
+            session.completed[0] = wire.unpack(wire.pack(kind=wire.RESULT, status=1))
+            session.end = wire.unpack(wire.pack(kind=wire.END, status=1))
+            command = mock.Mock()
+            command.exited.return_value = command.signal_group.return_value = True
+            command.reap.return_value = 143
+            with mock.patch.object(cp.runner, "Command", return_value=command), mock.patch.object(cp.runner, "end_group"), \
+                    mock.patch.object(cp, "SCOPE_REQUIRED", True), \
+                    mock.patch.object(cp.time, "monotonic", side_effect=itertools.count(0, 20)), \
+                    mock.patch.object(session, "scope_populated", return_value=populated):
+                session.stop()
+            self.assertEqual(session.outcome()["status"], "incomplete" if populated else "complete",
+                             "REPAIR-SCOPE-survivor-refuses")
+
+    def test_terminal_release_after_stop_signal(self):
+        from unittest import mock
+        host = Host(self)
+        ack_r, ack_w = os.pipe()
+        ready = host.root / "terminal-ready"
+        process = subprocess.Popen([PYTHON, "-I", "-c",
+            "import os, signal, sys; signal.signal(signal.SIGTERM, signal.SIG_IGN); "
+            "open(sys.argv[2], 'w').close(); os.read(int(sys.argv[1]), 1)", str(ack_r), str(ready)],
+            pass_fds=(ack_r,), start_new_session=True)
+        os.close(ack_r)
+        self.addCleanup(ContainmentTests.reap, self, host, process)
+        deadline = time.monotonic() + 5
+        while not ready.exists() and time.monotonic() < deadline:
+            time.sleep(.02)
+        self.assertTrue(ready.exists())
+        session = cp.Session(None, {}, "A1", 5)
+        session.process = process
+        session.end = wire.unpack(wire.pack(kind=wire.END, status=wire.STATUS["complete"]))
+        try:
+            with mock.patch.object(cp, "SCOPE_REQUIRED", False):
+                session.stop(ack_w)
+            self.assertEqual(session.reasons, [], "REPAIR-TERMINAL-release")
+            self.assertEqual(process.returncode, 0, "REPAIR-TERMINAL-exit")
+        finally:
+            with cp._suppress(OSError):
+                os.close(ack_w)
+
+    def test_inherited_sigchld_ignore_preserves_waitable_children(self):
+        code = r'''
+import json, os, signal, subprocess, sys
+from types import SimpleNamespace
+sys.path[:0] = [sys.argv[1] + '/tools/credentials', sys.argv[1] + '/scripts']
+import canary_proof as cp
+import canary_scan_worker as w
+signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+checks = []
+def observe(process):
+    try:
+        first = os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
+        second = os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
+        checks.append(first.si_status == second.si_status == 7)
+    except ChildProcessError:
+        checks.append(False)
+argv = ['/usr/bin/python3', '-I', '-c', 'raise SystemExit(7)']
+if sys.argv[2] == 'runner':
+    cp.SCOPE_REQUIRED = False
+    cp.launch_argv = lambda exes: argv
+    run = SimpleNamespace(key=bytes(32), env={}, runtime=sys.argv[3])
+    session = cp.Session(run, {'exes': {}}, 'setup', 5)
+    session.read_records = lambda *fds: observe(session.process)
+    session.run_worker()
+    checks.append(session.process.returncode == 7)
+else:
+    scan = SimpleNamespace(setpriv=sys.argv[4], child_env={'PATH': '/usr/bin:/bin'})
+    child = w.Child(scan, argv, subprocess.DEVNULL, subprocess.DEVNULL, subprocess.DEVNULL)
+    observe(child.process)
+    child.stop()
+    checks.append(child.process.returncode == 7)
+print(json.dumps(checks))
+'''
+        host = Host(self)
+        for kind in ("runner", "helper"):
+            with self.subTest(kind=kind):
+                result = subprocess.run([PYTHON, "-I", "-c", code, str(ROOT), kind, str(host.root), REAL["setpriv"]],
+                                        capture_output=True, timeout=20)
+                self.assertEqual(result.returncode, 0, "REPAIR-SIGCHLD-execution")
+                self.assertEqual(json.loads(result.stdout), [True, True], "REPAIR-SIGCHLD-pinned " + kind)
+
+    def test_a12_is_primary_home_checkout_and_deduplicated(self):
+        from unittest import mock
+        host = Host(self)
+        with mock.patch.object(cp, "ROOT", host.home / "code/native-agent-stack-live"):
+            roots = cp.sink_roots(str(host.home), os.getuid(), [], "cursor")
+        self.assertEqual(roots["A12"][1][1], str(host.home / "code/native-agent-stack"), "REPAIR-A12-primary")
+        host.constants["PRIMARY_CHECKOUT"] = str(host.home / "code/native-agent-stack-live")
+        host.constants["AGENT_SINKS"] = ["A12"]
+        host.prepare()
+        self.assertEqual(host.scan().returncode, 0, "REPAIR-A12-deduplicate")
+        self.assertNotEqual(host.tool("status", "--run", host.run_id).returncode, 4, "REPAIR-A12-record-valid")
+
+    def test_partial_record_preserves_durable_hit_count(self):
+        host = self.host()
+        (host.home / ".claude/leak").write_text(host.canary())
+        self.assertEqual(host.scan().returncode, 5)
+        count = sum(e["count"] for e in hits(host))
+        with open(host.path / "events.jsonl", "ab") as out:
+            out.write(b"{")
+        result = host.tool("status", "--run", host.run_id)
+        self.assertEqual(result.returncode, 4, "REPAIR-PARTIAL-invalid")
+        self.assertIn(f"hits={count}".encode(), result.stdout, "REPAIR-PARTIAL-durable-count")
+
+    def test_bound_pointer_stays_excluded_when_variable_unset(self):
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = ["A1"]
+        target = host.home / ".claude/bound-secret"
+        target.write_text("synthetic unrelated value")
+        result = host.tool("prepare", env=host.env(ENV_FILE=str(target)))
+        self.assertEqual(result.returncode, 0)
+        host.run_id = re.search(rb"run: (cp-\S+)", result.stdout)[1].decode()
+        self.assertEqual(host.scan(worker={"forbid_paths": [str(target)]}).returncode, 0, "REPAIR-POINTER-unset")
+        self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["excluded_key"], 1)
+
+    def test_rg15_grammar_and_empty_file_accounting(self):
+        for version, tail in ((14001000, b"seconds"), (15002000, b"seconds total")):
+            for files in (1, 3, 8):
+                stats = (b"\n0 matches\n0 matched lines\n0 files contained matches\n" + str(files).encode()
+                         + b" files searched\n0 bytes printed\n0 bytes searched\n0.0 seconds spent searching\n0.0 "
+                         + tail + b"\n")
+                scan = type("Scan", (), {"plan": {"rg_version": version}})()
+                for actual, expected in ((files, "ok"), (files + 1, "files_searched_mismatch")):
+                    check = wire.Check(1, "M1", "raw", "other", bytes(16), 0)
+                    parser = wire.RgOutput(scan, check, {})
+                    parser.feed(stats)
+                    parser.close(actual)
+                    self.assertEqual(check.reason, expected, "REPAIR-RG15-empty-accounting")
+                check = wire.Check(1, "M1", "raw", "other", bytes(16), 0)
+                parser = wire.RgOutput(scan, check, {})
+                parser.feed(stats.replace(tail + b"\n", b"wrong terminator\n"))
+                parser.close(files)
+                self.assertEqual(check.reason, "unparseable_output", "REPAIR-RG15-grammar")
+
+    def test_equal_count_replacement_and_unselected_retry(self):
+        host = self.host()
+        target = host.home / ".claude/sample"
+        target.write_text("old")
+        before = len(list(target.parent.iterdir()))
+        moved = target.parent / next(v for v in cp.forms(host.canary()) if "/" not in v)
+        result = host.scan(worker={"hooks": {"before_postwalk": {"do": "replace", "source": str(target),
+            "target": str(moved), "once": str(host.root / "once")}}})
+        self.assertEqual(len(list(target.parent.iterdir())), before, "REPAIR-S4-equal-count")
+        self.assertEqual(result.returncode, 5, "REPAIR-S4-retry-hit")
+        self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "REPAIR-S4-retry")
+        other = Host(self)
+        other.constants.update(AGENT_SINKS=["A1"], MARGIN_NS=0)
+        old = other.home / ".claude/old"
+        old.write_text("old")
+        other.prepare()
+        self.assertLess(old.stat().st_ctime_ns, other.events()[0]["threshold_ns"])
+        (old.parent / "trigger").write_text("new")
+        result = other.scan(worker={"fs_magic": 0xEF53, "hooks": {"after_file_scan": {"do": "write",
+            "target": str(old), "data": other.canary().encode().hex(), "when": "trigger", "once": str(other.root / "once")}}})
+        self.assertEqual(result.returncode, 5, "REPAIR-S8-new-selection")
+        self.assertTrue(any(e["subpass"] == 1 and e["mode"] == 1 for e in hits(other)), "REPAIR-S8-retry-content")
+
+    def test_st5_removal_link_parent_pack_wal_shm_changes(self):
+        import sqlite3
+        for kind in ("remove", "link", "parent", "pack", "wal", "shm"):
+            with self.subTest(kind=kind):
+                host = self.host()
+                top = host.home / ".claude"
+                path = top / "sample"
+                path.write_text("old")
+                hook = {"do": "remove", "target": str(path)}
+                if kind == "link":
+                    path.unlink(); os.symlink("/nonexistent/old", path)
+                    hook = {"do": "symlink", "target": str(path), "source": "/nonexistent/new"}
+                elif kind == "parent":
+                    path.unlink(); path.mkdir(); (path / "f").write_text("old")
+                    replacement = host.root / "replacement"; replacement.mkdir(); (replacement / "f").write_text("new")
+                    hook = {"do": "swap", "target": str(path), "source": str(replacement), "aside": str(host.root / "aside")}
+                elif kind == "pack":
+                    repo = git_repo(top / "repo", {"f": b"old"})
+                    pack = next(repo.glob("objects/pack/*.pack"))
+                    saved = host.root / "saved.pack"; pack.replace(saved)
+                    hook = {"do": "replace", "source": str(saved), "target": str(pack)}
+                elif kind in ("wal", "shm"):
+                    db = top / "db"
+                    connection = sqlite3.connect(db)
+                    connection.execute("PRAGMA journal_mode=WAL"); connection.execute("CREATE TABLE t(v)")
+                    connection.commit(); self.addCleanup(connection.close)
+                    side = Path(str(db) + "-" + kind)
+                    saved = host.root / ("saved-" + kind); side.replace(saved)
+                    hook = {"do": "replace", "source": str(saved), "target": str(side)}
+                hook["once"] = str(host.root / "once")
+                result = host.scan(worker={"hooks": {"after_prewalk": hook}})
+                self.assertIn(result.returncode, (0, 3), "REPAIR-S5-fixed-scope")
+                inventories = [e for e in host.events() if e["event"] == "scan_inventory"]
+                if len(inventories) == 1:
+                    # A newly added pack/side file can also leave an unreconciled Git/SQLite view. C14 forbids
+                    # retrying away that hard error, but the inventory change must still be recorded.
+                    self.assertEqual(result.returncode, 3, "REPAIR-S5-inventory-change")
+                    self.assertIn("file_set_changed", sink_reasons(host), "REPAIR-S5-change-reason")
+                else:
+                    self.assertEqual([e["subpass"] for e in inventories], [0, 1], "REPAIR-S5-inventory-retry")
+
+    def test_requests_all_groups_supersede_previous_pass(self):
+        host = self.host()
+        host.constants["USER_SINKS"] = ["U4"]
+        for phase, user, code in (("baseline", False, "baseline_unfinished"), ("final", False, "final_unfinished"),
+                                  ("final", True, "user_run_unfinished"), ("comparison", True, "comparison_unfinished")):
+            extra = ("--user-run",) if user else ()
+            for point in ("after_request", "before_mkdir", "before_union", "before_plan"):
+                with self.subTest(phase=phase, user=user, point=point):
+                    prior = host.scan(phase, *extra, tty=user)
+                    self.assertEqual(prior.returncode, 0, ("REPAIR-R1-prior-complete", prior.stdout,
+                                                          prior.stderr, host.finished()))
+                    killed = host.scan(phase, *extra, tty=user, hooks={point: {"do": "kill"}})
+                    self.assertEqual(killed.returncode, -9)
+                    self.assertIn(code, host.verdict()[2], "REPAIR-R1-group-request")
+
+    def test_missing_registered_lane_and_present_file_roots(self):
+        host = Host(self)
+        lane = host.root / "missing-lane"
+        host.constants["AGENT_SINKS"] = ["A4"]
+        host.prepare("--codex-home", str(lane))
+        self.assertEqual(host.scan().returncode, 0)
+        row = host.finished()["sinks"]["A4"]
+        self.assertEqual(len(row["absent"]), 1, "REPAIR-R6-absent-lane")
+        self.assertFalse(row["absent_only"])
+        existing = Host(self)
+        existing.constants["AGENT_SINKS"] = ["A4"]
+        lane = existing.root / "present-lane"
+        lane.mkdir()
+        existing.prepare("--codex-home", str(lane))
+        lane.rmdir()
+        self.assertEqual(existing.scan().returncode, 3, "REPAIR-R6-removed-lane")
+        self.assertIn("vanished", sink_reasons(existing, "A4"), "REPAIR-R6-removed-reason")
+        for sink, rel in (("A2", "claude-config-audit.log"), ("A2", ".bash_history"),
+                          ("A3", ".cache/claude-cli-nodejs/log"), ("A9", ".local/share/codex-ecosystem/observability/collector/log")):
+            other = self.host(sink)
+            target = other.home / rel
+            target.parent.mkdir(parents=True, exist_ok=True); target.write_text(other.canary())
+            self.assertEqual(other.scan().returncode, 5, "REPAIR-A-sink-leak " + rel)
+            self.assertTrue(any(e["sink"] == sink for e in hits(other)), "REPAIR-A-attribution " + rel)
+            self.assertEqual(other.finished()["status"], "complete")
+
+    def test_fact_counter_end_zero_rules_and_count_cap(self):
+        permitted = {wire.FACT: {"check", "observed", "expected", "object", "seal"},
+                     wire.COUNTER: {"check", "sink", "subpass", "observed"},
+                     wire.END: {"sink", "subpass", "status", "observed", "expected", "seal", "aux"}}
+        for kind, allowed in permitted.items():
+            fields = {"check": 1} if kind != wire.END else {"status": 1}
+            for field in set(wire.NAMES) - allowed - {"magic", "version", "kind", "nonce", "seq"}:
+                session = cp.Session(None, {}, "A1", 5)
+                session.nonce, session.seal = bytes(16), bytes(16)
+                self.assertTrue(session.accept(wire.unpack(wire.pack(kind=wire.BEGIN, seq=1))))
+                value = b"x" + bytes(6) if field == "r1" else b"x" + bytes(15) if field in ("object", "seal") else 1
+                bad = wire.unpack(wire.pack(kind=kind, seq=2, **{**fields, field: value}))
+                with self.subTest(kind=kind, field=field):
+                    self.assertFalse(session.accept(bad), "REPAIR-B4-kind-zero")
+        for number, accepted in ((1 << 48, True), ((1 << 48) + 1, False)):
+            session = cp.Session(None, {}, "A1", 5); session.nonce = session.seal = bytes(16)
+            session.accept(wire.unpack(wire.pack(kind=wire.BEGIN, seq=1)))
+            self.assertEqual(session.accept(wire.unpack(wire.pack(kind=wire.COUNTER, seq=2, check=1, observed=number))),
+                             accepted, "REPAIR-B4-count-cap")
+
+    def test_schema_and_table_errors_are_distinct(self):
+        import sqlite3
+        for kind, reason in (("schema", "sqlite_schema_error"), ("table", "sqlite_table_error")):
+            host = self.host()
+            path = sqlite_file(host.home / ".claude/state", [("CREATE TABLE t(v)", ()), ("INSERT INTO t VALUES ('old')", ())])
+            connection = sqlite3.connect(path)
+            connection.execute("PRAGMA writable_schema=ON")
+            if kind == "schema":
+                connection.execute("UPDATE sqlite_master SET sql='invalid sql' WHERE name='t'")
+            else:
+                page = connection.execute("SELECT rootpage FROM sqlite_master WHERE name='t'").fetchone()[0]
+                size = connection.execute("PRAGMA page_size").fetchone()[0]
+            connection.commit(); connection.close()
+            if kind == "table":
+                # Keep the schema valid, but damage the table's b-tree page so SELECT * itself fails.
+                with path.open("r+b") as handle:
+                    handle.seek((page - 1) * size)
+                    handle.write(b"\x00")
+            self.assertEqual(host.scan().returncode, 3, "REPAIR-M5-error")
+            self.assertIn(reason, sink_reasons(host), "REPAIR-M5-distinct-" + kind)
+
+    def test_negative_m2_and_m6_controls_detect_union_matches(self):
+        import gzip
+        for mode in ("m2", "m6"):
+            host = self.host()
+            (host.home / ".claude/sample.gz").write_bytes(gzip.compress(b"plain"))
+            self.assertEqual(host.scan(taint_negative=mode).returncode, 3, "REPAIR-NEGATIVE-refuses " + mode)
+            self.assertIn("negative_control_matched", sink_reasons(host), "REPAIR-NEGATIVE-matched " + mode)
+
+    def test_stream_roots_and_failed_requests_are_described_truthfully(self):
+        host = self.host("A11")
+        host.constants["USER_SINKS"] = ["U4"]
+        self.assertEqual(host.scan("final").returncode, 0)
+        self.assertEqual(host.scan("final", "--user-run", tty=True).returncode, 0)
+        host.verdict("verdict")
+        receipt = json.loads(next((host.state / "native-agent-stack/canary-proof").glob("*.json")).read_text())
+        rows = receipt["not_covered"]
+        self.assertFalse(any(row.startswith(("A11:absent:", "U4:absent:")) for row in rows),
+                         "REPAIR-STREAM-presence")
+        self.assertIn("A11:requested_incomplete", rows, "REPAIR-STREAM-requested")
+        self.assertNotIn("A11:not_requested", rows, "REPAIR-STREAM-not-requested")
+
+    def test_each_mode_control_and_inband_control_is_required(self):
+        import bz2, gzip, lzma
+        cases = [(f"m2_{fmt}_{kind}", "m2", fmt) for fmt in ("gzip", "bzip2", "xz", "lzma")
+                 for kind in ("plain", "le", "be", "neg")]
+        cases += [("m2_gzip_" + kind, "m2", "gzip") for kind in ("two", "mixed")]
+        cases += [("m4_" + name, "m4", None) for name in ("loose", "packed", "keep")]
+        cases += [("m5_" + name, "m5", None) for name in ("overflow", "le", "be", "default", "view", "trigger",
+                                                              "name", "schema_overflow", "uri1", "uri2", "uri3", "uri4")]
+        cases += [("m6_" + name, "m6", None) for name in ("name", "target", "path", "negative")]
+        cases += [(name, "inband", None) for name in ("m2raw", "m2bom", "m3", "m4", "m5", "u4")]
+        for name, mode, fmt in cases:
+            with self.subTest(control=name):
+                host = self.host("A11" if name == "m3" else "A1")
+                payload = b"\xff\xfe" + "plain".encode("utf-16-le")
+                target = host.home / ".claude/sample"
+                if mode == "m2" or name.startswith("m2"):
+                    compress = {"gzip": gzip.compress, "bzip2": bz2.compress, "xz": lzma.compress,
+                                "lzma": lambda d: lzma.compress(d, format=lzma.FORMAT_ALONE)}[fmt or "gzip"]
+                    target.with_suffix(".lzma" if fmt == "lzma" else ".data").write_bytes(compress(payload))
+                elif mode == "m4" or name == "m4":
+                    git_repo(target, {"f": b"old"})
+                elif mode == "m5" or name == "m5":
+                    sqlite_file(target, [("CREATE TABLE t(v)", ())])
+                user = name == "u4"
+                host.constants["USER_SINKS"] = ["U4"]
+                config = {"drop_inband" if mode == "inband" else "drop_control": name}
+                result = host.scan("final" if user else "baseline", *(("--user-run",) if user else ()),
+                                   tty=user, worker=config)
+                self.assertEqual(result.returncode, 3, "REPAIR-CONTROL-required " + name)
+                self.assertIn("control_missing", host.finished()["reasons"], "REPAIR-CONTROL-fixed-reason " + name)
+
+    def test_header_fields_and_xz_padding(self):
+        import gzip, lzma, struct
+        for kind in ("comment", "extra", "xz-padding"):
+            host = self.host()
+            value = host.canary().encode()
+            if kind == "xz-padding":
+                data = lzma.compress(b"first") + b"\0" * 4 + lzma.compress(value)
+            else:
+                stream = bytearray(gzip.compress(b"ordinary body"))
+                stream[3] = 16 if kind == "comment" else 4
+                extra = value + b"\0" if kind == "comment" else struct.pack("<H", len(value)) + value
+                data = bytes(stream[:10]) + extra + bytes(stream[10:])
+            (host.home / ".claude/sample").write_bytes(data)
+            self.assertEqual(host.scan().returncode, 5, "REPAIR-HEADER-PADDING-hit " + kind)
+            self.assertTrue(any(e["mode"] == (2 if kind == "xz-padding" else 1) for e in hits(host)),
+                            "REPAIR-HEADER-PADDING-view " + kind)
+            self.assertEqual(host.finished()["status"], "complete", "REPAIR-HEADER-PADDING-complete " + kind)
+
+    def test_nested_record_carriers_reject_free_text(self):
+        host = self.host()
+        self.assertEqual(host.scan().returncode, 0)
+        events = host.events()
+        locations = [("prepared", ("ref",)), ("scan_planned", ("classes",)), ("scan_planned", ("controls",)),
+                     ("scan_planned", ("deadlines",)), ("scan_inventory", ("counters",)),
+                     ("scan_finished", ("sinks", "A1"))]
+        for kind, path in locations:
+            changed = copy.deepcopy(events); target = latest(changed, kind)
+            for key in path: target = target[key]
+            target["unknown"] = "synthetic free text"
+            self.assertFalse(cp.validate(changed, host.run_id), "REPAIR-NESTED-closed " + kind + repr(path))
+
+    def test_control_output_check_survives_new_invocation(self):
+        host = self.host()
+        self.assertEqual(host.scan().returncode, 0)
+        run = cp.Run(host.env(), host.run_id)
+        self.addCleanup(os.close, run.lock)
+        run.load()
+        control = next(line for line in next(host.path.glob("scan-*/patterns")).read_text().splitlines()
+                       if line.startswith("CNRYCTL"))
+        with self.assertRaises(cp.Refused, msg="REPAIR-OUTPUT-controls-loaded"):
+            cp.check_output(control.encode(), run.secrets())
+
+    def test_git_covered_alternate_and_common_directory(self):
+        host = self.host()
+        top = host.home / ".claude"
+        source = git_repo(top / "source", {"old": b"ordinary"}, pack=False)
+        alternate = git_repo(top / "alternate", {"old": b"ordinary"}, pack=False)
+        subprocess.run([REAL["git"], "--git-dir=" + str(alternate), "hash-object", "-w", "--stdin"],
+                       input=host.canary().encode(), capture_output=True, check=True)
+        (source / "objects/info/alternates").write_text(str(alternate / "objects") + "\n")
+        self.assertEqual(host.scan().returncode, 5, "REPAIR-GIT-alternate-hit")
+        self.assertEqual(host.finished()["status"], "complete", "REPAIR-GIT-alternate-complete")
+        self.assertTrue(any(e["mode"] == 4 for e in hits(host)), "REPAIR-GIT-alternate-logical")
+        other = self.host("A12")
+        primary = other.home / "code/native-agent-stack"
+        common = git_repo(primary, {"old": b"ordinary"})
+        subprocess.run([REAL["git"], "--git-dir=" + str(common), "hash-object", "-w", "--stdin"],
+                       input=other.canary().encode(), capture_output=True, check=True)
+        admin = common / "worktrees/live"; admin.mkdir(parents=True)
+        (admin / "commondir").write_text("../..\n")
+        live = other.home / "code/native-agent-stack-live"; live.mkdir()
+        (live / ".git").write_text("gitdir: " + str(admin) + "\n")
+        self.assertEqual(other.scan().returncode, 5, "REPAIR-GIT-common-hit")
+        self.assertEqual(other.finished()["status"], "complete", "REPAIR-GIT-common-complete")
+        self.assertEqual({e["root"] for e in hits(other) if e["mode"] == 4},
+                         {root for root, _present in other.events()[0]["roots"]["A12"]},
+                         "REPAIR-GIT-common-roots")
+
+    def test_git_pack_replacement_and_missing_enumerated_object(self):
+        for kind in ("replace", "omit"):
+            host = Host(self)
+            host.constants["AGENT_SINKS"] = ["A1"]
+            repo = git_repo(host.home / ".claude/repo", {"file": b"ordinary"})
+            pack = next(repo.glob("objects/pack/*.pack"))
+            replacement = host.root / "replacement.pack"; replacement.write_bytes(pack.read_bytes())
+            prefix = (f"import subprocess\nif '--batch-check=%(objectname) %(objecttype) %(objectsize)' in sys.argv:\n"
+                      f"    p=subprocess.run([{REAL['git']!r}] + sys.argv[1:], capture_output=True)\n")
+            if kind == "replace":
+                prefix += f"    if os.path.exists({str(replacement)!r}): os.replace({str(replacement)!r}, {str(pack)!r})\n"
+                prefix += "    sys.stdout.buffer.write(p.stdout);sys.exit(p.returncode)\n"
+            else:
+                prefix += "    sys.stdout.buffer.write(b'\\n'.join(p.stdout.splitlines()[1:]) + b'\\n');sys.exit(p.returncode)\n"
+            wrapper(host, "git", prefix=prefix)
+            host.prepare()
+            self.assertEqual(host.scan().returncode, 3 if kind == "omit" else 0, "REPAIR-GIT-reconcile " + kind)
+            if kind == "replace":
+                self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "REPAIR-GIT-pack-retry")
+            else:
+                self.assertIn("git_unaccounted_payload", sink_reasons(host), "REPAIR-GIT-missing-object")
+
+    def test_exception_between_sinks_and_missing_bootstrap_handshake(self):
+        host = self.host()
+        host.constants["AGENT_SINKS"] = ["A1", "A3"]
+        result = host.scan(hooks={"between_sinks": {"do": "exception", "when": "A1"}})
+        self.assertEqual(result.returncode, 3, "REPAIR-C5-exception-incomplete")
+        self.assertEqual(host.finished()["reasons"], ["setup_failed"], "REPAIR-C5-fixed-code")
+        self.assertIn("baseline_sink_not_scanned:A3", host.verdict()[2], "REPAIR-C5-between-sinks")
+        for action in ("exit 0", "kill -TERM $$"):
+            other = self.host()
+            (other.bin / "stub-runner").write_text("#!/bin/sh\n" + action + "\n")
+            self.assertEqual(other.scan().returncode, 3, "REPAIR-C8-no-handshake")
+            self.assertFalse(any(e["event"] == "scan_planned" for e in other.events()),
+                             "REPAIR-C8-bootstrap-preplan")
+            self.assertEqual(wait_gone(str(other.root), 3), [], "REPAIR-C8-no-children")
+
+    def test_exception_with_live_child_reaps_and_keeps_hit(self):
+        host = self.host()
+        (host.home / ".claude/leak").write_text(host.canary())
+        result = host.scan(hooks={"after_durable_hit": {"do": "exception"}})
+        self.assertEqual(result.returncode, 5, "REPAIR-C5-sticky-hit")
+        self.assertEqual(host.finished()["status"], "incomplete", "REPAIR-C5-live-child-incomplete")
+        self.assertEqual(host.finished()["reasons"], ["setup_failed"], "REPAIR-C5-live-child-code")
+        self.assertEqual(wait_gone(str(host.root), 5), [], "REPAIR-C5-live-child-cleanup")
+
+
+@needs_tools
+class ContainmentMatrixTests(unittest.TestCase):
+    """Every worker-started executable and helper stage, under coordinator and worker death."""
+
+    def death(self, host, process, ready, fifo, victim, label, prepared=True):
+        self.addCleanup(ContainmentTests.reap, self, host, process)
+        child = observe_fifo(self, ready, fifo, process)
+        self.assertIn(child, processes_with(str(host.root)), "C-MATRIX-intended-child")
+        if "/--version" in label:
+            args = Path(f"/proc/{child}/cmdline").read_bytes().split(b"\0")[:-1]
+            self.assertEqual(args, [PYTHON.encode(), b"-I", os.fsencode(host.bin / label.split("/")[0]), b"--version"],
+                             "C-MATRIX-exact-version-stage")
+        if victim == "worker":
+            workers = []
+            for pid in processes_with(str(host.root)):
+                args = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+                if args[0].endswith(b"python3") and b"worker" in args:
+                    workers.append(pid)
+            self.assertEqual(len(workers), 1, "C-MATRIX-worker-observed")
+            os.kill(workers[0], signal.SIGKILL)
+        else:
+            process.kill()
+        process.communicate(timeout=25)
+        self.assertEqual(wait_gone(str(host.root), 15), [], "C-MATRIX-death-cleanup " + label + "/" + victim)
+        if prepared:
+            self.assertNotEqual(host.verdict()[1], "clean", "C-MATRIX-unfinished")
+
+    def test_parent_death_every_scan_kind_and_stage(self):
+        import bz2, gzip, lzma
+        rows = [("rg-raw", "rg", "none", 1, False), ("rg-bom", "rg", "auto", 1, False),
+                ("rg-m2raw", "rg", "none", 1, True), ("rg-m2bom", "rg", "auto", 1, True),
+                ("gzip", "gzip", None, 1, False), ("bzip2", "bzip2", None, 1, False),
+                ("xz", "xz", None, 1, False), ("lzma", "xz", "--format=lzma", 1, False),
+                ("journal", "journalctl", "--user", 1, False),
+                ("environment", "systemctl", "show-environment", 1, False),
+                ("sqlite", None, None, 1, False), ("worker", None, None, 1, False)]
+        rows += [("git-" + stage + str(n), "git", stage, n, False) for stage, n in (
+            ("fsck", 1), ("verify-pack", 1), ("--batch-check=%(objectname) %(objecttype) %(objectsize)", 1),
+            ("--batch=%(objectname) %(objecttype) %(objectsize)", 1),
+            ("--batch-check=%(objectname) %(objecttype) %(objectsize)", 2))]
+        for label, executable, stage, occurrence, stream_only in rows:
+            for victim in ("coordinator", "worker"):
+                with self.subTest(case=label, victim=victim):
+                    host = Host(self)
+                    host.constants["AGENT_SINKS"] = ["A11" if label == "journal" else "A1"]
+                    host.constants["USER_SINKS"] = ["U4"]
+                    payload = b"\xff\xfe" + b"x\0" * 300
+                    target = host.home / ".claude/sample"
+                    if executable == "git":
+                        git_repo(target, {"f": b"old"})
+                    elif label == "sqlite":
+                        sqlite_file(target, [("CREATE TABLE t(v)", ())])
+                    elif label in ("gzip", "bzip2", "xz", "lzma") or stream_only:
+                        compress = {"bzip2": bz2.compress, "xz": lzma.compress,
+                                    "lzma": lambda d: lzma.compress(d, format=lzma.FORMAT_ALONE)}.get(label, gzip.compress)
+                        if label == "lzma":
+                            target = target.with_suffix(".lzma")
+                        target.write_bytes(compress(payload))
+                    else:
+                        target.write_bytes(payload if label == "rg-bom" else b"old")
+                    host.prepare()
+                    if executable:
+                        prefix = "os.write(1, b'\\xff\\xfe' + b'x\\x00' * 300)" if label in ("gzip", "bzip2", "xz", "lzma") else ""
+                        fifo = blocked_program(host, executable, stage, prefix, occurrence, stream_only)
+                        ready = host.root / ("ready-" + executable)
+                        FifoTests.repin(self, host, executable)
+                    else:
+                        fifo, ready = host.root / "hook-fifo", host.root / "ready-hook"
+                        os.mkfifo(fifo)
+                        config = host.dumper if label == "sqlite" else host.worker
+                        config["hooks"]["after_identity" if label == "sqlite" else "after_prewalk"] = {
+                            "do": "block", "path": str(fifo), "ready": str(ready)}
+                    user = label == "environment"
+                    process = host.scan("final" if user else "baseline", *(("--user-run",) if user else ()),
+                                        tty=user, background=True)
+                    self.death(host, process, ready, fifo, victim, label)
+
+    def test_parent_death_every_setup_helper_stage(self):
+        stages = [("git", stage, n, False) for stage, n in (("init", 1), ("hash-object", 1),
+                  ("hash-object", 2), ("mktree", 1), ("commit-tree", 1), ("update-ref", 1),
+                  ("pack-objects", 1), ("prune-packed", 1))]
+        stages += [("git", "rev-parse", 1, True), ("systemd-cat", "-t", 1, True),
+                   ("journalctl", "SYSLOG_IDENTIFIER=canary-proof", 1, True)]
+        stages += [(name, "--version", 1, True) for name in cp.EXECUTABLES]
+        for executable, stage, occurrence, preparation in stages:
+            for victim in ("coordinator", "worker"):
+                with self.subTest(executable=executable, stage=stage, occurrence=occurrence, victim=victim):
+                    host = Host(self)
+                    host.constants["AGENT_SINKS"] = ["A1"]
+                    if not preparation:
+                        host.prepare()
+                    fifo = blocked_program(host, executable, stage, occurrence=occurrence)
+                    if not preparation:
+                        FifoTests.repin(self, host, executable)
+                    process = host.tool("prepare", background=True) if preparation else host.scan(background=True)
+                    self.death(host, process, host.root / ("ready-" + executable), fifo, victim,
+                               executable + "/" + stage + str(occurrence), not preparation)
 
 
 if __name__ == "__main__":

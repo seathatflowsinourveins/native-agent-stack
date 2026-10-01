@@ -93,7 +93,7 @@ R = {name: code for code, name in enumerate(REASONS)}
 CONSUMERS = ("systemd-user-unit", "fresh-claude-session", "subagent", "workflow-child", "codex-exec", "omniroute-lane")
 FACTS = {"root_presence": 1, "executable_version": 2, "executable_fingerprint": 3, "pointer_binding": 4,
          "journal_binding": 5, "git_inventory": 6, "root_registration": 7, "baseline_policy": 8, "checkout": 9,
-         "guard_pin": 10, "store_outside_worktree": 11}
+         "guard_pin": 10, "store_outside_worktree": 11, "scope_binding": 12}
 COUNTERS = {name: code for code, name in enumerate(
     ("selected unselected special excluded_key excluded_user declined declared_link dangling_link covered_link "
      "excluded_link directories git_stores").split(), 1)}
@@ -208,6 +208,7 @@ class Child:
 
     def __init__(self, scan, argv: list, stdin, stdout, stderr, pass_fds=(), cwd=None):
         hook("before_child", argv[0])
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)  # Same pinned-leader prerequisite as credential_run.run_command.
         self.process = subprocess.Popen([scan.setpriv, "--pdeathsig", "TERM", "--", *argv], stdin=stdin, stdout=stdout,
                                         stderr=stderr, pass_fds=pass_fds, close_fds=True, start_new_session=True,
                                         cwd=cwd, env=scan.child_env)
@@ -357,6 +358,8 @@ class Wire:
         self.proto, self.ack, self.nonce, self.seq = proto, ack, nonce, 0
 
     def emit(self, kind: int, **fields) -> int:
+        if kind == END:
+            signal.pthread_sigmask(signal.SIG_BLOCK, (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT))
         self.seq += 1
         view = memoryview(pack(kind=kind, nonce=self.nonce, seq=self.seq, **fields))
         while view:
@@ -409,6 +412,7 @@ def verify_scope() -> None:
         with open(b"/sys/fs/cgroup" + group + b"/" + name, "rb") as handle:
             if handle.read().split()[:1] in ([], [b"max"]):
                 raise Stop("containment_unavailable")
+    return os.getpid(), int(group.rsplit(b"-", 1)[1].split(b".", 1)[0])
 
 
 def fs_magic(fd: int):
@@ -538,6 +542,7 @@ class Check:
     def __init__(self, ident: int, mode: str, view: str, path: str, obj: bytes, root: int):
         self.id, self.mode, self.view, self.path, self.object, self.root = ident, mode, view, path, obj, root
         self.reason, self.exit, self.stderr, self.observed = "ok", 0, 0, 0
+        self.matches = 0
         self.counts = collections.Counter()  # (klass, consumer, attempt, id) -> occurrences of non-canary patterns
 
     def fail(self, reason: str) -> None:
@@ -621,7 +626,7 @@ class Relay:
 
     def data(self, data: bytes) -> None:
         self.total += len(data)
-        if self.total > DECODED_CAP:
+        if self.total > self.scan.plan["decoded_cap"]:
             raise Stop("output_cap")
         self.transform(data)
 
@@ -701,10 +706,64 @@ class Decoded(Relay):
         if self.control_expect is not None:
             ident, view, expected = self.control_expect
             target = views.get(view)
-            found = target.counts.pop((CLASSES["control"], 0, 0, ident), 0) if target else 0
-            self.scan.control(target or self.check, ident, found, expected)
+            found = (sum(check.matches - 1 for check in views.values()) if view == "negative" else
+                     target.counts.pop((CLASSES["control"], 0, 0, ident), 0) if target else 0)
+            self.scan.control(target or self.check, ident, found, expected,
+                              "negative" if view == "negative" else "control")
         if self.encoding:
             self.scan.result(self.bom_check, self.bom_check.observed, 1)
+
+
+class ExportParser:
+    """Incremental systemd v255 export framing; a final field LF does not terminate its entry."""
+
+    def __init__(self, entry):
+        self.entry, self.buffer, self.fields, self.binary = entry, bytearray(), {}, None
+
+    def feed(self, data: bytes, final: bool = False) -> None:
+        self.buffer += data
+        while self.parse():
+            pass
+        if len(self.buffer) > STDOUT_CAP or final and (self.buffer or self.binary or self.fields):
+            raise Stop("unparseable_output")
+
+    def parse(self) -> bool:
+        if self.binary is not None:
+            name, size = self.binary
+            if len(self.buffer) < size + 1:
+                return False
+            if self.buffer[size] != 10:
+                raise Stop("unparseable_output")
+            self.fields[name] = bytes(self.buffer[:size])
+            del self.buffer[:size + 1]
+            self.binary = None
+            return True
+        end = self.buffer.find(b"\n")
+        if end < 0:
+            return False
+        line = bytes(self.buffer[:end])
+        if not line:
+            del self.buffer[:1]
+            if not self.fields:
+                raise Stop("unparseable_output")
+            self.entry(self.fields)
+            self.fields = {}
+            return True
+        name, separator, value = line.partition(b"=")
+        if not re.fullmatch(rb"[A-Z0-9_]+", name):
+            raise Stop("unparseable_output")
+        if separator:
+            self.fields[name] = value
+            del self.buffer[:end + 1]
+        else:
+            if len(self.buffer) < end + 9:
+                return False
+            size = struct.unpack_from("<Q", self.buffer, end + 1)[0]
+            if size > STDOUT_CAP:
+                raise Stop("output_cap")
+            self.binary = name, size
+            del self.buffer[:end + 9]
+        return True
 
 
 class Journal(Relay):
@@ -713,52 +772,17 @@ class Journal(Relay):
 
     def __init__(self, check: Check, cursor: bytes, anchor: bytes):
         super().__init__(check, "m3")
-        self.cursor, self.anchor, self.buffer, self.binary, self.entries, self.first = cursor, anchor, bytearray(), None, 0, {}
+        self.cursor, self.anchor, self.entries = cursor, anchor, 0
+        self.export_parser = ExportParser(self.entry)
 
     def transform(self, data: bytes) -> None:
-        self.buffer += data
-        while self.parse():
-            pass
-        if not data and (self.buffer or self.binary):
-            self.check.fail("unparseable_output")
+        self.export_parser.feed(data, final=not data)
         super().transform(data)
 
-    def parse(self) -> bool:
-        if self.binary is not None:
-            name, size = self.binary
-            if len(self.buffer) < size + 1:
-                return False
-            if self.buffer[size] != 0x0A:
-                raise Stop("unparseable_output")
-            self.field(name, bytes(self.buffer[:size]))
-            del self.buffer[:size + 1]
-            self.binary = None
-            return True
-        end = self.buffer.find(b"\n")
-        if end < 0:
-            return False
-        if end == 0:
-            del self.buffer[:1]
-            self.entries += 1
-            if self.entries == 1 and self.first.get(b"__CURSOR") != self.cursor:
-                self.check.fail("journal_cursor_missing")
-            return True
-        equals = self.buffer.find(b"=", 0, end)
-        if equals >= 0:
-            self.field(bytes(self.buffer[:equals]), bytes(self.buffer[equals + 1:end]))
-            del self.buffer[:end + 1]
-            return True
-        if len(self.buffer) < end + 9:
-            return False
-        self.binary = (bytes(self.buffer[:end]), struct.unpack("<Q", self.buffer[end + 1:end + 9])[0])
-        del self.buffer[:end + 9]
-        return True
-
-    def field(self, name: bytes, value: bytes) -> None:
-        if not re.fullmatch(rb"[A-Z0-9_]+", name):
-            raise Stop("unparseable_output")
-        if self.entries == 0:
-            self.first[name] = value
+    def entry(self, fields: dict) -> None:
+        self.entries += 1
+        if self.entries == 1 and fields.get(b"__CURSOR") != self.cursor:
+            self.check.fail("journal_cursor_missing")
 
     def finish(self) -> None:
         super().finish()
@@ -881,6 +905,7 @@ class Scan:
 
     def attribute(self, check: Check, pattern: bytes) -> None:
         """One match: a canary is a HIT now, acknowledged before anything else runs; other classes are counted."""
+        check.matches += 1
         for klass, consumer, attempt, ident in self.patterns.classes[pattern]:
             if klass == CLASSES["canary"]:
                 self.wire.hit(check=check.id, sink=self.sink, mode=MODES[check.mode], view=VIEWS[check.view],
@@ -969,7 +994,8 @@ class Scan:
                     continue
                 code = process.finish(flow.deadline)
                 owner.exit = -int(signal.SIGKILL) if code is None else code
-                owner.fail("deadline" if code is None else DUMPER_EXITS.get(code, "producer_exit") if code else "ok")
+                reason = DUMPER_EXITS.get(code, "producer_exit") if producer.mode == "M5" else "producer_exit"
+                owner.fail("deadline" if code is None else reason if code else "ok")
             feed.finish()
         except (Deadline, Stop) as error:
             flow.abandon()
@@ -981,6 +1007,8 @@ class Scan:
     # -- the three traversals, the stores and the once-per-worker controls
     def run(self) -> None:
         self.wire.emit(BEGIN, sink=self.sink, subpass=self.subpass, seal=self.seal)
+        if self.scope_binding is not None:
+            self.wire.emit(FACT, check=FACTS["scope_binding"], observed=self.scope_binding[0], expected=self.scope_binding[1])
         if self.plan["op"] != "scan":
             return SETUP[self.plan["op"]](self)
         self.patterns = Patterns(self.plan["patterns"], self.plan["patterns_sha256"], self.plan["classes"])
@@ -1041,9 +1069,13 @@ class Scan:
         walk = Walk(self, {"id": "00" * 16, "kind": "dir", "path": spec["dir"], "present": True}, number=0)
         walk.name_check = check
         walk.traverse("pre")
+        if not os.path.isfile(spec["negative"]):
+            check.fail("control_missing")
         for ident, expected, klass in spec["ids"]:
             key = (CLASSES[klass], 0, 0, bytes.fromhex(ident))
-            self.control(check, bytes.fromhex(ident), check.counts.pop(key, 0), expected, klass)
+            count = (len(self.patterns.find(os.fsencode(spec["negative"]))) if klass == "negative"
+                     else check.counts.pop(key, 0))
+            self.control(check, bytes.fromhex(ident), count, expected, klass)
         self.counters.subtract(walk.counted)
         self.result(check, walk.named, walk.named)
 
@@ -1141,6 +1173,8 @@ class Scan:
 
     def decode(self, fd: int, fmt: str, obj: bytes, size: int, path_class: str = "other", expect=None) -> None:
         """M2: one contained decoder per file reading the held descriptor as stdin; no raw fallback (contract 10.5)."""
+        routing = self.declare("M2", "metadata", obj, path_class, FORMATS[fmt])
+        self.result(routing, FORMATS[fmt], FORMATS[fmt])
         self.used.add(("M2", fmt))
         producer = self.declare("M2", "decoded_raw", obj, path_class, 0, size)
         check = self.declare("M2", "decoded_raw", obj, path_class, 1, size)
@@ -1174,7 +1208,7 @@ class Scan:
             os.close(write_end)
             try:
                 self.stream(check, producer, [*self.plan["dumper_argv"], str(read_end)], Relay(check, "m5", expect),
-                            budget(120, identity[2], 20e6, 3600), pass_fds=(read_end, fd))
+                            budget(120, family.get("bytes", identity[2]), 20e6, 3600), pass_fds=(read_end, fd))
             finally:
                 os.close(read_end)
         self.result(producer)
@@ -1187,6 +1221,35 @@ def pointer_seal(key: bytes, target: bytes) -> bytes:
     except FileNotFoundError:
         return keyed(key, b"pointer-missing", target)
     return keyed(key, b"pointer", info.st_dev, info.st_ino, stat.S_IFMT(info.st_mode))
+
+
+def git_directory(candidate: bytes) -> bytes:
+    """Git v2.43 gitrepository-layout: gitfile relative to its parent, commondir relative to gitdir."""
+    info = os.lstat(candidate)
+    if stat.S_ISREG(info.st_mode):
+        fd = os.open(candidate, OPEN_FLAGS)
+        try:
+            text = os.read(fd, 4097).strip()
+        finally:
+            os.close(fd)
+        if len(text) > 4096 or not text.startswith(b"gitdir: "):
+            raise Stop("git_indirection_unplanned")
+        candidate = os.path.normpath(os.path.join(os.path.dirname(candidate), text[8:]))
+    elif not stat.S_ISDIR(info.st_mode):
+        raise Stop("git_indirection_unplanned")
+    try:
+        fd = os.open(candidate + b"/commondir", OPEN_FLAGS)
+    except FileNotFoundError:
+        return candidate
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise Stop("git_indirection_unplanned")
+        common = os.read(fd, 4097).strip()
+        if not common or len(common) > 4096:
+            raise Stop("git_indirection_unplanned")
+        return os.path.normpath(os.path.join(candidate, common))
+    finally:
+        os.close(fd)
 
 
 class Walk:
@@ -1270,20 +1333,16 @@ class Walk:
         except FileNotFoundError:
             self.state = "vanished" if self.root["present"] else "absent_since_prepare"
             return None
-        if stat.S_ISDIR(info.st_mode):
-            return candidate
         try:
-            with open(candidate, "rb") as handle:
-                text = handle.read(4096).strip()
-            gitdir = os.path.join(self.path, text[len(b"gitdir: "):]) if text.startswith(b"gitdir: ") else b""
-            with open(os.path.join(gitdir, b"commondir"), "rb") as handle:
-                return os.path.normpath(os.path.join(gitdir, handle.read(4096).strip()))
-        except OSError:
+            return git_directory(candidate)
+        except (OSError, Stop):
             self.state = "git_validation_failed"
             return None
 
     def excluded(self, child: bytes, parent: bytes, name: bytes):
         plan = self.scan.plan
+        if pointer_seal(self.scan.key, child).hex() in plan["pointers"]["bound"]:
+            return "key"
         for rule in plan["exclude"]:
             if child == os.fsencode(rule["path"]):
                 return rule["class"]
@@ -1326,8 +1385,8 @@ class Walk:
             self.items[b"d:" + rel], self.lists[rel] = identity, entries
         self.count("directories")
         # A Git directory by the pinned layout (git v2.43.0 setup.c: HEAD, objects/, refs/), wherever it sits.
-        if {b"HEAD", b"objects", b"refs"} <= stats.keys() and stat.S_ISREG(stats[b"HEAD"].st_mode) \
-                and stat.S_ISDIR(stats[b"objects"].st_mode) and stat.S_ISDIR(stats[b"refs"].st_mode):
+        if (os.path.basename(path).endswith(b".git") or
+                b"objects" in stats and ({b"HEAD", b"refs"} & stats.keys())):
             store = Store(self.scan, path, keyed(self.scan.key, b"store", self.scan.sink, self.number, rel))
             if self.mode == "scan":
                 self.stores.append(store)
@@ -1343,14 +1402,26 @@ class Walk:
                 if stat.S_ISREG(entry.st_mode) and (self.selected_by_time(entry) or any(
                         self.selected_by_time(member) for member in families.get(name, {}).values())):
                     self.selected.add(rel + b"/" + name if rel else name)
+            for main, sides in families.items():
+                members = {main: stats.get(main), **{main + suffix: entry for suffix, entry in sides.items()}}
+                if any(entry is not None and self.selected_by_time(entry) for entry in members.values()):
+                    self.selected.update(rel + b"/" + member if rel else member for member in members)
         for name in names:
             if name in stats:
                 if self.kind == "glob" and depth == 0 and not fnmatch.fnmatchcase(name, self.match_pattern):
                     continue
-                family = {"path": path + b"/" + name, "main": name[:-4] in stats,
+                family = {"path": path + b"/" + name,
+                          "main": self.routes.get(rel + b"/" + name[:-4] if rel else name[:-4]) == ("sqlite", "sqlite"),
+                          "bytes": stats[name].st_size + sum(e.st_size for e in families.get(name, {}).values()),
                           **{suffix.decode(): True for suffix in families.get(name, {})}}
                 self.entry(fd, name, rel + b"/" + name if rel else name, path + b"/" + name, stats[name], depth, store,
                            family)
+        if self.mode == "scan":
+            for main, sides in families.items():
+                main_rel = rel + b"/" + main if rel else main
+                if any((rel + b"/" + main + suffix if rel else main + suffix) in self.selected for suffix in sides):
+                    if self.routes.get(main_rel) != ("sqlite", "sqlite"):
+                        self.scan.reasons.append("sqlite_uri_identity")
 
     def entry(self, fd: int, name: bytes, rel: bytes, path: bytes, info, depth: int, store, family: dict) -> None:
         self.named += self.mode == "pre"
@@ -1370,7 +1441,7 @@ class Walk:
             self.scan.reasons.append("file_set_changed")
             return
         if stat.S_ISLNK(mode):
-            target = os.readlink(name, dir_fd=fd)
+            target = current[3]
             if self.mode != "scan":
                 self.items[rel] = ("l", info.st_dev, info.st_ino, target)
             self.names(target, 0)
@@ -1401,6 +1472,18 @@ class Walk:
                 self.items[rel] = identity
             if self.kind == "tasks" and depth < 3:
                 return
+            if name == b".git" and self.mode == "scan":
+                try:
+                    target = git_directory(path)
+                    if not self.covered(target):
+                        raise Stop("git_indirection_unplanned")
+                    # The target must also be a directory this walk discovers as a logical store, including
+                    # damaged .git directories. Ordinary directory coverage alone cannot cover Git objects.
+                    if not (os.path.basename(target).endswith(b".git") or os.path.lexists(target + b"/objects")
+                            and (os.path.lexists(target + b"/HEAD") or os.path.lexists(target + b"/refs"))):
+                        raise Stop("git_indirection_unplanned")
+                except (OSError, Stop):
+                    self.scan.reasons.append("git_indirection_unplanned")
             payload = store.payload(path) if store is not None else False
             chosen = rel in self.selected or (store is not None and not payload)
             if self.mode == "pre":
@@ -1443,9 +1526,51 @@ class Walk:
         if any(under(resolved, os.fsencode(rule["path"])) for rule in plan["exclude"]) or any(
                 under(resolved, os.fsencode(root)) for root in plan["user_roots"]):
             return self.count("excluded_link")
-        if any(under(resolved, os.fsencode(root)) for root in plan["covered"]):
+        if self.covered(resolved):
             return self.count("covered_link")
         self.state = "link_out" if self.state == "ok" else self.state
+
+    def covered(self, target: bytes) -> bool:
+        """A root recipe must actually select this target; a common path prefix is insufficient."""
+        for root in self.scan.plan["coverage"]:
+            kind, path = root["kind"], os.fsencode(root["path"])
+            if kind == "git":
+                try:
+                    path = git_directory(path + b"/.git")
+                except (OSError, Stop):
+                    continue
+            if kind not in ("dir", "file", "tasks", "git") or not under(target, path):
+                continue
+            if kind == "file" and target != path:
+                continue
+            parts = os.path.relpath(target, path).split(b"/")
+            if kind == "tasks" and (len(parts) < 4 or parts[2] != b"tasks"):
+                continue
+            current = target
+            while under(current, path):
+                if self.excluded(current, os.path.dirname(current), os.path.basename(current)):
+                    break
+                try:
+                    info = os.lstat(current)
+                except OSError:
+                    break
+                if stat.S_ISLNK(info.st_mode):
+                    break
+                if current == target and not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
+                    break
+                if current == target and stat.S_ISREG(info.st_mode):
+                    parent = os.open(os.path.dirname(current), DIR_FLAGS)
+                    try:
+                        selected = (self.all or fs_magic(parent) not in FS_CHANGED_OK or
+                                    info.st_ctime_ns >= self.threshold or kind == "git")
+                    finally:
+                        os.close(parent)
+                    if not selected:
+                        break
+                if current == path:
+                    return True
+                current = os.path.dirname(current)
+        return False
 
     def path_class(self, rel: bytes, store, payload: bool) -> str:
         if store is not None:
@@ -1474,7 +1599,7 @@ class Walk:
             try:
                 with open(self.path, "rb") as handle:
                     cursor = handle.read(256).strip()
-                if not CURSOR.fullmatch(cursor):
+                if not CURSOR.fullmatch(cursor) or keyed(scan.key, b"cursor", cursor).hex() != scan.plan["journal_seal"]:
                     raise OSError()
             except OSError:
                 check.fail("journal_cursor_missing")
@@ -1546,7 +1671,7 @@ class Store:
 
     def git(self, check: Check, args: list, seconds: float) -> bytes:
         """A producer-only git stage: exit 0, no stderr, its stdout parsed here."""
-        flow, output = Flow(time.monotonic() + seconds), bytearray()
+        flow, output = Flow(min(time.monotonic() + seconds, self.deadline)), bytearray()
         child = None
         try:
             child, _in, out, err = spawn(self.scan, [self.scan.exe("git"), "--git-dir=.", *args], cwd=self.path)
@@ -1601,6 +1726,7 @@ class Store:
         scan = self.scan
         scan.used.add(("M4", None))
         seconds = budget(1800, cap=1800)
+        self.deadline = time.monotonic() + seconds
         fsck = scan.declare("M4", "logical", self.object, "git_object")
         verdict = self.validate()
         if verdict != "ok":
@@ -1636,7 +1762,8 @@ class Store:
             check.fail("git_unaccounted_payload")
         argv = [scan.exe("git"), "--git-dir=.", "cat-file", "--batch-all-objects", "--unordered",
                 "--batch=%(objectname) %(objecttype) %(objectsize)"]
-        scan.stream(check, producer, argv, GitStream(check, objects, expect), seconds, cwd=self.path)
+        scan.stream(check, producer, argv, GitStream(check, objects, expect),
+                    max(0, self.deadline - time.monotonic()), cwd=self.path)
         scan.result(producer)
         scan.result(check, check.observed, 1)
         again = self.enumerate()
@@ -1682,6 +1809,8 @@ def setup_prepare(scan: Scan) -> None:
             present = 2 if stat.S_ISLNK(info.st_mode) else 1
         except OSError:
             present = 0
+        if root["kind"] in ("journal", "environment"):
+            present = 1
         scan.wire.emit(FACT, check=FACTS["root_presence"], observed=present, object=bytes.fromhex(root["id"]))
     for index, path in enumerate(plan["pointers"]["current"]):
         target = os.fsencode(path)
@@ -1780,30 +1909,8 @@ def run_text(scan: Scan, argv: list, stdin=subprocess.DEVNULL, cwd=None, stderr=
 
 def export_entries(data: bytes) -> list:
     """systemd v255 JOURNAL_EXPORT_FORMATS: binary fields have uint64 LE lengths; delimiters inside them are data."""
-    entries, fields, offset = [], {}, 0
-    while offset < len(data):
-        end = data.find(b"\n", offset)
-        if end < 0:
-            raise Stop("unparseable_output")
-        line, offset = data[offset:end], end + 1
-        if not line:
-            entries.append(fields)
-            fields = {}
-            continue
-        name, separator, value = line.partition(b"=")
-        if not re.fullmatch(rb"[A-Z0-9_]+", name):
-            raise Stop("unparseable_output")
-        if not separator:
-            if offset + 8 > len(data):
-                raise Stop("unparseable_output")
-            length = struct.unpack_from("<Q", data, offset)[0]
-            offset += 8
-            if length > len(data) - offset - 1 or data[offset + length] != 10:
-                raise Stop("unparseable_output")
-            value, offset = data[offset:offset + length], offset + length + 1
-        fields[name] = value
-    if fields:
-        raise Stop("unparseable_output")
+    entries = []
+    ExportParser(entries.append).feed(data, final=True)
     return entries
 
 
@@ -1889,8 +1996,21 @@ def dump(control_fd: int) -> int:
         shadows = {row[1] for row in connection.execute("PRAGMA main.table_list") if row[2] == b"shadow"}
     except sqlite3.Error:
         return 12
-    if any(not any(table.startswith(name + b"_") for table in shadows) for name in virtual):
-        return 12
+    # SQLite version-3.45.1: fts3ShadowName, fts5ShadowName and rtreeShadowName. The module and exact suffix
+    # establish ownership; a_b_data is not a shadow of a. Optional content/docsize tables may be absent.
+    required = {b"fts3": (b"segments", b"segdir"), b"fts4": (b"segments", b"segdir"),
+                b"fts5": (b"config", b"data", b"idx"), b"rtree": (b"node", b"parent", b"rowid"),
+                b"rtree_i32": (b"node", b"parent", b"rowid")}
+    identifier = rb'(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|\[[^\]]+\]|[^\s(]+)'
+    for row in schema:
+        if row[1] not in virtual:
+            continue
+        match = re.match(rb"\s*CREATE\s+VIRTUAL\s+TABLE\s+" + identifier + rb"\s+USING\s+(" + identifier + rb")",
+                         row[3], re.IGNORECASE)
+        module = match[1].strip(b'"`[]').lower() if match else b""
+        suffixes = required.get(module)
+        if not suffixes or not {row[1] + b"_" + suffix for suffix in suffixes} <= shadows:
+            return 12
     try:
         for table in tables:
             quoted = '"' + table.decode("utf-8").replace('"', '""') + '"'
@@ -1934,8 +2054,9 @@ def main(argv: list) -> int:
         os.close(plan_fd)
     wire, scan, reason = Wire(proto_fd, ack_fd, nonce), None, "ok"
     try:
-        SCOPE_CHECK()
+        binding = SCOPE_CHECK()
         scan = Scan(plan, wire, body)
+        scan.scope_binding = binding
         if plan.get("budget_seconds"):
             signal.signal(signal.SIGALRM, lambda *_args: (_ for _ in ()).throw(Deadline()))
             signal.setitimer(signal.ITIMER_REAL, plan["budget_seconds"])
@@ -1961,6 +2082,14 @@ def main(argv: list) -> int:
         except OSError:
             pass
         return 1
+    # Keep the native runner alive until the coordinator explicitly stops its scope after END. Closing the ACK
+    # channel also releases a terminal worker if the coordinator disappears. No second END is emitted.
+    try:
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT))
+        if select.select([ack_fd], [], [], ACK_SECONDS)[0]:
+            os.read(ack_fd, 1)
+    except (Interrupted, OSError):
+        pass
     return 0
 
 

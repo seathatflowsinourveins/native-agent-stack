@@ -39,6 +39,7 @@ import json  # noqa: E402
 import lzma  # noqa: E402
 import re  # noqa: E402
 import secrets  # noqa: E402
+import shlex  # noqa: E402
 import select  # noqa: E402
 import signal  # noqa: E402
 import sqlite3  # noqa: E402  (writes synthetic control databases only; sink databases are read by the dumper)
@@ -71,20 +72,19 @@ EXECUTABLES = ("bzip2", "git", "gzip", "ionice", "journalctl", "nice", "python3"
                "systemd-cat", "xz")
 WORKER_COMMAND = None   # a test launcher's worker entry ([python, -I, -S, -c, code, config]); None is the file
 DUMPER_COMMAND = None
+SCOPE_REQUIRED = True  # test launchers using an exec stub explicitly disable only the native scope check
 SETTLE_SECONDS = 1200
 DRIFT_NS, MARGIN_NS = 60 * 10**9, 3600 * 10**9
 ARM_RECOVERY_NS = 5 * 10**9
 # RuntimeMaxSec per phase and sink (C13): 7,200 s bounds a walking sink's scope, 900 s the journal, 60 s U4, 120 s a
 # setup child; a test launcher shortens them.
 SCOPE_SECONDS = {**{sink: 7200 for sink in wire.SINKS}, "A11": 900, "U4": 60, "setup": 120}
-PHASE_SECONDS = {phase: dict(SCOPE_SECONDS) for phase in ("baseline", "final", "comparison")}
 AGENT_SINKS = ("A1", "A2", "A3", "A4", "A9", "A10", "A11", "A12")
 USER_SINKS = tuple(f"U{number}" for number in range(1, 9))
 EXIT = {"clean": 0, "refused": 1, "usage": 2, "incomplete": 3, "invalid": 4, "leak": 5, "busy": 75}
 RUN_ID = re.compile(r"cp-\d{8}t\d{6}z-[0-9a-f]{6}")
 SESSION = re.compile(r"[0-9A-Za-z-]{8,64}")
 HOOKS: dict = {}  # a test launcher's module hooks (contract 9.5); there is no environment switch
-AUDIT: list = []   # the validated CP03 records of this invocation, kept for the boundary audit (B1)
 
 
 class Refused(Exception):
@@ -189,13 +189,19 @@ class Run:
         if not RUN_ID.fullmatch(self.id or "") or not self.dir.is_dir():
             raise Refused("unknown_run")
         self.key = self.read("key")
+        self.events, complete = [], False
         try:
             text = self.read("events.jsonl").decode("ascii")
-            self.events = [json.loads(line) for line in text.split("\n")[:-1]] if text.endswith("\n") else None
+            for line in text.split("\n")[:-1]:
+                event = json.loads(line)
+                if not validate(self.events + [event], self.id):
+                    break
+                self.events.append(event)
+            else:
+                complete = text.endswith("\n")
         except (ValueError, OSError):
-            self.events = None
-        self.valid = bool(self.events) and validate(self.events, self.id)
-        self.events = self.events or []
+            pass
+        self.valid = bool(self.events) and complete
 
     def secrets(self) -> list:
         """Every synthetic value this run could print by accident: canary forms, tags and tag lines, the request's
@@ -208,6 +214,9 @@ class Run:
             consumer, attempt = name.rsplit(".", 1)
             line = tag_line(lines[0], self.id, consumer, int(attempt))
             values += lines + [line, line.rsplit(" ", 1)[1]]
+        for name in os.listdir(self.dir):
+            if re.fullmatch(r"scan-[0-9a-f]{12}", name) and (self.dir / name / "patterns").is_file():
+                values += self.read(name + "/patterns").decode("ascii").splitlines()
         return values
 
 
@@ -228,7 +237,7 @@ EVENTS = {
     "prepared": {"tools": dict, "executables": dict, "versions": dict, "rg_version": int, "checkout": str, "ref": dict,
                  "threshold_ns": int, "roots": dict, "policy": str, "exclusions": str, "anchor": str, "patterns": dict,
                  "transcripts": str, "session_known": bool, "session": str, "proxy_verified": bool, "pointers": list,
-                 "guard_pinned": bool, "journal_bound": bool},
+                 "guard_pinned": bool, "journal_bound": bool, "journal_seal": str},
     "arming": {"consumer": str, "attempt": int, "pattern": str, "root": str, "root_present": bool},
     "armed": {"consumer": str, "attempt": int, "dev": int, "ino": int, "ctime_ns": int, "guard_pinned": bool,
               "recovered": bool},
@@ -251,6 +260,8 @@ def validate(events: list, run_id: str) -> bool:
     """False for partial records, gaps, unknown events or fields, bad values or an impossible transition."""
     requests, pending, armed = {}, None, None
     for number, event in enumerate(events, 1):
+        if not isinstance(event, dict):
+            return False
         kind = event.get("event")
         schema = {**COMMON, **EVENTS.get(kind, {})}
         if kind not in EVENTS or set(event) != set(schema) or event["seq"] != number or event["run"] != run_id:
@@ -318,7 +329,11 @@ def valid_fields(event: dict) -> bool:
                     and set(event["versions"]) == set(EXECUTABLES) | {"sqlite"}
                     and all(natural(code) for code in event["versions"].values()) and patterns(event["patterns"])
                     and all(hex_(event[field], 64) for field in ("policy", "exclusions", "anchor"))
-                    and hex_(event["checkout"]) and (not event["session"] or hex_(event["session"], 64)))
+                    and hex_(event["checkout"]) and hex_(event["journal_seal"])
+                    and (not event["session"] or hex_(event["session"], 64))
+                    and set(event["ref"]) == {"dev", "ino", "ctime_ns"}
+                    and all(type(v) is int and v >= 0 for v in event["ref"].values())
+                    and all(hex_(v) for v in event["pointers"]))
         if kind in ("arming", "armed", "disarmed", "hit") and not (
                 type(event["attempt"]) is int and 1 <= event["attempt"] <= 0xFFFFFFFF):
             return False
@@ -335,9 +350,22 @@ def valid_fields(event: dict) -> bool:
             return (all(sink in wire.SINKS and len(ids) == len(set(ids)) and all(hex_(root) for root in ids)
                         for sink, ids in event["sinks"].items()) and hex_(event["union"], 64)
                     and all(c in CONSUMERS and type(a) is int and a > 0 for c, a in event["attempts"])
-                    and len(event["attempts"]) == len(set(map(tuple, event["attempts"]))))
+                    and len(event["attempts"]) == len(set(map(tuple, event["attempts"])))
+                    and set(event["classes"]) == set(map(str, range(9)))
+                    and all(natural(v) for v in event["classes"].values())
+                    and all(re.fullmatch(r"(?:plain|nul|bomraw|fname|dbmain|dbwal|bomle|bombe|objhdr|"
+                                         r"m2raw|m2bom|m3|m4|m5|u4|m2_(?:gzip|bzip2|xz|lzma)_(?:plain|le|be|neg|two|mixed)|"
+                                         r"m4_(?:loose|packed|keep)|m5_(?:overflow|le|be|default|view|trigger|name|schema_overflow|uri[1-4])|"
+                                         r"m6_(?:name|target|path|negative))", name) and hex_(value)
+                            for name, value in event["controls"].items())
+                    and hex_(event["executables"], 64) and hex_(event["exclusions"], 64)
+                    and set(event["deadlines"]) == set(event["sinks"])
+                    and all(type(v) is int and 0 < v <= 7200 for v in event["deadlines"].values()))
         if kind == "scan_inventory":
-            return event["sink"] in wire.SINKS and event["subpass"] in (0, 1) and natural(event["checks"])
+            return (event["sink"] in wire.SINKS and event["subpass"] in (0, 1) and natural(event["checks"])
+                    and (not event["seal"] or hex_(event["seal"]))
+                    and set(event["counters"]) == set(wire.COUNTERS)
+                    and all(natural(v) for v in event["counters"].values()))
         if kind == "hit":
             return (event["sink"] in wire.SINKS and event["subpass"] in (0, 1) and hex_(event["root"])
                     and hex_(event["object"]) and 0 < event["count"] <= (1 << 48)
@@ -346,7 +374,13 @@ def valid_fields(event: dict) -> bool:
         if kind == "scan_finished":
             return (event["status"] in ("complete", "incomplete")
                     and all(reason in wire.R or reason in CODES for reason in event["reasons"])
-                    and all(sink in wire.SINKS and row["status"] in ("complete", "incomplete")
+                    and all(sink in wire.SINKS and set(row) == {"status", "reasons", "checks", "completed", "hits",
+                                "counters", "absent", "roots", "ledger", "observations", "controls", "subpass",
+                                "absent_only", "exits"} and row["status"] in ("complete", "incomplete")
+                            and type(row["absent_only"]) is bool and row["subpass"] in (0, 1)
+                            and len(row["controls"]) == 2 and all(natural(v) for v in row["controls"])
+                            and all(len(item) == 3 and natural(item[0]) and type(item[1]) is int
+                                    and -(1 << 31) <= item[1] < (1 << 31) and natural(item[2]) for item in row["exits"])
                             and all(reason in wire.R or reason == "inventory_unreconciled" for reason in row["reasons"])
                             and all(natural(row[name]) for name in ("checks", "completed", "hits"))
                             and set(row["counters"]) == set(wire.COUNTERS)
@@ -425,10 +459,10 @@ class Request:
     """One durable scan request: its directory, union file, controls and the connections that keep WAL controls live."""
 
     def __init__(self, run: Run, event: dict):
-        self.run, self.id, self.phase, self.group = run, event["request"], event["phase"], event["group"]
+        self.run, self.id, self.phase = run, event["request"], event["phase"]
         self.selection = event["selection"]
         self.name = f"scan-{self.id}"
-        self.connections, self.controls, self.ids = [], {}, {}
+        self.connections, self.controls = [], {}
 
     def ident(self, kind: str) -> str:
         return keyed(self.run.key, b"control", self.id, kind)
@@ -493,7 +527,6 @@ class Request:
         spec["m6"] = self.names(top / "m6")
         spec["objhdr"] = self.ident("objhdr")
         spec["anchor"] = keyed(run.key, b"anchor")
-        self.spec = spec
         return spec
 
     def file(self, rel: str, data: bytes) -> str:
@@ -558,9 +591,11 @@ class Request:
         first, second = spanning.split("/")
         os.mkdir(directory / f"p-{first}", 0o700)
         (directory / f"p-{first}" / f"{second}-end").write_bytes(b"")
-        (directory / f"neg-{self.value('m6_negative')[:14]}").write_bytes(b"")
-        return {"dir": str(directory), "ids": [[self.ident(kind), 1, "control"] for kind in
-                                               ("m6_name", "m6_target", "m6_path")]}
+        negative = directory / f"neg-{self.value('m6_negative')[:14]}"
+        negative.write_bytes(b"")
+        return {"dir": str(directory), "negative": str(negative),
+                "ids": [[self.ident(kind), 1, "control"] for kind in ("m6_name", "m6_target", "m6_path")]
+                + [[self.ident("m6_negative"), 0, "negative"]]}
 
     def close(self) -> None:
         for connection in self.connections:
@@ -609,7 +644,7 @@ def homes(run: Run) -> list:
 
 
 TASKS_ROOT = "/tmp/claude-{uid}"  # A10's glob parent, /tmp/claude-<uid>/*/*/tasks (a test launcher points elsewhere)
-PRIMARY_CHECKOUT = str(ROOT)
+PRIMARY_CHECKOUT = None  # default is HOME/code/native-agent-stack, independent of this live tool checkout
 
 
 def sink_roots(home: str, uid: int, codex: list, cursor: str) -> dict:
@@ -620,7 +655,7 @@ def sink_roots(home: str, uid: int, codex: list, cursor: str) -> dict:
         "A3": [("dir", f"{h}/.cache/claude-cli-nodejs")], "A4": [("dir", path) for path in codex],
         "A9": [("dir", f"{h}/.local/share/codex-ecosystem/observability/collector")],
         "A10": [("tasks", TASKS_ROOT.format(uid=uid))], "A11": [("journal", cursor)],
-        "A12": [("git", f"{h}/code/native-agent-stack-live"), ("git", PRIMARY_CHECKOUT)],
+        "A12": [("git", f"{h}/code/native-agent-stack-live"), ("git", PRIMARY_CHECKOUT or f"{h}/code/native-agent-stack")],
         "U1": [("dir", f"{h}/.omniroute"), ("dir", f"{h}/.local/share/omniroute-fw"), ("dir", f"{h}/.local/share/omniroute")],
         "U2": [("dir", f"{h}/.local/share/docker/containers"), ("file", f"{h}/.docker/config.json")],
         "U3": [("dir", f"{path}/shell_snapshots") for path in codex], "U4": [("environment", "-")],
@@ -696,9 +731,10 @@ class Session:
                  controls=frozenset(), roots=()):
         self.run, self.plan, self.sink, self.request = run, plan, sink, request
         self.attempts, self.controls, self.roots = set(map(tuple, attempts_)), set(controls), set(roots)
-        self.records, self.checks, self.completed, self.facts, self.reasons = [], {}, {}, [], []
+        self.checks, self.completed, self.facts, self.reasons = {}, {}, [], []
         self.control_reports, self.observations, self.counters, self.hits = [], [], {}, 0
         self.end, self.seq, self.root, self.bad, self.seconds = None, 0, None, False, seconds
+        self.scope = None
 
     def fail(self, reason: str) -> None:
         self.bad = True
@@ -717,6 +753,7 @@ class Session:
         argv = launch_argv(self.plan["exes"]) + [str(plan_r), str(proto_w), str(ack_r)]
         hook("before_launch", argv)
         try:
+            signal.signal(signal.SIGCHLD, signal.SIG_DFL)  # Command needs a waitable zombie through group cleanup.
             self.process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                             stderr=subprocess.DEVNULL, pass_fds=(plan_r, proto_w, ack_r),
                                             close_fds=True, start_new_session=True, env=env)
@@ -730,10 +767,18 @@ class Session:
             os.close(plan_w)
             self.read_records(proto_r, ack_w)
         finally:
+            self.stop(ack_w)
+            # END is terminal. Keep the channels alive until scope termination, then reject trailing bytes.
+            if self.end is not None:
+                os.set_blocking(proto_r, False)
+                try:
+                    if os.read(proto_r, 65536):
+                        self.fail("protocol_error")
+                except BlockingIOError:
+                    self.fail("protocol_error")
             os.close(proto_r)
             with _suppress(OSError):
                 os.close(ack_w)
-            self.stop()
 
     def read_records(self, proto: int, ack: int) -> None:
         deadline, buffer = time.monotonic() + self.seconds + 30, b""
@@ -756,22 +801,71 @@ class Session:
                     return
                 if record.kind == wire.HIT:
                     self.durable_hit(record, ack)
+                if record.kind == wire.END:
+                    if buffer:
+                        self.fail("protocol_error")
+                    return
 
-    def stop(self) -> None:
+    def stop(self, ack: int = None) -> None:
         """End the runner's group (its trap stops the scope), then reap; 78/64 is containment_unavailable."""
-        with _suppress(OSError):
-            if self.process.poll() is None and (self.bad or self.end is None):
-                os.killpg(self.process.pid, signal.SIGTERM)
-        try:
-            code = self.process.wait(timeout=30)
-        except subprocess.TimeoutExpired:
+        command = runner.Command(self.process)
+        # The worker holds its terminal frame open. TERM invokes the native runner's scope-stop trap even after
+        # a complete END. Leave its unreaped leader pinned while descendants and the scope are stopped.
+        stopped = command.signal_group(signal.SIGTERM)
+        # Release a terminal worker only after signalling the pinned runner. The runner's trap and the independent
+        # cgroup-empty check still govern success; shutdown must not depend on delivery of a second signal to it.
+        if ack is not None:
             with _suppress(OSError):
-                os.killpg(self.process.pid, signal.SIGKILL)
-            code = self.process.wait()
+                os.close(ack)
+        deadline = time.monotonic() + 15
+        while not command.exited() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        if not command.exited():
+            self.fail("deadline")
+            command.signal_group(signal.SIGKILL)
+        runner.end_group(command)
+        if SCOPE_REQUIRED:
+            try:
+                if self.scope is None:
+                    raise OSError()
+                while self.scope_populated() and time.monotonic() < deadline:
+                    time.sleep(.02)
+                if self.scope_populated():
+                    raise OSError()
+            except (OSError, ValueError):
+                self.fail("containment_unavailable")
+        code = command.reap()
         if code in (64, 78):
             self.fail("containment_unavailable")
-        elif code != 0 and self.end is not None and self.end.status == wire.STATUS["complete"]:
+        elif code not in ((0, 143) if stopped else (0,)) and self.end is not None \
+                and self.end.status == wire.STATUS["complete"]:
             self.fail("protocol_error")
+
+    def scope_populated(self) -> bool:
+        """systemd v255.4 cgroup-util.c cg_is_empty_recursive: absent or populated 0 is empty; errors refuse."""
+        try:
+            data = (self.scope / "cgroup.events").read_bytes()
+        except FileNotFoundError:
+            return False
+        entries = [line for line in data.splitlines() if line.startswith(b"populated ")]
+        if len(entries) != 1 or entries[0] not in (b"populated 0", b"populated 1"):
+            raise ValueError()
+        return entries[0] == b"populated 1"
+
+    def bind_scope(self, record) -> bool:
+        if self.scope is not None or not 0 < record.observed <= (1 << 31) or not 0 <= record.expected <= 32767:
+            return False
+        try:
+            lines = Path(f"/proc/{record.observed}/cgroup").read_bytes().splitlines()
+            groups = [line[3:] for line in lines if line.startswith(b"0::/")]
+            leaf = f"ecosystem-job-{os.getuid()}-{self.process.pid}-{record.expected}.scope".encode()
+            if len(groups) != 1 or not re.fullmatch(rb"/[\w@.:/-]+", groups[0]) \
+                    or groups[0].split(b"/")[-1] != leaf or any(p in (b".", b"..") for p in groups[0].split(b"/")):
+                return False
+            self.scope = Path(os.fsdecode(b"/sys/fs/cgroup" + groups[0]))
+            return self.scope_populated()
+        except (OSError, ValueError):
+            return False
 
     def durable_hit(self, record, ack: int) -> None:
         self.hits += 1
@@ -789,11 +883,10 @@ class Session:
                 or self.end is not None or r.kind not in PERMITTED:
             return False
         self.seq = r.seq
-        AUDIT.append(r)
         if unused_set(r):
             return False
         sink = wire.SINKS.get(self.sink, 0)
-        if r.sink not in (0, sink) or r.subpass != self.plan.get("subpass", 0) or r.mode > 7 or r.view > 7 \
+        if r.sink not in (0, sink) or r.subpass != (0 if r.kind == wire.FACT else self.plan.get("subpass", 0)) or r.mode > 7 or r.view > 7 \
                 or r.klass > 8 or r.path >= len(wire.PATHS) or r.status > 4 or r.reason >= len(wire.REASONS) \
                 or r.consumer > 6:
             return False
@@ -840,6 +933,8 @@ class Session:
                 return False
             if r.check in (1, 5, 7, 8, 10, 11) and r.observed > 2:
                 return False
+            if r.check == wire.FACTS["scope_binding"] and not self.bind_scope(r):
+                return False
             self.facts.append(r)
         elif r.kind == wire.COUNTER:
             if r.check not in wire.COUNTERS.values() or r.check in self.counters:
@@ -858,20 +953,26 @@ class Session:
         end = self.end
         if end is None:
             reasons.append("protocol_error")
-        elif end.status != wire.STATUS["complete"] or end.aux or end.observed != len(self.checks) \
-                or end.expected != len(self.checks):
-            reasons.append(wire.REASONS[self.completed[0].reason] if 0 in self.completed else "protocol_error")
+        else:
+            summary = self.completed.get(0)
+            if end.status != wire.STATUS["complete"]:
+                reasons.append(wire.REASONS[summary.reason] if summary and summary.status == 2 and summary.reason
+                               else "protocol_error")
+            if end.aux or end.observed != len(self.checks) or end.expected != len(self.checks):
+                reasons.append("protocol_error")
         if set(self.checks) - set(self.completed):
             reasons.append("protocol_error")
         for ident, result in self.completed.items():
             if ident and result.status == wire.STATUS["incomplete"]:
-                reasons.append(wire.REASONS[result.reason])
+                reasons.append(wire.REASONS[result.reason] if result.reason else "protocol_error")
+            elif ident and result.status not in (1, 3, 4):
+                reasons.append("protocol_error")
             if ident and result.status == wire.STATUS["complete"] and (
                     result.exit not in (0, 1) or result.aux or result.reason or result.observed != result.expected):
                 reasons.append("protocol_error")
         summary = self.completed.get(0)
         if summary is None or summary.status != wire.STATUS["complete"]:
-            reasons.append(wire.REASONS[summary.reason] if summary else "protocol_error")
+            reasons.append(wire.REASONS[summary.reason] if summary and summary.reason else "protocol_error")
         seals = {record.seal for record, _root in self.checks.values() if any(record.seal)}
         if end is not None and seals and seals != {end.seal}:
             reasons.append("inventory_unreconciled")
@@ -891,6 +992,7 @@ class Session:
                             self.completed[ident].status if ident in self.completed else 0,
                             self.completed[ident].reason if ident in self.completed else wire.R["protocol_error"]]
                            for ident, (record, root) in self.checks.items()],
+                "exits": [[ident, record.exit, record.aux] for ident, record in self.completed.items() if ident],
                 "observations": [[r.klass, r.consumer, r.attempt, r.path, (root or bytes(16)).hex(), r.observed]
                                  for r, root in self.observations],
                 "controls": [len(self.control_reports), sum(r.observed == r.expected for r in self.control_reports)]}
@@ -913,7 +1015,7 @@ class Session:
             wanted = required.get(mode_view, [])
             if record.expected == 1 and record.mode in (2, 4, 5) and record.view in (3, 5):
                 wanted = [spec["inband"][{2: "m2raw", 4: "m4", 5: "m5"}[record.mode]]]
-            if record.mode == 2 and record.expected in (2, 3, 4, 5) and record.view == 3:
+            if record.mode == 2 and record.expected in (2, 3, 4, 5) and record.view == 7:
                 formats.add({2: "gzip", 3: "bzip2", 4: "xz", 5: "lzma"}[record.expected])
             result = self.completed.get(ident)
             if result is None or result.status != wire.STATUS["complete"] or record.expected == 0:
@@ -1053,7 +1155,8 @@ def prepare(args, env) -> int:
                session_known=bool(args.session), session=digest(args.session.encode()) if args.session else "",
                proxy_verified=False, pointers=[record.seal.hex() for record in fact(session, "pointer_binding")],
                guard_pinned=bool(fact(session, "guard_pin", observed=1)),
-               journal_bound=bool(fact(session, "journal_binding", observed=1)))
+               journal_bound=bool(fact(session, "journal_binding", observed=1)),
+               journal_seal=fact(session, "journal_binding", observed=1)[0].seal.hex())
     say(run, f"run: {run.id}")
     return 0
 
@@ -1062,7 +1165,7 @@ def all_roots(run: Run, env) -> dict:
     """sink -> [{id, kind, path, present?}] for every configured sink; ids are keyed with the run key."""
     recipes = sink_roots(env.get("HOME") or "", os.getuid(), homes(run), str(run.dir / "child-cursor"))
     return {sink: [{"id": keyed(run.key, b"root", sink, kind, path), "kind": kind, "path": path}
-                   for kind, path in recipes[sink]] for sink in recipes}
+                   for kind, path in dict.fromkeys(recipes[sink])] for sink in recipes}
 
 
 def integrity(run: Run) -> list:
@@ -1144,7 +1247,7 @@ def scan(args, env) -> int:
         status = "complete" if all(result["status"] == "complete" for result in results.values()) else "incomplete"
         run.append("scan_finished", request=request.id, status=status, sinks=results,
                    reasons=sorted({reason for result in results.values() for reason in result["reasons"]}))
-    except (Refused, OSError, Interrupt) as error:
+    except Exception as error:  # every admitted request receives a fixed-code failure on an ordinary exception
         reason = "interrupted" if isinstance(error, Interrupt) else str(error) if isinstance(error, Refused) \
             else "setup_failed"
         with _suppress(Exception):
@@ -1157,6 +1260,7 @@ def scan(args, env) -> int:
         say(run, f"{sink}: {result['status'] if result['status'] != 'complete' or not result['absent_only'] else 'absent'}"
                  f" files={result['counters']['selected']} views={result['checks']} hits={result['hits']}"
                  f" controls={result['controls'][1]}/{result['controls'][0]}")
+    say(run, "not_covered: " + ",".join(not_covered(run, classify(run.events, [], expected_markers(run)))))
     return report(run, [], exit_only=True, request=request.id)
 
 
@@ -1183,9 +1287,11 @@ def scan_sink(run: Run, env, request: Request, sink: str, roots: dict, sinks: tu
     plan = {"op": "scan", "run_key": run.key.hex(), "sink": wire.SINKS[sink], "setpriv": executables["setpriv"][0],
             "exes": executables, "child_path": CHILD_PATH, "patterns": union[0], "patterns_sha256": union[1],
             "classes": union[2], "controls": spec, "rg_version": prepared["rg_version"],
+            "journal_seal": prepared["journal_seal"], "decoded_cap": wire.DECODED_CAP,
             "roots": [dict(root, present=presence.get(root["id"], False)) for root in roots[sink]],
             "covered": [root["path"] for name in sinks for root in roots[name] if root["kind"] in ("dir", "file",
                                                                                                  "tasks", "git")],
+            "coverage": [root for name in sinks for root in roots[name]],
             "user_roots": [root["path"] for name in USER_SINKS for root in roots[name]] if group == "agent" else [],
             "exclude": [{"path": path, "class": klass} for path, klass in exact],
             "exclude_glob": [{"dir": directory, "glob": pattern, "class": klass} for directory, pattern, klass in glob],
@@ -1197,7 +1303,7 @@ def scan_sink(run: Run, env, request: Request, sink: str, roots: dict, sinks: tu
             "dumper_argv": [executables["python3"][0], "-I", "-S", str(WORKER), "sqlite-dumper"]
             if DUMPER_COMMAND is None else DUMPER_COMMAND}
     result = None
-    deadline = time.monotonic() + min(SCOPE_SECONDS[sink], PHASE_SECONDS[request.phase][sink])
+    deadline = time.monotonic() + SCOPE_SECONDS[sink]
     for subpass in (0, 1):
         plan["subpass"] = subpass
         seconds = max(1, int(deadline - time.monotonic()))
@@ -1205,7 +1311,8 @@ def scan_sink(run: Run, env, request: Request, sink: str, roots: dict, sinks: tu
         session = Session(run, plan, sink, seconds, request.id, [
             (CONSUMERS.index(consumer) + 1, attempt) for consumer, attempt in bound],
             controls={row[4] for row in union[2] if row[4]} | {row[1] for row in spec["m1_negative"]}
-            | {row[1] for row in spec["bom_negative"]}, roots={bytes.fromhex(root["id"]) for root in roots[sink]})
+            | {row[1] for row in spec["bom_negative"]} | {row[0] for row in spec["m6"]["ids"]},
+            roots={bytes.fromhex(root["id"]) for root in roots[sink]})
         session.run_worker()
         result = session.outcome()
         result["subpass"] = subpass
@@ -1308,8 +1415,8 @@ def arm(args, env) -> int:
         signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
         os.close(fd)
     leak = " --leak-check" if args.consumer == "systemd-user-unit" else ""
-    say(run, f"probe: python3 -I tools/credentials/credential_run.py {ENTRY} -- python3 -I tools/credentials/"
-             f"canary_probe.py --run {run.id} --consumer {args.consumer} --attempt {attempt}{leak}")
+    say(run, f"probe: /usr/bin/python3 -I {shlex.quote(str(TOOLS['credential_run']))} {ENTRY} -- /usr/bin/python3 -I "
+             f"{shlex.quote(str(PROBE))} --run {run.id} --consumer {args.consumer} --attempt {attempt}{leak}")
     say(run, f"then: python3 tools/credentials/canary_proof.py disarm --run {run.id}")
     return 0
 
@@ -1548,7 +1655,7 @@ def masked_markers(canary: str) -> int:
 # ---- Verdict, receipt and claim --------------------------------------------------------------------------------------
 def report(run: Run, now_codes: list, receipt: bool = False, exit_only: bool = False, request: str = None) -> int:
     if not getattr(run, "valid", False):
-        hits = sum(1 for event in run.events if isinstance(event, dict) and event.get("event") == "hit")
+        hits = sum(event["count"] for event in run.events if event.get("event") == "hit")
         say(run, f"verdict: invalid codes=record_invalid hits={hits}")
         return EXIT["invalid"]
     result = classify(run.events, now_codes, expected_markers(run))
@@ -1567,19 +1674,22 @@ def report(run: Run, now_codes: list, receipt: bool = False, exit_only: bool = F
 def claim(run: Run, result: dict) -> str:
     prepared = run.events[0]
     final = result["final"] or {"sinks": {}}
-    complete = sorted(sink for sink, row in final["sinks"].items() if row["status"] == "complete"
-                      and not row.get("absent_only"))
+    complete = sorted(root for row in final["sinks"].values() if row["status"] == "complete"
+                      for root in row["roots"] if root not in row["absent"])
     absent = sorted(sink for sink, row in final["sinks"].items() if row.get("absent_only"))
     if result["verdict"] != "clean":
         return f"Canary proof {run.id}: {result['verdict']}; codes {', '.join(result['codes']) or 'none'}."
     user = result["user"]
+    requested = next(e for e in run.events if e["event"] == "scan_requested" and e["request"] == final["request"])
+    total = sum(len(numbers) for numbers in all_attempts(run.events).values())
+    markers = sum(expected_markers(run).values())
     return (f"Canary proof {run.id}: clean for the coverage stated here. Each of six consumers used its latest "
             f"attempt's synthetic canary through the inventory-id credential runner, and its HMAC tag was found in its "
             f"specified recording class. The named complete roots {', '.join(complete)} had zero observations of any "
-            f"of this run's canaries in the runner's enumerated raw/base64/base64url/percent/JSON/hex forms. "
-            f"Selection was changed-since the prepare threshold. The files and directories passed pre/post identity, "
-            f"entry-list and routing checks. The final result was requested at least {SETTLE_SECONDS // 60} minutes "
-            f"after the last disarm. The systemd form corpus produced the expected full markers and zero partial "
+            f"of this run's {total} canaries in the runner's enumerated raw/base64/base64url/percent/JSON/hex forms. "
+            f"Selection was changed-since ctime_ns {prepared['threshold_ns']}. The files and directories passed pre/post identity, "
+            f"entry-list and routing checks. The final result was requested at {requested['utc']}, at least {SETTLE_SECONDS // 60} minutes "
+            f"after the last disarm. The systemd form corpus produced the expected {markers} full markers and zero partial "
             f"markers. User-run coverage: {'U1-U8' if user else 'none requested'}. Loki: not_covered:proxy_unverified."
             f" Not covered: {', '.join(absent) or 'no absent sink'}, "
             f"{'declined transcripts, ' if prepared['transcripts'] == 'exclude' else ''}"
@@ -1626,9 +1736,11 @@ def not_covered(run: Run, result: dict) -> list:
         final = result["user"] if sink.startswith("U") else result["final"]
         observed = (final or {"sinks": {}})["sinks"].get(sink, {})
         if final is None:
-            rows.append(sink + ":not_requested")
+            requested = any(e["event"] == "scan_requested" and e["phase"] == "final"
+                            and e["group"] == ("user" if sink.startswith("U") else "agent") for e in run.events)
+            rows.append(sink + (":requested_incomplete" if requested else ":not_requested"))
         for root, present in roots:
-            if not present or root in observed.get("absent", []):
+            if root in observed.get("absent", []) or not observed and not present:
                 rows.append(sink + ":absent:" + root)
     if run.events[0]["transcripts"] == "exclude":
         rows.append("transcripts:user_scope_declined")

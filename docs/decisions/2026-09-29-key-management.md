@@ -1027,13 +1027,16 @@ repository until a future evidence PR.
 
 Evidence classes remain distinct: installed help/version, fresh pinned source
 retrieval, synthetic local integration, independent kernel process observation,
-workstation scope enforcement and live consumer/provider execution. This build
-uses the first five. The GPT-6 worker's sandbox had no user service manager and
-skipped the real-scope classes; the Opus continuation ran them on the
-workstation, where they first failed only because the fixture CHILD_PATH lacked
-what the unchanged runner resolves through PATH (`bash`, `id`, `stat`), then
-passed, with a kernel observer of processes and scope cgroups. It runs no
-upstream test suite and does not relabel these local fixtures as upstream
+workstation scope enforcement and live consumer/provider execution. The repair
+uses the first four. Workstation scope enforcement on the final repaired tree
+is pending the coordinator's outside-sandbox run and retained output. Earlier
+fixture repairs and partial runs do not establish that acceptance. The final
+synthetic unit run completed 141 tests: 128 passed and 13 skipped (12 native-scope cases and the
+uninstalled K4 guard rule). Separate FIFO and boundary runs passed 9 and 12 tests.
+All 135 mutants were killed by their named assertions after 88 passing pristine
+runs; the mutation runner confirmed its repository inputs stayed unchanged.
+Credential suites and the whole repository suite remain with the coordinator.
+This repair runs no upstream test suite and does not relabel these local fixtures as upstream
 acceptance. Network retrieval worked through the installed public context-mode
 channel despite shell-network failure. Returned source pins and hashes are
 retained with the build handoff; no credentials or host paths enter public
@@ -1043,13 +1046,65 @@ environment override or credential-runner edit.
 
 Draft 3 estimates 650 coordinator lines, 1,150 worker lines, 1,800 aggregate
 and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). The
-inherited implementation already exceeded the implementation ceilings; at the
-continuation's head the coordinator is 1,720 lines and the worker 1,968, about
-twice the aggregate ceiling, while the probe (110), workflow (28), wrapper (25)
-and tests (under their 2,800) stay within theirs. This continuation retains explicit checks rather
-than compressing statements or dropping obligations; the deviation is reported
-in the handoff for the coordinator's decision under amendment C13. The mutation
+repaired implementation has 1,832 coordinator lines and 2,097 worker lines,
+3,929 combined. The coordinator accepted that deviation for the required
+coverage and containment logic in the one repair round. The 3,590-line permanent
+test file also exceeds its original ceiling because the reviews require the
+missing cases, independent observations and paired mutants; that test-size
+deviation remains reported for coordinator disposition. The 768-line mutation
 runner is allowed separately and excluded from the test-line ceiling.
+
+The repair corrects seven reviewed false-clean paths: discovered Git indirections
+and damaged layouts, WAL families without a logical main scan, incomplete END,
+selection-aware symlink coverage, the prepared cursor seal, final journal entry
+termination, and virtual shadow ownership. SQLite shadow ownership follows
+`sqlite/sqlite@version-3.45.1` `ext/fts5/fts5_main.c` (`fts5ShadowName`),
+`ext/fts3/fts3.c` (`fts3ShadowName`) and `ext/rtree/rtree.c` (`rtreeShadowName`).
+Unknown virtual modules refuse logical completeness.
+
+The cleanup design required Astra/Max review after a bounded Sol repair: native
+runner exit 143 alone cannot prove the scope was stopped because its trap
+suppresses stop errors. The accepted design keeps the worker alive after END,
+signals the still-owned runner group to invoke its scope-stop trap, releases
+the terminal acknowledgement pipe, and checks kernel cgroup emptiness before
+reaping. FACT 12 supplies only a worker PID and
+the numeric native scope suffix. The coordinator validates membership against
+its own runner PID and reads containment metadata only. This follows
+[systemd v255.4 cg_is_empty_recursive](https://github.com/systemd/systemd-stable/blob/v255.4/src/basic/cgroup-util.c#L927):
+`cgroup.events` populated 0 or disappearance is empty; all other failures refuse.
+Synthetic acceptance is distinct from the pending native scope acceptance.
+
+Correction log for this round: the reviewed prior claims of complete acceptance
+were too broad. Header sentinels now plant exactly what the oracle checks; FIFO
+tests observe the intended child's open FIFO inode and sleeping reader through
+`/proc`. The installed kernel calls that wait channel `anon_pipe_read` (older
+kernels use `pipe_read`). Consolidating the journal parser initially collided
+with the scanner parser attribute; the independent export parser fixes that.
+Strict END rejection initially prevented legitimate stability retries; an
+incomplete END now retains a nonzero failure reason while inconsistent counts
+still fail the protocol. Removing M2 control reports exposed a missing format
+obligation; an explicit numeric routing check now binds per-format controls.
+An intermittent post-END shutdown timeout exposed reliance on signal delivery
+to the terminal worker; releasing its pipe after signalling the runner fixes
+that wait while retaining the cgroup-empty gate. A deterministic fixture also
+ignores TERM and requires pipe release. The version-stage FIFO fixture initially
+matched `--version` inside setpriv's nested command, blocking the outer wrapper
+before the native executable set PDEATHSIG. Exact argv matching fixes the
+fixture, and the observer checks the complete version-helper argv. Astra/Max
+confirmed this against [util-linux v2.39.3 setpriv.c](https://github.com/util-linux/util-linux/blob/v2.39.3/sys-utils/setpriv.c#L1055);
+the failed fixture is not evidence of a production parent-death regression.
+The pinned-leader review also found inherited `SIGCHLD=SIG_IGN` could automatically
+reap children before cleanup. Both parents now reset SIGCHLD immediately before
+their owned Popen, matching `credential_run.run_command`. Isolated regressions
+require two successful `waitid(WNOWAIT)` observations and the original exit status;
+both reset-removal mutants are killed. This follows Linux execve/wait semantics
+([man-pages 6.19](https://man7.org/linux/man-pages/man2/wait.2.html)). The first
+mutation run additionally exposed a cleanup fixture whose child accepted TERM
+and an equal-count rename caught too early by the held-file identity check.
+The child now ignores TERM before announcing readiness; the rename occurs just
+before the postwalk. Their dedicated mutants now exercise the intended oracles.
+The historical builder substitution under section 16/C14 remains a recorded
+deviation. Existing commit attribution is preserved, as the coordinator directed.
 
 One classifier selects latest requests, binds attempts/roots/ledgers, retains
 sticky hits and rejects missing/error/stale checks. Requested U/comparison
