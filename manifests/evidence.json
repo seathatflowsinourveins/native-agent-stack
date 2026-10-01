@@ -4160,8 +4160,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "d2a29cb93d2dd0c43ecbd3290e619b20d0b53e9883d06bc1fa2285da65d70718",
-      "bytes": 23798
+      "sha256": "52513428d4b10ab40e0dbeb05373514ceae1e79f1d81a79afdc52868f58c743c",
+      "bytes": 24767
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -6313,6 +6313,11 @@
       "path": "blueprints/convergence-practice/wsl-native-tools/source-review.json",
       "sha256": "e308b8aa0da7896893c0c93703a7c03500cccd11abec280bbbcb45aec027f41a",
       "bytes": 5452
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+      "sha256": "07f390a909f8be861685012fd2050040399c6e3604040d470d3311bd6871e660",
+      "bytes": 10935
     },
     {
       "path": "blueprints/convergence-practice/wsl-restore/README.md",
@@ -47430,6 +47435,7 @@
     "evidence/artifacts/memory-stack-20260925/experiment.json",
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
-    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
   ]
 }
