@@ -12811,8 +12811,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-      "sha256": "54260beb15a60b88d176926deea6329f0ff94a0bc8f67f70634ee6d4aa8063bf",
-      "bytes": 21865
+      "sha256": "5e2132f41e30d97bacd269359496492c9853f940316c36c7b6d93295bf5a8a74",
+      "bytes": 23023
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/equity-replay/README.md",
@@ -12841,8 +12841,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "9efbc9a8e92990810234bb72395c2369e9ee850180b23c6d299fea45c9e5fb11",
-      "bytes": 5955
+      "sha256": "85fe841622a590c7b19a9a4fcb00fe00b537bbd0820bca6aebc9614504173595",
+      "bytes": 6541
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
@@ -12971,8 +12971,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
-      "sha256": "9ccf5b974c79fb94fe28e4968a9278f531ebc4054e67784f04eb58126bc8d5b3",
-      "bytes": 21207
+      "sha256": "1a0d91d7f5db609f654dc8b8329f186a90e0d88cb48cdf7df98a2dcd9f9df178",
+      "bytes": 21648
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS",
@@ -15131,8 +15131,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1534ffde0c013ee2761f381ce3130d5aefb02709c3ce1696041d1621f9bb5010",
-      "bytes": 67221
+      "sha256": "7369879021c763b3f8b699aafd80cb90f3a31406d21bd98be7a28d6961565c32",
+      "bytes": 67910
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -15216,8 +15216,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "a1c69546d898dfcd8790efa573f13d7b5cc797e3ef6b3ee5a1e0c0a4856064af",
-      "bytes": 16411
+      "sha256": "8224f6aa4a1f4d01707fbd6f106ffb95326446f6c97fc9b92db56037e72c7fbc",
+      "bytes": 21913
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -32361,8 +32361,8 @@
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
-      "sha256": "6a7ea176983a1b4097a39e5755d9dbb45cec876d185228bd6d99b559d3f1390c",
-      "bytes": 5114
+      "sha256": "c6f7e93d22a0239355452c4c228080ce9b38faa438d442b3e310173a5423bf20",
+      "bytes": 6242
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation-run-variance.json",
@@ -32378,6 +32378,21 @@
       "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
       "sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22",
       "bytes": 615461
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-run-variance.json",
+      "sha256": "26cc8dbd6df4e61459e03258eb30b1f7cef0bef6f7c869553a3c4ed22e682490",
+      "bytes": 2753
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "sha256": "6b0bc2a886989e96433c86f188c2dcae68d372c37c5d6649c23f1e9352d1ead1",
+      "bytes": 73573
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "sha256": "340ae10c0fbaeac0beacdf928f2ec986a5e2703b5ae8b0a55a3491678f168470",
+      "bytes": 363123
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",

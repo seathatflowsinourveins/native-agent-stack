@@ -11,9 +11,12 @@ Per-layer assessments of the catalog layers against the closure criterion of
 | `foundation.json` | The 20 foundation layers at repository revision `3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a`, `as_of` 2026-10-01T03:50Z. Per layer: `corrected` (the assessor's return as corrected by the refuter: selected components with pins and pin sources, alternatives, evidence class, upstream currency, the five closure items each with a status and its evidence, install readiness with the missing new-host steps, the next unit), `corrections` (the refuter's corrections, 8 to 18 per layer), `verdict` (`corrected` for all 20) and `runs`. |
 | `foundation-synthesis.md` | One reviewer's synthesis of the 20 assessments: ranking, cross-layer patterns, program units, pins behind their latest release, install-readiness gaps and contradictions. |
 | `foundation-run-variance.json` | The item statuses of the seven layers that ran twice (the workflow was resumed after a sign-in). Five of them differ in one or two items between the two runs; none becomes final for install in either. |
+| `us-equities.json` | The 12 us-equities layers at repository revision `4d11709ce3fc42db87dc3a003b9bd8509c72a4c1` (PR #358's head at the time), `as_of` 2026-10-01T03:28Z, same method and form as `foundation.json`. It holds the **last** complete refuted result per layer, the synthesis's basis. `<session-scratch>` stands for the assessors' private read-only checkout of that revision. |
+| `us-equities-run-variance.json` | The item statuses of the six us-equities layers with two complete refuted results (the refuter ran twice in each; the assessor in four). Two differ by one step: backtesting-engine c1 and c4, portfolio-risk c5. |
+| `us-equities-synthesis.md` | One reviewer's synthesis of the 12 assessments: the ranked gap table, install readiness, 31 ordered units, pins behind their latest release and 17 program risks. |
 
-The us-equities assessment (12 layers, same method) lands with the trading lane owner's records in that lane's own
-pull request.
+The trading lane owner's verdicts on the 12 layers, which decide, are in
+`docs/decisions/2026-10-01-trading-layer-verdicts.md`.
 
 ## How it was produced
 
@@ -42,6 +45,9 @@ the statements it marks "(checked)". The file holds the first complete refuted r
 - Usage: the workflow was interrupted by a sign-in and resumed, and the resumed segment ran agents again that had
   already returned. The last segment recorded 3,612,716 tokens across 20 agents; the first segment's total was not
   retained, so the complete usage is unknown.
+- `us-equities.json` comes from a second run of the same roles over the 12 us-equities layers (`as_of`
+  2026-10-01T03:28Z, at PR #358's head `4d11709c`). It keeps the **last** complete refuted result per layer, the basis
+  of `us-equities-synthesis.md`, and that run's usage is not recorded here.
 
 ## Corrections found in review
 
