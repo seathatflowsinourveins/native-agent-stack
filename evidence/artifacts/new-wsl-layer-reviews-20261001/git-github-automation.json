@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "layer_id": "git-github-automation",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "confirmed",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "gh CLI lifecycle acceptance remains a catalog gap; returned help/version does not qualify worktree/PR/release operations on a new host.",
+      "Changed worktrunk/gh versions and new-distro cross-client bridge/worktree lifecycle are unmeasured."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin_of_record": "0.79.0 @ 5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "pin_source": "manifests/stack.json:1057",
+      "source_pinned_url": "https://github.com/max-sixty/worktrunk/blob/v0.79.0/README.md",
+      "upstream_currency": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0; unmeasured candidate",
+      "native_install": {
+        "command": "cargo install --locked --version 0.79.0 worktrunk; wt config shell install",
+        "source": "https://github.com/max-sixty/worktrunk/blob/v0.79.0/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "wt list --format=json",
+        "source": "Pinned README; installed0.79.0 list --help exited0",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "gh",
+      "repository": "https://github.com/cli/cli",
+      "pin_of_record": "2.101.0 (documented/installed reviewer-host baseline)",
+      "pin_source": "docs/github-automation.md:660",
+      "source_pinned_url": "https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md",
+      "upstream_currency": "https://github.com/cli/cli/releases/tag/v2.102.0; unmeasured candidate",
+      "native_install": {
+        "command": "sudo dpkg -i gh_2.101.0_linux_amd64.deb",
+        "source": "https://github.com/cli/cli/releases/tag/v2.101.0; pinned Linux installation/signing instructions",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "gh pr view --json number,headRefOid,state; gh attestation verify \"$ARTIFACT\" --repo \"$REPOSITORY\"",
+        "source": "Installed2.101.0 pr view/attestation verify --help exited0; no PR execution",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "pin_of_record": "0.71.0",
+      "pin_source": "manifests/stack.json:466",
+      "source_pinned_url": "https://github.com/Wilfred/difftastic/blob/0.71.0/manual/src/installation.md",
+      "upstream_currency": "0.71.0; matches record",
+      "native_install": {
+        "command": "tar -xzf difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz; install difft \"$BIN_DIR/difft\"",
+        "source": "https://github.com/Wilfred/difftastic/blob/0.71.0/manual/src/installation.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "difft --exit-code --color never \"$BEFORE\" \"$AFTER\"",
+        "source": "Installed0.71.0 --help exited0; native structural-diff semantics",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "codex-for-claude",
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "pin_of_record": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "pin_source": "manifests/stack.json:349",
+      "source_pinned_url": "https://github.com/openai/codex-plugin-cc/blob/v1.0.6/README.md",
+      "upstream_currency": "v1.0.6; matches record",
+      "native_install": {
+        "command": "/plugin marketplace add openai/codex-plugin-cc; /plugin install codex@openai-codex; /codex:setup",
+        "source": "https://github.com/openai/codex-plugin-cc/blob/v1.0.6/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "/codex:review --base main",
+        "source": "Pinned README native review invocation; no new model run",
+        "evidence_class": "source_only"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Codex for Claude review bridge",
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "verdict": "Selected for a concrete cross-client review; not a mandatory second general orchestrator",
+      "sources": [
+        "https://github.com/openai/codex-plugin-cc/blob/v1.0.6/README.md"
+      ]
+    },
+    {
+      "name": "Native Git worktrees",
+      "repository": "https://github.com/git/git",
+      "verdict": "Keep native worktree ownership/cleanup as worktrunk's underlying supported interface",
+      "sources": [
+        "https://git-scm.com/docs/git-worktree"
+      ]
+    }
+  ],
+  "corrections": [],
+  "evidence_assessment": [
+    "Read installed wt/difft/gh version/help before pin-specific release notes and tagged installation/review sources. No external messages, PRs, releases, provider calls or worktree lifecycle mutations were performed.",
+    "worktrunk0.80.0 and gh2.102.0 are dated currency candidates; matching0.79.0/2.101.0 evidence stays scoped. gh2.101.0 release describes Linux package signing-key rotation; retain supported current signing instructions.",
+    "The native bridge is1.0.6; its previously qualified receipt is historical. A new version/sign-in/client route requires a separate concrete review acceptance.",
+    "No source-only helper invocation or receipt replay is presented as a new Codex/Claude review/model run."
+  ],
+  "failed_access": [],
+  "omissions": [
+    "No gh lifecycle, native PR/release acceptance or new-host bridge review.",
+    "No native authentication-store reads or shell/global configuration changes."
+  ],
+  "next_wave": [
+    "Qualify gh's own bounded lifecycle with upstream commands and independent observation; preserve owned branch/repository boundaries.",
+    "On the created distro qualify one worktree create/list/remove sequence and one concrete bridge review after native sign-in; compare newer pins only against a demonstrated gap."
+  ],
+  "reopen_on": [
+    "worktrunk/gh/bridge pin changes",
+    "Native worktree cleanup or cross-client review fails",
+    "A GitHub workflow needs a capability outside the current native commands"
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

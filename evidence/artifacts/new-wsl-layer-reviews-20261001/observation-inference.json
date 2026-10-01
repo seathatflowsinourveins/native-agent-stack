@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "layer_id": "observation-inference",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Unknown process/worker attribution, interactive rendering and provider compatibility conditions retain their original scoped gaps.",
+      "New WSL loopback scrape/log/alert delivery, history isolation, service recovery and optional GPU inference acceptance are unexecuted."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin_of_record": "0.161.0",
+      "pin_source": "manifests/stack.json:1085",
+      "source_pinned_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+      "upstream_currency": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0; currency only",
+      "native_install": {
+        "command": "tar -xzf otelcol-contrib_0.161.0_linux_amd64.tar.gz",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "otelcol-contrib validate --config=\"$CONFIG\"",
+        "source": "Installed0.161.0 validate --help exited0; binaries are from opentelemetry-collector-releases",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin_of_record": "3.15.0",
+      "pin_source": "manifests/stack.json:1116",
+      "source_pinned_url": "https://github.com/prometheus/prometheus/blob/v3.15.0/README.md",
+      "upstream_currency": "v3.15.0; matches record",
+      "native_install": {
+        "command": "tar xvfz prometheus-3.15.0.linux-amd64.tar.gz",
+        "source": "https://github.com/prometheus/prometheus/blob/v3.15.0/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "promtool check config \"$CONFIG\"; promtool query instant \"$LOOPBACK_URL\" up",
+        "source": "Pinned cmd/promtool/main.go; installed check config --help exited0",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "pin_of_record": "3.7.8",
+      "pin_source": "manifests/stack.json:1154",
+      "source_pinned_url": "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+      "upstream_currency": "v3.7.8; matches record",
+      "native_install": {
+        "command": "unzip loki-linux-amd64.zip; install loki-linux-amd64 \"$BIN_DIR/loki\"",
+        "source": "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "loki -config.file=\"$CONFIG\" -verify-config=true",
+        "source": "Pinned cmd/loki/main.go; help exits2 while printing Go flag usage",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "pin_of_record": "13.2.2",
+      "pin_source": "manifests/stack.json:1191",
+      "source_pinned_url": "https://github.com/grafana/grafana/blob/v13.2.2/conf/defaults.ini",
+      "upstream_currency": "https://github.com/grafana/grafana/releases/tag/v13.2.3; currency only",
+      "native_install": {
+        "command": "sudo dpkg -i grafana_13.2.2_34846740809_linux_amd64.deb",
+        "source": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/; pinned13.2.2 release asset",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "curl --fail --silent \"$LOOPBACK_URL/api/health\"",
+        "source": "Pinned pkg/api/http_server.go and pkg/api/health.go; documentation health alone is limited",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "pin_of_record": "0.34.1",
+      "pin_source": "manifests/stack.json:1224",
+      "source_pinned_url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+      "upstream_currency": "v0.34.1; matches record",
+      "native_install": {
+        "command": "tar -xzf alertmanager-0.34.1.linux-amd64.tar.gz",
+        "source": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "amtool check-config \"$CONFIG\"",
+        "source": "Pinned cli/check_config.go; installed help exited0",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "pin_of_record": "2.28.0",
+      "pin_source": "manifests/stack.json:1248",
+      "source_pinned_url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+      "upstream_currency": "v2.28.0; matches record",
+      "native_install": {
+        "command": "tar zxvf ntfy_2.28.0_linux_amd64.tar.gz",
+        "source": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "curl --fail --silent \"$LOOPBACK_URL/v1/health\"",
+        "source": "Pinned server/server.go; installed serve --help exited0; external delivery requires its own observation",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "pin_of_record": "0.43.0",
+      "pin_source": "manifests/stack.json:66",
+      "source_pinned_url": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md",
+      "upstream_currency": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0; currency only",
+      "native_install": {
+        "command": "tar -xzf agentsview_0.43.0_linux_amd64.tar.gz",
+        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0; pinned README",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "Pinned Makefile upstream tests; installed --help exited0; no history ingestion/UI run",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "pin_of_record": "0.7.5",
+      "pin_source": "manifests/stack.json:1633",
+      "source_pinned_url": "https://github.com/ymtdzzz/otel-tui/blob/v0.7.5/README.md",
+      "upstream_currency": "v0.7.5; matches record",
+      "native_install": {
+        "command": "go install github.com/ymtdzzz/otel-tui@v0.7.5",
+        "source": "https://github.com/ymtdzzz/otel-tui/blob/v0.7.5/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "otel-tui --host 127.0.0.1 --grpc \"$GRPC_PORT\" --http \"$HTTP_PORT\"",
+        "source": "Pinned README flags; installed --help exited0; interactive rendering not observed",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "claude-hud",
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "pin_of_record": "0.8.0",
+      "pin_source": "manifests/stack.json:244",
+      "source_pinned_url": "https://github.com/jarrodwatts/claude-hud/blob/v0.8.0/README.md",
+      "upstream_currency": "v0.8.0; matches record",
+      "native_install": {
+        "command": "/plugin marketplace add jarrodwatts/claude-hud; /plugin install claude-hud; /claude-hud:setup",
+        "source": "https://github.com/jarrodwatts/claude-hud/blob/v0.8.0/README.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "Pinned package.json defines npm run build then node --test; not executed",
+        "evidence_class": "source_only"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "verdict": "Tracing/evaluation candidate; releases/latest is an MCP package and cannot establish server currency",
+      "sources": [
+        "https://github.com/Arize-ai/phoenix/blob/7994b9df4f3e2e88c3792d5498cf3d91bf25b7ea/README.md"
+      ]
+    },
+    {
+      "name": "OpenLIT",
+      "repository": "https://github.com/openlit/openlit",
+      "verdict": "OTel-based AI observability/evaluation candidate; compare a missing selected signal",
+      "sources": [
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md"
+      ]
+    },
+    {
+      "name": "SGLang",
+      "repository": "https://github.com/sgl-project/sglang",
+      "verdict": "GPU serving candidate; compare selected model/hardware, latency and attribution",
+      "sources": [
+        "https://github.com/sgl-project/sglang/blob/v0.5.20/README.md"
+      ]
+    },
+    {
+      "name": "llama.cpp optional local inference",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "verdict": "Historical b11057 pin stays conditional; latest v0.5.0 requires new workload evidence",
+      "sources": [
+        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/docs/build.md"
+      ]
+    },
+    {
+      "name": "vLLM optional existing route",
+      "repository": "https://github.com/vllm-project/vllm",
+      "verdict": "Record0.30.0 matches latest; independent GPU/provider compatibility remains conditional",
+      "sources": [
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Passwordless observation grants equivalent permissions across Grafana and Dagu",
+      "correction": "Grafana anonymous enabled + org_role Viewer must stay loopback and is Grafana-specific; Dagu auth:none grants no Viewer restriction",
+      "deciding_source": "https://github.com/grafana/grafana/blob/v13.2.2/conf/defaults.ini; https://github.com/dagucloud/dagu/blob/v2.16.6/README.md"
+    },
+    {
+      "claim": "Latest Phoenix monorepo release proves Phoenix server version",
+      "correction": "releases/latest returned @arizeai/phoenix-mcp@4.3.15; reviewed server-capability README at its frozen commit instead",
+      "deciding_source": "https://github.com/Arize-ai/phoenix/releases/tag/@arizeai/phoenix-mcp@4.3.15"
+    }
+  ],
+  "evidence_assessment": [
+    "Primary pin source/release notes and safe native help read; no services, telemetry/history reads, model/provider runs or GPU trials.",
+    "Distribution artifact source for collector: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0 . Config validation, health endpoints and upstream unit suites do not prove worker attribution, visual UI rendering or alert delivery.",
+    "Existing optional llama.cpp/vLLM/OmniRoute receipts retain their own workload/host boundaries; no optional service is activated by this catalog review."
+  ],
+  "failed_access": [
+    "Guessed Grafana install path404 resolved as https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/ .",
+    "One local extraction regex failed, was corrected, and original source URLs were read successfully."
+  ],
+  "omissions": [
+    "No live credential/account route, raw client conversations, actual history, GPU telemetry or complete service audit.",
+    "OmniRoute trial remains a separate provider-compatibility receipt; no new gateway version promotion."
+  ],
+  "next_wave": [
+    "Qualify one named missing attribution/rendering/provider condition; keep metric counters and provider/cache scopes separate.",
+    "On the created distro observe loopback Viewer, scrape/log correlation, one external alert and service/distro/reboot recovery separately."
+  ],
+  "reopen_on": [
+    "Selected collector/Grafana/history pin changes",
+    "Observed attribution/rendering/delivery failure",
+    "A specific model/hardware route requires comparison"
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

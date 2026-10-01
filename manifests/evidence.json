@@ -11015,13 +11015,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "c3966d55a867612e50fe3cd0d841060b3d8944ae77ad39fb4a050bc0def0bba2",
-      "bytes": 37314
+      "sha256": "60f443999a3cc4071e074637285165cf3cf899606b3ab2fb0b65b485e42e08e4",
+      "bytes": 37422
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
-      "sha256": "5a4e4a1aa7bd58e6b906604e2ab1c635cbf0417613b5c94546e6e2af968bb86e",
-      "bytes": 19095
+      "sha256": "4df541b43bd81135097716cd180556596644bac9778d7ca756fea17d4d46cbed",
+      "bytes": 19201
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
@@ -14829,6 +14829,11 @@
       "bytes": 105311
     },
     {
+      "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
+      "sha256": "37636424b34850e43e2655136b6daf90624f6633efa1b60a8b5175f65fc6815c",
+      "bytes": 11875
+    },
+    {
       "path": "catalogs/foundation/practice-references.json",
       "sha256": "6c7eb7a582477eff724de4c807eb08adbf752664abfdce9dd02e3e78a2397c00",
       "bytes": 20197
@@ -15255,8 +15260,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "8224f6aa4a1f4d01707fbd6f106ffb95326446f6c97fc9b92db56037e72c7fbc",
-      "bytes": 21913
+      "sha256": "95a066e28fe63b8f143aa02d6411e9908eb127d09ebafb92c33084adf3c6ee92",
+      "bytes": 22245
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -15630,8 +15635,8 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "d13d2e71db5bbf79f9133a34ffd109ba0217cb59e6fe6099f85e815998b062c1",
-      "bytes": 17975
+      "sha256": "ed4b5384848386d0a6077cd17147c2dd02dc7aeaf463ec8807c3b3ba0effb21b",
+      "bytes": 18065
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -15670,8 +15675,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "c61e23df300b0872bc784d5dc7926ef23009ba6d9f16acc4ae9e0f0aab8ae7d3",
-      "bytes": 125994
+      "sha256": "b1fc23b3595dca2164f0b3fc7bb19d553caa0be8c4fe4b25e70004a48ebcc165",
+      "bytes": 126141
     },
     {
       "path": "docs/evidence.md",
@@ -35389,6 +35394,266 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
+      "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
+      "bytes": 6213
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json",
+      "sha256": "198bf19eefa0ac8083ef9d2e8fa089f2cd7ada650cbba904d08fb911c01d356b",
+      "bytes": 4074
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/agents-models-workers.json",
+      "sha256": "3194527178e6622d42f691577c1cfdc4584a40ecbb3b96a12bad7aeff1882ac4",
+      "bytes": 89291
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-hook-tests.stdout.txt",
+      "sha256": "a2505133bf2d7ba9cabcfb9c9f65374c904d55b3a19c894e890d7581f7c850d7",
+      "bytes": 6536
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-upstream-hooks.json",
+      "sha256": "47aacc3d6d4dba9609b218b3515c54897f1c79b427563b570195a00ba74cbec1",
+      "bytes": 2983
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/architecture-independent-review-scope.json",
+      "sha256": "57e8484ece512b198a6251c5650dfc11c1893ca91e49e7d75cf0f11e325180b6",
+      "bytes": 7888
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/backtesting-engine.json",
+      "sha256": "1e4e3292a0eebe6d8deda4b1d09ae83b73323e5f53830458dc9312ede67dc58a",
+      "bytes": 65160
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/ci-supply-chain.json",
+      "sha256": "a7a0419f89d408badbeb6fbd789381f641d13cc5958ca07f97b21d6a3c2fd416",
+      "bytes": 11820
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/code-navigation.json",
+      "sha256": "6a7bf565d1205b3c6845849d35457ba25e8de3a58c7551d2f665fb754b0d347e",
+      "bytes": 5439
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/context-install-bindings-followup.json",
+      "sha256": "b1a90579f01b5a512b0166fd04d546743df035b3c128dc5c5c146ae3e0c7da20",
+      "bytes": 26653
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/cooperation.json",
+      "sha256": "6fa0c4d7ee766a509bf75cc3e5e692ab3de618fed9faef3d4156ac4ffd43fb9c",
+      "bytes": 9211
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/cross-client-messaging-candidate-followup.json",
+      "sha256": "a24e3089fc5a9e0a3f3d2bc6ed3cf29bc5cf12e556bda8adf0498892ac59d157",
+      "bytes": 8256
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/data-quality-orchestration.json",
+      "sha256": "df20a822832a6c727325df1085f2f2ffa1b406598b8468558411c26e9ba9e93b",
+      "bytes": 118265
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/document-retrieval.json",
+      "sha256": "91515bed6f474e25b3c4d427cab6a62508e0fe142e1fc283e94eb65d98e32b35",
+      "bytes": 6572
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sha256": "dc0a02ef044d4277160a04f5e1c632f8dee7e48a72207cae30d6b4700955e886",
+      "bytes": 16399
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "sha256": "2f2c2d772e8aaefec0da0919b7cf497d9dd1a4c0251084e3c994dfb9d17f9a36",
+      "bytes": 19471
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/evaluation-experiments.json",
+      "sha256": "93757251b0a67cb8d2d868d62fd7a6b8021156507636a74021ae4680fe37cc71",
+      "bytes": 163527
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/execution-broker.json",
+      "sha256": "724d722bc943b301cf365a37c38d28aa2254807284ea1ac306089ce039a1cc33",
+      "bytes": 64911
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/existing-host-gates.json",
+      "sha256": "f52bc48b134032d7461a6446d58e597da98c78e816f63f4f680d3729fc47e3e7",
+      "bytes": 6384
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/git-github-automation.json",
+      "sha256": "31d8dff9fb9355d087846a7ffa22e9f3e328870a555a297e3ee7f9d63a464eb2",
+      "bytes": 6541
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/hosting-services.json",
+      "sha256": "7235edaca3e8467ace6c1b90a0fb868496ca99bc96ee5e0832857bb21105034f",
+      "bytes": 9276
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/identity-provenance.json",
+      "sha256": "e4ab41af7ee12eb842266323378b6854e47ecf189544d48b0ff9a43338b1c804",
+      "bytes": 133259
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/instructions-skills.json",
+      "sha256": "939aca2a6453e67fe5c76ec04bd7020bf2aaec15adaf15e9c08ff1f851161029",
+      "bytes": 6448
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/isolation-failure-controls-followup.json",
+      "sha256": "90edc4f5d258df3250f6108bf1ee56325d7f8679c42604f95c3ca9f5a969a522",
+      "bytes": 6405
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/isolation.json",
+      "sha256": "77e8bebdb72796dbe23e4dd23b683f79210d359e4797c510fd0ffc9b827a8528",
+      "bytes": 5287
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/landscape-smoke-attempt.json",
+      "sha256": "972a1238b787866d2a80a1274a29b4d0722f562816768b11d39e7c5b5c2daa88",
+      "bytes": 5541
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json",
+      "sha256": "f275f2905d0343fdbbe83b426a4cd036c0570ea9efb9b713d778eef79489d84e",
+      "bytes": 134329
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/mcp-surfaces.json",
+      "sha256": "730e88147a137f74e2b8cd630218f26ff37afcb582e5f5d7e2a76a6c0f5df540",
+      "bytes": 3731
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "sha256": "11916abbb727b70331a7d9567aafb77c6a1f507d5874eeb5d83718300256d4cb",
+      "bytes": 5048
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/observability-hosting.json",
+      "sha256": "a8c804be78b0283cb00bb5032996bb671dd8c3497b388c4545ce6815ecb936ac",
+      "bytes": 70822
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "sha256": "3ceeb7c19019b8191bc61343f45069cbf5b2bf5e5bdd07cc128de60ee862c75e",
+      "bytes": 12505
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/openviking-0422-native-plugin-tests.stdout.txt",
+      "sha256": "b3ce94aa6870869a8e5f3254a217931781e71eb16d34d50545846e3918162ed5",
+      "bytes": 13797
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/openviking-0422-upstream-plugin-tests.json",
+      "sha256": "faba93c88af1d7c7c3cfab335b77b9c7d09f8881e088288e71552f1c028a380a",
+      "bytes": 4778
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/operations-install-bindings-followup.json",
+      "sha256": "5f0ae9451d979dfab6de3e19f5979bccd456ddb294c1cff1704de08709471187",
+      "bytes": 58685
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/persistent-caller-repair.json",
+      "sha256": "f4f31a8c1d94ad32b410075cc3828c46bdc533604d447d3eae785ecc5c92d8b3",
+      "bytes": 4978
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/portfolio-risk.json",
+      "sha256": "3290960da159e71fde30b8a46f2e8e15fce5f97abeea750e9af6e296af5f023e",
+      "bytes": 65297
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/publication-validation.json",
+      "sha256": "c45fdd472ea0b41770ae17d80fd998db53138365a1a72003c49340a779f80c41",
+      "bytes": 1990
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/quality-evaluation.json",
+      "sha256": "f3fdfa30281c814d8ea84f00ba6f66c2db8adaedfed5d9f8d968b6c246100450",
+      "bytes": 8243
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/recovery-portability.json",
+      "sha256": "563d1e0f96f605d393617a59c817a769ab898602b4adb05a2d9966eb63bf0c5e",
+      "bytes": 6085
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/research-factors-ml.json",
+      "sha256": "69e0cafcb921c5d44b7a743b294faef34d81735b4681599707b8e854a67419e8",
+      "bytes": 199209
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json",
+      "sha256": "5059a0ff4f71887efa0db1a2109cbe73fad9bda7bc095e53d144031ac210d409",
+      "bytes": 6169
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/secret-scanner-native-comparison.json",
+      "sha256": "e747eaf9c1548df0ce16633aab81cfaecbe99cc2cecd57656cfc0cdce657ed35",
+      "bytes": 29747
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/secrets-credentials.json",
+      "sha256": "6cfb40b01a94fd0c031a835571cf2f61de9042c12e91323ea5d4b31df1ce87ec",
+      "bytes": 3382
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/security-supply-chain.json",
+      "sha256": "de1066fbab613bbd6712c7bfff5b8c71bdb062a66cb916034f49ae30adcfaf93",
+      "bytes": 91793
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/selection-gap-convergence-followup.json",
+      "sha256": "65e76b3ee33014294a2ae915b713a56a1e8a8e9aee3fdbc10ea4a86146d061ec",
+      "bytes": 8140
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json",
+      "sha256": "3f3059127daabfb6669ee8f4867dadeec7f42005d35d928329dd270fe1ee5f8d",
+      "bytes": 9121
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json",
+      "sha256": "b7a134ef6f5879bebe69ec33e642ceaf3b5bd568bc6cc824b4dcf60f18145a6d",
+      "bytes": 131871
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json",
+      "sha256": "e7b25a53d48e4a3331a4c472326a5adbb446a27e7b364478d8f33613d5852cc8",
+      "bytes": 7992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json",
+      "sha256": "d87e71e37765ca2950c36d7ecf8e934ec480b711d231821355b5a3ffdc0189fb",
+      "bytes": 9702
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/web-research.json",
+      "sha256": "587433b1edf46cf60d458dbdd605379f3c82e4bb731c8e5ffcd7cd2ceca0bcdc",
+      "bytes": 8723
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "sha256": "bc21293ecf183822914650693babe11cb247003ce90c5dfb6f05c6013d884af7",
+      "bytes": 5736
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
+      "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
+      "bytes": 8224
+    },
+    {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
       "sha256": "a056580fbe32371bfdddb46aa0c9c1947f27b91066be644d4382288670b4424c",
       "bytes": 12091
@@ -46940,8 +47205,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "8e0fbb9b579e99eb740155a9e728c43146ac61ce51fa0bbce47a344482822561",
-      "bytes": 137469
+      "sha256": "d1990f63256a86d69eaa154217aba92548905ff0bafc61e574465425e9ba62bb",
+      "bytes": 137485
     },
     {
       "path": "tests/test_effort_default_guard.py",
