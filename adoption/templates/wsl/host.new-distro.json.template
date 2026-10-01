@@ -1,0 +1,11 @@
+{
+  "HOME": "/home/${WSL_USER}",
+  "ECO_ROOT": "/home/${WSL_USER}/.local/share/codex-ecosystem",
+  "PROJECT_ROOT": "/home/${WSL_USER}/code/native-agent-stack",
+  "HOST_PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  "CODE_INDEX_PATH": "/home/${WSL_USER}/.code-index",
+  "OTEL_ENDPOINT": "127.0.0.1:24318",
+  "AI_MEMORY_URL": "127.0.0.1:29374",
+  "QDRANT_URL": "127.0.0.1:26333",
+  "EMBED_URL": "127.0.0.1:28231"
+}
