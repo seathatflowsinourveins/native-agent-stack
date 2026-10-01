@@ -2,6 +2,7 @@
 
 **Decided by:** coordinator session `native-agent-stack-c5` (decisions 1 to 5 below), on the research unit's findings of
 2026-10-01. Unit W2 of that wave wrote the recipe, the templates and the test, and re-read the sources the same day.
+A follow-up unit added F11 and the F5 range rule later that day, on the coordinator's brief.
 This record changes nothing on a host. No `wsl.exe` command, import, `.wslconfig` edit or first launch ran for it.
 
 **Scope:** [`adoption/platforms/linux-wsl2-new-distro.md`](../../adoption/platforms/linux-wsl2-new-distro.md) and its
@@ -125,6 +126,29 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
   "Listeners and ports"). The template's ports collide with the workstation's services: `adoption/hosts/example.json:7-10`
   uses 14318, 49374, 16333 and 8231. The observability backend's templates fix 13000, 13100, 14333, 16333, 18080, 18525,
   18888, 18889, 19090, 19093, 20128 and 31415, and the live services also use 20129, 3710, 3800, 49474 and 18231.
+- **jCodeMunch on a new distribution** (follow-up, 2026-10-01). The coordinator reported this gap from the cross-family
+  review of PR #548. Stage 2's Claude profile step copies six SubagentStart carrier blocks from `adoption/hooks/claude/`
+  into `~/.claude/hooks/` (`tools/adoption/install_claude_profile.py:49-59`):
+  - `token-lanes-block.md` and `token-lanes-block.researcher.md` name jCodeMunch's `route`, `menu` and `order`;
+  - `token-lanes-block.builder.md` and `token-lanes-block.reviewer.md` name `route` and `order`;
+  - `token-lanes-block.scout.md` and `token-lanes-block.verifier.md` name no jCodeMunch tool.
+
+  `adoption/mcp/claude-user.json` registers only `ai-memory` and `serena` at user scope. The 2026-09-25 addendum of
+  `docs/decisions/2026-09-23-claude-user-profile.md` moved jCodeMunch to a per-project opt-in,
+  `claude mcp add --scope local` (`adoption/bootstrap.md:458-472`), and no script runs it. No profile of
+  `adoption/manifest.json` and no entry of `adoption/pins-linux-x86_64.json` carries `jcodemunch-mcp`. Only step 4a's
+  `uv tool install --python 3.13 jcodemunch-mcp==1.108.319` installs it (`adoption/bootstrap.md:387-395`), and F9 does
+  not run that line.
+- **Local scope** (Claude Code's MCP page). "Local scope is the default. A local-scoped server loads only in the project
+  where you added it and stays private to you. Claude Code stores it in `~/.claude.json` under that project's path, so
+  the same server won't appear in your other projects." Its "Server status" section says "`claude mcp add` confirms a
+  successful add by printing an `Added ...` line, which means the configuration was written". In its example, a
+  repeated add at the same scope fails with `MCP server sentry already exists in local config`.
+- **More than 65,536 subordinate ids.** Docker's rootless troubleshooting page says of
+  `docker: failed to register layer: Error processing tar file(exit status 1): lchown <FILE>: invalid argument`: "This
+  error occurs when the number of available entries in `/etc/subuid` or `/etc/subgid` is not sufficient. The number of
+  entries required vary across images. However, 65,536 entries are sufficient for most images." The coordinator's
+  brief calls the workstation's wider range a host observation for one benchmark image set.
 
 ## Alternatives
 
@@ -154,6 +178,13 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      `fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6`; read with `readelf -d` on 2026-10-01).
    - Append `<user>:100000:65536` to `/etc/subuid` and `/etc/subgid` by hand, as in Docker's example, instead of
      `usermod --add-subuids` and `--add-subgids`.
+   - Allocate a wider subordinate range at first boot, as the workstation has. Docker's troubleshooting page ties the
+     need to the image set and calls 65,536 sufficient for most images.
+   - Register jCodeMunch in F11 through step 4a's checked-in `.mcp.json` form. It waits for workspace trust and
+     approval, and a nested `${ECO_INSTALL_ROOT:-...}` default does not expand there (the addendum's measurement).
+   - Install `jcodemunch-mcp` in F11 when it is absent, with step 4a's `uv tool install` line. Not chosen in the
+     coordinator's brief: F11 records `not installed`, and the install stays with step 4a.
+   - Leave the clone unregistered. Four carrier blocks would then name tools of a server the session lacks.
 4. **Host-wide.**
    - Update WSL to 2.7.14 or 3.0.1 first: neither changes install, import or first launch.
    - Apply settings with `wsl --shutdown`: it stops every distribution.
@@ -193,7 +224,8 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      - `libatomic1` for parity with the workstation profile (`docs/new-workstation-runtime-profile-20260922.md:34`). The
        measurement in Alternatives 3 removes the original reason, so the coordinator may drop it.
    - Subordinate ids are checked, and `usermod --add-subuids 100000-165535 --add-subgids 100000-165535` runs only when
-     none exist.
+     none exist. 65,536 stays the stage-1 value. The unit that pulls the images (the evaluation harness unit) widens
+     the range only when a pull fails with `lchown <FILE>: invalid argument`, and records the image and the error.
    - `~/.bash_profile` gets the hand-off line of `adoption/platforms/linux-wsl2.md` (lines 185-188).
    - A clone of `origin/main`; `adoption/hosts/<host>.json` from the host template on ports 24318, 29374, 26333 and 28231,
      probed with `ss`.
@@ -201,6 +233,11 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      `--profile`, which the script requires.
    - The Windows Terminal fragment with profile names that carry `<Name>`, then `type -P claude codex`, with each printed
      path tested by `test -f` and `test -x`.
+   - F11, after stage 2 and F10, in a login shell. `test -x` checks the `jcodemunch-mcp` binary in its own block. When
+     the binary exists, step 4a's `claude mcp add --scope local jcodemunch` line runs from the clone's root, and
+     `claude mcp get jcodemunch` proves it. The receipt's `jcodemunch_registration` records `registered`,
+     `not installed` or `skipped` with the reason. The coordinator's brief gives the reason to record every outcome:
+     under the Gate A re-aim, the baseline capture freezes whichever state exists.
 4. **Host-wide.**
    - No `.wslconfig` change, no `wsl --update`, never `wsl --shutdown`.
    - `wsl --terminate <Name>` only, and only for the new distribution.
@@ -221,10 +258,12 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      (`:293-303`).
 
    The coordinator may instead adopt the in-place repair as the first fallback, ahead of path B.
-3. **First boot.** Revisit in three cases:
+3. **First boot.** Revisit in four cases:
    - F1 reports `degraded` on a clean run;
    - the bootstrap starts installing `uidmap` or `libatomic1` itself;
-   - the Harbor lane retires rootless Docker, which removes `uidmap` and F5.
+   - the Harbor lane retires rootless Docker, which removes `uidmap` and F5;
+   - the user-scope MCP template registers jCodeMunch again (the addendum's overturn condition), or a script runs the
+     per-project registration, which turns F11 into a check.
 
    Drop `libatomic1` when the coordinator accepts the `readelf` measurement.
 4. **Host-wide.** Revisit when the keys lane updates WSL (re-verify install, import and first run at that tag) or when a
@@ -321,6 +360,10 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'` | stage 2, after native sign-in |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two absolute paths |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'` | `executable:` and each path: both are regular executable files |
+| F11 | sh | `test -x "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | exit 0; exit 1 means `not installed`: record it and skip the rest of F11 |
+| F11 | sh | `cd ~/code/native-agent-stack` | the clone, the project the local scope belongs to |
+| F11 | sh | `claude mcp add --scope local jcodemunch -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | an `Added ...` line; on a re-run the name already exists |
+| F11 | sh | `claude mcp get jcodemunch` | the local scope, the command and a status, recorded as `jcodemunch_registration` |
 
 ## Open questions
 
@@ -342,7 +385,9 @@ Each one stays open until a host run records the observation named here.
 
 - **Read today (source review).** The WSL source at tag 2.7.13; `ubuntu/wsl-setup` at
   `86a561d5149a9d76ec3c9b3ce2745e7ebca5f2ad` (`test/systemd-assertions.sh:6-9` asserts `running`, `:30-33` the marker);
-  systemd v255 `man/loginctl.xml:186-194` and `man/systemctl.xml:2297-2307`; and the documentation below.
+  systemd v255 `man/loginctl.xml:186-194` and `man/systemctl.xml:2297-2307`; and the documentation below. For the
+  follow-up: step 4a and the addendum, the carrier blocks, the MCP template, the profiles and the Linux pins, Claude
+  Code's MCP page and Docker's rootless troubleshooting page.
 - **Artifact checks on the authoring host, 2026-10-01** (not runs of the recipe):
   - the image stream's size and sha256, and the files read from it;
   - the gzip size field;
@@ -350,6 +395,8 @@ Each one stays open until a host run records the observation named here.
 - **Local integration.** `tests/test_wsl_new_distro_recipe.py`, checks over repository text and an in-memory render; it
   runs nothing on a host.
 - **Not run.** Stage 1 and the first boot. The first host run records `native_proven` evidence in the stage-1 receipt.
+  F11 rests on a source read and has not run on a new distribution. The addendum records a run of the same command
+  form on 2026-09-25, under a temporary `CLAUDE_CONFIG_DIR` on one WSL2 host.
 - **Cross-family review.** GPT-6.1 Sol, read-only, 2026-10-01, of PR #569, returned `needs_changes` with three findings.
   All three were fixed against the cloud-init 26.1 source above, and `tests/test_wsl_new_distro_recipe.py`
   `CrossFamilyReviewTests` keeps them fixed:
@@ -444,3 +491,16 @@ Read on 2026-10-01 by the research unit or by unit W2:
   - `docs/new-workstation-runtime-profile-20260922.md:25,34`; `docs/next-host-stages.md:54-77`;
     `docs/decisions/2026-09-28-ecosystem-roadmap.md:58,122,205`; `observability/backends/templates`;
   - `scripts/validate.py` (`RECEIPT_KINDS`, receipt payload keys); `manifests/stack.json` (`systemd`).
+
+Read on 2026-10-01 by the follow-up unit (F11 and the F5 range rule):
+
+- https://code.claude.com/docs/en/mcp: local scope; "Server status", with the `Added ...` line; the repeated-add
+  failure. The coordinator fetched it at 07:54Z and the unit re-read it at 08:02Z.
+- https://docs.docker.com/engine/security/rootless/troubleshoot/: the `lchown <FILE>: invalid argument` entry. The
+  coordinator fetched it at 07:47Z and the unit re-read it at 08:02Z.
+- This repository at `3361b342`; the files read are unchanged at this branch's head:
+  - `adoption/bootstrap.md:387-395` (step 4a's `uv tool install` lines) and `:458-472` ("jCodeMunch, per project");
+  - `docs/decisions/2026-09-23-claude-user-profile.md:127-210` (the 2026-09-25 addendum);
+  - `adoption/hooks/claude/token-lanes-block.md` and its five role blocks;
+  - `tools/adoption/install_claude_profile.py:49-59` (the blocks it copies);
+  - `adoption/mcp/claude-user.json`, the `profiles` of `adoption/manifest.json` and `adoption/pins-linux-x86_64.json`.

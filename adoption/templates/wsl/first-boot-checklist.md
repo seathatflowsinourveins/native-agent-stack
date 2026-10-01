@@ -26,3 +26,4 @@ The ticked list and the transcript feed [the receipt example](stage1-receipt.exa
 - [ ] **F8** `ss` shows no listener on the four ports; the host file parses with the nine keys and is git-ignored.
 - [ ] **F9** Stage 2 runs from this clone with `--profile <id>`; its own receipts cover it.
 - [ ] **F10** The fragment profiles carry `<Name>` in their names; `type -P claude codex` prints two absolute paths, and the per-path `test -f` and `test -x` line prints `executable:` for both.
+- [ ] **F11** In a login shell, after F9 and F10: when `test -x` finds `jcodemunch-mcp`, `claude mcp add` run from the clone's root prints `Added ...` and `claude mcp get jcodemunch` names the local scope and the command; when it does not, `not installed` is recorded, and a step not run is recorded as `skipped` with the reason. `jcodemunch_registration` holds the outcome.

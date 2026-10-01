@@ -9,7 +9,8 @@
   "limitations": [
     "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
     "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
-    "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host."
+    "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host.",
+    "jcodemunch_registration records F11's state only: a registration is not evidence that a session or subagent uses jCodeMunch."
   ],
   "recorded_at_utc": "<YYYY-MM-DDTHH:MM:SSZ>",
   "recipe": {
@@ -38,6 +39,7 @@
     "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>"
   },
   "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
+  "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
   "steps": [
     {
       "step": "W4",

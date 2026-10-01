@@ -26,7 +26,14 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
     cloudinit/cmd/main.py:1017-1030);
   - W1 tests both Ubuntu Pro files, the Landscape instance file and agent.yaml
     (cloudinit/sources/DataSourceWSL.py:241-270 and 317-336);
-  - F10 tests every path ``type -P`` prints with ``test -f`` and ``test -x``.
+  - F10 tests every path ``type -P`` prints with ``test -f`` and ``test -x``;
+- F11 (added 2026-10-01) runs adoption/bootstrap.md step 4a's own ``claude mcp add --scope local jcodemunch`` line,
+  identical once continuations are joined, from the clone's root, after F9 (stage 2) and F10. It runs in a block after
+  the one that tests the binary, so a script run never registers a missing binary, and ``claude mcp get jcodemunch``
+  proves it. The checklist and the receipt example record its outcome (registered, not installed or skipped), and the
+  record cites Claude Code's MCP page;
+- F5 keeps 65,536 subordinate ids as the stage-1 value and cites Docker's rootless troubleshooting page for the
+  ``lchown <FILE>: invalid argument`` error that says an image needs more; the record lists that page too.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell or cloud-init; a pass is not a host run.
@@ -53,6 +60,7 @@ RECEIPT_EXAMPLE = TEMPLATES / "stage1-receipt.example.json"
 CHECKLIST = TEMPLATES / "first-boot-checklist.md"
 HOST_EXAMPLE = ROOT / "adoption/hosts/example.json"
 STACK = ROOT / "manifests/stack.json"
+BOOTSTRAP = ROOT / "adoption/bootstrap.md"
 
 IMAGE = "ubuntu-24.04.5-wsl-amd64.wsl"
 IMAGE_BYTES = 388975696
@@ -64,6 +72,14 @@ WORKSTATION_PORTS = frozenset({3710, 3800, 8231, 13000, 13100, 14318, 14333, 163
                                18889, 19090, 19093, 20128, 20129, 31415, 49374, 49474})
 URL_KEYS = ("OTEL_ENDPOINT", "AI_MEMORY_URL", "QDRANT_URL", "EMBED_URL")
 SHELLS = ("powershell", "sh")
+# F11: the code block right after this lead in adoption/bootstrap.md (step 4a) is the per-project registration.
+JCODEMUNCH_LEAD = "**jCodeMunch, per project.**"
+JCODEMUNCH_OUTCOMES = ("registered", "not installed", "skipped")
+CLONE = "cd ~/code/native-agent-stack"
+CLAUDE_MCP_PAGE = "https://code.claude.com/docs/en/mcp"
+# F5: Docker says 65,536 entries suffice for most images and names the error an image that needs more produces.
+DOCKER_TROUBLESHOOT = "https://docs.docker.com/engine/security/rootless/troubleshoot/"
+SUBORDINATE_IDS = 65536
 
 SHA256_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")
 FENCE_RE = re.compile(r"^(?P<indent>[ \t]*)```(?P<lang>[\w-]*)[^\n]*\n(?P<body>.*?)^(?P=indent)```[ \t]*$", re.M | re.S)
@@ -344,6 +360,80 @@ def path_proof_errors(recipe: str) -> list[str]:
     return ["F10 does not test each path `type -P claude codex` prints with `test -f` and `test -x`"]
 
 
+def step_blocks(recipe: str, step: str) -> list[list[str]]:
+    """The command lines of each ``powershell`` or ``sh`` code block of one recipe step, one list per block."""
+    return [[command for _, command in fenced_commands(match.group(0))]
+            for match in FENCE_RE.finditer(section(recipe, step)) if match["lang"] in SHELLS]
+
+
+def bootstrap_registration(bootstrap: str) -> list[str]:
+    """The command lines of the first code block after adoption/bootstrap.md's "jCodeMunch, per project" lead."""
+    _, lead, rest = bootstrap.partition(JCODEMUNCH_LEAD)
+    match = FENCE_RE.search(rest) if lead else None
+    return [command for _, command in fenced_commands(match.group(0))] if match else []
+
+
+def jcodemunch_errors(recipe: str, bootstrap: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """F11. Four of the six SubagentStart carrier blocks name jCodeMunch tools. The user-scope MCP template leaves the
+    server out, because it registers per project (the 2026-09-25 addendum of
+    docs/decisions/2026-09-23-claude-user-profile.md), and no script registers it. F11 runs bootstrap step 4a's own line
+    from the clone's root, where local scope is keyed (Claude Code's MCP page), after stage 2 and the PATH proof. It runs
+    in a block after the binary test, because one block run as a script would register a missing binary. Every outcome
+    is recorded."""
+    expected = bootstrap_registration(bootstrap)
+    if len(expected) != 1 or not expected[0].startswith("claude mcp add --scope local jcodemunch "):
+        return [f"adoption/bootstrap.md's jCodeMunch block is not one `claude mcp add --scope local jcodemunch` line: "
+                f"{expected!r}"]
+    (registration,) = expected
+    binary_test = "test -x " + registration.rsplit(" -- ", 1)[-1]
+    steps = STEP_RE.findall(recipe)
+    if "F11" not in steps:
+        return ["the recipe has no ### F11. step"]
+    errors = []
+    if not all(step in steps and steps.index(step) < steps.index("F11") for step in ("F9", "F10")):
+        errors.append("F11 does not come after stage 2 (F9) and the PATH proof (F10)")
+    blocks = step_blocks(recipe, "F11")
+    holding = [index for index, block in enumerate(blocks) if registration in block]
+    if len(holding) != 1 or blocks[holding[0]].count(registration) != 1:
+        errors.append("F11 does not run bootstrap step 4a's registration line exactly once")
+    else:
+        index = holding[0]
+        block = blocks[index]
+        if block[:1] != [CLONE]:
+            errors.append(f"F11's registration block does not start with `{CLONE}`; local scope is keyed to that path")
+        if "claude mcp get jcodemunch" not in block[block.index(registration) + 1:]:
+            errors.append("F11 does not prove the registration with `claude mcp get jcodemunch`")
+        if binary_test in block:
+            errors.append("F11 tests the binary in the registration's own block, so a script run registers a missing one")
+        if not any(binary_test in earlier for earlier in blocks[:index]):
+            errors.append(f"F11 does not run `{binary_test}` in a block before the registration")
+    line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **F11**")), "")
+    if not all(part in line for part in ("claude mcp get jcodemunch", *JCODEMUNCH_OUTCOMES[1:])):
+        errors.append("the checklist's F11 line does not name the proof and the not-installed and skipped outcomes")
+    field = receipt.get("jcodemunch_registration") if isinstance(receipt, dict) else None
+    if not isinstance(field, str) or not field.startswith("<F11:") or not all(part in field for part in JCODEMUNCH_OUTCOMES):
+        errors.append("the receipt example has no jcodemunch_registration field naming F11's three outcomes")
+    if CLAUDE_MCP_PAGE not in record:
+        errors.append("the record does not cite Claude Code's MCP page for local scope")
+    return errors
+
+
+def subordinate_id_errors(recipe: str, record: str) -> list[str]:
+    """F5 adds 65,536 subordinate uids and gids, the stage-1 value. A wider range is an image-set need: Docker's rootless
+    troubleshooting page gives the error an image that needs more produces, and both the page and the record cite it."""
+    ranges = [(int(low), int(high)) for step, _, command in recipe_rows(recipe) if step == "F5"
+              for low, high in re.findall(r"--add-sub[ug]ids (\d+)-(\d+)", command)]
+    errors = []
+    if len(ranges) != 2 or any(high - low + 1 != SUBORDINATE_IDS for low, high in ranges):
+        errors.append(f"F5 does not add {SUBORDINATE_IDS} subordinate uids and gids: {ranges}")
+    f5 = section(recipe, "F5")
+    if DOCKER_TROUBLESHOOT not in f5 or "lchown <FILE>: invalid argument" not in f5:
+        errors.append("F5 does not say, with Docker's troubleshooting page, when more than 65,536 ids are needed")
+    if DOCKER_TROUBLESHOOT not in record:
+        errors.append("the record's sources lack Docker's rootless troubleshooting page")
+    return errors
+
+
 class UserDataTemplateTests(unittest.TestCase):
     def test_the_template_renders_to_the_recipe_user(self):
         self.assertEqual(user_data_errors(read(USER_DATA)), [])
@@ -404,6 +494,15 @@ class CommandTableTests(unittest.TestCase):
             with self.subTest(mutant=name):
                 self.assertNotEqual(mutant, record)
                 self.assertTrue(command_table_errors(recipe, mutant))
+
+    def test_the_check_rejects_each_missing_f11_row(self):
+        recipe, record = read(RECIPE), read(RECORD)
+        rows = [line for line in record.splitlines() if line.startswith("| F11 | sh | ")]
+        self.assertTrue(rows, "the record's command table has no F11 row")
+        self.assertEqual(len(rows), sum(1 for step, _, _ in recipe_rows(recipe) if step == "F11"))
+        for row in rows:
+            with self.subTest(row=row[:70]):
+                self.assertTrue(command_table_errors(recipe, record.replace(row + "\n", "", 1)))
 
     def test_commands_are_read_from_indented_fences_with_continuations(self):
         text = "1. Step\n\n   ```sh\n   # comment\n   apt-get install \\\n     jq\n   ```\n\n```text\nnot a command\n```\n"
@@ -469,6 +568,11 @@ class ChecklistTests(unittest.TestCase):
         self.assertTrue(checklist_errors(checklist.replace(first, "- [ ] **gone**", 1), recipe))
         self.assertTrue(checklist_errors(checklist + f"\n{first} again\n", recipe))
 
+    def test_the_check_rejects_a_checklist_without_f11(self):
+        checklist, recipe = read(CHECKLIST), read(RECIPE)
+        line = next(line for line in checklist.splitlines() if line.startswith("- [ ] **F11**"))
+        self.assertTrue(checklist_errors(checklist.replace(line + "\n", ""), recipe))
+
 
 class CrossFamilyReviewTests(unittest.TestCase):
     """The three findings of the 2026-10-01 GPT-6.1 Sol review of PR #569 stay fixed."""
@@ -510,6 +614,78 @@ class CrossFamilyReviewTests(unittest.TestCase):
         recipe = read(RECIPE)
         self.assertIn("test -x $p && ", recipe)
         self.assertTrue(path_proof_errors(recipe.replace("test -x $p && ", "")))
+
+
+class JCodeMunchStepTests(unittest.TestCase):
+    """F11, added 2026-10-01 after the cross-family review of PR #548: the clone's per-project jCodeMunch registration."""
+
+    def inputs(self):
+        return read(RECIPE), read(BOOTSTRAP), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
+
+    def test_f11_runs_the_bootstrap_registration_after_stage_2_and_records_the_outcome(self):
+        self.assertEqual(jcodemunch_errors(*self.inputs()), [])
+
+    def test_the_bootstrap_block_is_read_with_its_continuations_joined(self):
+        (registration,) = bootstrap_registration(read(BOOTSTRAP))
+        self.assertEqual(registration, 'claude mcp add --scope local jcodemunch -e "CODE_INDEX_PATH=$HOME/.code-index" '
+                                       '-e JCODEMUNCH_SHARE_SAVINGS=0 -- '
+                                       '"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"')
+
+    def test_the_check_rejects_drift_a_missing_guard_a_wrong_order_and_a_lost_record(self):
+        recipe, bootstrap, record, checklist, receipt = self.inputs()
+        f11 = section(recipe, "F11")
+        (registration,) = bootstrap_registration(bootstrap)
+        binary_test = "test -x " + registration.rsplit(" -- ", 1)[-1] + "\n"
+        get = "claude mcp get jcodemunch\n"
+        for line in (binary_test, CLONE + "\n", get):
+            self.assertEqual(f11.count(line), 1, line)
+        unregistered = {key: value for key, value in receipt.items() if key != "jcodemunch_registration"}
+        mutants = {
+            "user scope": (recipe.replace(f11, f11.replace("--scope local", "--scope user")), bootstrap, record,
+                           checklist, receipt),
+            "bootstrap drift": (recipe, bootstrap.replace("JCODEMUNCH_SHARE_SAVINGS=0 \\\n", "JCODEMUNCH_SHARE_SAVINGS=1 \\\n",
+                                                          1), record, checklist, receipt),
+            "no binary test": (recipe.replace(f11, f11.replace(binary_test, "")), bootstrap, record, checklist, receipt),
+            "binary test in the registration block": (
+                recipe.replace(f11, f11.replace(binary_test, "").replace(CLONE + "\n", CLONE + "\n" + binary_test)),
+                bootstrap, record, checklist, receipt),
+            "not from the clone": (recipe.replace(f11, f11.replace(CLONE + "\n", "")), bootstrap, record, checklist,
+                                   receipt),
+            "no proof": (recipe.replace(f11, f11.replace(get, "")), bootstrap, record, checklist, receipt),
+            "before stage 2": (recipe.replace(f11, "").replace("### F9. ", f11 + "### F9. ", 1), bootstrap, record,
+                               checklist, receipt),
+            "no receipt field": (recipe, bootstrap, record, checklist, unregistered),
+            "checklist without not installed": (recipe, bootstrap, record, checklist.replace("not installed", "absent"),
+                                                receipt),
+            "record without the MCP page": (recipe, bootstrap, record.replace(CLAUDE_MCP_PAGE, "https://example.invalid"),
+                                            checklist, receipt),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(mutant, (recipe, bootstrap, record, checklist, receipt))
+                self.assertTrue(jcodemunch_errors(*mutant))
+
+
+class SubordinateIdTests(unittest.TestCase):
+    """F5 keeps the stage-1 range and says, with its source, when an image needs a wider one."""
+
+    def test_f5_adds_65536_ids_and_cites_when_an_image_needs_more(self):
+        self.assertEqual(subordinate_id_errors(read(RECIPE), read(RECORD)), [])
+
+    def test_the_check_rejects_a_wider_range_and_a_lost_citation(self):
+        recipe, record = read(RECIPE), read(RECORD)
+        f5 = section(recipe, "F5")
+        self.assertIn("100000-165535", f5)
+        rootless = "https://docs.docker.com/engine/security/rootless/"
+        mutants = {
+            "wider range": (recipe.replace(f5, f5.replace("100000-165535", "100000-231071")), record),
+            "no citation on the page": (recipe.replace(f5, f5.replace(DOCKER_TROUBLESHOOT, rootless)), record),
+            "no citation in the record": (recipe, record.replace(DOCKER_TROUBLESHOOT, rootless)),
+        }
+        for name, (page, sources) in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(page + sources, recipe + record)
+                self.assertTrue(subordinate_id_errors(page, sources))
 
 
 if __name__ == "__main__":

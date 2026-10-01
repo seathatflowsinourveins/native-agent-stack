@@ -15,9 +15,9 @@ PowerShell block as a `.ps1` file with `powershell.exe -NoProfile -ExecutionPoli
 ([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Open each block's file with
 `Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append`, placed in W1 right after its first line
 (which creates that folder), and end the file with `Stop-Transcript`. That private transcript is the raw install log the
-receipt is cut from. The first boot (F1 to F10) runs inside the new
+receipt is cut from. The first boot (F1 to F11) runs inside the new
 distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a WSL session,
-`wsl.exe -d <Name> -- bash -s < steps.sh`.
+`wsl.exe -d <Name> -- bash -s < steps.sh`. F11 needs a login shell instead, as its section says.
 
 ## Names and inputs
 
@@ -310,6 +310,15 @@ grep "^$(id -un):" /etc/subuid /etc/subgid
 Proof: `/etc/subuid:<WSL_USER>:100000:65536` and `/etc/subgid:<WSL_USER>:100000:65536`, or another range of 65,536.
 Record whether the range came from `useradd` or from `usermod`.
 
+65,536 stays the stage-1 value. Docker's
+[rootless troubleshooting page](https://docs.docker.com/engine/security/rootless/troubleshoot/) (read 2026-10-01) says
+of `docker: failed to register layer: Error processing tar file(exit status 1): lchown <FILE>: invalid argument`: "This
+error occurs when the number of available entries in `/etc/subuid` or `/etc/subgid` is not sufficient. The number of
+entries required vary across images. However, 65,536 entries are sufficient for most images." A wider range is
+therefore an image-set need. The unit that pulls the images (the evaluation harness unit) adds it only when that error
+appears, and records the image and the error. The workstation's wider range is a host observation for one benchmark
+image set, not a requirement of this page.
+
 ### F6. Login shell hand-off
 
 A Windows Terminal profile starts its client through a Bash login shell, which reads only the first of
@@ -398,6 +407,56 @@ non-executable path and exit 0 (step 2 of
 second line therefore tests each printed path as a regular file (`test -f`) that is executable (`test -x`). A missing
 `executable:` line fails the proof.
 
+### F11. jCodeMunch for this clone
+
+Added after `v2026.09.26.2`. Stage 2's Claude profile step copies the SubagentStart carrier blocks of
+`adoption/hooks/claude/` (changed after `v2026.09.26.2`) into `~/.claude/hooks/`. Four of the six name jCodeMunch tools
+as a retrieval lane: the full block and the researcher block name `route`, `menu` and `order`, and the builder and
+reviewer blocks name `route` and `order`. The user-scope MCP template leaves jCodeMunch out on purpose, because it
+registers per project
+([2026-09-25 addendum](../../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)),
+and no script runs that registration, so without this step those lanes name a server the clone has not registered.
+F9's stage 2 does not install the server either: no adoption profile pins `jcodemunch-mcp`, and only the
+`uv tool install` line of [`adoption/bootstrap.md`](../bootstrap.md) step 4a installs it. After F9 alone,
+`not installed` is the expected outcome.
+
+Run F11 as `<WSL_USER>` inside `<Name>` in a login shell, such as the `<Name> - Shell` profile: F10's proof found
+`claude` from a login shell, and a non-login `bash -s` may not. First test for the binary:
+
+```sh
+test -x "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
+```
+
+When it exits 1, record `not installed` and skip the rest of F11. Otherwise register the server from the clone's root
+with the command step 4a gives under "jCodeMunch, per project"; a local-scope entry belongs to the project in the
+current directory:
+
+```sh
+cd ~/code/native-agent-stack
+claude mcp add --scope local jcodemunch \
+  -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 \
+  -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
+claude mcp get jcodemunch
+```
+
+Proof:
+
+- `claude mcp add` prints an `Added ...` line. Claude Code's [MCP page](https://code.claude.com/docs/en/mcp) (read
+  2026-10-01) says: "`claude mcp add` confirms a successful add by printing an `Added ...` line, which means the
+  configuration was written", and "Local scope is the default. A local-scoped server loads only in the project where
+  you added it and stays private to you. Claude Code stores it in `~/.claude.json` under that project's path, so the
+  same server won't appear in your other projects."
+- `claude mcp get jcodemunch` names the local scope and the command, which ends in `/bin/jcodemunch-mcp`, with a status.
+  On Claude Code 2.1.282 the addendum saw `Local config (private to you in this project)` and a `Connected` status;
+  record what this run prints.
+- On a re-run `claude mcp add` fails because the name exists at that scope (the MCP page's example prints
+  `MCP server sentry already exists in local config`); `claude mcp get` alone is then the proof.
+
+Record `jcodemunch_registration` in the receipt: `registered` with the scope and command lines of `claude mcp get`,
+`not installed`, or `skipped` with the reason, for example when stage 2 has not run. A later baseline capture freezes
+whichever state exists, so the receipt states it either way and never hides it. F11 rests on a source read (step 4a's
+block, the addendum and the MCP page); no host has run it on a new distribution.
+
 ## Stage-1 receipt
 
 Added after `v2026.09.26.2`. Tick [`adoption/templates/wsl/first-boot-checklist.md`](../templates/wsl/first-boot-checklist.md)
@@ -414,7 +473,7 @@ transcript and the F outputs:
   - the three hashes and the `wsl.exe --version` lines;
   - the default distribution before and after;
   - `creation_path` (`A` or `B`), with the W5 markers when B was taken;
-  - the clone's commit and the subordinate-id outcome.
+  - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
   `limitations` and its `path`. Its claim quotes only that run's output. Follow
@@ -436,3 +495,5 @@ Kept open in the record, each with the observation that would settle it:
 A new distribution on the existing WSL kernel and Windows installation is not a new physical machine. Stage 1 proves the
 image, the install, the default user and the systemd preconditions only; stage 2, native sign-in, services and
 model-mediated behavior each need their own evidence ([`adoption/README.md`](../README.md), "Native verification tiers").
+F11's commands and proofs come from a source read, not a run, and a recorded registration does not show that a session
+or subagent uses jCodeMunch.
