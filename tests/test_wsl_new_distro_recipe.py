@@ -44,15 +44,17 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   - C1: P2 renders the user-data the way W3 does and runs ``cloud-init schema -c`` before any boot, and W3 prints the
     Windows file's SHA-256 to compare with P2's;
   - C2: W5 runs ``cloud-init schema --system`` as root on path A, and W6 skips it on path B;
-  - D: P3 counts ``hv_storvsc`` lines of the current boot's kernel journal, without the driver's registration line,
-    and stops on a nonzero count (microsoft/WSL#41482);
+  - D: P3 records the current boot's ``hv_storvsc`` kernel journal count, without the driver's registration line, as
+    a baseline and stops only when the newest error line is less than one hour old by its kernel time; W5 counts again
+    after the first launch on both paths, and a larger count is exposure to microsoft/WSL#41482 (the coordinator's
+    rule of 2026-10-01, which replaced the stop on any nonzero count);
   - E1 and E2: W7 terminates ``<Name>`` once after the first launch, relaunches it and reads the owner of a file created
     from Windows (microsoft/WSL#40941, PR #40977);
   - F: W1 reads the two idle keys of the global WSL configuration, F2 observes ``<Name>`` for two minutes with no client
     attached, and the host-wide check passes a plain ``Select-String`` or ``grep`` read of ``.wslconfig`` and nothing
     else that names it;
-  - G: R1, the page's first step, rehearses on a throwaway name and removes only that name, exporting it first when
-    the rehearsal failed.
+  - G: R1, the page's first step, rehearses on a throwaway name with both storage readings and removes only that
+    name, exporting it first when the rehearsal failed.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -130,7 +132,14 @@ SCHEMA_SYSTEM = "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system"
 SCHEMA_LINE = "`^\\s*Valid schema user-data$`"
 CLOUD_INIT_HOWTO = "https://ubuntu.com/wsl/docs/stable/howto/cloud-init/"
 STORVSC_COUNT = "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'"
-P3_COMMANDS = [STORVSC_COUNT, "swapon --show"]
+# The coordinator's P3 rule (2026-10-01): the count is a baseline; the newest error line's kernel time against the
+# uptime decides whether errors are current; W5 counts again after the first launch.
+STORVSC_NEWEST = ("sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | "
+                  "grep -v 'registering driver hv_storvsc' | tail -n 1")
+UPTIME = "cat /proc/uptime"
+P3_COMMANDS = [STORVSC_COUNT, STORVSC_NEWEST, UPTIME, "swapon --show"]
+STORAGE_FIELDS = {"baseline": "<P3", "newest_line_time": "<P3", "swap": "<P3", "second_count": "<W5", "new_lines": "<W5"}
+THRESHOLD_SOURCE = "this recipe's choice, not an upstream figure"
 STORVSC_ISSUE = "https://github.com/microsoft/WSL/issues/41482"
 OWNER_ISSUE = "https://github.com/microsoft/WSL/issues/40941"
 OWNER_FIX = "https://github.com/microsoft/WSL/pull/40977"
@@ -146,7 +155,8 @@ IDLE_POLL = ("foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::Ut
              "wsl.exe --list --running --quiet }")
 REHEARSAL_TAR = r"Z:\WSL\downloads\<Name>-rehearsal.tar"
 REHEARSAL_EXPORT = f"wsl.exe --export '<Name>' '{REHEARSAL_TAR}'"
-REHEARSAL_FIELDS = {"name", "result", "creation_path", "schema_system", "ownership_probe", "idle_observation", "export"}
+REHEARSAL_FIELDS = {"name", "result", "creation_path", "schema_system", "ownership_probe", "idle_observation",
+                    "storage_readings", "export"}
 
 SHA256_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")
 FENCE_RE = re.compile(r"^(?P<indent>[ \t]*)```(?P<lang>[\w-]*)[^\n]*\n(?P<body>.*?)^(?P=indent)```[ \t]*$", re.M | re.S)
@@ -688,11 +698,15 @@ def schema_system_errors(recipe: str, record: str, checklist: str, receipt: dict
 
 
 def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
-    """Item D (critic item 3). The workstation distribution shares the kernel, so before stage 1 P3 counts the current
-    boot's ``hv_storvsc`` kernel journal lines (sudo: the user cannot read the kernel journal; ``dmesg`` keeps only the
-    recent ring buffer), searching for the driver name rather than a device id and leaving out the driver's
-    registration line, which every boot logs, and records ``swapon --show``. A nonzero count stops the run and names
-    microsoft/WSL#41482, whose workaround needs the global file and a WSL shutdown."""
+    """Item D (critic item 3), under the coordinator's rule of 2026-10-01. The workstation distribution shares the
+    kernel. Before stage 1, P3 counts the current boot's ``hv_storvsc`` kernel journal lines (sudo: the user cannot read
+    the kernel journal; ``dmesg`` keeps only the recent ring buffer), by the driver's name rather than a device id and
+    without the driver's registration line, which every boot logs. The count is a baseline, not a verdict. P3 prints the
+    newest error line with its kernel time and the uptime: a line less than one hour old means errors are happening now,
+    and the run stops. The one-hour threshold is the recipe's choice. W5 counts again after the first launch, on both
+    paths: an equal count passes; a larger one is recorded with the new lines as exposure to microsoft/WSL#41482, and
+    nothing continues to stage 2 until that is decided. A bare count that stops on any line was rejected: it cannot tell
+    an old burst from errors that are happening now."""
     steps = STEP_RE.findall(recipe)
     if "P3" not in steps:
         return ["the recipe has no ### P3. step (the kernel storage errors)"]
@@ -701,16 +715,34 @@ def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dic
         errors.append(f"P3's commands are not {P3_COMMANDS}")
     p3 = prose(section(recipe, "P3"))
     errors += [f"P3's text does not name {needed}" for needed in
-               (STORVSC_ISSUE, "`0`", "exits 1", "A nonzero count stops the run", "registration line", "swap=0")
-               if needed not in p3]
+               (STORVSC_ISSUE, "a baseline, not a verdict", "less than one hour", "3600", THRESHOLD_SOURCE,
+                "registration line", "swap=0", "stops the run") if needed not in p3]
+    if "A nonzero count stops the run" in p3:
+        errors.append("P3 still stops the run on any nonzero count")
+    rows = recipe_rows(recipe)
+    second = [index for index, (step, shell, command) in enumerate(rows) if step == "W5" and shell == "sh"]
+    launch = [index for index, (step, _, command) in enumerate(rows) if step == "W5" and "< NUL" in command]
+    if [rows[index][2] for index in second] != [STORVSC_COUNT] or not launch or second[0] < launch[0]:
+        errors.append("W5 does not count the storage errors again, in the workstation distribution, after the launch")
+    w5 = prose(section(recipe, "W5"))
+    errors += [f"W5's text does not name {needed}" for needed in
+               ("On both paths", "P3's baseline", "the new lines", "exposure to microsoft/WSL#41482", "stage 2")
+               if needed not in w5]
     evidence = prose(chapter(record, "Evidence classes"))
     errors += [f"the record's Evidence classes lack P3's {needed}" for needed in
-               (STORVSC_COUNT, "swapon --show", "registering driver hv_storvsc") if needed not in evidence]
+               (STORVSC_COUNT, STORVSC_NEWEST, UPTIME, "swapon --show", "registering driver hv_storvsc", "baseline")
+               if needed not in evidence]
+    if THRESHOLD_SOURCE not in prose(record) or "bare count" not in prose(chapter(record, "Alternatives")):
+        errors.append("the record does not say the threshold is the recipe's choice and why a bare count was rejected")
     line = checklist_line(checklist, "P3")
-    if "`0`" not in line or "41482" not in line:
-        errors.append("the checklist's P3 line does not require a count of 0 and name microsoft/WSL#41482")
-    if not is_placeholder(field(receipt, "pre_checks", "kernel_storage_errors"), "<P3"):
-        errors.append("the receipt example has no pre_checks.kernel_storage_errors placeholder for P3")
+    if not all(part in line for part in ("baseline", "one hour", "41482")):
+        errors.append("the checklist's P3 line does not require the baseline and the one-hour rule")
+    if "P3's baseline" not in checklist_line(checklist, "W5"):
+        errors.append("the checklist's W5 line does not compare the second count with P3's baseline")
+    block = field(receipt, "storage_errors")
+    if not isinstance(block, dict) or set(block) != set(STORAGE_FIELDS) or not all(
+            is_placeholder(block[key], prefix) for key, prefix in STORAGE_FIELDS.items()):
+        errors.append(f"the receipt example has no storage_errors block with {sorted(STORAGE_FIELDS)}")
     return errors
 
 
@@ -814,7 +846,7 @@ def rehearsal_errors(recipe: str, record: str, checklist: str, receipt: dict, ex
     r1 = prose(section(recipe, "R1"))
     errors += [f"R1's text does not name {needed}" for needed in
                ("throwaway", "through F3", "`cloud-init schema --system`", "W7", "F2", "only its own distribution",
-                "W6's export rule", "`rehearsal`") if needed not in r1]
+                "W6's export rule", "`rehearsal`", "P3's baseline and W5's second count") if needed not in r1]
     blocks = step_blocks(recipe, "R1")
     passed = [block for block in blocks if not any("--export" in command for command in block)]
     failed = [block for block in blocks if any("--export" in command for command in block)]
@@ -1288,31 +1320,49 @@ class SchemaSystemTests(FollowUpCase):
 
 
 class KernelStorageTests(FollowUpCase):
-    """Item D (critic item 3): P3 counts the current boot's storage errors before stage 1 and stops on any."""
+    """Item D (critic item 3), under the coordinator's rule: P3 records a baseline and stops only on errors less than
+    one hour old; W5 counts again after the first launch on both paths."""
 
-    def test_p3_counts_storage_errors_before_stage_1(self):
+    def test_p3_records_a_baseline_with_a_recency_rule_and_w5_counts_again(self):
         self.assertEqual(kernel_storage_errors(*self.inputs()), [])
 
-    def test_the_check_rejects_dmesg_no_sudo_a_counted_registration_line_a_device_id_and_lost_records(self):
+    def test_the_check_rejects_the_old_rule_no_recency_rule_no_second_reading_and_lost_records(self):
         recipe, record, checklist, receipt = self.inputs()
-        p3, count = section(recipe, "P3"), STORVSC_COUNT + "\n"
-        self.assertIn(count, p3)
+        p3, w5, count = section(recipe, "P3"), section(recipe, "W5"), STORVSC_COUNT + "\n"
+        for line in (count, STORVSC_NEWEST + "\n", UPTIME + "\n"):
+            self.assertIn(line, p3)
+        self.assertIn(count, w5)
         later = "### W5. "
         page = lambda new: (recipe.replace(p3, p3.replace(count, new)), record, checklist, receipt)  # noqa: E731
+        text = lambda old, new: (recipe.replace(p3, p3.replace(old, new)), record, checklist, receipt)  # noqa: E731
         self.assert_mutants_fail(kernel_storage_errors, {
             "dmesg": page(count.replace("sudo journalctl -k -b 0 --no-pager", "dmesg")),
             "no sudo": page(count.replace("sudo ", "", 1)),
             "registration line counted": page("sudo journalctl -k -b 0 --no-pager | grep -c hv_storvsc\n"),
             "a device id": page(count.replace("grep hv_storvsc", "grep 00000000-0000-0000-0000-000000000000")),
-            "no swap state": (recipe.replace(p3, p3.replace("swapon --show\n", "")), record, checklist, receipt),
-            "no issue": (recipe.replace(p3, p3.replace(STORVSC_ISSUE, "https://example.invalid/")), record, checklist,
-                         receipt),
-            "no stop": (recipe.replace(p3, p3.replace("A nonzero count stops the run", "A count is recorded")), record,
-                        checklist, receipt),
+            "no swap state": text("swapon --show\n", ""),
+            "no issue": text(STORVSC_ISSUE, "https://example.invalid/"),
+            "no newest line": text(STORVSC_NEWEST + "\n", ""),
+            "no uptime": text(UPTIME + "\n", ""),
+            "no recency rule": text("less than one hour", "recent"),
+            "the old stop rule": text("a baseline, not a verdict", "A nonzero count stops the run"),
+            "no second reading": (recipe.replace(w5, w5.replace(count, "")), record, checklist, receipt),
+            "second reading on one path": (recipe.replace(w5, w5.replace("On both paths", "On path A")), record,
+                                           checklist, receipt),
+            "no exposure rule": (recipe.replace(w5, w5.replace("exposure to microsoft/WSL#41482", "a warning")), record,
+                                 checklist, receipt),
             "after the install": (recipe.replace(p3, "").replace(later, p3 + later, 1), record, checklist, receipt),
-            "record without the run": (recipe, record.replace(STORVSC_COUNT, "the count"), checklist, receipt),
-            "checklist without the issue": (recipe, record, checklist.replace("41482", "the issue"), receipt),
-            "no receipt field": (recipe, record, checklist, without(receipt, "pre_checks", "kernel_storage_errors")),
+            "record without the run": (recipe, record.replace(STORVSC_NEWEST, "the newest line"), checklist, receipt),
+            "record without the threshold's source": (recipe, record.replace(THRESHOLD_SOURCE, "an upstream figure"),
+                                                      checklist, receipt),
+            "checklist with the old rule": (recipe, record, checklist.replace(checklist_line(checklist, "P3"),
+                                                                              "- [ ] **P3** The count is `0` (41482)."),
+                                            receipt),
+            "checklist without the second count": (recipe, record, checklist.replace("P3's baseline", "the baseline"),
+                                                   receipt),
+            "no receipt block": (recipe, record, checklist, without(receipt, "storage_errors")),
+            "no second count in the receipt": (recipe, record, checklist, without(receipt, "storage_errors",
+                                                                                  "second_count")),
         })
 
 
@@ -1422,6 +1472,8 @@ class RehearsalTests(unittest.TestCase):
                                             record, checklist, receipt, experiment),
             "no host-wide rule": (recipe.replace(r1, r1.replace("only its own distribution", "its distribution")), record,
                                   checklist, receipt, experiment),
+            "no storage readings": (recipe.replace(r1, r1.replace("P3's baseline and W5's second count", "the counts")),
+                                    record, checklist, receipt, experiment),
             "checklist without R1": (recipe, record, checklist.replace(checklist_line(checklist, "R1") + "\n", ""), receipt,
                                      experiment),
             "no receipt block": (recipe, record, checklist, without(receipt, "rehearsal"), experiment),
