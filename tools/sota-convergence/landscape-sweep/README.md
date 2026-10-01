@@ -13,6 +13,107 @@ The harness then turns the run into the retained evidence that `scripts/saturati
 writes `catalogs/landscape/`, `catalogs/sota-convergence/` or `research-state.json`. Those files, and publishing
 the merged manifest, stay with the lane owners.
 
+## Version 2 source contracts (U11 A/B)
+
+The opt-in repository input contract implements source preparation for
+[U11 revision 4, A/B/E](https://github.com/seathatflowsinourveins/native-agent-stack/blob/89424e36e8f60c4413021bc449390f235c3f2cfd/docs/decisions/2026-10-01-u11-merit-neutral-selection.md)
+(design SHA256 `031e8cf64347914fe4684f9dba40fe4c1f20b40cce6b6ca04649b99e0dd0358b`).
+It extends the maintained
+[input builder at 798ac445](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/build_inputs.py),
+[manifest candidate join](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/lane_packets.py#L325)
+and [prose reducer](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/lane_packets.py#L981).
+Repository identities also reuse the existing [canonical slug helpers](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/sweep_common.py)
+and [Hugging Face model adapter](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/source_reviews.py#L205).
+The existing runner stays on version 1. `build_args.py` refuses V2-marked inputs and
+`--contract-version 2` before staging a launchable workflow. The future runner must wire the blind
+inputs, full-field screens, replicated judgments and expanded field hash before V2 can run.
+`sweep.js` and `make_prompt.py` still use the V1 shared input and proposal projection.
+
+Prepare source inputs with the existing frozen scope and manifest arguments, adding:
+
+```sh
+python3 tools/sota-convergence/landscape-sweep/build_inputs.py \
+  --work-dir "$SWEEP_WORK_DIR" --freshness-manifest "$FRESHNESS_MANIFEST" --contract-version 2
+```
+
+Version 1 remains the default, and the skills modality keeps version 1. The added
+`common_v2`, `discover_v2`, `facts_v2` and `fit_v2` keys coexist with unchanged V1 strings;
+`schemas/discover-v2.json` and `schemas/votes-v2.json` coexist with the unchanged V1 schemas.
+The filled V1 repository/skills prompt hashes remain pinned in the tests. The whole repository
+`templates.json` file has a new source hash because it includes additional keys; that hash never
+replaces a prior run's frozen source or prompt hash. The filled V2 fixture hash is a future
+source-contract change detector, not execution evidence. Active workflows, frozen private inputs,
+historical sweeps and their receipts are not rewritten.
+
+For each layer, `inputs/<layer>.json` records `contract_version: 2`, `eligible_field` and
+`field_sha256`. The field unions all landscape selections/candidates/alternatives, manifest
+components/entries/candidates/alternatives, layer-linked candidate/independent reviews, the second
+family's final selections and challengers, seeds, and all historical repository-sweep proposals.
+History includes stopped attempts, V1 fit-only refutations and raw discovery-family returns beyond
+the merge cap. Identity dedupe keeps each canonical repository once. The known-repository filter
+and six-proposal discovery budget govern novelty, and cannot remove an eligible member.
+
+Every member awaits the same V2 screen. The producer records `disposition: admit_pending`,
+`material: true`, a `pending_reason` (`awaiting_v2_screen` or `legacy_v1_refutation`), nullable
+`exclusion_reason`, stable `candidate_key` and `evidence_key`, and source `evidence_refs`.
+GitHub keys have the form `<catalog>/<layer_id>/<lowercase owner/repo>`; Hugging Face keys
+use `<catalog>/<layer_id>/https://huggingface.co/<lowercase namespace/model>` so registries
+cannot collide. Model source URLs retain upstream case. Historical maintenance or
+adoption labels are observations, not automatic exclusions. `baseline_manifest` and
+`freshness_manifest` reference the supplied documents; `seeded_candidates` references the supplied
+seed object. Catalog/review/history refs retain their repository-relative paths and JSON pointers.
+
+The field hash is SHA256 of UTF-8 JSON with sorted keys, no inter-key whitespace and
+`ensure_ascii=False`: `{contract_version, catalog, layer_id, requirement_sha256,
+platform_profiles_sha256, members}`. `members` contains only `{candidate_key, repository}` sorted
+by `candidate_key`; adoption, mutable screen states and receipt counts do not enter that hash.
+If discovery returns a new identity, a future consumer must freeze the expanded union, recompute
+`field_sha256` and preserve the earlier `source_field_sha256` separately. The original hash cannot
+cover additions. A deciding comparison must later bind its actual releases/tasks/preregistration
+and this complete field.
+
+`inputs/<layer>.fit-v2.json` is the blind input for both fit and facts; `layers.json` names it in
+`fit_input` and `facts_input`, with the same version and field hash. It carries every candidate's
+identity, latest technical release facts (unknowns are null), and equal primary source surfaces:
+repository/releases/commits for GitHub, model page/tree/API for Hugging Face. It omits selection
+labels, installed pins, receipt counts, historical verdicts and
+selection-bearing prose. The requirement uses the maintained prose reducer. Explicit user pins
+and fixture oracles appear in `pinned_requirements`: the destination/broker/adapter requirement
+and fixed oracle remain requirements, while their source-host installed versions do not become fit
+evidence. Unknown facts or a budget cutoff leave a material member pending.
+
+Trading `acceptance_gates` extracts what every candidate must show from
+[the unchanged acceptance plan at 798ac445, sections 1–6](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/blueprints/us-equities/engine-nautilus/acceptance-plan.md).
+The current `runtime-target.next_acceptance` scopes describe executed history, so those scopes,
+statuses and executed evidence refs stay out of the screen. The three named gates use declarative
+replay, offline broker-state and independent paper-adapter requirements from that plan. An explicit
+future `gate.requirement` takes precedence; an unrecognized gate without one remains pending.
+This extraction declares requirements and provides no new acceptance result.
+
+Discovery V2 returns `admit`, `admit_pending` or `not_admitted`, `requirement_fit` and `frozen_tasks`;
+it never requires a winner-relative gap. Even `not_admitted` enters the field pending because
+discovery sees the source-host health notes. Model votes use `status: credible | not_credible | pending`
+and preserve candidate/evidence keys and reasoning/refs. The only model exclusion criteria are
+`target_host_incompatible`, `outside_requirement` and `paid_service_required`, each with a fact and
+supporting evidence. A mandatory paid service is a ground only when the frozen requirement forbids
+it. Missing credentials never establish that ground. Script owns API-supported maintenance and
+repository identity dedupe; unverifiable facts never exclude.
+
+Every V2 vote envelope requires `judgment`: `judgment_id`, integer `order_seed`, `family`
+(`claude` or `gpt6`), `model_route_requested`, nullable `model_route_actual`, the exact screened
+`source_field_sha256`, nullable `provider_sampling_seed_requested` and
+`provider_sampling_seed_actual`, and `provider_sampling_seed_status` (`unknown`, `not_exposed`
+or `recorded`). `order_seed` records deterministic candidate ordering. It does not establish a
+provider sampling seed. Native unexposed sampling seeds stay null/unknown; no run is claimed here.
+The future role slots accept lists of these envelopes (a single envelope is one judgment): each
+family needs two distinct judgment IDs and order seeds, bound to the same screened field, and
+the families' majorities must agree. Ties, missing/malformed provenance, insufficient replication,
+unsupported exclusions or unresolved exposure stay material pending; clean saturation cannot advance.
+
+Focused no-model integration tests cover neutral admission, full-field inclusion, blind input and
+pin/gate projection, provenance, the V1 staging guard, and unchanged V1 repository/skills contracts.
+They are synthetic/local integration checks, not unchanged upstream model acceptance or a merit result.
+
 ## Files
 
 | File | Runs | Role |

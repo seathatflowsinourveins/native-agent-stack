@@ -62,7 +62,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import MANIFEST_SECTION, REPO_ROOT, ledger_module, load_json, slug, work_dir, write_json  # noqa: E402
+from sweep_common import (  # noqa: E402
+    MANIFEST_SECTION, REPO_ROOT, canon, ledger_module, load_json, sha256_bytes, slug, work_dir, write_json,
+)
 
 CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities.json"))
 REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSITORY_MODALITY)
@@ -98,6 +100,22 @@ INSTALLED_FIELDS = ("name", "source", "ref", "path", "skill_md_sha256", "descrip
 TASK_FIELDS = ("layer_id", "lifecycle_task", "requirement", "installed", "source_ids", "open_gaps", "overturn_when")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+# U11 E extracts declarative requirements from the unchanged acceptance plan, never its observed-status narrative.
+# Source: blueprints/us-equities/engine-nautilus/acceptance-plan.md at 798ac445, sections 1-3, 4, and 5-6.
+ACCEPTANCE_REQUIREMENTS = {
+    "retained-equity-replay": (
+        "Replay the frozen equity tasks with declared identity, data, time, visibility, fill, distribution, cost and "
+        "margin mappings; reproduce numeric accounting and independently reconcile the fixed fixture oracle.", "1"),
+    "broker-state-failures": (
+        "Keep a durable intent/order/fill journal and deterministic numeric risk per account. Exercise duplicate "
+        "intent, lost response, rejection, partial/duplicate fills, cancel race, crash/restart, stale/risk, rate and "
+        "disconnect, snapshot contradiction and kill boundaries, with zero duplicate economic effects or unexplained "
+        "differences; retain each broker's expected and actual results.", "4"),
+    "separate-paper-adapters": (
+        "Qualify each broker independently: verify paper account and contract identity read-only, freeze numeric "
+        "risk and request limits, run bounded submit/fill/cancel and reconnect/restart cases, reconcile durable "
+        "state and cash, and apply the declared final order/position disposition with no unexplained differences.", "5"),
+}
 
 
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
@@ -201,13 +219,278 @@ def check_seeds(seeds, layer_ids) -> dict:
     return seeds
 
 
+def repository_identity(value, annotated=False) -> str | None:
+    """The existing sweep_common canonical identity, restricted to repository candidates, not seed notes."""
+    if isinstance(value, dict):
+        value = value.get("repository") or value.get("repo")
+    if not isinstance(value, str):
+        return None
+    if annotated:
+        value = value.split(" (", 1)[0]
+    repository = canon(value)
+    if isinstance(repository, str) and re.fullmatch(r"https://github.com/[a-z0-9-]+/[a-z0-9._-]+", repository):
+        return repository
+    # The maintained source-review adapter already recognizes Hub model repositories and rejects Hub sections.
+    from source_reviews import HUB, hub_model
+    model = hub_model(repository)
+    return f"{HUB}/{model}" if model else None
+
+
+def field_record_sources(repo: Path, catalogs: dict, ledger: dict) -> dict:
+    """Retained typed records only: manifests, independent reviews and every sweep's returned proposals.
+
+    This extends the current manifest_layer_candidates/previous_by_layer joins without their V1 disposition or
+    survival filters. Source references stay in the owner input; the blind screen does not read their labels/prose.
+    """
+    layer_catalog = {layer["layer_id"]: catalog for catalog, _ in CATALOG_FILES
+                     for layer in catalogs[catalog]["layers"]}
+    sources = {}
+
+    def add(catalog, layer_id, values, ref, annotated=False, single=False):
+        catalog = catalog or layer_catalog.get(layer_id)
+        if layer_catalog.get(layer_id) != catalog:
+            return
+        for index, value in enumerate(values or []):
+            repository = repository_identity(value, annotated)
+            if repository:
+                sources.setdefault((catalog, layer_id), []).append({
+                    "repository": repository, "record": value if isinstance(value, dict) else {},
+                    "ref": ref if single else f"{ref}/{index}"})
+
+    paths = {path.relative_to(repo).as_posix() for path in (repo / "catalogs/sota-convergence").glob("manifest-*.json")}
+    paths |= {"catalogs/landscape/candidate-quality-review.json", "catalogs/landscape/independent-discovery.json",
+              "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
+              "evidence/artifacts/blind-catalog-convergence-20260921/codex-source-review.json"}
+    for sweep in ledger.get("sweeps") or []:
+        if sweep_modality(sweep) != REPOSITORY:
+            continue
+        if sweep.get("record_ref"):
+            paths.add(sweep["record_ref"].split("#", 1)[0])
+        for layer in sweep.get("layers") or []:
+            if isinstance(layer.get("discovery_ref"), str):
+                paths.add(layer["discovery_ref"].split("#", 1)[0])
+    for rel in sorted(paths):
+        path = (repo / rel).resolve()
+        if not path.is_relative_to(repo.resolve()):
+            raise ValueError(f"field source escapes the checkout: {rel}")
+        if not path.is_file():
+            continue
+        document = load_json(path)
+        if isinstance(document, list):  # retained second-family final layer review
+            for index, layer in enumerate(document):
+                for field in ("selected", "challengers"):
+                    add(layer.get("catalog"), layer.get("layer_id"), layer.get(field),
+                        f"{rel}#/{index}/{field}", annotated=True)
+            continue
+        for catalog, section in MANIFEST_SECTION.items():
+            for index, layer in enumerate(document.get(section) or []):
+                for field in ("components", "entries", "candidates", "alternatives_keep_but_compare", "alternatives"):
+                    add(catalog, layer.get("layer"), layer.get(field), f"{rel}#/{section}/{index}/{field}")
+        for index, layer in enumerate(document.get("layer_coverage") or []):
+            add(layer.get("catalog"), layer.get("layer_id"), layer.get("challenger_repositories"),
+                f"{rel}#/layer_coverage/{index}/challenger_repositories")
+        for index, candidate in enumerate(document.get("candidates") or []):
+            for layer in candidate.get("layers") or []:
+                add(layer.get("catalog"), layer.get("layer_id"), [candidate], f"{rel}#/candidates/{index}", single=True)
+        for index, layer in enumerate(document.get("layers") or []):
+            for field in ("primary_stack", "strongest_challengers", "repositories", "proposed", "merged", "dropped"):
+                add(layer.get("catalog"), layer.get("layer_id"), layer.get(field), f"{rel}#/layers/{index}/{field}")
+        for layer_id, layer in (document.get("discovery") or {}).items():
+            add(layer.get("catalog"), layer_id, layer.get("proposed"), f"{rel}#/discovery/{layer_id}/proposed")
+        for layer_id, rounds in (document.get("raw") or {}).items():
+            for round_name, record in rounds.items():
+                for family in ("claude_discover", "gpt6_discover"):
+                    returned = record.get(family) or {}
+                    prefix = f"{rel}#/raw/{layer_id}/{round_name}/{family}"
+                    if isinstance(returned.get("output"), dict):
+                        returned, prefix = returned["output"], prefix + "/output"
+                    add(None, layer_id, returned.get("proposed"), prefix + "/proposed")
+    return sources
+
+
+def eligible_field(catalog: str, layer: dict, baseline: dict, fresh: dict, ledger: dict, seeds: list,
+                   sources: list, catalog_index=0, baseline_index=0, freshness_index=0) -> list[dict]:
+    """One identity per repository, independently of catalog adoption, V1 refutations or discovery's six-row cap.
+
+    Every member awaits the same V2 screen. Historical health/fit labels are observations, never a new exclusion.
+    """
+    members = {}
+    layer_id = layer["layer_id"]
+
+    def add(value, ref, legacy_refuted=False):
+        repository = repository_identity(value)
+        if not repository:
+            return
+        candidate_key = f"{catalog}/{layer_id}/{slug(repository)}"
+        member = members.setdefault(slug(repository), {
+            "candidate_key": candidate_key, "repository": repository, "disposition": "admit_pending",
+            "pending_reason": "awaiting_v2_screen", "exclusion_reason": None,
+            "evidence_key": candidate_key, "evidence_refs": [], "material": True})
+        if ref not in member["evidence_refs"]:
+            member["evidence_refs"].append(ref)
+        if legacy_refuted:
+            member["pending_reason"] = "legacy_v1_refutation"
+
+    for field in ("candidates", "winners", "alternatives"):
+        for index, record in enumerate(layer.get(field) or []):
+            add(record, f"catalogs/landscape/{catalog}.json#/layers/{catalog_index}/{field}/{index}")
+    for label, record, row_index in (("baseline_manifest", baseline, baseline_index),
+                                    ("freshness_manifest", fresh, freshness_index)):
+        for field in ("components", "entries", "candidates", "alternatives_keep_but_compare", "alternatives"):
+            for index, value in enumerate(record.get(field) or []):
+                add(value, f"{label}#/{MANIFEST_SECTION[catalog]}/{row_index}/{field}/{index}")
+    for sweep_index, sweep in enumerate(ledger.get("sweeps") or []):
+        if sweep_modality(sweep) != REPOSITORY:
+            continue
+        for layer_index, old in enumerate(sweep.get("layers") or []):
+            if (old.get("catalog"), old.get("layer_id")) != (catalog, layer_id):
+                continue
+            for field in ("proposed", "survived", "refuted", "pending"):
+                for index, value in enumerate(old.get(field) or []):
+                    add(value, f"catalogs/saturation/ledger.json#/sweeps/{sweep_index}/layers/{layer_index}/{field}/{index}",
+                        legacy_refuted=field == "refuted" and sweep.get("contract_version", 1) == 1)
+    for index, seed in enumerate(seeds):
+        add(seed, f"seeded_candidates#/{layer_id}/{index}")
+    for source in sources:
+        add(source["repository"], source["ref"])
+    return [dict(member, evidence_refs=sorted(member["evidence_refs"])) for _, member in sorted(members.items())]
+
+
+def field_sha256(layer_input: dict) -> str:
+    """Bind the frozen identities to requirement/platform scope; mutable screen states and adoption are not inputs."""
+    binding = {key: layer_input[key] for key in (
+        "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+    binding["members"] = sorted(({"candidate_key": row["candidate_key"], "repository": row["repository"]}
+                                 for row in layer_input["eligible_field"]), key=lambda row: row["candidate_key"])
+    return sha256_bytes(json.dumps(binding, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+
+def neutral_requirement(text: str, candidates: list, pinned_requirements=None) -> str:
+    """Reuse the maintained verdict packet's prose reducer; no candidate's recorded selection becomes a requirement."""
+    saved_path = sys.path[:]
+    try:
+        sys.path.insert(0, str(HERE.parent))
+        import lane_packets
+    finally:
+        sys.path[:] = saved_path
+    text = text or ""
+    pins = pinned_requirements or []
+    protected = {slug(pin.get("repository")) for pin in pins if pin.get("repository")}
+    names = {pin["name"].lower() for pin in pins}
+    candidates = [candidate for candidate in candidates if slug(candidate.get("repository")) not in protected
+                  and str(candidate.get("name") or "").lower() not in names]
+    # These are the actual user destination and fixed oracle from U11 E/AGENTS.md, not a tool-selected default.
+    for pin in pins:
+        name = re.escape(pin["name"])
+        text = re.sub(rf"\bselected\s+({name})\s+destination\b", r"user-pinned \1 destination", text, flags=re.I)
+        text = re.sub(rf"\bprior\s+({name})\s+oracle\b", r"fixed \1 oracle", text, flags=re.I)
+    # The existing matcher accepts layer words so an owner fragment (loopx-project's "project") cannot turn a
+    # capability clause into a selection sentence. Full candidate names and repository slugs still reduce.
+    layer_words = re.findall(r"[A-Za-z0-9]+", text)
+    return lane_packets.reduce_prose(text, lane_packets.candidate_matcher(candidates, layer_words=layer_words))
+
+
+def pinned_requirements(requirement: str, runtime_target: dict) -> list[dict]:
+    """The recorded user carve-out, only when the runtime target names that exact destination and the text needs it."""
+    engine = runtime_target.get("engine") or {}
+    if (engine.get("decision") != "selected_destination"
+            or slug(engine.get("repository")) != "nautechsystems/nautilus_trader"):
+        return []
+    pins = (("NautilusTrader", "user_pinned_destination", "https://github.com/nautechsystems/nautilus_trader"),
+            ("IBKR", "user_pinned_broker", None), ("Alpaca", "user_pinned_separate_adapter", "https://github.com/alpacahq/alpaca-py"),
+            ("LEAN", "fixture_oracle", "https://github.com/quantconnect/lean"))
+    return [{"name": name, "role": role, "repository": repository, "source_ref": "AGENTS.md#trading-north-star"}
+            for name, role, repository in pins if re.search(rf"\b{re.escape(name)}\b", requirement or "", re.I)]
+
+
+def acceptance_gates(runtime_target: dict, candidates: list, pins: list) -> list[dict]:
+    """The shared gate, what any member must show; execution status and incumbent evidence are kept out."""
+    plan = runtime_target.get("acceptance_plan") or "blueprints/us-equities/engine-nautilus/acceptance-plan.md"
+    gates = []
+    for row in runtime_target.get("next_acceptance") or []:
+        gate_id = row.get("id")
+        # A future explicit declaration takes precedence. Current rows have only an observed scope, so use the
+        # reviewed plan's requirement clauses above rather than republishing their historical outcome prose.
+        declaration = row.get("gate")
+        declared = declaration.get("requirement") if isinstance(declaration, dict) else declaration
+        requirement, section = ACCEPTANCE_REQUIREMENTS.get(gate_id, (None, None))
+        gates.append({"id": gate_id, "requirement": neutral_requirement(declared or requirement or "", candidates, pins),
+                      "source_ref": f"{plan}#section-{section}" if section else
+                      f"catalogs/us-equities/runtime-target.json#/next_acceptance/{len(gates)}/gate",
+                      "pending_reason": None if declared or requirement else "gate_requirement_not_recorded"})
+    return gates
+
+
+def neutral_platform_requirements(profiles) -> list[dict]:
+    """U11V4 A/B target-host facts from adoption/manifest.json, without adoption evidence or paths."""
+    fields = ("id", "os", "architecture")
+    if not isinstance(profiles, list) or not profiles or any(
+            not isinstance(row, dict) or any(not isinstance(row.get(key), str) or not row[key].strip()
+                                             for key in fields) for row in profiles):
+        raise ValueError("V2 platform requirements need explicit id/os/architecture in every platform profile")
+    if len({row["id"] for row in profiles}) != len(profiles):
+        raise ValueError("V2 platform requirements need unique profile ids")
+    return sorted(({key: row[key] for key in fields} for row in profiles), key=lambda row: row["id"])
+
+
+def blind_fit_input(layer_input: dict, layer: dict, baseline: dict, fresh: dict, sources: list,
+                    runtime_target: dict, platform_requirements: list) -> dict:
+    """Identity, requirement and equally available primary-source surfaces; no adoption, installed pin or history prose.
+
+    Latest upstream release facts describe technical capability, not the source host's pin of record. Unknown facts
+    are explicit nulls for every member and cannot be converted into an exclusion by this producer.
+    """
+    records = [source["record"] for source in sources]
+    for document in (baseline, layer, fresh):
+        records.extend(record for field in ("candidates", "winners", "alternatives", "components", "entries")
+                       for record in document.get(field) or [] if isinstance(record, dict))
+    candidates = []
+    for member in layer_input["eligible_field"]:
+        upstream = {key: None for key in ("latest_release", "released_at", "stars", "pushed_at", "archived", "license")}
+        for record in records:
+            if repository_identity(record) != member["repository"]:
+                continue
+            fact = record.get("upstream_now") or record.get("upstream") or {}
+            for key in upstream:
+                source_key = "latest" if key == "latest_release" and "latest" in fact else key
+                if source_key in fact:
+                    upstream[key] = fact[source_key]
+        repository = member["repository"]
+        from source_reviews import HUB, hub_model
+        model = hub_model(repository)
+        primary_sources = ([repository, repository + "/tree/main", f"{HUB}/api/models/{model}"] if model else
+                           [repository, repository + "/releases", repository + "/commits"])
+        candidates.append({"candidate_key": member["candidate_key"], "repository": repository,
+                           "evidence_key": member["evidence_key"], "upstream_now": upstream,
+                           "primary_sources": primary_sources,
+                           "requirement_fit": None})
+    names = [record for document in (layer,) for field in ("candidates", "winners", "alternatives")
+             for record in document.get(field) or []]
+    pins = pinned_requirements(layer_input.get("requirement"), runtime_target) if layer_input["catalog"] == "us-equities" else []
+    requirement = neutral_requirement(layer_input.get("requirement"), candidates + names, pins)
+    return {**{key: layer_input[key] for key in ("contract_version", "catalog", "layer_id", "requirement_sha256",
+                                               "platform_profiles_sha256", "field_sha256")},
+             "requirement": requirement, "candidates": candidates, "pinned_requirements": pins,
+             "platform_requirements": platform_requirements,
+             "platform_requirements_sha256": sha256_bytes(json.dumps(
+                 platform_requirements, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
+            "acceptance_gates": acceptance_gates(runtime_target, candidates + names, pins)
+                                if layer_input["catalog"] == "us-equities" else []}
+
+
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
-                       ledger: dict, seeds=None, absent=None, followups=None) -> list[dict]:
+                        ledger: dict, seeds=None, absent=None, followups=None, contract_version=1,
+                        record_sources=None, runtime_target=None, platform_requirements=None) -> list[dict]:
     """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
     refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted.
     ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is empty."""
+    if contract_version not in (1, 2):
+        raise ValueError("contract_version must be 1 or 2")
+    if contract_version == 2 and not platform_requirements:
+        raise ValueError("V2 requires readable neutral platform requirements bound to the frozen scope")
     followups = followups or {}
+    record_sources = record_sources or {}
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
     previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
@@ -218,7 +501,7 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     out, missing = [], []
     for catalog, _ in CATALOG_FILES:
         baseline_rows, fresh_rows = rows_by_layer(baseline, catalog), rows_by_layer(freshness, catalog)
-        for layer in catalogs[catalog]["layers"]:
+        for layer_index, layer in enumerate(catalogs[catalog]["layers"]):
             layer_id = layer["layer_id"]
             key = f"{catalog}/{layer_id}"
             known = {slug(item.get("repository")) for field in ("candidates", "alternatives", "winners")
@@ -253,6 +536,25 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                 "known_repositories": sorted(known),
                 "seeded_candidates": list(seeds.get(layer_id, [])),
             })
+            if contract_version == 2:
+                row = out[-1]
+                row["contract_version"] = 2
+                row["eligible_field"] = eligible_field(catalog, layer, baseline_rows.get(layer_id, {}), fresh, ledger,
+                    seeds.get(layer_id, []), record_sources.get((catalog, layer_id), []), layer_index,
+                    next((i for i, r in enumerate((baseline or {}).get(MANIFEST_SECTION[catalog]) or [])
+                          if r.get("layer") == layer_id), 0),
+                    next((i for i, r in enumerate(freshness.get(MANIFEST_SECTION[catalog]) or [])
+                          if r.get("layer") == layer_id), 0))
+                row["field_sha256"] = field_sha256(row)
+                row["known_repositories"] = sorted(slug(member["repository"]) for member in row["eligible_field"])
+                row["fit_projection"] = blind_fit_input(row, layer, baseline_rows.get(layer_id, {}), fresh,
+                                                        record_sources.get((catalog, layer_id), []), runtime_target or {},
+                                                        platform_requirements)
+                row["requirement"] = row["fit_projection"]["requirement"]
+                row["pinned_requirements"] = row["fit_projection"]["pinned_requirements"]
+                row["acceptance_gates"] = row["fit_projection"]["acceptance_gates"]
+                for key in ("platform_requirements", "platform_requirements_sha256"):
+                    row[key] = row["fit_projection"][key]
     if missing:
         raise ValueError(f"the frozen scope has no requirement_sha256 for {missing}; refreeze it with "
                          "saturation_ledger.py --scope")
@@ -405,6 +707,8 @@ def main(argv=None) -> int:
     parser.add_argument("--baseline-manifest", type=Path,
                         help="default: manifest_ref of the saturation ledger's last completed repository sweep")
     parser.add_argument("--seeds", type=Path)
+    parser.add_argument("--contract-version", type=int, choices=(1, 2), default=1,
+                        help="1: unchanged current sweep; 2: prepare the future neutral repository field")
     parser.add_argument("--modality", choices=("repository", SKILLS), default="repository",
                         help=f"repository: the landscape catalogs' layers (default); skills: the skills-* layers of "
                              f"{SKILLS_CATALOG}")
@@ -423,6 +727,8 @@ def main(argv=None) -> int:
         print(json.dumps(scope, indent=1, sort_keys=True))
         return 0
     if args.modality == SKILLS:
+        if args.contract_version != 1:
+            parser.error("the skills modality keeps contract version 1")
         if args.freshness_manifest or args.baseline_manifest:
             parser.error("--freshness-manifest and --baseline-manifest describe repository layers; the skills "
                          "modality reads its pins from the skills catalog")
@@ -439,6 +745,13 @@ def main(argv=None) -> int:
             baseline_path = repo / previous_sweep["manifest_ref"]
         catalogs = {catalog: load_json(repo / "catalogs" / "landscape" / name) for catalog, name in CATALOG_FILES}
         led = ledger_module(REPO_ROOT)  # the ledger's rules from this checkout, applied to --repo-root's files
+        scope = load_json(args.scope or work / "scope.json")
+        platform_requirements = None
+        if args.contract_version == 2:
+            adoption = load_json(repo / "adoption/manifest.json")
+            if led.platform_profiles_sha256(adoption) != scope.get("platform_profiles_sha256"):
+                raise ValueError("V2 platform_profiles_sha256 differs from adoption/manifest.json; refreeze the scope")
+            platform_requirements = neutral_platform_requirements(adoption.get("platform_profiles"))
         documents = {}
         target_of = led.ref_resolver(lambda path: documents[path] if path in documents
                                      else documents.setdefault(path, led.load_json(repo, path)))
@@ -446,10 +759,15 @@ def main(argv=None) -> int:
         followups, gap_counts = join_gap_followups(catalogs, gap_entries)
         inputs = build_layer_inputs(
             catalogs, load_json(repo / "catalogs" / "landscape" / "research-state.json"),
-            load_json(args.scope or work / "scope.json"), load_json(args.freshness_manifest),
+            scope, load_json(args.freshness_manifest),
             load_json(baseline_path) if baseline_path else None, ledger,
             load_json(args.seeds) if args.seeds else None,
-            absent=lambda entry: led.refuted_by_absence(entry, target_of), followups=followups)
+            absent=lambda entry: led.refuted_by_absence(entry, target_of), followups=followups,
+            contract_version=args.contract_version,
+            record_sources=field_record_sources(repo, catalogs, ledger) if args.contract_version == 2 else None,
+            runtime_target=load_json(repo / "catalogs/us-equities/runtime-target.json")
+                           if args.contract_version == 2 and (repo / "catalogs/us-equities/runtime-target.json").is_file()
+                           else None, platform_requirements=platform_requirements)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_inputs.py: {error}", file=sys.stderr)
         return 2
@@ -457,9 +775,15 @@ def main(argv=None) -> int:
     layers = []
     for layer_input in inputs:
         path = work / "inputs" / f"{layer_input['layer_id']}.json"
+        screen_path = work / "inputs" / f"{layer_input['layer_id']}.fit-v2.json"
+        if args.contract_version == 2:
+            write_json(screen_path, layer_input.pop("fit_projection"))
         write_json(path, layer_input)
         layers.append({"catalog": layer_input["catalog"], "layer_id": layer_input["layer_id"],
-                       "title": layer_input["title"], "input": str(path)})
+                       "title": layer_input["title"], "input": str(path),
+                       **({"contract_version": 2, "field_sha256": layer_input["field_sha256"],
+                           "fit_input": str(screen_path), "facts_input": str(screen_path)}
+                          if args.contract_version == 2 else {})})
     write_json(work / "layers.json", layers)
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
           f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "

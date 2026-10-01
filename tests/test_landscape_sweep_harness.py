@@ -55,6 +55,8 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
 # Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
 PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
+# Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
+PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6cb98839b94e525"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -602,6 +604,353 @@ class BuildInputsTests(unittest.TestCase):
         seeds = json.loads((HARNESS / "seeds-20260926.json").read_text(encoding="utf-8"))
         self.assertEqual(build_inputs.check_seeds(seeds, list(seeds)), seeds)
         self.assertEqual(len(seeds), 14)
+
+
+class NeutralSchemaTests(unittest.TestCase):
+    @staticmethod
+    def judgment():
+        return {"judgment_id": "screen-alpha-claude-1", "order_seed": 17, "family": "claude",
+                "model_route_requested": "opus", "model_route_actual": None, "source_field_sha256": "c" * 64,
+                "provider_sampling_seed_requested": None, "provider_sampling_seed_actual": None,
+                "provider_sampling_seed_status": "not_exposed"}
+
+    def test_v2_vote_schema_requires_screen_provenance_without_inventing_provider_seeds(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/votes-v2.json").read_text())
+        returned = {"contract_version": 2, "layer_id": "alpha", "role": "facts", "votes": [{
+            "candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+            "evidence_key": "foundation/alpha/o/r", "status": "pending", "criterion": None,
+            "fact": None, "confidence": 0, "reasoning": "identity source unavailable", "refs": [],
+            "requirement_fit": None}], "skills_used": [], "judgment": self.judgment()}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for field in ("judgment_id", "order_seed", "family", "model_route_requested", "source_field_sha256",
+                      "provider_sampling_seed_requested", "provider_sampling_seed_actual", "provider_sampling_seed_status"):
+            invalid = copy.deepcopy(returned)
+            invalid["judgment"].pop(field)
+            errors = []
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, field)
+        invalid = copy.deepcopy(returned)
+        invalid.pop("judgment")
+        errors = []
+        host_receipts.validate_against_schema(invalid, schema, "$", errors)
+        self.assertTrue(errors)
+
+    def test_v2_templates_admit_against_the_requirement_and_keep_unknown_votes_pending(self):
+        templates = build_args.load_templates()
+        v2 = build_args.fill_build(templates, "2026-09-26", 32, "2026-09-25", contract_version=2)
+        self.assertEqual(sweep_common.prompts_sha256(v2), PROMPTS_SHA256_V2_CURRENT)
+        self.assertIn("requirement_fit", v2["discover"])
+        self.assertIn("frozen_tasks", v2["discover"])
+        self.assertIn("novelty only", v2["discover"])
+        self.assertIn("not an eligibility limit", v2["discover"])
+        self.assertIn("https://huggingface.co/<lowercase namespace/model>", v2["discover"])
+        self.assertIn("only when the frozen requirement explicitly requires maintenance", v2["common"])
+        for role in ("facts", "fit"):
+            self.assertIn("status=pending", v2[role])
+            self.assertIn("candidate_key", v2[role])
+            self.assertNotIn("refuted=true", v2[role])
+            self.assertNotIn("gap versus the current winners", v2[role])
+        for candidate_name in ("NautilusTrader", "ai-memory", "LEAN"):
+            self.assertNotIn(candidate_name, v2["common"])
+        self.assertIn("mandatory paid service", v2["fit"])
+        self.assertIn("missing credentials", v2["fit"])
+        # Existing source strings and frozen V1 hashes remain the explicit historical lane contract.
+        self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25")),
+                         PROMPTS_SHA256_CURRENT)
+        self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25", "skills")),
+                         PROMPTS_SHA256_SKILLS_CURRENT)
+        with self.assertRaisesRegex(ValueError, "skills"):
+            build_args.fill_build(templates, "2026-09-26", 32, "2026-09-25", "skills", contract_version=2)
+
+    def test_v2_discovery_admits_requirement_fit_without_a_winner_relative_gap(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/discover-v2.json").read_text())
+        candidate = {"candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+                     "evidence_key": "foundation/alpha/o/r", "proposed_label": "admit",
+                     "requirement_fit": "The documented interface renders exact output on both target hosts.",
+                     "frozen_tasks": ["frozen-render-task"], "admission_reason": None, "pending_reason": None,
+                     "evidence": ["https://github.com/o/r/blob/main/README.md"], "source": "primary-source search",
+                     "upstream_now": {"latest_release": None, "released_at": None, "stars": None,
+                                      "pushed_at": None, "archived": None, "license": None}}
+        returned = {"contract_version": 2, "layer_id": "alpha", "proposed": [candidate],
+                    "calls": {"web_search": 1, "web_fetch": 1, "gh_api": 0}, "notes": "", "skills_used": []}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for change in ({"proposed_label": "keep_but_compare"}, {"admission_reason": "no_gap_vs_winner"},
+                       {"demonstrated_gap": "must beat the installed winner"}):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["proposed"][0].update(change)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, change)
+
+    def test_v2_votes_preserve_pending_identity_and_reject_incumbent_relative_refutations(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/votes-v2.json").read_text())
+        vote = {"candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+                "evidence_key": "foundation/alpha/o/r", "status": "pending", "criterion": None,
+                "fact": None, "confidence": 0.0, "reasoning": "the primary source did not return",
+                "refs": [], "requirement_fit": None}
+        returned = {"contract_version": 2, "layer_id": "alpha", "role": "fit", "votes": [vote], "skills_used": [],
+                    "judgment": self.judgment()}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for change in ({"criterion": "no_gap_vs_winner", "status": "not_credible"}, {"refuted": True},
+                       {"status": "not_refuted"}):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["votes"][0].update(change)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, change)
+        for required in ("candidate_key", "evidence_key", "reasoning"):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["votes"][0].pop(required)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, required)
+
+
+class NeutralFieldTests(unittest.TestCase):
+    """U11 A/B fixtures at the input-builder CLI, independent of the live V1 workflow."""
+
+    def setUp(self):
+        BuildInputsTests.setUp(self)
+        profiles = [{"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64"},
+                    {"id": "macos-arm64", "os": "macos", "architecture": "arm64"}]
+        write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+        scope = json.loads((self.work / "scope.json").read_text())
+        scope["platform_profiles_sha256"] = hashlib.sha256(
+            json.dumps(profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write_json(self.work / "scope.json", scope)
+
+    build = BuildInputsTests.build
+
+    def test_v2_field_keeps_actual_hugging_face_history_and_fit_refutations_pending(self):
+        path = self.repo / "catalogs/saturation/ledger.json"
+        ledger = json.loads(path.read_text())
+        repository = "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"
+        ledger["sweeps"][0]["layers"][0]["proposed"] = [repository, "https://github.com/o/also-returned"]
+        ledger["sweeps"][0]["layers"][0]["refuted"].append({"repo": repository,
+            "facts": {"vote": "not_refuted"}, "fit": {"vote": "refuted"}})
+        write_json(path, ledger)
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        row = json.loads((self.work / "inputs/alpha.json").read_text())
+        field = {member["repository"]: member for member in row["eligible_field"]}
+        self.assertIn(repository, field)
+        self.assertIn("https://github.com/o/also-returned", field)
+        self.assertEqual(field[repository]["candidate_key"],
+                         "foundation/alpha/https://huggingface.co/xiaomimimo/mimo-v2.6-distill-qwen-9b")
+        self.assertEqual(field[repository]["pending_reason"], "legacy_v1_refutation")
+        self.assertTrue(field[repository]["material"])
+        screen = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        model = next(candidate for candidate in screen["candidates"] if candidate["repository"] == repository)
+        self.assertEqual(model["primary_sources"], [repository, repository + "/tree/main",
+                         "https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"])
+
+    def test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments(self):
+        path = self.repo / "catalogs/landscape/foundation.json"
+        catalog = json.loads(path.read_text())
+        requirement = "Keep exact project knowledge retrievable across clients, with explicit project scope."
+        catalog["layers"][0]["requirement"] = requirement
+        catalog["layers"][0]["alternatives"].append({"name": "loopx-project/loopx",
+            "repository": "https://github.com/loopx-project/loopx", "disposition": "not_adopted"})
+        write_json(path, catalog)
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        screen = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        self.assertEqual(screen["requirement"], requirement)
+
+    def test_v2_field_catalog_provenance_resolves_to_the_recorded_member(self):
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        layer = json.loads((self.work / "inputs/alpha.json").read_text())
+        member = next(row for row in layer["eligible_field"] if row["repository"] == "https://github.com/sharkdp/bat")
+        self.assertIn("catalogs/landscape/foundation.json#/layers/0/winners/0", member["evidence_refs"])
+
+    def test_v2_field_includes_known_review_seed_and_all_historical_proposals(self):
+        ledger_path = self.repo / "catalogs/saturation/ledger.json"
+        ledger = json.loads(ledger_path.read_text())
+        ledger["sweeps"].insert(0, {"sweep_id": "older", "status": "completed", "layers": [{
+            "catalog": "foundation", "layer_id": "alpha", "proposed": ["o/fit-only", "o/over-cap"],
+            "survived": [], "refuted": [{"repo": "o/fit-only", "facts": {"vote": "not_refuted"},
+                                          "fit": {"vote": "refuted"}}]}]})
+        ledger["sweeps"][-1]["layers"][0]["proposed"] = ["o/stopped"]
+        write_json(ledger_path, ledger)
+        write_json(self.repo / "catalogs/landscape/candidate-quality-review.json", {
+            "candidates": [{"repository": "o/review", "disposition": "not_adopted"}],
+            "layer_coverage": [{"catalog": "foundation", "layer_id": "alpha",
+                                "challenger_repositories": ["o/review"]}]})
+        write_json(self.repo / "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json", [{
+            "catalog": "foundation", "layer_id": "alpha", "selected": [{"repo": "o/second-family"}],
+            "challengers": ["o/another (reviewed)"]}])
+        seeds = write_json(self.work / "seeds.json", {"alpha": [f"o/seed-{n}" for n in range(9)] + ["note only"]})
+        done = self.build("--contract-version", "2", "--seeds", seeds)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        row = json.loads((self.work / "inputs/alpha.json").read_text())
+        field = {member["repository"]: member for member in row["eligible_field"]}
+        expected = {"sharkdp/bat", "cli/cli", "tauri-apps/tauri", "facebook/react", "o/s", "o/r",
+                    "o/fit-only", "o/over-cap", "o/stopped", "o/review", "o/second-family", "o/another"}
+        expected |= {f"o/seed-{n}" for n in range(9)}
+        self.assertEqual(set(field), {f"https://github.com/{repo}" for repo in expected})
+        self.assertEqual(row["contract_version"], 2)
+        self.assertEqual(field["https://github.com/o/fit-only"]["pending_reason"], "legacy_v1_refutation")
+        self.assertEqual(field["https://github.com/sharkdp/bat"]["disposition"], "admit_pending")
+        self.assertTrue(all(member["material"] for member in field.values()))
+        self.assertTrue(all(member["evidence_refs"] for member in field.values()))
+        self.assertEqual(field["https://github.com/o/fit-only"]["candidate_key"], "foundation/alpha/o/fit-only")
+        self.assertEqual(field["https://github.com/o/fit-only"]["evidence_key"], "foundation/alpha/o/fit-only")
+        self.assertIn("o/fit-only", row["known_repositories"])
+        layers = json.loads((self.work / "layers.json").read_text())
+        self.assertEqual(layers[0]["contract_version"], 2)
+        self.assertEqual(layers[0]["field_sha256"], row["field_sha256"])
+
+    def test_v2_blind_input_carries_only_readable_target_requirements_and_separate_hash(self):
+        profiles = [
+            {"id": "macos-arm64", "os": "macos", "architecture": "arm64", "status": "ADOPTION_STATUS_MARKER",
+             "pins": {"tool": "PIN_MARKER"}, "doc": "DOC_MARKER", "evidence_ref": "RECEIPT_MARKER"},
+            {"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64",
+             "bootstrap_script": "BOOTSTRAP_MARKER", "hosted_smoke": {"result": "HISTORY_MARKER"}},
+        ]
+        write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+        scope = json.loads((self.work / "scope.json").read_text())
+        scope["platform_profiles_sha256"] = hashlib.sha256(
+            json.dumps(profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write_json(self.work / "scope.json", scope)
+        self.assertEqual(self.build().returncode, 0)
+        legacy = (self.work / "inputs/alpha.json").read_bytes()
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        expected = [{"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64"},
+                    {"id": "macos-arm64", "os": "macos", "architecture": "arm64"}]
+        digest = hashlib.sha256(json.dumps(expected, sort_keys=True, separators=(",", ":"),
+                                          ensure_ascii=False).encode()).hexdigest()
+        for name in ("alpha.json", "alpha.fit-v2.json", "beta.json", "beta.fit-v2.json"):
+            value = json.loads((self.work / "inputs" / name).read_text())
+            self.assertEqual(value.get("platform_requirements"), expected)
+            self.assertEqual(value.get("platform_requirements_sha256"), digest)
+            self.assertEqual(value["platform_profiles_sha256"], scope["platform_profiles_sha256"])
+            text = json.dumps(value)
+            for marker in ("ADOPTION_STATUS_MARKER", "PIN_MARKER", "DOC_MARKER", "RECEIPT_MARKER",
+                           "BOOTSTRAP_MARKER", "HISTORY_MARKER"):
+                self.assertNotIn(marker, text)
+        self.assertEqual(self.build().returncode, 0)
+        self.assertEqual((self.work / "inputs/alpha.json").read_bytes(), legacy)
+        self.assertEqual(json.loads((self.repo / "adoption/manifest.json").read_text())["platform_profiles"], profiles)
+
+    def test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs(self):
+        for problem in ("changed_scope", "missing_architecture", "duplicate_profile_id"):
+            with self.subTest(problem=problem):
+                profiles = [{"id": "linux", "os": "linux", "architecture": "x86_64"}]
+                if problem == "missing_architecture":
+                    profiles[0].pop("architecture")
+                elif problem == "duplicate_profile_id":
+                    profiles.append({"id": "linux", "os": "linux", "architecture": "arm64"})
+                write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+                if problem != "changed_scope":
+                    scope = json.loads((self.work / "scope.json").read_text())
+                    scope["platform_profiles_sha256"] = hashlib.sha256(json.dumps(
+                        profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+                    write_json(self.work / "scope.json", scope)
+                done = self.build("--contract-version", "2")
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn("platform", done.stderr)
+                self.assertFalse((self.work / "inputs").exists())
+                self.assertFalse((self.work / "layers.json").exists())
+
+    def test_v2_fit_input_withholds_adoption_prose_but_keeps_equal_primary_sources_and_release_facts(self):
+        path = self.repo / "catalogs/landscape/foundation.json"
+        catalog = json.loads(path.read_text())
+        catalog["layers"][0]["requirement"] = "bat must render exact output. The current winner bat stays selected."
+        catalog["layers"][0]["winners"][0]["why_selected"] = "ADOPTION_ONLY_MARKER"
+        catalog["layers"][0]["alternatives"][0]["why_not_default"] = "INCUMBENT_ONLY_MARKER"
+        write_json(path, catalog)
+        freshness = json.loads(self.freshness.read_text())
+        freshness["foundation"][0]["components"][0]["upstream"]["archived"] = True
+        write_json(self.freshness, freshness)
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        screen_path = self.work / "inputs/alpha.fit-v2.json"
+        self.assertTrue(screen_path.is_file(), "V2 fit must have its own blind input")
+        text = screen_path.read_text()
+        screen = json.loads(text)
+        self.assertEqual(screen["requirement"], "<candidate> must render exact output.")
+        for signal in ("winners", "alternatives", "why_selected", "why_not_default", "ADOPTION_ONLY_MARKER",
+                       "INCUMBENT_ONLY_MARKER", "legacy_v1_refutation", "admit_pending", "pin_behind_upstream"):
+            self.assertNotIn(signal, text)
+        source = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(screen["field_sha256"], source["field_sha256"])
+        self.assertEqual({row["candidate_key"] for row in screen["candidates"]},
+                         {row["candidate_key"] for row in source["eligible_field"]})
+        for candidate in screen["candidates"]:
+            self.assertEqual(candidate["primary_sources"], [candidate["repository"],
+                             candidate["repository"] + "/releases", candidate["repository"] + "/commits"])
+        bat = next(row for row in screen["candidates"] if row["repository"] == "https://github.com/sharkdp/bat")
+        self.assertEqual(bat["upstream_now"]["latest_release"], "2")
+        self.assertIs(bat["upstream_now"]["archived"], True)
+        health_member = next(row for row in source["eligible_field"] if row["candidate_key"] == bat["candidate_key"])
+        self.assertEqual(health_member["disposition"], "admit_pending")
+        self.assertTrue(health_member["material"])
+        self.assertIsNone(health_member["exclusion_reason"])
+        self.assertNotIn("pin", bat)
+        self.assertTrue(all(row["requirement_fit"] is None for row in screen["candidates"]))
+        layers = json.loads((self.work / "layers.json").read_text())
+        self.assertEqual(layers[0]["fit_input"], str(screen_path))
+
+    def test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status(self):
+        path = self.repo / "catalogs/landscape/us-equities.json"
+        catalog = json.loads(path.read_text())
+        catalog["layers"][0]["requirement"] = (
+            "Use the selected NautilusTrader destination with IBKR and a separate Alpaca adapter; "
+            "preserve the prior LEAN oracle and reconcile numeric accounting.")
+        catalog["layers"][0]["candidates"] = [
+            {"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader",
+             "disposition": "selected"},
+            {"name": "LEAN", "repository": "https://github.com/QuantConnect/Lean", "disposition": "not_adopted"}]
+        write_json(path, catalog)
+        write_json(self.repo / "catalogs/us-equities/runtime-target.json", {
+            "engine": {"repository": "https://github.com/nautechsystems/nautilus_trader",
+                       "decision": "selected_destination", "requested_version": "2.0.0rc5"},
+            "acceptance_plan": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
+            "next_acceptance": [{"id": "broker-state-failures", "status": "EXECUTED_ONLY_MARKER",
+                                 "scope": "Installed incumbent already passed 27 checks.",
+                                 "executed_evidence_ref": "incumbent-receipt.json"}]})
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        text = (self.work / "inputs/beta.fit-v2.json").read_text()
+        screen = json.loads(text)
+        self.assertEqual(screen["requirement"], (
+            "Use the user-pinned NautilusTrader destination with IBKR and a separate Alpaca adapter; "
+            "preserve the fixed LEAN oracle and reconcile numeric accounting."))
+        self.assertEqual({pin["name"] for pin in screen["pinned_requirements"]},
+                         {"NautilusTrader", "IBKR", "Alpaca", "LEAN"})
+        self.assertEqual(screen["acceptance_gates"][0]["id"], "broker-state-failures")
+        self.assertIn("durable", screen["acceptance_gates"][0]["requirement"])
+        for signal in ("EXECUTED_ONLY_MARKER", "executed_evidence_ref", "incumbent-receipt.json",
+                       "already passed", "requested_version", "2.0.0rc5"):
+            self.assertNotIn(signal, text)
+
+
+class NeutralStagingTests(unittest.TestCase):
+    def test_legacy_staging_refuses_v2_inputs_before_writing_a_launchable_runner(self):
+        work = stage_work(self, layers=("alpha",))
+        path = work / "inputs/alpha.json"
+        layer = json.loads(path.read_text())
+        write_json(path, dict(layer, contract_version=2, field_sha256="c" * 64))
+        done = build(work)
+        self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+        self.assertIn("V2", done.stderr)
+        self.assertFalse((work / "args.json").exists())
+        self.assertFalse((work / "sweep.embedded.js").exists())
+        explicit = build(work, "--contract-version", "2")
+        self.assertEqual(explicit.returncode, 2, explicit.stdout + explicit.stderr)
+        self.assertIn("future V2 runner", explicit.stderr)
+        self.assertFalse((work / "templates.json").exists())
 
 
 # --------------------------------------------------------------------------- build_args
