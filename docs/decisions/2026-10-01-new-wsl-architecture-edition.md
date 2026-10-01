@@ -26,7 +26,8 @@ The inputs already existed in the repository, spread over several records:
 - the acceptance classes of `docs/acceptance-evidence-policy.md:26-33`.
 
 A closure assessment of the 20 foundation layers (2026-10-01, at `3361b342`, each assessment refuted and
-corrected by a second reviewer) and the Gate A owner's draft for three layers fed this edition as working
+corrected by a second reviewer), a closure assessment of 11 of the 12 us-equities layers (2026-10-01, at PR
+#358's head `4d11709c`, same method) and the Gate A owner's draft for three layers fed this edition as working
 input. Neither is a repository record, so the edition carries only the facts that a repository path or a
 URL read on 2026-10-01 supports, each cited where it is used. The core files those assessments cite
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
@@ -93,16 +94,19 @@ classes, closure states, install kinds and gate kinds; `closed` if and only if a
 non-empty `missing` for every open row; `no_selection` if and only if there are no winners. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
-**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 19
-`selection_of_record_open`, 12 `comparison_required`, 4 `no_selection`, 1 `provisional`, 1
-`new_host_required`. Every foundation row has at least one closure item unmet or partial, and every review
-item (c4) is unmet or partial. The 12 us-equities rows are the fallback form: the trading closure assessment
-was not available, so each closure item is `unknown` with `missing: "assessment pending"`, the winners are
-the components the 2026-09-22 verdict names that have a pin of record (runtime-target.json for the engine and
-brokers, stack pins for the profile components), and every trading row is marked `provisional_wording` in its
-notes for the trading lane owner. The backtesting-engine row carries the dispute recorded at PR #358's head
-`b0eb7a11`. The cross row for the distribution is `no_selection` on main: its image, hash and creation path
-land with PR #569.
+**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 21
+`selection_of_record_open`, 13 `comparison_required`, 1 `no_selection`, 1 `provisional`, 1
+`new_host_required`. Every assessed row has at least one closure item unmet or partial, and no review item
+(c4) is met. Eleven us-equities rows follow the trading closure assessment: their winners are the components
+the layer's current choice names that have a pin of record (runtime-target.json for the engine, the brokers
+and the adaptive paper engine; stack pins for profile components), while the 2026-09-22 verdict winners
+without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow, Grype) stay alternatives. The
+assessment does not cover security-supply-chain, whose closure items stay `unknown` with
+`missing: "assessment pending"`. Every trading row is marked `provisional_wording` in its notes for the
+trading lane owner. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
+Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
+41 entries and 39 exits filled). The cross row for the distribution is `no_selection` on main: its image,
+hash and creation path land with PR #569.
 
 **Install order on the new distribution** (row `cross:wsl-distro`, each step citing the recipe of PR #569):
 stage 1 on Windows; first boot (systemd, linger, user bus, packages, subordinate ids, the login hand-off);
@@ -137,7 +141,8 @@ Write a new edition, or update this one in the change that causes it, when any o
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
 4. **A pending source lands.** PR #569, #570 or #358 merges: move its citations to `source_path` and re-rate
    `cross:wsl-distro`.
-5. **The trading closure assessment arrives**, or the trading lane owner writes the final wording.
+5. **The trading lane owner writes the final wording** for the us-equities rows, or an assessment of
+   security-supply-chain arrives.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a
    gap until a row is added.

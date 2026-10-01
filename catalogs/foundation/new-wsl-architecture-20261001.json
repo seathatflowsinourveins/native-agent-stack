@@ -1364,52 +1364,120 @@
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
+        },
+        {
+          "component_id": "duckdb",
+          "repository": "https://github.com/duckdb/duckdb",
+          "pin": "1.5.5",
+          "pin_source": "manifests/stack.json:1275",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
+          "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
+          "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "met",
+        "c2": "partial",
+        "c3": "unmet",
+        "c4": "unmet",
+        "c5": "partial",
+        "missing": "c2: saturation is not established, and the 2026-09-22 layer entry does not disposition the 2026-09-26 sweep survivors (arcticdb, tiingo-python) or the GPT-6 omissions; c3: the Databento and Massive arms on the frozen AAPL plan with a generalized comparator, point-in-time and as-known availability, licensing, and a fresh-host acquisition receipt for alpaca-py have not run; c4: no review reports the bounded set free of material gaps, and the GPT-6 votes found errors in the 2026-09-26 proposal; c5: no closure record while the layer is comparison_required."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict keeps alpaca-py for the bounded market-data path, EdgarTools for filings and exchange-calendars for sessions, with a comparison still required.", "source_path": "catalogs/landscape/us-equities.json"},
-        {"text": "The Alpaca boundary records bounded data acceptance: AAPL SIP and raw daily bars with corporate actions, and FB/META identity observations.", "source_path": "catalogs/us-equities/runtime-target.json"}
+        {"text": "runtime-target.json selects alpaca-py 0.44.0 for ingestion; EdgarTools, exchange-calendars and DuckDB come from the layer's current choice.", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"text": "The live provider evidence is five authenticated Alpaca market-data requests on 2026-09-20; the rest is native operation and local integration from 2026-09-19 to 2026-09-26.", "source_path": "blueprints/us-equities/authenticated-data/native-receipt.json"},
+        {"text": "The 2026-09-26 convergence record keeps Databento and Sharadar as targeted candidates and pandas_market_calendars and sec-api-python as keep_but_compare.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "Databento", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "Massive Python client", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "Databento", "verdict": "conditional, source review; a targeted candidate on 2026-09-26", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Massive Python client", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Sharadar SEP/SF1", "verdict": "a targeted candidate on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
+        {"name": "pandas_market_calendars", "verdict": "keep_but_compare on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "new_host_steps": [
-        "None of these is in a Linux pin set: install each into its recipe's own uv environment from the recorded lock or pinned requirements.",
-        "Keep the Alpaca and SEC contact credentials in their 0600 provider files (row cross:credential-practice).",
-        "Run each recipe's bounded check and record the host receipt."
+        "Provide CPython 3.13.15 for the research SDK lock (no step installs it; Ubuntu 24.04's python3 is 3.12) and a separate environment per recipe.",
+        "Install alpaca-py, EdgarTools, exchange-calendars and DuckDB from their recipes: the research-runtime profile exits 3 in the bootstrap because nine of its components lack Linux pins.",
+        "Keep the Alpaca data keys and the SEC contact identity in their 0600 provider files (row cross:credential-practice), then record a fresh-host acquisition receipt."
       ],
       "gates": [
         {"text": "Alpaca data access uses the user's own paper credentials and feed entitlements; entitlements stay separate from the code.", "kind": "user_side", "source_path": "catalogs/us-equities/runtime-target.json"}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "identity-provenance",
       "catalog": "us-equities",
       "title": "Identity, provenance and lineage",
-      "winners": [],
-      "verdict": "no_selection",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "winners": [
+        {
+          "component_id": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0",
+          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
+        },
+        {
+          "component_id": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0",
+          "pin_source": "manifests/stack.json:1516",
+          "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
+          "acceptance": {"command": "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py (the recipe's bounded filing query)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
+          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+        },
+        {
+          "component_id": "duckdb",
+          "repository": "https://github.com/duckdb/duckdb",
+          "pin": "1.5.5",
+          "pin_source": "manifests/stack.json:1275",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
+          "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
+          "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
+        },
+        {
+          "component_id": "exchange-calendars",
+          "repository": "https://github.com/gerrymanoim/exchange_calendars",
+          "pin": "4.13.2",
+          "pin_source": "manifests/stack.json:1544",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
+          "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
+          "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
+        }
+      ],
+      "verdict": "comparison_required",
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "unmet",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: no selection covers the stated requirement (licensed acquisition, permanent identity, historical eligibility) or explicitly scopes it out, and DVC's status is unreconciled across the records; c2: no frozen candidate set reconciles the 2026-09-22 entry with the 2026-09-26 record (DuckLake, delta-rs and Pandera need dispositions); c3: the point-in-time fixture comparison with Iceberg add_files and ArcticDB staged-write arms, the two identity gates and a second-host rerun have not run; c4: no review of a reconciled closure set; c5: no closure record."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict names DVC 3.67.1 on source review only; no pin of record for it exists in the stack, the Linux pins, runtime-target.json or an adoption profile, so this edition carries no winner.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The selection of record is alpaca-py from runtime-target.json plus EdgarTools, DuckDB and exchange-calendars from the layer's current choice; the verdict's own winner, DVC 3.67.1, is source review only and has no pin of record.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The identity gates wait on user-owned identity sources.", "source_path": "catalogs/us-equities/gates-20260922.json"},
         {"text": "The research state asks first for a frozen universe, history and rights, with auditable delisting, ticker-reuse, action, currency and revision evidence.", "source_path": "catalogs/landscape/research-state.json"}
       ],
-      "evidence_class": "none_recorded",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "DVC 3.67.1", "verdict": "the verdict's source-reviewed winner, without a pin of record", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "DVC 3.67.1", "verdict": "the verdict's provisional winner on source review, without a pin of record", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Databento and Massive", "verdict": "conditional licensed or reference providers", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "ArcticDB", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Install nothing for this layer until the trading lane records a selection with a pin of record."
+        "These install with row market-data-reference.",
+        "Run the point-in-time fixture comparison before the identity gates; those gates need user-owned identity sources."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "The dated security-identity gate needs an entitled identity source that the user owns.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
+      ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "storage-compute",
@@ -1424,24 +1492,62 @@
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "v1.5.6 (2026-09-28)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/duckdb/duckdb/releases"}
+        },
+        {
+          "component_id": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0",
+          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
+        },
+        {
+          "component_id": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0",
+          "pin_source": "manifests/stack.json:1516",
+          "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
+          "acceptance": {"command": "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py (the recipe's bounded filing query)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
+          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+        },
+        {
+          "component_id": "exchange-calendars",
+          "repository": "https://github.com/gerrymanoim/exchange_calendars",
+          "pin": "4.13.2",
+          "pin_source": "manifests/stack.json:1544",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
+          "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
+          "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "unmet",
+        "c4": "unmet",
+        "c5": "partial",
+        "missing": "c1: recoverable primary evidence is incomplete (one check's input is external and the broad-universe input is private); c2: the 2026-09-22 entry, the 2026-09-26 trading record and the companion sweep differ and are not reconciled; c3: the representative comparison (frozen universe, history, latency, rights, correction and availability semantics, and providers on securities with delistings, ticker reuse and corporate actions) is missing; c4: the cross-family reviews found gaps that remain unresolved; c5: no closure record while the layer is comparison_required."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict keeps DuckDB with Parquet for local analysis, with a comparison still required.", "source_path": "catalogs/landscape/us-equities.json"}
+        {"text": "DuckDB with Parquet is the layer's sole recorded verdict winner; alpaca-py comes from runtime-target.json and EdgarTools and exchange-calendars from the shared current choice of the data layers.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The research state asks first for a frozen universe, history and rights, with auditable delisting, ticker-reuse, action, currency and revision evidence.", "source_path": "catalogs/landscape/research-state.json"}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
+        {"name": "Databento", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Polars", "verdict": "conditional; no same-data comparison", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Apache Iceberg", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "QuestDB", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Install DuckDB 1.5.5 into the data recipe's uv environment and run its promotion gate on a retained snapshot."
+        "These install with row market-data-reference; the promotion gate needs its own environment from blueprints/us-equities/data/requirements.lock.",
+        "Decide whether to keep DuckDB 1.5.5 and EdgarTools 5.58.0 or re-pin to 1.5.6 and 5.59.1 before collecting receipts, then run the promotion gate on a retained snapshot."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "data-quality-orchestration",
@@ -1454,27 +1560,111 @@
           "pin": "2.16.6",
           "pin_source": "manifests/stack.json:1335",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
-          "acceptance": {"command": "\"$DAGU\" version", "evidence_class": "synthetic_fixture", "source_path": "blueprints/us-equities/hosting/README.md"},
+          "acceptance": {"command": "\"$DAGU\" version", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/README.md"},
           "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+        },
+        {
+          "component_id": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2",
+          "pin_source": "manifests/stack.json:297",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
+        },
+        {
+          "component_id": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284",
+          "pin_source": "manifests/stack.json:192",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v2.1.286 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/claude-code/releases"}
+        },
+        {
+          "component_id": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17",
+          "pin_source": "manifests/stack.json:1448",
+          "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
+          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
+          "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
+        },
+        {
+          "component_id": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0",
+          "pin_source": "manifests/stack.json:1087",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/README.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+        },
+        {
+          "component_id": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0",
+          "pin_source": "manifests/stack.json:1118",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "curl --fail --silent http://127.0.0.1:19090/api/v1/status/buildinfo | grep -F '\"version\":\"3.15.0\"' (the new host moves the port with --port-overrides)", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
+        },
+        {
+          "component_id": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8",
+          "pin_source": "manifests/stack.json:1156",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
+        },
+        {
+          "component_id": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2",
+          "pin_source": "manifests/stack.json:1193",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+        },
+        {
+          "component_id": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1",
+          "pin_source": "manifests/stack.json:1307",
+          "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
         }
       ],
       "verdict": "selection_of_record_open",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: the current choice leaves out pandera, which the verdict and the domain card select, and keeps Dagu, which the 2026-09-29 manifest labels conditional; c2: DBOS, Pueue, Windmill, Great Expectations, Pointblank, Restate, Flyte and dataframely never entered the layer entry; c3: the Dagu-against-Temporal kill comparison does not meet the same-fixture clause of the overturn condition, and pandera has no matched comparison; c4: no review of the current layer state reports zero material gaps; c5: no closure record."
+      },
       "reasons": [
-        {"text": "The verdict retains Dagu for selected local command workflows and pandera for data checks; pandera 0.33.1 has no pin of record outside the data recipe's install line.", "source_path": "catalogs/landscape/us-equities.json"},
-        {"text": "Dagu's selection, recipe and failed preregistered SIGKILL case are shared with the foundation row scheduling-supervision.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"}
+        {"text": "The current choice is native Codex and Claude for bounded research and review, Dagu and systemd for local command workflows, one OpenTelemetry Collector with Prometheus, Loki and Grafana, and Restic; pandera 0.33.1, the verdict's data-check winner, has no stack pin.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "Dagu's selection, recipe and failed preregistered SIGKILL case are shared with the foundation row scheduling-supervision.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
+        {"text": "The 2026-09-26 convergence record keeps Temporal, DBOS, Pueue, Dagster and Great Expectations as keep_but_compare.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
-      "evidence_class": "synthetic_fixture",
+      "evidence_class": "local_integration_check",
       "alternatives": [
-        {"name": "Temporal", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "pandera 0.33.1", "verdict": "the verdict's data-check winner, installed only by the data recipe; no stack pin", "source_path": "blueprints/us-equities/data/README.md"},
+        {"name": "Temporal", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Modal", "verdict": "unqualified; the client needs a user login", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "DBOS, Pueue, Dagster and Great Expectations", "verdict": "keep_but_compare on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "new_host_steps": [
-        "Dagu installs once, as in the foundation row scheduling-supervision.",
+        "These install with the foundation rows native-clients, scheduling-supervision, observation-inference and recovery-portability; pandera installs only in the data recipe's promotion-gate environment.",
+        "Adjudicate the Dagu-against-Temporal kill comparison with a same-fixture rerun before extending scheduler scope.",
         "Exercise one chosen real research worker job end to end, preserving its source packet, complete output, cancellation, process ownership and usage."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "research-factors-ml",
@@ -1482,41 +1672,61 @@
       "title": "Research, factors and ML",
       "winners": [
         {
-          "component_id": "skfolio",
-          "repository": "https://github.com/skfolio/skfolio",
-          "pin": "1.2.9",
-          "pin_source": "manifests/stack.json:1493",
-          "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
-          "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\"", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
-          "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
+          "component_id": "nautilus-trader",
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "2.0.0rc5",
+          "pin_source": "catalogs/us-equities/runtime-target.json:26",
+          "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
+          "acceptance": {"command": "the retained SPY/LEAN parity replay of the acceptance plan (gate spy-lean-parity, one_zero case)", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md"},
+          "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
         },
         {
-          "component_id": "edgartools",
-          "repository": "https://github.com/dgunning/edgartools",
-          "pin": "5.58.0",
-          "pin_source": "manifests/stack.json:1516",
-          "install": {"command": "uv venv \"$CATALYST_RUNTIME/sdk\" --python 3.13; uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "acceptance": {"command": "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py (the recipe's bounded filing query)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/catalyst-provenance/README.md"},
-          "upstream_currency": {"latest_release": "v5.59.1 (2026-09-26)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dgunning/edgartools/releases"}
+          "component_id": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0",
+          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
+        },
+        {
+          "component_id": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation",
+          "pin_source": "manifests/stack.json:1368",
+          "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
+          "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
+          "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "unmet",
+        "c5": "partial",
+        "missing": "c1: runtime-target.json names no research, factor or ML component, and no re-recorded verdict reconciles the 2026-09-22 winners, the catalog decisions and the roadmap; c2: the candidate set is not refrozen with dispositions for the GPT-6 missed names and the sweep survivors; c3: the overturn-protocol arms have not run under one contract, the current upstream releases (skfolio 1.4.10, EdgarTools 5.59.1) are not qualified, and no fresh-host lifecycle run exists; c4: no review after these items; c5: no closure record."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict keeps skfolio (walk-forward) and EdgarTools for research features, with a comparison still required.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The layer's current choice is the engine destination, NautilusTrader 2.0.0rc5, with LEAN as the retained comparison engine and the separate Alpaca path; runtime-target.json selects no research or factor component.", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"text": "The 2026-09-22 verdict names skfolio (walk-forward) and EdgarTools instead; the two lists are not reconciled.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "Strategy qualification stays independent of the engine and broker checks.", "source_path": "catalogs/landscape/research-state.json"}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "sktime", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "alphalens-reloaded", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "skfolio 1.2.9 and EdgarTools 5.58.0", "verdict": "the 2026-09-22 verdict winners, outside the current choice; reconciliation pending", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "LEAN Alpaca brokerage", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "vectorbt", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Backtrader", "verdict": "overlap", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Install the research-evaluation lock into its own uv environment (LEAN source is an input; row backtesting-engine), then run evaluate.py once and record the receipt."
+        "Install the engine, LEAN and alpaca-py as in rows backtesting-engine and execution-broker; provide CPython 3.12 to 3.14 for the engine, since its recipe assumes /usr/bin/python3.12.",
+        "Install skfolio and EdgarTools from the research-evaluation and catalyst-provenance locks only if the reconciled selection keeps them, then run evaluate.py once and record the receipt."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "backtesting-engine",
@@ -1540,24 +1750,43 @@
           "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
           "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
           "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
+        },
+        {
+          "component_id": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0",
+          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "partial",
+        "c5": "partial",
+        "missing": "c1: three alternatives have empty evidence references and the five omitted sweep entries have no disposition; c2: no reconciled candidate union exists, and ml4t-backtest, the one alternative with a same-input one_zero pass, is in neither set; c3: the alternative comparisons cover only one_zero under the v1 contract, and the other sealed v2 cases stay blocked; c4: findings that touch the layer (the parity corrections, the IBKR 1.231.0 scope, the LEAN payable-date caveat) are not applied; c5: no closure record (the research state still says comparison_required and 'qualify Nautilus parity')."
+      },
       "reasons": [
-        {"text": "NautilusTrader 2.0.0rc5 is the user-selected destination engine; LEAN stays the retained historical comparison engine.", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"text": "NautilusTrader 2.0.0rc5 is the user-selected destination engine; LEAN stays the retained historical comparison engine; the Alpaca path is a separate boundary.", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"text": "ml4t-backtest 0.1.12 passed the same-input SPY one_zero trial under the v1 contract on 2026-09-26; its consequence for the layer is not recorded.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
         {"text": "SPY/LEAN parity is established for the historical one_zero case only (136 checks, 0 failed); realistic liquidity and rc5 native broker adapter acceptance remain open.", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "In the 2026-09-26 convergence record at PR #358's head, the NautilusTrader winner is cross_family_disputed: both GPT-6 votes refute its earns_it rationale as circular and accept only provisional retention, so comparative merit stays unproven.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
         {"text": "The research state marks the layer comparison_required.", "source_path": "catalogs/landscape/research-state.json"}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "cvxportfolio", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "lumibot", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "hftbacktest", "verdict": "out of scope", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "ml4t-backtest 0.1.12", "verdict": "a same-input one_zero pass under the v1 contract; no recorded consequence", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
+        {"name": "Lumibot", "verdict": "conditional, with empty evidence references", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "LEAN Alpaca brokerage", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "vectorbt", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Create a dedicated Python environment for NautilusTrader (supported CPython >=3.12,<3.15) and install the pinned pre-release wheel with the recipe's numpy and pandas pins; the trading-nautilus profile has no Linux pins.",
+        "Install bubblewrap first: the trading-nautilus profile requires python3, uv and bwrap, and no step installs bwrap.",
+        "Create a dedicated Python environment for NautilusTrader (supported CPython >=3.12,<3.15; the recipe assumes /usr/bin/python3.12) and install the pinned pre-release wheel with the recipe's numpy and pandas pins; the trading-nautilus profile has no Linux pins.",
         "Install the .NET 10 SDK from Microsoft's release metadata with its hash check, clone LEAN at the pinned commit and build it.",
         "Replay the retained SPY/LEAN parity case and compare with the frozen oracle; record the host receipt."
       ],
@@ -1565,7 +1794,7 @@
         {"text": "The comparative merit of NautilusTrader stays disputed until the trading lane's comparison runs; retention is provisional.", "kind": "lane", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown. The disputed-winner fact is read at PR #358's head b0eb7a11."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles. The disputed-winner fact is read at PR #358's head b0eb7a11."
     },
     {
       "layer_id": "execution-broker",
@@ -1578,7 +1807,7 @@
           "pin": "2.0.0rc5",
           "pin_source": "catalogs/us-equities/runtime-target.json:26",
           "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
-          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "catalogs/us-equities/runtime-target.json"},
+          "acceptance": {"command": "IBKR acceptance plan section 5 against a signed-in paper IB Gateway: step 1 (read-only, execution disabled) passed on rc5; steps 2 to 4 run after the upstream gates clear", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md"},
           "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
         },
         {
@@ -1589,22 +1818,51 @@
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v, then one bounded paper roundtrip under the paper-lane policy", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
+        },
+        {
+          "name": "Adaptive-paper engine (runner.py with the custom Alpaca adapter on NautilusTrader's LiveNode)",
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+          "pin_source": "blueprints/us-equities/adaptive-paper/source-hashes.json:30",
+          "install": {"command": "requirements.txt into an isolated Python 3.12 environment", "kind": "repo_recipe", "source_path": "blueprints/us-equities/adaptive-paper/README.md"},
+          "acceptance": {"command": "python runner.py preflight --env-file \"$PAPER_ENV_FILE\" --output \"$PRIVATE_OUTPUT/preflight.json\", then one dated paper trial and `python runner.py recover`", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/README.md"},
+          "upstream_currency": {"latest_release": "not applicable: an in-repo engine whose source hashes were last bound at the #559 merge (dca821cc)", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
+        },
+        {
+          "component_id": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation",
+          "pin_source": "manifests/stack.json:1368",
+          "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
+          "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
+          "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "unmet",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: no layer verdict with winners and alternatives exists (the landscape record says pending_lanes), the selected IBKR boundary has no order and execution evidence, and the #4983 statement in the selection of record is unreconciled; c2: eight unverified and two omitted candidates lack dispositions, and the 2026-09-26 set is not merged into the layer entry; c3: no executed comparison on the same inputs, and IBKR acceptance-plan steps 2 to 4 have not run on any accepted version; c4: both existing reviews found material gaps; c5: no closure record."
+      },
       "reasons": [
+        {"text": "On rc5 only the read-only step 1 of the IBKR acceptance plan passed (2026-09-23, execution disabled, against a signed-in paper IB Gateway); steps 2 to 4 have not run.", "source_path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json"},
         {"text": "Each broker keeps its own boundary: IBKR through the Nautilus native IBKR adapter with a signed-in TWS or IB Gateway (local acceptance on rc5 not established), Alpaca through alpaca-py with a separately qualified deterministic paper lifecycle (one SPY roundtrip filled, flat, cash reconciled, recovery completed, no duplicate writes).", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "Paper results, counted only as fills and passed trials: the 2026-09-29 regular-session Alpaca series passed 5 of 6 trials (one failed on a ledger halt) with 23 entries and 23 exits filled; it is not a frozen gate run.", "source_path": "blueprints/us-equities/adaptive-paper/trials/rth-20260929/receipt.json"},
         {"text": "The 2026-09-29 pre-market series passed 3 of 3 trials (9 entries and 9 exits filled), and the extended-hours series passed 3 of 4 (one needs attention with a residual open; 9 entries and 7 exits filled).", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/receipt.json"},
         {"text": "The adaptive paper engine is NautilusTrader 2.0.0rc5's LiveNode with a custom Alpaca adapter and alpaca-py 0.44.0; its fee activities are booked in ledger cash since the #559 merge.", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/559"}
       ],
-      "evidence_class": "none_recorded",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "NautilusTrader 1.231.0 Python IBKR adapter", "verdict": "bounded paper orders passed on 2026-09-23, but no record accepts 1.231.0 for this gate and reconnect, restart reconciliation and the kill switch were not run", "source_path": "catalogs/us-equities/runtime-target.json"}
+        {"name": "NautilusTrader 1.231.0 Python IBKR adapter", "verdict": "bounded paper orders passed on 2026-09-23, but no record accepts 1.231.0 for this gate and reconnect, restart reconciliation and the kill switch were not run", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"name": "LEAN Alpaca brokerage", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Lumibot", "verdict": "conditional in the layer; not adopted in the 2026-09-26 set", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Install the engine (row backtesting-engine) and alpaca-py in their own environments; keep each broker's credentials in its 0600 provider file.",
+        "Install the engine (row backtesting-engine), alpaca-py and the adaptive-paper requirements in their own environments; keep each broker's credentials in its 0600 provider file.",
+        "No IB Gateway or TWS install step or version pin exists; the recipes require an already signed-in paper Gateway.",
         "Alpaca: run the order-contract tests, then one bounded paper roundtrip under the paper-lane policy, and count only fills and passed trials.",
         "IBKR: start TWS or IB Gateway with a native paper sign-in (paper socket 7497 or 4002) only after the upstream gates below clear."
       ],
@@ -1614,13 +1872,40 @@
         {"text": "The IB Gateway or TWS paper sign-in is the user's own native action, as are the paper account and market-data permissions.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown. The layer verdict is pending_lanes in the landscape record; the winners come from runtime-target.json's broker boundaries."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles. The layer verdict is pending_lanes in the landscape record; the winners come from runtime-target.json's broker boundaries."
     },
     {
       "layer_id": "portfolio-risk",
       "catalog": "us-equities",
       "title": "Portfolio and risk",
       "winners": [
+        {
+          "component_id": "nautilus-trader",
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "2.0.0rc5",
+          "pin_source": "catalogs/us-equities/runtime-target.json:26",
+          "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
+          "acceptance": {"command": "the retained SPY/LEAN parity replay of the acceptance plan (gate spy-lean-parity, one_zero case)", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md"},
+          "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
+        },
+        {
+          "component_id": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation",
+          "pin_source": "manifests/stack.json:1368",
+          "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
+          "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
+          "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
+        },
+        {
+          "component_id": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0",
+          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
+          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
+        },
         {
           "component_id": "skfolio",
           "repository": "https://github.com/skfolio/skfolio",
@@ -1632,45 +1917,147 @@
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "unmet",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: the layer entry (checked 2026-09-22) does not cite the 2026-09-23 gap-wave2 receipts that settled or advanced most of its open gaps; c2: the 2026-09-22 packet, the layer card, the convergence record and the sweep differ, and pyhrp, riskkit, the Nautilus RiskEngine, PortfolioAnalytics and ibflex are not folded in; c3: no fresh preregistered matched comparison, no leverage-ladder paper receipts, no broker-fill reconciliation under RiskEngine limits for Alpaca and IBKR, and no financing and liquidity realism; c4: every recorded review reports open material gaps; c5: no closure record."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict keeps skfolio for portfolio construction and walk-forward checks, with a comparison still required.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The engine destination, LEAN as the comparison oracle and the Alpaca boundary come from runtime-target.json; the 2026-09-22 verdict keeps skfolio for its walk-forward splitter only.", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "Risk and order state stay in deterministic code; the adaptive practice caps total requests at 200 per minute and submissions at 180 per minute.", "source_path": "catalogs/us-equities/runtime-target.json"}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "local_integration_check",
       "alternatives": [
-        {"name": "cvxportfolio", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "quantstats", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "cvxportfolio", "verdict": "unqualified in the verdict", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "empyrical-reloaded", "verdict": "unqualified in the verdict", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "quantstats", "verdict": "unqualified in the verdict", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "PyPortfolioOpt", "verdict": "a conditional card", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "skfolio installs with the research-evaluation lock (row research-factors-ml)."
+        "The engine, LEAN and alpaca-py install as in rows backtesting-engine and execution-broker; skfolio installs with the research-evaluation lock.",
+        "Run the verdict's recorded overturn checks on the target host, starting with the research-evaluation tests, then collect leverage-ladder paper receipts that count only fills and passed trials."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "evaluation-experiments",
       "catalog": "us-equities",
       "title": "Evaluation and experiments",
-      "winners": [],
-      "verdict": "no_selection",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
-      "reasons": [
-        {"text": "The 2026-09-22 verdict names agent-retrieval-bench, Inspect AI and MLflow on source review only; none has a pin of record in the stack, the Linux pins, runtime-target.json or an adoption profile, so this edition carries no winner.", "source_path": "catalogs/landscape/us-equities.json"},
-        {"text": "The foundation's quality row selects Harbor as the containerized E2E runner with Inspect AI as its fallback; this layer can reuse it once the trading lane records a selection.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"}
+      "winners": [
+        {
+          "component_id": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2",
+          "pin_source": "manifests/stack.json:297",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
+        },
+        {
+          "component_id": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284",
+          "pin_source": "manifests/stack.json:192",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v2.1.286 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/claude-code/releases"}
+        },
+        {
+          "component_id": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6",
+          "pin_source": "manifests/stack.json:1335",
+          "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
+          "acceptance": {"command": "\"$DAGU\" version", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/README.md"},
+          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+        },
+        {
+          "component_id": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17",
+          "pin_source": "manifests/stack.json:1448",
+          "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
+          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
+          "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
+        },
+        {
+          "component_id": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0",
+          "pin_source": "manifests/stack.json:1087",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/README.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+        },
+        {
+          "component_id": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0",
+          "pin_source": "manifests/stack.json:1118",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "curl --fail --silent http://127.0.0.1:19090/api/v1/status/buildinfo | grep -F '\"version\":\"3.15.0\"' (the new host moves the port with --port-overrides)", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
+        },
+        {
+          "component_id": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8",
+          "pin_source": "manifests/stack.json:1156",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
+        },
+        {
+          "component_id": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2",
+          "pin_source": "manifests/stack.json:1193",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+        },
+        {
+          "component_id": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1",
+          "pin_source": "manifests/stack.json:1307",
+          "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
+        }
       ],
-      "evidence_class": "none_recorded",
+      "verdict": "selection_of_record_open",
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: the current choice and the 2026-09-22 verdict winners (agent-retrieval-bench, Inspect AI and MLflow, none with a stack row) are not reconciled; c2: no single frozen candidate set (the limit-refused GPT-6 discovery needs a rerun, and FinMTEB, DeepEval and Ragas need dispositions); c3: no financial-document retrieval comparison, no mteb arm on the frozen fixture and no host acceptance; c4: no review after the 2026-09-26 corrections are applied; c5: no closure record."
+      },
+      "reasons": [
+        {"text": "The layer's current choice reuses the foundation's native clients, Dagu and systemd, the OpenTelemetry Collector with Prometheus, Loki and Grafana, and Restic.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The 2026-09-22 verdict winners agent-retrieval-bench 0.2.1, Inspect AI 0.3.266 and MLflow 3.16.1 are recorded but not adopted: none has a stack row.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The foundation's quality row runs containerized E2E evaluation on Harbor with Inspect AI as its fallback, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"}
+      ],
+      "evidence_class": "local_integration_check",
       "alternatives": [
+        {"name": "agent-retrieval-bench, Inspect AI and MLflow", "verdict": "the 2026-09-22 verdict winners, recorded but not adopted", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "promptfoo", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Arize Phoenix", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "Install nothing for this layer beyond the foundation's quality row until the trading lane records a selection with a pin of record."
+        "These install with the foundation rows native-clients, scheduling-supervision, observation-inference and recovery-portability.",
+        "Build the financial-document retrieval comparison and the mteb arm on the frozen fixture before any evaluation claim."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "agents-models-workers",
@@ -1703,47 +2090,186 @@
           "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
           "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "v1.16.0 (2026-09-28)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/giancarloerra/SocratiCode/releases"}
+        },
+        {
+          "component_id": "qmd",
+          "repository": "https://github.com/tobi/qmd",
+          "pin": "2.8.3",
+          "pin_source": "manifests/stack.json:758",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "qmd --index \"$QMD_INDEX\" search 'local code' -c \"$QMD_COLLECTION\" -n 2 --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v2.8.3 (2026-08-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/tobi/qmd/releases"}
+        },
+        {
+          "component_id": "serena",
+          "repository": "https://github.com/oraios/serena",
+          "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "pin_source": "manifests/stack.json:880",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd (then find_symbol and find_referencing_symbols through the client)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v1.7.0 (2026-08-09); the pin is a 2.0.0.dev0 development commit 123 commits ahead of that release, so release currency does not apply", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "unknown", "url": "https://github.com/oraios/serena/releases"}
+        },
+        {
+          "component_id": "qdrant",
+          "repository": "https://github.com/qdrant/qdrant",
+          "pin": "1.19.1",
+          "pin_source": "manifests/stack.json:727",
+          "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
+          "acceptance": {"command": "curl --fail --silent --show-error http://127.0.0.1:16333/healthz (the new host file moves the port)", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
+        },
+        {
+          "component_id": "context-mode",
+          "repository": "https://github.com/mksglu/context-mode",
+          "pin": "1.0.169",
+          "pin_source": "manifests/stack.json:403",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency (the npm CLI), then the Claude plugin from its SHA-pinned source 6f0cc6841c687e754059f36714a11233fda1a02b", "kind": "repo_recipe", "source_path": "recipes/README.md"},
+          "acceptance": {"command": "compare the installed plugin's gitCommitSha with 6f0cc6841c687e754059f36714a11233fda1a02b, then read ctx_stats in a fresh session", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v1.0.169 (2026-06-29)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/mksglu/context-mode/releases"}
+        },
+        {
+          "component_id": "rtk",
+          "repository": "https://github.com/rtk-ai/rtk",
+          "pin": "0.50.0",
+          "pin_source": "manifests/stack.json:822",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "rtk git log -6; rtk proxy git log -6", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v0.50.0 (2026-09-24)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/rtk-ai/rtk/releases"}
         }
       ],
       "verdict": "comparison_required",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: the current choice, the winners, the alternatives, the 2026-09-29 sweep and the roadmap target do not agree on one selection, QMD BM25 against hybrid is undecided, and the recorded pins lag the installed ones; c2: eight names lack dispositions and the vote builder is not retained; c3: no preregistered held-out finance, document and code retrieval comparison at a matched context budget with abstention, across the retrieval challengers including QMD hybrid; c4: no review after the repairs; c5: no closure record."
+      },
       "reasons": [
-        {"text": "The 2026-09-22 verdict keeps native Codex with its SDK, ai-memory and SocratiCode for research workers; its pins (CLI 0.155.1, ai-memory 2.3.1, SocratiCode 1.14.0) are older than the stack pins carried here.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The 2026-09-22 verdict keeps native Codex with its SDK, ai-memory and SocratiCode for research workers, and the current choice adds QMD BM25, Serena, Qdrant, Context Mode and RTK; the verdict's pins (CLI 0.155.1, ai-memory 2.3.1, SocratiCode 1.14.0) are older than the stack pins carried here.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "The research state asks for held-out finance, document and code relevance judgments comparing fidelity, abstention and total task cost.", "source_path": "catalogs/landscape/research-state.json"},
         {"text": "In the 2026-09-26 convergence record at PR #358's head, the votes allow only provisional retention of ai-memory and SocratiCode: operational receipts do not establish comparative superiority.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
-        {"name": "LangGraph", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "PageIndex", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "vLLM", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
+        {"name": "Mem0", "verdict": "overlap", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Hindsight", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Graphiti", "verdict": "conditional, and also listed as unqualified", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "LangGraph", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"}
       ],
       "new_host_steps": [
-        "These install with the foundation rows native-clients, durable-memory and semantic-rag; nothing extra for this layer.",
-        "Build the held-out relevance judgments before any comparison run."
+        "These install with the foundation rows native-clients, durable-memory, code-navigation, document-retrieval, semantic-rag and token-efficiency; nothing extra for this layer.",
+        "Decide QMD BM25 against hybrid on the recorded retrieval-quality evidence, then build the held-out relevance judgments before any comparison run."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "observability-hosting",
       "catalog": "us-equities",
       "title": "Observability and hosting",
-      "winners": [],
-      "verdict": "no_selection",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
-      "reasons": [
-        {"text": "The landscape record leaves this layer's verdict pending its lanes and records no winner; its current choice reuses the foundation's loopback telemetry and Dagu/systemd supervision.", "source_path": "catalogs/landscape/us-equities.json"}
+      "winners": [
+        {
+          "component_id": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2",
+          "pin_source": "manifests/stack.json:297",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "codex exec -C \"$PROJECT_ROOT\" --json - < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
+        },
+        {
+          "component_id": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284",
+          "pin_source": "manifests/stack.json:192",
+          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
+          "acceptance": {"command": "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
+          "upstream_currency": {"latest_release": "v2.1.286 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/claude-code/releases"}
+        },
+        {
+          "component_id": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6",
+          "pin_source": "manifests/stack.json:1335",
+          "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
+          "acceptance": {"command": "\"$DAGU\" version", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/README.md"},
+          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+        },
+        {
+          "component_id": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0",
+          "pin_source": "manifests/stack.json:1087",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/README.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+        },
+        {
+          "component_id": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0",
+          "pin_source": "manifests/stack.json:1118",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "curl --fail --silent http://127.0.0.1:19090/api/v1/status/buildinfo | grep -F '\"version\":\"3.15.0\"' (the new host moves the port with --port-overrides)", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.15.0 (2026-09-25)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/prometheus/prometheus/releases"}
+        },
+        {
+          "component_id": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8",
+          "pin_source": "manifests/stack.json:1156",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v3.7.8 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/loki/releases"}
+        },
+        {
+          "component_id": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2",
+          "pin_source": "manifests/stack.json:1193",
+          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
+          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+        },
+        {
+          "component_id": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1",
+          "pin_source": "manifests/stack.json:1307",
+          "install": {"command": "the official restic_0.19.1_linux_amd64.bz2 release asset, its detached signature verified against the upstream primary fingerprint", "kind": "upstream_documented", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "blueprints/us-equities/hosting/backup/README.md"},
+          "upstream_currency": {"latest_release": "v0.19.1 (2026-07-05)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/restic/restic/releases"}
+        }
       ],
-      "evidence_class": "none_recorded",
-      "alternatives": [],
+      "verdict": "selection_of_record_open",
+      "closure": {
+        "c1": "partial",
+        "c2": "partial",
+        "c3": "partial",
+        "c4": "unmet",
+        "c5": "unmet",
+        "missing": "c1: no recorded layer verdict with winners and alternatives exists (the landscape record says pending_lanes); c2: no frozen candidate set reconciles the layer rows, the convergence record, the ledger, the decision index and the 2026-09-29 manifest (the Tempo conflict and the Jaeger and OpenObserve dispositions are open); c3: no preregistered target-host runs of the metric clauses at current pins, including broker-authority removal, and no Restic restore of live telemetry, state and the broker journal into an independent trust domain; c4: the recorded reviews name open material gaps; c5: no closure record."
+      },
+      "reasons": [
+        {"text": "The current choice reuses the foundation's native clients, Dagu with systemd, the OpenTelemetry Collector with Prometheus, Loki and Grafana, and Restic; the landscape record leaves the layer verdict pending its lanes.", "source_path": "catalogs/landscape/us-equities.json"},
+        {"text": "The landscape winner pin for Prometheus is still 3.14.0 while the stack and the installer pin 3.15.0.", "source_path": "manifests/stack.json"}
+      ],
+      "evidence_class": "local_integration_check",
+      "alternatives": [
+        {"name": "Temporal", "verdict": "conditional, source review only", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Prefect", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
+        {"name": "Dagster", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
+      ],
       "new_host_steps": [
-        "Reuse the foundation rows observation-inference and scheduling-supervision; install nothing separately for this layer."
+        "These install with the foundation rows native-clients, scheduling-supervision, observation-inference and recovery-portability; nothing extra for this layer.",
+        "After the paper lane runs on the new host, restore its telemetry, state and broker journal with Restic into an independent trust domain and record the check."
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "security-supply-chain",
@@ -1786,7 +2312,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment is pending, so every closure item is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment covers eleven layers and not this one, so every closure item here is unknown."
     },
     {
       "layer_id": "cross:wsl-distro",
