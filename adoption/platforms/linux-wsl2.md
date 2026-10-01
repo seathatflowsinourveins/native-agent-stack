@@ -165,6 +165,16 @@ upstream behavior behind each.
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
 
+## A new distro from the official Ubuntu WSL image
+
+Added after `v2026.09.26.2`. [A new distro from the official Ubuntu WSL image](linux-wsl2-new-distro.md) creates a
+second WSL 2 distribution on this Windows host from Canonical's `ubuntu-24.04.5-wsl-amd64.wsl`, after checking the file
+against both published sha256 values. cloud-init gives it a passwordless default user before its first launch, and the page
+proves systemd, linger and the user bus before the bootstrap runs there. It changes nothing for the other distributions:
+no `.wslconfig` edit, no `wsl --update`, never `wsl --shutdown`, and the default distribution stays as it is. The
+decisions, their alternatives, the command table and the open questions are in
+[the 2026-10-01 record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
+
 ## Windows Terminal profiles and the login shell
 
 Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example

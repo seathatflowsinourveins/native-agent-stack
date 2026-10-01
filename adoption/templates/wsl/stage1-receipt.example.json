@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "wsl-new-distro-stage1-<host>-<YYYYMMDD>",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "claim": "<One or two sentences quoting only this run's output: the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, and F1-F3 printed running, Linger yes and a user-owned bus socket.>",
+  "limitations": [
+    "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
+    "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
+    "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host."
+  ],
+  "recorded_at_utc": "<YYYY-MM-DDTHH:MM:SSZ>",
+  "recipe": {
+    "path": "adoption/platforms/linux-wsl2-new-distro.md",
+    "catalog_revision": "<F7: git rev-parse HEAD of the new clone>",
+    "creation_path": "<A (cloud-init) or B (import and manual user)>"
+  },
+  "host": {
+    "wsl_version": [
+      "<each line of wsl.exe --version in W1>"
+    ],
+    "default_distribution_before": "<starred line of wsl.exe --list --verbose in W1>",
+    "default_distribution_after": "<starred line in W5; equal to the line above>",
+    "z_free_bytes": "<Free of Get-PSDrive Z in W1>"
+  },
+  "image": {
+    "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+    "bytes": 388975696,
+    "sha256_published": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+    "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256>",
+    "sha256_computed": "<W2: Get-FileHash .Hash in lower case>"
+  },
+  "first_launch": {
+    "user_prompt_marker": "<true when the W5 output contains 'Create a default Unix user account:'>",
+    "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>"
+  },
+  "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
+  "steps": [
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
+      "exit": 0,
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "cmd.exe /d /c \"wsl.exe -d <Name> < NUL\"",
+      "exit": 0,
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl is-system-running --wait",
+      "exit": 0,
+      "output_excerpt": "running"
+    },
+    {
+      "step": "F2",
+      "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
+      "exit": 0,
+      "output_excerpt": "yes"
+    },
+    {
+      "step": "F3",
+      "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER> directory\n<WSL_USER> socket"
+    }
+  ]
+}
