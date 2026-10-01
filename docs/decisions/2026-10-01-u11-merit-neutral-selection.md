@@ -1,6 +1,7 @@
 # U11: merit-neutral selection rules (design for review, 2026-10-01)
 
-Status: proposed, revision 2. This is the one repair round over the two reviews of revision 1 (see Review history).
+Status: proposed, revision 3: the repair round over the two reviews of revision 1 and the final wording repair after
+the second reads of revision 2 (see Review history).
 Nothing in this record is implemented, and no prompt, verdict or acceptance record changes with it. Owner of the files
 and of the implementing pull requests: the foundation lane's coordinator (session `sota-default-harness-setup`).
 
@@ -26,9 +27,8 @@ advantage that the repositories' quality does not:
 3. **Aggregation and absence count against the challenger.** Either family refuting refutes (`convert.py`, `FIT_RULE`);
    a missing or malformed vote refutes (`convert.py`, `is_refuted`); every proposal is projected onto survived or
    refuted; and the saturation ledger has no state for an unresolved candidate (`scripts/saturation_ledger.py`). The
-   Gate A owner's count over the ledger: in the 2026-09-26 and 2026-09-29 sweeps 352 of 382 refutations came from the
-   fit refuter alone, 42 of them only because a vote was missing (keyword counts over the retained reasoning, not a
-   classification).
+   ledger's own vote records: in the 2026-09-26 and 2026-09-29 sweeps 352 of 382 refutations came from the fit refuter
+   alone, 42 of them only because a vote was missing; the 352 rows cover 321 distinct layer and repository keys.
 4. **Entry is not symmetric.** The selection of record enters every later step without a vote; a newcomer must clear
    all of the above. A proposal the sweep refuted never reaches a verdict packet. Verdict packets do list manifest
    newcomers and keep-but-compare entries (`lane_packets.py`, `manifest_layer_candidates`), but those can never win.
@@ -41,8 +41,10 @@ advantage that the repositories' quality does not:
    although `verdict_status` already allows `no_selection`.
 6. **Evidence and prose lean to the incumbent.** Native runs exist mostly for what the source host installed, and its
    receipts and records name its selection; v1 measures the leak as `prose_exposed` (`scripts/landscape.py`).
-7. **Which layers get a comparison came out of the same rules.** The program record's split of the layers into
-   `comparison_required` and `on_requirement_change` rests on v1 survival.
+7. **Which layers get a comparison follows the same shape.** The layer statuses are maintained by hand
+   (`scripts/landscape.py` checks only the value set), and the `next_action` texts of the `on_requirement_change` layers
+   in `catalogs/landscape/research-state.json` say to compare only against a concrete gap or need, the same shape as the
+   v1 fit bar.
 
 ## Design
 
@@ -61,8 +63,9 @@ advantage that the repositories' quality does not:
 - Discovery keeps its novelty purpose and changes its contract. The task and schema ask for admission against the frozen
   requirement: `requirement_fit` (how the candidate meets the requirement, with evidence) replaces `demonstrated_gap`,
   `frozen_tasks` (which frozen tasks would measure it) replaces `comparison_that_would_overturn`, and the labels become
-  `admit`, `admit_pending` and `not_admitted` with a closed reason. The six-proposal cap stays a discovery budget, not an
-  eligibility limit. Credentials or a paid service are recorded as a cost and feasibility fact. The `known_repositories`
+  `admit`, `admit_pending` and `not_admitted` with a closed reason. A `not_admitted` label does not exclude: the
+  discoverer sees the winners, so such a member enters the field as `pending` and takes the same screen as every other.
+  The six-proposal cap stays a discovery budget, not an eligibility limit. Credentials or a paid service are recorded as a cost and feasibility fact. The `known_repositories`
   filter stays for novelty only, because every known candidate is already in the field.
 
 **B. The screens, version 2, and `pending` end to end.** New template versions; the current templates and their pinned
@@ -73,45 +76,71 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
 - Votes: `credible`, `not_credible` with a criterion from A's closed list and the fact, or `pending`. A missing,
   unavailable or malformed vote is `pending`. The duplicate rule becomes A's repository-identity dedupe; the paid rule
   becomes A's criterion (iv).
-- Aggregation, named: a member is excluded only when both families vote `not_credible` on the same closed criterion and
-  the facts support it; otherwise it stays, `credible` when both say so and `pending` in every other case.
+- Aggregation, named: for A's criteria (ii) to (iv) a member is excluded only when both families vote `not_credible` on
+  the same criterion and the facts support it; otherwise it stays, `credible` when both say so and `pending` in every
+  other case. Criteria (i) and (v) are decided by script.
 - `pending` survives every stage with the member's identity and reason: the vote file, the converter (which stops the
   binary projection), the frozen field and the saturation ledger, which gains a pending predicate. A pending material
   member is not clean: the layer's clean-sweep count does not advance, and merit cannot close, until the member is
   resolved by evidence or excluded under A.
-- The proposals the v1 sweeps refuted are re-voted under these rules when model capacity allows; until then they are in
-  the field as `pending`.
+- The proposals the v1 sweeps refuted are re-voted under these rules in a neutral seeded order over layer and repository
+  keys, never ordered by doubt about the incumbent, until the re-vote's budget ends; members past that cutoff stay
+  `pending`, and their layers carry D's provisional install, not a merit result.
 
 **C. Verdict lane contract, version 2.** A new contract version; the sealed 2026-09-22 wave and its rules stay.
 - Eligible winner keys are the field's members. `adopted` is sealed in the packet-keys document like the other
   `SEALED_CANDIDATE_FIELDS`, not left as a packet field.
 - The lane prompt reads the evidence of every field member, writes one status line per member, and has no adopted-only
   clause; `challenger_preferred` is retired, since `open_gaps` already carries the deciding comparison.
-- Blinding is partial, and the record says so. Packet labels are sealed; the judges read a blind evidence bundle built
-  like the blind checkout (`tools/sota-convergence/blind_checkout.py`), with neutral candidate labels and
+- Blinding is partial, and the record labels it accurately. Packet labels are sealed; the judges read a blind evidence
+  bundle built like the blind checkout (`tools/sota-convergence/blind_checkout.py`), with neutral candidate labels and
   selection-bearing prose reduced as `lane_packets.py` already reduces packet prose, and every candidate gets the same
-  bundle types and reading budget. The incumbent's records still name it, and `prose_exposed` still measures that. What
-  makes a leak harmless is the next rule: no judgment alone can make a winner.
+  bundle types and reading budget. The incumbent's records still name it, and `prose_exposed` still measures that.
+- Where a model judgment affects a deciding score or the selection, adoption information is withheld along that whole
+  path: its inputs, the prose it can open and its aggregation. A material exposure that cannot be resolved leaves the
+  layer's merit `undetermined`. An objective fixed oracle, a frozen task set scored by tests or exact checks, can support
+  a selection independently of exposed narrative, and the record states which deciding evidence came from an oracle
+  and which from judgments. Consistency is not accuracy: judges who saw the incumbent's records and prefer it in every
+  order and family are still biased (Zheng et al. 2023, section 3.4: high consistency may not imply high accuracy).
 - One evidence bar, enforced by the validators: a v2 winner needs `winner_evidence_class` `measured_comparison` and refs
-  that resolve to a registered receipt covering that winner and the field's hash. A member that was not compared is
-  listed `undetermined` with the deciding comparison and gets no `why_not_default`. Without such a receipt the lane
+  that resolve to a registered receipt covering that winner and the field's hash. The receipt cites the hash of the
+  comparison's preregistration, which predates its first trial, and the validator recomputes the preregistered decision
+  rule's outcome from the receipt's per-arm results: the lane's winner must equal that outcome, otherwise the layer is
+  `undetermined`. A member that was compared and lost gets a `why_not_default` that cites the receipt; a member that was
+  not compared is listed `undetermined` with the deciding comparison and gets none. Without such a receipt the lane
   returns `undetermined`, recorded as `verdict_status` `no_selection` with `open_gaps` naming the comparison.
 - Order: each lane gets its own candidate-order seed, and a winner that depends on the order is recorded
   `undetermined`. Pairwise judgments run in both orders and count a win only when the same candidate is preferred in both,
   otherwise a tie (Zheng et al. 2023, section 3.4); scored judgments average both orders (Wang et al. 2023, section 3.2);
-  a panel of three judges from different families votes by a function declared in advance, majority for binary
-  judgments and average pooling for scores (Verga et al. 2024, section 3.1); a missing judgment is pending, and no
-  majority is `undetermined`.
-- The selection of record carries no install precedence on the new distribution.
+  three judgments vote by a function declared in the preregistration, max voting (the majority label) for binary
+  judgments and average pooling for scores (Verga et al. 2024, section 3.1, where the panel spans three model families);
+  the tooling routes two families today (Claude and Codex), so the three judgments come from those two under different
+  seeds until a third family has a route, which the record then names; a missing judgment is pending, and no majority
+  is `undetermined`. These controls apply to every model judgment in this design, including D's.
+- The selection of record carries no precedence in selection, ties or arm order. What installs before a comparison is
+  set in D.
 
 **D. The comparisons that decide (program unit U5).**
 - Frozen before any run, with the field's hash: the tasks, the oracle, the resource budget, the quality criteria, the
   same retry budget for every arm, and the decision rule: the effect that matters, the tie-break and what a tie installs
   (a preregistered cost or footprint tie-break, both arms behind a selector, or no selection). The choice among those is
   the owners' and the user's; a silent default to the incumbent is not an option.
-- The arm set is a preregistered function of the field, the budget and a seed, for example a cheap screen on a shared
-  task subset and then the full comparison on the members that pass it. Members that are not run are `undetermined`,
-  never excluded. A comparison decides only among the arms it ran and records a disposition for every other member.
+- The arm set is a preregistered function of a closed list of inputs: the field's members and their requirement-fit
+  evidence, the budget and a seed; adoption, installed state and receipt counts are not among them. For example, a cheap
+  screen on a shared task subset, then the full comparison on the members that pass it. A member that fails the screen
+  is `undetermined`, not compared-and-lost, unless the screen itself meets the decision rule's power. Members that are
+  not run are `undetermined`, never excluded. A comparison decides only among the arms it ran and records a disposition
+  for every other member.
+- Closure: a member is material when A does not exclude it and it is `credible` or `pending`. A layer's closure record
+  lists every material member that was not compared, with its reason (the arm cap, pending), and states that the layer's
+  merit is decided only among the compared arms.
+- Run order and time windows are counterbalanced across arms. No arm gets the source host's wiring beyond the
+  upstream-documented integration, or every arm gets the same.
+- What installs on the new distribution: a layer that needs a comparison installs its arms fresh. A layer whose
+  comparison has not run, or whose field still holds a pending member, installs its selection of record provisionally,
+  labeled as not a merit result, with the pending set recorded and a reopening trigger (the comparison's first receipt,
+  or the pending set's resolution). The preregistration also names what a no-selection outcome installs: both arms
+  behind a selector, or neither, with the layer's function left to the clients' built-in tools.
 - Tasks come from the layer's real workload. A named external benchmark is allowed with a recorded reason; unless that
   reason shows it represents the workload, its run is a pilot, not the deciding comparison.
 - Each arm runs fresh at its current release on the target host, installed by its upstream commands. Program decision 5
@@ -124,10 +153,28 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
   or indecisive run is `undetermined`. Failures are kept with their usage. Inspect's eval sets are cited for the retry and
   reuse pattern only; the runner is the user's choice in the Gate A harness question.
 
-**E. Inputs.** A sweep or verdict input carries the field. `catalogs/us-equities/runtime-target.json` `next_acceptance`
-is split: the gate, what any candidate must show, goes to every member; the incumbent's executed status and evidence refs
-stay sealed. The trading lane owner states whether a user-pinned destination counts as a requirement, so that no tooling
-pass can override it.
+**E. Inputs and pinned requirements.** A sweep or verdict input carries the field. `catalogs/us-equities/runtime-target.json`
+`next_acceptance` is split: the gate, what any candidate must show, goes to every member; the incumbent's executed status
+and evidence refs stay sealed. A requirement text that names a candidate is reduced in sweep inputs as `lane_packets.py`
+(`reduce_prose`) already reduces verdict-packet prose, or rewritten as capabilities; a name that is a user pin or a fixture
+(LEAN as the parity oracle) is recorded as that. Four trading layers name NautilusTrader and LEAN in their requirement
+(research-factors-ml, backtesting-engine, execution-broker, portfolio-risk); none of the twenty foundation layers names a
+candidate. The trading lane owner's answer on the pinned destination, verbatim:
+
+> The destination is a requirement of its layer, not a selection that a comparison can change. The user selected
+> NautilusTrader with the IBKR destination and a separate Alpaca adapter path (AGENTS.md, north star;
+> catalogs/us-equities/runtime-target.json engine.decision selected_destination). The north star also says that dated LEAN
+> and Alpaca receipts remain comparison evidence rather than overriding that destination. So no tooling pass may override
+> it. A comparison that favours another engine is reported to the user as a decision, with its evidence, and only the user
+> changes the destination. The comparisons still run under the merit rule of 2026-10-01: the destination's comparative
+> merit is undetermined until they do, and they inform the user's choice without overriding it. Two parts stay
+> selections. First, the release pin: 2.0.0rc5 is the pin of record, and a newer NautilusTrader release replaces it only
+> through a dated version-selection record after its own qualification (unchanged upstream tests, then the acceptance
+> plan's steps). Second, every component around the destination (data, storage, research, risk, evaluation,
+> observability) follows the merit rule like any other selection.
+
+The rule this design takes from it: a requirement the user pinned stays out of every tooling decision; comparisons that
+involve it still run, and a result that favours another candidate is reported to the user as a decision.
 
 **F. Re-triage.** After the field, the version 2 screens and the re-vote, the layers are triaged again: a layer with a
 `credible` challenger in its field becomes `comparison_required`. This is a landing condition of the implementation.
@@ -174,6 +221,17 @@ hashes of sweeps already started; every acceptance contract and receipt. No cand
   A arms are wiring arms (now H). It also corrected this record's Why: v1 fit's bar is a plausible advantage, not a proven
   gap, and verdict packets do list non-adopted candidates; the gap is that sweep-refuted proposals never reach them.
 
+- Second reads of revision 2 (`51e6fcfbb1cb5f0d27c066c85e8f4f1279ff4b22`, sha256
+  `7a5f5371c219a5389552aade004a1074f826b8840ea76cbb941a01ebb85ef4b8`). The Codex catalog lane: scope pass on neutral
+  discovery, pending and the full field; one material blinding repair, now in C (no unconditional claim that the
+  evidence bar makes a leak harmless; the winner must satisfy the preregistered decision rule; adoption withheld along any
+  judgment path that affects a deciding score; oracle and judgment evidence labelled apart; consistency is not
+  accuracy); it verified 352 fit-only rows over 321 distinct keys (now in Why 3). The Gate A owner: revision 2 closes the
+  revision 1 boundaries; four paths remained (the validator recomputes the decision rule, now C; the provisional install
+  for layers with pending members, now C and D; requirement texts that name a candidate, now E; three judgments from two
+  routed families, now C) with residual rules (now A, B, C and D) and two corrections (Why 3 and Why 7). The trading lane
+  owner answered E's question (now quoted in E). This is revision 3, the final wording repair before implementation.
+
 ## Review question
 
 Do these repairs close the boundaries both reviews named? Name any remaining path where adoption status changes
@@ -188,7 +246,7 @@ without an executed comparison.
 - Wang et al. 2023, "Large Language Models are not Fair Evaluators", arXiv:2305.17926v2, section 3.2: balanced position
   calibration, the final score is the average over both orders.
 - Verga et al. 2024, "Replacing Judges with Juries", arXiv:2404.18796v2, section 3.1: three judges from disjoint model
-  families; max voting for binary judgments, average pooling for scores.
+  families; max voting for binary judgments, average pooling for scores. The voting function is a design choice.
 - OpenAI, "Evaluation best practices", https://developers.openai.com/api/docs/guides/evaluation-best-practices: position
   and verbosity bias, pairwise comparison, the "biased design" anti-pattern.
 - Anthropic, "A statistical approach to model evaluations" (2024-11-19),
