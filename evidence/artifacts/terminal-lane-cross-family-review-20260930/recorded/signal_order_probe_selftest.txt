@@ -1,0 +1,7 @@
+sent SIGTERM then SIGHUP: the handlers ran in the order []; equals the expected ascending pair: False
+sent SIGHUP then SIGTERM: the handlers ran in the order []; equals the expected ascending pair: False
+sent SIGTERM then SIGINT: the handlers ran in the order []; equals the expected ascending pair: False
+sent SIGTERM then SIGHUP: the handlers ran in the order ['SIGHUP']; equals the expected ascending pair: False
+sent SIGHUP then SIGTERM: the handlers ran in the order ['SIGHUP']; equals the expected ascending pair: False
+sent SIGTERM then SIGINT: the handlers ran in the order ['SIGINT']; equals the expected ascending pair: False
+the check rejects a recorder that records nothing and one that records only the first handler: True

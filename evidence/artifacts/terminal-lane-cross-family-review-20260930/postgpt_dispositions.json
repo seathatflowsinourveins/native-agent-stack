@@ -1,0 +1,382 @@
+{
+ "F-sol-P1-1": [
+  "coordinator: reproduced: `end_by_latched_signal` raised BrokenPipeError on a closed pipe and killed nothing",
+  "repaired",
+  "alert_probe.py and push_notification_probe.py: no flush before the final kill, the signal unblocked, the cleanup's report flushed in `main` with its failure tolerated; flush_case (a closed stdout, a blocked signal); mutants: a flush comes back, the signal is not unblocked",
+  {
+   "unit": "V1",
+   "check": "flush",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P1-2": [
+  "coordinator: reproduced: a SIGTERM that arrives after the cleanups ended the probe by SIGTERM, the second signal, not by the first",
+  "repaired",
+  "`with_private_dir(restore=False)` in `main`: the latch stays installed to the end of the process; the sweep driver and the new handoff_case end like `__main__`; mutant: the previous handlers are restored before the process ends",
+  {
+   "unit": "V1",
+   "check": "handoff",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P1-3": [
+  "coordinator: reproduced: a SIGTERM delivered at the Enter line left the latch set when the Enter was written; typing_case tested one boundary and one mutant removed every guard at once",
+  "repaired",
+  "`type_prompt` checks and writes the Enter with the handled signals blocked, so no Enter is written after the latch is set; typing_case checks five situations; four mutants, one per guard and one for the signal block",
+  {
+   "unit": "V1",
+   "check": "typing",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P1-4": [
+  "coordinator: reproduced: the guard-removed copy failed the sweep only because the guard's source marker disappeared; `started` was the stand-in's pidfile",
+  "repaired",
+  "the sweep driver counts the client's `subprocess.Popen` calls; the guard carries a `# SPAWN GUARD:` marker; the spawn mutant keeps the marker and must fail with the client-start message",
+  {
+   "unit": "V2",
+   "check": "spawn",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P1-5": [
+  "coordinator: reproduced: with handlers that record nothing the check printed True",
+  "repaired",
+  "signal_order_probe.py compares the recorded order with the exact expected pair; `--selftest` rejects a recorder that records nothing and one that records only the first handler",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P1-6": [
+  "coordinator: by reading: pty_probe_mutants.py:98 discarded a mutant run's skip notes (`_notes`) while the baseline's notes end the run",
+  "repaired",
+  "the runner ends the run on the notes of a mutant as on those of the baseline",
+  {
+   "unit": "V2",
+   "check": "skips",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P2-1": [
+  "coordinator: reproduced: another server whose socket path was ours plus `.old` was accepted as ours (the check was a substring test on the command line)",
+  "repaired",
+  "`server_identity` compares the command name (`tmux: server`) and the socket argument exactly; a fourth shutdown-failure control answers the pid of a prefix server; tmux_identity_mutant.py runs three mutants (comparison removed, substring, cleanup removed)",
+  {
+   "unit": "V3",
+   "check": "identity",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P2-2": [
+  "duplicate of F-ultra-P2-2 (coordinator: reproduced or read under F-ultra-P2-2)",
+  "repaired",
+  "see F-ultra-P2-2",
+  {
+   "unit": "V3",
+   "check": "symlink",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P2-3": [
+  "coordinator: reproduced: the third control's other tmux server survived an unexpected failure of the measurement",
+  "repaired",
+  "`shutdown_control` stops every server it caused by exact socket path in a `finally`; cleanup_control; mutant: the servers of a failing control are not stopped",
+  {
+   "unit": "V3",
+   "check": "cleanup",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P2-4": [
+  "duplicate of F-sol-P1-5 (coordinator: reproduced or read under F-sol-P1-5)",
+  "repaired",
+  "see F-sol-P1-5",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P2-5": [
+  "coordinator: reproduced: with a handler installed 0.3 s after the signal the exit-130 arm stopped (0 of 3 runs continued)",
+  "repaired",
+  "the control waits for a readiness file (the child's pid) before it sends SIGINT",
+  {
+   "unit": "V3",
+   "check": "delay",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P2-6": [
+  "coordinator: reproduced: dash with SIGINT to the process group stops its loop whatever the child does, and bash goes on after a child that died by SIGINT when only the child received the signal",
+  "repaired",
+  "every statement about shells names bash (and dash where measured) and the condition (the shell must receive the SIGINT too); shell_loop_control.py measures bash and dash, SIGINT to the group and to the child only",
+  {
+   "unit": "V4",
+   "check": "dash",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-1": [
+  "duplicate of F-sol-P1-3 (coordinator: reproduced or read under F-sol-P1-3)",
+  "repaired",
+  "see F-sol-P1-3",
+  {
+   "unit": "V1",
+   "check": "typing",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P3-2": [
+  "coordinator: reproduced: `sweep_trial` raised JSONDecodeError on a truncated record before it killed the stand-in",
+  "repaired",
+  "`sweep_trial` parses defensively (`unreadable_record`) and kills the stand-in in a `finally`; partial_case; mutant: a truncated sweep record raises",
+  {
+   "unit": "V2",
+   "check": "partial",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P3-3": [
+  "duplicate of F-sol-P1-1 (coordinator: reproduced or read under F-sol-P1-1)",
+  "repaired",
+  "see F-sol-P1-1",
+  {
+   "unit": "V1",
+   "check": "flush",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-4": [
+  "duplicate of F-sol-P1-4 (coordinator: reproduced or read under F-sol-P1-4)",
+  "repaired",
+  "see F-sol-P1-4",
+  {
+   "unit": "V2",
+   "check": "spawn",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-5": [
+  "duplicate of F-sol-P1-5 (coordinator: reproduced or read under F-sol-P1-5)",
+  "repaired",
+  "see F-sol-P1-5",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-6": [
+  "coordinator: reproduced with the reviewer's mutation: a child that kills its parent shell with SIGTERM was accepted (exit 0)",
+  "repaired",
+  "the shell's exit status is asserted (-SIGINT and no `continued` line) and a rejecting control kills the parent shell with SIGTERM",
+  {
+   "unit": "V3",
+   "check": "wrongsignal",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-7": [
+  "coordinator: reproduced (same measurement as F-sol-P2-6): with SIGINT to the child only bash goes on after a child that died by SIGINT",
+  "repaired",
+  "the condition that the shell must receive the SIGINT too is stated and measured (see F-sol-P2-6)",
+  {
+   "unit": "V4",
+   "check": "dash",
+   "severity": "medium"
+  }
+ ],
+ "F-sol-P3-8": [
+  "coordinator: by reading: the README said recorded/ holds the outputs of the F2 and F3 reproductions and holds neither",
+  "repaired",
+  "the README says which outputs are recorded; F2 and F3 are covered by the sweep's recorded detail (lines swept of lines with code) and by the runner's spawn mutant, which must fail with the client-start message",
+  {
+   "unit": "V4",
+   "check": "reading",
+   "severity": "low"
+  }
+ ],
+ "F-sol-P3-9": [
+  "coordinator: by reading: the decision record said all 11 findings were repaired while the record says ten repaired and one documented",
+  "repaired",
+  "the wording says ten repaired and one documented",
+  {
+   "unit": "V4",
+   "check": "reading",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P1-1": [
+  "duplicate of F-sol-P1-1 (coordinator: reproduced or read under F-sol-P1-1)",
+  "repaired",
+  "see F-sol-P1-1",
+  {
+   "unit": "V1",
+   "check": "flush",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P1-2": [
+  "duplicate of F-sol-P1-3 (coordinator: reproduced or read under F-sol-P1-3)",
+  "repaired",
+  "see F-sol-P1-3",
+  {
+   "unit": "V1",
+   "check": "typing",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P1-3": [
+  "duplicate of F-sol-P1-2 (coordinator: reproduced or read under F-sol-P1-2)",
+  "repaired",
+  "see F-sol-P1-2",
+  {
+   "unit": "V1",
+   "check": "handoff",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P1-4": [
+  "duplicate of F-sol-P3-2 (coordinator: reproduced or read under F-sol-P3-2)",
+  "repaired",
+  "see F-sol-P3-2",
+  {
+   "unit": "V2",
+   "check": "partial",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P1-5": [
+  "duplicate of F-sol-P1-4 (coordinator: reproduced or read under F-sol-P1-4)",
+  "repaired",
+  "see F-sol-P1-4",
+  {
+   "unit": "V2",
+   "check": "spawn",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P1-6": [
+  "duplicate of F-sol-P1-5 (coordinator: reproduced or read under F-sol-P1-5)",
+  "repaired",
+  "see F-sol-P1-5",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P2-1": [
+  "duplicate of F-sol-P2-1 (coordinator: reproduced or read under F-sol-P2-1)",
+  "repaired",
+  "see F-sol-P2-1",
+  {
+   "unit": "V3",
+   "check": "identity",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P2-2": [
+  "coordinator: reproduced: a symlink at the predictable path made the script overwrite its target",
+  "repaired",
+  "shell_loop_control.py keeps its scripts in a private temporary directory (`tempfile.TemporaryDirectory`, mode 0700), never at a predictable path",
+  {
+   "unit": "V3",
+   "check": "symlink",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P2-3": [
+  "duplicate of F-sol-P2-3 (coordinator: reproduced or read under F-sol-P2-3)",
+  "repaired",
+  "see F-sol-P2-3",
+  {
+   "unit": "V3",
+   "check": "cleanup",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P2-4": [
+  "duplicate of F-sol-P1-5 (coordinator: reproduced or read under F-sol-P1-5)",
+  "repaired",
+  "see F-sol-P1-5",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P2-5": [
+  "duplicate of F-sol-P2-5 (coordinator: reproduced or read under F-sol-P2-5)",
+  "repaired",
+  "see F-sol-P2-5",
+  {
+   "unit": "V3",
+   "check": "delay",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P2-6": [
+  "duplicate of F-sol-P2-6 (coordinator: reproduced or read under F-sol-P2-6)",
+  "repaired",
+  "see F-sol-P2-6",
+  {
+   "unit": "V4",
+   "check": "dash",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P3-1": [
+  "duplicate of F-ultra-P2-2 (coordinator: reproduced or read under F-ultra-P2-2)",
+  "repaired",
+  "see F-ultra-P2-2",
+  {
+   "unit": "V3",
+   "check": "symlink",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P3-2": [
+  "duplicate of F-sol-P1-3 (coordinator: reproduced or read under F-sol-P1-3)",
+  "repaired",
+  "see F-sol-P1-3",
+  {
+   "unit": "V1",
+   "check": "typing",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P3-3": [
+  "duplicate of F-sol-P1-5 (coordinator: reproduced or read under F-sol-P1-5)",
+  "repaired",
+  "see F-sol-P1-5",
+  {
+   "unit": "V3",
+   "check": "order",
+   "severity": "medium"
+  }
+ ],
+ "F-ultra-P3-4": [
+  "duplicate of F-sol-P3-8 (coordinator: reproduced or read under F-sol-P3-8)",
+  "repaired",
+  "see F-sol-P3-8",
+  {
+   "unit": "V4",
+   "check": "reading",
+   "severity": "low"
+  }
+ ],
+ "F-ultra-P3-5": [
+  "duplicate of F-sol-P2-6 (coordinator: reproduced or read under F-sol-P2-6)",
+  "repaired",
+  "see F-sol-P2-6",
+  {
+   "unit": "V4",
+   "check": "dash",
+   "severity": "medium"
+  }
+ ]
+}

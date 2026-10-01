@@ -3679,15 +3679,15 @@
         "omniroute",
         "claude-code"
       ],
-      "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 259 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (49 and 49 passes, each with eight end-to-end cases and eight in-process tests, among them a SIGTERM at each line a dry run reaches in the end-to-end cases) and 22 mutants (eleven per probe; each unmutated probe passes all eight cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun on the installed client shows the pattern recorded in 2026-09-28, no truecolor sequence without COLORTERM and no 256-colour sequence with it, with other exact counts), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at each line a dry run reaches, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock. After the merge of those repairs one more read followed, by one read-only Claude Opus agent (effort max, no shell) on the signal handling and shutdown code only, because the gateway pool's one usable account was at 83 of 100 points: 11 findings (3 medium, 8 low), each verified by a measurement or by reading before it was repaired in one round: the pty probes now end BY a latched signal instead of exiting 128 plus its number (a shell loop goes on after an exit 130 and stops after a death by SIGINT, measured), the sweep observes the spawn guard, the documents state the sweep's real coverage, an inherited SIG_IGN stays ignored, typing stops at a latched signal, and a third tmux control only the command-line check of the identity can fail.",
+      "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 260 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (53 and 53 passes, each with ten end-to-end cases and ten in-process tests, among them a SIGTERM at each line a dry run reaches in the end-to-end cases) and 48 mutants (twenty-four per probe; each unmutated probe passes all twelve cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun on the installed client shows the pattern recorded in 2026-09-28, no truecolor sequence without COLORTERM and no 256-colour sequence with it, with other exact counts), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at each line a dry run reaches, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock. After the merge of those repairs one more read followed, by one read-only Claude Opus agent (effort max, no shell) on the signal handling and shutdown code only, because the gateway pool's one usable account was at 83 of 100 points: 11 findings (3 medium, 8 low), each verified by a measurement or by reading before it was repaired in one round: the pty probes now end BY a latched signal instead of exiting 128 plus its number (a bash loop goes on after an exit 130 and stops after a death by SIGINT when the shell got the signal too, measured), the sweep observes the spawn guard, the documents state the sweep's real coverage, an inherited SIG_IGN stays ignored, typing stops at a latched signal, and a third tmux control only the command-line check of the identity can fail. After that, on the user's instruction to keep going with the highest-quality GPT lane, the packaged lane read the merged repairs: six read-only jobs (three lenses, each on gpt-6.1-sol and on cx/gpt-6-astra-ultra, effort max, Codex CLI 0.159.3, all exit 0) returned 38 findings (5 high, 31 medium, 2 low; each with a command the reviewer ran): 16 distinct issues and 22 duplicates, all 16 reproduced by the coordinator (13 by execution, 3 by reading; no Claude verifier agent ran because the shared five-hour meter read 89%) and all 38 repaired in one round: the probes' latch stays installed to the end of the process, nothing is flushed before the final kill and the signal is unblocked, the Enter is written under a signal block, the sweep counts the client's creation (the guard carries a marker and its mutant must fail through that count), a truncated record is reported and the stand-in killed, the tmux identity is an exact comparison with a fourth control and a cleanup control, the shell statements are scoped to the shells measured (bash and dash) and the scripts that measured them were repaired. The GPT read used 27.69M input tokens (96.1% cache reads) and 0.36M output tokens in 47 minutes of wall clock. The Codex review bot (GitHub's, chatgpt-codex-connector) then read the first push of those repairs on its own, at 07:27Z, and left three P2 threads, which the repository's ruleset makes a merge gate: a SIGTERM that landed after the final snapshot of the latch was lost, a stuck stdout held the probe for good, and the tmux selftests left socket directories behind. All three were reproduced by execution (verify_codex_bot_findings.py: before the repairs a child exit 0, a probe still running after 6 s, and two directories left by each tmux selftest; after them -15 four times and none left) and repaired in one round: the handoff ends the latch's life (block, read, die BY the first signal or give the handlers back to the default action), nothing is written while the latch is installed, the controls remove and count their socket directories and have a scope control, and the sweep covers the handoff and requires death BY SIGTERM. Before the second head was pushed one read-only Claude Opus reader (no shell) read those repairs and returned nine findings (four high, one medium, four low): the sweep's driver repeated the handoff call that hid its window, two expected sets of new mutants were wrong, the flush case failed under PYTHONUNBUFFERED=1, a closed stdout made a normal run exit 120, and more; five were confirmed by execution and four by reading, and all nine were repaired.",
       "limitations": [
         "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). No live Windows Terminal or interactive Claude Code session was run: the reviewers and the verifiers read code, upstream sources and ran scripts, synthetic homes and private tmux servers; the bell, the tab icon and focus reports in Windows Terminal remain unobserved.",
-        "One review family (GPT-6: gpt-6.1-sol in all three reads and cx/gpt-6-astra-ultra beside it in the re-check and the final read, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus). The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the graded findings of the three passes (23, 19 and 21) are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
+        "One review family (GPT-6: gpt-6.1-sol in all four GPT reads and cx/gpt-6-astra-ultra beside it in the re-check, the final read and the post-merge GPT read, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus); the Codex review bot is a third, automated reader of the last repairs, and one Claude Opus reader without a shell read the second head's repairs before its push. The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the graded findings of the three passes (23, 19 and 21) are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
         "Twelve findings of the first wave and two of the re-check were checked by the coordinator, not by a verifier (of the twelve: eight against the code or upstream source, three concerning the removed second-distro target, one convention). The removed target's code was not run before it was removed.",
-        "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Three further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; a one-lens Claude Opus read after the merge: 11 findings; each repaired in one round); the last round's repairs were checked by controls, 22 mutant runs, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
-        "Residuals of the last round: the lines after the prompt is typed are not swept (110 of 160 lines with code are for the alert probe, 123 of 186 for the push probe); signals pending together run their handlers in ascending number, so the first signal wins only one dispatch apart; a kill by pid after the tmux identity check has a gap that pidfd_open would close; SIGHUP is covered in process only; the tmux probes install no signal handler; a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor, and the post-merge read is a single Claude Opus reader without a shell: it read code and documents and ran nothing.",
+        "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Six further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; a one-lens Claude Opus read after the merge: 11; a GPT read of the merged repairs: 38; the Codex review bot's read of the first push of those repairs: 3; an Opus read of the second head's repairs before its push: 9; each repaired in one round); the last round's repairs were checked by controls, 50 mutant runs (25 per probe), a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
+        "Residuals of the last round: the lines after the prompt is typed are not swept (122 of 184 lines with code for the alert probe, 135 of 210 for the push probe) and the writes to the client's pty in `measure` are not bounded while the latch is installed; signals pending together run their handlers in ascending number, so the first signal wins only one dispatch apart; a kill by pid after the tmux identity check has a gap that pidfd_open would close; SIGHUP is covered in process only; the tmux probes install no signal handler; a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor, and the post-merge read is a single Claude Opus reader without a shell: it read code and documents and ran nothing. The GPT read's findings were reproduced by the coordinator alone (no verifier agent): a defect in a reproduction would not have been caught by a second reader, and the bot's findings were reproduced by the coordinator alone too; only bash and dash were measured for the shell statements; the tmux selftests must run one at a time (the two probes share the /tmp/tw* control directories).",
         "Some claims rest on source reading only and were not run: the remote-workspace branch of the PushNotification tool (installed client 2.1.285, `CLAUDE_CODE_REMOTE` or a thin-client session), Windows Terminal's parent order of profiles.defaults and fragment profiles (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`), and Tab.cpp's two-second indicator timer for a focused tab.",
-        "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave, 11 after it, 22 after the re-check, and 36 before and 52 after the final read; other sessions may have used points in between."
+        "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave, 11 after it, 22 after the re-check, 36 before and 52 after the final read, and 30 before and 67 after the post-merge GPT read; other sessions may have used points in between."
       ],
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
     },
@@ -15560,8 +15560,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "f9655a49295793d60bffdb9a24d22b1a6793e1354ffe08d0f3c6e02154fcd7ad",
-      "bytes": 92921
+      "sha256": "de936e27ab396580c9d26d082da659e3f5c551280a9f5444eb2daf4e5c43b21b",
+      "bytes": 110919
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -15735,8 +15735,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1bc87ac866ca9920f008aae41e71167ad4cd40d55d10ec79f9ee778cab928875",
-      "bytes": 112654
+      "sha256": "02a0483354e60d23152c9a8393a6fe88caa18f4f207430100f67b1fb7a9afbe9",
+      "bytes": 121960
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -35370,8 +35370,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
-      "sha256": "3b118cb3c6a5ffa294f27e591b47da5d2da2eb38effb5bbcdb7a46fd2691d49a",
-      "bytes": 11349
+      "sha256": "a056580fbe32371bfdddb46aa0c9c1947f27b91066be644d4382288670b4424c",
+      "bytes": 12091
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/concurrent_writer_harness.py",
@@ -35385,8 +35385,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
-      "sha256": "43039c7e5055964843352ec60d38cc63145316a7c1dbcfb018de59ac223662e1",
-      "bytes": 48806
+      "sha256": "52c3cdcb52e3e63dd8e589bd3b9a67feb1b508cb6fa7dcc6c28e8ce82cac2710",
+      "bytes": 73137
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
@@ -35470,8 +35470,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
-      "sha256": "6f56032a39ec0c42435f1ed4a247ce96fac5dab7a9153a4b33f4f1e4a60f2e0e",
-      "bytes": 14752
+      "sha256": "b13ffd5fe0995830da568e5582f1bd3fdea77d3b16d651d660d16c4fa56628ef",
+      "bytes": 23333
     },
     {
       "path": "evidence/artifacts/observability-dashboard.png",
@@ -42415,13 +42415,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/README.md",
-      "sha256": "e951e486088e0118c4417e4f1d02ffe2b55400841aae2be441324e8fd514d3e0",
-      "bytes": 8982
+      "sha256": "e515ddde1b299f413b4bd3a1aa431892791237eb3376c1e712feac4e5521bfef",
+      "bytes": 12405
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
-      "sha256": "ecc12d3e13e67d2144b528d559f08f41f4b78b7493557e4e37882477e5b2c764",
-      "bytes": 45186
+      "sha256": "32fd68917f1457f062e42df7716f9eba7e19d368c7cb647fa4380aca3a8d3082",
+      "bytes": 69519
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
@@ -42435,8 +42435,8 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
-      "sha256": "ce312445627fa1005960ae504ccfe3c28ff032f41e6dadc3033f6d7e1ecf77fc",
-      "bytes": 8900
+      "sha256": "c9bd867ec198ec788093f7614b9e892fbbe0ccfbfcb2f375d40a9479323c7506",
+      "bytes": 16917
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/validate_fragment.py",
@@ -42460,8 +42460,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
-      "sha256": "b28b34c57453bf321aa32130e4d8bcf3413922ce9edad56e4e01e6e65f3ef3ba",
-      "bytes": 11979
+      "sha256": "8077b1265ab09478091441a503dfabc8ccc068a03729450ab6fc05282e29ea91",
+      "bytes": 18884
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_codex_bot_record.py",
+      "sha256": "5919654c3838cd29d783dbc4afe11d49898861b09d192322f4abbee7bf80a471",
+      "bytes": 7395
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_final_prompts.py",
@@ -42477,6 +42482,16 @@
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_findings_record.py",
       "sha256": "b3652aa81ee934a43556557ba5bfadf380d55809da8caf65145ab6388bb677b8",
       "bytes": 11907
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_post_gpt_prompts.py",
+      "sha256": "48120203699429898ede808cf88067440c4d4114c5929928bf745a4061ddcbf3",
+      "bytes": 20336
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_postgpt_record.py",
+      "sha256": "90492ef049fc0ba0ca5b99f0eb01842d57f7c281257ee7b064539afdc1deaf4f",
+      "bytes": 5473
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_recheck_prompts.py",
@@ -42497,6 +42512,11 @@
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/check_receipt_hashes.py",
       "sha256": "4406b561aed203704111ce32e42d407920f2c9debb71568d3d95fd01694a9866",
       "bytes": 1128
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/codex-bot-read.json",
+      "sha256": "1f2003bc89d028d47c01b5259294a5d0a8b358d5602d78d8a0c9f295384d6788",
+      "bytes": 8260
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/collect_reviews.py",
@@ -42544,6 +42564,11 @@
       "bytes": 2579
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/make_post_units.py",
+      "sha256": "f665014b094756b23be6c9a92262c6a03fb001a156f85ed46ffea43f794a8aba",
+      "bytes": 2245
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/make_verify_briefs.py",
       "sha256": "e4dffde4dca7892831218ab761e50ac7b26976d562cc2604e4f1036e99aeafce",
       "bytes": 1924
@@ -42557,6 +42582,36 @@
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/post-merge-read.json",
       "sha256": "f5a3a9acadeaa9a77c831d081279409cd69c3aa571ec81c77fd3f93f51f31679",
       "bytes": 7724
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-findings.json",
+      "sha256": "d951153f4dc7d52c000a7fc4be52aad4da9a0dbaf99071a76fc0f342f1a16247",
+      "bytes": 22583
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-results.json",
+      "sha256": "e63ec86cf147ba2ae9261b9b514a4f942d45cdfd20519f460d031443eeb478f8",
+      "bytes": 143211
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt-verification.json",
+      "sha256": "64b43ff93def578984246c711e62b8a5ac3557c2829997421ffea09a15e7d56c",
+      "bytes": 8528
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt_dispositions.json",
+      "sha256": "5a818eec0780297fcc45195cb543ce542551a6667325d3b832964bfc15c5ad12",
+      "bytes": 11127
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt_prompts_sha256.txt",
+      "sha256": "480f82f2e887653e942478b97ec1edbc8ec3d724a052b0f83133baaaff28662d",
+      "bytes": 297
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/postgpt_units.json",
+      "sha256": "cdf1d974ea55f3232cdd9f906b021375899ddf21adf9d5c2faa359571b5325d1",
+      "bytes": 1186
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/prompts_sha256.txt",
@@ -42590,12 +42645,22 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/alert_probe_selftest.txt",
-      "sha256": "6c7dce708bf2e22b941776014475956e65d9cd74099092ebf0372e20d1149147",
-      "bytes": 5417
+      "sha256": "5374b7cc36dbcc77f8bf48971e031a6f68e3da812ee8dbb4162efce2dd2cdf90",
+      "bytes": 6697
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_bot_verification.txt",
+      "sha256": "cf46460cbac70dfe0c6d3e1f635622b43900523bdff27105871beeb68bb883b9",
+      "bytes": 943
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_bot_verification_after.txt",
+      "sha256": "894d7c48ad305f3dfbbca6ccdce3ee9031fc9bbd9e79b2ade4b80c7b6135bb6e",
+      "bytes": 810
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_tui_strict_check.txt",
-      "sha256": "0fe9d235c8c2aaf4209ca4179cc29218fc7afcf7258477fc1b3a48a4d5dd0428",
+      "sha256": "2d85aa6f77157107d4230a6fefcc9169ca5e545a654301b6b81dfa747dfa9f0e",
       "bytes": 1417
     },
     {
@@ -42615,13 +42680,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/environment.txt",
-      "sha256": "60c59684c98a5ff763ef5501ffae5a49b2832805dccc6349d4d7e84683bcca94",
+      "sha256": "8fbe7ba1e371db260e86897dfe973e4354bd68438f612d079e4e5fbc43016bfd",
       "bytes": 87
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/exit_codes.txt",
-      "sha256": "f5ae410d9877bf1bb8cbcdf0c364fb8a7951bf7415e242c8459bd2b03818cc47",
-      "bytes": 2622
+      "sha256": "f23aad10cbceebdfb4dc51ddd9155c361f821d8ee0175602690a22976559caf2",
+      "bytes": 3049
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/landscape_refresh_selftest.txt",
@@ -42674,6 +42739,11 @@
       "bytes": 534
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/post_gpt_verification.txt",
+      "sha256": "f605a3b8250092ed8181ff1f57be376a143788aa2b0278708cf5843d45b8946b",
+      "bytes": 2959
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_check_terminal_profiles.txt",
       "sha256": "a5d6a4547ccf677f1b65d2b289c80304fad79e3ca7048262cb711c9b74cbbdb0",
       "bytes": 288
@@ -42695,18 +42765,18 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_alert.txt",
-      "sha256": "5bc22c3a72b62e3cf9a7f62854c125d1a56dec8cae8cfc7c37f97c7dc4c1a172",
-      "bytes": 1020
+      "sha256": "3c55c2dc76241c0d460db82e9edf0316b4d510c3e786a299ec83c16e475929f1",
+      "bytes": 2589
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_push.txt",
-      "sha256": "393c260dc05a1bf58d31a5d4dfb10374264d7f8fff5fe75c10fbf2389f313bab",
-      "bytes": 1008
+      "sha256": "1963cc63d31b236be25de2fd6391ef079cae1ea7a08e5b49b6534d068da24da3",
+      "bytes": 2564
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/push_notification_probe_selftest.txt",
-      "sha256": "28c33004f324f5a26dce31ac63aee0250963416ea1091412dbe5797948a4550b",
-      "bytes": 5431
+      "sha256": "f03175f1fc2328ce097a414148cd5242c5bc873601b197ab9e2ba8dec7c0047c",
+      "bytes": 6712
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/replace_bell_group_controls.txt",
@@ -42725,7 +42795,7 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scrub_placeholder_probe.txt",
-      "sha256": "6f37ce37903e60e95eef4b09249a613172cd44cc4e5840a012d91f4a4941336c",
+      "sha256": "efe9cb0d88e309a6d03ed7fe213c613193aaac70040e99adf4ac6dcd1b15518c",
       "bytes": 5716
     },
     {
@@ -42735,13 +42805,18 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/shell_loop_control.txt",
-      "sha256": "fd4c05c85371174fd98f5ca152954ad74cd0b4fc62b10bad9cce792084b0286f",
-      "bytes": 252
+      "sha256": "c82755aa549f74921ed88775846b77e46879bdc0a568ec536c7132ba4dbc8861",
+      "bytes": 1180
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/signal_order_probe.txt",
-      "sha256": "f39776a4d9f93babd14e36cccb82fc4d214e50b999424c4ce244072d5fd90475",
-      "bytes": 298
+      "sha256": "6992b6144a1cdb14b946996510997b9d14f849ebd17461d554ba1796708a9f2d",
+      "bytes": 439
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/signal_order_probe_selftest.txt",
+      "sha256": "39ba3fada9d3cc8942627a28f20f6b0b54b2de4df3ab222d6aa16bd740369b7d",
+      "bytes": 736
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe.txt",
@@ -42750,18 +42825,18 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe_selftest.txt",
-      "sha256": "de0eabd3a559de8b1b1eddc8718ba200c9e7404530f7ddc131fdab8dcc80ec74",
-      "bytes": 515
+      "sha256": "e4f3c07109b685350abc50664e4ba7641b8d28f81c2df774093bb92e112bd771",
+      "bytes": 1304
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_identity_mutant_bell.txt",
-      "sha256": "92917d93eda823384de22bfa3e800c5d94f44ff3c68b4d6b22d314b0245bc3e6",
-      "bytes": 336
+      "sha256": "089312529b22cac27af96d1864bb29f2507bed78846e25607571db0ed8cc9d66",
+      "bytes": 1486
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_identity_mutant_sync.txt",
-      "sha256": "b0af07b70470386fff3107d27783f0673c167c5e41e137fe179f8882f9e71c4f",
-      "bytes": 272
+      "sha256": "15d201f1c28e72d2b5d049267f0521c9a74a00bf52c811a35a1638fd9c0d2e71",
+      "bytes": 1154
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_sync_probe.txt",
@@ -42770,13 +42845,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_sync_probe_selftest.txt",
-      "sha256": "b6c68ddcd146a3a6cd9cb4065d8896a26e2b3f871b605c1f95928477115be3cf",
-      "bytes": 484
+      "sha256": "cf2992375d87ed5c2dba9e8fa5405065625f924beacca23c2ed98969551dbd2f",
+      "bytes": 1272
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/unit_tests.txt",
-      "sha256": "2ad64fa82f7c6dbaa822f21c11934baa774fb0a4a4b47c6fbdaac4fc61363716",
-      "bytes": 976
+      "sha256": "cf3415b9444762c7853967e8bd72eba4318f37300fdeb440e61ed3e10cfe00e9",
+      "bytes": 977
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
@@ -42789,14 +42864,19 @@
       "bytes": 1897
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/second-head-read.json",
+      "sha256": "812801002250d406c2e4c81236c59944dae28b6f36ee8f68750df5316599ee61",
+      "bytes": 7523
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
-      "sha256": "fd5ee47cfd1533b89171dc8ec3d1643252f54aa088518e5ca4424bf91c91cce1",
-      "bytes": 2714
+      "sha256": "d74fdb9e94ca18ace6bf914d51e7ef930657d130fc53444be0c8e7a70c56c832",
+      "bytes": 6206
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
-      "sha256": "519a9ce1164dfa92e7a9f89bea89af748fbb6c23a8adcc53188bceb98c56a5cf",
-      "bytes": 1562
+      "sha256": "9f84281d1acc0cd4b5e4ffc896fb600e7f8f1d4c7b7ce1a2a5329ea18376ef50",
+      "bytes": 3518
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/stage_review_lane.py",
@@ -42805,18 +42885,28 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_identity_mutant.py",
-      "sha256": "5ba3fc0c481c4c1b00e28b747bb064e3627c89b8c635d180639cfd173b934fcd",
-      "bytes": 2528
+      "sha256": "95ffa5dd9ea545dd0262a45bfe995c6bfe3f80a4a455cbb6f809eb15bf693a44",
+      "bytes": 5561
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
-      "sha256": "b4bb1d85e5e37d116aca343c523b6a0cf81c1475f83e5ea106f7e1103e6658ee",
-      "bytes": 12636
+      "sha256": "0b49670b599938891f643f6fbfc54609fd8f9431fbb809dd5af201a726f25718",
+      "bytes": 21048
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verification.json",
       "sha256": "91d8315dc5f5457b1e6181e7acc0c8031ca0e857c29c29222d0ac1d16c0cf676",
       "bytes": 75925
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verify_codex_bot_findings.py",
+      "sha256": "d56d4c7d01494b136608c86df660cc74f61e5e50c038402001ddf206e716203e",
+      "bytes": 6281
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verify_post_gpt_findings.py",
+      "sha256": "d85c5e123e6c388415ac814f4c62dd41e66829397ff0b6a2ad6f6941b70fccb5",
+      "bytes": 12530
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
@@ -44970,8 +45060,8 @@
     },
     {
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
-      "sha256": "488ae5c39ea978e7bc4ddf0daaf1bd789e95a352f6d89d618bca9cbbd2c4e138",
-      "bytes": 34401
+      "sha256": "6e871a44a3dcedbf37e221b78508e5be0f781e212a4dcfbd02172f0a2065522c",
+      "bytes": 47644
     },
     {
       "path": "evidence/receipts/current-session-observation-20260920.json",

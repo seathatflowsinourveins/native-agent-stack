@@ -1,0 +1,106 @@
+{
+ "read": {
+  "reviewer": "chatgpt-codex-connector (GitHub's Codex review bot)",
+  "pull_request": 572,
+  "commit_read": "5c48464",
+  "head_when_fetched": "66283fe8",
+  "threads": 3,
+  "severities": {
+   "P2": 3
+  },
+  "all_reproduced_by_execution": true,
+  "verification_script": "verify_codex_bot_findings.py"
+ },
+ "findings": [
+  {
+   "id": "B1",
+   "reviewer": "chatgpt-codex-connector",
+   "severity": "P2",
+   "title": "Close the final signal handoff window",
+   "commit": "5c48464",
+   "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 726,
+   "posted": "2026-10-01T07:27:38Z",
+   "body": "Close the final signal handoff window**\n\nWhen no signal has yet been latched, keeping these handlers installed through process exit creates a lost-signal window: `end_by_latched_signal()` snapshots `STOP[\"signal\"]`, and a SIGTERM delivered after that read but before the `return` is merely latched, after which `sys.exit(status)` exits normally. I reproduced this by delivering SIGTERM with a line trace at the `if number is None` line; the alert probe returned 0 with `STOP[\"signal\"] == SIGTERM`, and the mirrored push probe has the same path. Block handled signals across this final check/handoff or restore their previous dispositions when the snapshot is empty.",
+   "resolved_when_read": false,
+   "reproduced_by": "R1",
+   "before_the_repairs": [
+    "R1 alert: SIGTERM after the snapshot line -> child exit 0 (-15 = ended BY SIGTERM; 0 = the signal was lost) | returned; latch = 15",
+    "R1 push: SIGTERM after the snapshot line -> child exit 0 (-15 = ended BY SIGTERM; 0 = the signal was lost) | returned; latch = 15"
+   ],
+   "after_the_repairs": [
+    "R1 alert: SIGTERM after the snapshot line -> child exit -15 (-15 = ended BY SIGTERM; 0 = the signal was lost) | ",
+    "R1 push: SIGTERM after the snapshot line -> child exit -15 (-15 = ended BY SIGTERM; 0 = the signal was lost) | "
+   ],
+   "coordinator_severity": "medium",
+   "repair": "`end_by_latched_signal` is the last safe point and the end of the latch's life: with the handled signals blocked it reads the latch; a latched signal ends the process BY it; with none latched every handler that is still the latch goes back to the default action and the old mask returns, so a signal that is pending or lands later ends the process by its default action (a signal the parent ignored stays ignored). The handoff is run once, in `main`'s `finally` (the probe's `__main__` and the test drivers no longer repeat it), and the sweep covers the handoff and the output after it and requires death BY SIGTERM (it accepted exit status 143 too).",
+   "checks_that_fail_without_it": [
+    "the sweep case (a SIGTERM at each line, now including `end_by_latched_signal` and `emit_report`)",
+    "mutant: the snapshot of the latch is read without a block",
+    "mutant: the latch is not handed back to the default action when nothing was latched",
+    "mutant: an ignored signal is handed to the default action too",
+    "the nohup case at the end of the process"
+   ]
+  },
+  {
+   "id": "B2",
+   "reviewer": "chatgpt-codex-connector",
+   "severity": "P2",
+   "title": "Avoid flushing before honoring the latched signal",
+   "commit": "5c48464",
+   "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 730,
+   "posted": "2026-10-01T07:27:38Z",
+   "body": "Avoid flushing before honoring the latched signal**\n\nWhen stdout is a full pipe whose consumer is not reading, this forced flush blocks after cleanup but before `end_by_latched_signal()` runs; because the installed signal handlers only update the latch and return, SIGINT or SIGTERM cannot release the blocked write. I reproduced this with a pipe filled to capacity and a pre-latched SIGTERM: the child remained running until SIGKILL instead of ending by SIGTERM. The derived push probe has the same flush, and the new closed-stdout case does not cover this blocking path. Emit this diagnostic without a potentially blocking flush, or perform the signal handoff before any output operation.",
+   "resolved_when_read": false,
+   "reproduced_by": "R2",
+   "before_the_repairs": [
+    "R2 alert: stdout a full pipe that nobody reads, a latched SIGTERM -> STILL RUNNING after 6 s (killed by SIGKILL) (-15 = ended BY SIGTERM)",
+    "R2 push: stdout a full pipe that nobody reads, a latched SIGTERM -> STILL RUNNING after 6 s (killed by SIGKILL) (-15 = ended BY SIGTERM)"
+   ],
+   "after_the_repairs": [
+    "R2 alert: stdout a full pipe that nobody reads, a latched SIGTERM -> child exit -15 (-15 = ended BY SIGTERM)",
+    "R2 push: stdout a full pipe that nobody reads, a latched SIGTERM -> child exit -15 (-15 = ended BY SIGTERM)"
+   ],
+   "coordinator_severity": "medium",
+   "repair": "Nothing is written while the latch is installed: `measure` collects its result lines with `say`, `end_by_latched_signal` runs first in the `finally` of `main`, and `emit_report` prints after it, so a stuck stdout cannot hold a probe that has a signal to honor and a signal during the output takes its default action.",
+   "checks_that_fail_without_it": [
+    "the flush case: the real `main`, in children without PYTHONUNBUFFERED, with a closed stdout and a latched signal, with a closed stdout and none (the exit status must stay 0), with a full pipe and a latched signal, with a full pipe and a signal sent once the child is seen blocked in its write, and with a blocked signal (each must die by SIGTERM, or exit 0, and leave no payload directory)",
+    "the static case: `measure` and `type_prompt` write nothing to stdout or stderr themselves",
+    "mutant: the diagnostic is printed before the handoff",
+    "mutant: a failed report leaves its bytes for the final flush",
+    "mutant: the measurement writes a result line itself",
+    "mutant: a flush comes back before the final kill"
+   ]
+  },
+  {
+   "id": "B3",
+   "reviewer": "chatgpt-codex-connector",
+   "severity": "P2",
+   "title": "Remove socket directories recorded during failed controls",
+   "commit": "5c48464",
+   "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 196,
+   "posted": "2026-10-01T07:27:38Z",
+   "body": "Remove socket directories recorded during failed controls**\n\nOn hosts with tmux, each `cleanup_control()` injection can leave an empty `<scratch>*` directory behind (and `<scratch>*` in the sync probe): its `failing()` wrapper catches the measurement's `ServerNotStopped` and raises `RuntimeError`, so this function never assigns the local `socket`. The `finally` block learns the measurement socket from `recorded`, and successfully kills its server via `known`, but this condition remains false and only the unrelated `/tmp/tw*` context directory is automatically removed. Remove the parent directories for the recorded owned sockets after stopping them so the selftest actually provides recoverable lifecycle cleanup.",
+   "resolved_when_read": false,
+   "reproduced_by": "R3",
+   "before_the_repairs": [
+    "R3 bell: selftest exit 0; new <scratch>* socket directories left behind: 2",
+    "R3 sync: selftest exit 0; new <scratch>* socket directories left behind: 2"
+   ],
+   "after_the_repairs": [
+    "R3 bell: selftest exit 0; new <scratch>* socket directories left behind: 0",
+    "R3 sync: selftest exit 0; new <scratch>* socket directories left behind: 0"
+   ],
+   "coordinator_severity": "low",
+   "repair": "The controls remove the directory of every recorded socket once its server is stopped (`remove_work_directory`: a direct child of /tmp that looks like the probe's own `mkdtemp` result, never the parent of an arbitrary path), compare the directories before and after, and a scope control checks that an unrelated directory and one with the right prefix and another shape stay; a directory is removed only when its server is gone; `tmux_servers()` counts only the processes started with a socket in the probes' own directories.",
+   "checks_that_fail_without_it": [
+    "the cleanup control and the shutdown-failure control (socket directories left behind 0)",
+    "the scope control",
+    "mutant: the socket directories of a failing control are not removed",
+    "mutant: the removal is not scoped to this probe's own directories"
+   ]
+  }
+ ]
+}

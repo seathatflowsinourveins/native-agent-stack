@@ -1,3 +1,7 @@
-sync, unmutated: exit 0 | [] | control lines ['PASS shutdown-failure control']
-sync, command-line clause removed: exit 1 | [] | control lines ['FAIL shutdown-failure control']
-the unmutated selftest passes: True; the mutant is caught by the shutdown-failure control: True
+sync, unmutated: exit 0 | ['PASS shutdown-failure control', 'PASS cleanup control', 'PASS scope control']
+sync, the comparison of the command line is removed: exit 1 | ['FAIL shutdown-failure control', 'FAIL cleanup control', 'PASS scope control'] | caught by 'FAIL shutdown-failure control': True
+sync, the socket argument is compared as a substring: exit 1 | ['FAIL shutdown-failure control', 'FAIL cleanup control', 'PASS scope control'] | caught by 'FAIL shutdown-failure control': True
+sync, the servers of a failing control are not stopped: exit 1 | ['FAIL shutdown-failure control', 'FAIL cleanup control', 'PASS scope control'] | caught by 'FAIL cleanup control': True
+sync, the socket directories of a failing control are not removed: exit 1 | ['FAIL shutdown-failure control', 'FAIL cleanup control', 'PASS scope control'] | caught by 'FAIL cleanup control': True
+sync, the removal is not scoped to this probe's own directories: exit 1 | ['PASS shutdown-failure control', 'PASS cleanup control', 'FAIL scope control'] | caught by 'FAIL scope control': True
+the unmutated selftest passes: True; every mutant is caught by the named control: True
