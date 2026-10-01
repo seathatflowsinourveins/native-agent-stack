@@ -30,7 +30,8 @@ still works offline; the guide and manifest links require the checkout layout.
 
 The views connect a layered ecosystem map, foundation and trading capabilities,
 current choices and alternatives, the repository explorer, selected-stack setup,
-token-efficiency evidence, and dated source provenance. Every
+token-efficiency evidence, the new-WSL final architecture, and dated source
+provenance. Every
 current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and
@@ -124,6 +125,35 @@ unsupported formats, files over 2 MiB and bundles over 16 MiB. It never follows
 arbitrary raw-log references. Publication review must establish that the declared
 public files are suitable for sharing; the hash check establishes byte identity.
 Receipts without public attachments say so explicitly.
+
+**Final architecture** (tab 05) appears when the dated edition
+[`catalogs/foundation/new-wsl-architecture-20261001.json`](../../catalogs/foundation/new-wsl-architecture-20261001.json)
+is present; without it the tab stays hidden. It is the install manifest for a
+new WSL distribution: one row per layer of both catalogs (the 20 foundation
+layers and the 12 us-equities layers of the research state) plus `cross:` rows
+for the distribution itself, runtime workers, the GPT-6 harnesses, the
+credential practice and the convergence practice. The header shows the edition
+date, its base commit, scope, the verdict rules verbatim, what each verdict and
+evidence class means, the five closure items of
+[the research state](../../catalogs/landscape/research-state.json) and the
+edition's sources, and states how many rows are closed. One table per catalog
+lists each row's winners at their pin of record, verdict, evidence class,
+reasons and install command; expanding a row shows the closure items with what
+is missing, the winners' pin locators, install and acceptance commands and
+upstream currency, the alternatives, the ordered new-host steps and the gates.
+
+The build validates the edition before it renders: every `layer_id` is a known
+catalog layer or a `cross:` id; a winner's `component_id` must be a
+`manifests/stack.json` component carrying that component's recorded version as
+its pin; repositories and currency links pass the public HTTPS gate; each cited
+`source_path` must be a repository file, which is hashed into the page's inputs
+and linked at the publication ref; a source not yet on main is cited as a
+`pending_source` with its pull request and is linked, not hashed; verdicts and
+evidence classes come from fixed enums, and a `closed` verdict requires all five
+closure items `met` (an open row must name what is missing). A catalog layer
+without a row is listed as a gap rather than failing the build. The record of
+this edition is
+[`docs/decisions/2026-10-01-new-wsl-architecture-edition.md`](../decisions/2026-10-01-new-wsl-architecture-edition.md).
 
 ## Rebuild and check
 
