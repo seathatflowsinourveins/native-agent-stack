@@ -7,7 +7,7 @@ The ticked list and the transcript feed [the receipt example](stage1-receipt.exa
 
 ## Windows host (PowerShell)
 
-- [ ] **W1** WSL is 2.4.10 or later; the default (starred) distribution is recorded; `<Name>` is unregistered; `Z:\WSL\<Name>` does not exist; no Landscape user-data exists for `<Name>`; free space on `Z:` is recorded.
+- [ ] **W1** `Z:\WSL\downloads` exists and the transcript is open; WSL is 2.4.10 or later; the default (starred) distribution is recorded; `<Name>` is unregistered; `Z:\WSL\<Name>` does not exist; no Landscape user-data exists for `<Name>`; free space on `Z:` is recorded.
 - [ ] **W2** The computed, Canonical-published and DistributionInfo.json sha256 are all `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e`; no `throw`.
 - [ ] **W3** `%USERPROFILE%\.cloud-init\<Name>.user-data` exists, starts with `#cloud-config`, names `<WSL_USER>` twice and contains no `${`.
 - [ ] **W4** Install exit 0; `Distribution successfully installed`; `<Name>` is `Stopped` at version 2; the starred line is unchanged.

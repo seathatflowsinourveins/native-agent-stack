@@ -12,9 +12,10 @@ default and is never shut down.
 
 Stage 1 (W1 to W6) runs on the Windows host in PowerShell. A session inside the workstation's WSL distribution runs each
 PowerShell block as a `.ps1` file with `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
-([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Start each block's file with
-`Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append` and end it with `Stop-Transcript`: that
-private transcript is the raw install log the receipt is cut from. The first boot (F1 to F10) runs inside the new
+([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Open each block's file with
+`Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append`, placed in W1 right after its first line
+(which creates that folder), and end the file with `Stop-Transcript`. That private transcript is the raw install log the
+receipt is cut from. The first boot (F1 to F10) runs inside the new
 distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a WSL session,
 `wsl.exe -d <Name> -- bash -s < steps.sh`.
 
@@ -51,9 +52,13 @@ distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a
 
 ## Stage 1 on the Windows host
 
-### W1. Preflight (read only)
+### W1. Preflight and the log folder
+
+The first line creates `Z:\WSL\downloads`, which holds the transcript, so it comes before the transcript starts. Nothing
+else in W1 writes.
 
 ```powershell
+New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'
 $env:WSL_UTF8 = '1'
 wsl.exe --version
 wsl.exe --list --verbose
@@ -82,7 +87,6 @@ This block reads the catalog at the commit of 2026-09-14 (#41465), whose `Ubuntu
 
 ```powershell
 $ProgressPreference = 'SilentlyContinue'
-New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'
 Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'
 Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\WSL\downloads\SHA256SUMS'
 $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'

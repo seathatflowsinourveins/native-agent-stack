@@ -210,6 +210,7 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 
 | Step | Shell | Command | Proof |
 | --- | --- | --- | --- |
+| W1 | powershell | `New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'` | the folder for the transcript and the image exists |
 | W1 | powershell | `$env:WSL_UTF8 = '1'` | wsl.exe writes UTF-8 instead of UTF-16 |
 | W1 | powershell | `wsl.exe --version` | `WSL version:` 2.4.10 or later; lines recorded |
 | W1 | powershell | `wsl.exe --list --verbose` | the starred line is recorded as the default |
@@ -218,7 +219,6 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | W1 | powershell | `Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\<Name>.user-data')` | `False` |
 | W1 | powershell | `Get-PSDrive -Name Z \| Select-Object -Property Name, Used, Free` | `Free` recorded |
 | W2 | powershell | `$ProgressPreference = 'SilentlyContinue'` | no progress rendering during the download |
-| W2 | powershell | `New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'` | the folder exists |
 | W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'` | 388,975,696 bytes saved |
 | W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\WSL\downloads\SHA256SUMS'` | the checksum list saved |
 | W2 | powershell | `$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'` | the pinned value |
