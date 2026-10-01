@@ -1893,7 +1893,7 @@ ORACLE_STAY_ALLOWED = [
 
 
 def run_hook(payload):
-    return subprocess.run([sys.executable, str(HOOK)], input=json.dumps(payload),
+    return subprocess.run([sys.executable, "-B", str(HOOK)], input=json.dumps(payload),
                           capture_output=True, text=True, timeout=30)
 
 
@@ -2525,7 +2525,7 @@ class SecretPathGuardTests(unittest.TestCase):
 
     def test_the_size_limit_is_at_200000_characters(self):
         # The boundary, without reading the text: the length counts characters, 200,000 pass to check() and one more do not.
-        for length, expected, called in ((guard.MAX_COMMAND_CHARACTERS, 0, True), (guard.MAX_COMMAND_CHARACTERS + 1, 2, False)):
+        for length, expected, called in ((200_000, 0, True), (200_001, 2, False)):
             with self.subTest(length=length):
                 payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "x" * length}})
                 stderr = io.StringIO()
@@ -2533,6 +2533,11 @@ class SecretPathGuardTests(unittest.TestCase):
                         mock.patch.object(sys, "stdin", io.StringIO(payload)), mock.patch.object(sys, "stderr", stderr):
                     status = guard.main()
                 self.assertEqual((status, check.called), (expected, called))
+                if called:
+                    self.assertEqual(stderr.getvalue(), "")
+                else:
+                    self.assertTrue(stderr.getvalue().startswith("secret_path_guard: blocked (command_too_large). "))
+                    self.assertEqual(stderr.getvalue().count("\n"), 1)
         # Characters, not bytes: 150,000 four-byte characters are 600 KB of UTF-8 and pass.
         payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "\U0001f600" * 150_000}})
         with mock.patch.object(guard, "check", return_value=None), mock.patch.object(sys, "stdin", io.StringIO(payload)):
@@ -2555,6 +2560,24 @@ class SecretPathGuardTests(unittest.TestCase):
         # that a budget test can only trip through it.
         self.assertEqual(guard.WORK_LIMITS["characters"], 400_000)
         self.assertEqual(sorted(guard.WORK_LIMITS), ["characters", "reads", "texts", "words"])
+        # Independent permanent witnesses for K3-12/13/14. Retained charges in
+        # the large rows below must not hide an omitted individual read/pass.
+        for counter, limit, call in (
+                ('reads', 0, lambda: guard.launched_commands([['watch', 'python3', 'a']])),
+                ('characters', 99, lambda: guard.mentions_injected_variable('x' * 3200, 'X'))):
+            with self.subTest(inherited_charge=counter), mock.patch.dict(guard.WORK_LIMITS, {counter: limit}):
+                guard.start_work()
+                try:
+                    with self.assertRaises(guard.WorkBudgetExceeded):
+                        call()
+                finally:
+                    guard.stop_work()
+        # The repaired started-command path costs five reads. Four allows the
+        # mutant that drops keyring_reason's own read, but not the real guard.
+        with mock.patch.dict(guard.WORK_LIMITS, {'reads': 4}):
+            with self.assertRaises(guard.WorkBudgetExceeded) as caught:
+                guard.check('kernel_keyring.py exec n X -- true')
+            self.assertEqual(caught.exception.args, ('reads',))
         cases = [
             ("characters", "echo '" + "x" * 205_000 + "' # x"),  # two readings of 205,000 characters
             ("characters", "echo '" + "€" * 150_000 + "' # x"),  # two-byte characters count twice: 300,000 a reading
@@ -3481,7 +3504,7 @@ k4_extend("base_reason_precedence", [
     ("python3 - <<'PY'\nprint(open('/home/example/.config/native-agent-stack/x.env').read())\nPY", "credential_store_path"),
     ("python3 - <<'PY'\nimport os\nprint(os.environ['TAVILY_API_KEY'])\nPY", "secret_variable_reference"),
     ("python3 - <<'PY'\nKEYCTL_READ = 11\nPY", "keyring_payload_read"),
-    # a B-allowed descriptor repair precedes a gateway finding; a B-refused mixed command keeps B's reason
+    # Harmless descriptor spellings stay allowed; B-refused mixed commands keep B's reason.
     ("echo 1>/dev/null; echo 1 > /dev/null; curl -s http://127.0.0.1:20128/api/health", None),
     ("curl -s http://127.0.0.1:20128/api/settings; cat .env", "dotenv_read"),
     ("systemctl --user import-environment; cat \"$PAPER_ENV_FILE\"", "credential_file_read"),
@@ -3966,6 +3989,9 @@ K4_BASE_REFUSED = {
 # A benign command, allowed by the base and by K4, that reaches each new helper (section 9.6, failure injection). The test wraps the helper
 # to prove it is reached, then makes it raise inside main() (mocked streams) and inside a child Python that patches it and calls main().
 K4_HELPER_FIXTURES = {
+    "k4_charge": "true",
+    "k4_word_charge": "systemctl --user set-environment PATH=/usr/bin",
+    "read_command": "true",
     "segment_identity": "echo 1>/dev/null; echo 1 > /dev/null",
     "descriptor_positions": "echo 1>/dev/null; echo 1 > /dev/null",
     "note_identity_collision": "echo 1>/dev/null; echo 1 > /dev/null",
@@ -3988,6 +4014,7 @@ K4_HELPER_FIXTURES = {
     "k4_join": K4_R + "tavily -- tvly search markets --json",
     "k4_runner_mentions": K4_R + "tavily -- tvly search markets --json",
     "k4_runner_environment": K4_R + "tavily -- tvly search markets --json",
+    "k4_runner_commands": K4_R + "tavily -- tvly search markets --json",
     "k4_runner_usage_reason": K4_R + "tavily -- tvly search markets --json",
     "k4_visible_words": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
     "k4_manager_reason": "systemctl --user set-environment PATH=/usr/bin",
@@ -4035,6 +4062,8 @@ K4_HELPER_FIXTURES = {
 # Helpers whose own work is charged (section 1, invariant 5), with a direct call and the counter it must raise by at least the amount given.
 K4_TEXT = "x" * 3200  # 100 units a pass
 K4_CHARGED = {
+    "k4_charge": (lambda: guard.k4_charge(K4_TEXT), "characters", 100),
+    "k4_word_charge": (lambda: guard.k4_word_charge(["echo"] * 100), "words", 100),
     "k4_anchors": (lambda: guard.k4_anchors(K4_TEXT), "characters", 100),
     "k4_shell_words": (lambda: guard.k4_shell_words(K4_TEXT), "characters", 100),
     "k4_runner_mentions": (lambda: guard.k4_runner_mentions(K4_TEXT), "characters", 300),
@@ -4114,7 +4143,9 @@ K4_TIMING = {
     "T-GW-PREFIX-METHOD": (lambda: "curl -s " + "-XGETX " * 20000 + "http://127.0.0.1:20128/api/health", "gateway_credential_route"),
     # Each runner hop re-emits the rest of the words (the words counter), and each interpreter word among a started command's arguments is
     # read again from there on (the characters counter), so these adversarial rereads stop on a counter instead of scanning every suffix.
-    "T-RUN-DEEP": (lambda: (K4_R + "tavily -- ") * 3000 + "true", "words"),
+    # Expanding only the started text now reaches the shared character budget
+    # before the old outer re-expansion reached words. Production limits stay fixed.
+    "T-RUN-DEEP": (lambda: (K4_R + "tavily -- ") * 3000 + "true", "characters"),
     "T-RUN-INTERPRETERS": (lambda: K4_R + "tavily -- echo " + "python3 " * 1200 + "; true", "characters"),
     "T-RUN-DISTINCT": (lambda: "; ".join(K4_R + f"tavily -- echo {n}" for n in range(1500)), "reads"),
     "T-RUN-ONLY": (lambda: K4_R + "alpaca-paper " + "--only APCA_API_KEY_ID " * 5000 + "-- true", None),
@@ -4142,6 +4173,11 @@ _K4_TIMING_CHILD = (
     "sys.dont_write_bytecode = True\n"
     "sys.path.insert(0, sys.argv[1])\n"
     "from tests import test_secret_path_guard as t\n"
+    "if len(sys.argv) > 3:\n"
+    "    import importlib.util\n"
+    "    spec = importlib.util.spec_from_file_location('timing_guard', sys.argv[3])\n"
+    "    t.guard = importlib.util.module_from_spec(spec)\n"
+    "    spec.loader.exec_module(t.guard)\n"
     "text = t.K4_TIMING[sys.argv[2]][0]()\n"
     "spans, verdict = [], None\n"
     "for _ in range(3):\n"
@@ -4161,6 +4197,7 @@ K4_SCALING = {
     "k4_shell_words": lambda n: "echo " + "'a' " * (n // 4) + "| python3 scripts/kernel_keyring.py store x",
     "k4_runner_mentions": lambda n: K4_R + "tavily -- echo " + "TAVILY_API_KE " * (n // 14),
     "k4_runner_environment": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
+    "k4_runner_commands": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
     "k4_runner_start": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
     "k4_script_position": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
     "k4_runner_start_scan": lambda n: K4_R + "tavily -- echo " + "a " * (n // 2),
@@ -4207,6 +4244,183 @@ K4_SCALING = {
 }
 
 
+# One repair round, 2026-09-30: exact inert witnesses from the GPT-6 and Opus
+# reviews. Each positive has an allowed control; the named permanent test owns
+# the witness (scratch adapters are not mutation-kill evidence).
+K4_REPAIR_CASES = {
+    "empty-userinfo": ("gateway_effective_requests",
+        "curl http://@127.0.0.1:20128/api/settings", "gateway_credential_route",
+        "curl http://127.0.0.1:20128/api/health"),
+    "httpie-option": ("gateway_effective_requests",
+        "http --timeout 5 http://127.0.0.1:20128/api/settings", "gateway_credential_route",
+        "http --timeout 5 http://127.0.0.1:20128/api/health"),
+    "xh-option": ("gateway_effective_requests",
+        "xh --timeout 5 http://127.0.0.1:20128/api/settings", "gateway_credential_route",
+        "xh --timeout 5 http://127.0.0.1:20128/api/health"),
+    "request-positional-method": ("gateway_effective_requests",
+        'python3 -c \'import urllib.request; urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:20128/api/health", None, {}, None, False, "POST"))\'',
+        "gateway_credential_route",
+        'python3 -c \'import urllib.request; urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:20128/api/health", None, {}, None, False, "GET"))\''),
+    "requests-member-write": ("gateway_effective_requests",
+        'python3 -c \'import requests; requests.get=requests.post; requests.get("http://127.0.0.1:20128/api/health")\'',
+        "gateway_credential_route", 'python3 -c \'import requests; requests.get("http://127.0.0.1:20128/api/health")\''),
+    "request-member-write": ("gateway_effective_requests",
+        'python3 -c \'import urllib.request; req=urllib.request.Request("http://127.0.0.1:20128/api/health"); req.method="POST"; urllib.request.urlopen(req)\'',
+        "gateway_credential_route",
+        'python3 -c \'import urllib.request; req=urllib.request.Request("http://127.0.0.1:20128/api/health"); urllib.request.urlopen(req,timeout=5)\''),
+    "runner-manager": ("runner_start_and_inline_order",
+        "python3 tools/credentials/credential_run.py tavily -- watch -n 1 systemctl --user import-environment",
+        "manager_environment_write",
+        "python3 tools/credentials/credential_run.py tavily -- watch -n 1 systemctl --user import-environment DISPLAY"),
+    "runner-selector": ("runner_start_and_inline_order",
+        "export CMD_ENV=bsd; python3 tools/credentials/credential_run.py tavily -- watch -n 1 ps -e",
+        "ps_personality_selector", "python3 tools/credentials/credential_run.py tavily -- watch -n 1 ps -e"),
+    "python-cr-comment": ("language_comments_and_interpolation",
+        "python3 -c '# comment\rimport os; print(os.environ)'", "environment_dump",
+        "python3 -c '# comment\rimport os; print(os.environ.get(\"HOME\"))'"),
+    "js-unicode-comment": ("language_comments_and_interpolation",
+        "node -e '// comment\u2028console.log(process.env)'", "environment_dump",
+        "node -e '// comment\u2028console.log(process.env.HOME)'"),
+    "python-alias-secret": ("whole_environment",
+        "python3 - <<'PY'\nimport os; e=os.environ.copy()\nprint(e['CLAUDE_CODE_MESSAGING_TOKEN'])\nPY",
+        "secret_variable_reference", "python3 - <<'PY'\nimport os; e=os.environ.copy()\nprint(e['HOME'])\nPY"),
+    "js-alias-secret": ("whole_environment",
+        "node - <<'JS'\nconst e={...process.env};\nconsole.log(e.CLAUDE_CODE_OAUTH_TOKEN)\nJS",
+        "secret_variable_reference", "node - <<'JS'\nconst e={...process.env};\nconsole.log(e.HOME)\nJS"),
+    "shellout-prefix": ("shell_literals_and_shellouts",
+        "python3 - <<'PY'\nimport subprocess\nargs=[]\nsubprocess.run(['printenv', *args])\nPY",
+        "environment_dump", "python3 - <<'PY'\nimport subprocess\nargs=[]\nsubprocess.run(['true', *args])\nPY"),
+    "spawn-mode": ("shell_literals_and_shellouts",
+        "python3 - <<'PY'\nimport os\nos.spawnl(0, '/usr/bin/printenv', 'printenv')\nPY", "environment_dump",
+        "python3 - <<'PY'\nimport os\nos.spawnl(0, '/usr/bin/true', 'true')\nPY"),
+    "store-wrapper": ("literal_store_provenance",
+        'builtin export K=demo; printf %s "$K" | python3 scripts/kernel_keyring.py store sample_key', "keyring_store_literal",
+        'builtin export K="$INPUT"; printf %s "$K" | python3 scripts/kernel_keyring.py store sample_key'),
+    "store-ansi-c": ("literal_store_provenance",
+        "echo $'demo$value' | python3 scripts/kernel_keyring.py store sample_key", "keyring_store_literal",
+        'echo "$value" | python3 scripts/kernel_keyring.py store sample_key'),
+    "canary-module": ("canary_gate", "python3 -m cProfile /p/canary_proof.py --phase comparison",
+        "canary_user_terminal_required", "python3 -m py_compile /p/canary_proof.py --phase comparison"),
+}
+for _group, _command, _reason, _control in K4_REPAIR_CASES.values():
+    k4_extend(_group, [(_command, _reason), (_control, None)])
+k4_extend('runner_environment_and_mentions', [
+    (K4_R + 'tavily -- sh -c "strace true; systemctl --user show-environment"', 'service_manager_environment'),
+    (K4_R + 'tavily -- sh -c "systemctl --user show-environment; strace true"', 'service_manager_environment')])
+for _wrapper in ("command export", "builtin declare -x"):
+    k4_extend("literal_store_provenance", [
+        (f'{_wrapper} K=demo; printf %s "$K" | python3 scripts/kernel_keyring.py store sample_key', 'keyring_store_literal'),
+        (f'{_wrapper} K="$INPUT"; printf %s "$K" | python3 scripts/kernel_keyring.py store sample_key', None)])
+for _module in ("cProfile", "pdb"):
+    k4_extend("canary_gate", [(f"python3 -m {_module} /p/canary_proof.py --phase comparison", "canary_user_terminal_required"),
+                             (f"python3 -m {_module} /p/canary_proof.py --phase baseline", None)])
+for _language, _breaks in (("py", ("\r", "\r\n")), ("js", ("\r", "\n", "\u2028", "\u2029"))):
+    for _break in _breaks:
+        _body = ("# comment" + _break + "import os; print(os.environ)" if _language == "py"
+                 else "// comment" + _break + "console.log(process.env)")
+        _safe = _body.replace("os.environ)", "os.environ.get('HOME'))").replace("process.env)", "process.env.HOME)")
+        for _code, _reason in ((_body, "environment_dump"), (_safe, None)):
+            k4_extend("language_comments_and_interpolation", [(k4_code_f(_code, _language), _reason)])
+k4_extend("language_comments_and_interpolation", [
+    ("node - <<'JS'\nconst x=1; x /* ' */\nconsole.log(process.env)\n// '\nJS", "environment_dump"),
+    (r"node -e 'console.log(\u0070rocess.env)'", "interpreter_environment_unclassified"),
+    ("node - <<'JS'\nconsole.log(\"process\")\nJS", None)])
+k4_extend("f_reference_boundaries", [
+    ("python3 - <<'PY' | grep '|'\nprint(set([1]))\nPY", None),
+    ("python3 - kernel_keyring.py exec n X -- systemd-run --user --pipe strace true <<'PY'\npass\nPY", "process_trace"),
+    ("python3 - kernel_keyring.py exec n X -- sudo -u '>' strace true <<'PY'\npass\nPY", "process_trace")])
+K4_F_LABELED += [("python3 - <<'PY' | grep '|'\nprint(set([1]))\nPY", True),
+                 ("python3 - <<-'PY'\npass\nPY", False), ("python3 - <<'PY'>x\npass\nPY", False)]
+for _option in "BbdEIOPqsSuv":
+    K4_F_LABELED.append((f"python3 -{_option} - <<'PY'\nprint(set([1]))\nPY", True))
+for _filter, _options in (("head", ("-q",)), ("tail", ("-q",)), ("wc", ("-l", "-c", "-w", "-m")),
+                           ("sort", ("-n", "-r", "-u", "-h", "-V")), ("uniq", ("-c", "-d", "-u"))):
+    for _option in _options:
+        K4_F_LABELED.append((f"python3 - <<'PY' | {_filter} {_option}\nprint(set([1]))\nPY", True))
+for _option in "inEFvwxco":
+    K4_F_LABELED.append((f"python3 - <<'PY' | grep -{_option} x\nprint(set([1]))\nPY", True))
+for _name in ("PS_PERSONALITY", "CMD_ENV", "I_WANT_A_BROKEN_PS"):
+    for _prefix in (f"{_name}=bsd ", f"env {_name}=bsd ", f"export {_name}=bsd; ", f"declare -x {_name}=bsd; "):
+        for _ps in ("ps -e", "/bin/ps -e", "sudo ps -e", K4_R + "tavily -- ps -e"):
+            k4_extend("ps_selectors", [(_prefix + _ps, "ps_personality_selector")])
+for _client in ("/usr/bin/curl", "sudo curl", "rtk proxy curl", K4_R + "tavily -- curl"):
+    k4_extend("gateway_effective_requests", [(_client + " http://127.0.0.1:20128/api/settings", "gateway_credential_route"),
+                                             (_client + " http://127.0.0.1:20128/api/health", None)])
+for _method in ("GET", "POST"):
+    for _data in ("--data x", "-d ''"):
+        k4_extend("gateway_matrix", [(f"curl -X {_method} {_data} http://127.0.0.1:20128/api/usage/provider-limits", "gateway_credential_route")])
+k4_extend("gateway_effective_requests", [
+    ("node - <<'JS'\nfetch('http://127.0.0.1:20128/api/health', {x: " + "1" * 5000 + "})\nJS", "gateway_credential_route"),
+    ("curl 'http://127.0.0.1:20128/api/health[1-" + "1" * 5000 + "]'", "gateway_credential_route")])
+K4_TIMING.update({
+    "T-GW-ASSIGNMENT-CHAIN": (lambda: "python3 -c 'import urllib.request; " + "=".join("v" + str(i) for i in range(12000))
+                             + '=urllib.request.Request("http://127.0.0.1:20128/api/health")\'', None),
+    "T-JS-REGEX-LOOKAHEAD": (lambda: "node - <<'JS'\nx = " + "{} / [" * 6000 + "1" + "]" * 6000 + ";\nJS", None),
+    "T-GW-REQUEST-BINDINGS": (lambda: "python3 - <<'PY'\n" + "\n".join(
+        "r%d = urllib.request.Request('http://127.0.0.1:20128/api/health')" % i for i in range(1600)) + "\nPY", None),
+})
+K4_F_LABELED += [(text, False) for text in (
+    "python3 - \\\n<<'PY'\npass\nPY", "python3 -m thing <<'PY'\npass\nPY", "python3 - < input <<'PY'\npass\nPY",
+    "python3 - <<'PY' ; true\npass\nPY", "python3 - <<<'PY'\npass\nPY", "python3 - <<'PY'\npass\n PY ",
+    *(f"{consumer} <<'PY'\npass\nPY" for consumer in ('tee', 'sh', 'bash', 'dash', 'zsh', 'ksh', 'ruby', 'perl', 'php')))]
+k4_extend('f_reference_boundaries', [
+    ("python3 - <<'PY'\n# ~/.codex/auth.json\npass\nPY", 'native_store_path'),
+    ("python3 - <<'PY'\n# KEYCTL_READ\npass\nPY", 'keyring_payload_read')])
+k4_extend('shell_literals_and_shellouts', [("sudo python3 - <<'PY'\nprint(dict(os.environ))\nPY", 'environment_dump')])
+k4_extend('runner_usage_and_documentation', [
+    ("python3 -W ignore tools/credentials/credential_run.py get tavily", 'credential_run_usage'),
+    ("python3 -- tools/credentials/credential_run.py get tavily", 'credential_run_usage')])
+k4_extend('gateway_matrix', [("curl 'http://127.0.0.1:20128/api/analytics/compression?since=all&extra=1'", 'gateway_credential_route')])
+k4_extend('gateway_effective_requests', [(text, 'gateway_credential_route') for text in (
+    "curl http://127.0.0.1:20128/api/health http://127.0.0.1:20129/api/compression/preview -X POST",
+    "python3 -c \"import httpx; httpx.post('http://127.0.0.1:20128/api/health')\"",
+    "curl --request-target /api/settings http://127.0.0.1:20128/api/health",
+    "node -e \"fetch('http://127.0.0.1:20128/api/usage/provider-limits',{method:'POST',body:''})\""
+)])
+for _prefix in ('systemctl --user import-environment ', 'dbus-update-activation-environment --systemd '):
+    k4_extend('manager_environment', [(_prefix + ' '.join('DISPLAY' + str(i) for i in range(12)) + ' GH_TOKEN',
+                                      'manager_environment_write'),
+                                     (_prefix + ' '.join('DISPLAY' + str(i) for i in range(12)), None)])
+
+# Own-pass charges frozen by helper name, independent of the mutated source.
+# Forwarders/O(1) predicates are covered by their charged scanning callee.
+K4_OWN_CHARGES = frozenset('''k4_anchors k4_needs_walk k4_names_and_stores k4_shell_words k4_program_operand_scan
+k4_script_position_scan k4_runner_start_scan k4_join k4_runner_mentions k4_runner_commands k4_runner_environment
+k4_visible_words k4_manager_reason k4_literal k4_store_reason k4_store_text k4_literal_input k4_ps_reason k4_canary_reason
+k4_regions k4_resume_contexts k4_f_tail k4_f_header k4_form_f k4_tail_reason k4_unescape k4_code_tokens
+k4_code_structure k4_leading_literals k4_derived k4_shell_literals k4_shellouts k4_whole_environment k4_single_key
+k4_code_units k4_unit_environment_reason k4_gateway_reason k4_curl_expansions k4_gateway_url k4_curl_requests
+k4_wget_requests k4_httpie_requests k4_gateway_cli k4_gateway_shell k4_call_parts k4_code_value
+k4_query_values k4_gateway_code read_command'''.split())
+K4_CHARGE_FIXTURES = dict(K4_HELPER_FIXTURES, **{
+    'k4_needs_walk': "bash -c 'true' kernel_keyring.py exec n X -- true",
+    'k4_runner_environment': K4_R + "tavily -- python3 -c 'print(1)'",
+    'k4_code_units': k4_code_f('pass'),
+    'k4_names_and_stores': 'echo CLAUDE_CODE_OAUTH_TOKEN',
+    'k4_gateway_reason': K4_HELPER_FIXTURES['k4_gateway_code'],
+    'read_command': k4_code_f('pass'),
+})
+K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, also in CI.
+# The acceptance/mutation driver injects the actual scratch adapter module.
+# Its behavioral assertions live here; no scratch callback counts as a kill.
+K4_ACCEPTANCE_ADAPTER = None
+K4_SCALING.update({name: K4_SCALING['k4_runner_environment'] for name in
+                   ('k4_tightenings', 'k4_needs_walk', 'k4_walk_reason', 'k4_memo', 'k4_join', 'k4_word_charge')})
+K4_SCALING.update({name: lambda n: 'echo ' + 'a ' * (n // 4) + '1>/dev/null; echo ' + 'a ' * (n // 4) + '1 > /dev/null'
+                   for name in ('segment_identity', 'descriptor_positions', 'note_identity_collision')})
+K4_SCALING.update({name: K4_SCALING['k4_whole_environment'] for name in
+                   ('k4_environment_use', 'k4_single_key', 'k4_interpreter_reason')})
+K4_SCALING.update({name: lambda n: k4_code_f("import requests\nrequests.get('http://127.0.0.1:20128/api/usage/call-logs', params={"
+                    + ','.join(f"'limiX{i:08d}':1" for i in range(n // 20)) + '})')
+                   for name in ('k4_code_value', 'k4_call_values', 'k4_query_values')})
+K4_SCALING.update({
+    'base_text_reason': lambda n: 'echo ' + 'HF_HOMX:-' * (n // 9),
+    'k4_names_stores_segment': K4_SCALING['k4_names_and_stores'],
+    'systemd_run_variables': lambda n: 'systemd-run --user ' + '-E X=CLAUDE_CODE_x ' * (n // 19) + 'true',
+    'k4_derived': lambda n: k4_code_f("import os\nos.system('true " + 'a ' * (n // 2) + "')"),
+})
+
+
 def k4_all_fixtures():
     """Every K4 fixture string once, with its expected K4 outcome where one is stated (form F labels have none)."""
     fixtures = {}
@@ -4231,6 +4445,15 @@ class K4GuardTests(unittest.TestCase):
 
     def test_k4_descriptor_identity(self):
         self.cases("descriptor_identity")
+        first = ['set', '0', '<', '/dev/null']
+        second = ['set', guard.Descriptor('0'), '<', '/dev/null']
+        guard.start_work()
+        try:
+            with mock.patch.object(guard, '_baseline', False), mock.patch.object(guard, 'tokenize', side_effect=[first, second]):
+                found = guard.command_segments('set # two reader modes')
+            self.assertTrue(any(isinstance(word, guard.Descriptor) for words in found for word in words))
+        finally:
+            guard.stop_work()
 
     def test_k4_base_reason_precedence(self):
         # Section 3: B(T) decides first. Every fixture the pinned base refuses (K4_BASE_REFUSED, measured) keeps the base's reason, unless it
@@ -4246,6 +4469,9 @@ class K4GuardTests(unittest.TestCase):
                     self.assertEqual(got, base_reason)
                 elif got is None:
                     self.assertIn(command, K4_F_ALLOW + [text for text, eligible in K4_F_LABELED if eligible])
+                else:
+                    self.assertNotEqual(fixtures[command], 'unstated')
+                    self.assertEqual(got, fixtures[command])  # A5 CODE reason, explicitly asserted
 
     def test_k4_prior_only_heredoc_controls(self):
         # Section 9.4 (amendment A10): each control is refused only by the prior reading of dc33b48a (its current reading allows it), so a
@@ -4307,12 +4533,46 @@ class K4GuardTests(unittest.TestCase):
 
     def test_k4_runner_start_and_inline_order(self):
         self.cases('runner_start_and_inline_order')
+        guard.start_work()
+        try:
+            self.assertEqual(guard.k4_runner_start_scan(
+                ['python3', 'tools/credentials/credential_run.py', 'tavily', '<', 'in.txt', '--', 'cat'])[2],
+                ['cat', '<', 'in.txt'])
+        finally:
+            guard.stop_work()
 
     def test_k4_runner_environment_and_mentions(self):
         self.cases('runner_environment_and_mentions')
 
     def test_k4_runner_usage_and_documentation(self):
         self.cases('runner_usage_and_documentation')
+        import ast
+        import inspect
+        from tools.credentials import credential_run
+        # Pure parser only: no main(), inventory, credential lookup or exec.
+        options = {node.value for node in ast.walk(ast.parse(inspect.getsource(credential_run.parse_args)))
+                   if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value.startswith('-')
+                   and ' ' not in node.value}
+        self.assertEqual(guard.K4_RUNNER_OPTIONS, options)
+        for name in guard.K4_RUNNER_VALUE_COMMANDS:
+            with self.assertRaises(credential_run.UsageError):
+                credential_run.parse_args([name, 'tavily'])
+        for args in (['tavily', '--only=NAME', '--check'], ['alpaca-paper', 'alpaca-paper-2', '--check']):
+            with self.assertRaises(credential_run.UsageError):
+                credential_run.parse_args(args)
+        for help_flag in ('-h', '--help'):
+            self.assertIsNone(credential_run.parse_args([help_flag]))
+            self.assertIsNone(credential_run.parse_args(['tavily', help_flag]))
+        documented = [
+            ['tavily', '--check'], ['tavily', '--', 'tvly', 'auth', '--json'],
+            ['tavily', '--', 'tvly', 'search', 'markets', '--json'],
+            ['alpaca-paper', '--only', 'APCA_API_KEY_ID', '--check'],
+            ['alpaca-paper', '--only', 'APCA_API_KEY_ID', '--', 'python3', 'collect.py'],
+            ['claude-oauth-token', '--', 'claude', '--help'],
+        ]
+        for args in documented:
+            self.assertIsNotNone(credential_run.parse_args(args))
+            self.assertIsNone(guard.check(K4_R + shlex.join(args)))
 
     def test_k4_manager_environment(self):
         self.cases('manager_environment')
@@ -4327,6 +4587,11 @@ class K4GuardTests(unittest.TestCase):
         self.cases('canary_gate')
 
     def test_k4_f_reference_boundaries(self):
+        guard.start_work()
+        try:
+            self.assertEqual(guard.read_command("python3 - <<'PY'\nprint(set([1]))\nPY", top=False), 'environment_dump')
+        finally:
+            guard.stop_work()
         for text in K4_F_ALLOW:
             with self.subTest(reference='positive', command=text):
                 self.assertIsNotNone(reference_form_f(text))
@@ -4369,6 +4634,8 @@ class K4GuardTests(unittest.TestCase):
 
     def test_k4_tail_reads_share_budget(self):
         self.cases('tail_reads_share_budget')
+        self.assert_shared_stages([
+            lambda n=n: guard.k4_tail_reason(f"cat <<'E{n}'\ntext\nE{n}\ntrue {n}") for n in range(6)], 'texts')
 
     def test_k4_gateway_matrix(self):
         self.cases('gateway_matrix')
@@ -4383,6 +4650,86 @@ class K4GuardTests(unittest.TestCase):
         self.assertEqual(len(K4_DOCUMENTED_GATEWAY), 4)
         self.assertEqual(sum(name.startswith('DOC-JSON-') for name, _text in K4_DOCUMENTED_GATEWAY), 2)
         self.cases('documented_gateway_fixtures')
+        if K4_ACCEPTANCE_ADAPTER is not None:
+            self.assertEqual({row['id'] for row in K4_ACCEPTANCE_ADAPTER.documented_fixtures()},
+                {'DOC-JSON-CACHE', 'DOC-JSON-ANALYTICS', 'DOC-PROSE-LOG-20128', 'DOC-PROSE-LOG-20129'})
+        from urllib.parse import urlsplit
+        for label, text in K4_DOCUMENTED_GATEWAY:
+            records = []
+            original = guard.k4_gateway_url
+            def observe(url, method='GET', body=False, additions=(), unresolved=False):
+                records.append((urlsplit(url), method, body, additions, unresolved))
+                return original(url, method, body, additions, unresolved)
+            with mock.patch.object(guard, 'k4_gateway_url', observe):
+                self.assertIsNone(guard.check(text))
+            self.assertTrue(records)
+            for parsed, method, body, additions, unresolved in records:
+                self.assertEqual(method, 'GET')
+                self.assertEqual(parsed.port, 20129 if label.endswith('20129') else 20128)
+                self.assertEqual(parsed.query, 'since=all' if label == 'DOC-JSON-ANALYTICS' else '')
+                self.assertFalse(body or additions or unresolved)
+
+    def test_k4_reference_adapter_selftest(self):
+        if K4_ACCEPTANCE_ADAPTER is None:
+            self.skipTest('scratch adapter supplied by the permanent-test mutation driver')
+        for text in ("python3 - <<'PY'2>/dev/null\nPY2\nprintenv\nPY",
+                     "node - <<'JS'1>/dev/null\nJS1\nprintenv\nJS",
+                     "cat <<'EOF'\nprint(set([1]))\nEOF", "sudo python3 - <<'PY'\nprint(set([1]))\nPY"):
+            first, last = text.index('\n') + 1, text.rfind('\n') + 1
+            label = {'eligible': True, 'benign': True, 'form': {'language': 'py', 'body': (first, last)}}
+            self.assertIsNone(reference_form_f(text))
+            accepted, evidence = K4_ACCEPTANCE_ADAPTER.classify_l1(text, candidate_label=label)
+            self.assertFalse(accepted, (text, evidence))
+
+    def test_k4_oracle_adapter_identity_count(self):
+        if K4_ACCEPTANCE_ADAPTER is None:
+            self.skipTest('scratch adapter supplied by the permanent-test mutation driver')
+        adapter = K4_ACCEPTANCE_ADAPTER
+        self.assertEqual(set(adapter.OVERRIDES), {('ROUTES.allow', 3), ('ROUTES.allow', 4), ('ROUTES.allow', 5),
+            ('HEREDOC.allow', 1), ('HEREDOC.allow', 2), ('HEREDOC.allow', 3), ('HEREDOC.allow', 4), ('HEREDOC.allow', 6)})
+        tables = adapter.oracle_tables()
+        for phase, count in {'base': 65, 'injector': 109, 'routes': 85, 'heredoc': 79}.items():
+            rows = adapter.oracle_phase(tables, phase)
+            self.assertEqual(len(rows), count)
+            self.assertEqual(len({(row['group'], row['index'], row['text']) for row in rows}), count)
+            for row in rows:
+                self.assertEqual(guard.check(row['text']) is not None, row['adjusted_blocked'], row)
+
+    def assert_shared_stages(self, stages, counter):
+        # Observe increments independently of _work: a start_work() reset
+        # cannot lower the single-stage reference measurement.
+        costs = []
+        spend = guard.spend
+        for stage in stages:
+            used = [0]
+            def observe(kind, amount):
+                if kind == counter:
+                    used[0] += amount
+                return spend(kind, amount)
+            guard.start_work()
+            try:
+                with mock.patch.object(guard, 'spend', observe):
+                    stage()
+            finally:
+                guard.stop_work()
+            costs.append(used[0])
+        limit = max(costs) + 1
+        self.assertGreater(sum(costs), limit)
+        with mock.patch.dict(guard.WORK_LIMITS, {counter: limit}):
+            for stage in stages:
+                guard.start_work()
+                try:
+                    stage()  # each stage fits alone
+                finally:
+                    guard.stop_work()
+            guard.start_work()
+            try:
+                with self.assertRaises(guard.WorkBudgetExceeded) as caught:
+                    for stage in stages:
+                        stage()  # only their accumulated work crosses limit
+                self.assertEqual(caught.exception.args, (counter,))
+            finally:
+                guard.stop_work()
 
     def k4_main(self, command):
         """main() on a Bash payload with mocked streams: (exit status, stdout, stderr)."""
@@ -4464,29 +4811,60 @@ class K4GuardTests(unittest.TestCase):
                             call()
                     finally:
                         guard.stop_work()
-        # One budget for every reading: a fixture that reaches K4 refuses when the characters limit sits just below what its whole check()
-        # spends (B, K4 and a tail together), and never resets between them.
-        for command in (K4_HELPER_FIXTURES["k4_tail_reason"], K4_HELPER_FIXTURES["k4_gateway_code"],
-                        K4_HELPER_FIXTURES["k4_walk_reason"], "python3 - <<'PY'\n" + "x = [1, 2]\n" * 200 + "PY",
-                        "echo 1>/dev/null; echo 1 > /dev/null; " + K4_R + "tavily -- true"):
-            with self.subTest(budget=command[:40]):
-                spent = guard.start_work()
-                try:
-                    self.assertIsNone(guard.read_command(command))
-                    total = dict(spent)
-                finally:
-                    guard.stop_work()
-                for counter in ("characters", "texts", "words"):
-                    with mock.patch.dict(guard.WORK_LIMITS, {counter: total[counter] - 1}):
-                        with self.assertRaises(guard.WorkBudgetExceeded) as caught:
-                            guard.check(command)
-                        self.assertEqual(caught.exception.args, (counter,))
+        # Isolate each helper's own budget from its callees. With no remaining
+        # scan allowance, the helper must refuse even if its callees' work is
+        # free. Omitting its charge cannot hide behind a downstream charge.
+        for name in sorted(K4_OWN_CHARGES):
+            with self.subTest(own_charge=name):
+                helper, captured = getattr(guard, name), []
+                def capture(*args, **kwargs):
+                    captured.append((args, kwargs))
+                    return helper(*args, **kwargs)
+                with mock.patch.object(guard, name, capture):
+                    self.assertIsNone(guard.check(K4_CHARGE_FIXTURES[name]))
+                self.assertTrue(captured)
+                spend = guard.spend
+                def own_spend(counter, amount):
+                    frame = sys._getframe(1)
+                    while frame is not None and frame.f_code.co_name in {'k4_charge', 'k4_word_charge', 'found'}:
+                        frame = frame.f_back
+                    if frame is not None and frame.f_code is helper.__code__:
+                        return spend(counter, amount)
+                # Try all captured invocations: conditional scans may follow a
+                # cache hit/early exit in an earlier invocation of this helper.
+                refused = False
+                for args, kwargs in captured:
+                    for arg in args:
+                        if isinstance(arg, guard.K4Reading):
+                            arg.units = None
+                    guard.start_work()
+                    try:
+                        with mock.patch.dict(guard.WORK_LIMITS, {'characters': 0, 'words': 0}), \
+                                mock.patch.object(guard, 'spend', own_spend):
+                            try:
+                                helper(*args, **kwargs)
+                            except guard.WorkBudgetExceeded:
+                                refused = True
+                    finally:
+                        guard.stop_work()
+                    if refused:
+                        break
+                self.assertTrue(refused, name + ' performed its scan with zero allowance')
+        # Each isolated reading fits; their sum exceeds a threshold derived
+        # solely from individual stages, never from the composed run.
+        for counter in ('characters', 'texts', 'words'):
+            self.assert_shared_stages([
+                lambda n=n: guard.read_command(k4_code_f(f'x = {n}\n' + 'x = [1, 2]\n' * 200))
+                for n in range(4)], counter)
+        with mock.patch.dict(guard.WORK_LIMITS, {'reads': 0}):
+            with self.assertRaises(guard.WorkBudgetExceeded):
+                guard.check(K4_R + 'tavily -- true')
 
     def test_k4_timing(self):
-        # Section 9.6: each named row in a fresh Python child (-B), median of three process_time spans around check() under LINEAR_SECONDS
-        # (0.5 s; a CI runner gets 1.5 s), with its exact outcome (a counter name for a budget refusal) and its length under 199,000. The
-        # children run one at a time, so no row's processor time includes another's contention.
-        runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name],
+        # Section 9.6: each named row in a fresh Python child (-B), median of
+        # three process_time spans below 0.5 s, including CI. Wall deadlines
+        # remain separate in the real hook-process test.
+        runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name, str(HOOK)],
                                      capture_output=True, text=True, timeout=180) for name in sorted(K4_TIMING)}
         for name, (build, expected) in sorted(K4_TIMING.items()):
             with self.subTest(row=name):
@@ -4495,7 +4873,7 @@ class K4GuardTests(unittest.TestCase):
                 verdict, cpu, length = json.loads(done.stdout)
                 self.assertLess(length, 199_000)
                 self.assertEqual(verdict, expected)
-                self.assertLess(cpu, LINEAR_SECONDS)
+                self.assertLess(cpu, K4_LINEAR_SECONDS)
         # T-CODE-NONOUTPUT's instrumentation: every environment occurrence is visited, and output context is read once a token (a list
         # built in one pass), so deepening the nesting four times with twice the occurrences stays linear, not depth x tokens.
         guard.start_work()
@@ -4517,23 +4895,16 @@ class K4GuardTests(unittest.TestCase):
             spans[depth] = min(best)
         self.assertLess(spans[4096], 8 * max(spans[1024], 0.005))
         # T-TAIL-BUDGET: several tail reads that each fit, together over a test-only budget, refuse without any reset.
-        tails = "".join(f"cat <<'E{n}'\n\"\nE{n}\ntrue {n}\n" for n in range(40))
-        spent = guard.start_work()
-        try:
-            self.assertIsNone(guard.read_command(tails))
-            used = spent["texts"]
-        finally:
-            guard.stop_work()
-        with mock.patch.dict(guard.WORK_LIMITS, {"texts": used - 1}):
-            with self.assertRaises(guard.WorkBudgetExceeded):
-                guard.check(tails)
+        self.assert_shared_stages([
+            lambda n=n: guard.k4_tail_reason(f"cat <<'E{n}'\ntext\nE{n}\ntrue {n}") for n in range(6)], 'texts')
         # Per-helper generators at about 25k, 50k and 100k characters: the helper is reached with the generated text (instrumented), each
-        # size finishes under LINEAR_SECONDS through check() and inside the helper, and 100k costs less than eight times 25k (a quadratic
+        # size finishes under K4_LINEAR_SECONDS through check() and inside the helper, and 100k costs less than eight times 25k (a quadratic
         # scan costs sixteen).
-        scanners = {name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))} - {
-            "k4_charge", "k4_word_charge", "k4_memo", "k4_tightenings", "k4_walk_reason", "k4_needs_walk", "k4_names_stores_segment",
-            "k4_join", "k4_derived", "k4_interpreter_reason", "k4_environment_use", "k4_single_key", "k4_code_value",
-            "k4_call_values", "k4_query_values"}
+        # k4_charge is an O(1) counter update with no scan. k4_word_charge's
+        # linear sum is exercised by its own supplementary generator.
+        scanners = ({name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))}
+                    | {'segment_identity', 'descriptor_positions', 'note_identity_collision', 'systemd_run_variables', 'base_text_reason'})
+        scanners -= {'k4_charge'}
         self.assertEqual(sorted(scanners - set(K4_SCALING)), [])
         for name, generator in sorted(K4_SCALING.items()):
             with self.subTest(helper=name):
@@ -4559,8 +4930,8 @@ class K4GuardTests(unittest.TestCase):
                         totals[size] = time.process_time() - cpu
                     self.assertTrue(inside, f"{name} not reached at {size}")
                     helper_totals[size] = sum(inside)
-                    self.assertLess(helper_totals[size], LINEAR_SECONDS)
-                    self.assertLess(totals[size], LINEAR_SECONDS)
+                    self.assertLess(helper_totals[size], K4_LINEAR_SECONDS)
+                    self.assertLess(totals[size], K4_LINEAR_SECONDS)
                 # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
                 self.assertLess(helper_totals[100_000], 8 * max(helper_totals[25_000], 0.01))
 
@@ -4568,6 +4939,18 @@ class K4GuardTests(unittest.TestCase):
         # Section 9.7: the real hook, launched as `python3 -B scripts/hooks/secret_path_guard.py` with a JSON payload on stdin (the payload
         # command never runs). A refusal is exit 2 with its exact reason on one line, nothing on stdout and no text of the command (each
         # payload carries a sentinel); an allowed command is exit 0 with empty streams; each finishes within PATHOLOGICAL_SECONDS.
+        # The three review generators previously hid quadratic scans. The
+        # actual hook must answer within one wall-clock second, not time out.
+        for name in ('T-GW-ASSIGNMENT-CHAIN', 'T-JS-REGEX-LOOKAHEAD', 'T-GW-REQUEST-BINDINGS'):
+            with self.subTest(deadline=name):
+                command, expected = K4_TIMING[name][0](), K4_TIMING[name][1]
+                wall = time.monotonic()
+                done = subprocess.run([sys.executable, '-B', str(HOOK)],
+                    input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': command}}),
+                    capture_output=True, text=True, timeout=1)
+                self.assertLess(time.monotonic() - wall, 1)
+                self.assertIsNone(expected)
+                self.assertEqual((done.returncode, done.stdout, done.stderr), (0, '', ''))
         sentinel = "SENTINEL-K4-3b9d"
         refused = [
             (K4_R + "tavily -- printenv", "environment_dump_in_credential_run"),
