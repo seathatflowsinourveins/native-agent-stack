@@ -44,7 +44,7 @@
       {"source_path": "catalogs/us-equities/runtime-target.json"},
       {"source_path": "catalogs/saturation/ledger.json"},
       {"pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
-      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
       {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
       {"pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
       {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "5adcc3a4"}}
@@ -352,7 +352,7 @@
       "reasons": [
         {"text": "Serena is the layer winner for exact symbols and references; ast-grep, codebase-memory-mcp and jCodeMunch are conditional lanes, and a known-source read with rg comes first.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The token-efficiency profile carries Serena; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes until each has a reviewed pin on both platforms.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}}
+        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -720,10 +720,10 @@
       },
       "reasons": [
         {"text": "The token-efficiency adoption profile (14 pinned components) was accepted as the selection on 2026-09-30 in #540; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
-        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
-        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
-        {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"}
       ],
       "evidence_class": "local_integration_check",
@@ -775,7 +775,7 @@
           "pin": "v0.23.0",
           "pin_source": "blueprints/runtime-workers/openhands/pins.json:62",
           "install": {"command": "uv tool install harbor==0.23.0", "kind": "upstream_documented", "url": "https://github.com/harbor-framework/harbor"},
-          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
           "upstream_currency": {"latest_release": "v0.23.0 (2026-09-12)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/harbor-framework/harbor/releases"}
         }
       ],
@@ -789,8 +789,8 @@
         "missing": "c1: the layer record cites a superseded receipt, its candidate dispositions disagree with the verdict, and the Inspect AI and MLflow entries predate the gap-wave2 receipts; c2: seven of eight unclaimed manifest components carry no omission reason and the sweep candidates are not in the record; c3: no representative comparison of semantic advice on fresh, independently labelled cases, no lifecycle receipt from the new WSL host, and the Harbor pilot that forces subagent use has not run; c4: every layer-level review records open gaps; c5: no current closure record."
       },
       "reasons": [
-        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
-        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks failed to pull at 65,536 with `lchown <path>: invalid argument` and pulled at 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
         {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
         {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"}
@@ -805,7 +805,7 @@
       "new_host_steps": [
         "Install promptfoo 0.123.1 into its prefix with npm (it is in no adoption profile) and Playwright from the wsl-application blueprint's lock with its verified Chrome for Testing archive.",
         "For the Harbor runner, install rootless Docker for the user with the 65,536 subordinate ids of the new-distro recipe's F5, set the egress allowlist and stage the Node v22.23.3 tarball pre-step that the arms use. Widen /etc/subuid and /etc/subgid only when a pull fails with `lchown <FILE>: invalid argument`, and record the image, the error and the range chosen.",
-        "Mint the native Claude OAuth token for Harbor as a user action (`claude setup-token`), kept in its 0600 provider file with the kernel keyring as the per-boot cache; never copy it from another host.",
+        "The Claude OAuth token for Harbor is held only in the kernel keyring today (status: present; memory only, gone at wsl --shutdown). K4 (#567) adds its claude-oauth-token inventory entry; after that merges, set_credential.py writes its 0600 provider file, which becomes the store of record, and the keyring stays the transport and per-boot spare. On the new distribution the user creates the token natively (claude setup-token) and stores it through set_credential.py.",
         "Run `uv tool install harbor==0.23.0`, then the pilot first: force subagent use and check that each trial's saved sessions tree carries subagents/agent-*.jsonl.",
         "Record install-and-control host receipts for promptfoo and Playwright, keeping every failed attempt."
       ],
@@ -1417,10 +1417,11 @@
         "Keep the Alpaca data keys and the SEC contact identity in their 0600 provider files (row cross:credential-practice), then record a fresh-host acquisition receipt."
       ],
       "gates": [
-        {"text": "Alpaca data access uses the user's own paper credentials and feed entitlements; entitlements stay separate from the code.", "kind": "user_side", "source_path": "catalogs/us-equities/runtime-target.json"}
+        {"text": "Alpaca data access uses the user's own paper credentials and feed entitlements; entitlements stay separate from the code.", "kind": "user_side", "source_path": "catalogs/us-equities/runtime-target.json"},
+        {"text": "Paid market data for the c3 comparison: the Databento arm (a paid entitlement) and Massive history beyond the free tier are the user's purchases.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict (trading lane, 2026-10-01): selection of record, open, distance 4. Blocking item: c3, the provider comparison on the frozen AAPL plan with point-in-time and availability evidence. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c)."
     },
     {
       "layer_id": "identity-provenance",
@@ -1492,7 +1493,7 @@
         {"text": "The dated security-identity gate needs an entitled identity source that the user owns.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, the verdict_overturn_when comparison on blueprints/us-equities/point-in-time/fixture.json with the validate_source invariants; no gate blocks it, and it needs a recorded DVC install first. The verdict's own winner, DVC 3.67.1, has no pin of record."
     },
     {
       "layer_id": "storage-compute",
@@ -1560,9 +1561,11 @@
         "These install with row market-data-reference; the promotion gate needs its own environment from blueprints/us-equities/data/requirements.lock.",
         "Decide whether to keep DuckDB 1.5.5 and EdgarTools 5.58.0 or re-pin to 1.5.6 and 5.59.1 before collecting receipts, then run the promotion gate on a retained snapshot."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "The comparison's licensed inputs need the same paid-data decision as market-data-reference.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
+      ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, a representative comparison (frozen universe, history, latency, rights, correction and availability semantics). A re-pin decision is pending: DuckDB 1.5.6 and EdgarTools 5.59.1 are published."
     },
     {
       "layer_id": "data-quality-orchestration",
@@ -1679,7 +1682,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5 (queue: on_requirement_change). Blocking item: c3. The Dagu-vs-Temporal kill comparison (gap-wave2 #7) does not meet the same-fixture clause of verdict_overturn_when. pandera 0.33.1 is the verdict's data-check winner without a pin of record."
     },
     {
       "layer_id": "research-factors-ml",
@@ -1700,7 +1703,7 @@
         {"text": "The 2026-09-22 verdict names skfolio (walk-forward) and EdgarTools instead; the two lists are not reconciled.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "Strategy qualification stays independent of the engine and broker checks.", "source_path": "catalogs/landscape/research-state.json"}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "local_integration_check",
       "alternatives": [
         {"name": "NautilusTrader 2.0.0rc5, LEAN and alpaca-py", "verdict": "the layer's current choice: the engine destination, the retained comparison engine and the Alpaca path, which rows backtesting-engine and execution-broker carry; none is a research, factor or ML component", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"name": "skfolio 1.2.9 and EdgarTools 5.58.0", "verdict": "the 2026-09-22 verdict winners, outside the current choice; reconciliation pending", "source_path": "catalogs/landscape/us-equities.json"},
@@ -1714,7 +1717,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner's verdict of 2026-10-01 is open with no selection of record for the layer itself; a selection, or an explicit scope-out, comes first in the layer's re-record. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: open, with no selection of record for the layer itself. runtime-target.json is the engine and broker record and deliberately names no research, factor or ML component. Blocking item: c1, a selection or an explicit scope-out at the layer's re-record."
     },
     {
       "layer_id": "backtesting-engine",
@@ -1765,7 +1768,7 @@
         {"text": "In the 2026-09-26 convergence record at PR #358's head, the NautilusTrader winner is cross_family_disputed: both GPT-6 votes refute its earns_it rationale as circular and accept only provisional retention, so comparative merit stays unproven.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
         {"text": "The research state marks the layer comparison_required.", "source_path": "catalogs/landscape/research-state.json"}
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "local_integration_check",
       "alternatives": [
         {"name": "ml4t-backtest 0.1.12", "verdict": "a same-input one_zero pass under the v1 contract; no recorded consequence", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
         {"name": "Lumibot", "verdict": "conditional, with empty evidence references", "source_path": "catalogs/landscape/us-equities.json"},
@@ -1782,7 +1785,7 @@
         {"text": "The comparative merit of NautilusTrader stays disputed until the trading lane's comparison runs; retention is provisional.", "kind": "lane", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles. The disputed-winner fact is read at PR #358's head b0eb7a11."
+      "notes": "Owner's verdict: selection of record, open, distance 4 (the other run graded c1 and c4 partial). Blocking item: c3. Five of six SPY parity cases wait on the undecided costs_and_routing contract; one_zero passed on 2026-09-23. The layer entry's \"parity BLOCKED\" text is stale and gets a dated superseding note. Cross-family (PR #358 at b0eb7a11): GPT-6 accepts provisional retention and disputes comparative merit."
     },
     {
       "layer_id": "execution-broker",
@@ -1808,10 +1811,10 @@
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
         },
         {
-          "name": "Adaptive-paper engine (runner.py with the custom Alpaca adapter on NautilusTrader's LiveNode)",
+          "name": "adaptive-paper (the engine folder blueprints/us-equities/adaptive-paper on main at the #559 merge; the custom Alpaca adapter on NautilusTrader's LiveNode)",
           "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
-          "pin": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
-          "pin_source": "blueprints/us-equities/adaptive-paper/source-hashes.json:30",
+          "pin": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+          "pin_source": "blueprints/us-equities/adaptive-paper/README.md",
           "install": {"command": "requirements.txt into an isolated Python 3.12 environment", "kind": "repo_recipe", "source_path": "blueprints/us-equities/adaptive-paper/README.md"},
           "acceptance": {"command": "python runner.py preflight --env-file \"$PAPER_ENV_FILE\" --output \"$PRIVATE_OUTPUT/preflight.json\", then one dated paper trial and `python runner.py recover`", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/adaptive-paper/README.md"},
           "upstream_currency": {"latest_release": "not applicable: an in-repo engine whose source hashes were last bound at the #559 merge (dca821cc)", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
@@ -1855,12 +1858,12 @@
         "IBKR: start TWS or IB Gateway with a native paper sign-in (paper socket 7497 or 4002) only after the upstream gates below clear."
       ],
       "gates": [
-        {"text": "nautilus_trader #4983 is open upstream (read 2026-10-01), and runtime-target.json lists it as an rc5 blocker; the trading lane is reconciling that entry with its own source review, and the rc5 IBKR path stays unqualified either way.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/issues/4983"},
+        {"text": "nautilus_trader #4983 (open upstream, read 2026-10-01) is a stale v1.227.0 report for rc5. At tag v2.0.0rc5 (1b0a49d2) the execution engine denies an order only when `handles_order_venue` is false, and the IB execution client returns true. That is source reading, not an rc5 order observation; PR #280 moves the report to `rc5_reclassified_reports`. The open rc5 obstacles are on the recovery and risk paths that acceptance steps 3-4 exercise: #5007, #5057 and #5060 (open, read 2026-10-01); #4946 is closed. The rc5 IBKR stock-order path stays unqualified until native paper execution.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/issues/4983"},
         {"text": "nautilus_trader PR #5041 (open, read 2026-10-01) ports the Interactive Brokers adapter onto ibapi 4.2.0.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/pull/5041"},
         {"text": "The IB Gateway or TWS paper sign-in is the user's own native action, as are the paper account and market-data permissions.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles. The layer verdict is pending_lanes in the landscape record; the winners come from runtime-target.json's broker boundaries."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, IBKR acceptance-plan steps 2-4 on rc5 after the user's IB Gateway paper sign-in. Alpaca: paper execution at engine b528bb55 (2026-09-29: 11 of 13 trials passed; receipts via #564). dca821cc has no paper execution yet, and its native-fault binding is stale until its re-run."
     },
     {
       "layer_id": "portfolio-risk",
@@ -1930,7 +1933,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open and inconsistent, distance 5 (the other run graded c5 unmet). Blocking item: c1, settle skfolio as winner or conditional (catalogs/landscape/us-equities.json:2840 against :2773). Then c3: a fresh, single-execution, preregistered matched comparison, and a separately frozen skfolio upgrade experiment (1.2.9 to 1.4.10)."
     },
     {
       "layer_id": "evaluation-experiments",
@@ -2045,7 +2048,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5 (queue: on_requirement_change). Blocking item: c1, reconciling the current choice (foundation workers and observability) with the verdict winners inspect-ai, mlflow and agent-retrieval-bench."
     },
     {
       "layer_id": "agents-models-workers",
@@ -2150,9 +2153,11 @@
         "These install with the foundation rows native-clients, durable-memory, code-navigation, document-retrieval, semantic-rag and token-efficiency; nothing extra for this layer.",
         "Decide QMD BM25 against hybrid on the recorded retrieval-quality evidence, then build the held-out relevance judgments before any comparison run."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "GPT-6 disputes the earns_it label of ai-memory and SocratiCode (PR #358); retention is provisional until the held-out comparison runs.", "kind": "lane", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
+      ],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5. This row follows the foundation memory and retrieval rows, whose closure governs. Blocking item: c3, a preregistered held-out financial, document and code retrieval comparison with abstention. The layer entry's pins (ai-memory 2.3.1, SocratiCode 1.14.0, CLI 0.155.1) lag the stack pins shown."
     },
     {
       "layer_id": "observability-hosting",
@@ -2257,7 +2262,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: selection of record, open, distance 5 under the shared rule (queue: on_requirement_change). This row follows the foundation observability rows. Blocking item: c2, one frozen set (the Tempo conflict; Jaeger and OpenObserve dispositions), then c3 on the target host. Five pins are behind upstream; Grafana 13.2.3 is a security release, which is a foundation pin decision."
     },
     {
       "layer_id": "security-supply-chain",
@@ -2270,7 +2275,7 @@
         {"text": "The verdict retains Grype, Syft and gitleaks; Grype 0.119.0 has no pin of record in the stack, so it is not carried as a winner here.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "Syft and gitleaks are the same pins as the foundation rows ci-supply-chain and secrets-credentials.", "source_path": "manifests/stack.json"}
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
         {"name": "Syft 1.52.0 and gitleaks 8.30.1", "verdict": "the layer's current choice at the stack pins that the foundation rows ci-supply-chain and secrets-credentials carry; not a selection of record for this layer", "source_path": "manifests/stack.json"},
         {"name": "Grype 0.119.0", "verdict": "a verdict winner without a pin of record", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2282,7 +2287,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner's verdict of 2026-10-01 is open with no selection of record (runtime-target.json has no entry for this layer), and the layer's own re-run trigger has fired. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "Owner's verdict: open, with no selection of record (queue: on_requirement_change). Blocking item: c1, and the layer's own re-run trigger has fired (cosign verify-blob and OpenBao secret-lifecycle receipts). gitleaks upstream ships security patches only and names Betterleaks as its successor, which is a foundation pin decision."
     },
     {
       "layer_id": "cross:wsl-distro",
@@ -2446,7 +2451,7 @@
           "pin_source": "evidence/receipts/guard-k3-verification-20260930.json:23",
           "install": {"command": "python3 tools/adoption/install_claude_profile.py --only guard", "kind": "repo_recipe", "source_path": "docs/secret-storage.md"},
           "acceptance": {"command": "the canary proof's end-to-end run on the new distribution: a per-consumer canary and a zero-hit search with positive controls over the named sinks (the tool is not merged)", "evidence_class": "local_integration_check", "source_path": "docs/decisions/2026-09-29-key-management.md"},
-          "upstream_currency": {"latest_release": "not applicable: the guard is this repository's own code (sha256 of scripts/hooks/secret_path_guard.py at this edition's base); K4 (#567) is open", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
+          "upstream_currency": {"latest_release": "not applicable: the guard is this repository's own code (sha256 of scripts/hooks/secret_path_guard.py at this edition's base); K4 (#567) is open; the pin becomes d4d4bef271df8973cca7f6e7fa6f70be717bec7a909f35e3b0eeea4ce67d65a4 when #567 merges", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
         }
       ],
       "verdict": "selection_of_record_open",
@@ -2456,13 +2461,13 @@
         "c3": "unmet",
         "c4": "unmet",
         "c5": "partial",
-        "missing": "c2: the secrets layer's candidate set is not frozen (row secrets-credentials); c3: the canary proof, the user's acceptance for the key lane, has not run on any host, and its tool is not merged; c4: the canary harness reviews found false-zero paths and no proof claim is made; c5: the key-management record is dated and lists residual risks, but it is not a closure record."
+        "missing": "c2: the secrets layer's candidate set is not frozen (row secrets-credentials); c3: the canary proof, the user's acceptance for the key lane, has not run on any host; its tool's PR opens after #567 (K4) merges; c4: the canary proof tool (tools/credentials/canary_proof.py with a contained ripgrep worker) had one review round (a GPT-6 verification found seven false-clean paths; an Opus review), one repair round and an Opus re-check whose one remaining false-clean path a bounded fix round closed, each fix with a permanent test and a mutant; its synthetic acceptance passes on the workstation (143 tests, 0 skipped; 138 of 138 mutants killed; 12 of 12 real-scope containment cases), and no proof claim is made before its end-to-end run; c5: the key-management record is dated and lists residual risks, but it is not a closure record."
       },
       "reasons": [
         {"text": "A new host inspects first (adoption_status.py, credential_status.py), signs in natively (claude, codex login --device-auth, gh auth login, gh auth setup-git), creates a 0700 store with one 0600 file per provider from its template, installs the scanner before the hook, installs the user-level guards and runs a fail-closed check with a synthetic file; values never pass through an agent.", "source_path": "docs/secret-storage.md"},
         {"text": "The tightened guard (sha256 a70a056f) merged with #511 at this edition's base; its verification is local integration on one host plus read-only cross-family reviews, not a proof.", "source_path": "evidence/receipts/guard-k3-verification-20260930.json"},
-        {"text": "Guard K4 (runner commands, bounded interpreter reading, OmniRoute management routes) is open.", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/567"},
-        {"text": "The canary proof harness is not merged and makes no proof claim; the next step is a smaller tool for exactly the user's acceptance: a per-consumer canary and a zero-hit search with positive controls over the named sinks.", "source_path": "docs/decisions/2026-09-29-key-management.md"}
+        {"text": "Guard K4 (#567: runner commands, bounded interpreter reading, OmniRoute management routes) is in the merge train after #569; its verification is evidence/receipts/guard-k4-verification-20261001.json, local integration plus read-only cross-family reviews.", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/567"},
+        {"text": "The canary proof tool for exactly the user's acceptance (a per-consumer canary and a zero-hit search with positive controls over the named sinks) is built and reviewed; its PR follows #567, and it makes no proof claim before its end-to-end run on the new distribution.", "source_path": "docs/decisions/2026-09-29-key-management.md"}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [

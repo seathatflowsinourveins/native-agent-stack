@@ -37,7 +37,7 @@ us-equities rows the last, which is the basis of that assessment's synthesis. Th
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json`, `catalogs/foundation/manifest.json`) are unchanged between `3361b342` and
 this edition's base. Four sources are not on main yet: the new-distribution recipe (PR #569, head `344a69ff`),
-the Harbor E2E receipt (PR #570, head `ee06ded7`), the trading convergence record (PR #358, head `b0eb7a11`) and
+the Harbor E2E receipt (PR #570, head `cd7db158`), the trading convergence record (PR #358, head `b0eb7a11`) and
 the program record with the foundation assessment (PR #573, head `5adcc3a4`).
 
 ## Alternatives
@@ -111,8 +111,9 @@ The trading lane owner's verdicts of 2026-10-01 call every trading layer "select
 two of them (research-factors-ml and security-supply-chain) open with no selection of record for the layer itself.
 On the page's six values that reads: `no_selection` for those two, whose current-choice components become
 alternatives; `comparison_required` where the research state asks for a comparison; `selection_of_record_open`
-for the rest. Every trading row is marked `provisional_wording` in its notes for the
-trading lane owner. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
+for the rest. The owner acknowledged the twelve rows in this change's pull request (#574), and each row's
+notes carry the owner's verdict and blocking item verbatim. The keys lane corrected the credential-practice row and
+the Gate A owner confirmed its three rows the same way. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
 Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
 41 entries and 39 exits filled). The cross row for the distribution is `no_selection` on main: its image,
 hash and creation path land with PR #569.
@@ -154,7 +155,7 @@ Write a new edition, or update this one in the change that causes it, when any o
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
 4. **A pending source lands.** PR #569, #570 or #358 merges: move its citations to `source_path` and re-rate
    `cross:wsl-distro`.
-5. **The trading lane owner writes the final wording** for the us-equities rows.
+5. **A lane owner changes a verdict or its wording** for one of its rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a
    gap until a row is added.
@@ -172,7 +173,7 @@ Write a new edition, or update this one in the change that causes it, when any o
 - `scripts/host_receipts.py` (a receipt binds only to a version that matches a winner pin)
 - PR #569 at `344a69ff`: `adoption/platforms/linux-wsl2-new-distro.md`,
   `docs/decisions/2026-10-01-new-wsl-distro-recipe.md`, `adoption/templates/wsl/`
-- PR #570 at `ee06ded7`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
+- PR #570 at `cd7db158`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
 - PR #573 at `5adcc3a4`: `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
   `evidence/artifacts/layer-closure-assessment-20261001/`
 - Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js
