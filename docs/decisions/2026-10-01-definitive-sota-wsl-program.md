@@ -120,6 +120,10 @@ record, a receipt or a closure assessment. Its JSON source is the new-WSL instal
 published as the `publish-catalog.yml` workflow artifact and, for the user, as a private page. The Codex runtime lane's
 additive runtime-workers panel in the same build is referenced, not duplicated.
 
+The edition is pull request #574: `catalogs/foundation/new-wsl-architecture-20261001.json` (37 rows: 20 foundation,
+12 us-equities and 5 cross-cutting; none closed) and the tab "05 Final architecture". Each lane owner confirmed or
+corrected its rows there.
+
 ## Baseline, checkpoint and rollback on the new distro
 
 Before stage 2 the session captures the pre-install inventory (`wsl.exe --version`, the distro's package list,
@@ -190,7 +194,7 @@ or between partial and unmet moves by a cell or two per layer between runs. Unit
 | semantic-rag | on_requirement_change | keep_but_compare | partial | partial | partial | unmet | partial | yes | no | item 1: winner pins 1.14.0 and 0.25.0 against installed 1.15.0 and 0.30.0 | selection of record, open; label to reconcile |
 | durable-memory | comparison_required | keep_but_compare | met | partial | unmet | unmet | unmet | yes | no | item 3: the preregistered comparison on a host named in a new amendment; an operator decision on the live-store isolation breach is open | comparison required |
 | web-research | on_requirement_change | retain | partial | partial | unmet | unmet | partial | partial | no | item 1: the selection predates the 2026-09-26 free-native-lanes decision | selection of record, open |
-| token-efficiency | comparison_required | keep_but_compare | partial | partial | unmet | unmet | partial | yes | no | item 3: a repeated, counterbalanced matched comparison at equal correctness (`catalogs/landscape/foundation.json:2737-2750`); the re-aimed Gate A E2E counts only if its arms cover that protocol's | comparison required; the install profile is provisional |
+| token-efficiency | comparison_required | keep_but_compare | partial | partial | unmet | unmet | partial | yes | no | item 3: a repeated, counterbalanced matched comparison at equal correctness (`catalogs/landscape/foundation.json:2737-2750`). The Harbor E2E covers four of that protocol's five arms in the short single-session regime (the receipt of PR #570, block `catalog_protocol_metric`); the Repomix outline arm and the multi-agent regime are open. The re-aimed Gate A E2E tests the accepted profile in the multi-agent regime, not the per-tool protocol | comparison required; the install profile is provisional |
 | quality-evaluation | comparison_required | retain | partial | partial | partial | unmet | partial | partial | yes | item 3: a comparison on fresh, independently labelled cases | comparison required; label to reconcile |
 | ci-supply-chain | on_requirement_change | retain | met | partial | partial | partial | partial | partial | yes | item 2: the candidate set is not re-recorded (the tools in use, the 09-26 and 09-29 survivors, the 09-30 verdicts) | selection of record, open |
 | scheduling-supervision | on_requirement_change | keep_but_compare | met | partial | partial | unmet | partial | partial | no | item 3: Dagu 2.16.6 failed the preregistered 150 s SIGKILL case, which Temporal passed | reopen candidate; treated as comparison required |
@@ -229,7 +233,7 @@ and U9 run beside U3 to U7 and finish before U10.
 | U3 Campaign verdicts | 12 citing the private list; 8 with a proposal decided by a missing vote (ci-supply-chain, document-retrieval, durable-memory, observation-inference, recovery-portability, semantic-rag, token-efficiency, web-research, recomputed from `catalogs/saturation/ledger.json` by this record's reviewer) | Publish the 2026-09-30 campaign verdicts as a sanitized receipt at a main commit, or drop the citations; rerun the missing discovery and fit votes | every cited status resolves to a committed file; no proposal is decided by a missing vote | source only (model calls on the gateway pool) | foundation |
 | U4 Re-record pass (items 1 and 2) | 20 | One `tools/sota-convergence/record_verdicts.py` pass per layer: winners at the U2 pins, alternatives, the frozen candidate set with dispositions, failed access, the six label reconciliations | `scripts/host_receipts.py` accepts each installed version without `--allow-unbound-version`; a check fails on a proposal without a disposition | source only | foundation; `manifests/stack.json` edits through the hot-file protocol |
 | U5 Preregistered comparisons | the 5 `comparison_required` layers and scheduling-supervision | Run the frozen arms; keep failures and complete usage | the preregistered metric, independently reviewed | the current distro or a named host; a provisional install on the new distro where only the target host can run it | Gate A (workers, token-efficiency); memory lane (durable-memory); foundation (document-retrieval, quality-evaluation, scheduling-supervision) |
-| U6 Second independent review (item 4) | 20, and the 12 us-equities layers | One cross-family source review per layer over the U4 and U5 output, listing the target-host checks as declared install-receipt items | no unresolved material gap except the declared install checks | source only | the Codex catalog lane, which took this unit on 2026-10-01 |
+| U6 Second independent review (item 4) | 20, and the 12 us-equities layers | One cross-family source review per layer over the U4 and U5 output, listing the target-host checks as declared install-receipt items | no unresolved material gap except the declared install checks | source only | the Codex catalog lane; its first delivery is PR #575 (the 20 foundation layers reviewed on 2026-10-01, remaining gaps in every layer) |
 | U7 Stage-1 closure record (item 5) | 20 | A dated record per layer: bound pins, residual risks, untested boundaries, reopening triggers, pending install checks; registered in `closure_refs` | the landscape checks pass; the layer is final for install | source only | foundation (landscape owners) |
 | U8 Profile and pin coverage | 16 | Add the selections to the adoption profiles and `adoption/pins-linux-x86_64.json`; script the prose-only installs; provision CPython 3.13.15, procps and the sandbox prerequisites; fix the `orx` and `openresearch` id mismatch; give `jcodemunch-mcp` a Linux pin or stop the carrier naming it | each profile bootstraps on the hosted runner without `--allow-unpinned`; `scripts/adoption_status.py` is clean | source only | foundation; trading lane for the research-runtime profile |
 | U9 Port and unit map for the shared virtual machine | durable-memory, quality-evaluation, scheduling-supervision, observation-inference, semantic-rag | Assign the ports and the systemd user units that two distros on one network namespace need | a committed map; on the new distro no port conflict, and the units survive a restart | decided now; verified on the new distro | foundation; memory lane |
@@ -300,8 +304,11 @@ although four of the six SubagentStart carrier blocks name its tools (PR #548's 
 
 The assessment reads `4d11709c`, an earlier head of PR #358, because that pull request carries the trading lane's
 current records. All 12 layers are assessed and refuted, and none is final for install: no layer meets item 4 or
-item 5 in any run. The trading lane owner keeps the decisions, the verdict wording and the closure records, and the
-table and its artifact land here after the owner's read.
+item 5 in any run. The trading lane owner's verdicts of 2026-10-01 call all 12 "selection of record, open", two of
+them (research-factors-ml and security-supply-chain) with no selection of record for the layer itself, and the owner
+acknowledged the 12 trading rows of the architecture edition in PR #574. The sanitized trading assessment and the
+owner's records land in a lane:trading pull request after this one merges; the decisions, the verdict wording and the
+closure records stay with that lane.
 
 ## Gate A re-aim (decided by the user, 2026-10-01 03:33Z)
 
@@ -324,7 +331,8 @@ The Gate A owner's independent audit found that the merged top rule (`AGENTS.md:
 covers the token-adoption E2E's custom runner, with no recorded exception. The owner therefore recommends path R:
 re-scope the adoption E2E onto an upstream harness (Harbor or Inspect) on the new distro, with a pilot as step zero:
 the Gate A owner's receipt of the 2026-09-29 Harbor E2E (`evidence/receipts/harbor-e2e-token-tools-20260930.json`,
-PR #570: 308 claude-code logs scanned, 0 Agent or Task tool calls, 0 subagent directories) shows that none of the
+which is on PR #570's branch and not in this revision, so its figures cannot be inspected from main until that pull
+request merges: 308 claude-code logs scanned, 0 Agent or Task tool calls, 0 subagent directories) shows that none of the
 trials spawned a subagent, so per-subagent attribution through Harbor is untested; the pilot forces subagent use and
 confirms that each trial's saved session directory carries per-subagent transcripts, after which the merged Gate A
 kernel serves as analysis code over those directories (analysis, not a runner). The pilot passes when, for at least
@@ -364,9 +372,13 @@ least six hours' notice: days, not hours.
 
 Install needs for the manifest: under R, Harbor v0.23.0 (pinned), rootless Docker with the 65,536 subordinate ids of
 stage 1 (see "Subordinate ids"), the egress allowlist, a Node v22.23.3 tarball pre-step for the arms, and the user's
-native Claude OAuth token held in the key lane's per-provider 0600 store with the kernel keyring as its cache (a user
-action;
-`docs/secret-storage.md` disallows keyring-only storage because a kernel restart loses it); under A only, Node 22.13 or later, Python 3.12 or 3.13 standard library,
+Claude OAuth token for the harness. That token is a separate long-lived credential that the user mints with
+`claude setup-token`; the native sign-in (`claude-native` in `adoption/credential-inventory.json`, a `native_store`
+entry) is never read or copied. The inventory has no entry for the minted token yet, so the credential runner cannot
+provision it: K4 (#567) adds the `claude-oauth-token` entry, after which `set_credential.py` writes its 0600 provider
+file, the store of record, and the kernel keyring stays the transport and per-boot spare. On the current workstation
+the token is held only in the keyring today. Until that entry is on main this is a stated gap of path R, not an
+install requirement the repository can meet. Under A only: Node 22.13 or later, Python 3.12 or 3.13 standard library,
 the pinned shell parser (`examples/claude-native/workflows/shell-parser.pin.json`), rtk, qmd and both clients on PATH;
 the toolchain opens no ports and runs no service.
 
@@ -376,8 +388,9 @@ troubleshooting page says the pull error `lchown <FILE>: invalid argument` "occu
 entries in `/etc/subuid` or `/etc/subgid` is not sufficient. The number of entries required vary across images.
 However, 65,536 entries are sufficient for most images"
 (https://docs.docker.com/engine/security/rootless/troubleshoot/, fetched 2026-10-01). The current workstation has run
-with 262,144 since the 2026-09-29 Harbor run: the images of six matplotlib SWE-bench tasks failed to pull with that
-error at 65,536 and pulled after the widening. The Gate A owner published the observation on 2026-10-01 in
+with 262,144 since the 2026-09-29 Harbor run: the images of six matplotlib SWE-bench tasks logged that error at
+65,536, and the four of them in the final task set ran after the widening. The Gate A owner published the observation
+on 2026-10-01 in
 `evidence/receipts/harbor-e2e-token-tools-20260930.json` (block
 `host_prerequisite_observations.rootless_docker_subordinate_ids`), which is on PR #570's branch and not on main yet.
 It is the workstation's value for one image set, not a default. On the new distro the range is widened only when
@@ -426,7 +439,10 @@ output is not in this repository, so they are recorded as relayed, each with the
 | The record required 262,144 subordinate ids while the recipe proves 65,536 | Docker's two pages, fetched 2026-10-01, and the Harbor receipt on PR #570's branch | "Subordinate ids"; the requirement is withdrawn |
 
 The same lane took the second independent review of item 4 for all 32 layers (unit U6), the crosswalk from the
-guide's ten themes to the 32 layers, and sanitized receipts for what it qualified on the current host.
+guide's ten themes to the 32 layers, and sanitized receipts for what it qualified on the current host. Its first
+packet is pull request #575 at `bbee2a8e`: gpt-6.1-sol reviewed the 20 foundation layers on 2026-10-01, with 26
+corrections to the layer records and remaining gaps in every layer. A performed review that names gaps does not
+satisfy item 4, so the item-4 cells of the foundation table keep the assessment's reading until the re-record pass.
 
 A second reviewer (the repository's evidence-reviewer role, Claude Opus 5.5 at effort max, so the same model family
 as the assessors) read the sections added on 2026-10-01 against the artifact and the cited sources. It found no high

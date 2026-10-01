@@ -12,7 +12,8 @@ Per-layer assessments of the catalog layers against the closure criterion of
 | `foundation-synthesis.md` | One reviewer's synthesis of the 20 assessments: ranking, cross-layer patterns, program units, pins behind their latest release, install-readiness gaps and contradictions. |
 | `foundation-run-variance.json` | The item statuses of the seven layers that ran twice (the workflow was resumed after a sign-in). Five of them differ in one or two items between the two runs; none becomes final for install in either. |
 
-The us-equities layers follow in the same form when their assessment is complete.
+The us-equities assessment (12 layers, same method) lands with the trading lane owner's records in that lane's own
+pull request.
 
 ## How it was produced
 
@@ -41,6 +42,19 @@ the statements it marks "(checked)". The file holds the first complete refuted r
 - Usage: the workflow was interrupted by a sign-in and resumed, and the resumed segment ran agents again that had
   already returned. The last segment recorded 3,612,716 tokens across 20 agents; the first segment's total was not
   retained, so the complete usage is unknown.
+
+## Corrections found in review
+
+The assessment file is frozen: the item-4 reviews bind to its hash. Corrections to it are recorded here and applied
+where the steps are carried forward (the architecture manifest's new-host steps).
+
+- token-efficiency, next unit: `python3 scripts/adoption_status.py --json` alone cannot show that client wiring is
+  complete. The script reports `client_wiring` only with its opt-in `--client-wiring` flag, so the step is
+  `python3 scripts/adoption_status.py --client-wiring --pinned-versions --json` (review of PR #573, 2026-10-01).
+- instructions-skills, new-host steps: the Codex `[[skills.config]]` tables come from a separate renderer call,
+  `python3 tools/adoption/install_skills.py --print-codex-config` (`adoption/update.md`), which the listed install
+  commands do not include; without it the pinned `skill-creator` copy stays enabled beside Codex's bundled one
+  (same review).
 
 ## Sanitization
 
