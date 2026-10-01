@@ -121,7 +121,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <p class="subnote">Codex input includes its cached-input subset. Claude ordinary input, cache creation and cache reads use different categories. Do not add those conventions blindly or double-count the same telemetry receipt.</p>
 </section>
 <section id="architecture" role="tabpanel" aria-labelledby="tab-architecture" hidden>
-<div class="page-heading"><div><div class="eyebrow">New WSL distro / one dated edition</div><h2>The final architecture, layer by layer.</h2><p>Each row names the selection of record at its recorded pin, the verdict under the edition's rules, the evidence class, the reasons with their sources and what a session runs on the new distro. Expand a row for the five closure items, alternatives, upstream currency, ordered new-host steps and gates. A new distro collects its own evidence; nothing here is acceptance on it.</p></div></div>
+<div class="page-heading"><div><div class="eyebrow">New WSL distro / one dated edition</div><h2>The final architecture, layer by layer.</h2><p>Each row names the source host's selection of record at its recorded pin (not a merit result: a comparison row's winner is undetermined until its arms run on the new distro), the verdict under the edition's rules, the evidence class, the reasons with their sources and what a session runs on the new distro. Expand a row for the five closure items, alternatives, upstream currency, ordered new-host steps and gates. A new distro collects its own evidence; nothing here is acceptance on it.</p></div></div>
 <div id="architecture-edition" class="scope-note landscape-summary"></div>
 <div id="architecture-actions" class="landscape-actions"></div>
 <div id="architecture-topic"></div>
@@ -797,7 +797,7 @@ function architectureDetail(row, edition) {
   const closure = make("dl", "catalog-facts");
   edition.closure_items.forEach(item => add(closure, make("dt", "", item.id + " · " + readable(row.closure[item.id])), make("dd", "", item.text)));
   add(detail, make("h4", "", "Closure items"), closure, make("p", "", row.closure.missing ? "Missing: " + row.closure.missing : "Nothing missing: all five closure items hold."));
-  if(row.winners.length) add(detail, make("h4", "", "Winners: pin of record, install, acceptance and upstream currency"));
+  if(row.winners.length) add(detail, make("h4", "", "Source host's selection of record: pin, install, acceptance and upstream currency"));
   row.winners.forEach(winner => {
     const block = add(make("div", "catalog-detail"), make("strong", "", [winner.label, winner.role, winner.pin].filter(Boolean).join(" · ")), add(make("p", "small"), link("Pin of record: " + winner.pin_source.locator + " ↗", winner.pin_source.url)));
     if(winner.pin_drift !== null) add(block, make("p", "small", architectureDrift(winner)));
@@ -853,7 +853,7 @@ function renderArchitecture() {
     const subset = rows.filter(row => row.catalog === catalog);
     if(!subset.length) return;
     const table = make("table", "token-table"), body = make("tbody");
-    add(table, add(make("thead"), add(make("tr"), ...["Layer", "Winners (pin)", "Verdict", "Evidence class", "Reasons", "Install on the new distro"].map(label => make("th", "", label)))));
+    add(table, add(make("thead"), add(make("tr"), ...["Layer", "Source host's selection (pin)", "Verdict", "Evidence class", "Reasons", "Install on the new distro"].map(label => make("th", "", label)))));
     subset.forEach(row => {
       const layer = add(make("td"), make("strong", "", row.title), make("p", "small mono", row.catalog + "/" + row.layer_id));
       if(row.research_status) add(layer, make("p", "small muted", "Research state: " + readable(row.research_status)));

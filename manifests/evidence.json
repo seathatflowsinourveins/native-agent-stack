@@ -15615,8 +15615,8 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "d13d2e71db5bbf79f9133a34ffd109ba0217cb59e6fe6099f85e815998b062c1",
-      "bytes": 17975
+      "sha256": "ed4b5384848386d0a6077cd17147c2dd02dc7aeaf463ec8807c3b3ba0effb21b",
+      "bytes": 18065
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -15655,8 +15655,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "c61e23df300b0872bc784d5dc7926ef23009ba6d9f16acc4ae9e0f0aab8ae7d3",
-      "bytes": 125994
+      "sha256": "b1fc23b3595dca2164f0b3fc7bb19d553caa0be8c4fe4b25e70004a48ebcc165",
+      "bytes": 126141
     },
     {
       "path": "docs/evidence.md",
@@ -47185,8 +47185,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "8e0fbb9b579e99eb740155a9e728c43146ac61ce51fa0bbce47a344482822561",
-      "bytes": 137469
+      "sha256": "d1990f63256a86d69eaa154217aba92548905ff0bafc61e574465425e9ba62bb",
+      "bytes": 137485
     },
     {
       "path": "tests/test_effort_default_guard.py",

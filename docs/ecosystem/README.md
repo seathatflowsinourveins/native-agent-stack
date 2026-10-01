@@ -137,7 +137,8 @@ date, its base commit, scope, the verdict rules verbatim, what each verdict and
 evidence class means, the five closure items of
 [the research state](../../catalogs/landscape/research-state.json) and the
 edition's sources, and states how many rows are closed. One table per catalog
-lists each row's winners at their pin of record, verdict, evidence class,
+lists each row's source-host selection of record (the winners column, which is
+this host's bookkeeping and not a merit result) at its pin, verdict, evidence class,
 reasons and install command; expanding a row shows the closure items with what
 is missing, the winners' pin locators, install and acceptance commands and
 upstream currency, the alternatives, the ordered new-host steps and the gates.
