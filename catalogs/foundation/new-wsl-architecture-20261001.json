@@ -1547,7 +1547,7 @@
         {"text": "The dated security-identity gate needs an entitled identity source that the user owns.", "kind": "user_side", "source_path": "catalogs/us-equities/gates-20260922.json"}
       ],
       "owner_lane": "trading",
-      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, the verdict_overturn_when comparison on blueprints/us-equities/point-in-time/fixture.json with the validate_source invariants; no gate blocks it, and it needs a recorded DVC install first. The verdict's own winner, DVC 3.67.1, has no pin of record."
+      "notes": "Owner's verdict: selection of record, open, distance 5. Blocking item: c3, the verdict_overturn_when comparison on blueprints/us-equities/point-in-time/fixture.json with the validate_source invariants; no gate blocks it. DVC 3.67.1 already ran natively on synthetic fixtures (2026-09-23), so the comparison needs a fresh DVC install on the target host and the point-in-time fixture. DVC's pin is the verdict's baseline 3.67.1; it has no stack pin, and the new distribution installs the current upstream release."
     },
     {
       "layer_id": "storage-compute",
