@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "kind": "native_fault_run_record",
+  "subject_gate": "native-fault-behaviour",
+  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "receipt_sha256": "54430f3803f3875e960aead66d777651d6822bdcce602152e12d5240d2445c8b",
+  "client_order_id_prefix": "nf-20261001t143832-835f9c-",
+  "purpose": "Re-run of the frozen native-faults plan (C01, C02, C05, C04) on engine dca821cc (#559). That commit changed runner.py, safety.py and transport.py after the 2026-09-25 receipt was recorded, so scripts/trading_gates.py reported the receipt's binding as stale, and the gate is cited for an engine only after a native re-run binds it.",
+  "operator": "the trading lane's coordinator session (Claude Code), run manually under the project's standing paper authorization after the Gate A owner approved one manual run before its seal announcement; paper endpoint only",
+  "evidence_classes": {
+    "harness_run_and_get_checks": "native_paper",
+    "independent_observation": "independent_observation (evidence/independent-observation-20261001t143832.json)",
+    "offline_tests_and_hash_checks": "measured_local (the native-faults suite is a local synthetic fixture with a fake transport)"
+  },
+  "tree": {
+    "commit": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+    "run_from": "a read-only frozen clone of main at dca821cc (#559), outside every worktree; its path is private and not recorded",
+    "clone_frozen_sums": {
+      "file": "frozen-dca821cc.SHA256SUMS (private, not committed)",
+      "sha256": "0deca48521d7141aefb6bcd45a41d5638e2d4f341598d65316419bfacad2ff5c",
+      "entries": 70,
+      "matched_before_run": true,
+      "matched_after_run": true,
+      "matched_at_record_time": "70 of 70, clone HEAD dca821cc with a clean git status",
+      "covers": "The engine sources, including runner.py, safety.py, transport.py and ../order-contract/order_contract.py with the receipt's values. harness.py and plan.json are not listed; their hashes in the clone, taken before the run, equal the receipt's harness_sha256 and plan_sha256."
+    },
+    "source_hashes_json_sha256_at_run_commit": "c9b6f5f8f39fe6595fa13c054420e1e96633038e895495f9a4a5d6b5da0ab93a",
+    "record_commit": "758bce0df6353e73fa62714f5d2e6f42cc5a1bcf",
+    "source_hashes_json_sha256": "0c4c2df382c7d263b393f80ab5c0ff5116d149258b8d10140c37d5003a1ec6b9",
+    "source_hashes_entries": 58,
+    "source_hashes_mismatches": 0,
+    "receipt_harness_sha256_equals_tree": true,
+    "receipt_plan_sha256_equals_tree": true,
+    "receipt_engine_sources_sha256": {
+      "../order-contract/order_contract.py": "57405f752fc933a6f09a5b2f0eb46482f94a780aa818dd0b73d7149a1fe58025",
+      "runner.py": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+      "safety.py": "f43def730273be28dbb2b4a791dff31ca7e3f661735eb45e35ebccb75c4d0285",
+      "transport.py": "8d1222f7b8e90cf2af0cd6efb88eb70704cf900c480a097e86576a8382435b16"
+    },
+    "receipt_engine_sources_equal_tree": {
+      "../order-contract/order_contract.py": true,
+      "runner.py": true,
+      "safety.py": true,
+      "transport.py": true
+    },
+    "receipt_engine_sources_equal_source_hashes_json": {
+      "runner.py": true,
+      "safety.py": true,
+      "transport.py": true
+    },
+    "note": "The harness ran from the clone at dca821cc; this record and the binding check are at main 758bce0d. No bound file (runner.py, safety.py, transport.py, ../order-contract/order_contract.py, native-faults/harness.py, native-faults/plan.json) changed between the two commits. source-hashes.json changed only its tests/test_adaptive_paper_safety.py entry (c228124f, #205), and all 58 entries matched the files both in the clone and at 758bce0d. source-hashes.json has no entry for ../order-contract/order_contract.py; its receipt value equals the tree file and the value the 2026-09-25 receipt bound."
+  },
+  "runtime": {
+    "python": "3.12.3 (pinned adaptive-paper runtime venv adaptive-paper-20260921)",
+    "alpaca_py": "0.44.0",
+    "nautilus_trader": "2.0.0rc5"
+  },
+  "host": {
+    "class": "WSL2 workstation (Linux)",
+    "load_1min_before_run": "1.04 (the run script refuses at 30 or more)",
+    "session": "2026-10-01 10:38 ET, inside the regular session; the harness refuses unless the broker clock says the market is open",
+    "clock_summary": "No host-clock measurement was taken. The run plan called for a clock check before the run, but chronyc is not installed on this host, and no other measurement of the host clock against a reference or against Alpaca's clock was made before, during or after the run. The 2026-09-25 requirement to make time sync single-source before the next timed paper run on this host was not verified. The only clock-related evidence is the ledger's request times below.",
+    "ledger_request_times": {
+      "evidence_class": "measured_local (the run's private engine ledger, read after the run)",
+      "rows": 24,
+      "first": "2026-10-01T14:38:33.284734Z",
+      "last": "2026-10-01T14:38:34.227807Z",
+      "strictly_increasing": true,
+      "reading": "request_budget (safety.py:1354) writes each request row as a durable reservation before the request is sent (safety.py:1382), and raises request_clock_moved_backward when a request time is earlier than the latest row (safety.py:1366-1367). The run reached native_faults_passed with no stop error, and the 24 times increase strictly, so no backward step of the host clock reached the ledger during the run. This bounds nothing about the offset from UTC or from Alpaca's clock."
+    },
+    "engine_clock_check": "The engine's 0.25 s clock check (runner.validate_preflight, runner.py:695-696 at dca821cc, SafetyError clock_drift) is not part of this harness. harness.py:42 imports only Controller, credentials, reconcile and save from runner, and prepare() (harness.py:296-314) reads the broker clock only for is_open and next_close. So the run neither passed nor failed that check.",
+    "outcome_dependence": "None found. The ledger's quote check refuses a quote more than 0.25 s in the future or older than the configured maximum age (safety.py:692-696), and C01's quote passed it. The independent observation read no broker timestamps, so unlike 2026-09-25 the broker's order times were not compared with the receipt window."
+  },
+  "offline_tests": {
+    "command": "<pinned runtime python> -B -m unittest tests.test_native_faults_min tests.test_adaptive_paper_source_hashes_manifest (run by the run script from the frozen clone, before the run)",
+    "ran": 31,
+    "seconds": 22.662,
+    "result": "OK",
+    "exit_code": 0,
+    "per_module": {
+      "test_native_faults_min": 24,
+      "test_adaptive_paper_source_hashes_manifest": 7
+    },
+    "per_module_source": "the test definitions in the two modules, unchanged between dca821cc and 758bce0d; the log is not verbose",
+    "log": {
+      "sha256": "b8ac3b72fa9fd37c08dd8ce37b6bddc385b0ce7da4738d948db112379175a23b",
+      "bytes": 3553,
+      "kept": "private, because it carries host paths"
+    }
+  },
+  "get_checks": {
+    "method": "No separate GET probe was made before or after the run, unlike 2026-09-25. These are the harness's own checks. prepare() (harness.py:290-318) reads the broker clock and refuses unless is_open is true. It reads the account only to key the account-writer lock, and that sha256 is never recorded. It takes a snapshot of account, positions and orders through the engine transport, and refuses unless every position quantity is zero and every order is terminal. Cleanup proves flat with runner.reconcile over a fresh transport.snapshot. The harness checks neither the account's status nor its identity.",
+    "before_run": {
+      "by": "harness prepare(); inferred from the run proceeding, since prepare() refuses with exit 2 otherwise",
+      "market_open": true,
+      "positions": 0,
+      "open_orders": 0,
+      "flat": true,
+      "account_status": "not checked by the harness",
+      "lane_account_identity_matched": "not compared; the account was selected by the env-file pointer of the lane's second paper account, and no fingerprint comparison (README Run, step 1) was made"
+    },
+    "after_run": {
+      "by": "harness cleanup (runner.reconcile over transport.snapshot), recorded in the receipt",
+      "open_orders": 0,
+      "positions": 0,
+      "cash_delta_usd": "0.00",
+      "flat": true
+    },
+    "after_run_observation": "About 12 s after the harness exited, the coordinator's observation (file time 14:38:46Z) read account status ACTIVE, 0 positions and 0 open orders (evidence/independent-observation-20261001t143832.json).",
+    "cash_and_equity_unchanged": "cash delta 0.00 by the harness's reconcile; equity was not compared"
+  },
+  "harness": {
+    "argv_redacted": "<pinned runtime python> -B <frozen clone>/blueprints/us-equities/adaptive-paper/native-faults/harness.py run --env-file <the lane's second paper account's private env file, named by a pointer variable that a non-terminal interactive bash expands> --state-root <private dedicated root under ~/.local/state/native-agent-stack/> --out <private receipt path>",
+    "launched_at": "2026-10-01T14:38:32.517554475Z",
+    "exited_by": "2026-10-01T14:38:34.467212274Z",
+    "exit_code": 0,
+    "stdout": {
+      "sha256": "27ca2ff19e7e9eaa5310d49b2f41d1542764186fbf60daa75a0e470a405f1f68",
+      "bytes": 135,
+      "text": "{\"status\": \"native_faults_passed\", \"posts_reserved\": 2, \"cases\": {\"C01\": \"passed\", \"C02\": \"passed\", \"C05\": \"passed\", \"C04\": \"passed\"}}",
+      "note": "the same bytes as the 2026-09-25 run's stdout"
+    },
+    "stderr": {
+      "sha256": "275384dfbdb43f634fd54d2483d566cb4ee55400654daaa52c7df55a4aa09167",
+      "bytes": 208,
+      "content": "kept private and not characterized here"
+    },
+    "receipt_copy": "written to private output by --out, copied byte-identical into the tree",
+    "run_state_markers_after_run": {
+      "IN_FLIGHT": false,
+      "CLEANUP_REQUIRED": false
+    },
+    "run_script_refusals": "Before starting the harness, the private run script refused if its output directory already existed (one run only), if the 1-minute load was 30 or more, if the engine STOP file existed, if the plan or harness hash prefix differed, or if the clone differed from its frozen sums. It also refused if the offline suite failed. None applied."
+  },
+  "ledger_readback": {
+    "method": "read-only, immutable sqlite open of the run's private ledger after the run; event kinds, client-id suffixes, intent states and row counts only",
+    "event_sequence": [
+      [
+        "trial_start",
+        ""
+      ],
+      [
+        "intent_reserved",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "order_observed",
+        "c01"
+      ],
+      [
+        "intent_reserved",
+        "c04"
+      ],
+      [
+        "broker_refused",
+        "c04"
+      ]
+    ],
+    "event_kind_counts": {
+      "broker_refused": 1,
+      "intent_reserved": 2,
+      "order_observed": 3,
+      "trial_start": 1
+    },
+    "broker_refused": [
+      {
+        "http_status": 422,
+        "refusal": "sub_penny_minimum_price_variance"
+      }
+    ],
+    "foreign_client_ids": 0,
+    "intents": {
+      "c01": {
+        "status": "canceled",
+        "filled_qty": "0",
+        "broker_id_recorded": true
+      },
+      "c04": {
+        "status": "broker_refused",
+        "filled_qty": "0",
+        "broker_id_recorded": false
+      }
+    },
+    "row_counts": {
+      "events": 7,
+      "intents": 2,
+      "requests": 24,
+      "executions": 0,
+      "positions": 0,
+      "fees": 0
+    }
+  },
+  "limits": [
+    "One paper run, one host, one paper account (the lane's second paper account); not live-endpoint evidence and no live order.",
+    "C05's repeat DELETE was answered 204 again, so a 404 or 422 cancel refusal remains offline-tested only.",
+    "C04's 422 is one more paper-endpoint observation of the documented sub-penny body, not a general rule that 422 is definitive.",
+    "Ambiguous or in-flight submit faults (timeouts, 429, 5xx, partial fills, restart during a submit) were not exercised.",
+    "The gate's flip condition checks only /status of the receipt. scripts/trading_gates.py also compares the six sha256 values this receipt binds with the tree and source-hashes.json. It lists any difference under warnings, and it never fails the check.",
+    "No host-clock measurement: chronyc is not installed on this host, so the planned clock check was not taken, and the host clock's offset from UTC or from Alpaca's clock is unknown for this run. The 2026-09-25 requirement to make time sync single-source before the next timed paper run on this host was not verified. The ledger's strictly increasing request times show only that no backward step reached the ledger during the run.",
+    "Changed observer method: there was one observation, made by the coordinator session that started the run, with alpaca-py TradingClient GETs and the frozen engine's guarded credential loader (runner.credentials, paper_only=True). On 2026-09-25 there were two observers. One was the unchanged alpaca-py script with its own env-file parser. The other was a separate session's standard-library, GET-only script that imported no engine code, matched 29 checks and cross-checked the ledger. This observation shares the engine's credential loader as well as the broker API and account. It made no ledger cross-check and no comparison of account identity, broker timestamps, cash or equity. Its --after value is not echoed in its stdout, its exit code was not retained and its interpreter was not recorded.",
+    "Preflight scope: the harness checked only that the market was open and the account flat with no open orders. README Run step 1, a separate GET probe that compares the account fingerprint and checks ACTIVE and not blocked, was not performed. Account selection rests on the env-file pointer, and ACTIVE comes from the observation after the run.",
+    "Pre-run conditions reported by the operator and not measured in this record: account 2's mover ledger was finished, and no other account-2 writer ran during the run.",
+    "The harness's stderr (208 bytes) is kept private; only its size and sha256 are recorded."
+  ],
+  "privacy": "No credential, account id, account fingerprint, balance, session id or host path is recorded here."
+}

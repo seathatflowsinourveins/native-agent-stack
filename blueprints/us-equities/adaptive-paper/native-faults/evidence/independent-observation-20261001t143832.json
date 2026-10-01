@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "independent_observation",
+  "evidence_class": "independent_observation",
+  "observed_on": "2026-10-01",
+  "observed_at": "2026-10-01T14:38:46Z",
+  "observed_at_source": "file time of the private stdout (14:38:46.301Z; its stderr file 14:38:45.617Z), about 12 s after the harness exited; the script prints no timestamp",
+  "observer": "the trading lane's coordinator session, which also started the run (not the harness process)",
+  "method": "alpaca-py TradingClient(paper=True) GET requests only, from a new private script run separately from the harness code path (not native-faults/harness.py, and not the adaptive-paper engine transport or ledger). The script loads the key pair through the frozen engine's guarded credential loader, runner.credentials(env_file, paper_only=True) from the dca821cc clone. It is not the 2026-09-24 alpaca-py observer with its own env-file parser and not the 2026-09-25 standard-library observer. It sent 7 GETs: get_account; get_all_positions; get_orders(status=open, limit=50); get_orders(status=all, after=<the run's start>, limit=50, nested=False), with client ids reduced to suffixes of the receipt's prefix; get_order_by_client_id for the c01 and c04 client ids; and the account's fill activities after the run's start.",
+  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "subject_gate": "native-fault-behaviour",
+  "client_order_id_prefix": "nf-20261001t143832-835f9c-",
+  "listing_since": "the run's start, passed as the script's --after argument; the retained stdout does not echo the value",
+  "observed": {
+    "gets": 7,
+    "orders_listed_since_start": 1,
+    "orders_with_prefix": 1,
+    "by_suffix": {
+      "c01": {
+        "symbol": "SPY",
+        "side": "buy",
+        "qty": "1",
+        "type": "limit",
+        "limit_price": "380.73",
+        "time_in_force": "day",
+        "extended_hours": false,
+        "status": "canceled",
+        "filled_qty": "0"
+      }
+    },
+    "lookup_c01": {
+      "found": true,
+      "status": "canceled",
+      "filled_qty": "0"
+    },
+    "lookup_c04": {
+      "found": false,
+      "http_status": 404,
+      "meaning": "no broker order exists for client id nf-20261001t143832-835f9c-c04"
+    },
+    "fill_activities_since_start": 0,
+    "open_orders": 0,
+    "positions": 0,
+    "account_status": "ACTIVE"
+  },
+  "compared_with_receipt": {
+    "receipt_status": "native_faults_passed",
+    "receipt_submit_responses": 2,
+    "receipt_submits_accepted": 1,
+    "receipt_submits_refused_422": 1,
+    "receipt_c01_final_status": "canceled (C02 and C05 ledger, zero filled)",
+    "receipt_c01_order": "SPY limit 380.73 (C01 detail; the plan's buy 1, day, not extended hours)",
+    "receipt_c04_ledger": "broker_refused {http_status 422, refusal sub_penny_minimum_price_variance}, broker_id_recorded false, client-id read 404",
+    "receipt_cleanup": "0 open orders, 0 positions, cash delta 0.00",
+    "expected_broker_orders_with_prefix": 1,
+    "observed_broker_orders_with_prefix": 1,
+    "c01_matches": true,
+    "c04_absent_matches": true,
+    "flat_matches": true,
+    "counts_match": true
+  },
+  "claim_boundary": "Confirms only the listed broker-side facts. Since the run's start there was one order with this prefix, c01 (SPY buy 1 limit 380.73 day, not extended hours), canceled with filled quantity 0. There was no broker order for the c04 client id (lookup 404) and no fill activity since the start. At observation time there were no open orders or positions, and the account status was ACTIVE. Only one order was listed since the start at all, below the listing's limit of 50, so no other order was written to the account in that window. The observation uses the same broker API and account and the engine's own credential loader. So it is independent of the harness and of the engine's transport and ledger code, not of the broker or the engine's credential loading, and it was run by the same session that started the run. It does not observe the HTTP statuses of the run's own requests (C04's 422 body, the C02 and C05 DELETE 204 answers), request ordering, the order-contract envelope or wire check, ledger contents, broker timestamps against the receipt window, the account's identity, cash or equity, or the engine's handling of a 422 cancel refusal, which C05 did not receive. It is not live-endpoint evidence and not a strategy result.",
+  "retained": {
+    "script": {
+      "path": null,
+      "kept": "private, not committed (the lane's observe-20261001.py)",
+      "sha256": "f118798f779c3dd322e6ee0d637ce23c034d66cb30a48846cc6d7297230da118",
+      "bytes": 3273
+    },
+    "stdout": {
+      "path": "observe-native-faults-20261001t143832.stdout.json",
+      "sha256": "c91b6b0012229d5f5868f42de1b0629dc59dd93061511417aca50b083edc9235"
+    },
+    "stderr_sha256": "e032297e4c2b97481f8b8b3dfccba849062ba923dd837f6bfbe18fa8bcfa2a8c (112 bytes: the two notices of a non-terminal interactive bash, 'cannot set terminal process group' and 'no job control in this shell'; nothing from the script)",
+    "argv_redacted": "<python> -B observe-20261001.py --engine <the frozen dca821cc clone> --env-file <the lane's second paper account's env file, through its pointer variable> --prefix nf-20261001t143832-835f9c- --after <the run's start>, per the script's usage line; the exact invocation was not retained",
+    "exit_code": "not retained; the stdout is the complete JSON object that the script prints as its last statement",
+    "runtime": "not recorded for this observation; the script imports alpaca-py and the clone's runner module",
+    "note": "A new script, run once against this run's prefix. It prints only client-id suffixes, order fields, counts, the account status and HTTP outcomes. The stdout is a byte-identical copy of the private file. The retained files contain no credential, account id, balance or host path."
+  }
+}
