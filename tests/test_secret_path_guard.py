@@ -2851,7 +2851,7 @@ def reference_form_f(text):
         if not line.startswith('&&', at):
             return None
         at = blanks(at + 2)
-    found = re.match(r'(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy|nodejs|node)(?=[ \t<]|$)', line[at:])
+    found = re.match(r'(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy3?|nodejs|node)(?=[ \t<]|$)', line[at:])
     if not found:
         return None
     language = 'js' if found[1] in ('node', 'nodejs') else 'py'
@@ -3374,6 +3374,12 @@ K4_CASES['gateway_effective_requests'] += [
     )
 ]
 K4_CASES['gateway_effective_requests'] += [
+    # curl(1): -0 is --http1.0 (review thread on PR #567): it changes the protocol, not the route.
+    ('curl -0 http://127.0.0.1:20128/api/health', None),
+    ('curl --http1.0 http://127.0.0.1:20128/api/health', None),
+    ('curl -s0 http://127.0.0.1:20128/api/health', None),
+    ('curl -0 http://127.0.0.1:20128/api/settings', 'gateway_credential_route'),
+    ('curl -0 -d x http://127.0.0.1:20128/api/health', 'gateway_credential_route'),
     ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/cache', None),
     ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/settings', 'gateway_credential_route'),
     ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/cache -d x', 'gateway_credential_route'),
@@ -3770,6 +3776,8 @@ K4_F_LABELED = [(text, True) for text in K4_F_ALLOW] + [(text, False) for text i
     ("python <<'PY'\npass\nPY", True),
     ("python3.12 - <<'PY'\npass\nPY", True),
     ("pypy - <<'PY'\npass\nPY", True),
+    ("pypy3 - <<'PY'\npass\nPY", True),
+    ("pypy3.10 - <<'PY'\npass\nPY", False),
     ("/usr/bin/python3 - <<'PY'\npass\nPY", True),
     ("./venv/bin/python3 - <<'PY'\npass\nPY", True),
     ("~/bin/python3 - <<'PY'\npass\nPY", True),

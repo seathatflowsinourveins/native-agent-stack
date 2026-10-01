@@ -3063,7 +3063,7 @@ def k4_canary_reason(words_list: list[list[str]]) -> str | None:
 
 
 K4_HD = re.compile(r"<<(-?)[ \t]*(?:([\"'])([A-Za-z_][A-Za-z0-9_]*)\2|([A-Za-z_][A-Za-z0-9_]*))(?=$|[ \t])")
-K4_F_EXEC = re.compile(r"\A(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy|nodejs|node)\Z")
+K4_F_EXEC = re.compile(r"\A(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy3?|nodejs|node)\Z")
 K4_F_FLAG = re.compile(r"\A-[BbdEIOPqsSuv]+\Z")
 K4_F_PLAIN = re.compile(r"[A-Za-z0-9_./:=,+@%~-]+")
 K4_F_VARIABLE = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})")
@@ -4220,7 +4220,7 @@ K4_CURL_SHORT_VALUE = {'X': '--request', 'd': '--data', 'F': '--form', 'T': '--u
                        'o': '--output', 'm': '--max-time', 'H': '--header', 'A': '--user-agent', 'D': '--dump-header',
                        'w': '--write-out', 'e': '--referer', 'r': '--range', 'Y': '--speed-limit', 'y': '--speed-time',
                        'C': '--continue-at'}
-K4_CURL_SHORT_FLAGS = frozenset("sSfkvNi#46gOJ")
+K4_CURL_SHORT_FLAGS = frozenset("sSfkvNi#046gOJ")  # curl(1): -0 is --http1.0
 # curl's URL globbing (curl(1) "URL"): {a,b} sets and [1-9], [a-z] ranges with an optional :step, expanded (to K4_CURL_GLOBS URLs) before
 # the matrix reads them, so `http://127.0.0.1:2012[8-9]/api/settings` is the two requests it makes; -g/--globoff turns globbing off.
 K4_CURL_GLOB = re.compile(r"\{([^{}]*)\}|\[([^\[\]]*)\]")

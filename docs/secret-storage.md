@@ -1428,7 +1428,7 @@ PLAIN   := one [A-Za-z0-9_./:=,+@%~-] | "$" NAME | "${" NAME "}"
 SQ      := "'" [^'\r\n]* "'"
 DQ      := '"' ( [^"$`\\!\r\n] | "$" NAME | "${" NAME "}" )* '"'
 PATHP   := [A-Za-z0-9_.~/-]* "/"
-PYNAME  := "python" | "python3" | "python" DIGITS "." DIGITS | "pypy"
+PYNAME  := "python" | "python3" | "python" DIGITS "." DIGITS | "pypy" | "pypy3"
 PY      := PATHP? PYNAME ( BL+ "-" [BbdEIOPqsSuv]+ )* [ BL+ "-" ( BL+ ARG )* ]
 JS      := PATHP? ( "node" | "nodejs" )
            [ BL+ "--input-type=" ( "module" | "commonjs" ) ] [ BL+ "-" ( BL+ ARG )* ]
