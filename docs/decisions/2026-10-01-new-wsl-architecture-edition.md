@@ -102,7 +102,9 @@ classes, closure states, install kinds and gate kinds; `closed` if and only if a
 non-empty `missing` for every open row and an empty one for a closed row; a `missing` that starts with one
 `cN: ...` segment for each item that is not `met` (segments separated by `; cN:`) and has none for a `met` item,
 a trailing sentence without a `cN:` prefix staying allowed; the row's evidence class rule above;
-`no_selection` if and only if there are no winners. A catalog layer
+`no_selection` if and only if there are no winners; and the sha256 of the five `close_only_when` texts (joined in
+order with newlines, no trailing newline), recorded as the edition's `close_only_when_sha256`, so a reworded or
+reordered research state fails the build instead of showing each row's states beside other texts. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
 **This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 19

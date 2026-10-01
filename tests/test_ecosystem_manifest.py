@@ -1656,8 +1656,11 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
 
     def architecture_edition(self):
         pending = {"path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"}
+        # The five closure texts joined in order with newlines, no trailing newline.
+        texts_sha256 = hashlib.sha256("\n".join(self.CLOSE_ONLY_WHEN).encode()).hexdigest()
         return {"schema_version": 1, "kind": "new_wsl_architecture_edition",
                 "edition": {"date_utc": "2026-10-01", "base_commit": "c" * 40, "scope": "Fixture edition",
+                            "close_only_when_sha256": texts_sha256,
                             "verdict_rules": ["A layer is closed only when all five close_only_when items hold."],
                             "verdict_values": {value: "Meaning of " + value for value in self.ARCHITECTURE_VERDICTS},
                             "evidence_classes": {value: "Label of " + value for value in self.ARCHITECTURE_CLASSES},
@@ -1784,6 +1787,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             (lambda e: e.update(schema_version=2), "unsupported architecture edition schema"),
             (lambda e: e.update(kind="other"), "architecture edition kind must be new_wsl_architecture_edition"),
             (lambda e: e["edition"].pop("base_commit"), "architecture edition needs exactly its date, base commit"),
+            (lambda e: e["edition"].update(close_only_when_sha256="0" * 63),
+             "architecture edition needs exactly its date, base commit"),
             (lambda e: e["edition"]["verdict_values"].pop("closed"),
              "architecture edition must define every value of verdict_values"),
             (lambda e: e.update(rows=[]), "architecture rows must be a non-empty list"),
@@ -1879,6 +1884,23 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             self.assertNotEqual(result.returncode, 0, result.stdout)
             self.assertIn("architecture closure items must be the five close_only_when items of the research state",
                           result.stdout)
+
+    def test_architecture_closure_texts_are_bound_by_their_hash(self):
+        """The edition records the sha256 of the five close_only_when texts it was written against, so a reworded or
+        reordered research state fails the build instead of showing each row's states beside other texts."""
+        message = ("architecture edition close_only_when_sha256 must be the sha256 of the research state's five "
+                   "close_only_when texts")
+        self.write_architecture(self.architecture_edition())
+        result = self.run_generator("--check")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        texts = self.CLOSE_ONLY_WHEN
+        for name, changed in (("reworded", [texts[0] + ", reworded", *texts[1:]]),
+                              ("reordered", [texts[1], texts[0], *texts[2:]])):
+            with self.subTest(case=name):
+                self.write_architecture(self.architecture_edition(), close_only_when=changed)
+                result = self.run_generator("--check")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(message, result.stdout)
 
     def assert_architecture_cases(self, cases):
         """Each case mutates a fresh fixture edition; None expects a passing --check, a string that failure."""

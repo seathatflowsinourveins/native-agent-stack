@@ -507,8 +507,8 @@ def token_topic_card(card, edition_date, stack_version, root):
 
 
 ARCHITECTURE_CITATION_KEYS = ("source_path", "pending_source", "url")
-ARCHITECTURE_EDITION_FIELDS = {"date_utc", "base_commit", "scope", "verdict_rules", "verdict_values",
-                               "evidence_classes", "sources"}
+ARCHITECTURE_EDITION_FIELDS = {"date_utc", "base_commit", "close_only_when_sha256", "scope", "verdict_rules",
+                               "verdict_values", "evidence_classes", "sources"}
 ARCHITECTURE_ROW_FIELDS = {"layer_id", "catalog", "title", "winners", "verdict", "closure", "reasons",
                            "evidence_class", "alternatives", "new_host_steps", "gates", "owner_lane", "notes"}
 ARCHITECTURE_WINNER_FIELDS = {"component_id", "name", "repository", "pin", "pin_source", "install", "acceptance",
@@ -702,12 +702,14 @@ def build_architecture(root, repository_url, stack, read, track, file_url, publi
             and isinstance(edition["date_utc"], str)
             and bool(re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", edition["date_utc"]))
             and isinstance(edition["base_commit"], str) and bool(re.fullmatch(r"[0-9a-f]{40}", edition["base_commit"]))
+            and isinstance(edition["close_only_when_sha256"], str)
+            and bool(re.fullmatch(r"[0-9a-f]{64}", edition["close_only_when_sha256"]))
             and isinstance(edition["scope"], str) and bool(edition["scope"].strip())
             and isinstance(edition["verdict_rules"], list) and bool(edition["verdict_rules"])
             and all(isinstance(rule, str) and bool(rule.strip()) for rule in edition["verdict_rules"])
             and isinstance(edition["sources"], list) and bool(edition["sources"]),
-            "architecture edition needs exactly its date, base commit, scope, verdict rules, verdict values, "
-            "evidence classes and sources")
+            "architecture edition needs exactly its date, base commit, close_only_when_sha256, scope, verdict rules, "
+            "verdict values, evidence classes and sources")
     for field, values in (("verdict_values", ARCHITECTURE_VERDICTS),
                           ("evidence_classes", ARCHITECTURE_EVIDENCE_CLASSES)):
         meanings = edition[field]
@@ -719,7 +721,12 @@ def build_architecture(root, repository_url, stack, read, track, file_url, publi
     require(isinstance(close_only_when, list) and len(close_only_when) == len(ARCHITECTURE_CLOSURE_ITEMS)
             and all(isinstance(text, str) and bool(text.strip()) for text in close_only_when),
             "architecture closure items must be the five close_only_when items of the research state")
-    known = {layer["id"]: "foundation" for layer in foundation["layers"]}
+    # The build reads the texts live, so the edition binds the ones its rows were assessed against: a reworded or
+    # reordered research state fails instead of showing each row's states beside other texts.
+    require(digest("\n".join(close_only_when).encode("utf-8")) == edition["close_only_when_sha256"],
+            "architecture edition close_only_when_sha256 must be the sha256 of the research state's five "
+            "close_only_when texts, joined in order with newlines and no trailing newline")
+    known ={layer["id"]: "foundation" for layer in foundation["layers"]}
     known.update({layer["layer_id"]: "us-equities" for layer in state["layers"]
                   if layer.get("catalog") == "us-equities"})
     status = {(layer.get("catalog"), layer.get("layer_id")): layer.get("status") for layer in state["layers"]}
