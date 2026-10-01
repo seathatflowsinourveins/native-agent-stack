@@ -93,8 +93,8 @@
       "kind": "gate",
       "id": "token-efficiency-wiring",
       "title": "Token-efficiency wiring for every session",
-      "state": "fresh-worktree coverage complete / Codex MCP at user scope / 12 of 14 versions match pins / 2 unchecked (npm metadata) / probes fail closed",
-      "evidence_ref": "evidence/artifacts/token-coverage-20260926/README.md"
+      "state": "source-host qualified / seven native memory hooks trusted / twelve pins match / draft PR561 / other hosts unqualified",
+      "evidence_ref": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json"
     },
     {
       "kind": "gate",
@@ -282,8 +282,8 @@
       "kind": "gate",
       "id": "token-stack-subagent-e2e",
       "title": "Token stack inside Ultracode subagents",
-      "state": "16 of 16 tools used in Sonnet workflow subagents with passing checks / RTK +56527 run-only / Headroom +183904 lifetime / Codex workers blocked until 2026-09-30",
-      "evidence_ref": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+      "state": "Claude Workflow and Agent recovery / Codex V2 Astra max child / Codex12 fresh tools / Claude8 fresh plus4 dated / no aggregate savings",
+      "evidence_ref": "evidence/receipts/token-profile-completion-20260930.json"
     },
     {
       "kind": "gate",
@@ -340,6 +340,13 @@
       "title": "Skills trial window 2026-09-25 to 2026-10-25",
       "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
       "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
+    },
+    {
+      "kind": "gate",
+      "id": "native-token-lifetime",
+      "title": "Native token lifetime accounting",
+      "state": "refresh service passed / timer active / retained-history and window and artifact scopes separate / exact provider lifetime saving unknown",
+      "evidence_ref": "evidence/artifacts/token-profile-completion-20260930/lifetime-native.json"
     }
   ],
   "workers": [

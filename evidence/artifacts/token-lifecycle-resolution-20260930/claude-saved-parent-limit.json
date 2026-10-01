@@ -1,0 +1,97 @@
+{
+  "kind": "saved-workflow-parent-final-reply-limit",
+  "native_exit_code": 1,
+  "external_timeout": false,
+  "termination_escalated": false,
+  "native_results": [
+    {
+      "subtype": "error_max_turns",
+      "is_error": true,
+      "num_turns": 5,
+      "errors": [
+        "Reached maximum number of turns (4)"
+      ],
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 20097,
+        "cache_read_input_tokens": 339161,
+        "output_tokens": 8000,
+        "output_tokens_details": {
+          "thinking_tokens": 6345
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 20097,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 4078,
+            "cache_read_input_tokens": 91844,
+            "cache_creation_input_tokens": 2210,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 2210
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 52,
+          "outputTokens": 59935,
+          "thinkingTokens": 44799,
+          "cacheReadInputTokens": 1448782,
+          "cacheCreationInputTokens": 207124,
+          "webSearchRequests": 0,
+          "costUSD": 2.7523803999999994,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 20678,
+          "thinkingTokens": 16493,
+          "cacheReadInputTokens": 84486,
+          "cacheCreationInputTokens": 36416,
+          "webSearchRequests": 0,
+          "costUSD": 0.3147492,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 92772,
+          "outputTokens": 13891,
+          "thinkingTokens": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 1.62227,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000
+        }
+      },
+      "total_cost_usd": 4.689399600000001
+    }
+  ],
+  "native_tool_names": [
+    "Bash",
+    "ToolSearch",
+    "Bash",
+    "Bash",
+    "Bash"
+  ],
+  "boundary": "The parent reached the requested four-turn limit after independently inspecting the already completed task output. No saved Workflow or child was rerun. This is a caller failure, not failure of the completed audit."
+}

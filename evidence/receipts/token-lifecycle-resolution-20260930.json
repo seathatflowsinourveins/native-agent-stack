@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "id": "token-lifecycle-resolution-20260930",
+  "kind": "native_model_e2e",
+  "recorded_date": "2026-09-30",
+  "status": "accepted_with_explicit_scope",
+  "decision": "docs/decisions/2026-09-30-token-lifecycle-resolution.md",
+  "evidence_directory": "evidence/artifacts/token-lifecycle-resolution-20260930",
+  "qualified": {
+    "selected_native_tools": {
+      "pin_source": "scripts/native_token_ci.py",
+      "tools": 16,
+      "commands": 259,
+      "integration_checks": 82,
+      "exit_code": 0,
+      "owned_temporary_install_removed": true,
+      "scope": "Upstream executables and supported installation/use on synthetic fixtures; local integration assertions."
+    },
+    "serena_exact_parity": {
+      "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "installed_source_files_byte_equal": 128,
+      "native_claude_preimage_sha256": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0",
+      "native_changed_schema_controls_exit_codes": [
+        1,
+        1
+      ],
+      "focused_tests": 48,
+      "historical_context_correction": "The retained 21-tool Claude preimage inherited an ancestor project via --project-from-cwd; the earlier no-active-project statement is retracted. Exact native bytes remain historical evidence. Explicit no-project replacement: token-profile-completion-20260930/serena-no-project; original failed CI:ci-repair.json."
+    },
+    "claude_saved_workflow_installation": {
+      "scripts": 3,
+      "installer_exit_code": 0,
+      "idempotent_rerun_exit_code": 0,
+      "source_bytes_independently_equal": true,
+      "focused_tests": 77,
+      "preexisting_optional_skips": 3
+    },
+    "claude_role_workflow": {
+      "native_exit_code": 0,
+      "source_scout": "claude-sonnet-5-5/max",
+      "stack_verifier": "claude-opus-5-5/max",
+      "children_complete": true,
+      "named_context_mode_use": true,
+      "role_token_lane_marker_observed": true
+    },
+    "claude_saved_audit": {
+      "native_task_status": "complete",
+      "cached_reader_reuse": true,
+      "confirmed_claims": 9,
+      "corrected_claims": 1,
+      "source_verdicts_confirmed": 2,
+      "scope": "Evidence/source coverage for the frozen version/role-binding question; not project readiness.",
+      "final_parent_exit_code": 0,
+      "final_parent_workflow_or_child_rerun": false
+    },
+    "claude_ordinary_builder": {
+      "same_child_continued": true,
+      "context_mode_preload_and_use": true,
+      "native_handback_success": true,
+      "native_completed_notification": true,
+      "parent_exit_code": 0,
+      "parent_termination_required": false
+    },
+    "codex_clean_install": {
+      "native_version": "0.159.2",
+      "official_platform_signature_and_provenance": true,
+      "disposable_package_uninstalled": true,
+      "active_client_retained": true
+    },
+    "codex_native_child": {
+      "coordinator": "gpt-6.1-sol/ultra",
+      "selected_role": "stack-researcher",
+      "child": "gpt-6-astra/max",
+      "protocol": "native V2",
+      "completed_turn_and_task": true,
+      "native_context_mode_use": true,
+      "independent_app_server_observation": true
+    }
+  },
+  "preserved_failed_attempts": [
+    "Original clean-prefix Serena reference mismatch",
+    "Existing pinned Serena mismatch",
+    "Live changed-schema controls rejected by exact guard",
+    "Root regression before native preimages were copied",
+    "Initial and resumed Claude ordinary-agent caller timeouts",
+    "Saved Claude transport cutoff and supervised parent termination",
+    "Original Codex V1-close requirement and incomplete filtered stream",
+    "Codex npm audit from the wrong prefix directory",
+    "Saved-audit parent final reply exceeded the requested four-turn limit; final followup exited 0"
+  ],
+  "cleanup": "evidence/artifacts/token-lifecycle-resolution-20260930/cleanup.json",
+  "limitations": [
+    "Scoped host and synthetic task acceptance; no equal-quality whole-task token saving or universal SOTA ranking.",
+    "The full token-efficiency profile remains drafted; this does not qualify every catalog candidate/tool inside each client.",
+    "Failed native caller timeouts/turn-limit attempts and partial or unknown usage remain retained; task completion is distinct from parent exit.",
+    "Native client accounts retained. Claude reinstall is not a fresh OS/account simulation; Codex platform attestation does not separately attest the wrapper.",
+    "Local integration assertions and tests remain separate from unchanged upstream verification."
+  ],
+  "measurement_limitations": [
+    "No equal-quality whole-task provider-token saving or universal SOTA superiority is established.",
+    "The token-efficiency adoption profile remains drafted; this receipt does not accept every selected tool inside each client or every catalog alternative.",
+    "Claude client reinstall used the existing signed-in host. Binary bytes match the native release manifest; new 2.1.285 signature acceptance was not performed.",
+    "Original saved-audit recovery required parent termination, and a later parent reply reached its four-turn limit. The final same-session parent continuation exited 0 without rerunning the Workflow or children.",
+    "Final usage for interrupted caller attempts remains unknown. Cumulative result snapshots and cache/reasoning subsets are never added twice.",
+    "Native workflow returned totalTokens and child transcript counters have different scopes.",
+    "Signature/provenance verification covers Codex's native platform dependency, not an independently verified top-level wrapper signature.",
+    "Local focused tests and native synthetic integration checks are not unchanged upstream tests. Only actual upstream verification commands retain that classification."
+  ],
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "rtk",
+    "context-mode",
+    "serena",
+    "qmd",
+    "repomix",
+    "toon",
+    "mcporter",
+    "markitdown",
+    "ast-grep",
+    "ccusage",
+    "codebase-memory-mcp",
+    "headroom",
+    "jcodemunch-mcp",
+    "ai-memory",
+    "context-hub",
+    "agentsview"
+  ],
+  "claim": "A fresh selected native token-tool installation passed 259 returned commands and 82 integration checks after a source-verified exact Serena reference repair. Three unchanged personal Claude workflows were installed/reused safely; live Claude role Workflow, cached saved-audit recovery, ordinary builder handback and native Codex V2 Astra/max child completed. Final Claude parent continuations exited cleanly."
+}

@@ -153,6 +153,8 @@ pinned-version check and one useful native call per tool in each client, and rec
 (`adoption/README.md:41`), and the profile's end-to-end protocol stays frozen and unexecuted
 (`evidence/artifacts/token-adoption-e2e-20260926/README.md:3`).
 
+Later execution is recorded separately in the [September 30 source-host native qualification](2026-09-30-token-profile-completion.md): twelve fresh useful Codex operations and eight fresh plus four dated unchanged-pin Claude operations, including the qualified ai-memory 2.4.2 selection. That dated host evidence has its own clean-install, recovery and native-command scope. Other hosts still require their own native acceptance; the frozen September 26 protocol and matched provider-saving comparison remain separate.
+
 **Three tools stay outside the profile.** The profile keeps its 14 components, each with an entry in
 `adoption/pins-linux-x86_64.json` and in `adoption/pins-macos-arm64.json` (`tests/test_adoption_status.py`,
 `TokenEfficiencyProfileTests`). jCodeMunch, codebase-memory-mcp and ast-grep are neither a `component_ids` entry nor a

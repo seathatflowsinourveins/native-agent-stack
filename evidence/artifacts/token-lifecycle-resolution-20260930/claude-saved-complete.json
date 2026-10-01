@@ -1,0 +1,112 @@
+{
+  "kind": "saved-workflow-independent-completion",
+  "evidence_class": "native-task-output-journal-and-owned-child-observation",
+  "native_task_output_identity": {
+    "bytes": 24393,
+    "sha256": "569729db2b0008c49889b050dcf6f8c8bec2a3b6996bb40c7df3013bd62a0e1f"
+  },
+  "native_task_notifications": [
+    {
+      "type": "system",
+      "subtype": "task_notification",
+      "task_id": "<owned-native-task-7>",
+      "status": "completed",
+      "timestamp": null
+    }
+  ],
+  "returned_result": {
+    "question": "Verify the exact source-scout role model and effort binding and the current returned Python version.",
+    "status": "complete",
+    "unread_sources": [],
+    "missing_sources": [],
+    "evidence_issues": [],
+    "source_verdicts": [
+      {
+        "packet_id": "docs-1",
+        "source": "adoption/agents/claude/source-scout.md",
+        "verdict": "confirmed"
+      },
+      {
+        "packet_id": "commands-2",
+        "source": "python3 --version",
+        "verdict": "confirmed"
+      }
+    ],
+    "claim_verdict_counts": {
+      "confirmed": 9,
+      "corrected": 1
+    },
+    "missing": [],
+    "readiness_verdict_first_paragraph": "VERIFIED on the question as posed. The documented source-scout binding and the current returned Python version both reproduce; one reader paraphrase (docs-1 claim 8, about line 13 command rules) was corrected and affects neither answer."
+  },
+  "native_workflow_returned_metrics": {
+    "agentCount": 3,
+    "totalTokens": 70052,
+    "totalToolCalls": 15,
+    "workflowProgress": [
+      {
+        "type": "workflow_phase",
+        "index": 1
+      },
+      {
+        "type": "workflow_phase",
+        "index": 2
+      },
+      {
+        "type": "workflow_agent",
+        "index": 1,
+        "label": "read:docs-1",
+        "agentId": "<owned-native-task-2>",
+        "model": "sonnet",
+        "state": "done",
+        "cached": true
+      },
+      {
+        "type": "workflow_agent",
+        "index": 2,
+        "label": "read:commands-2",
+        "agentId": "<owned-native-task-3>",
+        "model": "sonnet",
+        "state": "done",
+        "cached": true
+      },
+      {
+        "type": "workflow_agent",
+        "index": 3,
+        "label": "verify",
+        "agentId": "<owned-native-task-5>",
+        "model": "claude-opus-5-5",
+        "state": "done",
+        "attempt": 1,
+        "tokens": 70052,
+        "toolCalls": 15,
+        "durationMs": 433007
+      }
+    ]
+  },
+  "journal_observation": {
+    "reader_starts": 2,
+    "reader_results": 2,
+    "verifier_starts": 2,
+    "replacement_verifier_result_observed": true,
+    "completed_readers_reused": true
+  },
+  "replacement_verifier": {
+    "agent_id": "<owned-native-task-5>",
+    "models": [
+      "claude-opus-5-5"
+    ],
+    "efforts": [
+      "max"
+    ],
+    "unique_usage_message_count": 8,
+    "usage_sum_per_unique_message": {
+      "input_tokens": 18,
+      "cache_creation_input_tokens": 77266,
+      "cache_read_input_tokens": 458236,
+      "output_tokens": 18158
+    },
+    "has_assistant_end_turn": false
+  },
+  "claim_boundary": "Native workflow complete means source/evidence coverage, not project readiness. The enclosing parent was terminated by the supervisor without its final reply. Native workflow metrics and transcript counters have different scopes and are not added. No whole-task savings is claimed."
+}

@@ -1,0 +1,60 @@
+{
+  "kind": "independent-source-and-artifact-verification",
+  "reviewer_role": "stack-verifier",
+  "model_policy": "Astra/max",
+  "writes_performed": false,
+  "new_provider_acceptance_runs": false,
+  "commands": [
+    {
+      "command": "rtk proxy python3 -m unittest discover -s tests -p test_install_claude_profile.py",
+      "exit_code": 0,
+      "returned_summary": "Ran 77 tests in 1.029s\nOK (skipped=3)"
+    },
+    {
+      "command": "rtk proxy python3 -m unittest discover -s tests -p test_native_token_ci.py",
+      "exit_code": 0,
+      "returned_summary": "Ran 48 tests in 2.790s\nOK"
+    },
+    {
+      "command": "rtk proxy python3 scripts/validate_convergence.py blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json --json",
+      "exit_code": 0,
+      "returned_output": {
+        "records": [
+          {
+            "errors": [],
+            "observations": 21,
+            "path": "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
+            "valid": true
+          }
+        ],
+        "valid": true
+      }
+    }
+  ],
+  "verdicts": {
+    "clean_install_259_commands_82_checks": "confirmed from actual returned receipt; long suite not rerun",
+    "serena_strict_parity_and_changed_schema_controls": "confirmed from source, immutable identity and native preimages",
+    "owned_claude_saved_script_lifecycle": "confirmed; installed three scripts independently byte-equal and non-symlink",
+    "claude_role_workflow": "confirmed from native returned fields and child observations",
+    "claude_saved_recovery": "confirmed within retained native observations",
+    "claude_ordinary_builder_handoff": "confirmed within retained native observations",
+    "codex_v2_child": "confirmed within retained native observations"
+  },
+  "findings": [
+    {
+      "priority": "P2",
+      "issue": "Encoded private project-directory key survived leading-path sanitization.",
+      "resolution": "Public native IDs/project keys now use stable owned aliases; original identities retained in privacy.json."
+    },
+    {
+      "priority": "P3",
+      "issue": "Earlier parent termination wording used present tense despite subsequent clean continuation.",
+      "resolution": "Decision now frames unaccepted parent state historically at the cutoff."
+    }
+  ],
+  "verification_correction": "The reviewer's initial preimage calculation stripped protocol newlines. Repeating with preserved newlines reproduced both exact documented hashes.",
+  "limits": [
+    "Local original implementation, installed workflow bytes and retained artifacts independently reviewed. Primary remote source URLs were not re-fetched in this pass.",
+    "Focused tests are local integration/regression tests; no upstream acceptance or whole-stack savings promotion."
+  ]
+}

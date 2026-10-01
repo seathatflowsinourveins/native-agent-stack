@@ -1,0 +1,11 @@
+Run exactly one read-only native Workflow qualification using the script below. Use the Workflow tool, rather than simulating its agents. The script follows https://code.claude.com/docs/en/workflows#what-a-workflow-script-looks-like. This is a synthetic local integration fixture. The existing source-scout and stack-verifier definitions supply the tools for their bounded roles.
+
+Preserve this script's agent types, models and explicit max efforts. Do not edit or install anything, read credentials, launch other agents, or read the entire catalog. After the Workflow returns, return only its actual JSON result. If the native Workflow cannot execute, report the actual error and stop; never manufacture acceptance.
+
+const S = {type:'object',properties:{exit_code:{type:'integer'},stdout:{type:'string'}},required:['exit_code','stdout'],additionalProperties:false};
+phase('Extract');
+const scout = await agent('Run the acceptance command python3 --version exactly, via rtk proxy, in the foreground. Return its real exit_code and exact trimmed stdout in the schema. Do not edit, install, or read credentials.', {label:'native-scout',phase:'Extract',agentType:'source-scout',model:'sonnet',effort:'max',schema:S});
+phase('Verify');
+const verifier = await agent('Independently run the acceptance command python3 --version exactly, via rtk proxy. First use ToolSearch to load only mcp__plugin_context-mode_context-mode__ctx_execute. Execute JavaScript: const p=require("child_process").spawnSync("rtk",["proxy","python3","--version"],{encoding:"utf8",timeout:10000}); console.log(JSON.stringify({exit_code:p.status,stdout:p.stdout.trim()})); Return the real exit_code and stdout in the schema. Do not edit, install, or read credentials.', {label:'native-verifier',phase:'Verify',agentType:'stack-verifier',model:'opus',effort:'max',schema:S});
+log(JSON.stringify({scout,verifier}));
+return {accepted:!!scout&&!!verifier&&scout.exit_code===0&&verifier.exit_code===0&&scout.stdout.startsWith('Python ')&&scout.stdout===verifier.stdout,scout,verifier};

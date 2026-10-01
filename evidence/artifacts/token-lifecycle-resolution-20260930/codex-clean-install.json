@@ -1,0 +1,66 @@
+{
+  "kind": "codex-clean-native-install",
+  "evidence_class": "upstream-native-installation-and-package-verification",
+  "native_version": "codex-cli 0.159.2",
+  "npm_install": {
+    "command": "rtk npm install --global --prefix <owned-prefix> --no-audit --no-fund @openai/codex@0.159.2",
+    "exit_code": 0,
+    "returned_output": "added 2 packages in 7s"
+  },
+  "signature_check": {
+    "command": "rtk proxy npm audit signatures --json --include-attestations",
+    "cwd": "<owned-prefix>/lib/node_modules/@openai/codex",
+    "exit_code": 0,
+    "invalid": 0,
+    "missing": 0,
+    "verified": [
+      {
+        "name": "@openai/codex",
+        "version": "0.159.2-linux-x64",
+        "registry": "https://registry.npmjs.org/"
+      }
+    ],
+    "provenances": [
+      {
+        "predicateType": "https://github.com/npm/attestation/tree/main/specs/publish/v0.1"
+      },
+      {
+        "predicateType": "https://slsa.dev/provenance/v1",
+        "workflow": {
+          "ref": "refs/tags/rust-v0.159.2",
+          "repository": "https://github.com/openai/codex",
+          "path": ".github/workflows/rust-release.yml"
+        },
+        "dependencies": [
+          {
+            "uri": "git+https://github.com/openai/codex@refs/tags/rust-v0.159.2",
+            "digest": {
+              "gitCommit": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "failed_attempt": {
+    "command": "rtk proxy npm audit signatures --json --include-attestations --prefix <owned-prefix>",
+    "exit_code": 1,
+    "returned_error": {
+      "summary": "found no installed dependencies to audit",
+      "detail": ""
+    }
+  },
+  "claim_boundary": "The corrected signature command checks the native platform dependency from the installed wrapper package; it does not independently verify the top-level wrapper signature. No new provider run used the disposable client.",
+  "cleanup": {
+    "uninstall": {
+      "command": "rtk npm uninstall --global --prefix <owned-prefix> @openai/codex",
+      "exit_code": 0,
+      "returned_output": "removed 2 packages in 266ms"
+    },
+    "independent_observation": {
+      "codex_entrypoint_absent": true,
+      "wrapper_package_absent": true,
+      "active_client_version": "codex-cli 0.159.2"
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "id": "token-profile-completion-20260930",
+  "kind": "native_model_e2e",
+  "recorded_date": "2026-09-30",
+  "status": "accepted_with_explicit_scope",
+  "decision": "docs/decisions/2026-09-30-token-profile-completion.md",
+  "evidence_directory": "evidence/artifacts/token-profile-completion-20260930",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "rtk",
+    "context-mode",
+    "repomix",
+    "headroom",
+    "toon",
+    "ccusage",
+    "qmd",
+    "markitdown",
+    "serena",
+    "socraticode",
+    "ai-memory",
+    "mcporter"
+  ],
+  "claim": "The selected fourteen-component token-efficiency profile has native installation/lifecycle evidence and one useful operation per tool in both native client families on this host. Codex0.159.2 supplies fresh twelve-tool observations; Claude2.1.285 supplies eight fresh tool observations plus four dated unchanged-pin subagent observations. ai-memory 2.4.2 is active with native hook refresh, exact isolated restart/rollback and client read/query checks. The installed lifetime reporter completed with zero issues and retains distinct native counter scopes.",
+  "clients": {
+    "codex": {
+      "version": "0.159.2",
+      "repository": "https://github.com/openai/codex",
+      "source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "release_tag": "rust-v0.159.2",
+      "native_fixture": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+      "lifecycle_receipt": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+      "model": "gpt-6.1-sol",
+      "effort": "ultra",
+      "fresh_tools": 12
+    },
+    "claude": {
+      "version": "2.1.285",
+      "repository": "https://github.com/anthropics/claude-code",
+      "release_changelog_commit": "ec44ca97dc86c33d934c8d55b24959aabf076871",
+      "native_build_commit": "afb212976052ab038df25d5e871f6c049e094d3b",
+      "fresh_tools": 8,
+      "reused_tools": [
+        "toon",
+        "markitdown",
+        "serena",
+        "socraticode"
+      ],
+      "fresh_artifact": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+      "reused_receipt": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+      "lifecycle_receipt": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+      "ultracode": true,
+      "coordinator": {
+        "model": "opus",
+        "effort": "max"
+      },
+      "checked_fanout": {
+        "model": "sonnet",
+        "effort": "max"
+      },
+      "usage_scope": "result usage and cumulative modelUsage retained separately, not added"
+    }
+  },
+  "clean_install": {
+    "prior_full_profile": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/receipt.json",
+    "prior_ai_memory_version": "2.4.1",
+    "native_commands": 259,
+    "integration_checks": 82,
+    "current_ai_memory_delta": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-2.4.2-native",
+    "delta_is_not_a_new_full259_command_run": true
+  },
+  "memory_selection": "evidence/artifacts/token-profile-completion-20260930/memory-selection.json",
+  "lifetime_accounting": "evidence/artifacts/token-profile-completion-20260930/lifetime-native.json",
+  "independent_verification": "evidence/artifacts/token-profile-completion-20260930/independent-verification.json",
+  "preserved_failures": [
+    "Original strict Serena golden failure and recovered correct pinned bytes",
+    "Claude480s profile caller timeout and360s orientation-only caller timeout; both supported same-session continuations completed",
+    "RTK compact full-subject equality false; original recovery accepted",
+    "Codex Context Mode own-root access denials and replaced host-scoped ccusage attempt",
+    "Two tokenizer/source mismatches before the actual installed service passed with canonical4.0.0",
+    "Hindsight installer --help exit1 and native named Codex MCP lookup exit1; no live backend acceptance",
+    "Native hook refresh invalidated seven persisted Codex hashes; complete false before source-backed native trust repair, complete true afterward. First guarded path filter selected0 and made no mutation.",
+    "Clean Linux native CI:259commands/80checks, strict Serena inherited-project reference mismatch; cleanup passed",
+    "Foundation CI paired catalog date mismatch; local generated host list stale",
+    "First no-project regression repair retained a second stale frozen test hash; corrected before 48-test pass",
+    "Repaired-head global CI discovery rejected an undeclared canonical experiment; declaration-only correction passed all 26 records/142 observations locally."
+  ],
+  "limitations": [
+    "This is composed native acceptance on the existing host, not a fresh physical machine/WSL installation or new sign-in. Per-platform bootstrap pins do not confer acceptance on macOS.",
+    "Claude's TOON/MarkItDown/Serena/SocratiCode operations reuse dated unchanged-tool-pin positive checks; the historical receipt's absent discriminating controls remain absent. Retracted historical QMD/Repomix acceptance is replaced by fresh operations. No fresh twelve-tool Claude provider run is claimed.",
+    "Upstream RTK inline and Hindsight unchanged installer tests remain distinct from local native integration fixtures. Hindsight203pass/2skip does not establish a live memory/backend winner; other memory/RAG candidates remain comparisons.",
+    "Native counters are retained-history/window/event/byte estimates and overlap. Provider/cache usage, cumulative snapshots and exact artifact comparisons remain separate; exact lifetime provider tokens/dollars saved is unknown.",
+    "ai-memory activation retained the old binary and copied no production database/authentication. Binary rollback is not logical-data rollback; a new forced production PreCompact/provider extraction run was not performed.",
+    "Context Mode official tag, installed plugin and npm artifact identities differ. Counter formulas were verified, but the current MCP connection's loaded artifact binding remains unknown."
+  ],
+  "native_wiring": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json",
+  "native_hook_trust": "evidence/artifacts/token-profile-completion-20260930/codex-native-hook-trust.json",
+  "dated_tool_mapping": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
+  "publication": {
+    "kind": "draft_pull_request",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/561",
+    "number": 561,
+    "lane": "lane:foundation",
+    "native_gh_create_exit_code": 0,
+    "recorded_at_utc": "2026-09-30T20:45:21Z",
+    "review_pending": true,
+    "merged": false,
+    "integrated_upstream_main": "4720b202f1d9795754bf59bb42892193eb87693f",
+    "upstream_evidence_preserved": "codex-01592-qualification-20260930"
+  },
+  "ci_portability_correction": {
+    "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
+    "exact_native_preimages": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/",
+    "status": "Strict no-project repair independently accepted; current-pin Linux native CI passed 259 commands/82 checks; later registry declaration repair passed all 26 records locally."
+  },
+  "current_clean_linux_ci": {
+    "revision": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "run_id": 36780366887,
+    "job_id": 110108806860,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36780366887/job/110108806860",
+    "status": "passed",
+    "native_step_exit_code": 0,
+    "native_return": {
+      "status": "passed",
+      "commands": 259,
+      "checks": 82,
+      "failures": [],
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    },
+    "pin_count": 16,
+    "current_ai_memory_pin": "2.4.2",
+    "artifact_id": 11126919185,
+    "artifact_digest": "sha256:c131c43270d0c13ee86fcfcc7e853c5180d4b639816b859995879f70b2d3876d",
+    "retained_receipt": {
+      "path": "evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/receipt.json",
+      "bytes": 729601,
+      "sha256": "3ef752b071595e49351e4e2e33001c6a92fda7126dd73feb2019b39ab8d72092",
+      "format": "Unchanged native UTF-8 JSON receipt",
+      "publication_format_attempts": [
+        {
+          "representation": "GNU gzip1.12 --keep --no-name",
+          "compression_exit_code": 0,
+          "archive_bytes": 112546,
+          "archive_sha256": "b1307f2e91d7383d289d2de356dc6d0663d52d2a9b7aa09b92896802415939a9",
+          "publication_validator_exit_code": 1,
+          "error": "cannot inspect as UTF-8 publication text",
+          "correction": "Retained exact unchanged UTF-8 JSON; preserved publication inspection policy."
+        }
+      ]
+    },
+    "original_job_log_sha256": "2e6c11b501252290d7b5f72b138763ea040d36e7d20921e1ea981373d684f58b",
+    "scope": "Fresh native upstream CLI/MCP installation and locally authored fixture checks on disposable Linux; separate from client/provider/GPU acceptance."
+  }
+}

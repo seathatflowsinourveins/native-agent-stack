@@ -1,0 +1,1144 @@
+{
+  "schema_version": 1,
+  "kind": "native_ci_portability_correction",
+  "date": "2026-09-30",
+  "evidence_class": "original_native_ci_returns_and_local_integration_checks",
+  "failing_revision": "938b737f67d9382227a40910479bf62533873862",
+  "source_pins": {
+    "serena": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "local_validation_and_host_generator": "938b737f67d9382227a40910479bf62533873862"
+  },
+  "failed_native_ci": {
+    "run_id": 36776670600,
+    "job_id": 110096205464,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36776670600/job/110096205464",
+    "reader_exit_code": 0,
+    "native_step_exit_code": 1,
+    "native_return": {
+      "status": "failed",
+      "commands": 259,
+      "checks": 80,
+      "failures": [
+        {
+          "component": "serena",
+          "error": "serena-tools-list-byte-parity-with-the-pinned-install"
+        }
+      ],
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    },
+    "artifact_id": 11125634437,
+    "artifact_digest": "sha256:7e469b1f864af6a7aa8bc58a7b68c7f5f86e17895ac4e22b106e56731cdcb1bb",
+    "original_receipt_bytes": 729934,
+    "original_receipt_sha256": "9fd96f88c400ba2926c303c1cac9e58a03f4719ce16d2b6187c4cf9558f45815",
+    "original_job_log_sha256": "c8a9487abaa6642f30c9104c2818c5ca175bd3dc8ca61d80c6183f7addc979e2"
+  },
+  "failed_validation_ci": {
+    "run_id": 36776670547,
+    "job_id": 110096206204,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36776670547/job/110096206204",
+    "reader_exit_code": 0,
+    "native_step_exit_code": 1,
+    "native_error": "catalogs/foundation/decisions.json: checked_at differs from manifest",
+    "original_job_log_sha256": "c0deba9a3146490c620fee31be9f86b2cfa4aebd9bdbbd569ba9ceb5e67a98ee"
+  },
+  "correction": {
+    "wrong_claim": "Earlier local Claude preimage had no active project",
+    "verified_cause": "Ancestor activation enabled single-project exclusion of activate_project/get_current_config",
+    "contract": "Omit --project-from-cwd and use a new empty scoped SERENA_HOME",
+    "comparison": "All 21 shared Claude objects identical; initialize/Codex bytes unchanged",
+    "exact_oracle_preserved": true,
+    "fresh_observation_path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/acceptance-observation.json"
+  },
+  "local_returns": [
+    {
+      "command": "python3 scripts/validate_foundation.py --root . --json",
+      "before_exit_code": 1,
+      "after_exit_code": 0
+    },
+    {
+      "command": "python3 scripts/new_host_grand_list.py --check",
+      "before_exit_code": 1,
+      "after_exit_code": 0,
+      "repair": "Maintained build()/render_md() functions produced the exact generated rows."
+    },
+    {
+      "command": "python3 -m unittest tests.test_native_token_ci",
+      "initial_repair_exit_code": 1,
+      "initial_failure": "Second frozen test hash still named inherited-project bytes",
+      "after_exit_code": 0,
+      "tests": 48
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_claude_profile",
+      "exit_code": 0,
+      "tests": 77,
+      "skipped": 3
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py --root . blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json --json",
+      "exit_code": 0,
+      "observations": 26,
+      "scope": "Declared historical consistency only; no new provider execution."
+    }
+  ],
+  "astra_review": {
+    "trigger": "Conflicting local and clean CI primary tool-list bytes; independent review of strict oracle correction",
+    "status": "accepted",
+    "verdict": "Fresh explicit no-project streams match clean CI exactly; source explains activation; complete byte equality and negative rejection preserved",
+    "independently_observed_native_exits": [
+      0,
+      0
+    ],
+    "independent_generator_check_exit_code": 0,
+    "independent_test_rerun": false
+  },
+  "limits": [
+    "Earlier clean host execution remains dated ai-memory 2.4.1 scope; failed CI used current 2.4.2.",
+    "Fixture/control checks are local integration checks, not unchanged upstream tests.",
+    "No new model-provider usage or token-saving comparison; missing usage stays unknown.",
+    "Fresh native CI passes at the named revision; original failed validation remains failed. The later registry declaration repair is separately observed locally across all 26 records/142 observations."
+  ],
+  "preserved_validation_attempts": [
+    {
+      "command": "python3 scripts/validate_convergence.py --root . --record <record>",
+      "exit_code": 2,
+      "error": "unrecognized arguments: --record",
+      "correction": "Records are positional; use the installed help/parser contract."
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py --root . <record> --json",
+      "exit_code": 1,
+      "error": "record.frozen_inputs.evaluation[0]: SHA-256 mismatch",
+      "correction": "Archived the exact original test file and changed only its frozen path; retained the historical hash."
+    }
+  ],
+  "frozen_evaluation_archive": {
+    "revision": "938b737f67d9382227a40910479bf62533873862",
+    "source_path": "tests/test_native_token_ci.py",
+    "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-tests-938b737f.py",
+    "native_git_show_exit_code": 0,
+    "bytes": 108181,
+    "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a"
+  },
+  "current_clean_native_ci": {
+    "revision": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "run_id": 36780366887,
+    "job_id": 110108806860,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36780366887/job/110108806860",
+    "status": "passed",
+    "native_step_exit_code": 0,
+    "native_return": {
+      "status": "passed",
+      "commands": 259,
+      "checks": 82,
+      "failures": [],
+      "cleanup": {
+        "owned_temporary_directory_absent": true,
+        "retained_output_exists": true
+      }
+    },
+    "pin_count": 16,
+    "current_ai_memory_pin": "2.4.2",
+    "artifact_id": 11126919185,
+    "artifact_digest": "sha256:c131c43270d0c13ee86fcfcc7e853c5180d4b639816b859995879f70b2d3876d",
+    "retained_receipt": {
+      "path": "evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/receipt.json",
+      "bytes": 729601,
+      "sha256": "3ef752b071595e49351e4e2e33001c6a92fda7126dd73feb2019b39ab8d72092",
+      "format": "Unchanged native UTF-8 JSON receipt",
+      "publication_format_attempts": [
+        {
+          "representation": "GNU gzip1.12 --keep --no-name",
+          "compression_exit_code": 0,
+          "archive_bytes": 112546,
+          "archive_sha256": "b1307f2e91d7383d289d2de356dc6d0663d52d2a9b7aa09b92896802415939a9",
+          "publication_validator_exit_code": 1,
+          "error": "cannot inspect as UTF-8 publication text",
+          "correction": "Retained exact unchanged UTF-8 JSON; preserved publication inspection policy."
+        }
+      ]
+    },
+    "original_job_log_sha256": "2e6c11b501252290d7b5f72b138763ea040d36e7d20921e1ea981373d684f58b",
+    "scope": "Fresh native upstream CLI/MCP installation and locally authored fixture checks on disposable Linux; separate from client/provider/GPU acceptance."
+  },
+  "linux_bootstrap": {
+    "revision": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "run_id": 36780372819,
+    "job_id": 110108826392,
+    "status": "passed",
+    "native_step_exit_code": 0,
+    "original_job_log_sha256": "42fedfc493707c24258010bc009e9622705347e28e0bc77633b27c499c642cae"
+  },
+  "global_discovery_correction": {
+    "source": "scripts/validate_convergence.py#L212-L241 at 1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "failed_revision": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "failed_run_id": 36780369690,
+    "failed_job_id": 110108816335,
+    "native_ci_step_exit_code": 1,
+    "native_error": "record discovery: invalid, changed or empty evidence manifest",
+    "original_job_log_bytes": 114449,
+    "original_job_log_sha256": "ec47584b491485944ea5d83182274dc4c5d0f03a20963e7b89e39443b7a92b43",
+    "cause": "New canonical experiment was correctly hashed but absent from convergence_records declaration. No file hash differed.",
+    "repair": "Declare the existing canonical record; preserve strict discovery and all historical hashes.",
+    "local_command": "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+    "before_exit_code": 1,
+    "after_exit_code": 0,
+    "records": 26,
+    "observations": 142,
+    "failed_records": [],
+    "scope": "Declared consistency only; no provider execution or usage aggregation."
+  },
+  "independent_publication_review": {
+    "revision": "1ac1f7d2fc76df85a083a7f2ddb70d92b9ae3102",
+    "native_git_show_exit_code": 0,
+    "working_tree_native_exit_code": 0,
+    "working_tree_stdout": "",
+    "all_three_public_stream_and_observation_files_match_originals": true,
+    "frozen_evaluation_archive_exact_bytes": 108181,
+    "frozen_evaluation_archive_sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a",
+    "targeted_public_marker_matches": 0,
+    "scope": "Astra byte/provenance and registry-consistency verification; no broad test or provider rerun.",
+    "fresh_native_receipt_exact_original": true,
+    "tested_source_files_exact_match_count": 17,
+    "independent_global_registry_validator": {
+      "command": "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "exit_code": 0,
+      "valid": true,
+      "records": 26,
+      "observations": 142,
+      "failed_records": []
+    }
+  },
+  "final_host_observation": {
+    "adoption_status_exit_code": 0,
+    "client_wiring_complete": true,
+    "pinned_versions_match": true,
+    "timer_native_exit_code": 0,
+    "timer_native_stdout": "active",
+    "private_manifest_json_exists": true,
+    "private_manifest_html_exists": true,
+    "scope": "Read-only wiring/version report and native host timer observation; separate from provider/GPU execution."
+  },
+  "final_head_validation_failure": {
+    "head": "11810a054546f50962270d93564afad36f3e0c60",
+    "linux": {
+      "run_id": 36782831321,
+      "job_id": 110117060358,
+      "exit_code": 1,
+      "tests": 8706,
+      "failures": 22,
+      "errors": 7,
+      "skipped": 806,
+      "duration_seconds": 1352.625,
+      "original_log_bytes": 281393,
+      "original_log_sha256": "177fcc9f0656fe0b34070eed5aac3a397ff3da215b0ff585e31eeaaea7eb1ace"
+    },
+    "macos": {
+      "run_id": 36782834471,
+      "job_id": 110117065934,
+      "exit_code": 1,
+      "tests": 480,
+      "failures": 1,
+      "skipped": 29,
+      "original_log_bytes": 199370,
+      "original_log_sha256": "7d0bd90d108a9c259d54a73891803790296d99edd61f71d6c7996a086ca62c07"
+    },
+    "corrections": [
+      "Preserve dashboard public metadata guard; shorten three gate state strings to allowed tokens.",
+      "Reconcile selected saturation-audit version and canonical receipt references to current registered native evidence without recertifying historical operations.",
+      "Use qualified ai-memory2.4.2 in the maintained foundation installation guide.",
+      "Preserve Mac2.3.2 qualification while updating Linux expected2.4.2 with the current profile receipt."
+    ],
+    "verification_pending": false,
+    "provider_usage": "unknown",
+    "bounded_corrected_validation": {
+      "command": "python3 -m unittest tests.test_grand_dashboard tests.test_stack_lifecycle tests.test_foundation_stack_pins tests.test_adoption_bootstrap_macos",
+      "exit_code": 0,
+      "tests": 185,
+      "skipped": 32,
+      "duration_seconds": 46.416,
+      "scope": "Local integration and metadata checks; not provider or upstream acceptance."
+    },
+    "patch_control": {
+      "failed_initial_repair_subtests": 11,
+      "cause": "Repeated JSON receipt blocks matched without component anchors.",
+      "correction": "Component-specific anchors and complete canonical identity/receipt equality across all69 selected rows.",
+      "single_consistency_test_exit_code": 0
+    },
+    "astra_review": {
+      "trigger": "Required full CI failures after bounded repair plus shared evidence/source merge.",
+      "status": "accepted_source_invariants",
+      "checks": [
+        "179 canonical receipt IDs preserved",
+        "Historical memory and macOS pins retain dated scope",
+        "All17 passing native CI source inputs match current working files",
+        "Strict dashboard token grammar retained"
+      ],
+      "tests_rerun_by_reviewer": false
+    },
+    "upstream_main_merged": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+    "merged_installer_tests": {
+      "exit_code": 0,
+      "tests": 79,
+      "skipped": 3
+    },
+    "frozen_installer_preimages": [
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-11810a05.py",
+        "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687",
+        "bytes": 21557
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-tests-11810a05.py",
+        "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e",
+        "bytes": 79170
+      }
+    ],
+    "full_corrected_ci": "passed on bbb4b3eb; later baseline dependency relock remains separate"
+  },
+  "full_corrected_linux_ci": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787697051,
+    "job_id": 110133164535,
+    "conclusion": "success",
+    "native_gh_log_fetch_exit_code": 0,
+    "tests": 8816,
+    "skipped": 806,
+    "duration_seconds": 1308.254,
+    "original_log_bytes": 399318,
+    "original_log_sha256": "8c76100ad196f623270f6f9dc45796c0fb99b32800237f64f8f01941f9ccfd7a",
+    "evidence_class": "Native CI execution of repository integration and validation tests; not live provider or GPU qualification."
+  },
+  "subsequent_native_tool_ci": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434133,
+    "job_id": 110132108170,
+    "conclusion": "success",
+    "commands": 259,
+    "checks": 82,
+    "failures": [],
+    "receipt_bytes": 729624,
+    "receipt_sha256": "f730d5dcc9f199f9e89ce8b636868089d8a1e1ff5604d71615774e16cf47d9df",
+    "artifact_id": 11130208006,
+    "artifact_digest": "sha256:3043166b9a2a58082c0f4ae4ef0857dacf0bf3928e05a3014d1fbb487f0f97ee",
+    "owned_temporary_files_gone": true,
+    "original_job_log_bytes": 64340,
+    "original_job_log_sha256": "4218be538d5c0aca0ed36ca013531dc4effd0b11a59670de90f75b707d614f16",
+    "native_gh_download_exit_code": 0,
+    "scope": "Native installed-tool fixture E2E; no provider/model execution. Complete unchanged earlier native receipt remains public with matching17sourceinputs."
+  },
+  "baseline_dependency_gate": {
+    "receipt": "evidence/receipts/osv-litellm-1932-20260930.json",
+    "finding": "GHSA-3cv6-jpf6-8222",
+    "scope": "Unchanged main-branch OpenHands runtime lock; bounded native1.93.2 relock and hash-bound exception source revalidation are separate from token-profile native/model acceptance.",
+    "independent_review": "accepted bounded source exception replacement; all12 queries replayed and new2104Python wheel plus1341SDK files exact"
+  },
+  "latest_lifetime_refresh": "evidence/artifacts/token-profile-completion-20260930/final-lifetime-refresh.json",
+  "corrected_macos_validation": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434204,
+    "job_id": 110132144196,
+    "conclusion": "success",
+    "native_gh_log_fetch_exit_code": 0,
+    "tests": 489,
+    "skipped": 29,
+    "duration_seconds": 155.412,
+    "original_log_bytes": 265439,
+    "original_log_sha256": "77ccbaa64e9b58b4a311a42edec797a1362ec30e8421c8867d193cd18b4876e0",
+    "scope": "Actual returned macOS selected test suite count; distinct from Linux8816 and native client/provider acceptance."
+  },
+  "corrected_macos_bootstrap": {
+    "head": "bbb4b3eb8ea1e7464c1c801642caeb07807aa154",
+    "run_id": 36787434204,
+    "native": {
+      "job_id": 110132265095,
+      "conclusion": "success",
+      "original_log_bytes": 173293,
+      "original_log_sha256": "2a3a04fb9b71540b47ca06c7c6ddf19b6992b21c1b373f71fb050542146a77fc"
+    },
+    "brew": {
+      "job_id": 110132265070,
+      "conclusion": "success",
+      "original_log_bytes": 157290,
+      "original_log_sha256": "7551ee68582c7e218e4066dbe19bb14315f9febbc0bdb772d1db45b1e9089e55"
+    },
+    "native_gh_log_fetch_exit_codes": [
+      0,
+      0
+    ],
+    "scope": "Hosted bootstrap operations; not fresh Mac12component/model qualification."
+  },
+  "review_handoff_correction": {
+    "error": "send_message queued completed evidence on an idle verifier without triggering a turn.",
+    "correction": "Observed completed agent status and resumed with followup_task; independent native source replay returned accepted bounded verdict.",
+    "source": "Installed collaboration tool contract: send_message does not trigger a turn; followup_task does."
+  },
+  "final_f03fb80d_validation": {
+    "head": "f03fb80d0bc0c1da99611448e7780a483206fe29",
+    "evidence_class": "original native GitHub job logs; exact source revision",
+    "linux": {
+      "run": 36792737973,
+      "job": 110150153401,
+      "conclusion": "success",
+      "native_log_download_exit": 0,
+      "summary": "Ran 8816 tests in 1341.209s",
+      "result": "OK (skipped=806)",
+      "original_bytes": 400576,
+      "original_sha256": "33b9f2dbe7e540b9f0fa54b2b1a1e91e6b60b2f41c124400970d9e1b01c43062"
+    },
+    "macos": {
+      "run": 36792680414,
+      "job": 110148966624,
+      "conclusion": "success",
+      "native_log_download_exit": 0,
+      "summary": "Ran 489 tests in 107.768s",
+      "result": "OK (skipped=29)",
+      "original_bytes": 340584,
+      "original_sha256": "61e7b4e7c850b268ccfef3602f5662eeaeaf33bf03df74b422014a2074e5bb0e"
+    },
+    "scope": "Prior-head acceptance before the later main reconciliation. No new provider or model run is inferred."
+  },
+  "shared_main_reconciliation_20261001": {
+    "main": "74cc5468691ada09674f325ebb2cddbdfe4ad68c",
+    "source_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/562",
+    "merge_tree_native_exit": 1,
+    "merge_native_exit": 1,
+    "conflict_paths": [
+      "manifests/evidence.json",
+      "tests/test_osv_lockfile_coverage.py"
+    ],
+    "returned_conflicts": [
+      "CONFLICT (content): Merge conflict in manifests/evidence.json",
+      "CONFLICT (content): Merge conflict in tests/test_osv_lockfile_coverage.py"
+    ],
+    "lock_comparison": {
+      "native_git_show_exit": 0,
+      "bytes": 106257,
+      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+      "byte_identical_to_main": true
+    },
+    "pins_comparison": {
+      "native_git_show_exit": 0,
+      "bytes": 4460,
+      "sha256": "36f9ab6c1b901621d685b6721b789dcbcc3cc0ce4526f9c997772c371cf24464",
+      "byte_identical_to_main": true
+    },
+    "resolution": "Preserve both lanes and all receipts. Use the exact main security gate and its canonical receipt; retain this branch independent changed-wheel native proof. Recompute only metadata for combined live files.",
+    "canonical_security_receipt": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+    "independent_native_proof": "evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json",
+    "usage": "Unknown for merge/reconciliation; not converted to token savings.",
+    "scope": "Source and evidence reconciliation only. The installed token profile, native clients and completed provider operations are not rerun.",
+    "local_returns": [
+      {
+        "command": "rtk proxy python3 scripts/validate.py",
+        "native_exit": 0,
+        "components": 69,
+        "hashed_files": 8751,
+        "profiles": 4,
+        "receipts": 179,
+        "status": "passed"
+      },
+      {
+        "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+        "native_exit": 0,
+        "records": 26,
+        "scope": "Declared evidence consistency only."
+      },
+      {
+        "command": "rtk proxy python3 -m unittest tests.test_osv_lockfile_coverage",
+        "native_exit": 0,
+        "summary": "Ran 38 tests in 0.218s",
+        "result": "OK"
+      },
+      {
+        "command": "rtk proxy python3 -m unittest tests.test_openhands_lock_binding",
+        "native_exit": 0,
+        "summary": "Ran 3 tests in 0.001s",
+        "result": "OK"
+      }
+    ],
+    "independent_source_verification": {
+      "role": "Astra/max independent source verifier",
+      "trigger": "Competing primary evidence receipt pointers after main independently adopted the identical security lock.",
+      "verdict": "accepted",
+      "main_reference": "74cc5468691ada09674f325ebb2cddbdfe4ad68c",
+      "native_git_show_exits": 0,
+      "gate_lock_pins_policy_byte_identical_to_main": true,
+      "native_ci_source_hashes_matching": 17,
+      "prior_receipt_registrations_preserved": 179,
+      "existing_live_hashes_reconciled": [
+        "blueprints/runtime-workers/openhands/research.md",
+        "tests/test_osv_lockfile_coverage.py",
+        "evidence/artifacts/token-profile-completion-20260930/ci-repair.json"
+      ],
+      "independent_receipt_proof_and_frozen_evaluation": "byte-identical",
+      "final_f03_log_hashes_and_sizes": "matched retained originals",
+      "archive_lookup_correction": {
+        "failed_native_exit": 128,
+        "corrected_native_exit": 0,
+        "path": "Exact mistaken path was not returned in the verifier summary; no source file changed.",
+        "usage": "unknown"
+      },
+      "scope": "Source-only acceptance. Tests and providers were not rerun by the verifier. Coordinator staged both resolved paths after the verifier index observation."
+    },
+    "generated_guide": {
+      "command": "rtk proxy python3 scripts/build_ecosystem.py --write",
+      "native_exit": 0,
+      "bytes": 14373722,
+      "sha256": "fea86fc88b79cb12467774ecf1eb0134d7d3a9d8e3b733786bde962f02de84fd",
+      "result": "byte-identical to prior qualified generated guide; ignored artifact"
+    }
+  },
+  "concurrent_token_adoption_reconciliation_20261001": {
+    "main": "46365ea812c3a680b19c8c8c9c3bb198bf3b38ab",
+    "source_prs": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/540",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/557"
+    ],
+    "prior_head": "9cd7696612c59fb9621d8806fd5b648fa94fb6fd",
+    "merge_tree_native_exit": 1,
+    "merge_native_exit": 1,
+    "conflict_paths": [
+      "adoption/README.md",
+      "adoption/manifest.json",
+      "catalogs/landscape/new-host-grand-list.json",
+      "docs/harness-defaults.md",
+      "docs/new-host-grand-list.md",
+      "manifests/evidence.json"
+    ],
+    "resolution": "Keep main selection/routing acceptance and both decision recipe paths, plus dated source-host qualification and other-host boundary. Preserve both anti-pattern logs, all14components and ai-memory2.4.2. Keep jcodemunch/codebase-memory/ast-grep optional.",
+    "anti_pattern_log_rows": 116,
+    "duplicate_log_titles": 0,
+    "failed_patch_preflight": {
+      "native_exit": 1,
+      "returned": "AssertionError: adoption/scaffold/AGENTS.md",
+      "mutation": "none; patch was not applied",
+      "correction": "Context Mode identified both automatically combined paths: scaffold AGENTS and installer tests. Hash closure includes those live files.",
+      "usage": "unknown"
+    },
+    "second_patch_preflight": {
+      "native_exit": 1,
+      "returned": "AssertionError: eight existing live hashes changed, not nine.",
+      "mutation": "none; patch was not applied",
+      "correction": "Check registered paths before counting. Main had not registered its new routing record and test; add both explicitly and update the eight combined existing files.",
+      "usage": "unknown"
+    },
+    "large_output_correction": {
+      "step": "Conflict inspection emitted a longer anti-pattern-table block than required.",
+      "correction": "Subsequent Context Mode analysis returned row counts, duplicates, selected keys and small conflicts only.",
+      "usage": "unknown; not attributed as token savings"
+    },
+    "primary_source_research": {
+      "role": "Astra/max stack-researcher",
+      "trigger": "Concurrent primary selection/routing acceptance overlaps dated native qualification.",
+      "verdict": "Compatible; preserve both acceptance levels and the qualified ai-memory2.4.2 pin.",
+      "source": "docs/decisions/2026-09-30-task-model-routing.md at46365ea8 and native completion at9cd76966; upstream Codex rust-v0.159.2 reasoning_effort.rs/models.json/child_config.rs",
+      "scope": "No edits, tests or model reruns."
+    },
+    "scope": "Source reconciliation only; original native/provider qualification and usage boundaries retained.",
+    "label_guard_correction": {
+      "source": "scripts/adoption_status.py native profile validation; unchanged len(label)<=160",
+      "failed_combined_label_chars": 251,
+      "corrected_label_chars": 135,
+      "initial_run": {
+        "native_exit": 1,
+        "summary": "Ran 219 tests in 17.174s",
+        "result": "FAILED (failures=1, skipped=3)"
+      },
+      "original_retained_run": {
+        "native_exit": 1,
+        "summary": "Ran 219 tests in 17.048s",
+        "result": "FAILED (failures=1, skipped=3)",
+        "bytes": 7113,
+        "sha256": "25c5db3e01e4eab2fedf9d29623d8bbc1eaf6aeaf2eed3fe0d53ef9c7c6a66e7",
+        "original": "private task-owned native log; no public personal paths"
+      },
+      "returned_failure": "test_the_profile_resolves_to_its_commands_and_recipes: AssertionError: 'invalid' != 'valid'; errors=['profile label is invalid']",
+      "correction": "Shorten the label only; retain Accepted, literal routing record path, both recipe links and native host scope. Native guard unchanged.",
+      "usage": "unknown; not counted as savings",
+      "corrected_run": {
+        "command": "rtk proxy python3 -m unittest tests.test_task_model_routing tests.test_adoption_status tests.test_install_claude_profile",
+        "native_exit": 0,
+        "summary": "Ran 219 tests in 16.302s",
+        "result": "OK (skipped=3)",
+        "original_bytes": 6313,
+        "original_sha256": "44a7747e8b758937934ab933331346a85cca6e3d2c89d4f361c59d7a17b33e60",
+        "scope": "Local integration and source-contract checks; no provider/model rerun."
+      }
+    },
+    "local_consistency_checks": {
+      "validate_native_exit": 0,
+      "components": 69,
+      "hashed_files": 8771,
+      "profiles": 4,
+      "receipts": 179,
+      "convergence_native_exit": 0,
+      "records": 26,
+      "scope": "Consistency only; repeated final precommit validation follows the evidence update."
+    },
+    "independent_source_verification": {
+      "role": "Astra/max stack-verifier",
+      "trigger": "Concurrent primary routing/rule records and bounded native label correction.",
+      "verdict": "accepted; no material counterexample",
+      "native_git_exits": 0,
+      "unmerged_count": 0,
+      "native_ci_sources_matching": 17,
+      "prior_receipt_entries_preserved": 179,
+      "profile_components": 14,
+      "label_chars": 135,
+      "native_label_limit": 160,
+      "anti_pattern_unique_titles": 116,
+      "frozen_evaluation": "unchanged",
+      "F1_instruction_surfaces": "match main",
+      "installer_test_functions": "both parents retained unchanged",
+      "routing_change": "dated host-qualification paragraph only",
+      "selected_ai_memory": "2.4.2",
+      "scope": "Source-only; tests/providers not run by verifier."
+    },
+    "generated_guide": {
+      "command": "rtk proxy python3 scripts/build_ecosystem.py --write",
+      "native_exit": 0,
+      "bytes": 14393184,
+      "sha256": "5debdd1c362f2a8e1ce576152c45ea721eed0d55878b33cc9f929a4186fd7d2b",
+      "artifact": "ignored local consolidated guide"
+    }
+  },
+  "generated_view_correction_20261001": {
+    "head": "3a858f9f638a3f21179dca50a62282fa8aa02afc",
+    "failed_validation": {
+      "run": 36801299192,
+      "job": 110176007400,
+      "native_ci_exit": 1,
+      "failed_command": "python3 scripts/new_host_grand_list.py --check",
+      "returned": "stale or missing: catalogs/landscape/new-host-grand-list.json; run python3 scripts/component_matrix.py --write, then python3 scripts/new_host_grand_list.py --write",
+      "full_test_step": "skipped",
+      "original_log_bytes": 122341,
+      "original_log_sha256": "136ea5507fd834ccf39cd9b5513299f630e5ea960048d31d45b7f5c42869025d",
+      "native_retrieval_exit": 0
+    },
+    "retrieval_attempts": [
+      {
+        "command_family": "gh run view --log",
+        "native_exit": 1,
+        "condition": "sibling jobs still running"
+      },
+      {
+        "command_family": "gh api job logs",
+        "native_exit": 1,
+        "condition": "CLI required --allow-escape-sequences"
+      },
+      {
+        "command_family": "gh api job logs --allow-escape-sequences",
+        "native_exit": 0
+      }
+    ],
+    "source": "scripts/new_host_grand_list.py:504 uses json.dumps(data, indent=2, ensure_ascii=False)",
+    "diagnosis": "JSON semantic comparison showed zero changed fields; generic serialization had escaped Unicode in a generated view.",
+    "native_returns": [
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --write",
+        "native_exit": 0,
+        "returned": {
+          "flip_rule_violations": 0,
+          "rows": 32,
+          "status": "written"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --write",
+        "native_exit": 0,
+        "returned": {
+          "status": "written",
+          "layers": 32,
+          "winners": 66
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --check",
+        "native_exit": 0,
+        "returned": {
+          "rows": 32,
+          "status": "checked"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+        "native_exit": 0,
+        "returned": {
+          "status": "passed",
+          "layers": 32,
+          "winners": 66
+        }
+      }
+    ],
+    "native_e2e": {
+      "run": 36801299152,
+      "commands": 259,
+      "checks": 82,
+      "pins": 16,
+      "failures": [],
+      "cleanup_confirmed": true,
+      "native_download_exit": 0,
+      "original_bytes": 729527,
+      "original_sha256": "f7daf2cc4f42003154c521a48bc315f47d8e8defbfb7e829b4398b124087eb8a",
+      "native_source_hashes_matching": 17
+    },
+    "other_observed_jobs": "OSV, dependency review, token report and Linux bootstrap passed; macOS queued at verifier observation.",
+    "scope": "Canonical generated-byte repair only. Native profile/configuration and original provider operations unchanged. Original failed and successful evidence remain separate.",
+    "usage": "unknown; no token savings attributed to the repair"
+  },
+  "final_native_ci_e537228f_20261001": {
+    "head": "e537228f1497dcd00d8fd37e8d1f19986d8f5aa3",
+    "evidence_class": "original native repository CI and integration returns; distinct from unchanged upstream tests",
+    "observed_at": "2026-10-01T02:53:47Z",
+    "linux": {
+      "run": 36802400597,
+      "job": 110179413847,
+      "native_summary": "Ran 8894 tests in 1323.409s",
+      "native_result": "OK (skipped=829)",
+      "original_log": {
+        "bytes": 253125,
+        "sha256": "22d11df7d8e52871b6c91e95fa3c633302e2341631581f130877a8693e6d6565"
+      },
+      "native_download_exit": 0
+    },
+    "macos": {
+      "run": 36802400527,
+      "job": 110179414392,
+      "conclusion": "success",
+      "full_suite_summary": "Ran 8894 tests in 1394.421s",
+      "full_suite_result": "OK (skipped=1148)",
+      "full_suite_native_exit": 0,
+      "adoption_gate_summary": "Ran 490 tests in 118.063s",
+      "adoption_gate_result": "OK (skipped=29)",
+      "original_full_suite": {
+        "bytes": 1652538,
+        "sha256": "593bc25edff4293f2d00ec2029dd57ddb7f1d9fc745209217439de4a56156591"
+      },
+      "original_job_log": {
+        "bytes": 222803,
+        "sha256": "a515313e8e6690500fb5a9ad9270ed0a102bbefdf77b6f7609291e60c85afcbd"
+      },
+      "native_download_exits": [
+        0,
+        0
+      ]
+    },
+    "macos_bootstraps": [
+      {
+        "job": 110179534639,
+        "conclusion": "success",
+        "native_download_exit": 0,
+        "original_log": {
+          "bytes": 138779,
+          "sha256": "26872aa76f49a3baec8a7c09ca0dd28a52522f193814f173eff1b43c9b7de706"
+        }
+      },
+      {
+        "job": 110179534686,
+        "conclusion": "success",
+        "native_download_exit": 0,
+        "original_log": {
+          "bytes": 166338,
+          "sha256": "f558dfd888d1308d409626e726e4ecf6c8b1e0bf991652d255f553dda4f8f751"
+        }
+      }
+    ],
+    "native_token_e2e": {
+      "run": 36802400516,
+      "job": 110179410327,
+      "commands": 259,
+      "checks": 82,
+      "pins": 16,
+      "failures": [],
+      "cleanup_confirmed": true,
+      "source_hashes_matching": 17,
+      "original_receipt": {
+        "bytes": 729568,
+        "sha256": "7c92a25b5ac8beda36d9c72d86c5de1fd78ac1793b84bde27d620c0b2225e149"
+      },
+      "original_job_log": {
+        "bytes": 63901,
+        "sha256": "77f2c6ae7604ebc483e2c3d6b0af52e0798fb35723e90eb46f0bfbcaaa1b5d05"
+      },
+      "native_download_exits": [
+        0,
+        0
+      ]
+    },
+    "betterleaks_comparison": {
+      "summary": "Ran 28 tests in 6.007s",
+      "result": "FAILED (failures=4)",
+      "job_conclusion": "success",
+      "scope": "Existing policy permits four comparison assertion differences; primary secret-scan passed. Not 28 passing comparison tests."
+    },
+    "prior_macos_scope_correction": {
+      "head": "f03fb80d0bc0c1da99611448e7780a483206fe29",
+      "run": 36792680414,
+      "artifact": 11133760984,
+      "adoption_gate": "Ran 489 tests in 107.768s; OK (skipped=29)",
+      "full_suite": "Ran 8816 tests in 1575.835s; OK (skipped=1125)",
+      "native_full_suite_exit": 0,
+      "native_download_exit": 0,
+      "original_full_suite_bytes": 1637336,
+      "original_full_suite_sha256": "a8602ff3e052e02d78056600ac673cc4a3b7d8ce483c043f66a83413cbcd4925",
+      "verification": "Pinned workflow separates both scopes; uploaded full-suite log lines9916/9918 supply counts, and original job independently reports full-suite exit0. Preserve historical 489-test summary with its adoption-gate scope."
+    },
+    "scope": "Native/provider acceptance retains its original source/head/date; no later client patch or shared-source reconciliation is relabeled as new execution.",
+    "usage": "unknown; native CI does not establish provider tokens saved"
+  },
+  "concurrent_main_c99a482e_reconciliation_20261001": {
+    "base": "46365ea812c3a680b19c8c8c9c3bb198bf3b38ab",
+    "main": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce",
+    "source_commits": [
+      "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+      "c99a482eec2d79baf515d8a7a1f94d542c1f09ce"
+    ],
+    "native_attempts": [
+      {
+        "command": "rtk proxy git fetch origin main",
+        "native_exit": 0
+      },
+      {
+        "command": "rtk proxy git merge-tree --write-tree HEAD origin/main",
+        "native_exit": 1
+      },
+      {
+        "command": "rtk proxy git merge --no-commit --no-ff origin/main",
+        "native_exit": 1
+      }
+    ],
+    "failed_patch_preflights": [
+      {
+        "stage": "JavaScript raw-template parsing",
+        "condition": "Literal Markdown backticks ended the template; no native command or file mutation started."
+      },
+      {
+        "stage": "multi-file apply_patch",
+        "patch_generation_native_exit": 0,
+        "captured_patch_characters": 180009,
+        "condition": "Expected registry context rejected; independent observation confirmed no files changed. Transport truncation and list reordering were possibilities, not proven causes."
+      },
+      {
+        "stage": "registry three-way guard",
+        "native_patch_generation_exit": 1,
+        "condition": "Shared origin/main advanced to3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a while MERGE_HEAD remained c99a482eec2d79baf515d8a7a1f94d542c1f09ce; a new test-file change correctly rejected the assumed conflict set before mutation.",
+        "verification": "Native rev-parse HEAD/MERGE_HEAD/origin/main and both-changed key comparison.",
+        "correction": "Freeze all parent blobs to immutable commit IDs. Capture the83152-character registry patch in17 validated5000-character pieces; apply only after complete length and consistent native digest checks."
+      }
+    ],
+    "bounded_repair": "Three separate apply_patch calls with payload guards and compact caught errors. Preserve working first-occurrence order; choose values by three-way receipt ID/file path semantics and remove two duplicated old terminal receipt rows.",
+    "conflicts": [
+      "docs/harness-defaults.md",
+      "manifests/evidence.json"
+    ],
+    "resolution": "Keep topic token records, all26 convergence records and main corrected terminal records. Retain both independent anti-pattern blocks and add the observed macOS count correction. Recompute only merged practice log and this live repair receipt hash/bytes. Preserve accepted terminal/trading sources and frozen artifacts.",
+    "astra_trigger": "Competing accepted changes in shared files; then a precondition failure unresolved after one bounded Sol repair.",
+    "astra_source_verdict": "17/17 native E2E source paths and selected pins unchanged by main delta. Working181 receipt rows179 unique IDs; only two terminal duplicates. First occurrence determines position, main determines terminal values. Expected179 receipts8782 files26 convergence records.",
+    "post_resolution_acceptance": "accepted source reconciliation: all six native validators/checks returned0 and17/17 resulting native source hashes match e537; independent Astra review accepted preserved records and frozen bytes",
+    "scope": "Source reconciliation only. Reuse original e537 native qualification if17 resulting inputs match; no fresh provider run claimed.",
+    "usage": "unknown; no savings attributed to reconciliation",
+    "native_checks": [
+      {
+        "command": "rtk proxy python3 scripts/validate.py",
+        "native_exit": 0,
+        "returned": {
+          "components": 69,
+          "hashed_files": 8782,
+          "profiles": 4,
+          "receipts": 179,
+          "status": "passed"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+        "native_exit": 0,
+        "valid_records": 26
+      },
+      {
+        "command": "rtk proxy git diff --check",
+        "native_exit": 0
+      },
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --check",
+        "native_exit": 0,
+        "returned": {
+          "rows": 32,
+          "status": "checked"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+        "native_exit": 0,
+        "returned": {
+          "status": "passed",
+          "layers": 32,
+          "winners": 66
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/build_ecosystem.py --check",
+        "native_exit": 0,
+        "returned": {
+          "bytes": 14396990,
+          "input_sha256": "aca31e50bd2d4c97e2fe72a489d690d8dd710f46a6adff0846f33c617a45439a",
+          "output_sha256": "2c464f3d370fe15e84d20e63a468af1434ae6801f635bf9653f3af880ad72259",
+          "status": "passed"
+        }
+      }
+    ],
+    "astra_acceptance": "PASS:179 receipts8782 files26 convergence records, unique IDs/paths; main2 terminal records and topic2 token records exact; all14 topic/four main anti-pattern changes preserved; frozen token artifacts untouched;17 native source paths match e537."
+  },
+  "concurrent_main_50bba7bb_reconciliation_20261001": {
+    "parent_topic": "893eaa6dd2a97ad20bda1a6e03f4fb5d3b9e56a4",
+    "main": "50bba7bb0a58fedf094089478f751c1f577d6267",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/commit/50bba7bb0a58fedf094089478f751c1f577d6267",
+    "trigger": "Fresh PR/native branch observations found an actual conflict after main accepted PR564 paper receipts and PR549 GPT bridge lifecycle changes.",
+    "native_merge": {"command": "rtk proxy git merge --no-commit --no-ff 50bba7bb0a58fedf094089478f751c1f577d6267", "native_exit": 1, "conflicts": ["manifests/evidence.json", "observability/grand-dashboard/state.json"]},
+    "resolution": "Preserve accepted main sources and frozen paper receipts. Keep main's recorded dashboard checkpoint2026-10-01T03:10:02Z, all topic token/memory acceptance fields and actual merged-state hash; update the checksum of the auto-merged model-routing document. No new provider or paper operation.",
+    "dashboard_state": {"bytes": 18608, "sha256": "39445d4d7f21da7fce28f9fcdc9e3b6e65b1a205067aaf1210f347dfe9eb9a44"},
+    "model_routing_document": {"bytes": 40876, "sha256": "35bd334f8b922a0ed36fd51dc46ef66f9cf398f615645c245b1c2d2a35c9d390"},
+    "preflights": "A JSON field parsed without its enclosing object failed before any write. An assumed scripts/check_grand_dashboard.py path returned native2; maintained script discovery selected scripts/new_host_grand_list.py instead.",
+    "native_checks": {
+      "integrity": {"command": "rtk proxy python3 scripts/validate.py", "native_exit": 0, "components": 69, "hashed_files": 8830, "profiles": 4, "receipts": 179, "original_sha256": "c17ca9962b4c4d8ecd59b6d011965cea899e9ee025c1559d550dcb3dfdb4d8b9"},
+      "convergence": {"command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --json", "native_exit": 0, "records": 26, "observations": 142, "original_sha256": "b16bedfa410147a047342bb4422a7c7b9417971a60576c3ba81a52ded4ee979e"},
+      "dashboard_source_check": {"command": "rtk proxy python3 scripts/new_host_grand_list.py --check", "native_exit": 0, "layers": 32, "winners": 66, "original_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"},
+      "diff": {"command": "rtk proxy git diff --check", "native_exit": 0}
+    },
+    "independent_source_acceptance": "PASS: immutable-parent Astra review confirms41/44 incoming files byte-identical to main, three shared files preserving both sides, unique179 receipts8830 files26 experiments, complete parent record union, unchanged token hook sources/tests/qualification and17/17 native E2E input hashes. Review's first document extraction included a diff-prefix space; corrected comparison finds zero missing additions.",
+    "scope": "Accepted-source reconciliation, exact artifact and native integrity checks. Original E2E and provider executions keep their recorded revisions; no replay or savings attributed to this merge."
+  },
+  "hook_refresh_boundary_repair_20261001": {
+    "astra_trigger": "Consequential interaction between supported native settings merge and upstream memory-hook lifecycle; concrete failure reproduced after bounded host registration repair.",
+    "sources": [
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L1513",
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L1547",
+      "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/install_hooks.rs#L6122",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a/adoption/templates/claude.settings.template.json#L298"
+    ],
+    "negative_control": {
+      "source_merger": "tools/adoption/apply_claude_settings.py at immutable7be865074de178dbfeaa8727d769bba0805cef89",
+      "source_sha256": "aa69bcb6adaa1cea6b6961ff3bc3366621f36ef9443047ac64fe2d232640a07a",
+      "native_initial_install_exit": 0,
+      "native_profile_merge_exit": 0,
+      "before_refresh": {"groups": 1, "hooks": 2, "carrier_present": true, "fixture_sha256": "07d2813587f5396442edc5d5057f05e1f67534fa1cd19cfb86d35b5044761481"},
+      "native_memory_refresh_exit": 0,
+      "after_refresh": {"groups": 1, "carrier_present": false, "unrelated_fixture_theme_preserved": true},
+      "original_refresh_log": {"bytes": 695, "sha256": "da0f9fed293a4e67c163e766074aa98b483416233707c46bcc1b59e28a8dfd36"},
+      "interpretation": "Native installer returned0 while the carrier was removed; this is a reproduced integration failure, not an upstream unit-test failure. Historical host removal is not attributed to this experiment."
+    },
+    "repair": {
+      "file": "tools/adoption/apply_claude_settings.py",
+      "sha256": "b80942c9e732f1c07d77f8092aa9379e07dec53c8c7efa87e5e2a2587ebaddaf",
+      "behavior": "Split existing groups by contiguous canonical-command membership before deduplication; retain every original hook, duplicate, command order, outer metadata and matcher presence. Append fresh canonical groups separately rather than coalescing equal matchers.",
+      "astra_architecture_acceptance": "Accepted against pinned upstream whole-entry ownership and canonical separate-entry template, conditional on contiguous splitting, scoped normalization and idempotence."
+    },
+    "integration_tests": {
+      "command": "rtk proxy python3 -m unittest -v tests.test_apply_claude_settings",
+      "before": {"native_exit": 1, "returned": "Ran 25 tests in 0.032s; FAILED (failures=3)", "original_bytes": 7213, "original_sha256": "aae366e316875302b056f789e586513392bde7af13e8236d6250157dbdfba5e0"},
+      "after": {"native_exit": 0, "returned": "Ran 25 tests in 0.038s; OK", "original_bytes": 4545, "original_sha256": "722e96eb372a8685c51789b017eb4fb99ccf92a6f9223ad6c0a0bd133000f9af"},
+      "scope": "Locally authored regression/integration tests, not unchanged upstream acceptance."
+    },
+    "native_acceptance": {
+      "settings_merge_command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <canonical carrier fragment> --target <synthetic settings.json>",
+      "memory_refresh_command": "rtk proxy <installed ai-memory2.4.2> --data-dir <fixture state> install-hooks --agent claude-code --apply --config-file <synthetic settings.json> --server-url http://127.0.0.1:19286",
+      "already_mixed_fixture_repair_exit": 0,
+      "groups_after_repair": 2,
+      "original_hook_values_order_and_other_settings_preserved_before_refresh": true,
+      "native_refresh_exit": 0,
+      "exact_carrier_survives": true,
+      "original_refresh_log": {"bytes": 698, "sha256": "502e335d352113b8303b4dcced5f6c2d4cf04dda2377cbbccd25ce1f4b0e03b8"},
+      "native_reapply_exit": 0,
+      "native_repeat_refresh_exit": 0,
+      "repeated_state_byte_identical": true,
+      "settings_sha256": "cf30925ac3da348c96641efa279d8ceff03ee65509fd9e2d72e335cd2378e90b",
+      "original_repeat_log": {"bytes": 689, "sha256": "4f49107fea1febeec6b66bb029b84c473fac090faddc4096e18faa729ac99f37"},
+      "scope": "Unchanged native ai-memory installer operates on synthetic configuration with fresh fixture state and explicit fixture URL. No production hook refresh, server or provider run. Upstream may append its replacement entries, so cross-owner order after its refresh is not asserted."
+    },
+    "host_structural_repair": {
+      "command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <private canonical carrier fragment>",
+      "native_exit": 0,
+      "groups": 2,
+      "value_free_readback": "Original hook objects/order preserved, all other settings and hook events unchanged; native backup exists and original mode retained.",
+      "original_log": {"bytes": 142, "sha256": "1fef70831a13303a1cbff25b597cab751ff37e9ea30e91b593c12401bc75a809"}
+    },
+    "final_independent_verification": "PASS: independent Astra source review and combined-module native rerun. The corrected assertion checks every exact-Bash group, preserves RTK count1 and requires exactly one secret guard. Merger source remains b80942c9e732f1c07d77f8092aa9379e07dec53c8c7efa87e5e2a2587ebaddaf; previous failed originals unchanged. No provider or installer replay used for this rerun.",
+    "combined_module_corrected_attempt": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed context-mode security.js> python3 -m unittest -v tests.test_apply_claude_settings tests.test_install_claude_profile",
+      "native_exit": 0,
+      "returned": "Ran 109 tests in 1.010s; OK (skipped=3)",
+      "skip_scope": "Three frontmatter checks require unavailable PyYAML; native ContextMode security assertion actually ran.",
+      "original_bytes": 26795,
+      "original_sha256": "b4310702e46b9f1a702e703f1cb08d727475ded4d196a08718dacc6da3bcf277",
+      "scope": "Focused local integration acceptance of the repaired merger and installed profile contracts. Not a new full suite or provider run."
+    },
+    "combined_module_first_attempt": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed context-mode security.js> python3 -m unittest -v tests.test_apply_claude_settings tests.test_install_claude_profile",
+      "native_exit": 1,
+      "returned": "Ran 109 tests in 0.993s; FAILED (failures=1, skipped=3)",
+      "failure": "SecretGuardProfileTests.test_apply_merge_keeps_host_rules_and_adds_the_guard assumed the guard belongs to PreToolUse[0]. Separate canonical groups preserve delivery under the same Bash matcher.",
+      "correction": "Read all exact-Bash groups; retain RTK count1 and strengthen the guard requirement to exactly one. No runtime guard or permission rule removed.",
+      "original_bytes": 27533,
+      "original_sha256": "5ed289bb67d9b481c2b90d5773d1b43cf13abd0030e8b35059d1f7b55edd461b",
+      "scope": "Locally authored integration assertion adjusted after the earlier F3 source-preservation checkpoint; not an upstream test modification."
+    },
+    "usage": "No model-run or token-savings claim; settings/installer fixtures only. Claude provider acceptance is retained separately."
+  },
+  "native_lifetime_snapshot_20261001": {
+    "generated_at": "2026-10-01T02:15:27.984655+00:00",
+    "command": "rtk proxy systemctl --user start token-report-refresh.service",
+    "native_exit": 0,
+    "native_service_result": "success",
+    "native_service_exec_main_status": 0,
+    "timer_active": true,
+    "collection_issues": [],
+    "rtk_retained_global_estimated_saved": 84314061,
+    "rtk_project_subset_estimated_saved_already_in_global": 55390889,
+    "context_mode_claude_estimated_saved_separate": 13050624,
+    "context_mode_codex_estimated_saved_separate": 27638784,
+    "headroom_30_day_estimated_saved_separate": 579852,
+    "jcodemunch_default_index_estimated_saved_separate": 10497245,
+    "exact_artifact_comparisons_separate": 25,
+    "original_manifest": {"bytes": 43649924, "sha256": "31cf0dac4aaf4bdd12a0e2d6d1c48041419d25da0c64de9d999207494b2f267b"},
+    "original_html": {"bytes": 41715165, "sha256": "c81648f382178df2d040c8cb09e2e9e4f71cb1f71ea22b9db6e1d526193dccf8"},
+    "scope": "Point-in-time native retained estimates, not a new model run or measured provider-billing reduction. Do not add overlapping scopes, cumulative snapshots or cache subsets. ContextMode lifetime uses retained events times256, Headroom is capped at30 days; the reporter retains original native returns privately."
+  },
+  "later_installed_client_version_observation_20261001": {
+    "native_commands": [
+      {
+        "command": "rtk proxy claude --version",
+        "native_exit": 0,
+        "returned": "2.1.286 (Claude Code)"
+      },
+      {
+        "command": "rtk proxy codex --version",
+        "native_exit": 0,
+        "returned": "codex-cli 0.159.3"
+      }
+    ],
+    "scope": "Native clients advanced during concurrent work. These are version observations only; qualified Claude2.1.285/Codex0.159.2 provider operations remain dated and are not relabeled as executions of the later binaries.",
+    "codex_source_compatibility": {
+      "current_source": "openai/codex rust-v0.159.3 @01fc69f4026735edfdf6789820549727a4867b11",
+      "qualified_source": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "unchanged_core_hook_app_server_protocol_files": 2489,
+      "delta": "24 changed files concern version declaration and TUI account-security reminders; selected hooks/list, config/batchWrite and multi-agent V2 surfaces unchanged.",
+      "sources": [
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "https://github.com/openai/codex/compare/rust-v0.159.2...rust-v0.159.3",
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/app-server-protocol/src/protocol/common.rs#L879"
+      ],
+      "scope": "Native CLI help and exact upstream source compatibility only; no new provider run."
+    },
+    "claude_source_delta": {
+      "current_release_commit": "f5f60250a032caa72d1eb47f9ca5f29becc7066f",
+      "qualified_release_commit": "ec44ca97dc86c33d934c8d55b24959aabf076871",
+      "compatible_configuration": "Ultracode gate without effort condition, environment effort override and model precedence remain compatible in installed embedded source.",
+      "consequential_changes": [
+        "Stalled Workflow subagents restarting from original prompts",
+        "Missing foreground task tools",
+        "Duplicated worktree instruction loading"
+      ],
+      "source": "https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md#L32",
+      "acceptance": "Bounded source-derived2.1.286 repair accepted: both native parents exit0, complete tiny Workflow, unchanged cached recovery, foreground Agent handback and byte-exact persistent role-carrier delivery. Earlier large-scope probes remain partial; source/version and wrapper observations remain separate.",
+      "bounded_native_repair": {
+        "source_fixture": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt unchanged body",
+        "source_supervisor": "blueprints/convergence-practice/native-recovery/claude/run.py:77",
+        "script_sha256": "2946da47a6f5b56689706b2946d96258642d9e6db8c0212fb4093ca9782ac132",
+        "script_metadata": "Native Workflow added eight metadata lines; original fixture body unchanged.",
+        "settings_override_used": false,
+        "parent_deadline_seconds": 180,
+        "attempts": [
+          {"stage": "tiny-initial", "native_exit": 0, "elapsed_seconds": 153.538, "stream_bytes": 183106, "stream_sha256": "51c84f7aa6a794bafe1f52ea25fe62e16fdcee738111f8fb40a344f58449cee0"},
+          {"stage": "tiny-resumed", "native_exit": 0, "elapsed_seconds": 27.507, "stream_bytes": 141199, "stream_sha256": "032c73ae1a193a6e4558d91978d24e4da5a31b0e333e6f64e23dca11239a73c0"}
+        ],
+        "workflow": "Explicit Sonnet/max scout and Opus/max verifier each returned the native ContextMode result exit_code0/stdout Python3.13.15; final accepted:true.",
+        "cached_recovery": "Journal byte-identical, two starts/two results, no Workflow child restarted.",
+        "ordinary_agent": "Explicit source-scout/Sonnet foreground Agent, max from role definition; actual native successful Python tool result handed back.",
+        "carrier": "Three fresh children: actual carrier-hook exit0 and additionalContext byte-identical to each corresponding source role file.",
+        "session_sha256": "1846cfc3e4e8d43b68640f04714eb67cea6b2d8d495015da267ea7801c7f5f78",
+        "usage_scope": "Native supervisor originals retain returned usage. Final cumulative modelUsage is counted once; preceding snapshots overlap. Unknown usage of earlier interrupted parents remains separate.",
+        "limits": "Specific network-stall restart fix and unavailable task-tracking-tool condition unqualified. Normal cached recovery is not fresh child execution. No broader provider-quality or billing-savings claim."
+      },
+      "initial_native_probes": {
+        "source_script": "agent-lab readiness-audit.js, unchanged installed personal workflow",
+        "source_pin": "b31f64020ab4900cd92341cd2aa92c3d98367758",
+        "script_sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb",
+        "source": "examples/claude-native/workflows/README.md",
+        "supervisor": "Existing NativeCLI supervisor;300-second parent deadlines. Supervisor wrapper exit0 is not native client exit0.",
+        "attempts": [
+          {"stage": "initial", "started_at": "2026-10-01T03:27:43.977Z", "native_exit": -15, "elapsed_seconds": 300.953, "stream_bytes": 225983, "stream_sha256": "54b7d323dd24ca8a3d0e79c1ebed1810ad5bed58d35c1930df047ad236aff451"},
+          {"stage": "resumed", "started_at": "2026-10-01T03:35:28.882Z", "native_exit": -15, "elapsed_seconds": 300.756, "stream_bytes": 240401, "stream_sha256": "4f857a53fdf7a43f7e6b78cbeb68c2de6d4c96675ddd772db44288dd593e76b3"}
+        ],
+        "observed": "Two Sonnet reader results completed and stayed byte-identical through saved-run recovery; verifier restarted but did not finish. Ordinary foreground Agent stack-verifier/Opus returned the actual ContextMode tool result exit_code0/stdout Python3.13.15 and handed it back.",
+        "workflow_journal": {"starts": 4, "results": 2, "verifier_completed": false},
+        "subagent_token_lane_carrier_confirmed": false,
+        "network_stall_induced": false,
+        "complete_workflow_recovery_qualified": false,
+        "preflight_failures": "Supervisor import exit1 before provider execution; personal scriptPath rejected, then supported saved-name launch worked.",
+        "complete_provider_usage": "unknown; resumed zero-turn success usage and inherited model counters are not summed",
+        "carrier_registration_repair": {
+          "finding": "Installed carrier and sibling blocks match source, but selected user SubagentStart registered only ai-memory; project settings registered only PreToolUse. CWD alone could not restore delivery.",
+          "carrier_sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd",
+          "source_rule": "adoption/templates/claude.settings.template.json SubagentStart token-lanes command and timeout5",
+          "source_merge": "tools/adoption/apply_claude_settings.py merge_settings/apply, documented in adoption/bootstrap.md",
+          "command": "rtk proxy python3 tools/adoption/apply_claude_settings.py --template <private canonical-carrier-settings.json>",
+          "native_exit": 0,
+          "canonical_fragment_bytes": 312,
+          "canonical_fragment_sha256": "f74d5f0586f9cb9bb7530f5dad89db9377e9e76b0c84a130ff0e34439b9810aa",
+          "original_log_bytes": 142,
+          "original_log_sha256": "dba5584909ee9e9a9fd4e1178978d5147ee1b998d92853ac976a9fafacbfdec8",
+          "independent_observation": "Exact rendered canonical fragment; one carrier registered with timeout5. All prior entries, other hook events and all other setting values preserved; native backup exists and original mode preserved.",
+          "preflight": "First authored fragment omitted the source timeout5; exact-source equality failed before any settings mutation. Corrected fragment passed before the supported native apply.",
+          "scope": "Persistent configuration repair, with fresh native delivery acceptance pending. No claim about which concurrent action removed registration."
+        },
+        "scope": "Actual synthetic native-client operations with retained private original streams, not upstream tests or a complete lifecycle pass. Supervisor termination is not a network-stall regression test."
+      }
+    }
+  },
+  "concurrent_main_3361b342_reconciliation_20261001": {
+    "parent_topic": "7be865074de178dbfeaa8727d769bba0805cef89",
+    "main": "3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/commit/3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+    "native_merge": {
+      "command": "rtk proxy git merge --no-commit --no-ff 3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a",
+      "native_exit": 1,
+      "conflicts": [
+        "manifests/evidence.json"
+      ],
+      "automerge": "tests/test_install_claude_profile.py"
+    },
+    "resolution": "Preserve accepted F3 skills-listing and MCP-timeout templates and topic workflow installer checks. AST review finds107 class methods, one module function and nine nested functions:117 definitions total. Every parent function body is preserved, with exactly one shutil import; recompute the combined test hash only in the conflict. Preserve6000 skills budget and MCP_TIMEOUT120000 source selections.",
+    "astra_trigger": "Continuation of accepted-source reconciliation in shared records.",
+    "astra_source_review": "Expected179 receipts8795 files26 convergence records; F3 changes no17 native E2E source paths. Client-template changes are outside that boundary; original native qualification retains its original scope.",
+    "native_profile_module": {
+      "command": "rtk proxy env CONTEXT_MODE_SECURITY_JS=<installed-context-mode-security.js> python3 -m unittest -v tests.test_install_claude_profile",
+      "native_exit": 0,
+      "summary": "Ran 84 tests in 1.019s",
+      "result": "OK (skipped=3)",
+      "skip_scope": "Three PyYAML frontmatter checks skipped because PyYAML is not installed; text-reader and original qualified-revision evidence remain separate.",
+      "original_bytes": 20988,
+      "original_sha256": "4e1f506bbf1d4477a0380e49a3464b8cd567b8f2b0fd8e1e16ab6e858595c128",
+      "native_context_mode_assertion": "test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path ... ok",
+      "native_security_module": {
+        "component": "context-mode1.0.169 installed npm build/security.js",
+        "bytes": 31164,
+        "sha256": "d453b53088b16c8b98b6f7bf11307ac196e81b68a969247971877c72a19943f7",
+        "scope": "Explicit fixture artifact; does not identify the artifact loaded by the active MCP connection."
+      }
+    },
+    "post_resolution_acceptance": "PASS: native integrity, convergence and deterministic ecosystem checks; independent Astra source review preserves both immutable parents, all41 skills deny rules,6000 Codex skills budget,120000 MCP timeout,179 unique receipts8795 files26 records and17/17 unchanged native E2E inputs. Source acceptance remains separate from current-head CI/provider execution.",
+    "count_correction": "Earlier shorthand116 methods was wrong. Independent AST inspection verified107 class methods, one module function and nine nested functions,117 definitions total, with every parent body preserved.",
+    "native_checks": {
+      "integrity": {"command": "rtk proxy python3 scripts/validate.py", "native_exit": 0, "components": 69, "hashed_files": 8795, "profiles": 4, "receipts": 179, "original_sha256": "4ac4b7f9240b43c4c9d2afbafacb66a58d57be3d6a0b12eede8599bff91cdb14"},
+      "convergence_before_registry_refresh": {"native_exit": 1, "returned": "record discovery: invalid, changed or empty evidence manifest", "original_sha256": "0ca95e98473a697dfa18eccf2d2420e1fe3f3055762bc23bfa8d4b506e2e3362"},
+      "convergence_after_registry_refresh": {"command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --json", "native_exit": 0, "records": 26, "observations": 142, "original_sha256": "b16bedfa410147a047342bb4422a7c7b9417971a60576c3ba81a52ded4ee979e"},
+      "ecosystem": {"command": "rtk proxy python3 scripts/build_ecosystem.py --check", "native_exit": 0, "original_sha256": "2ad57d780c2df7aa22c6573af0a9fe3d264d12c84d9b694a255fec3da2688df9"},
+      "diff": {"command": "rtk proxy git diff --check", "native_exit": 0}
+    },
+    "scope": "Source reconciliation plus84-test local integration module only. Not a new full suite, native tool E2E or provider run.",
+    "usage": "unknown; no savings attributed to source reconciliation"
+  }
+}

@@ -109,7 +109,7 @@
     {
       "order": 8,
       "profile": "token-efficiency",
-      "label": "Accepted 2026-09-30 as the selection, per docs/decisions/2026-09-30-task-model-routing.md: the token-efficiency practice and its Claude Code and Codex wiring",
+      "label": "Accepted 2026-09-30: docs/decisions/2026-09-30-task-model-routing.md; source host qualified (PR561); other hosts need native acceptance",
       "component_ids": [
         "codex",
         "claude-code",
@@ -725,7 +725,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.4.1"
+              "bootstrap_version": "2.4.2"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -2211,7 +2211,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.4.1"
+              "bootstrap_version": "2.4.2"
             },
             "macos-arm64": {
               "e2e_state": "untested",

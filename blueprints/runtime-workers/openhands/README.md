@@ -1094,3 +1094,5 @@ claimed until these observations exist.
 [llm-discovery]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/agent/base.py#L739-L775
 [llm-registration]: https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L1566-L1579
 [skills-local-lock]: https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/add.ts#L2130-L2160
+
+The current recipe lock also carries the bounded [LiteLLM1.93.2 relock](research.md#runtime-lock-litellm-relock-2026-09-30), with seven native upgrade arguments preserving PyJWT2.15.0 and urllib3 2.8.0. Earlier five-upgrade and image discussion above retains its dated scope. This changes the recipe venv lock and revalidates the changed wheel for the existing OAuthlib review; it does not update or qualify the image server binary.

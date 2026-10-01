@@ -1,0 +1,26 @@
+rtk python3 -m unittest discover -s tests -p test_native_token_ci.py -k verified_native_preimages
+EXIT 1
+F
+======================================================================
+FAIL: test_serena_verified_native_preimages_require_exact_tool_schemas (test_native_token_ci.NativeTokenCIContracts.test_serena_verified_native_preimages_require_exact_tool_schemas) (changed_schema=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1350, in test_serena_verified_native_preimages_require_exact_tool_schemas
+    ci.serena_fixture(run)
+    ~~~~~~~~~~~~~~~~~^^^^^
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 1619, in serena_fixture
+    run.check("serena-tools-list-byte-parity-with-the-pinned-install",
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              {context: digest(lines[1]) for context, lines in answers.items()} == SERENA_TOOLS_LIST_SHA256)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 738, in check
+    require(condition, label)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 244, in require
+    raise AssertionError(message)
+AssertionError: serena-tools-list-byte-parity-with-the-pinned-install
+
+----------------------------------------------------------------------
+Ran 1 test in 0.053s
+
+FAILED (failures=1)

@@ -499,7 +499,9 @@ GitHub-hosted macOS runner; see
    scalars win; nested objects such as `modelSettings`, `env`, `permissions`
    and `enabledPlugins` merge per key and lists union, so host-only rules
    are kept; `hooks` combine per event, de-duplicated across the event by
-   each command's shell words; everything else in the live file that the
+   each command's shell words, with canonical entries kept separate and old
+   mixed entries split into contiguous runs without changing hook values or
+   order; everything else in the live file that the
    template does not mention is kept), writes atomically and
    preserves the original file's mode bits. Never touches `~/.claude.json`
    or any credential store. `tools/adoption/apply_claude_settings.py`

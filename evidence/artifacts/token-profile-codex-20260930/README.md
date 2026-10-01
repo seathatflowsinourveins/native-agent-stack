@@ -1,0 +1,32 @@
+Native Codex useful-call acceptance, 2026-09-30
+
+All 12 non-client components in the selected token-efficiency profile returned useful results in a fresh native Codex 0.159.2 session, followed by one bounded continuation of that same session. Both native processes exited 0 with empty stderr. Read-only `thread/read` of the session's own generated thread and its returned rollout confirmed two completed turns at `gpt-6.1-sol` / `ultra`. The separate inspection server reported `notLoaded`; this is its own load state, not a deletion or a V1 `close_agent` operation.
+
+The frozen task compared two public greeting functions, retained a 19-entry decision, converted a public HTML fixture, and recovered a two-row table and 24-record JSON fixture. Actual native returned fields are retained in [native-tool-returns.json](native-tool-returns.json); [receipt.json](receipt.json) separates native producer reports from independent semantic checks. Raw streams, normal native sessions and owned state remain private outside the checkout. No credentials were read or copied.
+
+| Component | Useful native result checked |
+| --- | --- |
+| RTK 0.50.0 | Current commit prefix identified; original command recovered the complete long subject. Filtered subject equality remains false. |
+| Context Mode 1.0.169 | Direct MCP file processing returned `amberquartz verdict: 19` from the identical source fixture inside the project root. |
+| Repomix 1.18.1 | Native CLI packed exactly the two selected files; the existing XML oracle verified both full original bodies and excluded the unselected file. |
+| Headroom 0.37.0 | Direct MCP compression/retrieval recovered all 2,969 original bytes; independent parsing found 24 records and first latency 17. |
+| TOON 4.1.1 | Native CLI encoded 96 JSON bytes into 60 TOON bytes, then strictly decoded the exact original values: two rows, count sum 5. |
+| ccusage 20.0.26 | Native CLI parsed the bounded public usage fixture: two days, 1,900 input, 380 output, 100 cache-creation, 50 cache-read, total 2,430. |
+| QMD 2.8.3 | Native CLI indexed the owned Markdown collection, searched it, fetched the returned URI from a new process, checked 19 entries, then removed the collection. |
+| MarkItDown 0.1.8 | Native CLI conversion retained the public page heading and `Ready` status. |
+| Serena 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Direct native MCP returned the exact `greeting` function body from `fixtures/after.py`. |
+| SocratiCode 1.15.0 | Direct native MCP indexed only the owned project and returned the correct `after.py` hit; native removal and subsequent no-index/inactive-watcher status passed. |
+| ai-memory 2.4.2 | Direct native MCP wrote, queried and read the exact owned decision page; nonsense query returned zero hits. The returned page identifies `process:ai-memory/2.4.2`. |
+| MCPorter 0.14.1 | Native CLI bridge returned the exact same SocratiCode answer as the direct MCP search. |
+
+The initial prompt exposed three conditions requiring correction. Context Mode correctly denied two paths outside the project root; the continuation used the byte-identical committed source without changing allow rules. RTK truncated a long subject; its original recovery passed while filtered full-subject equality stayed false. The initial date-scoped host ccusage report completed but was replaced by the bounded public fixture and carries no accepted lifetime or savings claim. All conditions remain in the receipt; usage attributable to an individual failed condition is unknown.
+
+The last native cumulative thread snapshot is 1,340,232 input tokens, including 1,229,056 cached input, and 24,849 output tokens, including 9,086 reasoning output; native total is 1,365,081. The earlier and resumed snapshots overlap. Codex emits `usage.total` in `turn.completed`, as shown in [the pinned JSONL processor](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/exec/src/event_processor_with_jsonl_output.rs#L118). Use the last snapshot once. Headroom's 826 original / 511 compressed / 315 saved counters and the synthetic ccusage report have separate scopes and are not added to provider usage.
+
+Reproduce through supported native commands, with [native-prompt.txt](native-prompt.txt) and [native-repair-prompt.txt](native-repair-prompt.txt), using owned `R`/`P` directories and `CHECKOUT` placeholders. The first call is `rtk proxy codex exec --strict-config -C CHECKOUT -m gpt-6.1-sol -c 'model_reasoning_effort="ultra"' --json --output-last-message R/final.json -`; preserve the host's native configuration and add the supported invocation-only memory overrides described below. Resume only the returned own session with `codex exec resume OWN_SESSION_ID -`. The prompt files retain the original failed conditions deliberately; the receipt records their supported repair.
+
+The invocation disables only `mcp_servers.ai-memory.enabled` and adds `mcp_servers.token-profile-memory` with the checksum-verified ai-memory 2.4.2 executable, arguments `serve --transport stdio --data-dir R/memory --no-watcher --workspace native-ci --project fixture`, and embedding provider `none`. The synthetic operations all explicitly name that workspace and project. Existing native lifecycle capture remains enabled and is a separate scope. Native accounts, caching, discovery and compaction were preserved. No shared service was restarted.
+
+Operation and oracle sources are the selected upstream CLIs/MCP schemas and maintained repositories/pins listed in the receipt, plus `scripts/native_token_ci.py`'s bounded fixture methods and existing `verify_pack` / `verify_qmd_document` helpers. Execution supervision and read-only RPC reused `tools/adoption/apply_codex_lane.py`'s supported native CLI and `AppServer` pattern. These checks are local integration observations on actual returned results, not an upstream test suite. The ai-memory candidate source is [the official v2.4.2 release](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2); its binary SHA256 is recorded in the receipt.
+
+This evidence covers useful tool operations in Codex. Clean native client installation, Claude useful coverage, and previous native subagent/Ultracode lifecycle tests belong to separate receipts. No new subagent, automatic compaction event, equal-quality baseline or causal whole-task token-savings comparison is claimed. Historical `worked=true` summaries are leads and were not reused as QMD or Repomix acceptance.

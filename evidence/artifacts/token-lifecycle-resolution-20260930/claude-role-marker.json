@@ -1,0 +1,79 @@
+{
+  "kind": "claude-workflow-role-marker-observation",
+  "evidence_class": "local-integration-control-over-native-transcripts",
+  "passing": {
+    "command_exit_code": 0,
+    "complete": "complete",
+    "children": [
+      {
+        "label": "native-scout",
+        "agent_type": "source-scout",
+        "subagent_start": {
+          "types": [
+            "source-scout"
+          ],
+          "additional_context": true
+        },
+        "marker": {
+          "marker": "TOKEN LANES (source:",
+          "in_first_prompt": false,
+          "in_subagent_start_context": true
+        }
+      },
+      {
+        "label": "native-verifier",
+        "agent_type": "stack-verifier",
+        "subagent_start": {
+          "types": [
+            "stack-verifier"
+          ],
+          "additional_context": true
+        },
+        "marker": {
+          "marker": "TOKEN LANES (source:",
+          "in_first_prompt": false,
+          "in_subagent_start_context": true
+        }
+      }
+    ],
+    "marker_guard": true
+  },
+  "negative_control": {
+    "command_exit_code": 0,
+    "complete": "complete",
+    "children": [
+      {
+        "label": "native-scout",
+        "agent_type": "source-scout",
+        "subagent_start": {
+          "types": [
+            "source-scout"
+          ],
+          "additional_context": true
+        },
+        "marker": {
+          "marker": "TOKEN LANES ABSENT-CONTROL",
+          "in_first_prompt": false,
+          "in_subagent_start_context": false
+        }
+      },
+      {
+        "label": "native-verifier",
+        "agent_type": "stack-verifier",
+        "subagent_start": {
+          "types": [
+            "stack-verifier"
+          ],
+          "additional_context": true
+        },
+        "marker": {
+          "marker": "TOKEN LANES ABSENT-CONTROL",
+          "in_first_prompt": false,
+          "in_subagent_start_context": false
+        }
+      }
+    ],
+    "marker_guard": false
+  },
+  "limits": "The marker guard is a local integration assertion. Native child-usage exits report model/effort/usage completeness, not marker acceptance."
+}

@@ -644,3 +644,17 @@ Open after the repair round:
 - **G5's limits:** it cannot see a Codex connection's app-server opt-in
   (`open-sse/executors/codex.ts:415-439`). It counts inactive rows as served. Its
   provider lists are tied to the two builds read.
+
+## Runtime-lock LiteLLM relock (2026-09-30)
+
+Required token-profile CI surfaced [GHSA-3cv6-jpf6-8222](https://github.com/advisories/GHSA-3cv6-jpf6-8222) in the unchanged main-branch recipe lock. The official first patched release is [LiteLLM1.93.2 / cd1bd0f4](https://github.com/BerriAI/litellm/tree/cd1bd0f4b8af865f8d05fbd938392fdd4703babc). The pinned OpenHands1.49.6 SDK source stays fcc102a697874d54a357e36004e02c95040dbdc0 and allows litellm>=1.93.0.
+
+Use the preceding supported scratch-workspace procedure. Preserve Linux/x86_64 scope and all previous upgrades. Change only the scratch LiteLLM constraint to1.93.2 and its package cutoff to2026-08-10T00:00:00Z, which admits its official August9 artifacts; retain the global seven-day rule and other package cutoffs. Keep UV_NO_CONFIG unset. The actual native resolver command was:
+
+```bash
+rtk uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2
+rtk uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace
+rtk uv lock --check
+```
+
+Append the unchanged direct SDK wheel blocks in pins.json order as before. Native baseline reproduction and fixed export checks passed. Only the LiteLLM version/hash block changed: current requirements.lock is106257bytes with SHA256 e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1. Native OSV2.6.0 under the unchanged policy returned no findings. Independent source review replayed all12 search contracts over the hash-verified CPython3.13/Linux wheel and verified its2104Python files plus1341unchanged SDK Python files. The existing two OAuthlib exceptions keep their October13 expiry and upgrade follow-up; no compiled-binary, provider or runtime acceptance follows. [Compact receipt](../../../evidence/receipts/osv-litellm-1932-20260930.json) and [sanitized native commands and returns](../../../evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json) retain source scope and failed attempts. The image server-binary qualification remains separate.

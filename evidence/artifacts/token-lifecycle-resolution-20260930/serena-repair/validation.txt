@@ -1,0 +1,25 @@
+COMMAND rtk python3 scripts/validate.py
+EXIT 1
+Publication validation failed:
+scripts/native_token_ci.py: SHA-256 mismatch
+scripts/native_token_ci.py: byte count mismatch
+tests/test_native_token_ci.py: SHA-256 mismatch
+tests/test_native_token_ci.py: byte count mismatch
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/README.md: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude/receipt.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex/receipt.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/controls-observation.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing/receipt.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-regression.txt: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-unit-suite.txt: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stderr.txt: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stderr.txt: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/observation.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent_probe.py: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/inspect_controls.py: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing/receipt.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression-observation.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression.txt: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/source-identity.json: evidence file is not hash-listed
+evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/verify_source.py: evidence file is not hash-listed

@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1919,7 +1919,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3180,7 +3180,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66\u2026'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
+      "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66…'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
       "limitations": [
         "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing through 2.4.1 until the user re-trusts them in Codex /hooks. Real Codex capture through 2.4.1 was not observed.",
         "V67 is forward-only: after it, 2.4.0 refuses the store with rc 1. Rollback is the coordinator's private at-rest cold V66 copy, a relink to the retained tools/ai-memory-2.4.0 prefix and the installer's .bak-1790381983/.bak-1790381984 hook files (or a re-run of install-hooks with 2.4.0, which leaves unrelated settings edits alone); writes made after the cold copy would be lost from the live store. The rollback was not exercised on production.",
@@ -3242,7 +3242,7 @@
       "component_ids": [
         "codex"
       ],
-      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You\u2019ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You’ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
       "limitations": [
         "Reviewed once: a review round of the refresh coordinator (Claude Opus and GPT-6 Astra reviewers) reported that the rollback relinked bin/codex only and the switch checked only for 0.155.1 processes, so a background server started by 0.157.x would outlive a rollback; this revision repairs it (daemon_probe.py, results/daemon.json, stage/daemon-source-checks.txt and corrected switch and rollback commands). The repair itself has not been re-reviewed, and the qualification and this receipt still come from one worker family (Claude Opus 5.5).",
         "Staged, not switched, and no live model call ran on 0.157.1: a live call would either copy the ChatGPT credential into an isolated CODEX_HOME (not allowed; docs/secret-storage.md) or run the newer binary against the shared ~/.codex while the sweep runs 0.155.1. GPT-6 turns through 0.157.1 are unmeasured until the coordinator's post-switch probe (results.json switch_commands_for_the_coordinator).",
@@ -3380,7 +3380,7 @@
       "component_ids": [
         "socraticode"
       ],
-      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green and 89,567 indexed chunks; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 \u2014 STALE, this server is v1.15.0' (last built 21:35:09.670Z), because a 1.14.0 server had built the stored graph at 21:35:09.670Z, before the 21:42:49Z cutover, and no 1.15.0 rebuild happened until 21:43:08.450Z.",
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green and 89,567 indexed chunks; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 — STALE, this server is v1.15.0' (last built 21:35:09.670Z), because a 1.14.0 server had built the stored graph at 21:35:09.670Z, before the 21:42:49Z cutover, and no 1.15.0 rebuild happened until 21:43:08.450Z.",
       "limitations": [
         "Not every live session runs 1.15.0 yet, and nothing in the claim rests on that. At the cutover read-back 12 already-running 1.14.0 servers remained; at 2026-09-28T02:03:14Z a process listing still showed 2 processes on the 1.14.0 prefix, the MCP children of two long-running Claude Code sessions that each need their own /mcp reconnect. A codebase_graph_status read-back at about 02:07Z, served by one of those 1.14.0 servers, showed the stored graph still 'Built by: v1.15.0' (last built 2026-09-27T21:43:08.450Z). A 1.14.0 server that rebuilds the graph before its session reconnects would restart the flip-flop (data.all_sessions_on_1150).",
         "The pre-cutover checks ran from the staged 1.15.0 prefix against production services while 1.14.0 servers were still running, and shared their lock directory. The 1.15.0 server rebuilt the production code graph ('Built by: v1.15.0', last built 2026-09-27T21:34:21.531Z); a 1.14.0 server rebuilt it again at 21:35:09.670Z, as the post-cutover graph status shows. The decision record predicted this graph flip-flop from source (graph-inputs.ts:609); this is the first native observation of it on this host. No vector reindex was observed: the collection stayed green at 89,567 chunks throughout.",
@@ -3629,47 +3629,67 @@
       "path": "evidence/receipts/codex-01592-qualification-20260930.json"
     },
     {
-      "id": "notification-types-20260929",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "claude-code"
-      ],
-      "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
-      "limitations": [
-        "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
-        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; in a terminal session the permission prompt's notification is timed by inactivity (source read: the terminal path compares the time with the later of the prompt's appearance and the last interaction; the fixed-delay timer is the Agent SDK path). Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
-        "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
-        "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
-        "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
-        "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
-        "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
-        "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
-        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day (its hash moved, see the sha256 prefix in the dry-run output; the cause is not established here); the bell group is unchanged (the dry run).",
-        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the presence rule and the agentPushNotifEnabled check apply to a local session only (a remote workspace skips both); the permission prompt's notification in a terminal is timed by inactivity (the fixed-delay timer the earlier wording took for it is the Agent SDK path); notification_types_scan.py now resolves the catalog's spread identifier to its single array assignment (twelve reader tests, eleven mutants after the final read: an assignment counts only as a complete initializer, a member assignment of the same short name, also through whitespace or a comment, is not the catalog's array, every declared catalog must be one the reader recognizes, and the scope and later-mutation limits are stated); replace_bell_group.py compares the live file with the bytes it read before the backup and right before the rename (a save between the last comparison and the rename is still lost and is in neither file: a documented residual with a case of its own), refuses keys beyond matcher and hooks on the bell group, names no matcher value in a refusal and has no second-distro target (27 controls, 15 mutants); the tmux and push probes' verdicts, signal handling and printing were repaired (the tmux verdict now requires all five arms, the tmux sockets live inside the probes' private directories, and the derived push probe's hooks-disabled control exits 1 on a BEL). The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
-      ],
-      "path": "evidence/receipts/notification-types-20260929.json"
-    },
-    {
-      "id": "login-shell-contract-20260929",
-      "kind": "native_cli_e2e",
+      "id": "token-lifecycle-resolution-20260930",
+      "kind": "native_model_e2e",
       "component_ids": [
         "claude-code",
-        "codex"
+        "codex",
+        "rtk",
+        "context-mode",
+        "serena",
+        "qmd",
+        "repomix",
+        "toon",
+        "mcporter",
+        "markitdown",
+        "ast-grep",
+        "ccusage",
+        "codebase-memory-mcp",
+        "headroom",
+        "jcodemunch-mcp",
+        "ai-memory",
+        "context-hub",
+        "agentsview"
       ],
-      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The reproduction was re-run after the bounded re-check with the client's temporary state redirected to a short private directory beside each throwaway home (TMPDIR and CLAUDE_CODE_TMPDIR): the real /tmp and /tmp/claude-<uid> gained no top-level entry during the recorded run apart from /tmp/inline-comments-buffer.jsonl, which was absent before, appeared during the run and was removed by the script, the real home's placeholder names were unchanged, and the arm counts were 0 empty files with no variable, 27 with it in the stock home and 26 with a real hand-off file. A control run whose socket path (121 bytes, from a 99-byte private path) exceeded the client's own 103-byte cap on `<dir>/cc-socks/<pid>.sock` put the messaging-socket directory into a fixed /tmp/cc-socks-<uid> directory in the real /tmp instead, so the redirect holds only while the private path is short (under about 81 bytes with a 7-digit pid) and XDG_RUNTIME_DIR stays unset. The native `claude doctor` warned 3 times with the sandbox off and 4 times with it enabled and a planted stale mask file; it named the planted file (the warning is live) and named the scrub-created ~/.bash_profile, a writable 0644 file outside the warning's documented scope of 0-byte read-only placeholders, in neither run. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag (rust-v0.159.0 at the re-run).",
+      "claim": "A fresh selected native token-tool installation passed 259 returned commands and 82 integration checks after a source-verified exact Serena reference repair. Three unchanged personal Claude workflows were installed/reused safely; live Claude role Workflow, cached saved-audit recovery, ordinary builder handback and native Codex V2 Astra/max child completed. Final Claude parent continuations exited cleanly.",
       "limitations": [
-        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The second distro's two per-project Claude profiles were not measured (that distro was later unregistered). Another host collects its own evidence.",
-        "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
-        "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
-        "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
-        "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
-        "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.159.0 (the newest stable at the re-run) was not run. The candidate notifiers were compared by repository head and latest release only, not run. The three candidates agent-deck, ccmanager and zellij were first recorded by the refresh script on 2026-09-29, so their heads have no earlier pin to be compared with.",
-        "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (50 entries in the stock-home arm in the first run, 49 in the re-runs); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` was run in one throwaway home with the scrub-created file, with the sandbox off and with it enabled plus a planted stale mask file. That planted file shows the warning is live; it is not a positive control for the scrub placeholder, which the warning's documented scope (0-byte read-only placeholders at settings paths) does not cover, so the doctor's silence about ~/.bash_profile follows from that scope and is not evidence about the file.",
-        "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session.",
-        "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began.",
-        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): login_shell_check_controls.py (and the practice repository's doctor) now needs an answer for every command and an end marker, probes with type -P and accepts a name only when the printed path is an executable regular file (a stale hashed pathname and a non-executable file are refused), and lets only the first startup file bash reads shadow ~/.profile (eleven homes); login_path_digest.py reads the PATH from a nonce-framed record (a startup file's ordinary output cannot pass for it; one that replays the command string can, since shell stdout is not authenticated) and exits 1 on a measurement error (a rerun on this host gives 13 entries and the digest prefix that this receipt records before and after the hand-off file); scrub_placeholder_probe.py compares 19 named files of the real home by lstat (a native rerun with the revised script is recorded in the 2026-09-30 receipt) and reads its PATH the same nonce-framed way; landscape_refresh.py compares the whole notification and terminal-title definitions, multi-line attributes and the default of notifications included, and answers null when a part is missing. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
+        "Scoped host and synthetic task acceptance; no equal-quality whole-task token saving or universal SOTA ranking.",
+        "The full token-efficiency profile remains drafted; this does not qualify every catalog candidate/tool inside each client.",
+        "Failed native caller timeouts/turn-limit attempts and partial or unknown usage remain retained; task completion is distinct from parent exit.",
+        "Native client accounts retained. Claude reinstall is not a fresh OS/account simulation; Codex platform attestation does not separately attest the wrapper.",
+        "Local integration assertions and tests remain separate from unchanged upstream verification."
       ],
-      "path": "evidence/receipts/login-shell-contract-20260929.json"
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json"
+    },
+    {
+      "id": "token-profile-completion-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "repomix",
+        "headroom",
+        "toon",
+        "ccusage",
+        "qmd",
+        "markitdown",
+        "serena",
+        "socraticode",
+        "ai-memory",
+        "mcporter"
+      ],
+      "claim": "The selected fourteen-component token-efficiency profile has native installation/lifecycle evidence and one useful operation per tool in both native client families on this host. Codex0.159.2 supplies fresh twelve-tool observations; Claude2.1.285 supplies eight fresh tool observations plus four dated unchanged-pin subagent observations. ai-memory 2.4.2 is active with native hook refresh, exact isolated restart/rollback and client read/query checks. The installed lifetime reporter completed with zero issues and retains distinct native counter scopes.",
+      "limitations": [
+        "This is composed native acceptance on the existing host, not a fresh physical machine/WSL installation or new sign-in. Per-platform bootstrap pins do not confer acceptance on macOS.",
+        "Claude's TOON/MarkItDown/Serena/SocratiCode operations reuse dated unchanged-tool-pin positive checks; the historical receipt's absent discriminating controls remain absent. Retracted historical QMD/Repomix acceptance is replaced by fresh operations. No fresh twelve-tool Claude provider run is claimed.",
+        "Upstream RTK inline and Hindsight unchanged installer tests remain distinct from local native integration fixtures. Hindsight203pass/2skip does not establish a live memory/backend winner; other memory/RAG candidates remain comparisons.",
+        "Native counters are retained-history/window/event/byte estimates and overlap. Provider/cache usage, cumulative snapshots and exact artifact comparisons remain separate; exact lifetime provider tokens/dollars saved is unknown.",
+        "ai-memory activation retained the old binary and copied no production database/authentication. Binary rollback is not logical-data rollback; a new forced production PreCompact/provider extraction run was not performed.",
+        "Context Mode official tag, installed plugin and npm artifact identities differ. Counter formulas were verified, but the current MCP connection's loaded artifact binding remains unknown."
+      ],
+      "path": "evidence/receipts/token-profile-completion-20260930.json"
     },
     {
       "id": "cross-family-review-terminal-lane-20260930",
@@ -3714,9 +3734,67 @@
         "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the BEL counter of alert_probe.py now decodes UTF-8 and ignores C1 control characters like the pinned output engine; the probe exits 2 when its dialog never opened and 1 when its hooks-disabled control saw a BEL, cleans up after SIGINT, SIGTERM and SIGHUP (a handler only latches the first signal, the cleanups run to their end at explicit safe points and the probe then ends BY the signal; the designs of the second review, signals deferred under a mask and a spawn flag, and of the final read, an exit status 128 plus the signal, were replaced), and prints message lengths (the screen only with --show-screen); color_capture.py counts SGR sequences only, applies the pinned Windows Terminal parser's rules to its parameters (saturation at 65535, missing components as 0, byte bounds, the colon form's colour-space field) and counts a group it reads but does not apply apart (a native rerun on the client of 2026-09-30 shows the same pattern with other exact counts); check-terminal-profiles.py in the practice repository now accepts a bellSound only as exactly a measured file in C:\\Windows\\Media that exists; the sentence that tmux through 3.6 lacks synchronized output was false (tmux has a sync feature) and the bell icon clears after about 2 s on a focused tab. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/terminal-experience-20260928.json"
+    },
+    {
+      "id": "notification-types-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
+      "limitations": [
+        "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
+        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; in a terminal session the permission prompt's notification is timed by inactivity (source read: the terminal path compares the time with the later of the prompt's appearance and the last interaction; the fixed-delay timer is the Agent SDK path). Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+        "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
+        "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
+        "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
+        "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
+        "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
+        "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
+        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day (its hash moved, see the sha256 prefix in the dry-run output; the cause is not established here); the bell group is unchanged (the dry run).",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the presence rule and the agentPushNotifEnabled check apply to a local session only (a remote workspace skips both); the permission prompt's notification in a terminal is timed by inactivity (the fixed-delay timer the earlier wording took for it is the Agent SDK path); notification_types_scan.py now resolves the catalog's spread identifier to its single array assignment (twelve reader tests, eleven mutants after the final read: an assignment counts only as a complete initializer, a member assignment of the same short name, also through whitespace or a comment, is not the catalog's array, every declared catalog must be one the reader recognizes, and the scope and later-mutation limits are stated); replace_bell_group.py compares the live file with the bytes it read before the backup and right before the rename (a save between the last comparison and the rename is still lost and is in neither file: a documented residual with a case of its own), refuses keys beyond matcher and hooks on the bell group, names no matcher value in a refusal and has no second-distro target (27 controls, 15 mutants); the tmux and push probes' verdicts, signal handling and printing were repaired (the tmux verdict now requires all five arms, the tmux sockets live inside the probes' private directories, and the derived push probe's hooks-disabled control exits 1 on a BEL). The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
+      ],
+      "path": "evidence/receipts/notification-types-20260929.json"
+    },
+    {
+      "id": "login-shell-contract-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The reproduction was re-run after the bounded re-check with the client's temporary state redirected to a short private directory beside each throwaway home (TMPDIR and CLAUDE_CODE_TMPDIR): the real /tmp and /tmp/claude-<uid> gained no top-level entry during the recorded run apart from /tmp/inline-comments-buffer.jsonl, which was absent before, appeared during the run and was removed by the script, the real home's placeholder names were unchanged, and the arm counts were 0 empty files with no variable, 27 with it in the stock home and 26 with a real hand-off file. A control run whose socket path (121 bytes, from a 99-byte private path) exceeded the client's own 103-byte cap on `<dir>/cc-socks/<pid>.sock` put the messaging-socket directory into a fixed /tmp/cc-socks-<uid> directory in the real /tmp instead, so the redirect holds only while the private path is short (under about 81 bytes with a 7-digit pid) and XDG_RUNTIME_DIR stays unset. The native `claude doctor` warned 3 times with the sandbox off and 4 times with it enabled and a planted stale mask file; it named the planted file (the warning is live) and named the scrub-created ~/.bash_profile, a writable 0644 file outside the warning's documented scope of 0-byte read-only placeholders, in neither run. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag (rust-v0.159.0 at the re-run).",
+      "limitations": [
+        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The second distro's two per-project Claude profiles were not measured (that distro was later unregistered). Another host collects its own evidence.",
+        "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
+        "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
+        "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
+        "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
+        "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.159.0 (the newest stable at the re-run) was not run. The candidate notifiers were compared by repository head and latest release only, not run. The three candidates agent-deck, ccmanager and zellij were first recorded by the refresh script on 2026-09-29, so their heads have no earlier pin to be compared with.",
+        "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (50 entries in the stock-home arm in the first run, 49 in the re-runs); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` was run in one throwaway home with the scrub-created file, with the sandbox off and with it enabled plus a planted stale mask file. That planted file shows the warning is live; it is not a positive control for the scrub placeholder, which the warning's documented scope (0-byte read-only placeholders at settings paths) does not cover, so the doctor's silence about ~/.bash_profile follows from that scope and is not evidence about the file.",
+        "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session.",
+        "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began.",
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): login_shell_check_controls.py (and the practice repository's doctor) now needs an answer for every command and an end marker, probes with type -P and accepts a name only when the printed path is an executable regular file (a stale hashed pathname and a non-executable file are refused), and lets only the first startup file bash reads shadow ~/.profile (eleven homes); login_path_digest.py reads the PATH from a nonce-framed record (a startup file's ordinary output cannot pass for it; one that replays the command string can, since shell stdout is not authenticated) and exits 1 on a measurement error (a rerun on this host gives 13 entries and the digest prefix that this receipt records before and after the hand-off file); scrub_placeholder_probe.py compares 19 named files of the real home by lstat (a native rerun with the revised script is recorded in the 2026-09-30 receipt) and reads its PATH the same nonce-framed way; landscape_refresh.py compares the whole notification and terminal-title definitions, multi-line attributes and the default of notifications included, and answers null when a part is missing. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
+      ],
+      "path": "evidence/receipts/login-shell-contract-20260929.json"
     }
   ],
   "files": [
+    {
+      "path": ".claude/agents/landscape-sweep-worker.md",
+      "sha256": "bb7e436080483adf0eb14e69e3d73b4feb9c7c4b55baff31e8b70f30733e369c",
+      "bytes": 1871
+    },
+    {
+      "path": ".claude/agents/security-reviewer.md",
+      "sha256": "d7c571966343769d55ec23085f090b204c838492b3f389c7485f9ba9a93b6432",
+      "bytes": 3509
+    },
+    {
+      "path": ".claude/agents/semantic-evidence-reviewer.md",
+      "sha256": "0763bbfa0e635ffd6aaaba8ae1f668d3e2398776bc0be3516ad1593701b6a745",
+      "bytes": 1888
+    },
     {
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
@@ -3843,6 +3921,11 @@
       "bytes": 11346
     },
     {
+      "path": ".github/workflows/sota-sources-gate.yml",
+      "sha256": "b85d81d1ed8ec131d24e2ae1177dc2e0317bba233c2073fc33023eee8c928af6",
+      "bytes": 2459
+    },
+    {
       "path": ".github/workflows/supply-chain.yml",
       "sha256": "a752c1be5c7e73642085b3fd91f3e97c4b42167dbe5b3452b2bd1191652e9c24",
       "bytes": 7411
@@ -3904,8 +3987,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d144b49f6fee591ada0f6338124ecd5c5b3f955c72f866793270d9599ac0d93e",
-      "bytes": 18075
+      "sha256": "0449c4c629aa906b98953281cd75e13e3bf80491ff3d2c9615f993e194bc61a3",
+      "bytes": 18333
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -3926,6 +4009,11 @@
       "path": "adoption/agents/claude/security-reviewer.md",
       "sha256": "d7c571966343769d55ec23085f090b204c838492b3f389c7485f9ba9a93b6432",
       "bytes": 3509
+    },
+    {
+      "path": "adoption/agents/claude/semantic-evidence-reviewer.md",
+      "sha256": "0763bbfa0e635ffd6aaaba8ae1f668d3e2398776bc0be3516ad1593701b6a745",
+      "bytes": 1888
     },
     {
       "path": "adoption/agents/claude/source-scout.md",
@@ -3969,8 +4057,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "346cbb6c3d1bf2f54271c4d0ee55faeb39ea9d26d4a3ce8c99aded8994f28b0e",
-      "bytes": 59743
+      "sha256": "33fb65c6219abd3b2b18fecf5bc5309e10ba69bbfa24a2a623c80baf08999992",
+      "bytes": 59874
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3986,6 +4074,11 @@
       "path": "adoption/hooks/claude/SHA256SUMS",
       "sha256": "947c0ae1fcd5ba11fc82108e7223f095c0712f132edf9515638a84d8336d9668",
       "bytes": 950
+    },
+    {
+      "path": "adoption/hooks/claude/currency-due-notice.py",
+      "sha256": "c0979c22a701538a267e8f6b980dd2228e79db0c0b2b6bcf8d91dd2681735fb7",
+      "bytes": 6108
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -4069,8 +4162,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "8dfe143fdfed9a80d5c3518cdd43ec009947b4854954999e7c1faef1f535a832",
-      "bytes": 19478
+      "sha256": "685d81757e9a6dbfad2c2c0f8d93a960515016247c0bb04f02805b9f8a429122",
+      "bytes": 19521
     },
     {
       "path": "adoption/paired/README.md",
@@ -4104,8 +4197,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "4539311ef0437b9081f2811cc329bd880f33c3479c2724f7c218a63e9ff3a1b4",
-      "bytes": 32281
+      "sha256": "dbc57349d7d8d12c8ef4d1940dbd6cb95b89baa79de7b8885fade1f86ccbd6f9",
+      "bytes": 32430
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4141,6 +4234,31 @@
       "path": "adoption/research.md",
       "sha256": "10e83b515760e86ffd1a9b6540aaeea769f94af5d569c001954f0031548ca75b",
       "bytes": 2735
+    },
+    {
+      "path": "adoption/scaffold/.agents/skills/README.md",
+      "sha256": "1d51f43f551bad8a011e7f1429bdc681184dd91bafab68fd7d82a8cfec5f52f7",
+      "bytes": 1081
+    },
+    {
+      "path": "adoption/scaffold/.github/pull_request_template.md",
+      "sha256": "28b05bf68a34990d24537816ca7a49aaf32defddae1fbbfc89f5bafbb7996a06",
+      "bytes": 1129
+    },
+    {
+      "path": "adoption/scaffold/.github/workflows/sota-sources.yml.template",
+      "sha256": "3184fb042ca6111e94aa71180999c3d4cc226696e9f2c84f2748391562bb5999",
+      "bytes": 1085
+    },
+    {
+      "path": "adoption/scaffold/AGENTS.md",
+      "sha256": "742ad69a3ba0fbc656e47a24cbecfda2246a0c50859d9ef14e85e05c1a9cd882",
+      "bytes": 4508
+    },
+    {
+      "path": "adoption/scaffold/CLAUDE.md",
+      "sha256": "8d75ae16d9ccbe0ae6d4d551efbd68c8d89a439aa0fd4a8f410c54decefd8977",
+      "bytes": 181
     },
     {
       "path": "adoption/sdk/README.md",
@@ -4183,6 +4301,11 @@
       "bytes": 14510
     },
     {
+      "path": "adoption/templates/codex.hooks.template.json",
+      "sha256": "ced813cd16babd21e8567c33779a8c84baba6747eeb63680e0c74cc1343f0cb3",
+      "bytes": 1149
+    },
+    {
       "path": "adoption/templates/codex.omniroute.config.toml",
       "sha256": "0751419f445daaa7735e952af41fa93b1b0464de36282d22b38573653891aba8",
       "bytes": 4932
@@ -4206,6 +4329,16 @@
       "path": "adoption/templates/systemd/omniroute.service",
       "sha256": "b05477c72372578088d2f51eb6bb47664aadbe3aab938769c2cd07924b2b5951",
       "bytes": 7345
+    },
+    {
+      "path": "adoption/templates/systemd/stack-currency.service",
+      "sha256": "05b97c3596e3e13f0247db8907308f700a160824acc2d146043cf33cd6363499",
+      "bytes": 3305
+    },
+    {
+      "path": "adoption/templates/systemd/stack-currency.timer",
+      "sha256": "ce1800a5a724a196c8327c74e5a2ebd299e93cabfcbd4fb7dc2b67babac053e6",
+      "bytes": 1084
     },
     {
       "path": "adoption/tools/README.md",
@@ -5814,6 +5947,11 @@
       "bytes": 2816
     },
     {
+      "path": "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
+      "sha256": "064e6d1054baaac33c5727193a8cbc5da8e4b932d9c26ea90ae2e431948ba105",
+      "bytes": 46776
+    },
+    {
       "path": "blueprints/convergence-practice/validation.json",
       "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
       "bytes": 2009
@@ -6454,7 +6592,7 @@
       "bytes": 126
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
       "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
       "bytes": 111
     },
@@ -8910,8 +9048,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "37fdb5e555d96af47d8bf463cd2eae384ed955fa0b7c81c7e56506fc5fa7a546",
+      "bytes": 72598
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9390,8 +9528,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "ca047a295fe9f6ff5f23544cd10f2cac2687a93ab3eea4e4e351620058a85d9b",
-      "bytes": 75592
+      "sha256": "cf4c5b7b5e8d100ba2ff2a2332fd8a40270a1a236743109e91016c377753da3e",
+      "bytes": 77830
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -9435,8 +9573,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "2ad534497a379f5629bb950bcd21a0219cad321dc7be05b4275a8d52b7ac3a98",
-      "bytes": 482774
+      "sha256": "bfd0b880d731235473ee03ef55f1b90acd1aa3b38de9d933828bdff17ad08dfa",
+      "bytes": 489770
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14460,13 +14598,13 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
+      "sha256": "4d1226846d6d1eb6df610476c8194741e21034b66ece46d4efc52010e67adf7f",
       "bytes": 139753
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "6b05385e04a97d9816b8ab35c7fc3c5c33ad8ff5e4a7c7e34e7c043ba4c5af00",
+      "bytes": 26408
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14560,8 +14698,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "815405acffe546d358bf318805eff1d7d995f0ddfb66685e0b8338d9e809c33c",
-      "bytes": 287293
+      "sha256": "ef7a849d69c54487cd8f186581fd1c17b1761326ee4de07ac653ae7ba4d49e98",
+      "bytes": 287271
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -14570,8 +14708,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "11bb805b364a93d5bdafcc70e0e0bb14136561bf695fc88ebf155ae4f17b7044",
-      "bytes": 249102
+      "sha256": "136b657574777d392b2d41db2f0e2d887c1f8fd7b061806a29420075a3e97b6a",
+      "bytes": 249736
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15244,6 +15382,31 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-session-currency-notice.md",
+      "sha256": "32926b9035ba060a3f45df7711faa591d83fc3fced0a9e327f9bdb06ff9cbb2f",
+      "bytes": 22152
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "f309c112da73eb0a2708f0b1ae48c9c4d7dfdc7694b27591942151c373565902",
+      "bytes": 9161
+    },
+    {
+      "path": "docs/decisions/2026-09-30-task-model-routing.md",
+      "sha256": "35bd334f8b922a0ed36fd51dc46ef66f9cf398f615645c245b1c2d2a35c9d390",
+      "bytes": 40876
+    },
+    {
+      "path": "docs/decisions/2026-09-30-token-lifecycle-resolution.md",
+      "sha256": "b678f6c0f8ebb90909d78aa1ef74422f860171b43f3cd618d7231b73332ab7fb",
+      "bytes": 17325
+    },
+    {
+      "path": "docs/decisions/2026-09-30-token-profile-completion.md",
+      "sha256": "8eab81a13fc4ad4026b0bd227b73591304adfdee4acbb776587006884e8f76af",
+      "bytes": 15712
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15325,8 +15488,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "5a20461ffdd76482f30e8beb0f5ea670ccc53dc656931c5de91ec2dd2c80cea8",
-      "bytes": 39778
+      "sha256": "88ae20912571b2bffe53c283fa90d9e18fa89721d0d02daa3d6650b1927db6a8",
+      "bytes": 39982
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -15375,8 +15538,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1fe6f3a94f77453522b20b07dcdf08a4aea3d70f0c31a26972b44df9c0ea3f86",
-      "bytes": 108873
+      "sha256": "557560c85fc5bd866b116ef7cf0b9b46f007c3f56b3ad29070f3281c7845ac42",
+      "bytes": 118556
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15495,8 +15658,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "8a9ce14b2985ffcee351a9d01f8834808e44d8dc046334be0e78bce52e141b37",
-      "bytes": 18233
+      "sha256": "6b8636a6f3f2e50021348914b0854d7f825416b3fb5496f56fd40f301ca9b4fc",
+      "bytes": 18211
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -15600,8 +15763,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "701ae440e016c8fa1085f34f567dfbfa74e9746c22582f3510fde4b87dfbfd44",
-      "bytes": 33810
+      "sha256": "7a0b2f66890805986f2ef191914a52ab0de59424a07b3d6eee6693c081b205e5",
+      "bytes": 34451
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -42474,6 +42637,536 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/README.md",
+      "sha256": "2b68579d2fedec225245c7642c2964b5bbf39323ea7f821a40ba30feacd88cb8",
+      "bytes": 3687
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-2.4.2-native/receipt.json",
+      "sha256": "cd3a927e13ce312dc4d79019607fe742789ce63c393ba721e4d3992d01a69292",
+      "bytes": 226001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-binary-rollback/receipt.json",
+      "sha256": "c939eaf3d07179ff163b7344b8beadb1fcd1d170339c599b87edc37afde4103d",
+      "bytes": 68221
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-complete.json",
+      "sha256": "0c87e7ff001441b6a82026d71e44e0866f0b4e18965457141053845505dd6326",
+      "bytes": 4227
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+      "sha256": "34754620796d5311f03244c07046d7da8dfbed0bc08a255384876d42dbec48f2",
+      "bytes": 567
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-prompt.txt",
+      "sha256": "7ccbfa5ea9e9c9c789719e74f68120109d432bf416288cb78dbc75f27c5bad4a",
+      "bytes": 1229
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+      "sha256": "56542233289097db043ac9508707808a383fc10b2c19c1badf65cd096f8edd2c",
+      "bytes": 808
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery.json",
+      "sha256": "3a2c87f60dd936bfdbbe47a0c29574b7d9d5cf199cef22884359ad5cd531ca24",
+      "bytes": 3188
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json",
+      "sha256": "d92bf4163f90d1efcf89273b2da8ca2a518e33fa9800ea59a9fdeee4f654c8b5",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-client-install.json",
+      "sha256": "caa20a522b106c48972246eb2b811b77cf8a9231a348398ac30e4dc2c333d9ec",
+      "bytes": 2113
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-11810a05.py",
+      "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687",
+      "bytes": 21557
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-installer-tests-11810a05.py",
+      "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e",
+      "bytes": 79170
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-role-marker.json",
+      "sha256": "b47dbd05d24497364438bc0c20435504902e47cb676ed2b2191cbbce417b3455",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-complete.json",
+      "sha256": "d3c5de0a4a7417f4224566354f1344ddb4dc6bb4a0516d841c8a7ebbf7137416",
+      "bytes": 3360
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+      "sha256": "20b0bab4a95af99de93e8285b6bf004d8af40edcc251cf30e1525d89b851ec36",
+      "bytes": 504
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-close-prompt.txt",
+      "sha256": "546d224aab9479306f93761917040b4ba07a19c1aecefd5522e40afebea781e7",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-complete.json",
+      "sha256": "f3bded5184e8677f6d1ffffe2e3e1eb23d5a2db5cdeba450c52651be715462fe",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-limit.json",
+      "sha256": "f6510dd97211b0fb77e5255bf32cb41697aedcb18e4fb0b5c415f89e2f053f69",
+      "bytes": 2956
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-partial.json",
+      "sha256": "d27f01c19c78798fa14c1fa064ec3be6d8863bf6b52a3c7bcf82d8d37c9494d5",
+      "bytes": 2994
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+      "sha256": "ec1c8276b4bde3427a62ba18a37fb84964133be564670270634917853debfc28",
+      "bytes": 875
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json",
+      "sha256": "de9dead88a0d9ea3243c8968eb87acf1be12648fb667e700801b0887ec6c1573",
+      "bytes": 4096
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-workflow-prompt.txt",
+      "sha256": "8feadc30ece52b6e7d7d0c3bfcc00f5f751478ceee4a6d491917262f49917c8a",
+      "bytes": 851
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-children.json",
+      "sha256": "fb01638d1f60c4c8affe848fc9a335fc11048890349c0511b97567057b375ea0",
+      "bytes": 2883
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt",
+      "sha256": "350caea80633287e579f81dc66283d8893230cffc41e2ffa919ce16f54d28691",
+      "bytes": 2047
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json",
+      "sha256": "b233c36fc17b6b6fd9f7212d5f47dedbaccc83dbe5a984e5ac024ab66181133d",
+      "bytes": 21001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/receipt.json",
+      "sha256": "3432d68aafd022311ec6b4a1df1f3917d389db429e1acf96ce5257e1a0c313fa",
+      "bytes": 732035
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/receipt.json",
+      "sha256": "e313ad548fcb3265352b8843c589c4031d3e9b1241c76a2a344a084bc4758c88",
+      "bytes": 730468
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/cleanup.json",
+      "sha256": "8a4fd5942397d0619433a10d13e83c017c841d9c75962c28899dc8dc6382572c",
+      "bytes": 1201
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-clean-install.json",
+      "sha256": "2da7abd4734f99c9bc808e47a731e7c978428d14e80a0835041903705b1f9ae1",
+      "bytes": 2279
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json",
+      "sha256": "1b1fd20dec3e47011b5b24cb23d9a58a995e75e1bd189beb35eeb32e30a134b4",
+      "bytes": 3619
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+      "sha256": "711b5695debcec0e16d5b3fa307d966732091b11e214a84944f13546993f304b",
+      "bytes": 4163
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-prompt.txt",
+      "sha256": "5790564708258335a692e160ac87fb2454d68551caa6543d29ce434360246bbe",
+      "bytes": 1011
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/hindsight-upstream/installer-test.stdout.txt",
+      "sha256": "5c989e59e51c1a9cac2280b2bc03b2e2e4a3c8bd369740daf9a25cc024046f39",
+      "bytes": 369
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/independent-review.json",
+      "sha256": "ca163016f8b766e123ce6092d95459ed6a6e1144082e8edc739688eb910741d3",
+      "bytes": 2815
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-harness-241.py",
+      "sha256": "cace071899ba46fa60f49ed3256c2320beb9622b5cf5cf59b877763eacb8867e",
+      "bytes": 114987
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/measurement-tests-938b737f.py",
+      "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a",
+      "bytes": 108181
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/privacy.json",
+      "sha256": "80296a839fd5ff6e8424456306894f393b72e4e0dc5f933e1b18b117919e1e2a",
+      "bytes": 2941
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/publication-validation.json",
+      "sha256": "6ed89cb295ebf69441d2c88f25fb11910a537e3a3f6672238f4c57d81d4dde51",
+      "bytes": 2120
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/qmd-index-refresh.json",
+      "sha256": "c1fbecc07eb31dc2938d1dc9710aa77184ec5f0b5ef463f701afbf29afe77b77",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-existing/receipt.json",
+      "sha256": "59ad10ed93cc69b302d648ce5e34d122a9e782888d9459030c8928dfeea88c3d",
+      "bytes": 90114
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/README.md",
+      "sha256": "efa7191bf9d49b3d1eca06312b303b1cf04ec6b7115c60f3eb4da637f3dfe5ce",
+      "bytes": 7064
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude/receipt.json",
+      "sha256": "d22e63ed95ce40b1d79a9f50433efd75a0c2de0b3202994fe6c5e257417738c2",
+      "bytes": 91478
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex/receipt.json",
+      "sha256": "20bd33cb404c00e7db31a5d89578e48bdfb55b8cf2658e9b9bcef6851c37ff35",
+      "bytes": 91487
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/controls-observation.json",
+      "sha256": "45a24f61e8a2b872a005f6b69c047df823643e5c8777fca33f8d2ad60f24216f",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/final-unit-suite.txt",
+      "sha256": "c8c8fbb9a8e3cf21635bb7432ffcdd6dacf21e8a591d47b65602b0206ac21f11",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing/receipt.json",
+      "sha256": "af05563b9f0c1deff9ce4c4545127f748f48e9c9e428930e6922f552d19255e0",
+      "bytes": 91621
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-regression.txt",
+      "sha256": "fb0578c63a599272724e1b9d6f3cd8105c1f3e8885f88dae3915df29041442cb",
+      "bytes": 211
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-unit-suite.txt",
+      "sha256": "67d4f4f467dd30124bffbfb4c0fdd5a2d75ad2ec11bf1d0efa3035b7e21200ae",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stderr.txt",
+      "sha256": "9a4c6e08eff9b4ef064133699a15f7b735ce8cd27f7184763f9f5e41e2c95b14",
+      "bytes": 8986
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stdout.txt",
+      "sha256": "c34c2dcb08b92a60e040ba0c8d7378b0ce2904643d76db0fa5831dfbb6e1031d",
+      "bytes": 25825
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stderr.txt",
+      "sha256": "eda7467d375d6f915f4591480de55a6514626395a17a1d7e0d098d6c5f4c1016",
+      "bytes": 8721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stdout.txt",
+      "sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "bytes": 30548
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/observation.json",
+      "sha256": "2bda24d355d476afcb96eacea190c5b4ad75602199435a3eb6cedd2e0f062921",
+      "bytes": 4721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent_probe.py",
+      "sha256": "be854d87c058eae712efd38097c1cdce35f76c7bc907346bdb5385916ab198da",
+      "bytes": 5596
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/inspect_controls.py",
+      "sha256": "a49ad3b45adfa140781318b340c87b3b39fcab099350f1c72e45791326544337",
+      "bytes": 3311
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing/receipt.json",
+      "sha256": "04ecdc57d20b319242c828d44dd404eec52ccde92bfd8f1ca195e8c31d552dcb",
+      "bytes": 91108
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression-observation.json",
+      "sha256": "1fcb32b555632bbb7ac6398a89cdd2b2c7591fc326ecc454d0de43124a275e31",
+      "bytes": 553
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression.txt",
+      "sha256": "0505c8f3dbc3c92e06ff90e778629f9f5043951f9d62c95a48cbec010ab66526",
+      "bytes": 1523
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/repair.patch",
+      "sha256": "b160ec7d8fa433de9ef8399a2ad40d8cca960b28e4dfad0ec0eabf80af658f8d",
+      "bytes": 6954
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py",
+      "sha256": "f70e25e32f862d04f336307ff569eb6c4105e2b8dc23a63d8f1fd37ec509842a",
+      "bytes": 4136
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/source-identity.json",
+      "sha256": "4318aaad04aae171b6703957dbdbb102326c1d0f897eebb4eefd5a95e1bdd0d9",
+      "bytes": 34036
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/validation.txt",
+      "sha256": "9efb6b3aa73d04734c756b2e61c2297f1535e4c1c7e9e1544f5b119999553082",
+      "bytes": 2563
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/verify_source.py",
+      "sha256": "68ec456fdbc85b29fdfabf100864b7cfb89b5618b46548d04a715c71188e05b8",
+      "bytes": 3511
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-SHA256SUMS-5cfa2400.txt",
+      "sha256": "633a5d511261b5df04ef74bdc8c873cd5b2a1f7cc6cceacb755b9b50a2d4da20",
+      "bytes": 1129
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/README.md",
+      "sha256": "71df39560678cb43f83fa842e86dceba5e783408ba055dfd905668ced31b544c",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/focused-tests.txt",
+      "sha256": "f722c2960f9425896acde852873ff81fc6eefb82ab01ed7373e2fbe85f6f1a8f",
+      "bytes": 848
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/source-checksums.txt",
+      "sha256": "6dcb032720780d4bca43cef97abc6fd23e959bcb0f789364a3f93201b44cc431",
+      "bytes": 507
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/README.md",
+      "sha256": "6536329077f14df9dd05dd15c930566aff557bb87b863288080af3ea6a3c960c",
+      "bytes": 6452
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/frozen-task.json",
+      "sha256": "04571d14f6540cc2640d455388e9127056cf3f47206755a45ce1a299b82bf94e",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-invocations.json",
+      "sha256": "d457181746c74d3eb0a5e834b769c24db2ee5251e0b1e6d5faef1455030b56f5",
+      "bytes": 3208
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-prompt.txt",
+      "sha256": "833d5bd18690829649c59120a80e9d7358b76a4d79726d5b84b41063a80d9ccf",
+      "bytes": 8639
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-repair-prompt.txt",
+      "sha256": "0d23d6fc16fbddbcc2783ddcd441db9981df71169597a33db4f69ac1f947b4bb",
+      "bytes": 3723
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/native-tool-returns.json",
+      "sha256": "e5c5d26cf31c190f640806987d44aa389af2c5053e2a057a7900a20940155966",
+      "bytes": 6282
+    },
+    {
+      "path": "evidence/artifacts/token-profile-codex-20260930/receipt.json",
+      "sha256": "a10f55c645a61789fabeee42d262047c1dea6e364c7b31331dbeb559f36e3871",
+      "bytes": 19810
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
+      "sha256": "236d8f1d9330c62f49bb00379f1761208265ce60be2e67ac673e25a6c2e5e80c",
+      "bytes": 64008
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
+      "sha256": "4d25e7da68ab05e692c56057e2d771f1a0f6b8be7a7fa77df718ce3c21c7d112",
+      "bytes": 22145
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/codex-native-hook-trust.json",
+      "sha256": "698b2a099e6428136c40c44e43f9c05530be39828c32de9b8c7762585f7a0755",
+      "bytes": 4157
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/composed-acceptance.json",
+      "sha256": "33677a8a7e8cee504df5c64380d3a30bcefa35e6b8847f636d15fa6ffdc8530d",
+      "bytes": 15176
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/final-lifetime-refresh.json",
+      "sha256": "60c38eedef2ec800dec6ed2b3454196c96258109a577eae9524fbdb0df6609b3",
+      "bytes": 2122
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/independent-verification.json",
+      "sha256": "f7484e000a572c4f4d73f15b9359862e427f51b52fff4e805546e7a7c1e84877",
+      "bytes": 5611
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/lifetime-native.json",
+      "sha256": "c8a73461e2565d4345f342129237d8efd2c12d17c04c11a83acb841dcf0a8ecc",
+      "bytes": 10480
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/local-validation.json",
+      "sha256": "d5156bd266d9113bc41d768a6741d7e4da60a0fd365c04769257aa7887b247b3",
+      "bytes": 3502
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/memory-selection.json",
+      "sha256": "2f1a877a1b7144e35180f5231dfed5b927c8dc9387e351994c07a72657480cd8",
+      "bytes": 9801
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/README.md",
+      "sha256": "50c8c6449859741bc9c0aeb3aa8e53dc534acc2075ec5d6f043b377b97b1a589",
+      "bytes": 1203
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/receipt.json",
+      "sha256": "3ef752b071595e49351e4e2e33001c6a92fda7126dd73feb2019b39ab8d72092",
+      "bytes": 729601
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json",
+      "sha256": "1275e6c495088a1b6b1b2c2dbf7fc0bb5f0c05622feab8c09de5d7f8939f91a3",
+      "bytes": 22849
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/README.md",
+      "sha256": "698eefb4f62b886e96e2e7d28aae97e0c577bce787b49dcfd193b497814fc3e7",
+      "bytes": 2121
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/acceptance-observation.json",
+      "sha256": "dd4e8a6fee7828d3b322d9f4317133755444cd3d5d97d0034b69029360ce5980",
+      "bytes": 2589
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/claude-code.stdout.txt",
+      "sha256": "db4153306755c709c7213768e54a342cbc7d84857ed4379a0bb2836f174263fe",
+      "bytes": 26822
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/serena-no-project/codex.stdout.txt",
+      "sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "bytes": 30548
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/wiring-after-native-trust.json",
+      "sha256": "33de92f8ed1e25759f5278c7990f67c821f3a7036b71cbac6d2caca2296c6d5e",
+      "bytes": 5720
+    },
+    {
+      "path": "evidence/artifacts/token-profile-completion-20260930/wiring-before-native-trust.json",
+      "sha256": "694c7d17c23a853ed4647005859fc79d51c263fdbb3df26de5f1e455adec50b2",
+      "bytes": 5724
+    },
+    {
       "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
       "sha256": "7c04fec29e4fbbf5be5fcce0d65469bf6b3f873af41e3a840edbba32b086b1f6",
       "bytes": 13531
@@ -44624,6 +45317,11 @@
       "bytes": 16128
     },
     {
+      "path": "evidence/receipts/osv-litellm-1932-20260930.json",
+      "sha256": "be20d59cf08931f60cfd7c1778ac7860280fdad24cc0e41988df3e6df3f9b307",
+      "bytes": 11853
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -44719,6 +45417,11 @@
       "bytes": 17631
     },
     {
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+      "sha256": "214e65b2b15b604e2e64cff01d5b050eced0744eeab76bf23b3ace9f895e8b36",
+      "bytes": 6532
+    },
+    {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
       "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
       "bytes": 17135
@@ -44757,6 +45460,11 @@
       "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
       "sha256": "6c6edfde2da2c1292d36222372b62b2614b980337b72b399984a3a4b368cd37c",
       "bytes": 6386
+    },
+    {
+      "path": "evidence/receipts/token-profile-completion-20260930.json",
+      "sha256": "8ff6c2d36bb515ccbca063f5c2f1a2952cd4093fa68c7999d5bfe53ee732b967",
+      "bytes": 9058
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
@@ -45145,8 +45853,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5cafbe8aae1895fb41a4920039231f3c8a0d91b641db67b4e21f2f88e8d4e36b",
-      "bytes": 99473
+      "sha256": "d32d8d104704602239bcf54fb48682cb8043fa6a83ad413482cf0274555a691f",
+      "bytes": 100870
     },
     {
       "path": "observability/README.md",
@@ -45340,8 +46048,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "3031d75217d8d309f7d45d8bb3e45573dba034c9c56024a1a58d61cfe843880a",
-      "bytes": 18251
+      "sha256": "39445d4d7f21da7fce28f9fcdc9e3b6e65b1a205067aaf1210f347dfe9eb9a44",
+      "bytes": 18608
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -45425,8 +46133,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2961a95fe20b829b92a9a01812bf6aa240955378674d1ee7afc8e4df727cc041",
-      "bytes": 124550
+      "sha256": "5b3ef1e91e7455f34c01509cfc2f3b064a4cc5eef22976b64c76718482c5764a",
+      "bytes": 124858
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -45499,6 +46207,11 @@
       "bytes": 33813
     },
     {
+      "path": "scripts/currency_due.py",
+      "sha256": "4c0b579e2899ff3bd71998cc4b6833e8d50c1b9dacfbd526e681430a2476f438",
+      "bytes": 31688
+    },
+    {
       "path": "scripts/env_freshness.py",
       "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
       "bytes": 7138
@@ -45540,8 +46253,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
-      "bytes": 114715
+      "sha256": "783d19d1af7468f393d8b62cdf14f12c09e7701dd259982a6c186056232eb7fb",
+      "bytes": 115098
     },
     {
       "path": "scripts/path_safety.py",
@@ -45860,8 +46573,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "1ee0d6f15418f69d2055d6c71679fabb50bcd2b972377ebcc84865b64713791c",
-      "bytes": 228127
+      "sha256": "880aa42e833bfc7d094bd2f4896145d078ca3dae5f355bc02ad6c3a93d753b83",
+      "bytes": 228124
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -45920,13 +46633,18 @@
     },
     {
       "path": "tests/test_apply_claude_settings.py",
-      "sha256": "4e18b1a1bb457d3bb159e5886638e484ac6b581b6f10a0a41ca4b3bcbb5e046f",
-      "bytes": 16418
+      "sha256": "1bd3e90b095c326edf6327202bcbeeab7ed6ccc6c5789dc794062024baf6d64f",
+      "bytes": 18302
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
       "sha256": "327f104fc335a2b25f2a910e8cae44661fe9439764f4ab778412dbf3beeaea99",
       "bytes": 2827
+    },
+    {
+      "path": "tests/test_bootstrap_full_profile.py",
+      "sha256": "43cd53ef0a3461d5df08c915e2ea2a7edfe6c27d67084797ec9b366b1867662f",
+      "bytes": 40117
     },
     {
       "path": "tests/test_bootstrap_integrity_drivers.py",
@@ -46064,6 +46782,16 @@
       "bytes": 34946
     },
     {
+      "path": "tests/test_currency_due.py",
+      "sha256": "71ef2107b9c5ad188f5d7713be0f23d75865716c4c2b56605ac2101bc61d0bf0",
+      "bytes": 61016
+    },
+    {
+      "path": "tests/test_currency_due_notice.py",
+      "sha256": "0129a631527c0a1611f494e1e3ad6ecc976dd56cfa0f6f1c48617de85478eb53",
+      "bytes": 29380
+    },
+    {
       "path": "tests/test_delisting_coverage.py",
       "sha256": "c33b6dd7b33691dcac0ec84db6c600f8777abb06f6fce6d992b7f5fa2d277af5",
       "bytes": 24344
@@ -46190,8 +46918,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "09a0adcdc056a73147e42a2dc98a8e3053d2c2c87e62d5bf08d9147406caa690",
-      "bytes": 84628
+      "sha256": "e8ec7677d8d90e117e43b9de4f97e4545ec7081329b23000df5edff9cae2fc8f",
+      "bytes": 98649
     },
     {
       "path": "tests/test_install_skills.py",
@@ -46247,6 +46975,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_managed_block.py",
+      "sha256": "490c5bcb029d16b289e6bce39b0655784293baca910e19ecb5386832798dd229",
+      "bytes": 11405
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -46325,8 +47058,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "d233c0148973fca20352b6df2e93e75fde68b65fee3ee11b9ba282aff8f604e0",
-      "bytes": 104999
+      "sha256": "e69ae65b5ab65b093805df7c20b2d3e01d4f28c8bfa2a3ccaa0d9db132fd443e",
+      "bytes": 108145
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -46504,6 +47237,11 @@
       "bytes": 61882
     },
     {
+      "path": "tests/test_scaffold_repo.py",
+      "sha256": "e8f01abfcc27cd32553aafa9530981265f0768805d81138172efaec835e2c95c",
+      "bytes": 21042
+    },
+    {
       "path": "tests/test_secret_path_guard.py",
       "sha256": "7c9ff36f002aa3a04e54f8bdc32ee125659caa4bd811053b37781958be81a40f",
       "bytes": 66048
@@ -46564,6 +47302,11 @@
       "bytes": 163940
     },
     {
+      "path": "tests/test_sota_sources_gate.py",
+      "sha256": "4fa449000c2163ba92dc7f732d0d1a230548ac226eaee792ff7fd34be38043df",
+      "bytes": 13693
+    },
+    {
       "path": "tests/test_spy_parity.py",
       "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
       "bytes": 121917
@@ -46577,6 +47320,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_task_model_routing.py",
+      "sha256": "a4e703d8ac2efd5bffc532afd6eebaaeabe0e737056e039e8678b538e0d8d2ef",
+      "bytes": 23344
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -46685,13 +47433,18 @@
     },
     {
       "path": "tools/adoption/apply_claude_settings.py",
-      "sha256": "aa69bcb6adaa1cea6b6961ff3bc3366621f36ef9443047ac64fe2d232640a07a",
-      "bytes": 11810
+      "sha256": "b80942c9e732f1c07d77f8092aa9379e07dec53c8c7efa87e5e2a2587ebaddaf",
+      "bytes": 12924
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
       "sha256": "2509b78bbeb2be923d71022245ad3f5824d2324caf7fa8ed527ef8532614a099",
       "bytes": 76760
+    },
+    {
+      "path": "tools/adoption/codex_home.py",
+      "sha256": "4dee56b929aafd83cbd668e8df62e92a905146b965bb45a15a4a6e83c02d2ff4",
+      "bytes": 13542
     },
     {
       "path": "tools/adoption/codex_roles.py",
@@ -46705,13 +47458,18 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "b7f11aeec288fcbe1a333f111defc150d5fbdcd1f44de9f59aed972ef50ead9f",
-      "bytes": 14888
+      "sha256": "1452446700d9eab5f80ea5368426ae1be57810c630ff92f9160793789464089f",
+      "bytes": 21748
     },
     {
       "path": "tools/adoption/install_skills.py",
       "sha256": "407ffb4c470cbb06b70e518159e40530424511c2d8189b1c8bdf5a0421e8115e",
       "bytes": 40516
+    },
+    {
+      "path": "tools/adoption/managed_block.py",
+      "sha256": "6f997d5d3d75f098d8743d41bc3675f92c1d4acf87c5a88502bd8912a34b7cc8",
+      "bytes": 11911
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -46732,6 +47490,11 @@
       "path": "tools/adoption/runtime_skill_freshness.py",
       "sha256": "2bba00ee01b0b9e7b0e4ef1020f921c7b7b5d21a00935b79661577dcb74fc882",
       "bytes": 8628
+    },
+    {
+      "path": "tools/adoption/scaffold_repo.py",
+      "sha256": "c799d3139d823219b67aaa5bee8c9001a0f795080bb425a68d089b1f12765860",
+      "bytes": 17348
     },
     {
       "path": "tools/capability-gate/README.md",
@@ -47188,27 +47951,28 @@
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",
+    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
+    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/gpu-inference/experiment.json",
     "blueprints/convergence-practice/job-recovery/experiment-macos.json",
     "blueprints/convergence-practice/job-recovery/experiment-wsl.json",
+    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/mac-memory-patch/experiment.json",
     "blueprints/convergence-practice/native-recovery/claude/experiment.json",
     "blueprints/convergence-practice/native-recovery/experiment.json",
     "blueprints/convergence-practice/native-worker/experiment.json",
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+    "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
     "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
     "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
     "blueprints/convergence-practice/wsl-retrieval/experiment.json",
     "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
-    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/us-equities/sim-capacity/experiment.json",
-    "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
     "evidence/artifacts/local-model-workloads-20260924/experiment.json",
     "evidence/artifacts/memory-stack-20260925/experiment.json",
-    "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
-    "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
-    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json"
   ]
 }

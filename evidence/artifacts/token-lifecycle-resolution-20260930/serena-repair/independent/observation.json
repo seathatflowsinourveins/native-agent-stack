@@ -1,0 +1,167 @@
+{
+  "evidence_class": "independent_native_observation",
+  "upstream_revision": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "contexts": {
+    "claude-code": {
+      "argv": [
+        "<TOOL:serena>",
+        "start-mcp-server",
+        "--context",
+        "claude-code",
+        "--project-from-cwd",
+        "--enable-web-dashboard",
+        "false",
+        "--open-web-dashboard",
+        "false"
+      ],
+      "cwd": "<WORK>/no-project",
+      "started_at": "2026-09-30T15:41:22.222158+00:00",
+      "finished_at": "2026-09-30T15:41:23.892746+00:00",
+      "exit_code": 0,
+      "requests": [
+        {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": {
+            "protocolVersion": "2025-06-18",
+            "capabilities": {},
+            "clientInfo": {
+              "name": "native-token-ci",
+              "version": "1"
+            }
+          }
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 2,
+          "method": "tools/list",
+          "params": {}
+        }
+      ],
+      "responses": [
+        {
+          "id": 1,
+          "bytes": 465,
+          "sha256": "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
+        },
+        {
+          "id": 2,
+          "bytes": 25360,
+          "sha256": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0"
+        }
+      ],
+      "stdout_raw_sha256": "c34c2dcb08b92a60e040ba0c8d7378b0ce2904643d76db0fa5831dfbb6e1031d",
+      "stderr_raw_sha256": "57ac6b18a31f3201d774eefd2609e4021267d00aa67e10665f4dedb459958500",
+      "tool_names": [
+        "replace_content",
+        "replace_in_files",
+        "replace_symbol_body",
+        "insert_after_symbol",
+        "insert_before_symbol",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "find_implementations",
+        "find_declaration",
+        "get_diagnostics_for_file",
+        "rename_symbol",
+        "safe_delete_symbol",
+        "write_memory",
+        "read_memory",
+        "list_memories",
+        "delete_memory",
+        "rename_memory",
+        "edit_memory",
+        "onboarding",
+        "initial_instructions"
+      ]
+    },
+    "codex": {
+      "argv": [
+        "<TOOL:serena>",
+        "start-mcp-server",
+        "--context",
+        "codex",
+        "--project-from-cwd",
+        "--enable-web-dashboard",
+        "false",
+        "--open-web-dashboard",
+        "false"
+      ],
+      "cwd": "<WORK>/no-project",
+      "started_at": "2026-09-30T15:41:23.894052+00:00",
+      "finished_at": "2026-09-30T15:41:25.287976+00:00",
+      "exit_code": 0,
+      "requests": [
+        {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": {
+            "protocolVersion": "2025-06-18",
+            "capabilities": {},
+            "clientInfo": {
+              "name": "native-token-ci",
+              "version": "1"
+            }
+          }
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 2,
+          "method": "tools/list",
+          "params": {}
+        }
+      ],
+      "responses": [
+        {
+          "id": 1,
+          "bytes": 465,
+          "sha256": "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
+        },
+        {
+          "id": 2,
+          "bytes": 30083,
+          "sha256": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"
+        }
+      ],
+      "stdout_raw_sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "stderr_raw_sha256": "b1b561b7301a451266297c70e395aa602dd5649b2e0dd50ee50e867e635c9bb1",
+      "tool_names": [
+        "replace_in_files",
+        "replace_symbol_body",
+        "insert_after_symbol",
+        "insert_before_symbol",
+        "search_for_pattern",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "find_implementations",
+        "find_declaration",
+        "get_diagnostics_for_file",
+        "rename_symbol",
+        "safe_delete_symbol",
+        "write_memory",
+        "read_memory",
+        "list_memories",
+        "delete_memory",
+        "rename_memory",
+        "edit_memory",
+        "activate_project",
+        "get_current_config",
+        "onboarding",
+        "initial_instructions"
+      ]
+    }
+  },
+  "limits": [
+    "Existing installed executable; fresh prefix is exercised separately",
+    "No active project, language server, credentials, provider or model",
+    "Retained stdout contains exact native MCP response bytes",
+    "Retained stderr replaces the owned temporary directory, native HOME and executable paths"
+  ],
+  "cleanup": {
+    "owned_temporary_directory_absent": true
+  }
+}

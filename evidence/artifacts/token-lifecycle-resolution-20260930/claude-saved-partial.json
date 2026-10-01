@@ -1,0 +1,144 @@
+{
+  "kind": "saved-workflow-partial-observation",
+  "command_exit_code": 1,
+  "status": "incomplete",
+  "reason": "1 child(ren) incomplete",
+  "children": [
+    {
+      "label": "read:docs-1",
+      "type": "source-scout",
+      "requested_model": "sonnet",
+      "resolved": [
+        "claude-sonnet-5-5"
+      ],
+      "efforts": [
+        "max"
+      ],
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 9996,
+        "cache_read_input_tokens": 62396,
+        "cache_creation_input_tokens": 23033
+      },
+      "complete": true,
+      "issues": [],
+      "lanes": {
+        "marker": "TOKEN LANES (source:",
+        "in_first_prompt": false,
+        "in_subagent_start_context": true
+      }
+    },
+    {
+      "label": "read:commands-2",
+      "type": "source-scout",
+      "requested_model": "sonnet",
+      "resolved": [
+        "claude-sonnet-5-5"
+      ],
+      "efforts": [
+        "max"
+      ],
+      "usage": {
+        "input_tokens": 6,
+        "output_tokens": 4063,
+        "cache_read_input_tokens": 22090,
+        "cache_creation_input_tokens": 13383
+      },
+      "complete": true,
+      "issues": [],
+      "lanes": {
+        "marker": "TOKEN LANES (source:",
+        "in_first_prompt": false,
+        "in_subagent_start_context": true
+      }
+    },
+    {
+      "label": "verify",
+      "type": "workflow-subagent",
+      "requested_model": "opus",
+      "resolved": [
+        "claude-opus-5-5"
+      ],
+      "efforts": [
+        "max"
+      ],
+      "usage": {
+        "input_tokens": 8,
+        "output_tokens": 4272,
+        "cache_read_input_tokens": 138470,
+        "cache_creation_input_tokens": 53826
+      },
+      "complete": false,
+      "issues": [
+        "no result entry in journal"
+      ],
+      "lanes": {
+        "marker": "TOKEN LANES (source:",
+        "in_first_prompt": false,
+        "in_subagent_start_context": true
+      }
+    }
+  ],
+  "journal": [
+    {
+      "type": "launched",
+      "keys": [
+        "type"
+      ]
+    },
+    {
+      "type": "started",
+      "keys": [
+        "type",
+        "key",
+        "agentId",
+        "label",
+        "phase"
+      ]
+    },
+    {
+      "type": "started",
+      "keys": [
+        "type",
+        "key",
+        "agentId",
+        "label",
+        "phase"
+      ]
+    },
+    {
+      "type": "result",
+      "keys": [
+        "type",
+        "key",
+        "agentId",
+        "result"
+      ]
+    },
+    {
+      "type": "result",
+      "keys": [
+        "type",
+        "key",
+        "agentId",
+        "result"
+      ]
+    },
+    {
+      "type": "started",
+      "keys": [
+        "type",
+        "key",
+        "agentId",
+        "label",
+        "phase"
+      ]
+    }
+  ],
+  "transport_limit": {
+    "layer": "context-mode MCP tools/call",
+    "timeout_seconds": 300,
+    "native_exit_code": null
+  },
+  "claim_boundary": "Two completed readers and partial verifier usage are retained. Transport timeout is not a returned native Claude exit or proof of a provider failure."
+}

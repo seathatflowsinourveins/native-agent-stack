@@ -1,0 +1,7 @@
+COMMAND rtk python3 -m unittest discover -s tests -p test_native_token_ci.py -k verified_native_preimages
+EXIT 0
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.049s
+
+OK

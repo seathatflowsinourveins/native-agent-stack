@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "fixture_source_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "fixture_files": {
+    "records.json": {
+      "sha256": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c",
+      "bytes": 96
+    },
+    "after.py": {
+      "sha256": "7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54",
+      "bytes": 54
+    },
+    "context-mode-build.log": {
+      "sha256": "b490c80b7db760dca74f6e7ab96c30458064c1c019e0fb4ec6b627489a55df09",
+      "bytes": 24016
+    },
+    "headroom-records.json": {
+      "sha256": "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+      "bytes": 2969
+    },
+    "before.py": {
+      "sha256": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60",
+      "bytes": 48
+    },
+    "greeting.html": {
+      "sha256": "f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2",
+      "bytes": 474
+    },
+    "unselected.txt": {
+      "sha256": "9dcfbf43e4799a75446e535656eb489ad30864da1c3c83177d1265ad34852859",
+      "bytes": 26
+    },
+    "docs/amberquartz.md": {
+      "sha256": "0497a5567c66a5ecc63fbda2e5e0c5fb841709a239adf7008c38c2628efb3fe9",
+      "bytes": 67
+    }
+  },
+  "oracle": {
+    "before_greeting": "Hello, Ada",
+    "after_greeting": "Hello, Ada!",
+    "record_count": 2,
+    "record_count_sum": 5,
+    "retention_entries": 19,
+    "headroom_record_count": 24,
+    "conversion_heading": "Local browser command check"
+  },
+  "selected_tools": [
+    "rtk",
+    "context-mode",
+    "repomix",
+    "headroom",
+    "toon",
+    "ccusage",
+    "qmd",
+    "markitdown",
+    "serena",
+    "socraticode",
+    "ai-memory",
+    "mcporter"
+  ],
+  "ai_memory": {
+    "version": "2.4.2",
+    "workspace": "native-ci",
+    "project": "fixture",
+    "path": "notes/amberquartz.md",
+    "body": "# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n"
+  },
+  "contract_repair": {
+    "context-mode": "identical project-root source fixture, no weakened permission rule",
+    "rtk": "provenance prefix plus explicit original full-subject recovery; original filtered-equality condition remains false",
+    "ccusage": "public synthetic Claude-format source in bounded subprocess env; host-date scope excluded"
+  }
+}

@@ -256,8 +256,8 @@
       "component_id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
       "selected_repository_url": "https://github.com/akitaonrails/ai-memory",
-      "selected_version": "2.4.1",
-      "selected_source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "selected_version": "2.4.2",
+      "selected_source_pin": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
       "checks": [
         {
           "endpoint": "repos/akitaonrails/ai-memory",
@@ -319,11 +319,11 @@
         "committed_at": "2026-09-25T21:01:14Z"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "adoption_recommendation": "Current selection qualified2026-09-30 by token-lifecycle-resolution-20260930 and token-profile-completion-20260930; original upstream metadata timestamps, release and selected_pin_source observations remain historical, not a fresh global landscape scan. See docs/decisions/2026-09-30-token-profile-completion.md.",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/akitaonrails/ai-memory",
-      "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "release_relationship": "selected_version_differs_from_historical_release_snapshot",
+      "selected_pin_matches_latest_release_commit": false
     },
     {
       "component_id": "ast-grep",
@@ -635,7 +635,7 @@
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
       "selected_version": "0.159.2",
-      "selected_source_pin": null,
+      "selected_source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
       "checks": [
         {
           "endpoint": "repos/openai/codex",
@@ -691,10 +691,11 @@
         "committed_at": "2026-09-29T22:57:04Z"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "adoption_recommendation": "Codex0.159.2 selection matches the newly merged upstream release observation; selected Git sourceff6aec96948b70d94983af2641a6b67c94faeff5. Retain main codex-01592-qualification-20260930 plus native lifecycle/useful calls in token-lifecycle-resolution-20260930 and token-profile-completion-20260930.",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/openai/codex",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "codex-for-claude",

@@ -1,0 +1,34 @@
+{
+  "kind": "owned-lifecycle-cleanup",
+  "source_and_evidence_retention": {
+    "serena_source_and_test_files_byte_equal_before_removal": true,
+    "serena_evidence_files": 23,
+    "serena_evidence_mismatches": [],
+    "workflow_installer_source_and_test_files_byte_equal_before_removal": true,
+    "workflow_installer_evidence_files": 3,
+    "workflow_installer_evidence_mismatches": [],
+    "builder_worktree_clean_before_removal": true
+  },
+  "native_worktree_removals": [
+    {
+      "owned_worktree": "token-builder-lifecycle-20260930",
+      "exit_code": 0,
+      "returned_output": "ok\n"
+    },
+    {
+      "owned_worktree": "token-serena-resolution-20260930",
+      "exit_code": 0,
+      "returned_output": "ok\n"
+    },
+    {
+      "owned_worktree": "token-workflow-adoption-20260930",
+      "exit_code": 0,
+      "returned_output": "ok\n"
+    }
+  ],
+  "independent_observation": {
+    "all_three_owned_worktrees_absent": true,
+    "private_native_logs_retained": true
+  },
+  "boundary": "Only this task's three owned worktrees were removed after their changes and evidence were integrated. Other existing worktrees, native accounts, indexes, custom workflows and services were retained."
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "adopted-qmd-index-refresh-observation",
+  "command": "rtk qmd --index native-agent-stack-catalog update",
+  "exit_code": 0,
+  "collections": 4,
+  "indexed_new": 0,
+  "indexed_updated": 0,
+  "indexed_unchanged": 299,
+  "indexed_removed": 0,
+  "existing_vectors": 4056,
+  "pending_embedding_hashes": 5,
+  "index_target": {
+    "same_checkout": false,
+    "new_resolution_decision_present": false
+  },
+  "embedding_performed": false,
+  "claim_boundary": "The named adopted index targets a separate existing live checkout. Its native update returned no document changes; it does not index this checkout's new decision. Do not change another owner's index route or embed its pending documents for this task. Known-source reads in the current checkout remain available; final integration can refresh the adopted index when these docs reach its owned source."
+}

@@ -1,0 +1,107 @@
+{
+  "kind": "claude-workflow-child-observation",
+  "evidence_class": "independent-native-transcript-observation",
+  "command": "rtk node examples/claude-native/workflows/child-usage.mjs <owned-run-transcript-dir> --require-effort max --rtk-check",
+  "exit_code": 0,
+  "status": "complete",
+  "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result",
+  "effort_mismatches": [],
+  "children": [
+    {
+      "label": "native-scout",
+      "agent_type": "source-scout",
+      "requested_model": "sonnet",
+      "resolved_models": [
+        "claude-sonnet-5-5"
+      ],
+      "efforts": [
+        "max"
+      ],
+      "requests": 3,
+      "usage": {
+        "input_tokens": 6,
+        "output_tokens": 89,
+        "cache_read_input_tokens": 20829,
+        "cache_creation_input_tokens": 14005
+      },
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 8834,
+      "complete": true,
+      "issues": [],
+      "lanes": {
+        "mcp_calls": {},
+        "tool_search": {
+          "calls": 0,
+          "loaded": {}
+        },
+        "rtk": {
+          "hook_rewrites": 0,
+          "model_typed": 2,
+          "decisions": null
+        },
+        "subagent_start": {
+          "types": [
+            "source-scout"
+          ],
+          "additional_context": true
+        },
+        "injected_block": {
+          "marker": "<context_window_protection>",
+          "in_first_prompt": false,
+          "in_subagent_start_context": false
+        },
+        "first_prompt_tokens": 8834
+      }
+    },
+    {
+      "label": "native-verifier",
+      "agent_type": "stack-verifier",
+      "requested_model": "opus",
+      "resolved_models": [
+        "claude-opus-5-5"
+      ],
+      "efforts": [
+        "max"
+      ],
+      "requests": 3,
+      "usage": {
+        "input_tokens": 6,
+        "output_tokens": 1773,
+        "cache_read_input_tokens": 24630,
+        "cache_creation_input_tokens": 15017
+      },
+      "first_request_cache_read": 0,
+      "first_request_prompt_tokens": 10302,
+      "complete": true,
+      "issues": [],
+      "lanes": {
+        "mcp_calls": {
+          "plugin_context-mode_context-mode": 1
+        },
+        "tool_search": {
+          "calls": 1,
+          "loaded": {
+            "plugin_context-mode_context-mode": 1
+          }
+        },
+        "rtk": {
+          "hook_rewrites": 0,
+          "model_typed": 0,
+          "decisions": null
+        },
+        "subagent_start": {
+          "types": [
+            "stack-verifier"
+          ],
+          "additional_context": true
+        },
+        "injected_block": {
+          "marker": "<context_window_protection>",
+          "in_first_prompt": false,
+          "in_subagent_start_context": false
+        },
+        "first_prompt_tokens": 10302
+      }
+    }
+  ]
+}
