@@ -121,6 +121,8 @@ jobs:
         run: python3 scripts/component_matrix.py --check
       - name: Check the new-host grand list is current
         run: python3 scripts/new_host_grand_list.py --check
+      - name: Check the final catalog matches the edition, the blind selection and its cross-family record
+        run: python3 scripts/final_catalog.py --check
       - name: Report layer-winner rows whose evidence could flip their platform_status (report-only)
         shell: bash
         run: python3 scripts/verdict_flip_candidates.py | tee -a "$GITHUB_STEP_SUMMARY"
