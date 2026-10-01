@@ -152,10 +152,12 @@ the dispute recorded at PR #358's head `b0eb7a11`.
 Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
 41 entries and 39 exits filled). The cross row for the distribution is `new_host_required`: its image, hash
 and creation path are on main since PR #569, selected by source review, and nothing has run on a host; the
-recipe's follow-up with the completeness critic's pre-checks is open, and stage 1 waits for it.
+recipe's follow-up with the completeness critic's pre-checks merged with PR #582 (`b8dd81dd`), so the page now
+starts with a rehearsal on a throwaway name and pre-checks in the workstation distribution.
 
-**Install order on the new distribution** (row `cross:wsl-distro`, each step citing the recipe of PR #569):
-stage 1 on Windows; first boot (systemd, linger, user bus, packages, subordinate ids, the login hand-off);
+**Install order on the new distribution** (row `cross:wsl-distro`, each step citing the recipe of PR #569
+and #582): the rehearsal and the pre-checks; stage 1 on Windows; first boot (systemd, linger, user bus, packages,
+subordinate ids, the login hand-off);
 a clone of origin/main and the host file on free ports; credentials before any keyed tool; stage 2 with the
 token-efficiency profile, native sign-in, the Context Mode plugin started once before the settings step
 (its start script writes the SessionStart cache-heal hook that the settings template runs), then

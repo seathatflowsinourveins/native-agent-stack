@@ -2415,8 +2415,8 @@
           "name": "Ubuntu 24.04.5 LTS WSL image (Canonical)",
           "repository": "https://releases.ubuntu.com/24.04.5/",
           "pin": "sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
-          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:99",
-          "install": {"command": "Stage 1 of the recipe on the Windows host (W1 to W5): verify the image hash against both publications, render the cloud-init user data, `wsl.exe --install --from-file` with `--no-launch`, then the first launch with standard input at end of file", "kind": "repo_recipe", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
+          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:250",
+          "install": {"command": "The recipe, rehearsal first: R1 runs the page once on a throwaway name and removes it; P1 to P3 in the workstation distribution verify the signed checksums, the user-data schema and the storage-error baseline; then stage 1 on the Windows host (W1 to W7): verify the image hash against both publications, render the cloud-init user data, `wsl.exe --install --from-file` with `--no-launch`, the first launch with standard input at end of file, one terminate and the file-ownership probe", "kind": "repo_recipe", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "acceptance": {"command": "W5 and F1 to F3 of the recipe: the first launch exits 0 as the cloud-init user, `systemctl is-system-running --wait` prints running, linger is enabled and the user bus is a socket owned by the user", "evidence_class": "none_recorded", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "upstream_currency": {"latest_release": "Ubuntu 26.04.1 LTS is the newer LTS; it is queued as a bounded comparison before any switch", "checked_at": "2026-10-01", "pin_is_latest": "no", "url": "https://releases.ubuntu.com/"}
         }
@@ -2436,7 +2436,7 @@
         {"text": "26.04.1 LTS is queued as a bounded comparison before any switch (the bootstrap under python3 3.14, uutils coreutils and sudo-rs).", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"},
         {"text": "On main, the linux-wsl2-x86_64 platform profile is accepted while second-machine acceptance is pending; the only fresh-userspace qualification ran in an Ubuntu Base 24.04.5 filesystem on the existing WSL kernel, which is not a booted new PC.", "source_path": "adoption/platforms/linux-wsl2.md"},
         {"text": "The bootstrap's release step 0 checks out tag v2026.09.26.2, which installs older pins (codex 0.155.1, claude-code 2.1.281); the full-profile run refuses any HEAD other than origin/main, so the new distribution starts from a clone of main.", "source_path": "adoption/bootstrap.md"},
-        {"text": "The decision record's completeness critic lists what the unit did not look at, and says not to run stage 1 before a follow-up adds its pre-checks (a rehearsal on a throwaway name, the cloud-init schema check, the signed checksums, and the checks for three open WSL issues); that follow-up is in progress.", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"},
+        {"text": "The decision record's completeness critic listed what the unit did not look at; its follow-up (PR #582, merged as b8dd81dd) added the pre-checks: a rehearsal on a throwaway name first, signed checksums, two cloud-init schema checks, a kernel storage-error baseline with a second reading, a file-ownership probe and an idle observation. Nothing in the recipe has run on a host, the rehearsal included.", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"},
         {"text": "The selection has a scoped convergence record at status planned with decision trial: it is not a completed adoption until a host run and the queued comparison.", "source_path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"}
       ],
       "evidence_class": "none_recorded",
@@ -2445,7 +2445,8 @@
         {"name": "Path B: `wsl --import` and a manual user", "verdict": "fallback only after the first launch shows that cloud-init did not provision", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
       ],
       "new_host_steps": [
-        "Stage 1 on Windows (W1 to W6 of the recipe): preflight with no Ubuntu Pro cloud-init files; download ubuntu-24.04.5-wsl-amd64.wsl and verify its sha256 against both publications; render %USERPROFILE%\\.cloud-init\\<Name>.user-data from adoption/templates/wsl/cloud-init.user-data.template; `wsl.exe --install --from-file <image> --name <Name> --location <dir> --no-launch`; first launch with standard input at end of file; confirm cloud-init reports disabled by its marker file.",
+        "Rehearsal and pre-checks first (R1 and P1 to P3 of the recipe): run the page once on a throwaway name through F3 and remove it; in the workstation distribution verify the signed checksums with gpgv, the rendered user-data with `cloud-init schema -c`, and record the storage-error baseline.",
+        "Stage 1 on Windows (W1 to W7 of the recipe; W7 terminates once and probes file ownership): preflight with no Ubuntu Pro cloud-init files; download ubuntu-24.04.5-wsl-amd64.wsl and verify its sha256 against both publications; render %USERPROFILE%\\.cloud-init\\<Name>.user-data from adoption/templates/wsl/cloud-init.user-data.template; `wsl.exe --install --from-file <image> --name <Name> --location <dir> --no-launch`; first launch with standard input at end of file; confirm cloud-init reports disabled by its marker file.",
         "First boot (F1 to F6): `systemctl is-system-running --wait` prints running; `sudo loginctl enable-linger \"$(id -un)\"`; the user bus is a socket owned by the user; install the bootstrap's apt list plus libatomic1 and uidmap; check subordinate ids; write the ~/.bash_profile hand-off line before anything else creates that file.",
         "F7 and F8: clone origin/main into ~/code/native-agent-stack and render adoption/hosts/<host>.json from the host template on ports outside the workstation's exclusion set (24318, 29374, 26333 and 28231, each probed with ss first).",
         "Credentials next (row cross:credential-practice): native sign-ins and the 0700 store before any keyed tool.",
@@ -2456,10 +2457,10 @@
       ],
       "gates": [
         {"text": "Stage 1 runs in the user's own PowerShell on the Windows host; WSL package updates stay the keys lane's decision.", "kind": "user_side", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
-        {"text": "The recipe, its decision record and its templates under adoption/templates/wsl/ landed with PR #569; the follow-up with the completeness critic's pre-checks is open, and stage 1 waits for it.", "kind": "lane", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"}
+        {"text": "The recipe, its decision record and its templates under adoption/templates/wsl/ landed with PR #569, and the follow-up with the completeness critic's pre-checks with PR #582; the page starts with a rehearsal on a throwaway name.", "kind": "lane", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"}
       ],
       "owner_lane": "foundation",
-      "notes": "The selection is on main since PR #569 (2026-10-01): Canonical's Ubuntu 24.04.5 image by sha256, cloud-init path A with path B as the fallback, made by source review. Nothing has run on a host; the stage-1 receipt of the first run is the next evidence, after the recipe's follow-up lands."
+      "notes": "The selection is on main since PR #569 (2026-10-01): Canonical's Ubuntu 24.04.5 image by sha256, cloud-init path A with path B as the fallback, made by source review. Nothing has run on a host; the next evidence is the rehearsal's receipt and then the stage-1 receipt of the real run (the recipe starts with the rehearsal since PR #582)."
     },
     {
       "layer_id": "cross:runtime-workers",
