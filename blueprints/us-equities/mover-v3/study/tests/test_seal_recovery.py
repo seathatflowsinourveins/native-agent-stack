@@ -4,11 +4,16 @@ round-18 pre-outcome reviews (Claude H1, M1, L1-L3; GPT G-H, G-M): both adopt a 
 only through core.store.recover_seal, against its seal record and a binding that
 names the running study tree, protocol and runtime lock. Only temporary synthetic
 snapshots are read or damaged; every transport uses FakeMarket.
+
+Second repair, after the cross-family re-check of that repair (GPT-6.1 Sol, 2026-10-01; R2-1 to R2-4): a seal record
+without a sha256 of its ledger, a snapshot path that is not a directory, a change of attempt ids alone, and, at the
+command level, a study file whose change an index flag hides from git status.
 """
 import contextlib
 import copy
 import gzip
 import json
+import os
 import re
 import shutil
 import tempfile
@@ -27,10 +32,18 @@ from tests.test_identity import fixed_clock, issuer_data, transports
 RUN = {"study_tree": "synthetic-tree", "protocol_sha256": "synthetic-protocol", "runtime_lock_sha256": "synthetic-lock"}
 FETCH_CHANGE = "blueprints/us-equities/mover-v3/study/fetch/transport.py"
 FETCH_PREFIX = "blueprints/us-equities/mover-v3/study/fetch"
+# R2-1: what a seal record can hold in place of its ledger's sha256 (64 lowercase hexadecimal characters). At 406ad3c5
+# only null was adopted (Store.read compares no digest when it is given None); the others were refused by that
+# comparison or as a missing field, none as a malformed record.
+NOT_A_SHA256 = ("null", "missing", "number", "list", "short", "trailing_newline", "uppercase", "not_hexadecimal")
+# R2-3: what can stand at a snapshot path in place of a directory
+NOT_A_DIRECTORY = ("regular_file", "dangling_link")
 
 
 def snapshot_bytes(root):
-    return {str(p.relative_to(root)): p.read_bytes() for p in Path(root).rglob("*") if p.is_file()}
+    """Every file's bytes under root, and every symbolic link's target (a dangling link is not a file)."""
+    return {str(p.relative_to(root)): os.readlink(p) if p.is_symlink() else p.read_bytes()
+            for p in Path(root).rglob("*") if p.is_symlink() or p.is_file()}
 
 
 def ledger_lines(directory) -> list:
@@ -119,6 +132,51 @@ class RecoveryChecks:
         req["params"] = {**req["params"], "feed": "altered"}
         write_ledger(directory, lines)
         reseal(directory)
+
+    def break_record_digest(self, directory, kind):
+        """R2-1: only the seal record's ledger_sha256 changes, to something that is not a sha256 (NOT_A_SHA256)."""
+        path = Path(directory) / SEAL_RECORD
+        record = json.loads(path.read_bytes())
+        sha = record.pop("ledger_sha256")
+        values = {"null": None, "number": 0, "list": [sha], "short": sha[:63], "trailing_newline": sha + "\n",
+                  "uppercase": "A" + sha[1:], "not_hexadecimal": "g" + sha[1:]}
+        if kind != "missing":
+            record["ledger_sha256"] = values[kind]
+        path.write_bytes((dumps(record) + "\n").encode("utf-8"))
+
+    def replace_with_a_non_directory(self, directory, kind):
+        """R2-3: the snapshot path itself stops being a directory (NOT_A_DIRECTORY)."""
+        shutil.rmtree(directory)
+        if kind == "regular_file":
+            directory.write_bytes(b"not a snapshot directory\n")
+        else:
+            directory.symlink_to(directory.parent / "absent-target")
+
+    def renumber_attempt(self, directory, key, old, new) -> list:
+        """R2-4: one attempt of `key` gets another id, in its page events and in its completion stamp; the seal record
+        is resealed. Returns the events changed, after checking that nothing else changed: the ledger keeps every
+        other field of every line (stamp counts, statuses, page counts, page digests), the pages keep their bytes and
+        the seal record keeps every field but ledger_sha256. So only the attempt ids the seal record holds for its
+        stamps can refuse the edit."""
+        directory = Path(directory)
+        before, record = snapshot_bytes(directory), json.loads((directory / SEAL_RECORD).read_bytes())
+        sealed, lines = ledger_lines(directory), ledger_lines(directory)
+        changed = [x for x in lines if x["event"] in ("page", "stamp_complete", "stamp_incomplete")
+                   and x["key"] == key and x["attempt"] == old]
+        for x in changed:
+            x["attempt"] = new
+        write_ledger(directory, lines)
+        reseal(directory)
+
+        def without(field, items):
+            return [{k: v for k, v in x.items() if k != field} for x in items]
+        self.assertEqual(without("attempt", ledger_lines(directory)), without("attempt", sealed))
+        self.assertNotEqual(ledger_lines(directory), sealed)
+        after = snapshot_bytes(directory)
+        self.assertEqual({k: v for k, v in after.items() if k.startswith("pages/")},
+                         {k: v for k, v in before.items() if k.startswith("pages/")})
+        self.assertEqual(without("ledger_sha256", [json.loads(after[SEAL_RECORD])]), without("ledger_sha256", [record]))
+        return changed
 
 
 class DryRunSealRecovery(RecoveryChecks, unittest.TestCase):
@@ -340,6 +398,61 @@ class DryRunSealRecovery(RecoveryChecks, unittest.TestCase):
                     reseal(directory)
                 self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp), pattern)
 
+    def test_a_seal_record_without_a_ledger_sha256_refuses(self):
+        """R2-1: recovery reads the ledger under the sha256 its seal record holds, so a record that holds none cannot
+        verify it. At 406ad3c5 a record whose ledger_sha256 was JSON null was adopted: Store.read compares no digest
+        when it is given None, and the record comparison used the same null. With the ledger's vintages and durations
+        edited as well (the F12 calibration's inputs), that seal was adopted too, without a request. Every value that
+        is not 64 lowercase hexadecimal characters is now refused as a malformed record, before the ledger is read."""
+        for ledger_edited in (False, True):
+            for kind in NOT_A_SHA256:
+                with self.subTest(kind=kind, ledger_edited=ledger_edited), tempfile.TemporaryDirectory() as tmp:
+                    self.run_dry(tmp)
+                    directory = Path(tmp) / "dry-run"
+                    if ledger_edited:
+                        self.edit_fetch_times(directory)
+                    self.break_record_digest(directory, kind)
+                    self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
+                                                  "^dry-run: the seal record holds no sha256 of its ledger")
+
+    def test_a_snapshot_path_that_is_not_a_directory_refuses_without_requests(self):
+        """R2-3: a regular file or a dangling symbolic link at the snapshot path holds no ledger, pages or seal record,
+        so at 406ad3c5 it counted as unused: the dry run fetched again (16 calls here) and Store.write then failed,
+        with NotADirectoryError for the file and with its own 'pages already exist' SealError for the link. It is a
+        used path: a SealError that names the dry run, no request, no byte change."""
+        for kind in NOT_A_DIRECTORY:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                self.run_dry(tmp)
+                self.replace_with_a_non_directory(Path(tmp) / "dry-run", kind)
+                self.assertIn("dry-run", snapshot_bytes(tmp))
+                self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
+                                              "^dry-run: the snapshot path exists and is not a directory")
+
+    def fail_the_last_requests_first_attempt(self) -> dict:
+        """The L1 test's setup: the last request in key order fails its first call and its 3 retries, so it is sealed
+        incomplete at attempt 0 and complete at attempt 1. Returns that request."""
+        last = max(CO.dry_run_requests(self.cal, self.sessions, self.symbols), key=lambda r: r["key"])
+        self.market.fail = [(lambda path, p: path == last["endpoint"] and
+                             all(p.get(k) == str(v) for k, v in last["params"].items()), "urlerror", 4)]
+        return last
+
+    def test_a_resealed_attempt_id_change_refuses(self):
+        """R2-4, mutant A (st['attempt'] replaced by 0 in core.store.seal_record_of's stamp entries): at 406ad3c5 no
+        test compared attempt ids alone, so that mutant passed all 27 recovery tests (the L1 test removes a whole
+        stamp, which also changes the stamp count). Here a re-fetched request's second attempt becomes attempt 7 in
+        its page events and its completion stamp, with every count, status, page and digest kept and the seal record's
+        ledger_sha256 resealed: only the attempt ids the seal record holds refuse it."""
+        with tempfile.TemporaryDirectory() as tmp:
+            last = self.fail_the_last_requests_first_attempt()
+            self.run_dry(tmp)
+            changed = self.renumber_attempt(Path(tmp) / "dry-run", last["key"], 1, 7)
+            self.assertEqual(sorted({x["event"] for x in changed}), ["page", "stamp_complete"])
+            self.assertEqual([(x["event"], x["attempt"]) for x in ledger_lines(Path(tmp) / "dry-run")
+                              if x.get("key") == last["key"] and x["event"].startswith("stamp")],
+                             [("stamp_incomplete", 0), ("stamp_complete", 7)])
+            self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
+                                          "^dry-run: the snapshot differs from its seal record")
+
 
 # every change that applies to the whole transport-check run rather than to one label's source
 RUN_WIDE = {"seed": {"seed": "another-seed"},
@@ -503,6 +616,47 @@ class LiveSampleSealRecovery(RecoveryChecks, unittest.TestCase):
                                           "^live sample 'stage': snapshot ledger sha256 differs from the sealed value$")
             self.assertEqual(len(market.calls), 1)
 
+    def test_a_seal_record_without_a_ledger_sha256_refuses(self):
+        """R2-1 for each label, as the dry run's: a seal record whose ledger_sha256 is null (adopted at 406ad3c5, also
+        with the ledger's vintages and durations edited) or anything else that is not a sha256."""
+        for label in self.sources:
+            for ledger_edited in (False, True):
+                for kind in NOT_A_SHA256:
+                    with self.subTest(label=label, kind=kind, ledger_edited=ledger_edited), \
+                            tempfile.TemporaryDirectory() as tmp:
+                        self.seal_samples(tmp)
+                        if ledger_edited:
+                            self.edit_fetch_times(Path(tmp) / label)
+                        self.break_record_digest(Path(tmp) / label, kind)
+                        self.assert_refuses_unchanged(
+                            tmp, self.market, lambda: self.seal_samples(tmp),
+                            f"^live sample {re.escape(repr(label))}: the seal record holds no sha256 of its ledger")
+
+    def test_a_snapshot_path_that_is_not_a_directory_refuses_without_requests(self):
+        """R2-3 for each label, as the dry run's: a regular file or a dangling symbolic link at the label's path."""
+        for label in self.sources:
+            for kind in NOT_A_DIRECTORY:
+                with self.subTest(label=label, kind=kind), tempfile.TemporaryDirectory() as tmp:
+                    self.seal_samples(tmp)
+                    self.replace_with_a_non_directory(Path(tmp) / label, kind)
+                    self.assertIn(label, snapshot_bytes(tmp))
+                    self.assert_refuses_unchanged(
+                        tmp, self.market, lambda: self.seal_samples(tmp),
+                        f"^live sample {re.escape(repr(label))}: the snapshot path exists and is not a directory")
+
+    def test_a_resealed_attempt_id_change_refuses(self):
+        """R2-4, mutant A, for each label: the sample's one attempt becomes attempt 7 in its page event and its
+        completion stamp, with everything else kept and the seal record's ledger_sha256 resealed."""
+        for label in self.sources:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as tmp:
+                self.seal_samples(tmp)
+                key = next(x["key"] for x in ledger_lines(Path(tmp) / label) if x["event"] == "request")
+                changed = self.renumber_attempt(Path(tmp) / label, key, 0, 7)
+                self.assertEqual(sorted(x["event"] for x in changed), ["page", "stamp_complete"])
+                self.assert_refuses_unchanged(
+                    tmp, self.market, lambda: self.seal_samples(tmp),
+                    f"^live sample {re.escape(repr(label))}: the snapshot differs from its seal record")
+
 
 class DryRunCommandRecovery(RecoveryChecks, unittest.TestCase):
     """Repair of the round-18 reviews (H1, M1) at the command level. A dry run whose output step fails after the seal
@@ -604,6 +758,34 @@ class DryRunCommandRecovery(RecoveryChecks, unittest.TestCase):
             line = logs.read_lines(repo / RUN_LOG)[-1]
             self.assertEqual((line["purpose"], line["status"], line["input_snapshot_sha256s"], line["utc_start"]),
                              ("dry_run", "complete", [sealed], self.DAY2))
+
+    def test_a_transport_change_hidden_by_an_index_flag_is_refused_before_the_seal_is_adopted(self):
+        """R2-2: H1 binds a seal to the tree core.guards.running_tree names, and at 406ad3c5 that was HEAD's tree
+        whenever git status reported no change. git status does not report a tracked file whose index entry is marked
+        assume-unchanged or skip-worktree (git-update-index(1)), so a transport edited under either flag ran as the
+        committed tree: the run opened a start line, and the next one adopted the seal that the failed run of the
+        committed tree left and named that tree in its output. Now the run is refused when it builds its context:
+        no start line, no request, no byte change, no output."""
+        from core import guards
+        from core.params import DRY_RUN_OUTPUT, RUN_LOG, STUDY_PATH
+        from tests import fixture_repo as FR
+        transport = f"{STUDY_PATH}/fetch/transport.py"
+        for flag in ("assume-unchanged", "skip-worktree"):
+            with self.subTest(flag=flag), self.command() as (run, repo, tmp):
+                root = tmp / "snap"
+                self.fail_after_the_seal(run, repo, root)
+                tree = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
+                FR.sh(repo, "update-index", f"--{flag}", transport)
+                FR.write(repo / transport, "HOST = 'fixture-changed'\n")    # outside the plan code, as H1's tree B
+                self.assertEqual(FR.sh(repo, "status", "--porcelain", "--untracked-files=all", "--", STUDY_PATH), "")
+                self.assertEqual(FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
+                log, before, calls = (repo / RUN_LOG).read_bytes(), snapshot_bytes(root), len(self.market.calls)
+                with self.assertRaisesRegex(guards.Refused, re.escape(f"{transport} ({flag})")):
+                    run.main(self.argv(root))
+                self.assertEqual(self.market.calls[calls:], [])
+                self.assertEqual(snapshot_bytes(root), before)
+                self.assertEqual((repo / RUN_LOG).read_bytes(), log)
+                self.assertFalse((repo / DRY_RUN_OUTPUT).exists())
 
 
 if __name__ == "__main__":

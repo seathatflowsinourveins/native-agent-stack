@@ -1,13 +1,26 @@
 """run_discipline refusals: frozen protocol and running tree (R8-4), protocol sha256 (R8-2), vintages before the
-freeze (R8-4), the committed-tree requirement and the freeze commit time."""
+freeze (R8-4), the committed-tree requirement and the freeze commit time. Review round 18, second repair (R2-2): the
+running tree is HEAD's only when no index flag hides a tracked file from git status and every tracked file's bytes are
+HEAD's blob."""
+import contextlib
 import json
+import re
+import shlex
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from core import guards
 from core.params import PROTOCOL_PATH, STUDY_PATH
+
+TRANSPORT = f"{STUDY_PATH}/fetch/transport.py"
+# git-ls-files(1) -v: the tag of an index entry marked assume-unchanged is lowercase, that of one marked skip-worktree
+# is S, and s with both; git-update-index(1) sets each flag. (flag names in the refusal, tag, update-index options)
+INDEX_FLAGS = (("assume-unchanged", "h", ("--assume-unchanged",)),
+               ("skip-worktree", "S", ("--skip-worktree",)),
+               ("assume-unchanged and skip-worktree", "s", ("--assume-unchanged", "--skip-worktree")))
 
 
 def sh(repo, *args):
@@ -15,6 +28,100 @@ def sh(repo, *args):
                                    env={"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
                                         "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid",
                                         "GIT_COMMITTER_DATE": "2026-10-02T21:30:00+00:00", "PATH": "/usr/bin:/bin"}).strip()
+
+
+def status(repo) -> str:
+    """What core.guards.running_tree asks git first: the study tree's changes, untracked files included."""
+    return sh(repo, "status", "--porcelain", "--untracked-files=all", "--", STUDY_PATH)
+
+
+class RunningTreeContent(unittest.TestCase):
+    """Review round 18, second repair (R2-2). At 406ad3c5 running_tree returned HEAD's study tree whenever git status
+    reported no change, so the tree a run named (and every seal identity bound, H1) could differ from the files that
+    ran. Each case builds a state in which git status reports nothing."""
+
+    @contextlib.contextmanager
+    def study_repo(self):
+        """A temporary repository (tests/fixture_repo.py) whose committed, clean study tree holds two files."""
+        from tests import fixture_repo as FR
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.init_repo(Path(tmp) / "repo")
+            FR.write(repo / STUDY_PATH / "core" / "a.py", "x = 1\n")
+            FR.write(repo / TRANSPORT, "HOST = 'fixture'\n")
+            FR.commit_push(repo, "2026-10-01T21:30:00+00:00", "study tree")
+            self.assertEqual(guards.running_tree(repo), sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"))
+            yield repo, Path(tmp)
+
+    def change(self, repo, tmp, how):
+        from tests import fixture_repo as FR
+        path = repo / TRANSPORT
+        if how == "changed":
+            path.write_text("HOST = 'changed'\n")
+        elif how == "deleted":
+            path.unlink()
+        elif how == "replaced_by_a_link":       # a link to a file outside the repository that holds the same bytes
+            target = FR.write(tmp / "transport-outside.py", path.read_bytes())
+            path.unlink()
+            path.symlink_to(target)
+
+    def test_running_tree_refuses_an_index_entry_marked_assume_unchanged_or_skip_worktree(self):
+        """The index-flag refusal: an entry with either flag is refused, with a message that names the file and the
+        flag, whether or not the file changed (git status reports nothing in each case, a deleted file included)."""
+        for flag, tag, options in INDEX_FLAGS:
+            for how in ("unchanged", "changed", "deleted"):
+                with self.subTest(flag=flag, file=how), self.study_repo() as (repo, tmp):
+                    for option in options:
+                        sh(repo, "update-index", option, TRANSPORT)
+                    self.change(repo, tmp, how)
+                    self.assertEqual(status(repo), "")
+                    self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"{tag} {TRANSPORT}")
+                    with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} ({flag})")):
+                        guards.running_tree(repo)
+
+    def test_running_tree_compares_every_tracked_file_with_its_blob_when_the_flag_refusal_is_bypassed(self):
+        """The content check alone: with the index-flag refusal bypassed, a flagged file that changed, was deleted or
+        was replaced by a link to the same bytes is still refused, because the working file's own bytes are hashed."""
+        cases = {"changed": "differs from HEAD's blob", "deleted": "is missing",
+                 "replaced_by_a_link": "is not a regular file"}
+        for flag, _, options in INDEX_FLAGS[:2]:
+            for how, problem in cases.items():
+                with self.subTest(flag=flag, file=how), self.study_repo() as (repo, tmp):
+                    for option in options:
+                        sh(repo, "update-index", option, TRANSPORT)
+                    self.change(repo, tmp, how)
+                    self.assertEqual(status(repo), "")
+                    with mock.patch.object(guards, "_masked_index_entries", lambda *args: []), \
+                            self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} {problem}")):
+                        guards.running_tree(repo)
+
+    def test_running_tree_refuses_a_change_that_a_clean_filter_hides(self):
+        """Only the content check can refuse this one: no index flag is set, and git status reports nothing because a
+        clean filter (set in the repository's own configuration and .git/info/attributes, neither of them tracked)
+        gives the committed bytes back for the edited file. git hash-object --no-filters hashes the file itself."""
+        from tests import fixture_repo as FR
+        with self.study_repo() as (repo, tmp):
+            committed = FR.write(tmp / "transport-committed.py", (repo / TRANSPORT).read_bytes())
+            sh(repo, "config", "filter.committed.clean", f"cat {shlex.quote(str(committed))}")
+            FR.write(repo / ".git" / "info" / "attributes", f"{TRANSPORT} filter=committed\n")
+            (repo / TRANSPORT).write_text("HOST = 'changed'\n")      # the committed length: git compares content
+            self.assertEqual(len("HOST = 'changed'\n"), len(committed.read_bytes()))
+            self.assertEqual(status(repo), "")
+            self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"H {TRANSPORT}")
+            self.assertEqual(sh(repo, "hash-object", TRANSPORT), sh(repo, "rev-parse", f"HEAD:{TRANSPORT}"))
+            with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} differs from HEAD's blob")):
+                guards.running_tree(repo)
+
+    def test_running_tree_refuses_a_committed_symbolic_link(self):
+        """A symbolic-link entry is refused: the tree hash covers the link's text, not the file it names."""
+        from tests import fixture_repo as FR
+        with self.study_repo() as (repo, tmp):
+            link = f"{STUDY_PATH}/core/b.py"
+            (repo / link).symlink_to("a.py")
+            FR.commit_push(repo, "2026-10-01T22:00:00+00:00", "a symbolic link")
+            self.assertEqual(status(repo), "")
+            self.assertEqual(sh(repo, "ls-tree", "HEAD", "--", link).split()[0], "120000")
+            with self.assertRaisesRegex(guards.Refused, re.escape(f"{link} is a symbolic link or submodule entry")):
+                guards.running_tree(repo)
 
 
 class Guards(unittest.TestCase):
