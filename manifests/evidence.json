@@ -14996,8 +14996,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "6fda734fa9b42d93047a948a12c59762c0a6183dee4ade3fd37fd5495cca0582",
-      "bytes": 287293
+      "sha256": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+      "bytes": 287704
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -15966,8 +15966,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "861333f50f390b0c4664e195cb83e43a5c0b60297e4a4b2f846d5b18e5482d3c",
-      "bytes": 18233
+      "sha256": "245c7942ca34c078ddb8adc0d8a845efee8f42ea35e0fc4709175a14a9d79abb",
+      "bytes": 18483
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -35636,8 +35636,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "f17c8aa64ae312720551a84b3ca4912cf2cc24cf9d86f867f18f3791150ddf77",
-      "bytes": 3315
+      "sha256": "a69eacab74ce5c0bcc8abe6ecc35a2e4424b32ecd3f18737553e02680497f8fc",
+      "bytes": 4174
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",

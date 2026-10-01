@@ -18,6 +18,15 @@
   "setup_order": [
     {
       "order": 1,
+      "profile": "new-wsl-clean-foundation",
+      "label": "Clean replacement WSL: minimal native foundation; source-review recommendations only",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ]
+    },
+    {
+      "order": 2,
       "profile": "foundation-cpu",
       "label": "Native clients, context and lexical memory foundation",
       "component_ids": [
@@ -31,7 +40,7 @@
       ]
     },
     {
-      "order": 2,
+      "order": 3,
       "profile": "research-runtime",
       "label": "Historical LEAN/SDK research comparison and native workers",
       "component_ids": [
@@ -49,7 +58,7 @@
       ]
     },
     {
-      "order": 3,
+      "order": 4,
       "profile": "observability",
       "label": "Local native telemetry backends",
       "component_ids": [
@@ -62,7 +71,7 @@
       ]
     },
     {
-      "order": 4,
+      "order": 5,
       "profile": "semantic-rag",
       "label": "Optional explicit project semantic RAG",
       "component_ids": [
@@ -73,7 +82,7 @@
       ]
     },
     {
-      "order": 5,
+      "order": 6,
       "profile": "recovery",
       "label": "Selected application-state recovery",
       "component_ids": [
@@ -83,7 +92,7 @@
       ]
     },
     {
-      "order": 6,
+      "order": 7,
       "profile": "macos-arm64-foundation",
       "label": "Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon",
       "component_ids": [
@@ -98,7 +107,7 @@
       ]
     },
     {
-      "order": 7,
+      "order": 8,
       "profile": "trading-nautilus",
       "label": "Selected north-star Nautilus engine with separate broker boundaries",
       "component_ids": [
@@ -107,7 +116,7 @@
       ]
     },
     {
-      "order": 8,
+      "order": 9,
       "profile": "token-efficiency",
       "label": "Accepted 2026-09-30 as the selection, per docs/decisions/2026-09-30-task-model-routing.md: the token-efficiency practice and its Claude Code and Codex wiring",
       "component_ids": [
@@ -395,6 +404,7 @@
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
+            "new-wsl-clean-foundation",
             "foundation-cpu",
             "research-runtime",
             "macos-arm64-foundation",
@@ -1243,6 +1253,7 @@
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
+            "new-wsl-clean-foundation",
             "foundation-cpu",
             "research-runtime",
             "macos-arm64-foundation",
@@ -1282,6 +1293,7 @@
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
+            "new-wsl-clean-foundation",
             "foundation-cpu",
             "research-runtime",
             "macos-arm64-foundation",
@@ -2085,6 +2097,7 @@
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
+            "new-wsl-clean-foundation",
             "foundation-cpu",
             "research-runtime",
             "macos-arm64-foundation",

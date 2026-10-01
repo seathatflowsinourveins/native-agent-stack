@@ -22,6 +22,13 @@
     {"condition": "repository-only identity merged distinct Python and TypeScript Codex checksums", "native_exit_code": 1, "correction": "derive separate canonical package identities from supported metadata URLs"},
     {"condition": "explicit unsupported metadata URL coalesced with the sole canonical sibling", "native_exit_code": 1, "correction": "only a selection alias without its own profile entry may inherit a sole canonical package"}
   ],
+  "derived_catalog_correction": {
+    "failed_ci_checks": [{"platform": "linux", "run_id": 36940301620, "native_check_exit_code": 1}, {"platform": "macos", "run_id": 36940301756, "native_check_exit_code": 1}],
+    "cause": "The new adoption profile changed the new-host grand-list source projection; its generated files were stale.",
+    "supported_generator_commands": [{"command": "python3 scripts/component_matrix.py --write", "native_exit_code": 0}, {"command": "python3 scripts/new_host_grand_list.py --write", "native_exit_code": 0}, {"command": "python3 scripts/new_host_grand_list.py --check", "native_exit_code": 0}],
+    "returned_check": {"status": "passed", "layers": 32, "winners": 66},
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/85543efe5abcddb7b7cddb14e8774e83b6758616/scripts/new_host_grand_list.py"
+  },
   "independent_source_observation": {
     "privacy_guards_unchanged": true,
     "verdict_binding_unchanged": true,
