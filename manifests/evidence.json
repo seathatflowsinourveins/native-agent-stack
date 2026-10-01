@@ -11155,8 +11155,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
-      "sha256": "839b1e1dcbd739851258228210000ab31d30cd7ab70c2c27187b437d85a72e15",
-      "bytes": 51739
+      "sha256": "a56eb3516a8c5a3c4279c9d6c3c65141933e6252742a3768feffa4d628206753",
+      "bytes": 52906
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/chrony-20260925t182439z-before-run.txt",
@@ -11210,8 +11210,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/independent-observation-20261001t143832.json",
-      "sha256": "e671ec757cbf93968d897523212538579cd73ab93e06d804297064b075d7e9f3",
-      "bytes": 5922
+      "sha256": "a575d5209b3e465e32cac0f51c5cbf7c6f717abd52cc1169da045367b537861b",
+      "bytes": 6121
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-fault-20260925t184220z.py",
@@ -11244,6 +11244,11 @@
       "bytes": 735
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20261001.py",
+      "sha256": "f118798f779c3dd322e6ee0d637ce23c034d66cb30a48846cc6d7297230da118",
+      "bytes": 3273
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20261001t143832.stdout.json",
       "sha256": "c91b6b0012229d5f5868f42de1b0629dc59dd93061511417aca50b083edc9235",
       "bytes": 582
@@ -11255,8 +11260,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/run-20261001t143832.json",
-      "sha256": "fb6836b7d5cc8d209c8139e8b1fb7f23b8f7fd2fc77fe6264702e7f9dd8f0ba7",
-      "bytes": 14454
+      "sha256": "53e32ff08141f607a79e52f716c637fbe0b5c19cb8c28e34772889e2514db149",
+      "bytes": 14589
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native-faults/harness.py",
@@ -15260,8 +15265,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "95a066e28fe63b8f143aa02d6411e9908eb127d09ebafb92c33084adf3c6ee92",
-      "bytes": 22245
+      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
+      "bytes": 22531
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -46450,8 +46455,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "3031d75217d8d309f7d45d8bb3e45573dba034c9c56024a1a58d61cfe843880a",
-      "bytes": 18251
+      "sha256": "a4d1679756a39715056869d20958d1ada1bee8858589dd06fb28a4bdcf5ec286",
+      "bytes": 18246
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
