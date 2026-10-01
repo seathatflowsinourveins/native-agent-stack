@@ -100,8 +100,12 @@ the clean install. Where a comparison is required the merit winner is undetermin
 arms, and the comparison's result selects. No incumbent is swapped for a challenger without that comparison, which
 would be the same bias in the other direction. What changed with this rule: the durable-memory row names
 ai-memory as the reference arm, not a default, adds agentmemory with the one matched harness result on record
-(recall_all@5 0.821 against 0.570 on LongMemEval-S, Mac, descriptive) and MemPalace as arms, and no longer frames
-Hindsight by this host's integration holds; the verdict winners that had been listed as alternatives for lacking a
+and MemPalace as arms, and no longer frames Hindsight by this host's integration holds. That result is
+configuration-level evidence, not a production head-to-head: on LongMemEval-S (Mac, 470 questions, descriptive)
+agentmemory's arm D2 scored recall_all@5 0.821 against 0.570 for ai-memory with its production embedder and the
+reranker off (arm C3); ai-memory's production arm with the LLM reranker (C4) and agentmemory's shipped-hook arm
+(D2h) have not run, the arms' captures and embedders differ, and the ai-memory build was a 2.5 pre-release.
+Also: the verdict winners that had been listed as alternatives for lacking a
 stack pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow) are winners of their layers, in the trading
 lane owner's words; token efficiency reads `comparison_required` with the lean base as an arm of equal standing,
 in the Gate A owner's words; and the runtime-worker candidates without a repository pin are candidates, not
