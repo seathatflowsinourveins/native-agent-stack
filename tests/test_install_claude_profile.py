@@ -16,6 +16,7 @@ import string
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -24,6 +25,112 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
+
+# The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
+# repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
+CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
+# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
+                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
+CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
+HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
+# A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
+# it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
+# its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
+# accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
+# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph). The first phrase is Claude
+# Code's per-project registration command, so the exception holds only while a project can still register the server
+# the carrier names; the second is the Codex user template's statement of the same scope.
+CARRIER_EXCEPTIONS = {
+    "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
+                   ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
+}
+# Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
+# entry has carried neither since 2026-09-23.
+CODEX_ONLY_ENV = {"PATH", "RTK_TELEMETRY_DISABLED"}
+TOOL_ID = re.compile(r"(?<![A-Za-z0-9_])mcp__([A-Za-z0-9_-]+?)__[A-Za-z0-9_]+")
+
+
+def carrier_servers(text: str) -> set[str]:
+    """Server names of the mcp__<server>__<tool> ids a text names. A plugin's server (mcp__plugin_<plugin>_<server>__)
+    comes with its plugin, not from a user-scope registration, so it is left out."""
+    return {name for name in TOOL_ID.findall(text) if not name.startswith("plugin_")}
+
+
+def carrier_blocks_text(directory: Path) -> str:
+    """The text of every token-lanes-block*.md carrier block in `directory`, in name order: the union is what the
+    SubagentStart hook can hand a subagent, whichever role block it picks."""
+    return "\n".join(path.read_text(encoding="utf-8") for path in sorted(directory.glob("token-lanes-block*.md")))
+
+
+def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions: dict, read) -> list[str]:
+    """One error per server the carrier names that the template neither registers nor excepts, per exception phrase
+    missing from its named file (read(path) -> text or None), and per exception for a server the template registers
+    anyway."""
+    errors = []
+    for name in sorted(carrier_servers(carrier_text)):
+        if name in registered:
+            if name in exceptions:
+                errors.append(f"{name}: registered and also listed as an exception")
+            continue
+        if name not in exceptions:
+            errors.append(f"{name}: named by the carrier, not registered at user scope and not an exception")
+            continue
+        for path, phrase in exceptions[name]:
+            if phrase not in (read(path) or ""):
+                errors.append(f"{name}: the exception's phrase is not in {path}")
+    return errors
+
+
+# Arguments that differ by client on purpose, Codex value -> Claude value. serena runs its `claude-code` context under
+# Claude and `codex` under Codex (oraios/serena c6fbd1c src/serena/resources/config/contexts/). SocratiCode's script
+# is the npm bin link both bootstraps' install_npm create (adoption/bootstrap-linux.sh install_npm,
+# adoption/bootstrap-macos.sh install_npm), because the Claude installer renders only ${HOME} and ${ECO_ROOT}, never
+# the Codex template's per-platform ${SOCRATICODE_VERSION}; node runs the link's target (--preserve-symlinks-main is off
+# by default).
+CLIENT_ARGS = {
+    "serena": {"codex": "claude-code"},
+    "socraticode": {"${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js":
+                    "${ECO_ROOT}/bin/socraticode"},
+}
+
+
+def codex_host_values() -> dict:
+    """adoption/hosts/example.json without HOME and ECO_ROOT, which both templates keep as placeholders."""
+    values = json.loads(HOST_EXAMPLE.read_text(encoding="utf-8"))
+    return {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
+
+
+def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
+    """One error per difference between a Claude user-scope entry and the Codex user template's entry of each server
+    the Claude template names: transport, URL or command, arguments (after CLIENT_ARGS), and env names and values
+    (Codex's rendered with `values`, less CODEX_ONLY_ENV)."""
+    def render(value):
+        return string.Template(value).safe_substitute(values)
+
+    errors = []
+    for name, entry in sorted(claude.items()):
+        other = codex.get(name)
+        if other is None:
+            errors.append(f"{name}: not in the Codex user template")
+            continue
+        if "url" in other:
+            if (entry.get("type"), entry.get("url")) != ("http", render(other["url"])):
+                errors.append(f"{name}: transport or URL differs")
+            continue
+        if entry.get("type") != "stdio" or entry.get("command") != other.get("command"):
+            errors.append(f"{name}: transport or command differs")
+        mapped = [CLIENT_ARGS.get(name, {}).get(arg, arg) for arg in other.get("args", [])]
+        if entry.get("args", []) != mapped:
+            errors.append(f"{name}: arguments differ")
+        expected_env = {key: render(value) for key, value in other.get("env", {}).items() if key not in CODEX_ONLY_ENV}
+        if set(entry.get("env", {})) != set(expected_env):
+            errors.append(f"{name}: env names differ")
+        elif entry.get("env", {}) != expected_env:
+            errors.append(f"{name}: env values differ")
+    return errors
 
 # The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
 # to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
@@ -968,12 +1075,14 @@ class McpMatchTests(unittest.TestCase):
 
 
 class McpTemplateShapeTests(unittest.TestCase):
-    def test_template_names_the_two_expected_servers(self):
-        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in.
+    def test_template_names_the_expected_servers(self):
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in; socraticode, headroom,
+        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
-        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "serena"})
+        self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        self.assertEqual(data["mcpServers"]["serena"]["type"], "stdio")
+        for name in USER_SCOPE_SERVERS - {"ai-memory"}:
+            self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
     def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
@@ -986,6 +1095,123 @@ class McpTemplateShapeTests(unittest.TestCase):
         self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
         self.assertIn('"JCODEMUNCH_SHARE_SAVINGS": "0"', paragraph)
         self.assertEqual(paragraph.count("JCODEMUNCH_SHARE_SAVINGS"), 2)
+
+
+class McpCarrierCoverageTests(unittest.TestCase):
+    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
+    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    written in the file each cites. Structural validation of repository files; no client runs."""
+
+    BLOCKS = ROOT / "adoption" / "hooks" / "claude"
+
+    @staticmethod
+    def read(path: str) -> str | None:
+        target = ROOT / path
+        return target.read_text(encoding="utf-8") if target.is_file() else None
+
+    def test_the_carrier_names_the_lane_servers(self):
+        # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
+        # name a subset of the general block's servers today, so the union is the general block's set.
+        self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
+                         sorted(CARRIER_BLOCK_NAMES))
+        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
+        self.assertEqual(carrier_servers(carrier_blocks_text(self.BLOCKS)), lanes)
+        self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")), lanes)
+        self.assertEqual(carrier_servers("mcp__plugin_context-mode_context-mode__ctx_execute, mcp__qmd__get"), {"qmd"})
+
+    def test_every_carrier_server_is_registered_or_a_sourced_exception(self):
+        registered = set(template_server_names())
+        carrier = carrier_blocks_text(self.BLOCKS)
+        self.assertEqual(carrier_coverage_errors(carrier, registered, CARRIER_EXCEPTIONS, self.read), [])
+        # Exactly: no server the carrier blocks do not name.
+        self.assertEqual(registered, carrier_servers(carrier) - set(CARRIER_EXCEPTIONS))
+
+    def test_a_server_named_only_by_a_role_block_is_caught(self):
+        # Control for reading every block: a server that only a role block names is invisible to the general block
+        # alone and is reported from the union.
+        with tempfile.TemporaryDirectory() as tmp:
+            blocks = Path(tmp)
+            for name in CARRIER_BLOCK_NAMES:
+                shutil.copyfile(self.BLOCKS / name, blocks / name)
+            reviewer = blocks / "token-lanes-block.reviewer.md"
+            reviewer.write_text(reviewer.read_text(encoding="utf-8") + "\nmcp__newserver__tool\n", encoding="utf-8")
+            registered = set(template_server_names())
+            self.assertEqual(carrier_coverage_errors((blocks / "token-lanes-block.md").read_text(encoding="utf-8"),
+                                                     registered, CARRIER_EXCEPTIONS, self.read), [])
+            self.assertEqual(carrier_coverage_errors(carrier_blocks_text(blocks), registered, CARRIER_EXCEPTIONS,
+                                                     self.read),
+                             ["newserver: named by the carrier, not registered at user scope and not an exception"])
+
+    def test_the_check_rejects_a_gap_a_stale_exception_and_a_redundant_one(self):
+        carrier = carrier_blocks_text(self.BLOCKS)
+        registered = set(template_server_names())
+        cases = {
+            "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),
+            "a new lane server": (carrier + "\nmcp__newserver__tool", registered, CARRIER_EXCEPTIONS, self.read),
+            "the exception's reason removed": (carrier, registered, CARRIER_EXCEPTIONS,
+                                               lambda path: (self.read(path) or "").replace(
+                                                   "jcodemunch stays project-scoped (#240)", "")),
+            "the per-project registration removed": (carrier, registered, CARRIER_EXCEPTIONS,
+                                                     lambda path: (self.read(path) or "").replace(
+                                                         "claude mcp add --scope local jcodemunch", "")),
+            "an exception for a registered server": (carrier, registered | {"jcodemunch"}, CARRIER_EXCEPTIONS,
+                                                     self.read),
+        }
+        for label, args in cases.items():
+            with self.subTest(mutant=label):
+                self.assertEqual(len(carrier_coverage_errors(*args)), 1)
+
+
+class McpCodexParityTests(unittest.TestCase):
+    """Each user-scope server runs the command, arguments and environment the Codex user template gives it
+    (adoption/templates/codex.config.template.toml), rendered with this repository's default host values
+    (adoption/hosts/example.json), except the documented per-client arguments and the Codex-only PATH and
+    RTK_TELEMETRY_DISABLED. Claude Code has no per-server start-up timeout (MCP_TIMEOUT is global), so the Codex
+    template's startup_timeout_sec has no counterpart here."""
+
+    @staticmethod
+    def claude() -> dict:
+        return json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+
+    @staticmethod
+    def codex() -> dict:
+        return tomllib.loads(CODEX_TEMPLATE.read_text(encoding="utf-8"))["mcp_servers"]
+
+    def test_each_entry_matches_the_codex_user_template(self):
+        self.assertEqual(codex_parity_errors(self.claude(), self.codex(), codex_host_values()), [])
+
+    def test_the_codex_user_template_has_no_other_server_but_the_plugin_one(self):
+        # context-mode is bound per session on Codex and comes with its plugin on Claude.
+        self.assertEqual(set(self.codex()) - set(self.claude()), {"context-mode"})
+
+    def test_the_parity_check_rejects_each_kind_of_drift(self):
+        values = codex_host_values()
+        base = self.claude()
+        mutants = {
+            "command": ("headroom", lambda entry: entry.update(command="${ECO_ROOT}/bin/headroom-x")),
+            "argument": ("qmd", lambda entry: entry.update(args=["--index", "other", "mcp"])),
+            "env name missing": ("headroom", lambda entry: entry["env"].pop("DO_NOT_TRACK")),
+            "env name added": ("codebase-memory", lambda entry: entry.setdefault("env", {}).update(X="1")),
+            "env value": ("socraticode", lambda entry: entry["env"].update(QDRANT_URL="http://127.0.0.1:1")),
+            "url": ("ai-memory", lambda entry: entry.update(url="http://127.0.0.1:1/mcp")),
+        }
+        for label, (name, change) in mutants.items():
+            with self.subTest(mutant=label):
+                servers = json.loads(json.dumps(base))
+                change(servers[name])
+                self.assertEqual(len(codex_parity_errors(servers, self.codex(), values)), 1)
+
+    def test_codebase_memory_is_the_bare_frontend_of_the_shared_daemon(self):
+        # Each session's codebase-memory-mcp is a frontend of one shared daemon, so the entry is the binary itself:
+        # no wrapper (a bounded runner that stops its scope would take a daemon it started down with it), no args.
+        entry = self.claude()["codebase-memory"]
+        self.assertEqual(entry["command"], "${ECO_ROOT}/bin/codebase-memory-mcp")
+        self.assertEqual(entry.get("args", []), [])
+        self.assertEqual(entry.get("env", {}), {})
+
+    def test_qmd_serves_the_named_catalog_index(self):
+        self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
+        self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
 
 
 class McpRenderAndCommandTests(unittest.TestCase):
