@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Insert or replace one marker-delimited managed block in a user text file, idempotently. Stdlib only.
 
-adoption/bootstrap-linux.sh --configure-full-profile writes two such blocks:
+Supported blocks (the Linux full-profile flow uses claude-md and profile-path):
 
   claude-md     ~/.claude/CLAUDE.md, the user memory file Claude Code loads in every project
                 (code.claude.com/docs/en/memory, "Choose where to put CLAUDE.md files"): the text of
@@ -10,6 +10,9 @@ adoption/bootstrap-linux.sh --configure-full-profile writes two such blocks:
                   <!-- native-agent-stack:claude-user-instructions:end -->
                 Claude Code strips block-level HTML comments before the text reaches the context (same page), so the
                 markers cost nothing.
+  codex-md      $CODEX_HOME/AGENTS.md (else ~/.codex/AGENTS.md), replacing only the canonical Codex
+                user-instructions block. Does not run Codex, inspect configuration/authentication, or change
+                profiles/roles. A nonblank AGENTS.override.md shadows this file and is refused.
   profile-path  ~/.profile, which a Bash login shell reads when no ~/.bash_profile or ~/.bash_login exists (GNU bash
                 manual, "Bash Startup Files"): a POSIX sh block putting the ecosystem's bin directory first on PATH,
                 so `claude` in a login shell is the ecosystem launcher (adoption/bootstrap.md, step 2), between
@@ -47,8 +50,15 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_claude_settings as file_io  # noqa: E402  (reused: refuse_symlink, write_backup, atomic_write)
+sys.path.insert(0, str(ROOT / "scripts"))
+import adoption_status  # noqa: E402  (native Rust whitespace for the override guard)
 
 CLAUDE_EXAMPLE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
+CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
+CODEX_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
+CODEX_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
+CODEX_COPY_MARKERS = ("<!-- native-agent-stack:top-rule", "<!-- native-agent-stack:rtk-upstream",
+                      "<!-- native-agent-stack:rtk-exceptions")
 CLAUDE_BEGIN = "<!-- native-agent-stack:claude-user-instructions:begin"
 CLAUDE_END = "<!-- native-agent-stack:claude-user-instructions:end -->"
 CLAUDE_BEGIN_LINE = (f"{CLAUDE_BEGIN} (examples/claude-native/CLAUDE.md of native-agent-stack, written by "
@@ -67,7 +77,7 @@ class Refused(ValueError):
 def block_span(text: str, begin: str, end: str) -> tuple[int, int] | None:
     """(start, end) of the block's lines, end after the end marker's newline; None when there is no block."""
     begins = [match.start() for match in re.finditer(r"(?m)^" + re.escape(begin), text)]
-    ends = [match.span() for match in re.finditer(r"(?m)^" + re.escape(end) + r"[ \t]*(?:\n|\Z)", text)]
+    ends = [match.span() for match in re.finditer(r"(?m)^" + re.escape(end) + r"[ \t]*(?:\r?\n|\Z)", text)]
     if not begins and not ends:
         return None
     # The end marker must start after the begin marker starts: comparing its end instead would take an end line
@@ -118,6 +128,19 @@ def merged_claude_md(current: str, example: str) -> str:
     return with_block(current, block, CLAUDE_BEGIN, CLAUDE_END)
 
 
+def merged_codex_md(current: str, template: str) -> str:
+    if block_span(template, CODEX_BEGIN, CODEX_END) != (0, len(template)):
+        raise Refused("the Codex template must be exactly one complete managed block")
+    span = block_span(current, CODEX_BEGIN, CODEX_END)
+    outside = current if span is None else current[:span[0]] + current[span[1]:]
+    if any(marker in outside for marker in CODEX_COPY_MARKERS):
+        raise Refused("an unmanaged Codex template copy exists outside the block; review its migration first")
+    if span is None and current.strip():
+        # Keep operator bytes, including trailing blank lines, when appending a first block.
+        return current + ("\n" if current.endswith("\n") else "\n\n") + template
+    return with_block(current, template, CODEX_BEGIN, CODEX_END)
+
+
 def sh_double_quoted(text: str) -> str:
     """text for the inside of a POSIX sh double-quoted string."""
     return re.sub(r'([\\"$`])', r"\\\1", text)
@@ -160,7 +183,7 @@ def read_target(path: Path) -> tuple[str, int | None]:
     if not path.is_file():
         raise Refused(f"{path} is not a regular file")
     try:
-        return path.read_text(encoding="utf-8"), stat.S_IMODE(path.stat().st_mode)
+        return path.read_bytes().decode("utf-8"), stat.S_IMODE(path.stat().st_mode)
     except UnicodeDecodeError:
         raise Refused(f"{path} is not UTF-8 text") from None
 
@@ -194,6 +217,8 @@ def build_parser() -> argparse.ArgumentParser:
     claude = blocks.add_parser("claude-md", help="the Claude Code user instructions block in ~/.claude/CLAUDE.md")
     claude.add_argument("--target", type=Path, help="default: <home>/.claude/CLAUDE.md")
     claude.add_argument("--example", type=Path, default=CLAUDE_EXAMPLE, help="default: examples/claude-native/CLAUDE.md")
+    codex = blocks.add_parser("codex-md", help="only the Codex user instructions block; no config/profile/role changes")
+    codex.add_argument("--codex-home", type=Path, help="default: $CODEX_HOME, else <home>/.codex")
     profile = blocks.add_parser("profile-path", help="the PATH block in ~/.profile")
     profile.add_argument("--target", type=Path, help="default: <home>/.profile")
     profile.add_argument("--eco-root", required=True, help="the ecosystem root whose bin directory goes first")
@@ -208,6 +233,13 @@ def main(argv: list[str] | None = None) -> int:
             example = args.example.read_text(encoding="utf-8")
             target = args.target or Path(home) / ".claude" / "CLAUDE.md"
             return apply(target, lambda text: merged_claude_md(text, example), dry_run=args.dry_run)
+        if args.block == "codex-md":
+            codex_home = (args.codex_home or Path(os.environ.get("CODEX_HOME") or Path(home) / ".codex")).expanduser()
+            override, _ = read_target(codex_home / "AGENTS.override.md")
+            if override.strip(adoption_status.RUST_WHITESPACE):
+                raise Refused("AGENTS.override.md has text and would shadow AGENTS.md; nothing written")
+            template = CODEX_TEMPLATE.read_text(encoding="utf-8")
+            return apply(codex_home / "AGENTS.md", lambda text: merged_codex_md(text, template), dry_run=args.dry_run)
         target = args.target or Path(home) / ".profile"
         return apply(target, lambda text: merged_profile(text, args.eco_root, home), dry_run=args.dry_run)
     except (Refused, file_io.ApplyError) as error:

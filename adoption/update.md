@@ -269,6 +269,66 @@ the ecosystem launcher. A failed step exits 6
 after the others have run. A host installed from a release tag keeps the per-step commands until
 that release carries the flag.
 
+## Refresh only native instruction blocks
+
+Added after `v2026.09.26.2`. Use an exact reviewed source commit in a separate
+source clone, as [bootstrap's newer-step rule](bootstrap.md) permits. Keep the
+runtime installation checkout at its release pin. For example, with `NAS_SOURCE`
+pointing to that source clone and `NAS_SOURCE_SHA` set to the accepted full SHA:
+
+```sh
+(
+  set -eu
+  test -n "$NAS_SOURCE_SHA"
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  git -C "$NAS_SOURCE" fetch origin main
+  git -C "$NAS_SOURCE" checkout --detach "$NAS_SOURCE_SHA"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+Review the printed diffs, then recheck the exact clean source before writing:
+
+```sh
+(
+  set -eu
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+These file-only operations
+preserve text outside their owned markers, file modes and backups. Damaged
+markers, detectable unmanaged copies and a nonblank Codex `AGENTS.override.md`
+refuse rather than duplicate or shadow the rules. Select the intended Codex home
+explicitly when this host has multiple clients. No client executable/version,
+configuration, profile, role, authentication or service is changed by this helper.
+The command establishes synchronized files; native client consumption remains
+the host owner's separate readback/acceptance step.
+
+For an adopted catalog QMD index, verify its selected collection roots point to
+this source revision first. Follow [catalog retrieval](../docs/catalog-retrieval.md)
+for a path-only relocation that preserves masks, contexts, models and unrelated
+collections; `update` alone does not move an old root. Then:
+
+```sh
+qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status
+qmd --index native-agent-stack-catalog embed   # only if this adopted index already carries vectors
+```
+
+A source/text/index refresh is not a runtime re-pin or promotion. Retain reported
+host deployment facts separately from installer pins, historical experiments and
+open measured/blind convergence gates. Do not run a broad bootstrap solely to
+refresh instructions on a host whose verified production versions differ from
+its older installation pins.
+
 ## Start a new repository
 
 Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the
