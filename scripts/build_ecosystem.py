@@ -511,8 +511,9 @@ ARCHITECTURE_EDITION_FIELDS = {"date_utc", "base_commit", "close_only_when_sha25
                                "verdict_values", "evidence_classes", "sources"}
 ARCHITECTURE_ROW_FIELDS = {"layer_id", "catalog", "title", "winners", "verdict", "closure", "reasons",
                            "evidence_class", "alternatives", "new_host_steps", "gates", "owner_lane", "notes"}
-ARCHITECTURE_WINNER_FIELDS = {"component_id", "name", "repository", "pin", "pin_source", "install", "acceptance",
-                              "upstream_currency"}
+ARCHITECTURE_WINNER_FIELDS = {"component_id", "name", "role", "repository", "pin", "pin_source", "install",
+                              "acceptance", "upstream_currency"}
+ARCHITECTURE_ROLE_LIMIT = 120
 
 
 def architecture_citation(value, label, root, repository_url, cite_file):
@@ -532,9 +533,13 @@ def architecture_citation(value, label, root, repository_url, cite_file):
                 and pending["pull_request"] > 0
                 and (commit is None or (isinstance(commit, str) and bool(re.fullmatch(r"[0-9a-f]{7,40}", commit)))),
                 f"architecture {label} pending_source needs a path, a pull request number and an optional commit")
-        # Canonical and confined like every source path. The file lands with its pull request, so the page
-        # links the pull request and hashes nothing; a later edition moves the citation to source_path.
-        safe_file(root, pending["path"])
+        # Canonical and confined like every source path. The file lands with its pull request: until then the page
+        # links the pull request and hashes nothing. Once the file exists it has landed after this edition's base,
+        # so it is hashed and linked like a source_path; a later merge of that pull request never fails the build,
+        # and a later edition moves the citation to source_path.
+        if safe_file(root, pending["path"]).is_file():
+            return {**cite_file(pending["path"]), "kind": "landed", "pull_request": pending["pull_request"],
+                    "commit": commit}
         return {"kind": "pending", "path": pending["path"], "pull_request": pending["pull_request"],
                 "commit": commit, "url": f'{repository_url}/pull/{pending["pull_request"]}'}
     require(bool(public_url(value["url"])), f"architecture {label} url must be a public HTTPS URL")
@@ -557,14 +562,16 @@ def architecture_pin_source(value, root, cite_file):
 
 
 def architecture_row(row, known_layers, stack_versions, cite, pin_source):
-    """Validate one edition row. `known_layers` maps each catalog layer id to its catalog; `cite` resolves one
-    citation and `pin_source` one pin locator. Returns the page row with resolved links."""
+    """Validate one edition row. `known_layers` is the set of (catalog, layer id) pairs of both catalogs; `cite`
+    resolves one citation and `pin_source` one pin locator. Returns the page row with resolved links."""
     require(isinstance(row, dict) and set(row) <= ARCHITECTURE_ROW_FIELDS, "architecture row has an unknown field")
     layer_id, catalog = row.get("layer_id"), row.get("catalog")
     cross = isinstance(layer_id, str) and bool(re.fullmatch(r"cross:[a-z][a-z0-9-]*", layer_id))
-    require(cross or (isinstance(layer_id, str) and layer_id in known_layers),
+    require(cross or (isinstance(layer_id, str) and any(layer_id == known for _, known in known_layers)),
             "architecture layer_id must be a known catalog layer or a cross: id")
-    require(catalog == ("cross" if cross else known_layers[layer_id]), "architecture row catalog must match its layer")
+    # A layer's identity is its (catalog, layer id) pair: the two catalogs may share an id.
+    require((catalog == "cross") if cross else ((catalog, layer_id) in known_layers),
+            "architecture row catalog must match its layer")
     for field in ("title", "owner_lane"):
         require(isinstance(row.get(field), str) and bool(row[field].strip()), "architecture row needs its " + field)
     require(isinstance(row.get("notes", ""), str), "architecture row notes must be text")
@@ -598,14 +605,22 @@ def architecture_row(row, known_layers, stack_versions, cite, pin_source):
         require(isinstance(winner, dict) and set(winner) <= ARCHITECTURE_WINNER_FIELDS
                 and ("component_id" in winner) != ("name" in winner),
                 "architecture winner needs exactly one of component_id or name, and only known fields")
+        drift = None
         if "component_id" in winner:
             require(winner["component_id"] in stack_versions,
                     "architecture winner component_id must be a manifests/stack.json component")
-            require(winner.get("pin") == stack_versions[winner["component_id"]],
-                    "architecture row pin must match manifests/stack.json")
         label = winner.get("component_id", winner.get("name"))
         require(isinstance(label, str) and bool(label.strip()) and isinstance(winner.get("pin"), str)
                 and bool(winner["pin"].strip()), "architecture winner needs its name and pin")
+        if "component_id" in winner and winner["pin"] != stack_versions[winner["component_id"]]:
+            # The edition is dated and keeps the pin it recorded (the token topic's precedent): a later stack move
+            # never fails the build; the page notes the drift on the winner and --check lists it.
+            drift = str(stack_versions[winner["component_id"]])
+        # Winners are the components of the selection of record; a role says what each one is in it.
+        role = winner.get("role")
+        require(role is None or (isinstance(role, str) and bool(role.strip())
+                                 and len(role) <= ARCHITECTURE_ROLE_LIMIT),
+                f"architecture winner role must be non-empty text of at most {ARCHITECTURE_ROLE_LIMIT} characters")
         require(bool(public_url(winner.get("repository"))), "architecture winner repository must be a public HTTPS URL")
         install, acceptance, currency = (winner.get(key) for key in ("install", "acceptance", "upstream_currency"))
         require(isinstance(install, dict) and install.get("kind") in ARCHITECTURE_INSTALL_KINDS
@@ -630,8 +645,9 @@ def architecture_row(row, known_layers, stack_versions, cite, pin_source):
             else None
             for value, name, recorded in ((install, "install", install["kind"] != "none_recorded"),
                                           (acceptance, "acceptance", acceptance["evidence_class"] != "none_recorded")))
-        items.append({"label": label, "component_id": winner.get("component_id"), "repository": winner["repository"],
-                      "pin": winner["pin"], "pin_source": pin_source(winner.get("pin_source")),
+        items.append({"label": label, "component_id": winner.get("component_id"), "role": role or "",
+                      "repository": winner["repository"], "pin": winner["pin"], "pin_drift": drift,
+                      "pin_source": pin_source(winner.get("pin_source")),
                       "install": {"command": install["command"], "kind": install["kind"], "source": install_source},
                       "acceptance": {"command": acceptance["command"], "evidence_class": acceptance["evidence_class"],
                                      "source": acceptance_source},
@@ -726,9 +742,10 @@ def build_architecture(root, repository_url, stack, read, track, file_url, publi
     require(digest("\n".join(close_only_when).encode("utf-8")) == edition["close_only_when_sha256"],
             "architecture edition close_only_when_sha256 must be the sha256 of the research state's five "
             "close_only_when texts, joined in order with newlines and no trailing newline")
-    known ={layer["id"]: "foundation" for layer in foundation["layers"]}
-    known.update({layer["layer_id"]: "us-equities" for layer in state["layers"]
-                  if layer.get("catalog") == "us-equities"})
+    # Layer identity is the (catalog, layer id) pair, so the two catalogs may share an id.
+    known = {("foundation", layer["id"]) for layer in foundation["layers"]}
+    known.update(("us-equities", layer["layer_id"]) for layer in state["layers"]
+                 if layer.get("catalog") == "us-equities")
     status = {(layer.get("catalog"), layer.get("layer_id")): layer.get("status") for layer in state["layers"]}
     stack_versions = {component["id"]: component.get("version") for component in stack["components"]}
     require(isinstance(source["rows"], list) and bool(source["rows"]), "architecture rows must be a non-empty list")
@@ -736,9 +753,10 @@ def build_architecture(root, repository_url, stack, read, track, file_url, publi
     for row in source["rows"]:
         item = architecture_row(row, known, stack_versions, cite,
                                 lambda value: architecture_pin_source(value, root, cite_file))
-        require(item["layer_id"] not in seen, "architecture layer_id must be unique")
-        seen.add(item["layer_id"])
-        item["research_status"] = status.get((item["catalog"], item["layer_id"]))
+        identity = (item["catalog"], item["layer_id"])
+        require(identity not in seen, "architecture layer_id must be unique")
+        seen.add(identity)
+        item["research_status"] = status.get(identity)
         rows.append(item)
     return {"url": file_url(ARCHITECTURE_TOPIC), "rows": rows,
             "edition": {**{key: edition[key] for key in sorted(ARCHITECTURE_EDITION_FIELDS - {"sources"})},
@@ -746,8 +764,16 @@ def build_architecture(root, repository_url, stack, read, track, file_url, publi
                                           for item, text in zip(ARCHITECTURE_CLOSURE_ITEMS, close_only_when)],
                         "sources": [cite(value, "edition source") for value in edition["sources"]]},
             # Catalog layers without a row stay visible as a gap; they never fail the page.
-            "missing_layers": sorted(f"{catalog}/{layer_id}" for layer_id, catalog in known.items()
-                                     if layer_id not in seen)}
+            "missing_layers": sorted(f"{catalog}/{layer_id}" for catalog, layer_id in known
+                                     if (catalog, layer_id) not in seen)}
+
+
+def architecture_pin_drift(data):
+    """Winners whose recorded pin differs from manifests/stack.json now: the page notes each, --check lists them."""
+    architecture = data.get("architecture") or {"rows": []}
+    return [{"row": f'{row["catalog"]}/{row["layer_id"]}', "component_id": winner["component_id"],
+             "edition_pin": winner["pin"], "stack_pin": winner["pin_drift"]}
+            for row in architecture["rows"] for winner in row["winners"] if winner["pin_drift"] is not None]
 
 
 def build_data(root):
@@ -1244,7 +1270,7 @@ def check(root):
         second_bytes = target.read_bytes()
     require(first_bytes == second_bytes,
             "explorer build is not deterministic across two independent builds (separate processes and hash seeds)")
-    return first_bytes, input_digest(data, root)
+    return first_bytes, input_digest(data, root), architecture_pin_drift(data)
 
 
 def main(argv=None):
@@ -1265,9 +1291,10 @@ def main(argv=None):
             safe_file(root, OUTPUT).write_bytes(result)
             report = {"status": "written", "bytes": len(result), "sha256": digest(result)}
         else:
-            result, source_digest = check(root)
+            result, source_digest, pin_drift = check(root)
+            # A dated architecture edition whose stack pins moved still passes; the drifted winners are listed.
             report = {"status": "passed", "bytes": len(result), "output_sha256": digest(result),
-                      "input_sha256": source_digest}
+                      "input_sha256": source_digest, "architecture_pin_drift": pin_drift}
     except (InvalidDecisionIndex, OSError, ValueError, KeyError, TypeError) as error:
         print(f"Explorer validation failed: {error}")
         return 1

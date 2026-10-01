@@ -1677,8 +1677,9 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                                                gates=[{"text": "Upstream fix pending", "kind": "upstream",
                                                        "url": "https://github.com/example/search/issues/7"}])]}
 
-    def write_architecture(self, edition, close_only_when=None):
-        self.write("catalogs/foundation/manifest.json", {"layers": [{"id": "native-clients", "title": "Native clients"}]})
+    def write_architecture(self, edition, close_only_when=None, foundation_layers=("native-clients",)):
+        self.write("catalogs/foundation/manifest.json", {"layers": [
+            {"id": layer, "title": layer.replace("-", " ").capitalize()} for layer in foundation_layers]})
         self.write("catalogs/landscape/research-state.json", {
             "saturation": {"close_only_when": self.CLOSE_ONLY_WHEN if close_only_when is None else close_only_when},
             "layers": [{"catalog": "foundation", "layer_id": "native-clients", "status": "on_requirement_change"},
@@ -1716,8 +1717,19 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         hashed = {row["path"] for row in data["inputs"]}
         self.assertLessEqual({self.ARCHITECTURE, self.ARCHITECTURE_SOURCE, "catalogs/foundation/manifest.json",
                               "catalogs/landscape/research-state.json"}, hashed)
-        # A pending source is linked through its pull request; nothing that has not landed is hashed.
+        # A pending source whose file is absent is linked through its pull request and hashes nothing.
+        self.assertFalse((self.root / "docs/pending-recipe.md").exists())
         self.assertNotIn("docs/pending-recipe.md", hashed)
+        # Once the file exists it landed after this edition's base: hashed and linked like a source_path, and the
+        # build passes, so a later merge of that pull request never breaks main.
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        page, _ = self.build()
+        data = json.loads(page.data)
+        landed = data["architecture"]["rows"][2]["reasons"][0]["source"]
+        self.assertEqual({key: value for key, value in landed.items() if key != "url"}, {
+            "kind": "landed", "path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"})
+        self.assertTrue(landed["url"].endswith("/blob/main/docs/pending-recipe.md"))
+        self.assertIn("docs/pending-recipe.md", {row["path"] for row in data["inputs"]})
 
     def test_architecture_tab_is_hidden_without_the_edition(self):
         self.use_real_template()
@@ -1810,7 +1822,10 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             (lambda e: winner(e).update(name="search"), "architecture winner needs exactly one of component_id or name"),
             (lambda e: winner(e).update(component_id="unlisted"),
              "architecture winner component_id must be a manifests/stack.json component"),
-            (lambda e: winner(e).update(pin="0.9"), "architecture row pin must match manifests/stack.json"),
+            (lambda e: winner(e).update(role=" "),
+             "architecture winner role must be non-empty text of at most 120 characters"),
+            (lambda e: winner(e).update(role="r" * 121),
+             "architecture winner role must be non-empty text of at most 120 characters"),
             (lambda e: (winner(e).pop("component_id"), winner(e).update(name="ripgrep", pin=" ")),
              "architecture winner needs its name and pin"),
             (lambda e: winner(e).update(repository="http://github.com/example/search"),
@@ -1924,6 +1939,59 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         winner.pop("component_id")
         return winner
 
+    def test_architecture_pin_drift_passes_and_is_listed(self):
+        """A dated edition keeps the pin it recorded: a later stack move passes the build, the winner carries the
+        stack's version and --check lists it; a component_id outside the stack still fails (rejects test)."""
+        self.write_architecture(self.architecture_edition())
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [])
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [
+            {"row": "foundation/native-clients", "component_id": "search", "edition_pin": "1.0", "stack_pin": "1.1"},
+            {"row": "cross/cross:credential-practice", "component_id": "search", "edition_pin": "1.0",
+             "stack_pin": "1.1"}])
+        page, _ = self.build()
+        winner = json.loads(page.data)["architecture"]["rows"][0]["winners"][0]
+        self.assertEqual((winner["pin"], winner["pin_drift"]), ("1.0", "1.1"))
+
+    def test_architecture_layer_identity_is_the_catalog_and_layer_id_pair(self):
+        """The two catalogs may share a layer id; each (catalog, layer id) pair is its own layer."""
+        shared = ("native-clients", "backtesting-engine")
+        edition = self.architecture_edition()
+        edition["rows"].append(self.architecture_row("backtesting-engine", "foundation"))
+        self.write_architecture(edition, foundation_layers=shared)
+        page, _ = self.build()
+        architecture = json.loads(page.data)["architecture"]
+        identities = [(row["catalog"], row["layer_id"], row["research_status"]) for row in architecture["rows"]]
+        self.assertEqual(identities[1::2], [("us-equities", "backtesting-engine", "comparison_required"),
+                                            ("foundation", "backtesting-engine", None)])
+        self.assertEqual(architecture["missing_layers"], ["us-equities/execution-broker"])
+        # The us-equities row does not cover the foundation layer of the same id.
+        self.write_architecture(self.architecture_edition(), foundation_layers=shared)
+        page, _ = self.build()
+        self.assertEqual(json.loads(page.data)["architecture"]["missing_layers"],
+                         ["foundation/backtesting-engine", "us-equities/execution-broker"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_architecture_roles_pin_drift_and_landed_sources(self):
+        self.use_real_template()
+        edition = self.architecture_edition()
+        edition["rows"][0]["winners"][0]["role"] = "selected destination engine"
+        self.write_architecture(edition)
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        drift = "Pin drift: the stack now records 1.1; this edition recorded 1.0."
+        for expected in ("search ↗ · selected destination engine1.0" + drift,
+                         "search · selected destination engine · 1.0Pin of record: manifests/stack.json:1 ↗" + drift,
+                         "Recipe lands with its pull request (docs/pending-recipe.md · landed after this edition's base "
+                         "(pull request #569)) ↗"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, observed["architecture"])
+
     def test_architecture_row_class_is_the_floor_its_winners_reach(self):
         """No order is defined among the six policy classes, so the build enforces what it can: a row with a
         none_recorded winner is none_recorded, and otherwise its class is one that a winner's acceptance carries."""
@@ -1940,8 +2008,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             ("a row class no winner carries", lambda e: e["rows"][0].update(evidence_class="local_integration_check"),
              carried),
             ("a none_recorded winner under a none_recorded row", with_second("none_recorded", "none_recorded"), None),
-            ("a row class one of two winners carries", with_second("local_integration_check", "local_integration_check"),
-             None),
+            ("a row class one of two winners carries",
+             with_second("local_integration_check", "local_integration_check"), None),
             ("a row without winners keeps its owner's class",
              lambda e: e["rows"][1].update(evidence_class="local_integration_check"), None)))
 

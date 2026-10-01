@@ -787,7 +787,8 @@ if(topic.edition) {
 });
 // The dated new-WSL architecture edition: every verdict, closure state, count, date and label below is read
 // from the data, and every link goes through link() and safeHref.
-const architectureSourceLabel = source => source.kind === "pending" ? source.path + " · pull request #" + source.pull_request + (source.commit ? " at " + source.commit : "") + ", not on main at this edition's base" : (source.path || source.url);
+const architectureSourceLabel = source => source.kind === "pending" ? source.path + " · pull request #" + source.pull_request + (source.commit ? " at " + source.commit : "") + ", not on main at this edition's base" : source.kind === "landed" ? source.path + " · landed after this edition's base (pull request #" + source.pull_request + ")" : (source.path || source.url);
+const architectureDrift = winner => "Pin drift: the stack now records " + winner.pin_drift + "; this edition recorded " + winner.pin + ".";
 function architectureSource(parent, source, label) {
   if(source) add(parent, add(make("p", "small"), link(label + architectureSourceLabel(source) + " ↗", source.url)));
 }
@@ -798,7 +799,8 @@ function architectureDetail(row, edition) {
   add(detail, make("h4", "", "Closure items"), closure, make("p", "", row.closure.missing ? "Missing: " + row.closure.missing : "Nothing missing: all five closure items hold."));
   if(row.winners.length) add(detail, make("h4", "", "Winners: pin of record, install, acceptance and upstream currency"));
   row.winners.forEach(winner => {
-    const block = add(make("div", "catalog-detail"), make("strong", "", winner.label + " · " + winner.pin), add(make("p", "small"), link("Pin of record: " + winner.pin_source.locator + " ↗", winner.pin_source.url)));
+    const block = add(make("div", "catalog-detail"), make("strong", "", [winner.label, winner.role, winner.pin].filter(Boolean).join(" · ")), add(make("p", "small"), link("Pin of record: " + winner.pin_source.locator + " ↗", winner.pin_source.url)));
+    if(winner.pin_drift !== null) add(block, make("p", "small", architectureDrift(winner)));
     add(block, make("p", "small", "Install (" + readable(winner.install.kind) + ")"), codeBlock(winner.install.command || "No install command recorded"));
     architectureSource(block, winner.install.source, "Install source: ");
     add(block, make("p", "small", "Acceptance (" + edition.evidence_classes[winner.acceptance.evidence_class] + ")"), codeBlock(winner.acceptance.command || "No acceptance command recorded"));
@@ -857,7 +859,12 @@ function renderArchitecture() {
       if(row.research_status) add(layer, make("p", "small muted", "Research state: " + readable(row.research_status)));
       const winners = make("td");
       if(!row.winners.length) add(winners, make("p", "muted", "No selection of record"));
-      row.winners.forEach(winner => add(winners, add(make("p"), link(winner.label + " ↗", winner.repository)), make("p", "small mono", winner.pin)));
+      row.winners.forEach(winner => {
+        const name = add(make("p"), link(winner.label + " ↗", winner.repository));
+        if(winner.role) add(name, make("span", "small muted", " · " + winner.role));
+        add(winners, name, make("p", "small mono", winner.pin));
+        if(winner.pin_drift !== null) add(winners, make("p", "small muted", architectureDrift(winner)));
+      });
       const verdict = add(make("td"), make("p", "architecture-verdict " + (row.verdict === "closed" ? "closed" : "open"), readable(row.verdict)), make("p", "small muted", edition.verdict_values[row.verdict]));
       const reasons = make("td");
       row.reasons.forEach(reason => add(reasons, add(make("p"), make("span", "", reason.text + " "), link("(" + architectureSourceLabel(reason.source) + ") ↗", reason.source.url))));
