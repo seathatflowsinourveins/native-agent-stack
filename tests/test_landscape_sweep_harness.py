@@ -1164,10 +1164,50 @@ class RunnerCase(unittest.TestCase):
     def record(self):
         return json.loads((self.bin / "record.json").read_text())
 
+    def diagnose(self, name, completed):
+        """What a failed start, wait or result left behind: the command's own output and the runner's files."""
+        directory = self.work / "gpt6" / name
+        parts = [f"stdout={completed.stdout!r}", f"stderr={completed.stderr!r}"]
+        for file_name in ("exit", "failure.json", "stderr.txt", "runner.log"):
+            parts.append(f"{file_name}={codex_job.read(directory / file_name)!r}")
+        parts.append(f"done={(directory / 'done').exists()} running={codex_job.running(directory)}")
+        return "\n".join(parts)
+
 
 LAST = {"repository": "https://github.com/ggml-org/llama.cpp", "latest_release": "b1", "stars_known": 1}
 COMPLETED = {"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 80, "output_tokens": 7,
                                                  "reasoning_output_tokens": 3}}
+
+
+class WaitFinishRaceTests(unittest.TestCase):
+    """wait() checked done and then the job lock. A job that finished between the two checks was reported as
+    "done exit=none (the job is not running)": one hosted CI run of 2026-10-01 failed
+    test_web_search_modes_are_staged_bound_and_recorded that way. The runner writes done before it releases the lock,
+    so wait reads done again once it sees the lock free. Synthetic fixture: the lock check itself completes the job."""
+
+    def wait_output(self, finishes_during_the_lock_check):
+        base = temp_dir(self)
+        write_json(base / "staged.json", {"codex": {"wait_poll_s": 0.05}})
+        directory = codex_job.job_dir(base, "race")
+        directory.mkdir(parents=True)
+        (directory / "job.lock").touch()
+
+        def lock_check(_directory):
+            if finishes_during_the_lock_check:  # the runner's last writes; its lock is free when this returns
+                (directory / "events.jsonl").write_text(json.dumps(COMPLETED) + "\n", encoding="utf-8")
+                write_json(directory / "last.json", LAST)
+                codex_job.finish(directory, 0)
+            return False
+        output = io.StringIO()
+        with mock.patch.object(codex_job, "running", side_effect=lock_check), contextlib.redirect_stdout(output):
+            self.assertEqual(codex_job.wait(base, "race", 5), 0)
+        return output.getvalue().strip()
+
+    def test_a_job_that_finishes_during_the_lock_check_is_reported_done(self):
+        self.assertEqual(self.wait_output(True), "done exit=0")
+
+    def test_a_job_that_never_ran_is_still_reported_as_not_running(self):
+        self.assertEqual(self.wait_output(False), "done exit=none (the job is not running)")
 
 
 class ProcessGroupStopTests(unittest.TestCase):
@@ -1599,8 +1639,10 @@ class RunnerTests(RunnerCase):
             with self.subTest(mode=mode):
                 self.settings({"web_search": mode})
                 self.fake(last=LAST, events=[COMPLETED])
-                self.assertIn("started search", self.call("start", "search", self.prompt, self.schema).stdout)
-                self.assertTrue(self.call("wait", "search", "20").stdout.startswith("done exit=0"))
+                started = self.call("start", "search", self.prompt, self.schema)
+                self.assertIn("started search", started.stdout, self.diagnose("search", started))
+                waited = self.call("wait", "search", "20")
+                self.assertTrue(waited.stdout.startswith("done exit=0"), self.diagnose("search", waited))
                 result = json.loads(self.call("result", "search").stdout)
                 self.assertEqual(result["web_search"], mode)
                 self.assertIn(f'web_search="{mode}"', self.record()["argv"])
