@@ -863,7 +863,7 @@ class NeutralFieldTests(unittest.TestCase):
                 self.assertFalse((self.work / "inputs").exists())
                 self.assertFalse((self.work / "layers.json").exists())
 
-    def test_v2_fit_input_withholds_adoption_prose_but_keeps_equal_primary_sources_and_release_facts(self):
+    def test_v2_offline_fit_input_withholds_origin_facts_and_keeps_equal_primary_sources(self):
         path = self.repo / "catalogs/landscape/foundation.json"
         catalog = json.loads(path.read_text())
         catalog["layers"][0]["requirement"] = "bat must render exact output. The current winner bat stays selected."
@@ -873,8 +873,12 @@ class NeutralFieldTests(unittest.TestCase):
         freshness = json.loads(self.freshness.read_text())
         freshness["foundation"][0]["components"][0]["upstream"]["archived"] = True
         write_json(self.freshness, freshness)
-        done = self.build("--contract-version", "2")
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2")
         self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertFalse(Path(env["FACTS_CALLS"]).exists(), "offline V2 must not query either upstream transport")
+        self.assertEqual(json.loads((self.work / "upstream-facts-v2.json").read_text())["mode"], "not_requested")
         screen_path = self.work / "inputs/alpha.fit-v2.json"
         self.assertTrue(screen_path.is_file(), "V2 fit must have its own blind input")
         text = screen_path.read_text()
@@ -890,9 +894,14 @@ class NeutralFieldTests(unittest.TestCase):
         for candidate in screen["candidates"]:
             self.assertEqual(candidate["primary_sources"], [candidate["repository"],
                              candidate["repository"] + "/releases", candidate["repository"] + "/commits"])
+            self.assertTrue(all(value is None for value in candidate["upstream_now"].values()))
+            self.assertNotIn("stars", candidate["upstream_now"])
+            self.assertNotIn("license", candidate["upstream_now"])
+            self.assertEqual(candidate["upstream_observation"]["status"], "pending")
+            self.assertEqual(candidate["upstream_observation"]["pending_reason"], "not_requested")
         bat = next(row for row in screen["candidates"] if row["repository"] == "https://github.com/sharkdp/bat")
-        self.assertEqual(bat["upstream_now"]["latest_release"], "2")
-        self.assertIs(bat["upstream_now"]["archived"], True)
+        self.assertIsNone(bat["upstream_now"]["latest_release"])
+        self.assertIsNone(bat["upstream_now"]["archived"])
         health_member = next(row for row in source["eligible_field"] if row["candidate_key"] == bat["candidate_key"])
         self.assertEqual(health_member["disposition"], "admit_pending")
         self.assertTrue(health_member["material"])
@@ -901,6 +910,180 @@ class NeutralFieldTests(unittest.TestCase):
         self.assertTrue(all(row["requirement_fit"] is None for row in screen["candidates"]))
         layers = json.loads((self.work / "layers.json").read_text())
         self.assertEqual(layers[0]["fit_input"], str(screen_path))
+
+    def upstream_fixture(self, failure="", malformed=""):
+        """Synthetic API returns through the public CLI's existing native gh/urllib transports."""
+        fixtures = temp_dir(self)
+        gh = fixtures / "gh"
+        gh.write_text(f"#!{sys.executable}\n" + '''import json, os, sys
+from pathlib import Path
+path = sys.argv[2]
+with Path(os.environ["FACTS_CALLS"]).open("a") as log:
+    log.write(path + "\\n")
+if path == os.environ.get("FACTS_FAILURE"):
+    print("synthetic API unavailable; PRIVATE_ERROR_MARKER", file=sys.stderr)
+    sys.exit(1)
+if path == os.environ.get("FACTS_MALFORMED"):
+    print('["wrong response shape"]')
+    sys.exit(0)
+if path.endswith("/releases/latest"):
+    value = {"tag_name": "v-live", "published_at": "2026-09-30T10:00:00Z"}
+elif path.endswith("/commits?per_page=1"):
+    value = [{"sha": "c" * 40, "commit": {"committer": {"date": "2026-09-29T10:00:00Z"}}}]
+else:
+    value = {"default_branch": "main", "archived": False, "disabled": False,
+             "pushed_at": "2026-09-30T11:00:00Z", "stargazers_count": 999,
+             "license": {"spdx_id": "LICENSE_ONLY_MARKER"}}
+print(json.dumps(value))
+''', encoding="utf-8")
+        gh.chmod(0o755)
+        # No network is used: urllib sees fixed public model-info responses, and any unexpected path fails closed.
+        (fixtures / "sitecustomize.py").write_text('''import io, json, os, urllib.error, urllib.request
+from pathlib import Path
+def urlopen(request, timeout=None):
+    url = request.full_url
+    with Path(os.environ["FACTS_CALLS"]).open("a") as log:
+        log.write(url + "\\n")
+    if url != "https://huggingface.co/api/models/Org/Model":
+        raise urllib.error.URLError("synthetic model info unavailable")
+    return io.BytesIO(json.dumps({"id": "Org/Model", "sha": "d" * 40,
+        "lastModified": "2026-09-28T10:00:00Z", "disabled": False, "gated": "auto",
+        "likes": 999, "cardData": {"license": "LICENSE_ONLY_MARKER"}}).encode())
+urllib.request.urlopen = urlopen
+''', encoding="utf-8")
+        return {"PATH": str(fixtures) + os.pathsep + os.environ.get("PATH", ""),
+                "PYTHONPATH": str(fixtures), "FACTS_CALLS": str(fixtures / "calls.txt"),
+                "FACTS_FAILURE": failure, "FACTS_MALFORMED": malformed}
+
+    def test_v2_pull_reuses_one_origin_neutral_snapshot_for_every_membership(self):
+        beta_path = self.repo / "catalogs/landscape/us-equities.json"
+        beta = json.loads(beta_path.read_text())
+        beta["layers"][0]["candidates"] = [{"repository": "https://github.com/sharkdp/bat",
+            "upstream_now": {"latest_release": "ORIGIN_ONLY_MARKER", "archived": True}}]
+        write_json(beta_path, beta)
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot_path = self.work / "upstream-facts-v2.json"
+        snapshot = json.loads(snapshot_path.read_text())
+        self.assertEqual(snapshot["mode"], "api_pull")
+        observations = snapshot["repositories"]
+        calls = Path(env["FACTS_CALLS"]).read_text().splitlines()
+        expected = [f"repos/{url.removeprefix('https://github.com/')}" + suffix
+                    for url in sorted(observations)
+                    for suffix in ("", "/commits?per_page=1", "/releases/latest")]
+        self.assertEqual(calls, expected)  # exactly once, same path/order for adopted, catalog and sweep-only
+        shared = []
+        for layer in ("alpha", "beta"):
+            screen = json.loads((self.work / f"inputs/{layer}.fit-v2.json").read_text())
+            digest = hashlib.sha256(json.dumps(snapshot, sort_keys=True, ensure_ascii=False,
+                                               separators=(",", ":")).encode()).hexdigest()
+            self.assertEqual(screen["upstream_facts_sha256"], digest)
+            for candidate in screen["candidates"]:
+                frozen = observations[candidate["repository"]]
+                self.assertEqual(candidate["upstream_now"], frozen["upstream_now"])
+                self.assertEqual(candidate["upstream_observation"], frozen["upstream_observation"])
+                self.assertEqual(candidate["upstream_now"]["latest_release"], "v-live")
+                self.assertIs(candidate["upstream_now"]["archived"], False)
+                self.assertEqual(candidate["upstream_now"]["head_commit"], "c" * 40)
+                self.assertEqual(candidate["upstream_now"]["head_committed_at"], "2026-09-29T10:00:00Z")
+                self.assertEqual(candidate["upstream_observation"]["status"], "observed")
+                self.assertIsNone(candidate["requirement_fit"])
+                if candidate["repository"] == "https://github.com/sharkdp/bat":
+                    shared.append(frozen)
+            for signal in ("stars", "license", "LICENSE_ONLY_MARKER", "ORIGIN_ONLY_MARKER"):
+                self.assertNotIn(signal, json.dumps(screen))
+        self.assertEqual(len(shared), 2)
+        self.assertEqual(shared[0], shared[1])
+        release = {"tag_name": "v-live", "published_at": "2026-09-30T10:00:00Z"}
+        release_source = observations["https://github.com/sharkdp/bat"]["upstream_observation"]["sources"][-1]
+        self.assertEqual(release_source["url"], "https://api.github.com/repos/sharkdp/bat/releases/latest")
+        self.assertEqual(release_source["response_json_sha256"], hashlib.sha256(
+            json.dumps(release, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest())
+
+    def test_v2_failed_api_facts_stay_unknown_pending_and_later_members_and_layers_continue(self):
+        env = self.upstream_fixture(failure="repos/cli/cli")  # first repository in the sorted pull
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        failed = next(row for row in alpha["candidates"] if row["repository"] == "https://github.com/cli/cli")
+        self.assertIsNone(failed["upstream_now"]["archived"])
+        self.assertIsNone(failed["upstream_now"]["pushed_at"])
+        self.assertEqual(failed["upstream_observation"]["status"], "pending")
+        source = failed["upstream_observation"]["sources"][0]
+        self.assertEqual(source["url"], "https://api.github.com/repos/cli/cli")
+        self.assertEqual(source["status"], "pending")
+        self.assertIsNone(source["response_json_sha256"])
+        beta = json.loads((self.work / "inputs/beta.fit-v2.json").read_text())
+        self.assertEqual(beta["candidates"][0]["upstream_observation"]["status"], "observed")
+        self.assertEqual(beta["candidates"][0]["upstream_now"]["latest_release"], "v-live")
+        owner = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertTrue(all(row["disposition"] == "admit_pending" for row in owner["eligible_field"]))
+        self.assertNotIn("PRIVATE_ERROR_MARKER", (self.work / "upstream-facts-v2.json").read_text())
+
+    def test_v2_malformed_api_payload_retains_its_hash_and_leaves_facts_pending(self):
+        env = self.upstream_fixture(malformed="repos/cli/cli")
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot = json.loads((self.work / "upstream-facts-v2.json").read_text())
+        failed = snapshot["repositories"]["https://github.com/cli/cli"]
+        self.assertIsNone(failed["upstream_now"]["archived"])
+        self.assertEqual(failed["upstream_observation"]["status"], "pending")
+        source = failed["upstream_observation"]["sources"][0]
+        self.assertEqual(source["status"], "pending")
+        self.assertEqual(source["response_json_sha256"], hashlib.sha256(b'["wrong response shape"]').hexdigest())
+        self.assertEqual(snapshot["repositories"]["https://github.com/sharkdp/bat"]["upstream_observation"]["status"],
+                         "observed")
+
+    def test_v2_hub_pull_keeps_host_unknowns_null_and_failure_does_not_abort(self):
+        seeds = write_json(self.work / "seeds.json", {"alpha": ["https://huggingface.co/Org/Missing",
+                                                               "https://huggingface.co/Org/Model"],
+                                                   "beta": ["https://huggingface.co/org/model"]})
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts", "--seeds", seeds)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot = json.loads((self.work / "upstream-facts-v2.json").read_text())
+        model = snapshot["repositories"]["https://huggingface.co/Org/Model"]
+        self.assertEqual(model["upstream_now"]["head_commit"], "d" * 40)
+        self.assertEqual(model["upstream_now"]["last_modified"], "2026-09-28T10:00:00Z")
+        self.assertEqual(model["upstream_now"]["gated"], "auto")
+        self.assertEqual(snapshot["repositories"]["https://huggingface.co/org/model"], model)
+        for key in ("archived", "latest_release", "released_at", "head_committed_at"):
+            self.assertIsNone(model["upstream_now"][key])
+        missing = snapshot["repositories"]["https://huggingface.co/Org/Missing"]
+        self.assertTrue(all(value is None for value in missing["upstream_now"].values()))
+        self.assertEqual(missing["upstream_observation"]["status"], "pending")
+        calls = Path(env["FACTS_CALLS"]).read_text().splitlines()
+        self.assertEqual(calls.count("https://huggingface.co/api/models/Org/Model"), 1)
+
+    def test_upstream_pull_requires_explicit_v2_repository_mode(self):
+        done = self.build("--pull-upstream-facts")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("--contract-version 2", done.stderr)
+        self.assertFalse((self.work / "inputs").exists())
+
+    def test_acceptance_summaries_pin_the_exact_reviewed_plan_sections(self):
+        # Full source revision 798ac445307e2cd8eba6e74d7722ac0e16da02c7; bytes from each heading through
+        # the byte before the next section heading (the last range runs to EOF). These are summaries, not extracts.
+        plan = (ROOT / "blueprints/us-equities/engine-nautilus/acceptance-plan.md").read_bytes()
+        hashes = {
+            "retained-equity-replay": (1, 3, "a79c33c07f9de52bb7270fb9e6e0e85a19c1064da9ad47f9d7cc92ff362f0a0f"),
+            "broker-state-failures": (4, 4, "1f557403dc4169db578cd2a327f025ac3acee25c78b333dfc91906d83ff421c3"),
+            "separate-paper-adapters": (5, 6, "e5921c5afa6d5db25408549873127b5a07cd8690e2ca674b6ed508f22bb32ec9"),
+        }
+        self.assertEqual(set(hashes), set(build_inputs.ACCEPTANCE_REQUIREMENTS))
+        for gate, (first, last, expected) in hashes.items():
+            with self.subTest(gate=gate):
+                start = re.search(rb"^## " + str(first).encode() + rb"\. ", plan, re.M)
+                self.assertIsNotNone(start)
+                following = re.search(rb"^## " + str(last + 1).encode() + rb"\. ", plan, re.M)
+                section = plan[start.start():following.start() if following else len(plan)]
+                self.assertEqual(hashlib.sha256(section).hexdigest(), expected,
+                                 "Review the requirement summary against the changed acceptance-plan sections")
 
     def test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status(self):
         path = self.repo / "catalogs/landscape/us-equities.json"

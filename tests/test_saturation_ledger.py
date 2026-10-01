@@ -23,6 +23,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -1270,6 +1271,69 @@ class V2PendingCliTests(FixtureCase):
         self.assertEqual(converted["layers"][0]["refuted"], [])
         self.assertEqual(converted["survivors"], [])
 
+    def test_unsupported_discovery_identity_stays_pending_and_later_layer_converts(self):
+        scope = sl.scope_hashes(self.root)
+        gamma = dict(self.field_input, layer_id="gamma", eligible_field=[],
+                     requirement_sha256=scope["requirement_sha256"]["foundation/gamma"])
+        gamma["field_sha256"] = sl.v2_field_sha256(gamma)
+        write(self.work, "inputs/gamma.json", gamma)
+        proposals = [{"repository": value} for value in (
+            "https://gitlab.com/org/project", "https://codeberg.org/org/project",
+            "https://docs.example.org/guide", None, {"unexpected": "object"})]
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append({"catalog": "foundation", "layer_id": "gamma", "lost": True})
+        converted = self.convert_cli(run)
+        self.assertEqual([row["layer_id"] for row in converted["layers"]], ["alpha", "gamma"])
+        pending = converted["layers"][0]["pending"]
+        self.assertEqual(len(pending), len(proposals))
+        self.assertTrue(all(row["material"] and row["pending_reason"] ==
+                            "unsupported_discovery_identity" for row in pending))
+        self.assertEqual(converted["returns"]["raw"]["alpha"][0]["claude_discover"]["proposed"], proposals)
+        failures = converted["returns"]["failures"]["alpha"]
+        self.assertEqual(len(failures), len(proposals))
+        self.assertTrue(all(row["cause"] == "unsupported_discovery_identity" for row in failures))
+        self.assertTrue(converted["layers"][0]["reopen"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        self.assertEqual(self.ledger_cli("--check").returncode, 0)
+
+    def test_facts_role_outside_requirement_cannot_exclude(self):
+        run = self.screen_run(copies=2)
+        run["first"][0]["facts"] = [
+            self.judgment(family, "facts", "not_credible", n, "outside_requirement",
+                          "The source implements another task.")
+            for family in ("claude", "gpt6") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(converted["layers"][0]["refuted"], [])
+        self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+        self.assertEqual(converted["returns"]["votes"]["alpha"][0]["facts"]["status"], "pending")
+
+    def test_fit_role_supported_outside_requirement_can_exclude(self):
+        run = self.screen_run(copies=2)
+        for family, slot in (("claude", "fit_claude"), ("gpt6", "fit_gpt6")):
+            run["first"][0][slot] = [
+                self.judgment(family, "fit", "not_credible", n, "outside_requirement",
+                              "The source implements another task.") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(len(converted["layers"][0]["refuted"]), 2)
+        self.assertEqual(converted["layers"][0]["pending"], [])
+
+    def test_facts_role_supported_platform_exclusion_stands_with_pending_fit(self):
+        run = self.screen_run(copies=2, status="pending")
+        run["first"][0]["facts"] = [
+            self.judgment(family, "facts", "not_credible", n, "target_host_incompatible",
+                          "The upstream binary requires a different operating system.")
+            for family in ("claude", "gpt6") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(len(converted["layers"][0]["refuted"]), 2)
+        self.assertEqual(converted["layers"][0]["pending"], [])
+        self.assertEqual({row["exclusion_reason"] for row in converted["layers"][0]["refuted"]},
+                         {"target_host_incompatible"})
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        self.assertEqual(self.ledger_cli("--check").returncode, 0)
+
     def ledger_cli(self, *arguments):
         return subprocess.run([sys.executable, str(ROOT / "scripts/saturation_ledger.py"),
                                "--root", str(self.root), *arguments],
@@ -1398,7 +1462,7 @@ class V2PendingCliTests(FixtureCase):
         self.assertEqual({row["repo"] for row in layer["pending"]}, set(repositories))
         self.assertEqual(layer["source_field_sha256"], self.field_input["field_sha256"])
         self.assertNotEqual(layer["field_sha256"], layer["source_field_sha256"])
-        hf = next(row for row in layer["pending"] if row["repository"].startswith("https://huggingface.co"))
+        hf = next(row for row in layer["pending"] if urlparse(row["repository"]).hostname == "huggingface.co")
         self.assertEqual(hf["candidate_key"], "foundation/alpha/https://huggingface.co/org/model")
         self.assertEqual(hf["evidence_key"], hf["candidate_key"])
         self.assertEqual(hf["pending_reason"], "needs_primary_source")
@@ -1568,14 +1632,17 @@ class V2PendingCliTests(FixtureCase):
                 self.assertIn("contract_version", rejected.stderr)
                 self.assertFalse((self.converted / "layers.json").exists())
 
-    def test_paid_exclusion_requires_an_affirmative_mandatory_fee_fact(self):
-        for fact, expected in (("The source requires a paid subscription.", "not_credible"),
+    def test_paid_policy_is_pending_until_part2_frozen_owner_field(self):
+        for fact, expected in (("The source requires a paid subscription.", "pending"),
                                ("The source does not require a paid subscription.", "pending"),
                                ("No credentials are configured; the source requires a paid subscription.", "pending")):
             with self.subTest(fact=fact):
                 converted = self.convert_cli(self.screen_run(copies=2, status="not_credible",
                     criterion="paid_service_required", fact=fact))
                 self.assertEqual({row["status"] for row in converted["layers"][0]["eligible_field"]}, {expected})
+                self.assertEqual({row["pending_reason"] for row in converted["layers"][0]["pending"]},
+                                 {"the paid-service policy field arrives in part 2"})
+                self.assertEqual(converted["layers"][0]["refuted"], [])
 
 
 if __name__ == "__main__":

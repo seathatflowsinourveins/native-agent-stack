@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "kind": "u11_part1_source_review_repairs",
+  "observed_at": "2026-10-01T22:36:58Z",
+  "source_head": "b39b6ab29172add8b9b4a39100e70d75351d215e",
+  "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "evidence_class": "local_source_and_synthetic_integration",
+  "source_design": "docs/decisions/2026-10-01-u11-merit-neutral-selection.md",
+  "source_design_commit": "89424e36e8f60c4413021bc449390f235c3f2cfd",
+  "producer_patch_sha256": "4a757d488c5b91c557cc443a58e7d45c2c88369ea28c15e122c2f409581dddf6",
+  "repairs": [
+    {
+      "issue": "Unsupported discovery identity aborted conversion and lost later layers.",
+      "verification": "Public CLI fixture with GitLab, Codeberg, documentation URL, null and object proposals plus later gamma layer.",
+      "before": {
+        "exit_code": 1,
+        "control_tests": 3,
+        "failures": 2
+      },
+      "after": "Unsupported identities retain pending material entries, raw returns, pointer failures and reopen; later layer converts and ledger checks."
+    },
+    {
+      "issue": "Facts role could exclude only on a fit judgment.",
+      "after": "Facts exclusions restricted to platform/cost; outside_requirement requires a supported fit-role exclusion. Supported platform facts can exclude with pending fit."
+    },
+    {
+      "issue": "Part 1 tried to infer the future paid-service policy from requirement prose.",
+      "before": {
+        "exit_code": 1,
+        "phase": "updated policy control red"
+      },
+      "after": "paid_service_required stays pending with explicit part-2 policy reason; no inferred owner flag."
+    },
+    {
+      "issue": "Origin records populated blind facts unequally.",
+      "after": "Offline facts are null; explicit V2-only pull fetches each distinct identity uniformly once and records sanitized per-endpoint observation/hashes. Source errors remain pending."
+    },
+    {
+      "issue": "Review union reported 1134 memberships.",
+      "after": "Full producer 1135 = foundation688 + trading447; catalog alternative promptfoo/promptfoo explains one-member omission.",
+      "source_ref": "catalogs/landscape/us-equities.json#/layers/8/alternatives/3"
+    },
+    {
+      "issue": "Acceptance text described summaries as extracts.",
+      "after": "README states summaries; exact plan section-byte hashes and a changed-section negative fixture bind the summaries."
+    },
+    {
+      "issue": "CodeQL hostname comparison used a URL prefix.",
+      "after": "urllib.parse.urlparse(...).hostname == huggingface.co",
+      "review_thread": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#discussion_r4160735006"
+    }
+  ],
+  "failed_conditions_retained": [
+    {
+      "phase": "first unsupported-identity repair",
+      "command": "python3 -m unittest tests.test_saturation_ledger.V2PendingCliTests",
+      "exit_code": 1,
+      "tests": 19,
+      "failures": 1,
+      "condition": "Ledger identity check still assumed every expanded proposal was a supported upstream identity.",
+      "repair": "Verify expanded identities against the field rebuilt from frozen source and complete retained raw proposals."
+    },
+    {
+      "phase": "post-policy focused run",
+      "tests": 19,
+      "result": "OK",
+      "terminal_exit_code": null,
+      "condition": "Terminal poll no longer found process; returned test text retained without inventing its unobserved exit."
+    }
+  ],
+  "validation": {
+    "command": "env NAS_CODEX_INTEGRATION=0 python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills",
+    "exit_code": 0,
+    "tests": 390,
+    "skipped": 44,
+    "seconds": 57.506,
+    "scope": "local synthetic fixtures and integration contracts; no model/provider/GPU/new-host qualification"
+  },
+  "independent_verification": {
+    "requested_role": "stack-verifier / gpt-6-astra / max",
+    "actual_backend": null,
+    "verdict": "no source defect found in the bounded named claims",
+    "commands": [
+      {"command": "python3 -m unittest tests.test_saturation_ledger.V2PendingCliTests", "exit_code": 0, "tests": 20, "returned_summary": "Ran 20 tests in 5.105s\n\nOK"},
+      {"command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests", "exit_code": 0, "tests": 14, "returned_summary": "Ran 14 tests in 4.861s\n\nOK"},
+      {"command": "python3 -B -", "exit_code": 0, "scope": "existing producer helpers in memory", "returned_summary": "PASS: 1135 memberships across 32 layers (688 foundation + 447 trading); promptfoo catalog alternative accounts for 1134 review count; V1 32 objects and 9 templates unchanged."}
+    ],
+    "v1_serialized_input_sha256": "c9ca8b33ca2363ee8759f60395d5d876bfb77de4913ccfa54db4a91a07415471",
+    "not_verified": ["historical review union itself", "ae summary acknowledgement", "full 390-test run independently", "central validator independently", "live full-field API pull", "provider/GPU/new-host acceptance"]
+  },
+  "unchanged": {
+    "v1_templates": 9,
+    "v1_full_input_objects": 32,
+    "make_prompt": true,
+    "sweep_js": true
+  },
+  "requested_architecture_worker": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "consequential source-neutral architecture and conflicting primary evidence",
+    "actual_backend": null
+  },
+  "not_run": [
+    "full-field live upstream API pull",
+    "V2 native model workflow",
+    "deterministic maintenance exclusion screen",
+    "new-host installation or functional acceptance"
+  ],
+  "sources": [
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/github_freshness.py#L119",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/tools/sota-convergence/landscape-sweep/source_reviews.py#L192",
+    "https://docs.github.com/en/rest/repos/repos#get-a-repository",
+    "https://docs.github.com/en/rest/commits/commits#list-commits",
+    "https://docs.github.com/en/rest/releases/releases#get-the-latest-release",
+    "https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.model_info"
+  ]
+}

@@ -63,6 +63,13 @@ adoption labels are observations, not automatic exclusions. `baseline_manifest` 
 `freshness_manifest` reference the supplied documents; `seeded_candidates` references the supplied
 seed object. Catalog/review/history refs retain their repository-relative paths and JSON pointers.
 
+An unsupported discovery identity (including a GitLab/Codeberg repository or a documentation URL
+that the current adapter cannot resolve) is retained with an opaque `unsupported-identity-<sha256>`
+key and `pending_reason: unsupported_discovery_identity`. The raw proposal stays unchanged,
+its JSON pointer records a retained failure, and conversion continues through later proposals
+and layers. The failure reopens that layer. This does not establish that the candidate is ineligible.
+Original frozen GitHub/Hugging Face identities still use their strict canonical contract.
+
 The field hash is SHA256 of UTF-8 JSON with sorted keys, no inter-key whitespace and
 `ensure_ascii=False`: `{contract_version, catalog, layer_id, requirement_sha256,
 platform_profiles_sha256, members}`. `members` contains only `{candidate_key, repository}` sorted
@@ -74,7 +81,7 @@ and this complete field.
 
 `inputs/<layer>.fit-v2.json` is the blind input for both fit and facts; `layers.json` names it in
 `fit_input` and `facts_input`, with the same version and field hash. It carries every candidate's
-identity, latest technical release facts (unknowns are null), and equal primary source surfaces:
+identity, uniformly sourced technical facts (unknowns are null), and equal primary source surfaces:
 repository/releases/commits for GitHub, model page/tree/API for Hugging Face. It omits selection
 labels, installed pins, receipt counts, historical verdicts and
 selection-bearing prose. The requirement uses the maintained prose reducer. Explicit user pins
@@ -82,21 +89,52 @@ and fixture oracles appear in `pinned_requirements`: the destination/broker/adap
 and fixed oracle remain requirements, while their source-host installed versions do not become fit
 evidence. Unknown facts or a budget cutoff leave a material member pending.
 
-Trading `acceptance_gates` extracts what every candidate must show from
+The default offline build sets all upstream facts to null and records a `not_requested` pending
+observation. It never copies facts from a member's adoption, catalog or sweep record. For a source
+review, add `--pull-upstream-facts`: the builder pulls each distinct identity once, in sorted order,
+through the maintained GitHub/Hub transports and freezes `upstream-facts-v2.json`. Every membership
+of the identity shares that observation and its source URLs, returned status and canonical complete
+parsed-response hashes. API failures stay pending and do not stop later members. These hashes are
+not raw HTTP-byte hashes. Stars, license and likes stay out of blind input. This preparation mode
+does not implement the later maintenance exclusion script or make V2 launchable.
+
+The full producer contains 1,135 memberships across the 32 committed layer fields: 688 foundation
+and 447 trading. The earlier 1,134 review union omitted the catalog alternative
+`promptfoo/promptfoo` at `catalogs/landscape/us-equities.json#/layers/8/alternatives/3`; the complete
+producer already retained it. This is a corrected counting scope, not a new model return or merit
+result. The original September 29 manifest and September 26 seed inputs give unchanged membership
+sets at the integrated main revision.
+
+Trading `acceptance_gates` summarises what every candidate must show from
 [the unchanged acceptance plan at 798ac445, sections 1–6](https://github.com/seathatflowsinourveins/native-agent-stack/blob/798ac445307e2cd8eba6e74d7722ac0e16da02c7/blueprints/us-equities/engine-nautilus/acceptance-plan.md).
 The current `runtime-target.next_acceptance` scopes describe executed history, so those scopes,
 statuses and executed evidence refs stay out of the screen. The three named gates use declarative
 replay, offline broker-state and independent paper-adapter requirements from that plan. An explicit
 future `gate.requirement` takes precedence; an unrecognized gate without one remains pending.
-This extraction declares requirements and provides no new acceptance result.
+The three summaries are pinned by exact section-byte SHA256 assertions in the producer tests:
+sections 1–3 `a79c33c07f9de52bb7270fb9e6e0e85a19c1064da9ad47f9d7cc92ff362f0a0f`, section 4
+`1f557403dc4169db578cd2a327f025ac3acee25c78b333dfc91906d83ff421c3`, and sections 5–6
+`e5921c5afa6d5db25408549873127b5a07cd8690e2ca674b6ed508f22bb32ec9`. A changed plan must prompt
+review of its summaries. This projection declares requirements and provides no new acceptance result.
 
 Discovery V2 returns `admit`, `admit_pending` or `not_admitted`, `requirement_fit` and `frozen_tasks`;
 it never requires a winner-relative gap. Even `not_admitted` enters the field pending because
 discovery sees the source-host health notes. Model votes use `status: credible | not_credible | pending`
 and preserve candidate/evidence keys and reasoning/refs. The only model exclusion criteria are
 `target_host_incompatible`, `outside_requirement` and `paid_service_required`, each with a fact and
-supporting evidence. A mandatory paid service is a ground only when the frozen requirement forbids
-it. Missing credentials never establish that ground. Script owns API-supported maintenance and
+supporting evidence. Within the excluding role, both families need replicated agreeing majorities.
+The facts role may exclude only on `target_host_incompatible` or `paid_service_required`; that
+supported facts exclusion stands whatever fit returned. `outside_requirement` can exclude only
+when the fit role supports it (including when both roles returned it). A facts-only
+`outside_requirement` stays pending and cannot exclude. These are the design owner's PR #590
+review refinements; the V2 runner remains unlaunchable until the later frozen-scope/script work.
+In part 1, a `paid_service_required` vote stays pending with the explicit reason
+"the paid-service policy field arrives in part 2"; requirement-text matching cannot exclude it.
+Part 2 must add the layer owner's `paid_service_allowed` field, false by default, bind it into the
+frozen scope, and implement the deterministic screen before V2 launch. Under that future default,
+a paid-only candidate is excluded in each layer where its owner has not enabled the field;
+an enabled field carries a purchase gate. Missing credentials never establish a mandatory fee.
+Script owns API-supported maintenance and
 repository identity dedupe; unverifiable facts never exclude.
 
 Every V2 vote envelope requires `judgment`: `judgment_id`, integer `order_seed`, `family`

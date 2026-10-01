@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build the per-layer inputs a landscape sweep's workers read (no network, no model calls).
+"""Build the per-layer inputs a landscape sweep's workers read (offline by default, no model calls).
 
   build_inputs.py --work-dir W --freshness-manifest manifest-YYYYMMDD.json
                   [--scope W/scope.json] [--baseline-manifest catalogs/sota-convergence/manifest-YYYYMMDD.json]
                   [--seeds seeds.json] [--repo-root .]
+                  [--contract-version 2 [--pull-upstream-facts]]
 
 Reads the frozen scope (`saturation_ledger.py --scope`, default <work-dir>/scope.json), catalogs/landscape/
 {foundation,us-equities}.json and research-state.json, the saturation ledger's last completed repository sweep, a
@@ -48,6 +49,15 @@ task, the installed skills' adoption/skills/manifest.json pins and invocation fl
 excluded skills by the manifest's own source text, each comma-separated name kept whole). The task's text, its open
 gaps and the installed skills' gap fields are passed whole, never cut. No freshness manifest is read. A run covers
 one modality.
+
+V2's blind facts never inherit facts from a candidate's catalog, adoption or sweep record. Without
+--pull-upstream-facts every upstream value is null and every observation is pending/not_requested. The opt-in pulls
+each distinct repository once in sorted order, through the maintained gh_api/hub_get transports (60 seconds per
+request), then freezes upstream-facts-v2.json and shares its observations across all memberships. Source failures
+remain pending and do not abort later members. Response and snapshot hashes bind complete canonical parsed JSON
+(sorted keys, UTF-8, no separator whitespace), not raw HTTP bytes. GitHub commit dates come from the default branch;
+Hub lastModified is kept separately and is not asserted to be a default-branch commit date. These observations are
+inputs to the future script screen, never a maintenance verdict, model execution or provider-usage record.
 """
 
 from __future__ import annotations
@@ -57,7 +67,7 @@ import json
 import os
 import re
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -100,8 +110,9 @@ INSTALLED_FIELDS = ("name", "source", "ref", "path", "skill_md_sha256", "descrip
 TASK_FIELDS = ("layer_id", "lifecycle_task", "requirement", "installed", "source_ids", "open_gaps", "overturn_when")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
-# U11 E extracts declarative requirements from the unchanged acceptance plan, never its observed-status narrative.
+# U11 E summaries of declarative requirements from the unchanged acceptance plan, never its observed-status narrative.
 # Source: blueprints/us-equities/engine-nautilus/acceptance-plan.md at 798ac445, sections 1-3, 4, and 5-6.
+# NeutralFieldTests pins the SHA256 of the exact three section ranges; these sentences are summaries, not extracts.
 ACCEPTANCE_REQUIREMENTS = {
     "retained-equity-replay": (
         "Replay the frozen equity tasks with declared identity, data, time, visibility, fill, distribution, cost and "
@@ -116,6 +127,8 @@ ACCEPTANCE_REQUIREMENTS = {
         "risk and request limits, run bounded submit/fill/cancel and reconnect/restart cases, reconcile durable "
         "state and cash, and apply the declared final order/position disposition with no unexplained differences.", "5"),
 }
+UPSTREAM_FACT_FIELDS = ("latest_release", "released_at", "pushed_at", "archived", "disabled", "default_branch",
+                        "head_commit", "head_committed_at", "last_modified", "gated")
 
 
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
@@ -440,28 +453,15 @@ def blind_fit_input(layer_input: dict, layer: dict, baseline: dict, fresh: dict,
     Latest upstream release facts describe technical capability, not the source host's pin of record. Unknown facts
     are explicit nulls for every member and cannot be converted into an exclusion by this producer.
     """
-    records = [source["record"] for source in sources]
-    for document in (baseline, layer, fresh):
-        records.extend(record for field in ("candidates", "winners", "alternatives", "components", "entries")
-                       for record in document.get(field) or [] if isinstance(record, dict))
     candidates = []
     for member in layer_input["eligible_field"]:
-        upstream = {key: None for key in ("latest_release", "released_at", "stars", "pushed_at", "archived", "license")}
-        for record in records:
-            if repository_identity(record) != member["repository"]:
-                continue
-            fact = record.get("upstream_now") or record.get("upstream") or {}
-            for key in upstream:
-                source_key = "latest" if key == "latest_release" and "latest" in fact else key
-                if source_key in fact:
-                    upstream[key] = fact[source_key]
         repository = member["repository"]
         from source_reviews import HUB, hub_model
         model = hub_model(repository)
         primary_sources = ([repository, repository + "/tree/main", f"{HUB}/api/models/{model}"] if model else
                            [repository, repository + "/releases", repository + "/commits"])
         candidates.append({"candidate_key": member["candidate_key"], "repository": repository,
-                           "evidence_key": member["evidence_key"], "upstream_now": upstream,
+                           "evidence_key": member["evidence_key"], **unknown_upstream_facts(),
                            "primary_sources": primary_sources,
                            "requirement_fit": None})
     names = [record for document in (layer,) for field in ("candidates", "winners", "alternatives")
@@ -475,7 +475,109 @@ def blind_fit_input(layer_input: dict, layer: dict, baseline: dict, fresh: dict,
              "platform_requirements_sha256": sha256_bytes(json.dumps(
                  platform_requirements, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")),
             "acceptance_gates": acceptance_gates(runtime_target, candidates + names, pins)
-                                if layer_input["catalog"] == "us-equities" else []}
+                                 if layer_input["catalog"] == "us-equities" else []}
+
+
+def unknown_upstream_facts() -> dict:
+    return {"upstream_now": dict.fromkeys(UPSTREAM_FACT_FIELDS),
+            "upstream_observation": {"status": "pending", "pending_reason": "not_requested",
+                                     "observed_at": None, "sources": []}}
+
+
+def pull_upstream_facts(repository: str) -> dict:
+    """One origin-independent procedure using existing transports, with no adoption records or cached facts.
+
+    Reference: github_freshness.py gh_api/fetch_repository and source_reviews.py hub_get/hub_review at
+    798ac445307e2cd8eba6e74d7722ac0e16da02c7. GET commits without sha reads the default branch:
+    https://docs.github.com/en/rest/commits/commits#list-commits
+    https://docs.github.com/en/rest/repos/repos#get-a-repository
+    https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+    https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.model_info
+    """
+    saved_path = sys.path[:]
+    try:
+        sys.path.insert(0, str(HERE.parent))
+        from github_freshness import gh_api
+    finally:
+        sys.path[:] = saved_path
+    from source_reviews import GhError, HUB, hub_get, hub_model
+    from urllib.parse import quote
+
+    record = unknown_upstream_facts()
+    facts, observation = record["upstream_now"], record["upstream_observation"]
+    observation["observed_at"] = datetime.now(timezone.utc).isoformat()
+
+    def github(path):
+        returned, error = gh_api(path)
+        if error is not None:
+            raise GhError("upstream request failed")  # never copy native stderr/account state to blind input
+        return returned
+
+    def observe(url, read, paths, first=False):
+        source = {"url": url, "status": "pending", "response_json_sha256": None, "pending_reason": "api_error"}
+        observation["sources"].append(source)
+        try:
+            returned = read()
+            source["response_json_sha256"] = sha256_bytes(json.dumps(
+                returned, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+            source["pending_reason"] = "malformed_response"
+            if first:
+                if not isinstance(returned, list):
+                    raise ValueError("expected a commits list")
+                returned = returned[0] if returned else {}
+            if not isinstance(returned, dict):
+                raise ValueError("expected a metadata object")
+            for key, path in paths.items():
+                value = returned
+                for part in path.split("."):
+                    value = value.get(part) if isinstance(value, dict) else None
+                allowed = (bool,) if key in ("archived", "disabled") else (str, bool) if key == "gated" else (str,)
+                facts[key] = value if isinstance(value, allowed) else None
+            source.update(status="observed", pending_reason=None)
+        except (GhError, OSError, ValueError, TypeError):
+            # Missing repositories/releases, permission failures, rate limits and malformed JSON stay unknown.
+            # Transport errors are deliberately not reprinted; URL/status/hash describe the frozen observation.
+            pass
+
+    model = hub_model(repository)
+    if model:
+        path = f"api/models/{quote(model, safe='/')}"
+        observe(f"{HUB}/{path}", lambda: hub_get(path),
+                {"head_commit": "sha", "last_modified": "lastModified", "disabled": "disabled", "gated": "gated"})
+    else:
+        base = f"repos/{slug(repository)}"
+        observe(f"https://api.github.com/{base}", lambda: github(base),
+                {key: key for key in ("archived", "disabled", "pushed_at", "default_branch")})
+        commits = base + "/commits?per_page=1"
+        observe(f"https://api.github.com/{commits}", lambda: github(commits),
+                {"head_commit": "sha", "head_committed_at": "commit.committer.date"}, first=True)
+        release = base + "/releases/latest"
+        observe(f"https://api.github.com/{release}", lambda: github(release),
+                {"latest_release": "tag_name", "released_at": "published_at"})
+    pending = any(source["status"] == "pending" for source in observation["sources"])
+    observation.update(status="pending" if pending else "observed", pending_reason="source_unavailable" if pending else None)
+    return record
+
+
+def freeze_upstream_facts(inputs: list, pull=False) -> dict:
+    """Freeze a shared observation per unique identity before any blind input is written."""
+    from source_reviews import repository_key
+
+    repositories = sorted({candidate["repository"] for row in inputs for candidate in row["fit_projection"]["candidates"]})
+    snapshot = {"schema_version": 1, "mode": "api_pull" if pull else "not_requested", "repositories": {}}
+    observations = {}
+    for repository in repositories:
+        key = repository_key(repository)  # the maintained identity also folds Hub model URL casing
+        if key not in observations:
+            observations[key] = pull_upstream_facts(repository) if pull else unknown_upstream_facts()
+        snapshot["repositories"][repository] = observations[key]
+    digest = sha256_bytes(json.dumps(snapshot, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+    for row in inputs:
+        for candidate in row["fit_projection"]["candidates"]:
+            candidate.update(snapshot["repositories"][candidate["repository"]])
+        for target in (row, row["fit_projection"]):
+            target.update(upstream_facts_ref="upstream-facts-v2.json", upstream_facts_sha256=digest)
+    return snapshot
 
 
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
@@ -709,6 +811,9 @@ def main(argv=None) -> int:
     parser.add_argument("--seeds", type=Path)
     parser.add_argument("--contract-version", type=int, choices=(1, 2), default=1,
                         help="1: unchanged current sweep; 2: prepare the future neutral repository field")
+    parser.add_argument("--pull-upstream-facts", action="store_true",
+                        help="V2 repository input only: freeze one uniform GitHub/Hub API pull per repository; "
+                             "otherwise all blind upstream facts stay null/pending")
     parser.add_argument("--modality", choices=("repository", SKILLS), default="repository",
                         help=f"repository: the landscape catalogs' layers (default); skills: the skills-* layers of "
                              f"{SKILLS_CATALOG}")
@@ -716,6 +821,8 @@ def main(argv=None) -> int:
                         help="print the skills layers' frozen scope (saturation_ledger.py --scope's format) and exit")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
+    if args.pull_upstream_facts and (args.contract_version != 2 or args.modality != REPOSITORY or args.skills_scope):
+        parser.error("--pull-upstream-facts requires --contract-version 2 and repository inputs")
     if args.skills_scope:
         try:
             repo = args.repo_root.resolve()
@@ -767,11 +874,15 @@ def main(argv=None) -> int:
             record_sources=field_record_sources(repo, catalogs, ledger) if args.contract_version == 2 else None,
             runtime_target=load_json(repo / "catalogs/us-equities/runtime-target.json")
                            if args.contract_version == 2 and (repo / "catalogs/us-equities/runtime-target.json").is_file()
-                           else None, platform_requirements=platform_requirements)
+                            else None, platform_requirements=platform_requirements)
+        if args.contract_version == 2:
+            upstream_facts = freeze_upstream_facts(inputs, pull=args.pull_upstream_facts)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_inputs.py: {error}", file=sys.stderr)
         return 2
     (work / "inputs").mkdir(exist_ok=True)
+    if args.contract_version == 2:
+        write_json(work / "upstream-facts-v2.json", upstream_facts)
     layers = []
     for layer_input in inputs:
         path = work / "inputs" / f"{layer_input['layer_id']}.json"

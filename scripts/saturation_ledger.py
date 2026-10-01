@@ -175,6 +175,8 @@ def norm_repo(repository: str) -> str:
 
 def v2_identity(catalog: str, layer_id: str, repository: str) -> tuple[str, str]:
     """Reuse producer identity helpers (sweep_common and source_reviews at 798ac445)."""
+    if not isinstance(repository, str) or not repository.strip():
+        raise ValueError("V2 repository identity must be a nonempty string")
     helper_path = str(ROOT / "tools/sota-convergence/landscape-sweep")
     if helper_path not in sys.path:
         sys.path.insert(0, helper_path)
@@ -185,6 +187,34 @@ def v2_identity(catalog: str, layer_id: str, repository: str) -> tuple[str, str]
     if not isinstance(repo, str) or (not model and not re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s]+", repo)):
         raise ValueError("V2 field needs a canonical GitHub repository or Hugging Face model identity")
     return repo, f"{catalog}/{layer_id}/{slug(repo)}"
+
+
+def v2_proposals(value, pointer):
+    """Retain each raw discoverer proposal, including identities the adapter cannot resolve."""
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            yield from v2_proposals(item, f"{pointer}/{index}")
+    elif isinstance(value, dict):
+        if "repository" in value:
+            yield value, pointer
+        for child in ("output", "proposed"):
+            if child in value:
+                yield from v2_proposals(value[child], f"{pointer}/{child}")
+
+
+def v2_discovery_identity(catalog: str, layer_id: str, repository) -> tuple[str, str, bool]:
+    """U11 B and PR #590 review: unsupported discovery must remain pending, never abort conversion.
+
+    This opaque key identifies a raw proposal; it does not claim a supported upstream identity.
+    The strict original-field identity contract stays unchanged.
+    """
+    try:
+        repo, key = v2_identity(catalog, layer_id, repository)
+        return repo, key, True
+    except ValueError:
+        raw = json.dumps(repository, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        repo = repository.strip() if isinstance(repository, str) and repository.strip() else raw
+        return repo, f"{catalog}/{layer_id}/unsupported-identity-{sha256_bytes(norm_repo(repo).encode())}", False
 
 
 def v2_expand_field(source: dict, rounds: list) -> list[dict]:
@@ -202,28 +232,18 @@ def v2_expand_field(source: dict, rounds: list) -> list[dict]:
             raise ValueError("V2 original frozen field has a duplicate or mismatched identity")
         members[key] = copy.deepcopy(row)
 
-    def proposals(value, pointer):
-        if isinstance(value, list):
-            for i, item in enumerate(value):
-                yield from proposals(item, f"{pointer}/{i}")
-        elif isinstance(value, dict):
-            if "repository" in value:
-                yield value, pointer
-            for child in ("output", "proposed"):
-                if child in value:
-                    yield from proposals(value[child], f"{pointer}/{child}")
-
     token = layer_id.replace("~", "~0").replace("/", "~1")
     for i, entry in enumerate(rounds):
         if entry.get("catalog") != catalog or entry.get("layer_id") != layer_id:
             raise ValueError("V2 raw round does not belong to the frozen catalog/layer")
         for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
-            for row, ref in proposals(entry.get(slot), f"#/raw/{token}/{i}/{slot}"):
-                repo, key = v2_identity(catalog, layer_id, row["repository"])
+            for row, ref in v2_proposals(entry.get(slot), f"#/raw/{token}/{i}/{slot}"):
+                repo, key, supported = v2_discovery_identity(catalog, layer_id, row["repository"])
                 if key not in members:
                     members[key] = {"candidate_key": key, "repository": repo,
                                     "disposition": "admit_pending", "exclusion_reason": None,
-                                    "pending_reason": row.get("pending_reason") or "discovery_awaiting_v2_screen",
+                                    "pending_reason": (row.get("pending_reason") or "discovery_awaiting_v2_screen")
+                                    if supported else "unsupported_discovery_identity",
                                     "evidence_key": key, "evidence_refs": [], "material": True}
                 refs = [ref, *(value for value in row.get("evidence", []) if isinstance(value, str))]
                 members[key]["evidence_refs"] = sorted(set(members[key]["evidence_refs"] + refs))
@@ -261,6 +281,13 @@ def v2_round_failures(rounds: list) -> list[dict]:
     """A lost round/discovery cannot be a clean search, even if no candidate remains pending."""
     failures = []
     for index, row in enumerate(rounds):
+        token = row.get("layer_id", "").replace("~", "~0").replace("/", "~1")
+        for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
+            for proposal, ref in v2_proposals(row.get(slot), f"#/raw/{token}/{index}/{slot}"):
+                _, _, supported = v2_discovery_identity(row.get("catalog"), row.get("layer_id"),
+                                                        proposal["repository"])
+                if not supported:
+                    failures.append({"round": index, "cause": "unsupported_discovery_identity", "ref": ref})
         if row.get("lost"):
             failures.append({"round": index, "cause": "round_lost"})
         for family, slot in (("claude", "claude_discover"), ("gpt6", "gpt6_discover")):
@@ -305,12 +332,9 @@ def v2_supported_exclusion(row: dict, source_field: dict) -> bool:
     if not requirement:
         return False
     if row["criterion"] == "paid_service_required":
-        frozen = json.dumps(requirement, ensure_ascii=False).lower()
-        forbidden = re.search(r"(?:without|no|forbid\w*|prohibit\w*) (?:a |any )?(?:mandatory )?paid service", frozen)
-        # A fee must actually be required; unavailable sign-in is merely feasibility evidence.
-        fee = re.search(r"(?:requires?|mandatory|only|must).{0,60}(?:paid|payment|subscription)", fact)
-        negated = re.search(r"\b(?:not|never|no)\b.{0,60}(?:paid|payment|subscription)", fact)
-        return bool(forbidden and fee and not negated)
+        # Design-owner clarification in PR #590: part 2 owns the explicit, hash-bound policy.
+        # Requirement-text patterns are not a substitute for that field.
+        return False
     return True
 
 
@@ -318,8 +342,20 @@ def v2_member_outcome(member: dict, screens: dict) -> dict:
     """Retain the original identity/reason unless both required screens resolve it."""
     result = dict(member, status="pending", disposition="admit_pending", exclusion_reason=None, material=True)
     result["pending_reason"] = member.get("pending_reason") or "awaiting_v2_screen"
+    if any("the paid-service policy field arrives in part 2" in screen.get("pending_reasons", [])
+           for screen in screens.values()):
+        result["pending_reason"] = "the paid-service policy field arrives in part 2"
     if all(screen["status"] == "credible" for screen in screens.values()):
         result.update(status="credible", disposition="admit", pending_reason=None)
+    elif screens["facts"]["status"] == "not_credible" and screens["facts"]["criterion"] in (
+            "target_host_incompatible", "paid_service_required"):
+        # Confirmed platform/cost facts stand regardless of the fit judgment on claimed facts.
+        result.update(status="not_credible", disposition="refuted", pending_reason=None,
+                      exclusion_reason=screens["facts"]["criterion"], material=False)
+    elif screens["fit"]["status"] == "not_credible" and screens["fit"]["criterion"] == "outside_requirement":
+        # The fit role owns requirement fit; facts alone cannot establish this exclusion.
+        result.update(status="not_credible", disposition="refuted", pending_reason=None,
+                      exclusion_reason="outside_requirement", material=False)
     elif all(screen["status"] != "pending" for screen in screens.values()):
         criteria = {screen["criterion"] for screen in screens.values() if screen["status"] == "not_credible"}
         if len(criteria) == 1:
@@ -394,6 +430,9 @@ def v2_screen(role: str, documents: list, member: dict, source_field: dict, conf
             continue
         families[provenance["family"]].append((provenance, row))
     majority = {}
+    if any(row["status"] == "not_credible" and row["criterion"] == "paid_service_required"
+           for judgments in families.values() for _, row in judgments):
+        out["pending_reasons"].append("the paid-service policy field arrives in part 2")
     for family, judgments in families.items():
         if len(judgments) < 2 or len({p["order_seed"] for p, _ in judgments}) != len(judgments) \
                 or len({p["judgment_id"] for p, _ in judgments}) != len(judgments):
@@ -401,7 +440,8 @@ def v2_screen(role: str, documents: list, member: dict, source_field: dict, conf
             continue
         votes = [(row["status"], row["criterion"]) if (
             row["status"] == "credible" and row["criterion"] is None or
-            row["status"] == "not_credible" and v2_supported_exclusion(row, source_field))
+            row["status"] == "not_credible" and v2_supported_exclusion(row, source_field)
+            and (role != "facts" or row["criterion"] in ("target_host_incompatible", "paid_service_required")))
             else ("pending", None) for _, row in judgments]
         for vote in set(votes):
             if vote[0] != "pending" and votes.count(vote) * 2 > len(votes):
@@ -1094,10 +1134,9 @@ class Checker:
                 self.error(f"{label}: V2 member requires repository")
                 continue
             repo = member["repository"]
-            try:
-                canonical_repo, expected = v2_identity(catalog, layer_id, repo)
-            except ValueError:
-                canonical_repo, expected = None, None
+            original_member = original.get(member.get("candidate_key"))
+            canonical_repo = original_member.get("repository") if original_member else None
+            expected = original_member.get("candidate_key") if original_member else None
             if repo != canonical_repo or member.get("candidate_key") != expected or member.get("evidence_key") != expected:
                 self.error(f"{label}: V2 candidate/evidence identity mismatch")
             if norm_repo(repo) in by_repo:
@@ -1105,7 +1144,6 @@ class Checker:
             by_repo[norm_repo(repo)] = member
             if not isinstance(member.get("material"), bool) or not isinstance(member.get("evidence_refs"), list):
                 self.error(f"{label}: V2 material/refs required")
-            original_member = original.get(member.get("candidate_key"))
             if original_member is not None:
                 screens = {role: v2_screen(role, docs, original_member, source, conflict)
                            for role, docs in documents.items()}
