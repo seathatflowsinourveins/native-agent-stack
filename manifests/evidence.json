@@ -3810,6 +3810,25 @@
         "identity": "Private source-host identity omitted",
         "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
       }
+    },
+    {
+      "id": "canary-proof-verification-20261001",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "systemd"
+      ],
+      "claim": "The canary proof tool (tools/credentials/canary_proof.py, 1,834 lines, with the contained scan worker tools/credentials/canary_scan_worker.py, 2,114 lines) passed its synthetic acceptance on the workstation on 2026-10-01 on main with the K4 guard: its unit suite ran 143 tests, OK, with none skipped (including 12 cases that start transient systemd user scopes); its mutation runner killed 138 of 138 mutants by failures of their named permanent tests after 90 passing unmutated runs; and the credential, guard, Codex worker-lane and pre-commit suites ran 531 tests with one failure by design (the installed host copy of the guard). The tool plants a unique synthetic canary, lets named consumers use it through the key runner, and searches the named sinks with ripgrep in a worker that runs in a finite systemd user scope; its classifier refuses unless every required check has a fresh, complete result bound to the run. Reviews: a read-only GPT-6 verification found seven paths to a false clean verdict and four high findings, and an Opus build review found one blocking gap in the contract's acceptance cases; one repair round by a GPT-6 runtime worker fixed them, each with a permanent test and a mutant; an Opus re-check confirmed 37 of 42 dispositions and found one more false-clean path (a Git object store with no HEAD, refs or .git name, reached directly) and a record-validation defect, which one bounded fix round closed with tests and mutants. No end-to-end proof has run: it is the new distribution's acceptance after its guard install.",
+      "limitations": [
+        "Synthetic acceptance only: every sink, canary, Git store, SQLite database and journal in these runs is a fixture the tests build under a temporary directory; no real consumer, transcript, log, journal or credential was used, and no proof claim is made before the end-to-end run.",
+        "Containment evidence is workstation scope enforcement: the real-scope classes start transient systemd user scopes on this host (12 cases, all passing); hosted CI runners skip them where no user scope exists.",
+        "Scanner: ripgrep 14.1.0 is the executed version; the runtime also accepts 15.2.0 on a source-reviewed output grammar that no run has executed.",
+        "Size: the implementation (3,948 coordinator and worker lines) and the permanent test file (3,632 lines) exceed the contract's ceilings (1,800 and 2,800); the coordinator accepted the deviation for the required coverage and containment logic, and the reviews' dead-code findings were removed.",
+        "Residuals from the Opus re-check, recorded in the decision record: a completed but too-early or stale final is labelled requested_incomplete; the WAL/SHM-without-valid-main guard, Walk.covered's exclusion, time, special-file and symlinked-parent branches, and several O12 changes have no test of their own; three mutants are missing (END count/aux, --text, a count-based Git reconcile); bind_scope's refusal paths and the real scope_populated parser are untested; the scan's exit code still comes from events it does not validate.",
+        "Evidence classes differ: the unit, mutation and suite runs were made by the coordinator on the final head outside any sandbox; the reviews are read-only cross-family reads, not proofs."
+      ],
+      "path": "evidence/receipts/canary-proof-verification-20261001.json"
     }
   ],
   "files": [
@@ -4090,8 +4109,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "e2ce60d6424c0ec97a419ae3967ad9b902a4430605e435a00371f216c5abdf56",
-      "bytes": 22661
+      "sha256": "a7363da986a1552b4ae6e3c8a44b61929c484347c3e48ded5259a08ad8ea98d4",
+      "bytes": 23768
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -4235,8 +4254,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "f7d4117ff2b5baf287f8663a6fd3d4e283e612c9973daddbc7c6fe69a322282a",
-      "bytes": 62765
+      "sha256": "76d66f3cd8df2c86a5c1e523d7bd590bb01c2fc85ac321d418e0413f042ed237",
+      "bytes": 63161
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -15556,8 +15575,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "0900142af9a97dcdcd063a90a586df76cc9d75a7b115f33232199999a322c8d0",
-      "bytes": 72794
+      "sha256": "76d68d3e49eff51bc471539b57baca672afa000233d5ebe447c39b9a74cca357",
+      "bytes": 93607
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -15876,8 +15895,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "80b485f60688f2a01b468f5a22e545b8e793a7ab40269877917490f353dc4932",
-      "bytes": 163577
+      "sha256": "6f48997efed9e2e1271f2e21754e5b304f423e89faf45328951143c9a01a1fe4",
+      "bytes": 180968
     },
     {
       "path": "docs/stack.md",
@@ -44830,6 +44849,11 @@
       "bytes": 1568
     },
     {
+      "path": "evidence/receipts/canary-proof-verification-20261001.json",
+      "sha256": "fbe91b5fae55546cfa3ad10c5aa3140793afd3eabcac9a4276de3db96b803ec0",
+      "bytes": 8219
+    },
+    {
       "path": "evidence/receipts/catalog-clean-install-20260921.json",
       "sha256": "9ef05c095fa7b15d59709de71c135e80981ba62a1a8ef910cda1f9da5d60f7b8",
       "bytes": 1382
@@ -46191,8 +46215,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "636ee1a7b79941f02ea49ed5f62a7ae7860f3f2572b42d45c7cdcc7a986207e8",
-      "bytes": 33813
+      "sha256": "0d997b483438ff1b728f97de08c4beb020110b440c293f4c3d3adc872c665b54",
+      "bytes": 34277
     },
     {
       "path": "scripts/env_freshness.py",
@@ -46313,6 +46337,11 @@
       "path": "tests/adaptive_paper_hermetic.py",
       "sha256": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
       "bytes": 5384
+    },
+    {
+      "path": "tests/canary_mutants.py",
+      "sha256": "580c4d471815c69746167c830e679361cd37bbbf13335c573035197af7b71890",
+      "bytes": 61240
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -46650,6 +46679,11 @@
       "bytes": 50802
     },
     {
+      "path": "tests/test_canary_proof.py",
+      "sha256": "aa98d22b308befb9b0dd7e3b32745280ed83d16c6d9e9cdf1d4100d58270678b",
+      "bytes": 215840
+    },
+    {
       "path": "tests/test_capability_gate.py",
       "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
       "bytes": 38580
@@ -46756,13 +46790,13 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "9f8f8278dd1a74cc5422af9bc058778cee536180845da44e9f39a87cce937380",
-      "bytes": 128245
+      "sha256": "c31357e2a232fd9d9db4b7fe26edb1ee8c2f552183ad346db36b4b274e67d0fd",
+      "bytes": 128277
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "3b541daf16d04b13b9a4bace798117cb485ef37c6181f3e50fe22d4e7e3df927",
-      "bytes": 52288
+      "sha256": "3840065b72c62fe51278b513baee5a01eeff623eb7a3f814e55e3f345c282bf4",
+      "bytes": 53736
     },
     {
       "path": "tests/test_credential_tools.py",
@@ -47528,6 +47562,31 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/credentials/canary_lane_consumer.sh",
+      "sha256": "e820394825eeea9a1cfcec3c2ec87ccb62400af28c929f6ab2d52a99cd0a810c",
+      "bytes": 1824
+    },
+    {
+      "path": "tools/credentials/canary_probe.py",
+      "sha256": "273c5b899f45d1feb267da29108a7413d75895353014534cf474df40b3e772dd",
+      "bytes": 5553
+    },
+    {
+      "path": "tools/credentials/canary_proof.py",
+      "sha256": "3b78381c3bd24282b2b9c1eec8a9845d4221e36aaaaa46143b4b57cbe1ce7e76",
+      "bytes": 103189
+    },
+    {
+      "path": "tools/credentials/canary_scan_worker.py",
+      "sha256": "aefc5aef230869182fde95c12328e992c07cd69f932642d255c297812fc6c382",
+      "bytes": 106350
+    },
+    {
+      "path": "tools/credentials/canary_workflow.js",
+      "sha256": "84afb069f759e5f2df9f76484554f264adcbfb685f661f27cbba29866e7891ea",
+      "bytes": 2402
     },
     {
       "path": "tools/credentials/credential_run.py",
