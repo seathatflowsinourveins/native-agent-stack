@@ -36,9 +36,11 @@ some cells, and no run makes a layer final. The foundation rows use the first co
 us-equities rows the last, which is the basis of that assessment's synthesis. The core files those assessments cite
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json`, `catalogs/foundation/manifest.json`) are unchanged between `3361b342` and
-this edition's base. Four sources are not on main yet: the new-distribution recipe (PR #569, head `344a69ff`),
-the Harbor E2E receipt (PR #570, head `cd7db158`), the trading convergence record (PR #358, head `b0eb7a11`) and
-the program record with the foundation assessment (PR #573, head `5adcc3a4`).
+this edition's base. Six pull requests carry sources that are not on main yet: the new-distribution recipe
+(PR #569, head `344a69ff`), the Harbor E2E receipt (PR #570, head `cd7db158`), the trading convergence record
+(PR #358, head `b0eb7a11`), the program record with the foundation assessment (PR #573, head `5adcc3a4`), the
+Codex lane's layer reviews and crosswalk (PR #575, head `bbee2a8e`) and the runtime-workers blueprint README
+(PR #535, head `1195e212`).
 
 ## Alternatives
 
@@ -93,11 +95,17 @@ one that at least one winner's acceptance carries. A row without winners keeps i
 evidence for one winner stays in the reasons. Every class describes source-host history; a new distribution
 collects its own evidence.
 
-**Validation the build enforces.** Known layer ids or `cross:<name>`; the row catalog matches its layer;
-exactly one of `component_id` (a `manifests/stack.json` component, whose recorded version must be the pin,
-"architecture row pin must match manifests/stack.json") or `name`; public HTTPS repositories and currency
+**Validation the build enforces.** Known layer ids or `cross:<name>`, a layer's identity being its
+`(catalog, layer_id)` pair; the row catalog matches its layer; exactly one of `component_id` (a
+`manifests/stack.json` component) or `name`; when a component's recorded version in the stack differs from the
+winner's pin, the build passes, the page notes the drift on that winner ("the stack now records <version>") and
+the `--check` JSON lists it under `architecture_pin_drift`, the token topic's precedent for a dated edition; an
+optional `role` per winner (non-empty, at most 120 characters), rendered beside its name, because winners are the
+components of the selection of record and some are not its destination; public HTTPS repositories and currency
 links; a `pin_source` of one repository file with an optional line range inside it; every `source_path` a
-repository file, hashed into the page inputs and linked at the publication ref; enums for verdicts, evidence
+repository file, hashed into the page inputs and linked at the publication ref; a `pending_source` whose path
+exists as a repository file is treated as landed, hashed and linked like a `source_path` with the label "landed
+after this edition's base (pull request #N)", so a later merge never fails the build; enums for verdicts, evidence
 classes, closure states, install kinds and gate kinds; `closed` if and only if all five items are `met`; a
 non-empty `missing` for every open row and an empty one for a closed row; a `missing` that starts with one
 `cN: ...` segment for each item that is not `met` (segments separated by `; cN:`) and has none for a `met` item,
@@ -135,8 +143,11 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
 **Residual gaps.**
 - Upstream currency is one read per pinned winner on 2026-10-01 (GitHub releases, or the named registry
   page); it was not repeated. Serena, ECC, the guard and the convergence practice carry `unknown`.
-- `pin_source` validation checks the file and the line bounds, not the line's content; the content was checked
-  when the edition was written.
+- `pin_source` content is not checked: validation checks the file and the line bounds, not the line's content;
+  the content was checked when the edition was written. Two winners cite a file that cannot establish their
+  pin: the adaptive-paper engine is pinned to a merge commit (`dca821cc`), which no file in that merge can
+  record, and the convergence practice is pinned to this edition's base commit, cited from this edition's own
+  `base_commit` line.
 - The cross rows had no closure assessment; their closure items rest on this edition's reading, and items it
   cannot establish are `unknown`.
 - Item 4 for the foundation rows: the Codex lane's cross-family review of all 20 layers (PR #575 at `bbee2a8e`,
@@ -161,12 +172,15 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
 Write a new edition, or update this one in the change that causes it, when any of these happens:
 
 1. **A layer closure.** All five items hold for a row; the build then requires `closed`.
-2. **A pin move.** A winner's version changes in `manifests/stack.json`: the build fails on the pin rule
-   until the edition follows, by design. A move in the Linux pins file or runtime-target.json is caught by
-   the line-bounds check only when the line disappears, so re-read those rows.
+2. **A pin move.** A winner's version changes in `manifests/stack.json`: the build still passes, the page
+   notes the drift on that winner and `--check` lists it under `architecture_pin_drift`; re-read the row and
+   record the new pin in the next edition. A `component_id` that leaves the stack still fails the build. A move
+   in the Linux pins file or runtime-target.json is caught by the line-bounds check only when the line
+   disappears, so re-read those rows.
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
-4. **A pending source lands.** PR #569, #570 or #358 merges: move its citations to `source_path` and re-rate
-   `cross:wsl-distro`.
+4. **A pending source lands.** PR #569, #570, #358, #573, #575 or #535 merges: the build hashes the landed
+   file and labels it as landed after this edition's base; move its citations to `source_path` and, for #569,
+   re-rate `cross:wsl-distro`.
 5. **A lane owner changes a verdict or its wording** for one of its rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a

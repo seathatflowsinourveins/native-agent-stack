@@ -143,16 +143,24 @@ is missing, the winners' pin locators, install and acceptance commands and
 upstream currency, the alternatives, the ordered new-host steps and the gates.
 
 The build validates the edition before it renders: every `layer_id` is a known
-catalog layer or a `cross:` id; a winner's `component_id` must be a
-`manifests/stack.json` component carrying that component's recorded version as
-its pin; repositories and currency links pass the public HTTPS gate; each cited
-`source_path` must be a repository file, which is hashed into the page's inputs
-and linked at the publication ref; a source not yet on main is cited as a
-`pending_source` with its pull request and is linked, not hashed; verdicts and
-evidence classes come from fixed enums, and a `closed` verdict requires all five
-closure items `met` (an open row must name what is missing). A catalog layer
-without a row is listed as a gap rather than failing the build. The record of
-this edition is
+catalog layer or a `cross:` id, a layer being identified by its catalog and id; a
+winner's `component_id` must be a `manifests/stack.json` component, and when the
+stack's recorded version differs from the edition's pin the build still passes,
+the page notes the drift on that winner and the `--check` JSON lists it under
+`architecture_pin_drift`; a winner may carry a short `role` (at most 120
+characters), shown beside its name; repositories and currency links pass the
+public HTTPS gate; each cited `source_path` must be a repository file, which is
+hashed into the page's inputs and linked at the publication ref; a source not yet
+on main is cited as a `pending_source` with its pull request and is linked, not
+hashed, until its file exists, when it is hashed and labelled as landed after the
+edition's base; verdicts and evidence classes come from fixed enums; a row is
+`closed` if and only if all five closure items are `met`, so a closed row names
+nothing missing and an open row's `missing` names each item that is not met in
+its own `cN:` segment and no met item; a row with a winner whose acceptance is
+`none_recorded` is `none_recorded`, and otherwise its class is one that a
+winner's acceptance carries; and the edition's `close_only_when_sha256` must
+match the research state's five closure texts. A catalog layer without a row is
+listed as a gap rather than failing the build. The record of this edition is
 [`docs/decisions/2026-10-01-new-wsl-architecture-edition.md`](../decisions/2026-10-01-new-wsl-architecture-edition.md).
 
 ## Rebuild and check
