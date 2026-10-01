@@ -1,0 +1,418 @@
+{
+ "schema": "omniroute-rebuild-qualification-extract/1",
+ "recorded_at_utc": "2026-09-30T00:50:00Z",
+ "evidence_classes": {
+  "upstream_check": "upstream's own npm scripts, run unchanged on our builds (check:pack-artifact, check:pack-boot, test:unit)",
+  "integration_check": "our own boot smoke, targeted unit runs, classification of failures, live probes"
+ },
+ "builds": {
+  "B2_20128": {
+   "head": "ae5539a56",
+   "commits_over_tip": 3,
+   "tarball_sha256": "0239e52b1ac33e79a65569646cd00958255ec9a914a04f66fa1b19b7c833f370",
+   "build": {
+    "start": "2026-09-29T23:01:22Z",
+    "end": "2026-09-29T23:11:46Z",
+    "check_pack_artifact_rc": 0
+   },
+   "install_rc": 0,
+   "smoke": {
+    "health": 200,
+    "seconds_to_health": 4,
+    "sigterm_exit": 143,
+    "orphans": "none"
+   },
+   "check_pack_boot": {
+    "attempts": [
+     {
+      "n": 1,
+      "rc": 0,
+      "start": "2026-09-29T23:15:28Z",
+      "end": "2026-09-29T23:21:18Z"
+     }
+    ]
+   },
+   "targeted_unit_tests": {
+    "files": 7,
+    "tests": 69,
+    "pass": 69,
+    "fail": 0
+   }
+  },
+  "A2_20129": {
+   "head": "87c4c488d",
+   "commits_over_tip": 2,
+   "tarball_sha256": "117a625b70e0c67bede41f10fb79d2bf57caeae46c1886c543b85643b068a340",
+   "build": {
+    "start": "2026-09-29T23:11:46Z",
+    "end": "2026-09-29T23:23:39Z",
+    "check_pack_artifact_rc": 0
+   },
+   "install_rc": 0,
+   "smoke": {
+    "health": 200,
+    "seconds_to_health": 3,
+    "sigterm_exit": 143,
+    "orphans": "none"
+   },
+   "check_pack_boot": {
+    "attempts": [
+     {
+      "n": 1,
+      "rc": 1,
+      "cause": "not established: the check reported that its random port 23258 was already in use by another PID; the PID was never identified and lsof -ti counts any socket on the port",
+      "start": "2026-09-29T23:26:57Z",
+      "end": "2026-09-29T23:31:17Z"
+     },
+     {
+      "n": 2,
+      "rc": 1,
+      "cause": "not established: the server booted healthy, then the check's fetch failed with 30 s outbound timeouts in its own log, while our pristine-tree suite ran on the same CPUs at load average about 40; the 'Out of memory' lines after the SIGTERM are shutdown noise, not shown to be the cause",
+      "start": "2026-09-29T23:31:40Z",
+      "end": "2026-09-29T23:55:50Z"
+     },
+     {
+      "n": 3,
+      "rc": 0,
+      "start": "2026-09-29T23:56:49Z",
+      "end": "2026-09-30T00:01:15Z",
+      "note": "CPUs 32-39 at nice 5 (our pristine-tree suite still ran on CPUs 40-47 until 00:07:03Z); passing is the result of this attempt, not a demonstrated cause for attempts 1 and 2"
+     }
+    ],
+    "note": "attempt times are from the qualification's private time log; the run environment was isorun-pb.sh (HUSKY unset, sidecar ports 20198 and 20199, host network), whose scripts are not published; attempts 1 and 2 overlapped our own pristine-tree full suite (2026-09-29T23:23:50Z to 2026-09-30T00:07:03Z)"
+   },
+   "targeted_unit_tests": {
+    "files": 6,
+    "tests": 62,
+    "pass": 62,
+    "fail": 0
+   }
+  }
+ },
+ "carries": {
+  "#13788": {
+   "commits": [
+    "24bbadbad",
+    "6c7990058"
+   ],
+   "patch_ids": [
+    "d6cb98ecd2c4aed3",
+    "cbb7d8fb78ed0dcf"
+   ],
+   "both_builds": true
+  },
+  "affinity_local": {
+   "commit": "045aa81f3",
+   "patch_id": "132ad5e91380a1d2",
+   "build": "B2_20128"
+  },
+  "installed_check": {
+   "observed_utc": "2026-09-30T04:52:47Z",
+   "how": "scripts/installed_check.py.txt run at the printed time, counts only; its output as printed is checks/installed-check-20260930.json",
+   "20128_B2": {
+    "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
+    "build_sha": "ae5539a56",
+    "alpha_search_route_files": 6,
+    "pickMoreAvailableOAuthPeer": {
+     "occurrences": 23,
+     "built_files": 11
+    }
+   },
+   "20129_A2": {
+    "prefix": "omniroute-3.8.51-2f42a9ac-pr13788",
+    "build_sha": "87c4c488d",
+    "alpha_search_route_files": 6,
+    "pickMoreAvailableOAuthPeer": {
+     "occurrences": 0,
+     "built_files": 0
+    }
+   }
+  }
+ },
+ "upstream_test_unit_stage1": {
+  "note": "upstream 'test:unit' stage 1 of 3 (stages 2 and 3 exited 0 on both trees); spec reporter output; run in a network-less user+net namespace at nice 19 on 8 CPUs",
+  "pristine_tip_2f42a9ac1_unbuilt_worktree": {
+   "summary": {
+    "tests": 44863,
+    "suites": 1953,
+    "pass": 44815,
+    "fail": 14,
+    "cancelled": 0,
+    "skipped": 34,
+    "todo": 0
+   },
+   "window": [
+    "2026-09-29T23:23:50Z",
+    "2026-09-30T00:06:46Z"
+   ],
+   "stage1_rc": 1,
+   "failing_names": [
+    "#11632 ?prefix=canonical suppresses alias and bare rows for Codex-native roots",
+    "#11632 MODELS_CATALOG_PREFIX_MODE=canonical flag path gates Codex-native roots",
+    "#11632 canonical mode re-roots the surviving row instead of dangling at a suppressed parent",
+    "connection with both apiKey and refreshToken: refresh path is tried",
+    "fetches data from models.dev API",
+    "global\u2192rule switch re-evaluates binding: drops global, binds the selected provider scope",
+    "has anthropic provider with claude models",
+    "has openai provider with gpt-4o model",
+    "modelsDevSync \u2014 fetchModelsDev (live API)",
+    "remote image fetched for the claude-wire self-call is downscaled to the long-edge cap",
+    "remote non-image bytes pass through untouched (fail-open, no normalization)",
+    "returns cached data on second call",
+    "tests/unit/pindns-toctou-13883.test.ts",
+    "tests/unit/remote-image-fetch.test.ts",
+    "v1 image generation POST accepts promptless requests for image-only models"
+   ]
+  },
+  "B2_20128_built_worktree": {
+   "summary": {
+    "tests": 44824,
+    "suites": 1951,
+    "pass": 44772,
+    "fail": 18,
+    "cancelled": 0,
+    "skipped": 34,
+    "todo": 0
+   },
+   "window": [
+    "2026-09-30T00:07:03Z",
+    "2026-09-30T00:36:35Z"
+   ],
+   "stage1_rc": 1,
+   "failing_names": [
+    "#11632 ?prefix=canonical suppresses alias and bare rows for Codex-native roots",
+    "#11632 MODELS_CATALOG_PREFIX_MODE=canonical flag path gates Codex-native roots",
+    "#11632 canonical mode re-roots the surviving row instead of dangling at a suppressed parent",
+    "a login state expires after fifteen minutes",
+    "connection with both apiKey and refreshToken: refresh path is tried",
+    "every relative import of a shipped script is itself shipped (package.json files)",
+    "fetches data from models.dev API",
+    "global\u2192rule switch re-evaluates binding: drops global, binds the selected provider scope",
+    "hard-lease credential, executor, and connection-query inventory has no unclassified site",
+    "has anthropic provider with claude models",
+    "has openai provider with gpt-4o model",
+    "loads the TypeScript MCP entrypoint through the Node 26-compatible tsx import hook",
+    "modelsDevSync \u2014 fetchModelsDev (live API)",
+    "remote image fetched for the claude-wire self-call is downscaled to the long-edge cap",
+    "remote non-image bytes pass through untouched (fail-open, no normalization)",
+    "returns cached data on second call",
+    "tests/unit/pindns-toctou-13883.test.ts",
+    "tests/unit/remote-image-fetch.test.ts",
+    "v1 image generation POST accepts promptless requests for image-only models"
+   ]
+  },
+  "only_in_B2_classified": [
+   {
+    "name": "hard-lease credential, executor, and connection-query inventory has no unclassified site",
+    "class": "introduced by the #13788 carry",
+    "basis": "the inventory lists src/app/api/v1/alpha/search/route.ts; the carry has no matching test update (same attribution as the earlier 81c9b6da rebuild)"
+   },
+   {
+    "name": "every relative import of a shipped script is itself shipped (package.json files)",
+    "class": "artifact of running in a built worktree",
+    "basis": "fails only when dist/ exists: B2 as built 2 failures over the three files; B2 with dist/ moved aside 0; pristine unbuilt tree 0"
+   },
+   {
+    "name": "loads the TypeScript MCP entrypoint through the Node 26-compatible tsx import hook",
+    "class": "artifact of running in a built worktree",
+    "basis": "same three-file rerun as above"
+   },
+   {
+    "name": "a login state expires after fifteen minutes",
+    "class": "timing flake under load",
+    "basis": "passed in both isolated reruns"
+   }
+  ],
+  "totals_note": "tests differ by 39 between the two runs (44863 vs 44824); see full_suite_reconciliation: 17 carry tests plus results one full run did not print (attributed to --test-force-exit), identical when the files run alone. The source trees differ by the carries' files; the 20128 tree was also built in place.",
+  "not_run": [
+   "upstream Playwright e2e",
+   "upstream integration suites"
+  ],
+  "full_suite_reconciliation": {
+   "class": "our integration check (name-level comparison of the two full runs' spec output, then isolated reruns of the differing files)",
+   "result_lines": {
+    "pristine_tip_2f42a9ac1": 46815,
+    "B2_20128": 46774,
+    "difference": 41,
+    "note": "41 = 39 tests + 2 suites = 115 (only in the pristine run) - 57 (only in the 20128 run, not carry tests) - 17 (carry tests, only in the 20128 run)"
+   },
+   "only_in_pristine_run": {
+    "lines": 115,
+    "explained_by": "results the 20128 full run did not print, attributed to upstream's --test-force-exit (an observed effect of that flag on other files, not isolated for these); every name is produced by the isolated reruns of both trees"
+   },
+   "only_in_20128_run": {
+    "lines": 74,
+    "carry_tests": {
+     "lines": 17,
+     "files": {
+      "tests/unit/issue-8674-alpha-search.test.ts": 10,
+      "tests/unit/affinity-outranks-occupancy-8940.test.ts": 7
+     },
+     "note": "the carries' own regression tests exist only in the 20128 tree"
+    },
+    "explained_by_lost_results": {
+     "lines": 57,
+     "note": "results the pristine full run did not print, attributed to --test-force-exit (not isolated); every name is produced by the isolated reruns of both trees"
+    }
+   },
+   "isolated_reruns": {
+    "how": "each differing file run alone without --test-force-exit, once per tree, in two batches per tree (11 and 7 files): the stage-1 flags of upstream's test:unit with an explicit file list, network-less namespace, nice 19 (the qualification's runner scripts are not published)",
+    "files": 18,
+    "per_tree": {
+     "base2": {
+      "batch_1_11_files": {
+       "tests": 436,
+       "suites": 54,
+       "pass": 436,
+       "fail": 0,
+       "cancelled": 0,
+       "skipped": 0,
+       "todo": 0
+      },
+      "batch_2_7_files": {
+       "tests": 131,
+       "suites": 33,
+       "pass": 131,
+       "fail": 0,
+       "cancelled": 0,
+       "skipped": 0,
+       "todo": 0
+      },
+      "result_lines": 654
+     },
+     "B2": {
+      "batch_1_11_files": {
+       "tests": 436,
+       "suites": 54,
+       "pass": 436,
+       "fail": 0,
+       "cancelled": 0,
+       "skipped": 0,
+       "todo": 0
+      },
+      "batch_2_7_files": {
+       "tests": 131,
+       "suites": 33,
+       "pass": 131,
+       "fail": 0,
+       "cancelled": 0,
+       "skipped": 0,
+       "todo": 0
+      },
+      "result_lines": 654
+     }
+    },
+    "names_equal_between_trees": true,
+    "failing": 0,
+    "files_list": [
+     "image-generation-handler",
+     "executor-claude-identity",
+     "private-host-special-ranges",
+     "arena-elo-sync",
+     "arena-elo-sync-redesign",
+     "security/live-server-allowlist",
+     "db-providers-split",
+     "route-guard-cli-tools-settings-local-only",
+     "tool-schema-sanitizer (.mjs)",
+     "combo/quota-weighted-strategy",
+     "lmarena-provider",
+     "usagehistory-helpers-split",
+     "calllogs-format-split",
+     "providerlimits-quotanormalize-split",
+     "retrieval-scoring-split",
+     "ui/comboFlowModel",
+     "ui/comboFlowModel-breakers",
+     "ui/comboFlowModel-cooldown"
+    ]
+   },
+   "trees_differ_beyond_the_carries": {
+    "pristine_base2": "unbuilt worktree, clean (0 modified, 0 untracked)",
+    "B2": "built in place: dist/, 31 tracked files under bin/cli/api-commands regenerated by the build (3,707 insertions, 88 deletions), 94 untracked build outputs"
+   },
+   "reading": "The 41-line difference is accounted for by name: 17 lines are the carries' own tests, and the other 172 are results that one of the two full runs did not print (115 from the 20128 run, 57 from the pristine run), which we attribute to --test-force-exit; they are identical when the files run alone (0 failing on either tree). The security-relevant files (security/live-server-allowlist, private-host-special-ranges, route-guard-cli-tools-settings-local-only) pass alone on the 20128 build.",
+   "recorded_at_utc": "the two rerun batches printed 2026-09-30T02:46:02Z to 02:47:08Z (11 files) and 02:50:17Z to 02:50:37Z (7 files); the name-level comparison followed; this entry was written later the same day, and no time was printed for it"
+  },
+  "failing_names_note": "failing_names are the names printed under 'failing tests' (test names and two file names). The lists have one more entry than the runner's fail counts (15 vs 14, 19 vs 18); the difference was not traced."
+ },
+ "live_probes_after_switch": {
+  "20128": [
+   {
+    "model": "cx/gpt-6-sol",
+    "http": 200
+   },
+   {
+    "model": "cx/gpt-6.1-sol",
+    "http": 200,
+    "served": "gpt-6.1-sol"
+   },
+   {
+    "model": "cx/gpt-6.1-zzz-nonexistent",
+    "http": 400,
+    "message": "not available in the active live catalog"
+   },
+   {
+    "model": "cx/gpt-6-sol",
+    "headers": "User-Agent codex_exec/0.157.1, Version 0.157.1",
+    "http": 200,
+    "response_event_types": 9
+   }
+  ],
+  "20129": [
+   {
+    "model": "sharedgw/cx/gpt-6-luna",
+    "http": 200
+   },
+   {
+    "model": "sharedgw/cx/gpt-6.1-sol",
+    "http": 200,
+    "served": "gpt-6.1-sol"
+   },
+   {
+    "model": "cxa/gpt-6-luna",
+    "http": 503,
+    "note": "Codex app-server transport not configured"
+   }
+  ],
+  "models_listed": {
+   "20128": 610,
+   "20129": 477
+  }
+ },
+ "token_effect_synthetic": {
+  "class": "synthetic fixture through live gateways, one payload each, not savings figures",
+  "sharedgw_cx_gpt_6_luna_after_T09": {
+   "payload": "480-line retry-loop tool output with an error needle",
+   "input_tokens": {
+    "off": 7349,
+    "no_header": 7423,
+    "gpt6-agent-safe": 595,
+    "gpt6-safe-lossy": 595
+   },
+   "answers_correct": true
+  },
+  "sharedgw_cx_gpt_6_luna_after_delta": {
+   "payload": "480-line retry loop",
+   "input_tokens": {
+    "off": 8573,
+    "no_header": 8573,
+    "gpt6-agent-safe": 1745,
+    "gpt6-safe-lossy": 1643
+   },
+   "answers_correct": true
+  },
+  "sharedgw_cx_gpt_6_luna_repeated_read_in_history": {
+   "chat": {
+    "off": 2712,
+    "no_header": 1464,
+    "gpt6-agent-safe": 1464
+   },
+   "responses": {
+    "off": 2675,
+    "no_header": 1427,
+    "gpt6-agent-safe": 1427
+   },
+   "answers_correct": true,
+   "note": "session-dedup rewrites duplicates in history only: the current turn (after the last assistant message) is never rewritten, blocks need at least 512 characters and several lines"
+  }
+ }
+}

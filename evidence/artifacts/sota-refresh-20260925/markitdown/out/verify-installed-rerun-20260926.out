@@ -1,0 +1,9 @@
+$ date -u +%FT%TZ
+2026-09-26T01:50:58Z
+$ sha256sum <impl>/artifacts/markitdown-0.1.8-py3-none-any.whl
+de7375a50578a39bcbbf13b48c67d99033d988e0ae8ad25af46ed432dbe4cbab
+$ python3 -B <impl>/verify_installed.py <impl>/artifacts/markitdown-0.1.8-py3-none-any.whl ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages
+wheel_members=46 record_entries_checked=45 record_mismatches=0
+installed_identical=45 installed_differs=0 installed_missing=0 (RECORD excluded)
+installer_added_distinfo_files=INSTALLER,REQUESTED
+exit=0

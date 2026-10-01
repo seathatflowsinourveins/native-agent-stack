@@ -718,7 +718,7 @@ def symbol_price_decimals(price_at_t):
     above 1 USD can fall below it within the trial (X4's stop alone reaches it for any
     entry up to about 1.17 USD). A 2-decimal instrument cannot carry such a fill: the
     native adapter refuses a fill price finer than its instrument
-    (cumulative_fill_precision_requires_reconciliation). The pricing functions still
+    (execution_price_precision_requires_reconciliation). The pricing functions still
     use the 0.01 tick at or above 1 USD, as Alpaca and the ledger's price-increment
     check require; NautilusTrader accepts those coarser prices on a 4-decimal
     instrument. ``price_at_t`` is unused; the signature is kept for the plan's callers."""
@@ -1049,18 +1049,23 @@ class MoverBook:
     force reason (kill switch, risk halt, transport gap, hard flatten, ...) cancels open
     buys and flattens, in the evaluation that latched it.
 
-    Exit budget: no sell is sent on a halted quote, a pre-wire refusal is retried after
-    PRE_WIRE_RETRY_SECONDS without being charged, a latched force reason grants each leg
-    one fresh budget, and a leg that exhausts its budget before any force latches the
-    book-wide force ``exit_orders_exhausted`` (or ``exit_refusals_exhausted``), so every
-    leg flattens through the book first. ``handoff_reason`` then tells the runner when to
-    stop the native loop and leave the residual to recovery.recover.
+    Exit budget: no sell is sent while ``halted(symbol)`` (default: the quote's own halted
+    flag; the runner passes Controller.is_halted, the status stream and startup seed only,
+    so the quote's best-effort condition flag blocks entries but never exits), a pre-wire
+    refusal is retried after PRE_WIRE_RETRY_SECONDS without being charged, a latched force
+    reason grants each leg one fresh budget, and a leg that exhausts its budget before any
+    force latches the book-wide force ``exit_orders_exhausted`` (or
+    ``exit_refusals_exhausted``), so every leg flattens through the book first.
+    ``handoff_reason`` then tells the runner when to stop the native loop and leave the
+    residual to recovery.recover.
     """
 
-    def __init__(self, plan, *, positions, quote, limits, trial_id, existing_client_ids=(), event_sink=None):
+    def __init__(self, plan, *, positions, quote, limits, trial_id, existing_client_ids=(), event_sink=None,
+                 halted=None):
         self.plan = plan
         self._positions = positions
         self._quote = quote
+        self._halted = halted or (lambda symbol: bool(getattr(self._quote(symbol), "halted", False)))
         self.limits = limits
         self.prefix = f"mvr-{trial_id}-"
         self.sequence = max((int(cid[len(self.prefix):]) for cid in existing_client_ids
@@ -1232,7 +1237,7 @@ class MoverBook:
                     self.events({"type": "mover_exit_triggered", "symbol": symbol, "reason": reason, "at": now})
                     actions += self._cancels(leg, symbol, now, force)
             if leg.exit_reason is not None and not self.open_orders(symbol):
-                leg.exit_wait_reason = self._exit_wait(leg, quote, fresh, now)
+                leg.exit_wait_reason = self._exit_wait(leg, self._halted(symbol), fresh, now)
                 if leg.exit_wait_reason is None:
                     action = self._exit(leg, symbol, quote, held, now)
                     if action is not None:
@@ -1248,11 +1253,11 @@ class MoverBook:
         self._held_total = held
 
     @staticmethod
-    def _exit_wait(leg, quote, fresh, now):
+    def _exit_wait(leg, halted, fresh, now):
         """Why a triggered exit is not sent now (never charged to the budget), or None."""
         if not fresh:
             return "no_fresh_quote"
-        if getattr(quote, "halted", False):
+        if halted:
             return "quote_halted"   # a limit sell cannot fill during a halt; wait for it to lift
         if leg.exit_retry_at is not None and now < leg.exit_retry_at:
             return "pre_wire_refusal_backoff"
@@ -1288,7 +1293,13 @@ class MoverBook:
         return None
 
     def _cancels(self, leg, symbol, now, force):
+        """Cancels for one leg. A resting exit is re-priced after the exit timeout,
+        except while the symbol is halted (a trading halt, LULD pause or quotation-only
+        period; ``halted(symbol)``): a limit sell cannot fill then, and a cancel and
+        re-send every exit timeout would spend the exit budget (20 orders in about 200 s
+        against 5-10 min pauses). It rests; re-pricing resumes once the symbol trades."""
         actions = []
+        halted = self._halted(symbol)
         for record in self.open_orders(symbol):
             if record.cancel_requested:
                 continue
@@ -1300,7 +1311,7 @@ class MoverBook:
                     why = "exit_triggered"
                 elif now - record.created >= self.plan.timing.entry_timeout_seconds:
                     why = "entry_timeout"
-            elif now - record.created >= self.plan.timing.exit_timeout_seconds:
+            elif now - record.created >= self.plan.timing.exit_timeout_seconds and not halted:
                 why = "exit_reprice"
             if why is not None:
                 record.cancel_requested, record.cancel_reason = True, why

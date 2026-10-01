@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--rtk--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && rtk --version",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "27c3358e4e4d8fa03473b95913f1d2e47c2aa826f00e8400676b90ac925c0d93",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\nrtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk gain --format json | python3 -c 'import json,sys;s=json.load(sys.stdin)[\"summary\"];print(\"rtk gain (global, all retained projects):\",{k:s[k] for k in (\"total_commands\",\"total_input\",\"total_output\",\"total_saved\")});assert s[\"total_saved\"]>0 and s[\"total_input\"]>=s[\"total_output\"];print(\"asserted: total_saved > 0 and total_input >= total_output\")'",
+      "exit": 0,
+      "duration_s": 0.212,
+      "output_sha256": "94e3a8e2c23404a3063b98e558f44cba76bbf865a2dbb21e6d44a44144748de0",
+      "output_excerpt": "rtk gain (global, all retained projects): {'total_commands': 79382, 'total_input': 957746801, 'total_output': 219687690, 'total_saved': 741279600}\nasserted: total_saved > 0 and total_input >= total_output\n"
+    },
+    {
+      "cmd": "g=$(rtk gain --format json | python3 -c 'import json,sys;print(json.load(sys.stdin)[\"summary\"][\"total_saved\"])') && cd \"$HOME/code/agent-lab\" && rtk gain --project --format json | python3 -c 'import json,sys;g=int(sys.argv[1]);s=json.load(sys.stdin)[\"summary\"];print(\"rtk gain --project (agent-lab):\",{k:s[k] for k in (\"total_commands\",\"total_input\",\"total_output\",\"total_saved\")});assert 0<s[\"total_saved\"]<=g;print(\"asserted: 0 < project total_saved <= global total_saved read just before\")' \"$g\"",
+      "exit": 0,
+      "duration_s": 0.269,
+      "output_sha256": "d973dbe8fe2e02188cb72aea3182308445a3a4214784b21d0d3fdf2bf53685ad",
+      "output_excerpt": "rtk gain --project (agent-lab): {'total_commands': 31100, 'total_input': 694524394, 'total_output': 86019492, 'total_saved': 608509633}\nasserted: 0 < project total_saved <= global total_saved read just before\n"
+    },
+    {
+      "cmd": "python3 - <<'PY'\nimport sqlite3,os\nc=sqlite3.connect(\"file:\"+os.path.expanduser(\"~/.local/share/rtk/history.db\")+\"?mode=ro\",uri=True)\nr=list(c.execute(\"select input_tokens,output_tokens,saved_tokens from commands order by saved_tokens desc\"))\nt=sum(x[2] for x in r); s=lambda n:sum(x[2] for x in r[:n])/t\ncap,pre=7500,500\nseen=lambda n: n if n<=cap else pre\nd=[seen(i)-seen(o) for i,o,_ in r]\npos=sum(x for x in d if x>0); neg=-sum(x for x in d if x<0); net=pos-neg\nover=sum(1 for i,_,_ in r if i>cap)\nprint(\"rows\",len(r),\"saved\",t,\"| top 1/10/100: %.1f%%/%.1f%%/%.1f%%\"%(100*s(1),100*s(10),100*s(100)))\nprint(\"client-visible model (<=7500 inline, else 500 preview): avoided\",pos,\"added\",neg,\"net\",net,\"(%.2f%% of saved); raw over limit:\"%(100*net/t),over)\nassert s(10)>0.5 and 0<net<0.05*t\nprint(\"asserted: top 10 > 50% of saved; net client-visible difference > 0 and < 5% of saved\")\nPY",
+      "exit": 0,
+      "duration_s": 0.07,
+      "output_sha256": "a2b3d767db29943cc72ac497b11e2c75b6f95e5fca4748ab032def93b9cf0bbd",
+      "output_excerpt": "rows 79382 saved 741279600 | top 1/10/100: 28.7%/74.4%/93.5%\nclient-visible model (<=7500 inline, else 500 preview): avoided 9243930 added 469978 net 8773952 (1.18% of saved); raw over limit: 1725\nasserted: top 10 > 50% of saved; net client-visible difference > 0 and < 5% of saved\n"
+    },
+    {
+      "cmd": "b=$(readlink -f \"$HOME/.local/bin/claude\") && echo \"claude resolves to $b ($(\"$b\" --version | head -1))\" && python3 -c 'import sys;s=open(sys.argv[1],\"rb\").read();a=b\"(default 30000; values clamp to 4000-128000). Output past this is saved to a file and Claude receives a short preview plus the path.\" in s;p=b\"var Rwe=2000\" in s and b\"Preview (first ${Ft(Rwe)})\" in s;print(\"bashOutputMaxChars: inline default 30000 and over-limit output saved to a file with a short preview:\",a,\"| preview constant Rwe=2000 in Preview (first ${Ft(Rwe)}):\",p);raise SystemExit(0 if a and p else 1)' \"$b\" && echo \"asserted: this client shows up to 30000 characters inline and a 2000-character preview beyond that\"",
+      "exit": 0,
+      "duration_s": 0.368,
+      "output_sha256": "ee56fe281926a94fa150df5492cfe4fa6649abe204eb7e01eb75a33d20ea3e6a",
+      "output_excerpt": "claude resolves to ~/.local/share/claude/versions/2.1.282 (2.1.282 (Claude Code))\nbashOutputMaxChars: inline default 30000 and over-limit output saved to a file with a short preview: True | preview constant Rwe=2000 in Preview (first ${Ft(Rwe)}): True\nasserted: this client shows up to 30000 characters inline and a 2000-character preview beyond that\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-25T18:58:47Z",
+  "result": "pass",
+  "claim": "On host wsl-authoring-20260923 (WSL2 x86_64: Intel Core Ultra 9 275HX, NVIDIA RTX 5090 Laptop GPU; the catalog's WSL authoring laptop), rtk 0.49.0 (the catalog pin), resolved from the ecosystem PATH, returned its retained savings through rtk gain --format json for all retained projects and, with --project from the agent-lab checkout, for that project; the project total is positive and no larger than the global total read just before it (asserted). A read-only query of the commands table behind rtk gain shows the estimate is concentrated: the ten largest commands hold more than half of the saved total (asserted; exact shares in the excerpt). Upstream estimates each command as ceil(bytes/4) of raw output minus ceil(bytes/4) of filtered output, floored at zero, with no cap (estimate_tokens and track in src/core/tracking.rs at v0.49.0). The installed Claude Code 2.1.282 shows a Bash result inline up to 30,000 characters and, past that, saves it to a file and shows a preview of at most 2,000 characters (asserted from the client binary). Counting each output as the client would first show it (up to 7,500 estimated tokens inline, otherwise a 500-token preview), the net difference between raw and filtered output is positive and under 5% of the upstream total (asserted; the excerpt gives the avoided, added and net figures). All commands exit 0.",
+  "limitations": [
+    "No model session ran. rtk gain values are upstream bytes/4 estimates, not provider token measurements. They count every harness that ran rtk on this host (Claude hook rewrites, explicit Codex rtk commands, scripts), and the project figure is a subset of the global one, so neither may be summed with the other or with another tool's counter.",
+    "The client-visible figure is this receipt's own model, not an upstream number and not a bound. It counts only what the client shows first and excludes any later read of a saved output file, which would add context in the unfiltered case; it applies Claude Code's limits to Codex sessions, whose own output limits differ; and it treats bytes/4 as tokens and characters as bytes, which is exact only for ASCII. Rows can be negative where filtered output that fits inline shows more than the preview of the raw output would.",
+    "Counters grow while other sessions run commands, so the excerpts differ from each other and from any later read; the assertions are bounds, not exact values. The history query opens ~/.local/share/rtk/history.db in SQLite read-only mode and prints only aggregates.",
+    "Supersedes wsl-authoring-20260923--rtk--use--20260925, which carries an independent needs_changes review: it capped over-limit outputs at 30,000 characters, but this client shows only a preview of at most 2,000 characters past that limit, so its capped figure (about 2.1%) was too high and its interval between the capped and uncapped figures was unsupported. That file stays byte-identical.",
+    "Recorded from a Claude Code session in a detached git worktree of this repository at catalog_revision (origin/main at recording time), with this branch's first-generation receipts copied into the working tree so --supersedes could resolve them; not a pinned install checkout. The tools resolve as the commands show."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T18:58:47Z",
+      "reviewer": {
+        "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #270 independent session review (generation 2)",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:07:29Z",
+      "reviewer": {
+        "identity_sha256": "770fed978e9b0044b40247f768fdbb8b35da160b45d4175260e0ecac31999f16",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "wsl-authoring-20260923--rtk--use--20260925"
+}

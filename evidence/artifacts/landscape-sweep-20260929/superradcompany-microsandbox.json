@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-superradcompany-microsandbox",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/superradcompany/microsandbox",
+ "reviewed_commit": "2110af1e5cc965c57539815a432d6b055ba6a023",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of superradcompany/microsandbox at commit 2110af1e5cc965c57539815a432d6b055ba6a023 (license Apache-2.0), read from README.md at that commit. Repository description: \"🧱 easy, fast, programmable and local-first microVM runtime\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 8474,
+  "pushed_at": "2026-09-29T06:50:04Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2110af1e5cc965c57539815a432d6b055ba6a023",
+   "text": "**Microsandbox** runs **untrusted workloads** inside fast, local microVMs: AI agents, user code, plugins, CI jobs, dev environments, scrapers, and automation."
+  },
+  {
+   "source": "README.md@2110af1e5cc965c57539815a432d6b055ba6a023",
+   "text": "- <img height=\"14\" src=\"https://octicons-col.vercel.app/shield-lock/A770EF\"> **Hardware Isolation**: Hardware-level isolation with tiny virtual machines. - <img height=\"14\" src=\"https://octicons-col.vercel.app/repo-forked/A770EF\"> **Branch & Snapshot**: Fork live sandboxes[^demo]. Save running sandbox state and restore later. - <img height=\"14\" src=\"https://octicons-col.vercel.app/globe/A770EF\"> **Cross Platform**: Runs on Linux, macOS, and Windows. - <img height=\"14\" src=\"https://octicons-col.v"
+  },
+  {
+   "source": "README.md@2110af1e5cc965c57539815a432d6b055ba6a023",
+   "text": "## <a href=\"./#gh-dark-mode-only\" target=\"_blank\"><img height=\"13\" src=\"https://octicons-col.vercel.app/rocket/ffffff\" alt=\"rocket-dark\"></a><a href=\"./#gh-light-mode-only\" target=\"_blank\"><img height=\"13\" src=\"https://octicons-col.vercel.app/rocket/000000\" alt=\"rocket\"></a>&nbsp;&nbsp;Getting Started"
+  }
+ ]
+}

@@ -1,0 +1,206 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "agents-models-workers",
+ "title": "Agents, models and workers",
+ "requirement": "Keep durable project knowledge, exact code and dated financial sources retrievable across native clients, with source recovery, explicit project scope and measurable retrieval quality.",
+ "research_status": "comparison_required",
+ "next_action": "Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.",
+ "requirement_sha256": "c2358d8f11c2f15c2f4494c8de4cbe8ffb4dcac77f0af2a098163b354e5e7b01",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "codex-native-sdk",
+   "repository": "https://github.com/openai/codex",
+   "pin": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "foundation-ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "v2.3.1",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "foundation-socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "pin": "v1.14.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "foundation-toon",
+   "repository": "https://github.com/toon-format/toon",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "foundation-pageindex",
+   "repository": "https://github.com/VectifyAI/PageIndex",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "langgraph",
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm",
+   "disposition": "conditional"
+  },
+  {
+   "name": "omniroute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-repomix",
+   "repository": "https://github.com/yamadashy/repomix",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "disposition": "overlap"
+  },
+  {
+   "name": "foundation-pgvector",
+   "repository": "https://github.com/pgvector/pgvector",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Context Mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "disposition": "conditional"
+  },
+  {
+   "name": "RTK",
+   "repository": "https://github.com/rtk-ai/rtk",
+   "disposition": "overlap"
+  },
+  {
+   "name": "foundation-codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Graphiti",
+   "repository": "https://github.com/getzep/graphiti",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "disposition": "overlap"
+  },
+  {
+   "name": "codex-acp",
+   "repository": "https://github.com/agentclientprotocol/codex-acp",
+   "disposition": "conditional"
+  },
+  {
+   "name": "deerflow",
+   "repository": "https://github.com/bytedance/deer-flow",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-agent-retrieval-bench",
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "loopx-project/loopx",
+   "repository": "https://github.com/loopx-project/loopx",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "gastownhall/beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "jdx/mise",
+   "repository": "https://github.com/jdx/mise",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "No measured head-to-head comparison exists between the worker backends (codex-native-sdk, DeerFlow/codex-acp, OmniRoute). Each ran separately on a different task. The c19+c21 run returned the same facts in 1 of 1 tasks, with 0 blocked and 42345 cumulative tokens. c20 used 135311 tokens (204091 acros",
+  "The codex-native-sdk worker completed 1 research task. 2 follow-up extraction tasks were blocked, first by the Context Mode ctx_execute_file project-root restriction, then by the worker's own deny_all approval mode ('approval policy is \"never\"', workers/receipt.json line 196). For c20, strict read-o",
+  "c20's read-only filesystem mode does not restrict external MCP mutations (workers/receipt.json line 110). The recorded environment supplied no broker keys or broker tools.",
+  "The configured model/provider identity in the worker, ACP and OmniRoute receipts is not independent per-request provider attestation.",
+  "Retrieval quality rests on a single limit-1 query (score 0.6429) in native-rag.json. That is not a holdout or recall measurement. The group's 8/12 exact-source recall figure comes from the packet limitations, not from a file I opened."
+ ],
+ "overturn_when": "Run a preregistered, representative held-out financial/document and code retrieval set at the same context budget; replace or supplement a lane only if a candidate improves source/answer fidelity, abstention and measured task cost while preserving isolation, exact source recovery and native client behavior.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/confident-ai/deepeval",
+   "https://github.com/infiniflow/ragflow",
+   "https://github.com/google-gemini/gemini-cli",
+   "https://github.com/modelcontextprotocol/servers"
+  ]
+ },
+ "known_repositories": [
+  "agentclientprotocol/codex-acp",
+  "akitaonrails/ai-memory",
+  "basicmachines-co/basic-memory",
+  "bytedance/deer-flow",
+  "confident-ai/deepeval",
+  "deepset-ai/haystack",
+  "deusdata/codebase-memory-mcp",
+  "diegosouzapw/omniroute",
+  "docling-project/doclin",
+  "eyuansu62/agent-retrieval-bench",
+  "gastownhall/beads",
+  "getzep/graph",
+  "giancarloerra/socraticode",
+  "google-gemini/gemini-cl",
+  "headroomlabs-ai/headroom",
+  "hkuds/lightra",
+  "https://huggingface.co/ibm-granite/granite-4.2-8b",
+  "https://huggingface.co/qwen/qwen3.5-9b",
+  "infiniflow/ragflow",
+  "jdx/mise",
+  "langchain-ai/langgraph",
+  "letta-ai/letta-code",
+  "loopx-project/loopx",
+  "mem0ai/mem0",
+  "mksglu/context-mode",
+  "modelcontextprotocol/servers",
+  "msitarzewski/agency-agents",
+  "openai/codex",
+  "oraios/serena",
+  "pgvector/pgvector",
+  "qdrant/qdran",
+  "rtk-ai/rtk",
+  "run-llama/llama_index",
+  "supermemoryai/supermemory",
+  "thedotmack/claude-mem",
+  "tobi/qmd",
+  "toon-format/toon",
+  "topoteretes/cognee",
+  "vectifyai/pageindex",
+  "vectorize-io/hindsigh",
+  "vllm-project/vllm",
+  "volcengine/openvikin",
+  "yamadashy/repomix"
+ ],
+ "seeded_candidates_20260926": [
+  "Local models (latest only, user 2026-09-26): Qwen/Qwen3.8-27B (production), prism-ml/Ternary-Bonsai-2-27B-gguf (2026-09-16, Apache-2.0, 1.72 bpw), XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B (2026-09-21, MIT), XingChen-AGI/Xing4.0-29B-A4B (2026-09-16, Apache-2.0), Qwen3.8-Flash-Next (resource_infeasible on the workstation)",
+  "OpenAI GPT-6 family via Codex CLI: gpt-6-astra / gpt-6-sol / gpt-6-luna (codex debug models 2026-09-26)"
+ ]
+}

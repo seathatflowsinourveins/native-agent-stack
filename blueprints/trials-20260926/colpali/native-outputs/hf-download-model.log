@@ -1,0 +1,4 @@
+Hint: A new version of huggingface_hub (2.0.0) is available! You are using version 1.32.0.
+Hint: The `hf-cli` skill is not installed. Run `hf skills add -g --claude` to teach your AI agents how to use the `hf` CLI.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+path=<scratch>/trial-colpali/hf-cache/hub/models--vidore--colqwen2-v1.0/snapshots/530094e83a40ca4edcb5c9e5ddfa61a4b5ea0d2f

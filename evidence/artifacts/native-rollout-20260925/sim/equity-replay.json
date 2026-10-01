@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-equity-replay",
+  "kind": "native_cli_e2e",
+  "classification": "local integration with retained historical data; not an unchanged upstream test or broker execution",
+  "component_ids": ["nautilus-trader"],
+  "claim": "Ran blueprints/us-equities/engine-nautilus/equity-replay on the new nautilus-2.0.0rc5-r20260925 root against the same retained authenticated AAPL Alpaca acquisition (receipt a59c6ed7...). Two independent fresh-process runs exited 0 and matched the frozen oracle exactly: baseline 10 filled orders / 5 closed positions / $0 fees / -$133.40 realized PnL / $99,866.60 ending cash; fee_slippage_stress 10 filled orders / 5 closed positions / $10 fees / -$144.40 realized PnL / $99,855.60 ending cash. account.csv and the identity-excluded economic hash were byte-identical between the two runs.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/nautilus-2.0.0rc5-r20260925",
+  "frozen_oracle_source": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (2026-09-21, base_commit 86952998)",
+  "frozen_oracle_verified_fields": {
+    "baseline": {"filled_orders": 10, "closed_positions": 5, "fees_usd": "0.00", "realized_pnl_usd": "-133.40", "ending_cash_usd": "99866.60"},
+    "fee_slippage_stress": {"filled_orders": 10, "closed_positions": 5, "fees_usd": "10.00", "realized_pnl_usd": "-144.40", "ending_cash_usd": "99855.60"},
+    "note": "Verified by reading the file directly, not assumed from the task brief's paraphrase."
+  },
+  "input": {
+    "retained_run": "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+    "receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "new_acquisition_requests": 0,
+    "note": "Frozen/cached data already on disk; no Alpaca or other market-data API call was made."
+  },
+  "commands": [
+    {
+      "label": "run-1",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-1"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "stderr sha256 matches the original 2026-09-21 receipt's returned_runs[0].stderr sha256 exactly (four pandas deprecation warnings, deterministic)."
+    },
+    {
+      "label": "run-2",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-2"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "Independent fresh-process re-run per brief step 3."
+    },
+    {
+      "label": "run-3",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-3"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "This fix round's post-remediation reconfirmation, run against nautilus-2.0.0rc5-r20260925 AFTER it was rebuilt with --link-mode copy (see nautilus.json hardlink_entanglement_incident). Re-run because the root's site-packages files changed storage (hardlink -> independent copy) after run-1/run-2 completed; this confirms the relink did not change runtime behavior."
+    },
+    {
+      "label": "run-4",
+      "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py",
+        "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--run", "${PRIVATE_STATE}/authenticated-data-20260920/alpaca-run-1",
+        "--out", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-4"],
+      "exit_code": 0,
+      "stderr_sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc",
+      "note": "Second post-remediation reconfirmation run (independent fresh process), same purpose as run-3."
+    }
+  ],
+  "results_per_run": [
+    {"id": "baseline", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5, "fees_usd": "0.00",
+     "realized_pnl_usd": "-133.40", "ending_cash_usd": "99866.60", "open_orders": 0, "open_positions": 0,
+     "cash_ledger_reconciled": true, "cash_transitions_verified": 10, "scheduled_fill_prices_verified": 10,
+     "realized_pnl_reconciled": true,
+     "account_csv_sha256_run1": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run2": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run3_post_relink_fix": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_sha256_run4_post_relink_fix": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+     "account_csv_matches_original_2026-09-21_receipt": true,
+     "economic_repeat_sha256_run1": "8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57",
+     "economic_repeat_sha256_run2": "8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57",
+     "economic_repeat_sha256_matches_original_2026-09-21_receipt": true},
+    {"id": "fee_slippage_stress", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5, "fees_usd": "10.00",
+     "realized_pnl_usd": "-144.40", "ending_cash_usd": "99855.60", "open_orders": 0, "open_positions": 0,
+     "cash_ledger_reconciled": true, "cash_transitions_verified": 10, "scheduled_fill_prices_verified": 10,
+     "realized_pnl_reconciled": true,
+     "account_csv_sha256_run1": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run2": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run3_post_relink_fix": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_sha256_run4_post_relink_fix": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+     "account_csv_matches_original_2026-09-21_receipt": true,
+     "economic_repeat_sha256_run1": "2b97563442ef6d12235a85f09e78db960f8a10afb739777e7ab219ebc03e0a04",
+     "economic_repeat_sha256_run2": "2b97563442ef6d12235a85f09e78db960f8a10afb739777e7ab219ebc03e0a04",
+     "economic_repeat_sha256_matches_original_2026-09-21_receipt": true}
+  ],
+  "post_remediation_reconfirmation": {
+    "reason": "nautilus-2.0.0rc5-r20260925 (the root run-1/run-2 executed against) was rebuilt in place by this fix round to resolve hardlink_entanglement_incident in nautilus.json (uv --link-mode copy instead of the default hardlink). The rebuild does not change installed package content (freeze hash reverified identical), but it does replace every site-packages file's underlying storage, so run-1/run-2's result is technically about a filesystem state that no longer exists.",
+    "action": "Ran two more independent fresh-process runs (run-3, run-4) against the rebuilt root; both exited 0 and reproduced the same oracle-matching account.csv hashes shown above (account_csv_sha256_run3_post_relink_fix / _run4_post_relink_fix), and the same deterministic stderr_sha256 as run-1/run-2. This satisfies the brief's 'twice' requirement on the root as it actually exists after this fix round, not only on its pre-fix state."
+  },
+  "reoccurrence_verification": {
+    "twice_identical": true,
+    "account_csv_byte_identical_across_runs": true,
+    "economic_repeat_hash_identical_across_runs": true,
+    "economic_hash_encoding": "SHA256 of json.dumps({fills: selected non-identity fields, cash: account total strings, position_pnl: realized_pnl strings}, sort_keys=True, separators=(',', ':')); fields read as raw strings via csv.DictReader over each case's fills.csv/account.csv/positions.csv (not parsed from reports.json), generated identities (order/position/fill UUIDs) excluded. Re-deriving the hash this way from both fresh runs reproduces the original 2026-09-21 receipt's own economic_repeat_sha256 exactly (8f81042a... baseline, 2b975634... fee_slippage_stress).",
+    "fills_csv_and_positions_csv_hash_differ_across_runs": true,
+    "fills_positions_hash_difference_explained": "Expected and documented by the source blueprint (README.md: 'Generated identities are not claimed to repeat'); only generated identity fields differ, verified by the economic-only hash matching exactly.",
+    "correction": "A prior draft of this receipt computed economic_repeat_sha256 by hashing reports.json's fields directly, which is economically equivalent but not byte-identical to the oracle's CSV-string-based encoding, so it produced a different hash (338d9548...,fe8baf74...) than the recorded oracle even though the underlying results matched. Recomputing from the CSVs via csv.DictReader, matching receipt.json's documented economic_hash_encoding, reproduces the oracle hashes exactly; this receipt now records that corrected hash."
+  },
+  "procedural_note": "The two launch.py runs were executed directly rather than explicitly prefixed with `rtk proxy`; their JSON output was short and complete (not condensed/truncated), so no information was lost, but this is noted for exact compliance with the brief's 'acceptance and debugging commands run raw via rtk proxy' instruction.",
+  "oracle_comparison": {"result": "exact match on every oracle field (filled_orders, closed_positions, fees_usd, realized_pnl_usd, ending_cash_usd, cash_transitions_verified, scheduled_fill_prices_verified, economic_repeat_sha256, final_2_reports_sha256.account.csv) for both cases, both runs, and against the original 2026-09-21 receipt", "mismatches": 0},
+  "isolation": {
+    "mechanism": "existing launch.py Bubblewrap sandbox: --unshare-all --clearenv, mandatory new network namespace, read-only runtime/repository/data, only the run's own output directory writable",
+    "network_interfaces_observed": ["lo"],
+    "credential_variables": 0,
+    "market_data_api_calls": 0,
+    "orders_placed": 0
+  },
+  "repository_checks": [
+    {"argv": ["python3", "-c", "compute economic-only hash from reports.json per case"], "exit_code": 0, "scope": "local verification script, not a repository test suite",
+     "status": "SUPERSEDED / INCORRECT DESCRIPTION -- kept only as the record of the prior round's mistake, not as a description of how the recorded hashes were produced. This command describes the reports.json-based method that reoccurrence_verification.correction says gave the wrong hashes (338d9548.../fe8baf74...); see the corrected entry below."},
+    {"argv": ["python3", "evidence/artifacts/native-rollout-20260925/sim/economic_hash_recompute.py",
+        "${PRIVATE_RUN_DIR}/sim/equity-replay-run-1/native", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-2/native",
+        "${PRIVATE_RUN_DIR}/sim/equity-replay-run-3/native", "${PRIVATE_RUN_DIR}/sim/equity-replay-run-4/native"],
+     "exit_code": 0,
+     "scope": "local verification script, checked into this evidence directory (not a repository test-suite member -- this track's brief allows writing only under evidence/artifacts/native-rollout-20260925/sim/ and the one doc, not tests/)",
+     "output_sha256": "d22158457feaa942b8ae9cd22feccddec9acb9c37936e4c8ce2dc0c38df4bbf0",
+     "output_bytes_retained_at": "${PRIVATE_RUN_DIR}/sim/round3-acceptance-recheck/economic-hash-recompute.txt",
+     "note": "ROUND 3 CORRECTION of the two entries this replaces: the first (kept immediately below as SUPERSEDED history) described the wrong reports.json-based method; the second (round 2, replaced here) restated the right method in prose but then claimed in independently_reverified_this_round that several field-set reconstructions had been TRIED and had NOT reproduced the oracle hash. Round 3 found the correct field selection on the first try (see FIELDS in the checked-in script) and it reproduces the oracle hash exactly for every retained run. Round 2's negative claim was false, not merely incomplete -- its own tried-field list used 'type' where the correct selection uses 'instrument_id' (fills.csv's 'type' column holds the order type, e.g. MARKET/LIMIT, not the instrument; the oracle's own receipt.json documents 'instrument_id' explicitly, see below).",
+     "field_selection_matches_oracle": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json:86 (independent_observations.economic_repeat_fields) names exactly: instrument_id, side, quantity, filled_qty, avg_px, commissions, status, ts_init, ts_last (9 fields, fills.csv), account total sequence (account.csv), position realized_pnl sequence (positions.csv). The checked-in script uses precisely this field set.",
+     "result_all_runs": "python3 evidence/artifacts/native-rollout-20260925/sim/economic_hash_recompute.py against run-1, run-2 (pre-relink-fix) and run-3, run-4 (post-relink-fix) native output directories: 8/8 case results (4 runs x {baseline, fee_slippage_stress}) MATCH the oracle's economic_repeat_sha256 (8f81042a... baseline, 2b975634... fee_slippage_stress) exactly, exit 0. This supersedes independently_reverified_this_round's 'NOT independently re-derived' claim below, which is kept only as the record of round 2's own (incorrect) attempt, not as a current claim."}
+  ],
+  "repository_checks_round2_economic_repeat_sha256_attempt_superseded": {
+    "kept_for_history_only": "Round 2's own independently_reverified_this_round.economic_repeat_sha256 text asserted: 'NOT independently re-derived byte-for-byte this round. Several plausible reconstructions of the non-identity fields fill-dict subset (9-field combinations drawn from fills.csv 32 columns, e.g. side/type/quantity/status/filled_qty/commissions/avg_px/ts_init/ts_last and other variants) were tried ... and did not reproduce 8f81042a.... The exact serialization ... is under-specified ... and the originating script is not checked into the repository.' This is false, not merely a gap: round 2's own tried set used fills.csv's 'type' column (order type) in place of 'instrument_id' (the oracle's actual 9th field); with the correct field, the hash reproduces on the first try -- see repository_checks[1] above, which is the current, accurate record."
+  },
+  "limitations": [
+    "Retrospective scheduled diagnostic on completed daily bars, not a realizable closing-auction strategy or profitability claim (same scope as the original blueprint).",
+    "OneTickSlippageFillModel supplies unlimited synthetic depth; liquidity_consumption=true does not qualify finite liquidity, queue position, or broker restrictions.",
+    "No SPY/LEAN parity, IBKR/Alpaca broker execution, or paper/live order was exercised by this environment-build track.",
+    "Wall-clock/generated-identity fields (stdout completed_utc, fill/position/order UUIDs) are not claimed to repeat and are excluded from the reoccurrence check by design.",
+    "Round 3: the economic_repeat_sha256 reproduction script is now checked in (economic_hash_recompute.py, same directory) and independently reproduces the oracle hash for all 4 retained runs; round 2's prior claim that reconstruction attempts had failed is corrected, not merely softened -- see repository_checks and repository_checks_round2_economic_repeat_sha256_attempt_superseded."
+  ],
+  "sanitization": "Host paths use ${STACK_HOME} (codex-ecosystem tools root), ${PRIVATE_STATE} (codex-ecosystem/state) and ${PRIVATE_RUN_DIR} (this track's private run directory) placeholders. No raw provider prices, credentials, or session identifiers appear in this receipt."
+}

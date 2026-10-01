@@ -1,0 +1,32 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "Auth uses a fixed-window rate limiter and issues a JWT-like token with a 24 hour (86400s) expiry via issueToken() in src/auth.ts",
+  "createdAt": 1790386195163,
+  "files": [
+    "src/auth.ts"
+  ],
+  "id": "tsk-<uuid>",
+  "logId": "cur-1790386195164",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "reasoningContents": [
+    {
+      "content": "",
+      "isThinking": true,
+      "timestamp": 1790386195867
+    }
+  ],
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "curate",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386207920,
+  "error": {
+    "code": "TASK_ERROR",
+    "message": "request (12351 tokens) exceeds the available context size (8192 tokens), try increasing it",
+    "name": "TaskError"
+  },
+  "startedAt": 1790386195822,
+  "status": "error"
+}

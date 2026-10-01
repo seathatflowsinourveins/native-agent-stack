@@ -1,0 +1,1456 @@
+{
+  "schema_version": 1,
+  "run_date": "20260925",
+  "generated_at_utc": "2026-09-25T20:41:42Z",
+  "generated_at_human": "September 25, 2026",
+  "status": "completed_both_arms_evaluated",
+  "preregistration": "PREREGISTRATION.md",
+  "queries_file": "queries.json",
+  "qmd_version": "2.8.3",
+  "qmd_version_raw": "qmd 2.8.3 (facd35e)",
+  "index": {
+    "index_name": "retrieval-quality-v2",
+    "db_path_sanitized": "<SCRATCH_HOME>/.cache/qmd/retrieval-quality-v2.sqlite",
+    "collections_added": [
+      {
+        "collection": "rqv2-foundation",
+        "stdout_tail": "Creating collection 'rqv2-foundation'...\nCollection: <SCRATCH_HOME>/corpus-stage/blueprints/us-equities (**/*.md)\n\nIndexed: 18 new, 0 updated, 0 unchanged, 0 removed\n\nRun 'qmd embed' to update embeddings (18 unique hashes need vectors)\n\u2713 Collection 'rqv2-foundation' created successfully\n"
+      },
+      {
+        "collection": "rqv2-catalog",
+        "stdout_tail": "Creating collection 'rqv2-catalog'...\nCollection: <SCRATCH_HOME>/corpus-stage/catalogs/us-equities (**/*.md)\n\nIndexed: 10 new, 0 updated, 0 unchanged, 0 removed\n\nRun 'qmd embed' to update embeddings (28 unique hashes need vectors)\n\u2713 Collection 'rqv2-catalog' created successfully\n"
+      },
+      {
+        "collection": "rqv2-observability",
+        "stdout_tail": "Creating collection 'rqv2-observability'...\nCollection: <SCRATCH_HOME>/corpus-stage/observability (**/*.md)\n\nIndexed: 5 new, 0 updated, 0 unchanged, 0 removed\n\nRun 'qmd embed' to update embeddings (33 unique hashes need vectors)\n\u2713 Collection 'rqv2-observability' created successfully\n"
+      }
+    ],
+    "total_documents_indexed": 33,
+    "collection_file_counts": {
+      "rqv2-foundation": 18,
+      "rqv2-catalog": 10,
+      "rqv2-observability": 5
+    },
+    "status_stdout_sanitized": "QMD Status\n\nIndex: <SCRATCH_HOME>/.cache/qmd/retrieval-quality-v2.sqlite\nSize:  1.5 MB\n\nDocuments\n  Total:    33 files indexed\n  Vectors:  0 embedded\n  Pending:  33 need embedding (run 'qmd embed')\n  Updated:  1s ago\n\nAST Chunking\n  Status:   active\n  Languages: typescript, tsx, javascript, python, go, rust\n\nCollections\n  rqv2-foundation (qmd://rqv2-foundation/)\n    Pattern:  **/*.md\n    Files:    18 (updated 1s ago)\n  rqv2-catalog (qmd://rqv2-catalog/)\n    Pattern:  **/*.md\n    Files:    10 (updated 1s ago)\n  rqv2-observability (qmd://rqv2-observability/)\n    Pattern:  **/*.md\n    Files:    5 (updated 1s ago)\n\nExamples\n  # List files in a collection\n  qmd ls rqv2-foundation\n  # Get a document\n  qmd get qmd://rqv2-foundation/path/to/file.md\n  # Search within a collection\n  qmd search \"query\" -c rqv2-foundation\n\nModels\n  Embedding:   https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF\n  Reranking:   https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF\n  Generation:  https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf\n\nTips\n  Add context to collections for better search results: rqv2-foundation, rqv2-catalog, rqv2-observability\n    qmd context add qmd://<name>/ \"What this collection contains\"\n    qmd context add qmd://<name>/meeting-notes \"Weekly team meeting notes\"\n  Add update commands to keep collections fresh: rqv2-foundation, rqv2-catalog, rqv2-observability\n    qmd collection update-cmd <name> 'git stash && git pull --rebase --ff-only && git stash pop'\n"
+  },
+  "seal": {
+    "queries_sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+    "prereg_pinned_sha256": "4d0a0eaf0f6fc48b899f6139e7e98a6c1edf4798b1f17ddfbf5ec3e1cc6c5c7a",
+    "match": true,
+    "ordering_evidence": "Workflow run wf_eaf5338d-556: the query author's result precedes the runner's start in the workflow journal; the files are first committed together with these results."
+  },
+  "corpus_commit": "3e4054d02eac06ae8ac995c5e96fe8a75c0824c8",
+  "corpus_staging": [
+    {
+      "path": "blueprints/us-equities/README.md",
+      "sha256": "c96eac4c51466043a7091d464262afa96f6cda1dffda754b22d1545f13cb7314",
+      "utf8_bytes": 9946
+    },
+    {
+      "path": "blueprints/us-equities/data/README.md",
+      "sha256": "8810322b8daa2459970f15432bea4c8476a683742327a81320f514ac50f544de",
+      "utf8_bytes": 12108
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/README.md",
+      "sha256": "e1bec08e3b2d0e9ed78223b65091a2fd98d8513d660f3e3bdbed87a3c9c1004a",
+      "utf8_bytes": 13076
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-result.md",
+      "sha256": "4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613",
+      "utf8_bytes": 2614
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/research-task.md",
+      "sha256": "ea9a6c975597ca3ae135c657d07262b7f106f1d70a6cda3f660f24ab22b1445c",
+      "utf8_bytes": 1052
+    },
+    {
+      "path": "blueprints/us-equities/engine/README.md",
+      "sha256": "88a864d60160423a99722b0e300c71f9d7585549513b09aabc020e9c8b0e54cb",
+      "utf8_bytes": 8070
+    },
+    {
+      "path": "blueprints/us-equities/engine/resolution.md",
+      "sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
+      "utf8_bytes": 10783
+    },
+    {
+      "path": "blueprints/us-equities/financial-data/README.md",
+      "sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+      "utf8_bytes": 8176
+    },
+    {
+      "path": "blueprints/us-equities/gap-resolution.md",
+      "sha256": "5859a13cd7250327161f334fc7d6f5eb8e5dda4764c54708643fbddc3f66f35a",
+      "utf8_bytes": 10614
+    },
+    {
+      "path": "blueprints/us-equities/hosting.md",
+      "sha256": "ceed30aa8f9b8db1da4fe0e3735ae7bf2b8ebd14d5c45e36d21c31a9d9b4e1cf",
+      "utf8_bytes": 3219
+    },
+    {
+      "path": "blueprints/us-equities/hosting/README.md",
+      "sha256": "2f54419877841b64ea72c8738447ff34d360bc3619f662f005d9b81ab6669e15",
+      "utf8_bytes": 5877
+    },
+    {
+      "path": "blueprints/us-equities/hosting/backup/README.md",
+      "sha256": "ad00db7f83ee024c78518f4932701ac8a17f277a4111766ceff777c90b527ca5",
+      "utf8_bytes": 7193
+    },
+    {
+      "path": "blueprints/us-equities/north-star.md",
+      "sha256": "0934019e9dcce0e792dbcdca1f6e1ce5e48f8848a6d92381d7046cf1d7c3a9b7",
+      "utf8_bytes": 14643
+    },
+    {
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+      "utf8_bytes": 9587
+    },
+    {
+      "path": "blueprints/us-equities/routing/README.md",
+      "sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
+      "utf8_bytes": 20346
+    },
+    {
+      "path": "blueprints/us-equities/workers/README.md",
+      "sha256": "79de0f2d9e399e2ce04ccfe1c011788ea1adcab7745bfbfa02cdf8846c6d7425",
+      "utf8_bytes": 12195
+    },
+    {
+      "path": "blueprints/us-equities/workers/policy.md",
+      "sha256": "c59ef6d88cf5c60bac7971364b75643fd05018e2414b7868f82d1a7bc11d1c31",
+      "utf8_bytes": 2353
+    },
+    {
+      "path": "blueprints/us-equities/workers/research-task.md",
+      "sha256": "743c1f63d87ea9c4186b1d569ff02fc3a9dd32b3a7283048201ffee32b481cf5",
+      "utf8_bytes": 1309
+    },
+    {
+      "path": "catalogs/us-equities/README.md",
+      "sha256": "4ab4b02c9b51746d5891b4aa322d1d2b6dec5fdd3e31512d504475d95c15988b",
+      "utf8_bytes": 16601
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.md",
+      "sha256": "a765c37d0d689de51920e742686f5ffa2adfecd606f99b2b963fd5450ad40363",
+      "utf8_bytes": 26992
+    },
+    {
+      "path": "catalogs/us-equities/data-research.md",
+      "sha256": "9948f2ad3d789ca2a3b19010077320f36c5f20fbbe4b020e2b79f5ccc1711876",
+      "utf8_bytes": 23226
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.md",
+      "sha256": "74d4c7f385b6de7ff9f9011647b87eed6c7c3a2a24334732875dc0d4a227277b",
+      "utf8_bytes": 25459
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.md",
+      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9",
+      "utf8_bytes": 47825
+    },
+    {
+      "path": "catalogs/us-equities/models.md",
+      "sha256": "798b07a2703bb53cc253caa5b2a460fb75ed3b81ea9ebce7ecf24ef33671ad76",
+      "utf8_bytes": 21253
+    },
+    {
+      "path": "catalogs/us-equities/native-workflows.md",
+      "sha256": "aae8aa3cf0232052cb4573df9ba553ef05523c5c0ed0180d98cea0fccd89c583",
+      "utf8_bytes": 11678
+    },
+    {
+      "path": "catalogs/us-equities/repository-index.md",
+      "sha256": "6f9473762c1271cc66ad81858ffd23e9443dc111afced7823a54e1f8d0df8c91",
+      "utf8_bytes": 86033
+    },
+    {
+      "path": "catalogs/us-equities/source-followup.md",
+      "sha256": "c4e39f56b1ab9d633e1fee9c0a717a06fbbdc6811a8346db6dfc36cbd43e4845",
+      "utf8_bytes": 5752
+    },
+    {
+      "path": "catalogs/us-equities/star-audit.md",
+      "sha256": "6742e0b8a24d8615e8ec29110c785f493131a20df7bb57da6354fb99e98f70cc",
+      "utf8_bytes": 28080
+    },
+    {
+      "path": "observability/README.md",
+      "sha256": "29bb61f67614f52e9759b958bb35556f34fe4ef5ad49f0fd7e1d30a525e90646",
+      "utf8_bytes": 14744
+    },
+    {
+      "path": "observability/backends/README.md",
+      "sha256": "8f72fc88a1e80645a509f8671832cc748e6091000a22b8fca5b0fd5b9e2390f0",
+      "utf8_bytes": 15802
+    },
+    {
+      "path": "observability/collector/README.md",
+      "sha256": "4a63f6dadfaad5ac4609bbb4a48d7eba04e094e2031ce05a0eae09e4ac513702",
+      "utf8_bytes": 6391
+    },
+    {
+      "path": "observability/desktop-restart.md",
+      "sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+      "utf8_bytes": 6238
+    },
+    {
+      "path": "observability/session-e2e.md",
+      "sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
+      "utf8_bytes": 7704
+    }
+  ],
+  "arm_a": {
+    "status": "evaluated",
+    "per_query": [
+      {
+        "id": "nl-01",
+        "style": "natural_language",
+        "query": "What happens to a float-based check when the raw volume value is -1e-400, and why does the promotion gate parse it differently now?",
+        "latency_ms": 155.4,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-02",
+        "style": "natural_language",
+        "query": "Why did the SPY/LEAN parity comparison for Nautilus come back BLOCKED instead of passing, and what were the two unsupported mappings?",
+        "latency_ms": 149.2,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-03",
+        "style": "natural_language",
+        "query": "How does the research runtime confirm that a Claude report only used the numbers actually given to it, rather than the model's own outside knowledge?",
+        "latency_ms": 159.5,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-04",
+        "style": "natural_language",
+        "query": "What blocked the first live acquisition attempt against SEC's API, and how is that different from the offline tests passing?",
+        "latency_ms": 150.1,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-05",
+        "style": "natural_language",
+        "query": "What did the security review find wrong with the ai-trader-bot smart contract that got it rejected?",
+        "latency_ms": 149.6,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-06",
+        "style": "natural_language",
+        "query": "Which specific alert fires when the paper-trading ledger can't be opened or read at all, independent of what's inside it?",
+        "latency_ms": 162.5,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-07",
+        "style": "natural_language",
+        "query": "Why is a Desktop app's exact total token usage for a whole parent conversation still not verifiable from the metrics being collected?",
+        "latency_ms": 153.7,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-08",
+        "style": "natural_language",
+        "query": "Before letting a research LLM use QMD search results as a fact, what two-step process is it supposed to follow, and what should it do if the search comes back empty?",
+        "latency_ms": 157.6,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-09",
+        "style": "natural_language",
+        "query": "The SDK kept its OTLP metrics exporter configured, but no histogram data was showing up anywhere for it \u2014 what single setting was actually missing, and where does it belong?",
+        "latency_ms": 151.4,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "nl-10",
+        "style": "natural_language",
+        "query": "What specific role does NautilusTrader's IBKR adapter have today, and has its broker connection actually been accepted yet?",
+        "latency_ms": 152.7,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "kw-01",
+        "style": "keyword",
+        "query": "restic keep-last dry-run retention",
+        "latency_ms": 148.7,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "blueprints/us-equities/hosting/backup/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-02",
+        "style": "keyword",
+        "query": "DotNetZip ProDotNetZip CVE directory traversal",
+        "latency_ms": 153.7,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "blueprints/us-equities/engine/resolution.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-03",
+        "style": "keyword",
+        "query": "tokenizer o200k_base 6398 490 catalog reduction",
+        "latency_ms": 151.0,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "catalogs/us-equities/native-workflows.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-04",
+        "style": "keyword",
+        "query": "Dagu auth.mode none passwordless anonymous API DAG write disabled",
+        "latency_ms": 149.5,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "blueprints/us-equities/hosting/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-05",
+        "style": "keyword",
+        "query": "abtop --json --once summary invoke Claude private",
+        "latency_ms": 149.3,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "kw-06",
+        "style": "keyword",
+        "query": "OmniRoute CODEX_CLIENT_VERSION 0.149.0 mismatch",
+        "latency_ms": 152.8,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "blueprints/us-equities/routing/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-07",
+        "style": "keyword",
+        "query": "ctx_execute_file rejected scoped project root MCP approval",
+        "latency_ms": 149.5,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "blueprints/us-equities/workers/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8262346571285599,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-08",
+        "style": "keyword",
+        "query": "Massive Databento corporate action adjustment split dividend",
+        "latency_ms": 151.8,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "catalogs/us-equities/data-research.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-09",
+        "style": "keyword",
+        "query": "Loki receipt_id max_over_time double counting",
+        "latency_ms": 152.6,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "kw-10",
+        "style": "keyword",
+        "query": "SGLang CUDA 13 vLLM 0.29.0 UVA WSL failure",
+        "latency_ms": 155.2,
+        "raw_hit_count": 1,
+        "ranked_paths": [
+          "catalogs/us-equities/agents-operations.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.7262287617954056,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "pa-01",
+        "style": "paraphrased_indirect",
+        "query": "If we kill the process because it's taking too long, does that also stop the meter from running on the provider's side?",
+        "latency_ms": 159.9,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-02",
+        "style": "paraphrased_indirect",
+        "query": "Is there any proof yet that switching AI-search modes actually finds better answers than plain keyword lookup, for this project's own documents?",
+        "latency_ms": 156.2,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-03",
+        "style": "paraphrased_indirect",
+        "query": "If a company refiles something with the SEC, does the system assume the new numbers automatically replace the old ones?",
+        "latency_ms": 151.3,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-04",
+        "style": "paraphrased_indirect",
+        "query": "Does finishing the code build mean the software is safe to point at real, untrusted data yet?",
+        "latency_ms": 148.1,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-05",
+        "style": "paraphrased_indirect",
+        "query": "Can the assistant just say it looked something up and expect that to be taken at its word?",
+        "latency_ms": 153.3,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-06",
+        "style": "paraphrased_indirect",
+        "query": "Would leaving that research web-service running overnight actually give us a dependable, always-on research backend?",
+        "latency_ms": 152.9,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-07",
+        "style": "paraphrased_indirect",
+        "query": "If the repo's automatic checks all come back green, does that tell us the trading pieces were actually exercised against something live?",
+        "latency_ms": 153.9,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-08",
+        "style": "paraphrased_indirect",
+        "query": "When new repos get folded into the big master list, does that change how many are counted as officially reviewed decisions versus just names mentioned somewhere?",
+        "latency_ms": 155.3,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-09",
+        "style": "paraphrased_indirect",
+        "query": "Is a fill-in-the-blanks assignment sheet for a researcher the same thing as actually telling the model to go do something right now?",
+        "latency_ms": 150.9,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-10",
+        "style": "paraphrased_indirect",
+        "query": "Knowing how many tools and models a system reports having available \u2014 does that by itself tell us it successfully reasoned about anything yet?",
+        "latency_ms": 152.9,
+        "raw_hit_count": 0,
+        "ranked_paths": [],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      }
+    ],
+    "summary": {
+      "query_count": 30,
+      "mean_ndcg_at_10": 0.2227878901522255,
+      "mean_recall_at_5": 0.26666666666666666,
+      "mean_mrr": 0.26666666666666666,
+      "errored_queries": []
+    }
+  },
+  "arm_b": {
+    "status": "evaluated",
+    "per_query": [
+      {
+        "id": "nl-01",
+        "style": "natural_language",
+        "query": "What happens to a float-based check when the raw volume value is -1e-400, and why does the promotion gate parse it differently now?",
+        "latency_ms": 44337.0,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/data/README.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "blueprints/us-equities/workers/README.md",
+          "observability/README.md",
+          "observability/backends/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/agents-operations.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/data-research.md",
+          "catalogs/us-equities/star-audit.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "nl-02",
+        "style": "natural_language",
+        "query": "Why did the SPY/LEAN parity comparison for Nautilus come back BLOCKED instead of passing, and what were the two unsupported mappings?",
+        "latency_ms": 41960.6,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/north-star.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "catalogs/us-equities/README.md",
+          "blueprints/us-equities/engine/resolution.md",
+          "blueprints/us-equities/data/README.md",
+          "blueprints/us-equities/README.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/engine/README.md",
+          "catalogs/us-equities/source-followup.md",
+          "blueprints/us-equities/financial-data/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.7967075809905066,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "nl-03",
+        "style": "natural_language",
+        "query": "How does the research runtime confirm that a Claude report only used the numbers actually given to it, rather than the model's own outside knowledge?",
+        "latency_ms": 42097.1,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/hosting/README.md",
+          "catalogs/us-equities/models.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/data-research.md",
+          "blueprints/us-equities/routing/README.md",
+          "observability/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "blueprints/us-equities/deerflow/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.52129602861432,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "nl-04",
+        "style": "natural_language",
+        "query": "What blocked the first live acquisition attempt against SEC's API, and how is that different from the offline tests passing?",
+        "latency_ms": 48133.0,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/routing/README.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/star-audit.md",
+          "catalogs/us-equities/README.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.5345658893354267,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "nl-05",
+        "style": "natural_language",
+        "query": "What did the security review find wrong with the ai-trader-bot smart contract that got it rejected?",
+        "latency_ms": 37569.1,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/star-audit.md",
+          "blueprints/us-equities/README.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "catalogs/us-equities/agents-operations.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/workers/policy.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "observability/README.md",
+          "blueprints/us-equities/routing/README.md",
+          "blueprints/us-equities/deerflow/research-task.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "nl-06",
+        "style": "natural_language",
+        "query": "Which specific alert fires when the paper-trading ledger can't be opened or read at all, independent of what's inside it?",
+        "latency_ms": 64576.5,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/engines-strategies.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/engine/README.md",
+          "blueprints/us-equities/data/README.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "blueprints/us-equities/north-star.md",
+          "blueprints/us-equities/README.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "catalogs/us-equities/star-audit.md",
+          "blueprints/us-equities/engine/resolution.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.6309297535714574,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "nl-07",
+        "style": "natural_language",
+        "query": "Why is a Desktop app's exact total token usage for a whole parent conversation still not verifiable from the metrics being collected?",
+        "latency_ms": 47146.2,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "observability/README.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/workers/README.md",
+          "observability/session-e2e.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/agents-operations.md",
+          "blueprints/us-equities/routing/README.md",
+          "catalogs/us-equities/data-research.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.804532155482531,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "nl-08",
+        "style": "natural_language",
+        "query": "Before letting a research LLM use QMD search results as a fact, what two-step process is it supposed to follow, and what should it do if the search comes back empty?",
+        "latency_ms": 45486.8,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/star-audit.md",
+          "blueprints/us-equities/workers/policy.md",
+          "catalogs/us-equities/native-workflows.md",
+          "blueprints/us-equities/workers/research-task.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "catalogs/us-equities/README.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "catalogs/us-equities/agents-operations.md",
+          "blueprints/us-equities/north-star.md",
+          "blueprints/us-equities/data/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.6590018048024133,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "nl-09",
+        "style": "natural_language",
+        "query": "The SDK kept its OTLP metrics exporter configured, but no histogram data was showing up anywhere for it \u2014 what single setting was actually missing, and where does it belong?",
+        "latency_ms": 41967.9,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/workers/README.md",
+          "observability/session-e2e.md",
+          "observability/collector/README.md",
+          "observability/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/source-followup.md",
+          "catalogs/us-equities/data-research.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.639909328045346,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "nl-10",
+        "style": "natural_language",
+        "query": "What specific role does NautilusTrader's IBKR adapter have today, and has its broker connection actually been accepted yet?",
+        "latency_ms": 40711.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/north-star.md",
+          "catalogs/us-equities/README.md",
+          "blueprints/us-equities/README.md",
+          "blueprints/us-equities/engine/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/star-audit.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/engine/resolution.md",
+          "catalogs/us-equities/native-workflows.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.8343174379488818,
+        "recall_at_5": 0.5,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-01",
+        "style": "keyword",
+        "query": "restic keep-last dry-run retention",
+        "latency_ms": 37827.5,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/hosting/backup/README.md",
+          "catalogs/us-equities/star-audit.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/source-followup.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/hosting/README.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "observability/backends/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9639404333166532,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-02",
+        "style": "keyword",
+        "query": "DotNetZip ProDotNetZip CVE directory traversal",
+        "latency_ms": 36913.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/engine/resolution.md",
+          "observability/README.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/hosting/backup/README.md",
+          "blueprints/us-equities/engine/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "catalogs/us-equities/source-followup.md",
+          "observability/session-e2e.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9327783893101107,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-03",
+        "style": "keyword",
+        "query": "tokenizer o200k_base 6398 490 catalog reduction",
+        "latency_ms": 39720.0,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/native-workflows.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/README.md",
+          "observability/session-e2e.md",
+          "observability/README.md",
+          "catalogs/us-equities/models.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/workers/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "observability/backends/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9639404333166532,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-04",
+        "style": "keyword",
+        "query": "Dagu auth.mode none passwordless anonymous API DAG write disabled",
+        "latency_ms": 37096.6,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/hosting/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/hosting.md",
+          "blueprints/us-equities/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/native-workflows.md",
+          "blueprints/us-equities/financial-data/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9243382314975351,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-05",
+        "style": "keyword",
+        "query": "abtop --json --once summary invoke Claude private",
+        "latency_ms": 50415.3,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/README.md",
+          "catalogs/us-equities/source-followup.md",
+          "catalogs/us-equities/repository-index.md",
+          "observability/README.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "observability/session-e2e.md",
+          "blueprints/us-equities/hosting/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/workers/README.md",
+          "catalogs/us-equities/agents-operations.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.7967075809905066,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-06",
+        "style": "keyword",
+        "query": "OmniRoute CODEX_CLIENT_VERSION 0.149.0 mismatch",
+        "latency_ms": 40204.6,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/routing/README.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "observability/session-e2e.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/native-workflows.md",
+          "observability/backends/README.md",
+          "catalogs/us-equities/data-research.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "blueprints/us-equities/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9327783893101107,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-07",
+        "style": "keyword",
+        "query": "ctx_execute_file rejected scoped project root MCP approval",
+        "latency_ms": 44686.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/workers/README.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/native-workflows.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/deerflow/research-result.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "observability/session-e2e.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.9639404333166532,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-08",
+        "style": "keyword",
+        "query": "Massive Databento corporate action adjustment split dividend",
+        "latency_ms": 57987.8,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/data-research.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/star-audit.md",
+          "observability/session-e2e.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "blueprints/us-equities/hosting/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-09",
+        "style": "keyword",
+        "query": "Loki receipt_id max_over_time double counting",
+        "latency_ms": 48723.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "observability/collector/README.md",
+          "observability/session-e2e.md",
+          "observability/README.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/hosting/backup/README.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/workers/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "observability/desktop-restart.md",
+          "blueprints/us-equities/gap-resolution.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "kw-10",
+        "style": "keyword",
+        "query": "SGLang CUDA 13 vLLM 0.29.0 UVA WSL failure",
+        "latency_ms": 33319.2,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/models.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "blueprints/us-equities/engine/resolution.md",
+          "blueprints/us-equities/data/README.md",
+          "blueprints/us-equities/routing/README.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "observability/session-e2e.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/hosting/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.878961873034099,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "pa-01",
+        "style": "paraphrased_indirect",
+        "query": "If we kill the process because it's taking too long, does that also stop the meter from running on the provider's side?",
+        "latency_ms": 50477.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "observability/README.md",
+          "blueprints/us-equities/north-star.md",
+          "catalogs/us-equities/data-research.md",
+          "blueprints/us-equities/workers/policy.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "catalogs/us-equities/agents-operations.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "observability/session-e2e.md",
+          "blueprints/us-equities/data/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-02",
+        "style": "paraphrased_indirect",
+        "query": "Is there any proof yet that switching AI-search modes actually finds better answers than plain keyword lookup, for this project's own documents?",
+        "latency_ms": 65745.4,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/foundation-memory.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "blueprints/us-equities/workers/policy.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/north-star.md",
+          "catalogs/us-equities/data-research.md",
+          "blueprints/us-equities/routing/README.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "catalogs/us-equities/models.md",
+          "catalogs/us-equities/native-workflows.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.86907670576533,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "pa-03",
+        "style": "paraphrased_indirect",
+        "query": "If a company refiles something with the SEC, does the system assume the new numbers automatically replace the old ones?",
+        "latency_ms": 63562.2,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/README.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/financial-data/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "blueprints/us-equities/north-star.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/data-research.md",
+          "blueprints/us-equities/README.md",
+          "catalogs/us-equities/star-audit.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.5,
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333
+      },
+      {
+        "id": "pa-04",
+        "style": "paraphrased_indirect",
+        "query": "Does finishing the code build mean the software is safe to point at real, untrusted data yet?",
+        "latency_ms": 50611.7,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/source-followup.md",
+          "catalogs/us-equities/star-audit.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/data-research.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/engine/resolution.md",
+          "blueprints/us-equities/engine/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.3735151267451618,
+        "recall_at_5": 0.0,
+        "mrr": 0.16666666666666666
+      },
+      {
+        "id": "pa-05",
+        "style": "paraphrased_indirect",
+        "query": "Can the assistant just say it looked something up and expect that to be taken at its word?",
+        "latency_ms": 45590.8,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/workers/research-task.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/workers/policy.md",
+          "blueprints/us-equities/routing/README.md",
+          "catalogs/us-equities/repository-index.md",
+          "observability/session-e2e.md",
+          "blueprints/us-equities/workers/README.md",
+          "catalogs/us-equities/native-workflows.md",
+          "blueprints/us-equities/research-runtime/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.07961179255356228,
+        "recall_at_5": 0.0,
+        "mrr": 0.1
+      },
+      {
+        "id": "pa-06",
+        "style": "paraphrased_indirect",
+        "query": "Would leaving that research web-service running overnight actually give us a dependable, always-on research backend?",
+        "latency_ms": 41473.1,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "blueprints/us-equities/hosting.md",
+          "blueprints/us-equities/routing/README.md",
+          "blueprints/us-equities/README.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "catalogs/us-equities/README.md",
+          "observability/backends/README.md",
+          "blueprints/us-equities/hosting/README.md",
+          "blueprints/us-equities/research-runtime/README.md",
+          "blueprints/us-equities/workers/research-task.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.944847956559586,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "pa-07",
+        "style": "paraphrased_indirect",
+        "query": "If the repo's automatic checks all come back green, does that tell us the trading pieces were actually exercised against something live?",
+        "latency_ms": 50981.8,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/star-audit.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "observability/desktop-restart.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/data/README.md",
+          "blueprints/us-equities/deerflow/research-result.md",
+          "blueprints/us-equities/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/source-followup.md",
+          "catalogs/us-equities/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0
+      },
+      {
+        "id": "pa-08",
+        "style": "paraphrased_indirect",
+        "query": "When new repos get folded into the big master list, does that change how many are counted as officially reviewed decisions versus just names mentioned somewhere?",
+        "latency_ms": 48739.9,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/repository-index.md",
+          "catalogs/us-equities/star-audit.md",
+          "catalogs/us-equities/engines-strategies.md",
+          "catalogs/us-equities/source-followup.md",
+          "observability/session-e2e.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "catalogs/us-equities/agents-operations.md",
+          "catalogs/us-equities/README.md",
+          "observability/collector/README.md",
+          "observability/backends/README.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.91311732856428,
+        "recall_at_5": 1.0,
+        "mrr": 1.0
+      },
+      {
+        "id": "pa-09",
+        "style": "paraphrased_indirect",
+        "query": "Is a fill-in-the-blanks assignment sheet for a researcher the same thing as actually telling the model to go do something right now?",
+        "latency_ms": 43596.9,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/engines-strategies.md",
+          "blueprints/us-equities/workers/research-task.md",
+          "catalogs/us-equities/repository-index.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "blueprints/us-equities/workers/policy.md",
+          "catalogs/us-equities/foundation-memory.md",
+          "blueprints/us-equities/routing/README.md",
+          "catalogs/us-equities/models.md",
+          "blueprints/us-equities/engine/README.md",
+          "catalogs/us-equities/star-audit.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.52129602861432,
+        "recall_at_5": 1.0,
+        "mrr": 0.5
+      },
+      {
+        "id": "pa-10",
+        "style": "paraphrased_indirect",
+        "query": "Knowing how many tools and models a system reports having available \u2014 does that by itself tell us it successfully reasoned about anything yet?",
+        "latency_ms": 47636.6,
+        "raw_hit_count": 10,
+        "ranked_paths": [
+          "catalogs/us-equities/repository-index.md",
+          "observability/session-e2e.md",
+          "catalogs/us-equities/native-workflows.md",
+          "blueprints/us-equities/deerflow/research-task.md",
+          "blueprints/us-equities/deerflow/research-result.md",
+          "observability/README.md",
+          "blueprints/us-equities/gap-resolution.md",
+          "blueprints/us-equities/deerflow/README.md",
+          "catalogs/us-equities/README.md",
+          "catalogs/us-equities/foundation-memory.md"
+        ],
+        "error": null,
+        "resolution_notes": [],
+        "ndcg_at_10": 0.4382444959756785,
+        "recall_at_5": 1.0,
+        "mrr": 0.25
+      }
+    ],
+    "summary": {
+      "query_count": 30,
+      "mean_ndcg_at_10": 0.7139451725887042,
+      "mean_recall_at_5": 0.85,
+      "mean_mrr": 0.7283333333333334,
+      "errored_queries": []
+    },
+    "model_provenance": {
+      "models": [
+        {
+          "role": "embed",
+          "hf_uri": "hf:ggml-org/embeddinggemma-300M-GGUF/embeddinggemma-300M-Q8_0.gguf",
+          "hf_repo_id": "ggml-org/embeddinggemma-300M-GGUF",
+          "filename": "embeddinggemma-300M-Q8_0.gguf",
+          "size_bytes": 333590944,
+          "sha256": "b5ce9d77a3fc4b3b39ccb5643c36777911cc4eb46a66962eadfa3f5f60490d63",
+          "hf_repo_revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12",
+          "hf_repo_revision_error": null,
+          "hf_repo_revision_note": "Resolved via a GET to huggingface.co/api/models/<repo>.sha shortly after the pull completed; it pins the repo HEAD at query time, which may postdate the exact download instant by seconds if the upstream repo changed concurrently. The file's own sha256 above is the authoritative content pin regardless.",
+          "hf_content_store_etag": null,
+          "hf_content_store_etag_note": "HF's Xet content-store token for this file, not a sha256 checksum; recorded only as a cross-reference to qmd's own cache bookkeeping.",
+          "pull_note": "cached/checked",
+          "pull_size_reported": "318.1 MB"
+        },
+        {
+          "role": "generate",
+          "hf_uri": "hf:tobil/qmd-query-expansion-1.7B-gguf/qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "hf_repo_id": "tobil/qmd-query-expansion-1.7B-gguf",
+          "filename": "qmd-query-expansion-1.7B-q4_k_m.gguf",
+          "size_bytes": 1282438912,
+          "sha256": "000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0",
+          "hf_repo_revision": "7816de0b72572c6c860ca1eddf97ba9e7fb8cc65",
+          "hf_repo_revision_error": null,
+          "hf_repo_revision_note": "Resolved via a GET to huggingface.co/api/models/<repo>.sha shortly after the pull completed; it pins the repo HEAD at query time, which may postdate the exact download instant by seconds if the upstream repo changed concurrently. The file's own sha256 above is the authoritative content pin regardless.",
+          "hf_content_store_etag": null,
+          "hf_content_store_etag_note": "HF's Xet content-store token for this file, not a sha256 checksum; recorded only as a cross-reference to qmd's own cache bookkeeping.",
+          "pull_note": "cached/checked",
+          "pull_size_reported": "1.2 GB"
+        },
+        {
+          "role": "rerank",
+          "hf_uri": "hf:ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/qwen3-reranker-0.6b-q8_0.gguf",
+          "hf_repo_id": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF",
+          "filename": "qwen3-reranker-0.6b-q8_0.gguf",
+          "size_bytes": 639153184,
+          "sha256": "22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48",
+          "hf_repo_revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+          "hf_repo_revision_error": null,
+          "hf_repo_revision_note": "Resolved via a GET to huggingface.co/api/models/<repo>.sha shortly after the pull completed; it pins the repo HEAD at query time, which may postdate the exact download instant by seconds if the upstream repo changed concurrently. The file's own sha256 above is the authoritative content pin regardless.",
+          "hf_content_store_etag": null,
+          "hf_content_store_etag_note": "HF's Xet content-store token for this file, not a sha256 checksum; recorded only as a cross-reference to qmd's own cache bookkeeping.",
+          "pull_note": "cached/checked",
+          "pull_size_reported": "609.5 MB"
+        }
+      ],
+      "pull_stdout_sanitized": "Pulling models\n- hf:ggml-org/embeddinggemma-300M-GGUF/embeddinggemma-300M-Q8_0.gguf -> <SCRATCH_HOME>/.cache/qmd/models/hf_ggml-org_embeddinggemma-300M-Q8_0.gguf (318.1 MB, cached/checked)\n- hf:tobil/qmd-query-expansion-1.7B-gguf/qmd-query-expansion-1.7B-q4_k_m.gguf -> <SCRATCH_HOME>/.cache/qmd/models/hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf (1.2 GB, cached/checked)\n- hf:ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/qwen3-reranker-0.6b-q8_0.gguf -> <SCRATCH_HOME>/.cache/qmd/models/hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf (609.5 MB, cached/checked)\n"
+    },
+    "not_run_reason": null,
+    "embed_summary": {
+      "chunks_embedded": 249,
+      "documents_embedded": 33,
+      "upstream_reported_duration": "45s",
+      "stdout_sanitized": "Model: embeddinggemma-300M-Q8_0.gguf\n\n\n\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588 100%                                    \n\n\u2713 Done! Embedded 249 chunks from 33 documents in 45s\n"
+    }
+  },
+  "decision": {
+    "gain_ndcg_at_10": 0.49115728243647866,
+    "bootstrap_ci": {
+      "iterations": 10000,
+      "seed": 20260925,
+      "lower_95": 0.3673349459288359,
+      "upper_95": 0.6184658736624687,
+      "method": "Nearest-rank percentile on ascending-sorted resample means of mean(B)-mean(A) over N=10000 resamples of the 30 paired per-query nDCG@10 differences, each drawn with replacement (Python random.Random(seed=20260925)). lower=sorted[floor(0.025*N)], upper=sorted[min(floor(0.975*N), N-1)], both 0-indexed."
+    },
+    "condition_1_gain_ge_0_05": true,
+    "condition_2_ci_excludes_zero": true,
+    "decision": "Hybrid (Arm B) selected over BM25",
+    "reason": "Both preregistered conditions held.",
+    "interpretation": "Arm A is QMD 2.8.3's lexical `search` command, which returned no candidates for 22 of 30 queries (all natural-language and paraphrased queries, 2 of 10 keyword queries). The selection is QMD hybrid `query` over QMD lexical `search` as invoked here, not over BM25 in general; a relaxed/OR BM25 baseline is a named follow-up."
+  },
+  "durations_seconds": {
+    "seal_verify": 0.0004277440020814538,
+    "corpus_staging": 0.08776805200614035,
+    "index_build": 1.1053665590006858,
+    "arm_a": 4.591937149001751,
+    "arm_b_pull": 3.041575921990443,
+    "arm_b_embed": 45.00272992698592,
+    "arm_b": 1389.3009942100034,
+    "total_wall_clock": 1443.3437966089987
+  },
+  "environment": {
+    "python_version": "3.13.15",
+    "cpu_forced": true,
+    "gpu_used": false,
+    "cpu_count": 48,
+    "scratch_home_owned_by_this_run": false
+  },
+  "limitations": [
+    "30 queries against 33 short documents is a small-sample comparison; the paired bootstrap CI is the safeguard against reading noise as a real gain, not a substitute for a larger corpus.",
+    "This protocol measures retrieval quality only (nDCG@10, recall@5, MRR); it does not measure end-to-end answer quality, latency at scale, or provider-token cost.",
+    "The query author's relevance judgments reflect one reader's understanding of \"directly answers\" vs. \"partially relevant\", not adjudicated multi-rater agreement.",
+    "Arm B's models were pulled and run once, forced onto CPU on a shared host; a GPU run or a different host's CPU could show different absolute latency (not accuracy, since the same GGUF weights and inference code drive both).",
+    "QMD adaptively skips its query-expansion model per-query when BM25 signal is already strong; not every Arm B query necessarily exercised all three pulled models."
+  ]
+}

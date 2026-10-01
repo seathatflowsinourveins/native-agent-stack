@@ -1,10 +1,13 @@
 """Offline guards for the local metadata adapter, not native E2E acceptance."""
 import copy
+import errno
 import importlib.util
 import json
 import os
 from pathlib import Path
+import signal
 import stat
+import subprocess
 import sys
 import tempfile
 import time
@@ -157,6 +160,130 @@ class NativeDataTests(unittest.TestCase):
         visible_failed = {key: value for key, value in failed.items() if key in fields}
         self.assertEqual(visible_failed, {"state": "unknown"})
 
+    def test_token_panels_sum_per_writer_rates_and_exclude_unscoped_writers(self):
+        # Each Claude session and Codex process is its own series (observability/collector/README.md#writer-identity-
+        # and-counter-integrity): a raw sum of cumulative counters follows series lifetimes, and an unscoped series is
+        # shared by several writers, so the panels sum per-writer rates and leave instance="unscoped" out.
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        self.assertEqual(panels[10]["targets"][0]["expr"],
+                         '60 * sum by (type) (rate(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                         '[$__rate_interval]))')
+        self.assertEqual(panels[9]["targets"][0]["expr"],
+                         '60 * sum by (token_type) (rate(ecosystem_codex_turn_token_usage_sum{instance!="unscoped"}'
+                         '[$__rate_interval]))')
+        for pid in (9, 10):
+            with self.subTest(panel=pid):
+                panel = panels[pid]
+                self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+                self.assertIn('instance="unscoped"', panel["description"])
+                self.assertNotIn("known to undercount", panel["title"])
+                self.assertNotIn("cause is open", panel["description"])
+
+    def test_activity_panel_includes_every_native_client_service(self):
+        expr = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 12)["targets"][0]["expr"]
+        for service in ("codex_exec", "codex_cli_rs", "codex-app-server", "claude-code", "claude-code-desktop"):
+            with self.subTest(service=service):
+                self.assertIn(service, expr.split('"')[1].split("|"))
+
+    def test_loki_query_source_panels_cover_every_token_field(self):
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        expected_fields = {
+            15: "cache_read_tokens",
+            16: "input_tokens",
+            17: "output_tokens",
+            18: "cache_creation_tokens",
+        }
+        # Pin the literal expression so a change to the aggregation function, the grouping
+        # dimension or the range-vector window (e.g. sum_over_time -> avg_over_time, "sum by"
+        # -> "avg by", "[$__interval]" -> "[5m]") fails this test even though the helper would
+        # still agree with itself.
+        self.assertEqual(
+            R.by_query_source("cache_read_tokens"),
+            'sum by (query_source) (sum_over_time({service_name="claude-code"} | event_name="api_request"'
+            ' | unwrap cache_read_tokens [$__interval]))')
+        seen_grid = set()
+        for pid, field in expected_fields.items():
+            panel = panels[pid]
+            expr = panel["targets"][0]["expr"]
+            self.assertEqual(expr, R.by_query_source(field))
+            self.assertTrue(expr.startswith('sum by (query_source) (sum_over_time('), expr)
+            self.assertTrue(expr.endswith(' [$__interval]))'), expr)
+            self.assertIn('service_name="claude-code"', expr)
+            self.assertIn('event_name="api_request"', expr)
+            self.assertIn("by (query_source)", expr)
+            self.assertIn("unwrap " + field, expr)
+            self.assertEqual(panel["datasource"]["uid"], "ecosystem-loki")
+            self.assertEqual(panel["type"], "timeseries")
+            self.assertEqual(panel["targets"][0]["queryType"], "range")
+            # The legend must show a per-series sum so a completed range's total is readable
+            # without manual summation in Inspect > Data (Grafana Inspect panel).
+            self.assertEqual(panel["options"]["legend"]["calcs"], ["sum"])
+            self.assertEqual(panel["options"]["legend"]["displayMode"], "table")
+            grid = panel["gridPos"]
+            seen_grid.add((grid["x"], grid["y"]))
+        self.assertEqual(len(seen_grid), len(expected_fields), "new Loki panels must not share a grid position")
+
+    def test_prometheus_effort_split_panel_present(self):
+        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 19)
+        self.assertEqual(panel["targets"][0]["expr"],
+                         'sum by (effort) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!="unscoped"}'
+                         '[$__rate_interval]))')
+        self.assertEqual(panel["datasource"]["uid"], "ecosystem-prometheus")
+        self.assertIn("effort", panel["title"].lower())
+
+    def test_savings_trend_draws_each_scope_as_its_own_unsummed_series(self):
+        panels = {panel["id"]: panel for panel in R.dashboard()["panels"]}
+        panel = panels[20]
+        target = panel["targets"][0]
+        # Pin the literal expression: grouping by anything but entity_id, summing, or showing a
+        # step whose newest row is not ok must fail here even if the helper agrees with itself.
+        # The value is the step's last ok estimate, kept only where the newest ok row's
+        # observed_unix equals the newest row's: an earlier success in the same step never
+        # replaces a failed or stale newest row (checked on Loki 3.7.8 by the G2 repair round).
+        stream = '{service_name="agent-stack-native-data",record_kind="savings"}'
+        self.assertEqual(
+            R.savings_series(),
+            'last_over_time(' + stream + ' | json entity_id, state, estimated_saved | state="ok"'
+            ' | unwrap estimated_saved | __error__="" [$__interval]) by (entity_id)'
+            ' and on(entity_id) ('
+            'last_over_time(' + stream + ' | json entity_id, state, observed_unix | state="ok"'
+            ' | unwrap observed_unix | __error__="" [$__interval]) by (entity_id)'
+            ' == on(entity_id) '
+            'last_over_time(' + stream + ' | json entity_id, observed_unix'
+            ' | unwrap observed_unix | __error__="" [$__interval]) by (entity_id))')
+        self.assertEqual(target["expr"], R.savings_series())
+        self.assertNotIn("sum", target["expr"])
+        self.assertEqual((target["queryType"], target["legendFormat"]), ("range", "{{entity_id}}"))
+        self.assertEqual((panel["type"], panel["datasource"]["uid"]), ("timeseries", "ecosystem-loki"))
+        custom = panel["fieldConfig"]["defaults"]["custom"]
+        self.assertEqual(custom["stacking"]["mode"], "none")
+        self.assertFalse(custom["spanNulls"])
+        # No legend value: a last-non-null value would keep showing an old success after the
+        # scope fails. The savings table above carries each scope's current value and state.
+        self.assertEqual(panel["options"]["legend"]["calcs"], [])
+        self.assertNotIn("last", json.dumps(panel["options"]["legend"]).lower())
+        # Every step must hold at least one generation of the two-minute timer example.
+        timer = (ROOT / "observability/native-data/native-data.timer.example").read_text().splitlines()
+        self.assertIn("OnUnitActiveSec=2min", timer)
+        self.assertEqual(panel["interval"], "3m")
+        table = panels[5]["gridPos"]
+        self.assertEqual((panel["gridPos"]["x"], panel["gridPos"]["y"]), (0, table["y"] + table["h"]))
+
+    def test_dashboard_panel_grid_positions_never_overlap(self):
+        panels = R.dashboard()["panels"]
+        ids = [panel["id"] for panel in panels]
+        self.assertEqual(len(ids), len(set(ids)), "duplicate panel id in the rendered dashboard")
+
+        def rect(panel):
+            grid = panel["gridPos"]
+            return grid["x"], grid["y"], grid["x"] + grid["w"], grid["y"] + grid["h"]
+
+        rects = [rect(panel) for panel in panels]
+        for i, (ax0, ay0, ax1, ay1) in enumerate(rects):
+            for bx0, by0, bx1, by1 in rects[i + 1:]:
+                overlaps = ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1
+                self.assertFalse(overlaps, f"panel {ids[i]} overlaps another panel's gridPos")
+
     def test_qmd_collection_selection_and_bm25_zero(self):
         r = M.qmd_metrics(QMD, "selected-collection")
         self.assertEqual(r["collection_files"], 67)
@@ -228,6 +355,123 @@ class NativeDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             M.validate_config(c)
 
+    def test_configured_report_scopes_select_their_labels_without_publishing_them(self):
+        # Token-report labels observed on the WSL workstation: Context Mode scopes are the
+        # report's context_roots names and Headroom uses the reporter's default label.
+        now = 10000
+        latest = {"observed_at": M.utc(now), "success": True,
+                  "metrics": {"saved": 12, "session_estimated_saved": 3, "raw": {"updated_at": now * 1000}}}
+        report = {"native": [dict(tool=tool, scope=scope, latest=copy.deepcopy(latest)) for tool, scope in (
+            ("context-mode", "Claude Code (Context Mode plugin)"), ("headroom", "Native / last 30 days"),
+            ("jcodemunch", "Linux / upstream default index"), ("context-mode", "Native Codex"))]}
+        scopes = {"jcodemunch": "Linux / upstream default index", "headroom": "Native / last 30 days",
+                  "context-mode-native-claude": "Claude Code (Context Mode plugin)"}
+        c = self.config(); c["report_scopes"] = scopes
+        M.validate_config(c)
+        rows = M.report_rows(report, now, 60, now, scopes)
+        self.assertEqual([r["entity_id"] for r in rows], ["context-mode-native-claude", "headroom", "jcodemunch"])
+        self.assertEqual({r["state"] for r in rows}, {"ok"})
+        self.assertEqual(rows[0]["session_estimated_saved"], 3)
+        self.assertNotIn("Context Mode plugin", json.dumps(M.loki_payload(rows, 123)))
+        self.assertNotIn("Native / last 30 days", json.dumps(M.loki_payload(rows, 123)))
+        # Without the key the authoring host's labels remain: these labels stay unknown.
+        legacy = {r["entity_id"]: r["state"] for r in M.report_rows(report, now, 60, now)}
+        self.assertEqual(legacy, {"context-mode-native-codex": "ok", "context-mode-native-claude": "unknown",
+                                  "context-mode-desktop-wsl": "unknown", "headroom": "unknown", "jcodemunch": "ok"})
+
+    def test_report_scopes_accept_only_known_entities_and_distinct_labels(self):
+        for scopes in ({}, [], {"rtk-global": "Native / all retained projects"}, {"headroom": ""},
+                       {"headroom": 7}, {"headroom": "x" * 201}, {"headroom": "Native\n/ last 30 days"},
+                       {"context-mode-native-codex": "Same root", "context-mode-native-claude": "Same root"}):
+            c = self.config(); c["report_scopes"] = scopes
+            with self.subTest(scopes=scopes), self.assertRaises(ValueError):
+                M.validate_config(c)
+        c = self.config(); c["report_scopes"] = {"headroom": "Same root", "context-mode-native-codex": "Same root"}
+        M.validate_config(c)  # different tools may share a label
+
+    def test_ai_memory_server_url_reaches_only_the_memory_command(self):
+        for url in ("http://localhost:49474", "http://127.0.0.1:49474/", "https://127.0.0.1:49474",
+                    "http://127.0.0.1:0", "http://127.0.0.1:65536", 49474, None):
+            c = self.config(); c["ai_memory"]["server_url"] = url
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                M.validate_config(c)
+        c = self.config(); c["ai_memory"]["extra"] = "x"
+        with self.assertRaises(ValueError):
+            M.validate_config(c)
+        c = self.config(); del c["ai_memory"]["server_url"]
+        M.validate_config(c)  # optional: the child then keeps the caller's environment
+        seen = {}
+
+        class CapturingRecorder:
+            records = []
+
+            def command(self, name, argv, cwd, env=None):
+                seen[name] = env
+                self.records.append({"completed_at": M.utc(time.time())})
+                return None
+        with tempfile.TemporaryDirectory() as directory:
+            c = M.validate_config(self.config()); c["project"] = directory
+            c["ai_memory"]["server_url"] = "http://127.0.0.1:49474"
+            c["token_report"] = str(Path(directory) / "missing.json")
+            M.collect(c, CapturingRecorder(), time.time())
+            self.assertEqual(seen.pop("ai-memory"), {"AI_MEMORY_SERVER_URL": "http://127.0.0.1:49474"})
+            self.assertEqual(set(seen.values()), {None})
+            recorder = M.Recorder(Path(directory), 5)
+            out = recorder.command("env", [sys.executable, "-c", "import os; print(os.environ['AI_MEMORY_SERVER_URL'])"],
+                                   directory, env={"AI_MEMORY_SERVER_URL": "http://127.0.0.1:49474"})
+            self.assertEqual(out, b"http://127.0.0.1:49474\n")
+            self.assertEqual(recorder.records[-1]["environment_overrides"], ["AI_MEMORY_SERVER_URL"])
+            self.assertNotIn("127.0.0.1", json.dumps(recorder.records[-1]))
+
+    def test_scheduled_deployment_documents_the_native_undo(self):
+        text = (ROOT / "observability/native-data/README.md").read_text()
+        section = text.split("## Scheduled deployment", 1)[1].split("\n## ", 1)[0]
+        blocks = [block for block in section.split("```sh")[1:]]
+        commands = [line.strip() for block in blocks for line in block.split("```", 1)[0].splitlines()]
+        # The undo runs through the same native commands: disable the timer the deployment
+        # enabled, remove the installed units and dashboard file, then reload the user manager.
+        undo = commands.index("systemctl --user disable --now ecosystem-native-data.timer")
+        removal = next(i for i, line in enumerate(commands) if line.startswith("rm ")
+                       and "ecosystem-native-data.service" in line and "ecosystem-native-data.timer" in line)
+        dashboard = next(i for i, line in enumerate(commands) if line.startswith("rm ")
+                         and "native-foundation-data.json" in line)
+        reload = max(i for i, line in enumerate(commands) if line == "systemctl --user daemon-reload")
+        self.assertLess(undo, removal)
+        self.assertLess(removal, reload)
+        self.assertGreater(dashboard, undo)
+
+    def test_scheduled_deployment_undoes_timer_enablement_and_activation_separately(self):
+        text = (ROOT / "observability/native-data/README.md").read_text()
+        section = text.split("## Scheduled deployment", 1)[1].split("\n## ", 1)[0]
+        blocks = [block.split("```", 1)[0] for block in section.split("```sh")[1:]]
+        commands = [line.strip() for block in blocks for line in block.splitlines()]
+        # enable --now can change the timer's enablement, its activation or both. Both are read
+        # before it runs and each is undone on its own: a timer that was enabled but inactive is
+        # stopped again rather than left running, and one that was running is not stopped.
+        show = commands.index("systemctl --user show ecosystem-native-data.timer --property=UnitFileState,ActiveState")
+        self.assertLess(show, commands.index("systemctl --user enable --now ecosystem-native-data.timer"))
+        prose = " ".join(section.split())
+        self.assertIn("Disable the timer only if it was not enabled before", prose)
+        self.assertIn("stop it only if it was not active before", prose)
+        self.assertIn("`systemctl --user stop ecosystem-native-data.timer`", prose)
+
+    def test_unit_examples_give_the_collector_node_and_block_rtk_telemetry(self):
+        service = (ROOT / "observability/native-data/native-data.service.example").read_text().splitlines()
+        timer = (ROOT / "observability/native-data/native-data.timer.example").read_text().splitlines()
+        directives = [line for line in service if line and not line.startswith("#")]
+        self.assertIn("ExecStart=/usr/bin/python3 -B @REPOSITORY@/observability/native-data/snapshot.py "
+                      "--config @PRIVATE_CONFIG@ --publish", directives)
+        self.assertEqual({line for line in directives if line.startswith("Environment=")},
+                         {"Environment=PATH=@NODE_DIRECTORY@:/usr/local/bin:/usr/bin:/bin",
+                          "Environment=RTK_TELEMETRY_DISABLED=1"})
+        for setting in ("Type=oneshot", "UMask=0077", "NoNewPrivileges=true", "After=ecosystem-loki.service"):
+            self.assertIn(setting, directives)
+        self.assertNotIn("[Install]", directives)
+        self.assertIn("Unit=ecosystem-native-data.service", timer)
+        self.assertIn("WantedBy=timers.target", timer)
+        # Placeholders only: no systemd specifier or variable expansion to resolve at run time.
+        self.assertFalse([line for line in directives + timer if "%" in line or "$" in line])
+
     def test_original_audit_and_newer_receipts_have_distinct_meanings(self):
         report = self.report(10000)
         receipt = dict(id="native-later", path="evidence/receipts/native-later.json",
@@ -288,13 +532,61 @@ class NativeDataTests(unittest.TestCase):
             self.assertEqual(r.records[-1]["error"], "OverflowError")
             self.assertEqual(r.records[-1]["stdout"]["bytes"], 32)
 
+    @unittest.skipUnless(hasattr(os, "waitid"), "needs os.waitid")
+    def test_an_exited_group_that_refuses_the_kill_is_treated_as_gone(self):
+        # The overflow child usually exits before the kill; macOS then answers killpg with EPERM.
+        def refuse_once_exited(pgid, signum):
+            os.waitid(os.P_PID, pgid, os.WEXITED | os.WNOWAIT)  # exited but not reaped
+            raise PermissionError(errno.EPERM, "Operation not permitted")
+        with tempfile.TemporaryDirectory() as directory, patch.object(M, "LIMIT", 32), \
+                patch.object(M.os, "killpg", side_effect=refuse_once_exited) as killpg:
+            r = M.Recorder(Path(directory), 1)
+            self.assertIsNone(r.command("overflow", [sys.executable, "-c", "print('x'*100)"], directory))
+        killpg.assert_called_once()
+        self.assertEqual((r.records[-1]["error"], r.records[-1]["exit_code"]), ("OverflowError", 0))
+
+    def test_a_refused_kill_while_the_leader_still_runs_is_raised(self):
+        created, popen = [], subprocess.Popen
+
+        def track(*args, **kwargs):
+            created.append(popen(*args, **kwargs))
+            return created[-1]
+        script = "import sys,time; sys.stdout.write('x'*100); sys.stdout.flush(); time.sleep(5)"
+        try:
+            with tempfile.TemporaryDirectory() as directory, patch.object(M, "LIMIT", 32), \
+                    patch.object(M.subprocess, "Popen", side_effect=track), \
+                    patch.object(M.os, "killpg", side_effect=PermissionError(errno.EPERM, "Operation not permitted")):
+                with self.assertRaises(PermissionError):
+                    M.Recorder(Path(directory), 1).command("refused", [sys.executable, "-c", script], directory)
+        finally:
+            for process in created:
+                process.kill()
+                process.wait()
+                process.stdout.close()
+                process.stderr.close()
+
+    @unittest.skipUnless(sys.platform in ("darwin", "linux") and hasattr(os, "waitid"), "needs os.waitid")
+    def test_the_kernel_answer_for_signalling_an_exited_unreaped_group(self):
+        # The premise of the handler: macOS refuses with EPERM (XNU killpg1 skips zombies), Linux signals.
+        process = subprocess.Popen([sys.executable, "-c", "pass"], start_new_session=True)
+        try:
+            os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+                outcome = "signalled"
+            except PermissionError:
+                outcome = "EPERM"
+        finally:
+            process.wait()
+        self.assertEqual(outcome, {"darwin": "EPERM", "linux": "signalled"}[sys.platform])
+
     def test_complete_generation_unknown_supersedes_prior_values(self):
         with tempfile.TemporaryDirectory() as directory:
             c = M.validate_config(self.config()); c["project"] = directory
             c["token_report"] = str(Path(directory)/"missing.json")
             class FakeRecorder:
                 records = []
-                def command(self, name, argv, cwd):
+                def command(self, name, argv, cwd, env=None):
                     self.records.append({"completed_at": M.utc(time.time())})
                     return {"rtk-global": RTK, "rtk-project": None, "ai-memory": MEMORY, "qmd": QMD}[name]
             now = time.time(); snapshot = M.collect(c, FakeRecorder(), now)
@@ -309,6 +601,51 @@ class NativeDataTests(unittest.TestCase):
             self.assertNotIn(directory, json.dumps(payload))
             self.assertNotIn("DO_NOT_PUBLISH", json.dumps(payload))
 
+    def test_report_limit_covers_the_token_reports_embedded_attachment_total(self):
+        # The token report embeds up to RETURNED_RESULTS_TOTAL_LIMIT attachment bytes as base64
+        # (4/3) and as JSON-escaped text (at most 6 bytes per byte). Its other sections are not
+        # bounded, so REPORT_LIMIT is a consumer ceiling above the attachments' worst case, not a
+        # producer maximum. A 16 MiB bound turned every report-derived row unknown on the
+        # workstation once returned results were attached.
+        spec = importlib.util.spec_from_file_location("token_manifest", ROOT / "tools/token-report/token_manifest.py")
+        tm = importlib.util.module_from_spec(spec); spec.loader.exec_module(tm)
+        embedded = tm.RETURNED_RESULTS_TOTAL_LIMIT * 4 // 3 + tm.RETURNED_RESULTS_TOTAL_LIMIT * 6
+        self.assertGreater(M.REPORT_LIMIT, embedded)
+
+    def collect_report(self, directory, text, now):
+        path = Path(directory)/"manifest.json"; path.write_text(text)
+        c = self.config(); del c["report_scopes"]  # self.report() uses the default labels
+        c = M.validate_config(c); c["project"] = directory; c["token_report"] = str(path)
+        class FakeRecorder:
+            records = []
+            def command(self, name, argv, cwd, env=None):
+                self.records.append({"completed_at": M.utc(time.time())})
+                return {"rtk-global": RTK, "rtk-project": None, "ai-memory": MEMORY, "qmd": QMD}[name]
+        recorder = FakeRecorder()
+        rows = M.collect(c, recorder, now)["rows"]
+        entities = {e for e, _ in M.REPORT_SCOPES.values()}
+        states = {r["state"] for r in rows if r["entity_id"] in entities}
+        source = next(r for r in recorder.records if r.get("id") == "token-report")
+        return path.stat().st_size, states, source["error"]
+
+    def test_report_beyond_the_attachment_total_still_projects_its_rows(self):
+        with tempfile.TemporaryDirectory() as directory:
+            now = time.time(); report = self.report(now)
+            report["additional_evidence"] = {"returned_results": {"records": [{"text": "x" * (17 * M.LIMIT)}]}}
+            size, states, error = self.collect_report(directory, json.dumps(report), now)
+            self.assertGreater(size, 16 * M.LIMIT)
+            self.assertEqual((states, error), ({"ok"}, None))
+
+    def test_report_ceiling_is_inclusive_and_a_larger_report_stays_unknown(self):
+        with tempfile.TemporaryDirectory() as directory:
+            now = time.time(); report = self.report(now); report["pad"] = ""
+            ceiling = len(json.dumps(report)) + 64
+            report["pad"] = "x" * 64
+            with patch.object(M, "REPORT_LIMIT", ceiling):
+                self.assertEqual(self.collect_report(directory, json.dumps(report), now), (ceiling, {"ok"}, None))
+                report["pad"] += "x"
+                self.assertEqual(self.collect_report(directory, json.dumps(report), now),
+                                 (ceiling + 1, {"unknown"}, "unavailable_or_invalid_report"))
 
 if __name__ == "__main__":
     unittest.main()

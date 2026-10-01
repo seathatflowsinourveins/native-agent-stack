@@ -1,0 +1,17 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "{\"limit\":10,\"query\":\"authentication\"}",
+  "createdAt": 1790386303785,
+  "id": "tsk-<uuid>",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "search",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386303790,
+  "result": "{\"message\":\"Context tree is empty. Use /curate to add knowledge.\",\"results\":[],\"totalFound\":0}",
+  "startedAt": 1790386303790,
+  "status": "completed"
+}

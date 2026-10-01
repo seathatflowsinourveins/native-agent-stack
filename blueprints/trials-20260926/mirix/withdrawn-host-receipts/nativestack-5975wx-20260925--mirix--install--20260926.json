@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mirix--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "mirix",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "bash -c 'got=$(git -C /tmp/nas-mirix-trial/mirix-src rev-parse HEAD); test \"$got\" = \"0f3fbdb5e085ccceb6254e2a4a128a8957dac55a\" && echo TAG_COMMIT_MATCH: $got'",
+      "exit": 0,
+      "duration_s": 0.009,
+      "output_sha256": "79581f0fa5e538469ba843a7e3c09d0cf216854f0ec9d4d956e116681a406972",
+      "output_excerpt": "TAG_COMMIT_MATCH: 0f3fbdb5e085ccceb6254e2a4a128a8957dac55a\n"
+    },
+    {
+      "cmd": "bash -c 'W=/tmp/nas-mirix-trial; got=$(sha256sum \"$W/mirix-0.1.7.tar.gz\" | cut -d\" \" -f1); test \"$got\" = \"d6650d24d28fb110244daa873b11215c480c80ae2e4e0d7c65ab9c37e227b5a5\" && echo SDIST_SHA256_MATCH: $got && \"$W/venv/bin/python\" -c \"from mirix import MirixClient; print(MirixClient.__module__)\"'",
+      "exit": 0,
+      "duration_s": 2.373,
+      "output_sha256": "81581bad33148768831ef738cf72c97507f625d88146cbd7a64df1fabb6d775b",
+      "output_excerpt": "SDIST_SHA256_MATCH: d6650d24d28fb110244daa873b11215c480c80ae2e4e0d7c65ab9c37e227b5a5\n2026-09-25 23:00:55 - Mirix - INFO - Logging to: console (level: INFO)\nmirix.client.remote_client\n"
+    }
+  ],
+  "tool_versions": {
+    "mirix": "0.1.6 (git tag; commit 0f3fbdb5e085ccceb6254e2a4a128a8957dac55a)"
+  },
+  "observed_at_utc": "2026-09-26T03:00:55Z",
+  "result": "pass",
+  "claim": "MIRIX v0.1.6 (commit 0f3fbdb5e085ccceb6254e2a4a128a8957dac55a) installs cleanly from a git-tag clone with an exact commit-hash pin match, and the separately-published PyPI mirix==0.1.7 client artifact's sdist hash independently matches PyPI's own reported digest; `from mirix import MirixClient` imports successfully.",
+  "limitations": [
+    "PyPI mirix 0.1.7 ships only the thin REST client (mirix/client, mirix/schemas, mirix/helpers); no matching git tag exists for 0.1.7, and its own package long_description incorrectly says `pip install mirix-client`, a PyPI project that does not exist (404, verified).",
+    "Install-stage evidence only; see the 'use' stage receipts for whether the installed component does its job against this host's local models."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T03:00:55Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

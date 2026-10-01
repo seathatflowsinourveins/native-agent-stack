@@ -160,11 +160,22 @@ class WorkerInterrupted(Exception):
     pass
 
 
+def group_gone(error, process):
+    """Whether a killpg error means the group has nothing left to signal.
+
+    ESRCH does. macOS answers EPERM when no member can be signalled; once the leader has
+    exited, the rest are unreaped zombies (XNU killpg1 skips them), while EPERM with the
+    leader still running is a real refusal."""
+    return isinstance(error, ProcessLookupError) or process.poll() is not None
+
+
 def retire_group(process, grace=2):
     """Retire the owned POSIX group even if its leader has already exited."""
     try:
         os.killpg(process.pid, signal.SIGTERM)
-    except ProcessLookupError:
+    except (ProcessLookupError, PermissionError) as error:
+        if not group_gone(error, process):
+            raise
         process.wait()
         return
     deadline = time.monotonic() + grace
@@ -172,13 +183,16 @@ def retire_group(process, grace=2):
         process.poll()
         try:
             os.killpg(process.pid, 0)
-        except ProcessLookupError:
+        except (ProcessLookupError, PermissionError) as error:
+            if not group_gone(error, process):
+                raise
             break
         time.sleep(0.05)
     try:
         os.killpg(process.pid, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
+    except (ProcessLookupError, PermissionError) as error:
+        if not group_gone(error, process):
+            raise
     process.wait(timeout=5)
 
 

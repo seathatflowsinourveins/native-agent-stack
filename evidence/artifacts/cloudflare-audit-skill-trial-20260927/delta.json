@@ -1,0 +1,807 @@
+{
+ "schema_version": 1,
+ "kind": "cloudflare_audit_skill_trial_delta",
+ "recorded_at": "2026-09-27",
+ "observed_utc": {
+  "first": "2026-09-28T02:03:02Z",
+  "last": "2026-09-28T02:17:07Z",
+  "host_date_note": "02:03Z to 02:18Z on 2026-09-28 UTC is the evening of 2026-09-27 on the host (EDT)",
+  "repair_round_first": "2026-09-28T03:05Z (Context Mode index time of the first repair-round fetch, minute precision)",
+  "repair_round_last": "2026-09-28T03:17:14Z (the last verification re-fetch of the settings reference and sandboxing pages; quoting reads ended by 03:12:12Z)",
+  "repair_round_host_date_note": "still 2026-09-27 on the host (EDT)",
+  "repair_round_2_fetch": "2026-09-28T07:07:11Z (date -u just before the curl fetches of the skills, settings reference and commands pages)",
+  "repair_round_2_host_date_note": "03:07 EDT, so 2026-09-28 on the host"
+ },
+ "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "base_commit": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "tool_versions": {
+  "gh": "2.101.0",
+  "git": "2.43.0",
+  "jq": "1.7",
+  "python": "3.13.15",
+  "pyyaml": "6.0.3 (already present in the host's uv cache; nothing downloaded or installed)",
+  "node_fetch_runtime": "v24.21.0 (Context Mode ctx_execute)",
+  "claude_code": "2.1.283 (claude --version; repair round, read for claude plugin eval --help only)",
+  "curl": "8.5.0 (repair round 2 page fetches only)"
+ },
+ "method": {
+  "github": "gh api (REST): repos/<repo>, commits/<sha|branch>, git/trees/<sha>?recursive=1, contents/<path>?ref=<sha>, license?ref=<sha>, issues/20 and its comments, releases/latest; gh api graphql for archivedAt",
+  "pages": "ctx_fetch_and_index is not granted to this worker, so every page was fetched with fetch() inside Context Mode ctx_execute; raw bytes stayed outside the checkout and only their size, sha256 and quoted lines are recorded",
+  "description_chars": "Unicode code points of the PyYAML-parsed frontmatter description, whitespace stripped (the manifest's budget.description_chars_method)"
+ },
+ "upstream_pin": {
+  "repository": "cloudflare/security-audit-skill",
+  "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+  "ref_committed": "2026-09-14T19:28:54Z",
+  "ref_message": "Clarify guidance and full audit modes",
+  "default_branch": "main",
+  "default_branch_head": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+  "head_equals_pin": true,
+  "repo_pushed_at": "2026-09-14T19:29:02Z",
+  "archived": false,
+  "path": "skills/security-audit",
+  "tree_sha_at_pin": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+  "tree_sha_at_head": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+  "tree_sha_from_contents_listing": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+  "files": {
+   "AI-AND-LLM.md": 10617,
+   "ATTACK-CLASSES.md": 15695,
+   "CLIENT-SIDE.md": 8594,
+   "CLOUD-AND-DEPLOYMENT.md": 8291,
+   "DATA-ISOLATION-AND-LIFECYCLE.md": 7798,
+   "DESKTOP-MOBILE-AND-LOCAL-IPC.md": 8739,
+   "HUNTING.md": 22446,
+   "MEMORY-SAFETY-AND-BINARY.md": 10513,
+   "PROTOCOLS-RPC-AND-MESSAGING.md": 7483,
+   "RECONNAISSANCE.md": 15902,
+   "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md": 7476,
+   "SKILL.md": 22026,
+   "SUPPLY-CHAIN-AND-RELEASE.md": 7258,
+   "VALIDATION-AND-REPORTING.md": 17843,
+   "WEB-PROTOCOL-AND-AUTH.md": 12300,
+   "report-schema.json": 14494,
+   "validate-coverage-ledger.cjs": 33522,
+   "validate-coverage-ledger.test.cjs": 28483,
+   "validate-findings.cjs": 28806,
+   "validate-findings.test.cjs": 26384
+  },
+  "file_count": 20,
+  "total_bytes": 314670,
+  "skill_md": {
+   "blob_sha1": "92178dad304d3f63e37582a297026a7874e12c62",
+   "blob_sha1_recomputed": "92178dad304d3f63e37582a297026a7874e12c62",
+   "sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+   "bytes": 22026,
+   "frontmatter_keys": [
+    "name",
+    "description"
+   ],
+   "name": "security-audit",
+   "disable_model_invocation": null,
+   "description": "Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pen tests. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.",
+   "description_chars": 359
+  },
+  "license": {
+   "spdx_github_license_api_at_pin": "MIT",
+   "path": "LICENSE",
+   "blob_sha1": "6dbc9ecb3a5b9080e95b962869e8c7ab16cfdc20",
+   "in_skill_folder": false
+  },
+  "path_commits_latest": [
+   {
+    "sha": "c1c8a8c14710",
+    "date": "2026-09-14T19:28:54Z",
+    "message": "Clarify guidance and full audit modes"
+   },
+   {
+    "sha": "158eb448038e",
+    "date": "2026-09-10T10:11:38Z",
+    "message": "Rework the audit workflow, findings contract, and validators end to end"
+   },
+   {
+    "sha": "c1239b903704",
+    "date": "2026-07-06T13:25:33Z",
+    "message": "Bring the whole skill into one coherent house style"
+   }
+  ],
+  "stars_discovery_only": 22355
+ },
+ "skills_sh": {
+  "page": {
+   "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit",
+   "status": 200,
+   "bytes": 94448,
+   "sha256": "e55828751d175daa2cb487e37f21eb194a8335595b69e4b8e3185b16776632d9",
+   "fetched_at": "2026-09-28T02:04:51Z",
+   "labels": {
+    "gen_agent_trust_hub": "Pass",
+    "socket": "Pass",
+    "snyk": "Warn"
+   },
+   "installs_display_discovery_only": "18.2K",
+   "first_seen": "Jun 18, 2026"
+  },
+  "audit_pages": [
+   {
+    "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit/security/agent-trust-hub",
+    "bytes": 50492,
+    "sha256": "70db3649a2aeb657696d39437e46bf41cf28885d4169d16c5e61abd76eec8892",
+    "label": "Pass",
+    "audited": "Sep 15, 2026",
+    "risk_level": "SAFE",
+    "risk_level_rendered_note": "the quoted 'Risk Level: SAFE' is the page's rendered text (markup 'Risk Level: <!-- -->SAFE'), quoted in the repair round from a re-fetch with the same bytes and sha256",
+    "categories": [
+     "COMMAND_EXECUTION",
+     "DYNAMIC_EXECUTION",
+     "INDIRECT_PROMPT_INJECTION"
+    ],
+    "quoted": [
+     "Risk Level: SAFE",
+     "The skill executes local Node.js scripts ( validate-findings.cjs and validate-coverage-ledger.cjs ) during the workflow's structured output phase.",
+     "The skill is designed to ingest and analyze untrusted third-party source code, which could contain instructions meant to influence the agent's auditing logic."
+    ]
+   },
+   {
+    "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit/security/socket",
+    "bytes": 48734,
+    "sha256": "65b5227a4f075b722b598153a2f06344fa21308be489d5c6e734ebd08aa08e81",
+    "label": "Pass",
+    "audited": "Sep 15, 2026",
+    "analyzed_at": "Sep 15, 2026, 07:24 AM"
+   },
+   {
+    "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit/security/snyk",
+    "bytes": 48234,
+    "sha256": "6c66081d2e2b95c3ce7c7bdf2eb13f707bf0b63dc7064489187e7eceeaff0ed4",
+    "label": "Warn",
+    "audited": "Sep 15, 2026",
+    "risk_level": "MEDIUM",
+    "issues": 1,
+    "quoted": [
+     "W011: Third-party content exposure detected (indirect prompt injection risk).",
+     "Third-party content exposure detected (medium risk: 0.30). The security audit skill monitors and ingests external codebases, issue bodies, tool responses, and retrieved documents via AI/LLM hunting agents and RAG pipelines."
+    ]
+   }
+  ],
+  "audit_api": {
+   "url": "https://add-skill.vercel.sh/audit?source=cloudflare%2Fsecurity-audit-skill&skills=security-audit",
+   "fetched_at": "2026-09-28T02:05:03Z",
+   "response": {
+    "security-audit": {
+     "ath": {
+      "risk": "safe",
+      "analyzedAt": "2026-09-15T07:23:34.270Z"
+     },
+     "socket": {
+      "risk": "safe",
+      "alerts": 0,
+      "score": 90,
+      "analyzedAt": "2026-09-15T07:24:00.548Z"
+     },
+     "snyk": {
+      "risk": "medium",
+      "analyzedAt": "2026-09-15T07:23:12.704119+00:00"
+     }
+    }
+   }
+  },
+  "revision_named_by_audits": false,
+  "audits_after_pin_became_head": "all three analyzed 2026-09-15; the pin became main's HEAD on 2026-09-14",
+  "official_page": {
+   "url": "https://skills.sh/official",
+   "bytes": 504274,
+   "sha256": "2990963025c1031af5364ffdcf06b9ddfe0b3eb73629b47afbb7eb57a60787f6",
+   "fetched_at": "2026-09-28T02:05:18Z",
+   "heading": "Official Skills from Technology Makers",
+   "owners_listed": {
+    "cloudflare": true,
+    "openai": true,
+    "anthropics": true,
+    "vercel-labs": true,
+    "trailofbits": false,
+    "mattpocock": false,
+    "typesafe-ai": false,
+    "affaan-m": false,
+    "obra": false
+   },
+   "cloudflare_entry_repo": "skills",
+   "vercel_labs_entry_repo": "agent-skills",
+   "convention": "manifest official is owner-scoped: vercel-labs/agent-browser and vercel-labs/skills are official while the page features vercel-labs/agent-skills; every official=true source owner is listed and every official=false owner is absent"
+  }
+ },
+ "issue_20": {
+  "url": "https://github.com/cloudflare/security-audit-skill/issues/20",
+  "state": "open",
+  "created_at": "2026-09-16T21:57:05Z",
+  "updated_at": "2026-09-27T12:08:15Z",
+  "author_association": "NONE",
+  "comments": 4,
+  "comment_author_associations": [
+   "NONE"
+  ],
+  "names_commit": false,
+  "quoted": {
+   "L1_design": "n = 3 per arm, one target",
+   "L1_pin": "pinned to a recent commit",
+   "L1_disclosure": "Disclosure: the multi-lens pipeline is our own tool, so we have an interest here — read our arm's numbers with that in mind; the single-agent control is the neutral baseline.",
+   "L3_precision": "precision held at a median of 90% across rounds, zero hits on either deliberate look-alike decoy in any round",
+   "L18_cost": "Measured class facts, median cost per run (same model tier, same target, n = 3 rounds each): the skill's quick profile **$29.95**, a plain single-agent review **$2.06**, a multi-lens review pipeline of ours **$7.66**",
+   "L18_recall": "quick's median recall equalled the single-agent review's exactly — **0.467 vs 0.467**, on 15 seeds"
+  },
+  "weight": "weak third-party evidence: one seeded target, n = 3 rounds per arm, the author also ran a competing pipeline, no commit named"
+ },
+ "refutation_20260923": {
+  "file": "catalogs/sota-convergence/manifest-20260923.json",
+  "proposal_lines": "6035-6060",
+  "critic_lines": "17195-17201",
+  "edited": false,
+  "proposed_label": "not_adopted",
+  "demonstrated_gap_quoted": "No demonstrated gap. The native /security-review and security-best-practices skills already cover security review.",
+  "adversarial_verification": {
+   "survives": false,
+   "refuted_votes": 2,
+   "votes": 2
+  },
+  "critic_fix_quoted": "state whether the candidate closes the qualification gap instead of recording 'no demonstrated gap'",
+  "qualification_quoted": "Pinned installation and client discovery; security findings and false-positive control remain unqualified.",
+  "answer": "unknown until M5c; nothing measured here"
+ },
+ "native_docs": {
+  "read_on": "2026-09-27 (host date)",
+  "commands": {
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "bytes": 202541,
+   "sha256": "f0b71855bab62002c1bf410afc7d0e41b825ba8b3b6b8fa13da6fa142f6b8098",
+   "security_review_L136": "Analyze the changes on your current branch for security vulnerabilities. Reviews the diff between your branch and origin's default branch, identifying risks like injection, auth issues, and data exposure.",
+   "code_review_L68": "Review the current diff, or a PR number, branch, or path you pass, for correctness bugs."
+  },
+  "security": {
+   "url": "https://code.claude.com/docs/en/security.md",
+   "bytes": 13390,
+   "sha256": "a2a6827d9b44c07eab4eef697cf19836831fd6a0b6adb2ef3c108251c7770a86",
+   "L146": "* [`/security-review`](/docs/en/commands#all-commands): run an on-demand security pass over the changes on your current branch"
+  },
+  "skills": {
+   "url": "https://code.claude.com/docs/en/skills.md",
+   "bytes": 120554,
+   "sha256": "86137b6232cd54722549525729d1888717d5ee0eed6312a9a089097b2cadc181",
+   "L289": "To keep a personal or project skill but stop Claude from invoking it on its own, set [`disable-model-invocation: true`](#control-who-invokes-a-skill) in its frontmatter, or `\"user-invocable-only\"` in [`skillOverrides`](#override-skill-visibility-from-settings) when you don't want to edit the file.",
+   "L811": "| `\"name-only\"`           | Name only            | Yes         |",
+   "L812": "| `\"user-invocable-only\"` | Hidden               | Yes         |",
+   "repair_round_2_reread": "2026-09-28T07:07:11Z, curl -sS -L of the same URL: HTTP 200, same bytes and sha256. L523, L527, L768, L808, L810 and L813 below are whole raw lines (table rows keep their cell padding); L360 is the user-invocable row's description cell; L766 and L817 are one sentence each of their lines",
+   "L360": "Set to `false` when only Claude should invoke the skill: Claude Code hides it from the `/` menu and doesn't run it when you type `/name`.",
+   "L523": "| Frontmatter                      | You can invoke | Claude can invoke | When loaded into context                                     |",
+   "L527": "| `user-invocable: false`          | No             | Yes               | Description always in context, full skill loads when invoked |",
+   "L766": "By default, Claude can invoke any skill that doesn't have `disable-model-invocation: true` set.",
+   "L768": "Three ways to control which skills Claude can invoke:",
+   "L796": "**Hide individual skills** by adding `disable-model-invocation: true` to their frontmatter. This removes the skill from Claude's context entirely.",
+   "L799": "  With `user-invocable: false`, you can't invoke the skill, but Claude still can. To keep Claude from invoking it through the Skill tool, set `disable-model-invocation: true`.",
+   "L808": "| Value                   | Listed to Claude     | In `/` menu |",
+   "L810": "| `\"on\"`                  | Name and description | Yes         |",
+   "L813": "| `\"off\"`                 | Hidden               | Hidden      |",
+   "L817": "Invoking a hidden skill by its full name still returns the `skillOverrides` error instead of running it."
+  },
+  "settings_reference": {
+   "url": "https://code.claude.com/docs/en/settings-reference.md",
+   "bytes": 454604,
+   "sha256": "19fc12a219077c947744ba81977f1d3559d8b2ab36ac975de754aaef49e00117",
+   "L4168": "* `\"name-only\"`: Claude sees the skill by name without its description",
+   "L4169": "* `\"user-invocable-only\"`: Claude doesn't see the skill, but you can still type `/name`",
+   "repair_round_reread": "same bytes and sha256 on the repair-round fetch; the lines below were quoted then as whole raw lines. The first read's quotes above drop leading indentation; the repair round re-checked each as a substring of its stated line",
+   "L2174": "### `sandbox.credentials`",
+   "L2176": "Declare the credential files and environment variables to [protect from sandboxed commands](/docs/en/sandboxing#protect-credentials). Each entry names a file `path` or a variable `name` and a `mode`: `deny` hides the credential inside the sandbox, and `mask` shows sandboxed commands a placeholder while the [sandbox proxy](/docs/en/sandboxing#mask-credentials) substitutes the real value on outbound requests. Claude Code protects only the entries you list; there is no built-in credential deny list.",
+   "L2180": "* **Default**: unset, so no credentials are protected",
+   "L2188": "      \"files\": [{ \"path\": \"~/.aws/credentials\", \"mode\": \"deny\" }],",
+   "L2580": "### `sandbox.network.strictAllowlist`",
+   "L2584": "* **Scope**: [`User or managed`](#scopes). A repository can't turn it on or off.",
+   "L2587": "  * `false`: unless another trusted settings file sets `true`, Claude Code decides a host outside the allowlist by permission mode instead of denying it outright: in auto mode it checks the host against the command's [per-command allowed domains](/docs/en/sandboxing#per-command-allowed-domains-in-auto-mode), in `dontAsk` mode it denies, in `bypassPermissions` mode and in interactive terminal plan-mode sessions where bypass is available it allows, and otherwise it asks you",
+   "repair_round_2_reread": "2026-09-28T07:07:11Z, curl -sS -L of the same URL: HTTP 200, same bytes and sha256. L4163 below is a whole raw line; L4167 and L4170 drop their two-space indentation, as the first read's L4168 and L4169 do",
+   "L4163": "Hide or collapse a [skill](/docs/en/skills#override-skill-visibility-from-settings) without editing its `SKILL.md`. Claude Code applies the value under each skill's name to the skill list Claude sees and to your `/` autocomplete.",
+   "L4167": "* `\"on\"`: Claude sees the skill and you can type `/name`",
+   "L4170": "* `\"off\"`: Claude doesn't see the skill and `/name` is hidden from autocomplete"
+  },
+  "sandboxing": {
+   "url": "https://code.claude.com/docs/en/sandboxing.md",
+   "bytes": 78391,
+   "sha256": "ce4fc3532a3edc97aed103e18816e45e0fe8dcee832deb326424a78a09ee1b78",
+   "L58": "claude --settings '{\"sandbox\": {\"enabled\": true, \"allowUnsandboxedCommands\": false}}'",
+   "L62": "By default, if the sandbox cannot start because dependencies are missing or the platform is unsupported, Claude Code shows a warning and runs commands without sandboxing. To make this a hard failure instead, set [`sandbox.failIfUnavailable`](/docs/en/settings-reference#sandbox-failifunavailable) to `true`.",
+   "L67_70_summary": "Linux and WSL2 dependencies: bubblewrap and socat (L69-L70)",
+   "L98": "To check whether your environment enforces this restriction, including inside WSL2, run `sysctl kernel.apparmor_restrict_unprivileged_userns`.",
+   "L122": "On WSL2, WSL hands a launch of a Windows binary such as `cmd.exe`, `powershell.exe`, or anything under `/mnt/c/` to the Windows host over a Unix socket, so whether a sandboxed command can launch one follows the sandbox's [Unix-socket settings](/docs/en/settings-reference#sandbox-network-allowunixsockets): the optional seccomp filter has to be installed to block the socket in the first place.",
+   "repair_round_reread": "same bytes and sha256 on the repair-round fetch; the lines below were quoted then as whole raw lines. The first read's quotes above drop leading indentation or quote part of a line; the repair round re-checked each as a substring of its stated line",
+   "L295": "### Protect credentials",
+   "L299": "For entries with `\"mode\": \"deny\"`, file paths are denied for reads inside the sandbox, the same restriction that `filesystem.denyRead` applies, and environment variables are unset before each sandboxed command runs. The file protection is part of the filesystem layer, so it doesn't apply if you [disable filesystem isolation](#disable-filesystem-isolation); the environment variable protection still does.",
+   "L310": "        { \"path\": \"~/.ssh\", \"mode\": \"deny\" }",
+   "L525": "* **Strict allowlist**: if you set [`strictAllowlist`](/docs/en/settings-reference#sandbox-network-strictallowlist) to `true` in user, managed, or CLI `--settings` settings, Claude Code denies sandboxed commands access to any host outside the allowlist instead of prompting. The allowlist is the same one the sandbox otherwise prompts against: `allowedDomains` plus domains from `WebFetch(domain:...)` allow rules, or only the managed settings entries when `allowManagedDomainsOnly` is set. Claude Code enforces this for sandboxed commands only; in-process tools such as `WebFetch` still follow their [permission rules](#permission-rules). Setting it in a repository's `.claude/settings.json` or `.claude/settings.local.json` has no effect. Requires Claude Code v2.1.219 or later."
+  },
+  "plugin_eval_help": {
+   "command": "claude plugin eval --help",
+   "claude_code": "2.1.283",
+   "exit": 0,
+   "bytes": 6172,
+   "sha256": "6cda0b4f2264d4f2429cd95b9989de6ea393038af067101a639857b01dd1dc70",
+   "L1": "Usage: claude plugin eval [options] [command] [target]",
+   "L15_L18": "--ablation <mode>         Run a no-plugin baseline arm and report the score delta (none | with-without; default: with-without whenever a plugin resolves — by name, or from the target path — and none when nothing does; under",
+   "L40_L42": "--json [path]             Print the full run result (prompts, graders, per-run scores) as JSON to stdout, or write it to this .json file",
+   "L43": "--judge-model <model>     Override LLM-grader model (default: haiku)",
+   "L59": "--model <model>           Override model for all cases",
+   "L60_L61": "--no-publish              Keep the HTML report local only; skip publishing it to claude.ai",
+   "joining": "wrapped help lines are joined with one space and their leading indentation dropped"
+  }
+ },
+ "quoted_passages": {
+  "read": "repair round, gh api -H 'Accept: application/vnd.github.raw' contents/<file>?ref=c1c8a8c1471069fb0e188eeaff69b8e8db6564a8; line numbers are 1-based lines of the raw file",
+  "skill_md": {
+   "file": "skills/security-audit/SKILL.md",
+   "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+   "bytes": 22026,
+   "sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+   "blob_sha1": "92178dad304d3f63e37582a297026a7874e12c62",
+   "L12": "This skill is guidance by default. Loading it does not authorize the complete audit workflow or file creation.",
+   "L21": "This skill is agent-neutral:",
+   "L24": "- **Task tool** is the platform's delegation or sub-agent mechanism.",
+   "L40_last_sentence": "If every control cannot be enforced, do not execute target code: report the missing sandbox capability as a needs-validation blocker and give a safe validation plan.",
+   "L60": "- `coverage-ledger.json`",
+   "L82": "[HUNTING.md](HUNTING.md) and [VALIDATION-AND-REPORTING.md](VALIDATION-AND-REPORTING.md) carry this procedure as one identical fenced block for hunter and verifier prompts; it states the same rules in the same order as this list.",
+   "L172": "1. **Reconnaissance** — map the source, trust boundaries, local build paths, companion selections, prior evidence, and initial deterministic coverage ledger with [RECONNAISSANCE.md](RECONNAISSANCE.md).",
+   "L175": "4. **Structured output** — write all final `confirmed`, `needs_validation`, and `rejected` records to `findings.json`; validate it with `report-schema.json` and `validate-findings.cjs`, and validate the coverage claim with `validate-coverage-ledger.cjs`."
+  },
+  "report_schema": {
+   "file": "skills/security-audit/report-schema.json",
+   "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+   "bytes": 14494,
+   "sha256": "6575c9de4a62255699ea052ebf9a49ebfb373a32891bcd89af6f55cc84b35519",
+   "blob_sha1": "55815a3687a45fff63d8ebf20068611bd6ad6d9a",
+   "blob_sha1_matches_contents_api": true,
+   "L10": "\"verdict\": {",
+   "L12": "\"const\": \"confirmed\"",
+   "L250": "\"verdict\": {",
+   "L252": "\"const\": \"needs_validation\"",
+   "L367": "\"verdict\": {",
+   "L369": "\"const\": \"rejected\"",
+   "indentation": "leading spaces dropped"
+  },
+  "repository_at_base": {
+   "catalogs/landscape/native-practice.json:148": {
+    "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6",
+    "quoted": "The skill is not a full security audit or an instruction to review every ordinary coding task."
+   },
+   "scripts/saturation_ledger.py:8": {
+    "sha256": "fbb11a10f831b50d3320c81f134ae64f418ae9e448b213bdaebd7489dda5ec6c",
+    "quoted": "Editing, reordering or deleting a record breaks the chain."
+   },
+   "docs/decisions/2026-09-24-community-sweep.md:253": {
+    "quoted": "`claude plugin eval` is named in M9 but not qualified."
+   },
+   "docs/decisions/2026-09-24-community-sweep.md:178": {
+    "quoted": "Use deterministic `tool_used: Skill` graders or blind-judge on stripped packets, with `--judge-model` pinned to a model other than Haiku."
+   }
+  },
+  "used_by": "the 2026-09-27 addendum's gap, wiring, sandbox and M5c text and this receipt's README"
+ },
+ "stale_upstreams": {
+  "openai/skills": {
+   "default_branch": "main",
+   "head": "49f948faa9258a0c61caceaf225e179651397431",
+   "head_date": "2026-06-24T02:36:12Z",
+   "head_message": "[codex] Update skill installer post-install guidance (#507)",
+   "commits_on_main_since_2026-06-29": 0,
+   "commits_on_main_since_head_date": 0,
+   "pushed_at": "2026-09-08T20:35:26Z",
+   "archived": false,
+   "manifest_rows_pinned_here": [
+    "gh-fix-ci",
+    "security-best-practices",
+    "security-threat-model",
+    "gh-address-comments"
+   ],
+   "flag": "next verdict wave fields a challenger for kept security-best-practices and trial security-threat-model (recorded in the decision addendum: manifest skill rows have no notes field)"
+  },
+  "praetorian-inc/noseyparker": {
+   "archived": true,
+   "archived_at": "2026-04-24T16:25:50Z",
+   "pushed_at": "2026-02-21T13:04:04Z",
+   "latest_release": {
+    "tag": "v0.24.0",
+    "published_at": "2025-05-08T21:06:39Z"
+   },
+   "license": "Apache-2.0",
+   "readme_first_line": "Nosey Parker is now Replaced by Titus. Nosey Parker is Officially Retired",
+   "successor_named_by_readme": "https://github.com/praetorian-inc/titus (not reviewed here)",
+   "mentions_at_base": {
+    "catalogs/saturation/ledger.json": 4,
+    "catalogs/sota-convergence/manifest-20260926.json": 7,
+    "evidence/artifacts/landscape-sweep-20260926/README.md": 1,
+    "evidence/artifacts/landscape-sweep-20260926/lanes.json": 8,
+    "evidence/artifacts/landscape-sweep-20260926/layers.json": 2,
+    "evidence/artifacts/landscape-sweep-20260926/praetorian-inc-noseyparker.json": 5,
+    "evidence/artifacts/landscape-sweep-20260926/returns.json": 16,
+    "manifests/evidence.json": 1
+   },
+   "current_catalog_mentions": [],
+   "classification": {
+    "dated_artifacts_not_edited": [
+     "evidence/artifacts/landscape-sweep-20260926/",
+     "catalogs/sota-convergence/manifest-20260926.json"
+    ],
+    "append_only_hash_chained_not_edited": "catalogs/saturation/ledger.json (sweep landscape-sweep-20260926, layer secrets-credentials, survived)",
+    "registration_only": "manifests/evidence.json lists the dated source-review file's hash"
+   },
+   "correction_recorded_in": "docs/decisions/2026-09-25-skills-trial-and-usage.md, addendum 2026-09-27"
+  }
+ },
+ "sandbox_gate": {
+  "catalog": "catalogs/foundation/manifest.json",
+  "open_gate": {
+   "id": "claude-code-sandbox-profile",
+   "gap_id": "claude-code-sandbox-profile"
+  },
+  "gap": {
+   "id": "claude-code-sandbox-profile",
+   "priority": 2,
+   "status": "open"
+  },
+  "schema": "scripts/validate_foundation.py: open_gates entries are exactly {id, gap_id}; gap_id must be a top_gaps id; the gate set must equal the open or partial gaps; top_gaps holds exactly three ranked rows; source_paths are bare repository paths (no ':')",
+  "rotated_out": {
+   "id": "worker-cancellation-crash-resume",
+   "priority": 2,
+   "status": "accepted_within_scope",
+   "carried_by": "catalogs/foundation/decisions.json native-child-interruption-recovery (accepted_within_scope): its evidence_scope is the removed row's scope sentence verbatim, and its limitations restate the no-host/provider/distributed boundary",
+   "why_not_priority_3": "offhost-keys-and-service-reboot names client rebinding and atomicity, which no decision row states",
+   "why_not_priority_1": "catalog-capability-separation is the catalog's own maintenance rule and no decision row carries it"
+  },
+  "checked_at_unchanged": "catalogs/foundation/manifest.json checked_at stays 2026-09-21: validate_foundation.py requires decisions.json checked_at to equal it, and no decision was re-checked; 1c32ad22 (2026-09-27) edited the manifest the same way",
+  "deferral_source": "docs/decisions/2026-09-24-secret-storage.md lines 91-95",
+  "deferral_quoted": {
+   "docs/decisions/2026-09-24-secret-storage.md:91-92": "The only OS-level floor is the Claude Code sandbox (`sandbox.enabled`, `allowUnsandboxedCommands: false`, `credentials.files` deny).",
+   "docs/secret-storage.md:1171-1172": "A measured Claude Code sandbox profile (`sandbox.enabled`, `allowUnsandboxedCommands: false`, `credentials.files` deny for the store,",
+   "docs/secret-storage.md:29": "defines `<store>`, the per-provider credential directory; this receipt names it only as <store>"
+  },
+  "measurements": [
+   "sandbox.enabled true",
+   "sandbox.failIfUnavailable true",
+   "allowUnsandboxedCommands false",
+   "credentials.files deny for the store (deferral): a sandbox.credentials.files entry with mode deny for <store> (settings reference L2176, L2188)",
+   "credentials arm: with filesystem isolation on (sandboxing L299), a sandboxed read of a store file fails through a ~/ path and through its absolute path",
+   "host check: bubblewrap, socat, kernel.apparmor_restrict_unprivileged_userns",
+   "writes outside the owned worktree fail",
+   "/mnt/c Windows-binary launches fail",
+   "network allowlist, gh, git push, codex and the paper runner (deferral)",
+   "separate network arm: sandbox.network.strictAllowlist true through CLI --settings (sandboxing L525); a sandboxed request to a host outside the allowlist is denied. Without it, bypassPermissions mode allows such a host (settings reference L2587)",
+   "sandboxed commands cannot reach the user systemd bus (deferral)"
+  ],
+  "extra_arms_source": "a 2026-09-27 peer practice sweep (credentials arm through ~/ and absolute paths; separate strictAllowlist arm; permission mode stays the user's decision), checked against the settings reference and sandboxing lines in native_docs",
+  "permission_mode_source": "docs/harness-rules-convergence-20260922.md:88 (PS-1): \"rejected for this profile on 2026-09-22 by user decision (frictionless native practice: the ungated user profile stays)\"",
+  "adoption_next_action_refs": {
+   "file": "adoption/manifest.json",
+   "path": "continuation.next_action_refs",
+   "before": [],
+   "after": [
+    "claude-code-sandbox-profile"
+   ],
+   "precedent": "d17b3cff (2026-09-20) removed worker-cancellation-crash-resume from next_action_refs when its gate closed and kept offhost-keys-and-service-reboot, then the foundation catalog's only open gate; 49c094d9 (2026-09-20) emptied next_action_refs when that gate closed and open_gates became []",
+   "check": "tests/test_adoption_contract.py:73 asserts only that next_action_refs is a subset of the foundation open_gates ids, so no test fails without this listing; precedent check only, no red-to-green control"
+  },
+  "owner": "foundation coordinator",
+  "recheck": "2026-10-11",
+  "pressure_evidence": "each M5 run's missing-sandbox needs_validation blocker"
+ },
+ "manifest_row": {
+  "name": "security-audit",
+  "source": "cloudflare/security-audit-skill",
+  "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
+  "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+  "path": "skills/security-audit",
+  "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+  "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+  "skill_md_bytes": 22026,
+  "description_chars": 359,
+  "upstream_disable_model_invocation": false,
+  "license": "MIT",
+  "official": true,
+  "audits": {
+   "gen_agent_trust_hub": "Pass",
+   "socket": "Pass",
+   "snyk": "Warn",
+   "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit",
+   "checked_at": "2026-09-27"
+  },
+  "status": "trial",
+  "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Upstream user-invocable: false (absent at the pin) would remove only the user trigger; Claude could still invoke it, so stage-only use stays a usage policy (same docs, read 2026-09-28). The M5c bake-off against /security-review decides promotion.",
+  "claude_listing": "name-only",
+  "codex_enabled": false,
+  "added": "2026-09-27"
+ },
+ "manifest_changes": {
+  "file": "adoption/skills/manifest.json",
+  "changes": [
+   "checked_at 2026-09-26 -> 2026-09-27",
+   "skills[] + security-audit (trial, name-only, codex off, added 2026-09-27), appended last",
+   "budget unchanged: name-only and codex-disabled rows count toward neither sum (claude_on 7409, codex 3054)"
+  ],
+  "mirrored_in": "adoption/templates/claude.settings.template.json skillOverrides security-audit: name-only (tests/test_skills_manifest.py enforces equality)",
+  "host_effect": "none until the coordinator applies the settings template, the Codex disable table and then install_skills.py; this branch installed nothing"
+ },
+ "checks": {
+  "evidence_class": "our-integration (structural checks of this repository; no install, host change or model run)",
+  "discriminating_controls": [
+   {
+    "check": "python3 -m unittest tests.test_skills_manifest",
+    "condition_absent": "manifest row added, template skillOverrides key not yet added",
+    "failing_run": {
+     "exit": 1,
+     "failed": [
+      "FAIL: test_skill_overrides_equals_name_to_claude_listing (tests.test_skills_manifest.TemplateSkillOverridesConsistencyTests.test_skill_overrides_equals_name_to_claude_listing)"
+     ],
+     "ran": "Ran 21 tests"
+    },
+    "passing_run": {
+     "exit": 0,
+     "ran": "Ran 21 tests",
+     "last_line": "OK"
+    }
+   },
+   {
+    "check": "python3 scripts/validate.py",
+    "condition_absent": "changed hash-listed files and the new receipt not yet registered in manifests/evidence.json",
+    "failing_run": {
+     "exit": 1,
+     "errors": [
+      "adoption/skills/manifest.json: SHA-256 mismatch",
+      "adoption/skills/manifest.json: byte count mismatch",
+      "adoption/templates/claude.settings.template.json: SHA-256 mismatch",
+      "adoption/templates/claude.settings.template.json: byte count mismatch",
+      "catalogs/foundation/manifest.json: SHA-256 mismatch",
+      "catalogs/foundation/manifest.json: byte count mismatch",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md: SHA-256 mismatch",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md: byte count mismatch",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: evidence file is not hash-listed",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: evidence file is not hash-listed"
+     ]
+    },
+    "passing_run": {
+     "exit": 0,
+     "result": "{\"components\": 69, \"hashed_files\": 7375, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+     "note": "Integrity and scope checks only; no live provider or GPU execution."
+    }
+   },
+   {
+    "check": "python3 scripts/validate_foundation.py --root <throwaway copy of the tracked tree>",
+    "as_is": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3",
+    "gap_closed_gate_kept": "FOUNDATION catalog invalid: open_gates: must reference exactly the unfinished gaps",
+    "gap_open_gate_removed": "FOUNDATION catalog invalid: open_gates: must reference exactly the unfinished gaps",
+    "exits": {
+     "as_is": 0,
+     "gap_closed_gate_kept": 1,
+     "gap_open_gate_removed": 1
+    }
+   }
+  ],
+  "tests": {
+   "test_skills_manifest": {
+    "exit": 0,
+    "ran": "Ran 21 tests",
+    "last_line": "OK"
+   },
+   "test_install_skills": {
+    "exit": 0,
+    "ran": "Ran 19 tests",
+    "last_line": "OK"
+   },
+   "test_skills_status": {
+    "exit": 0,
+    "ran": "Ran 43 tests",
+    "last_line": "OK"
+   },
+   "test_install_claude_profile": {
+    "exit": 0,
+    "ran": "Ran 58 tests",
+    "last_line": "OK (skipped=3)"
+   },
+   "test_render_config": {
+    "exit": 0,
+    "ran": "Ran 25 tests",
+    "last_line": "OK"
+   },
+   "test_foundation_catalog": {
+    "exit": 0,
+    "ran": "Ran 18 tests",
+    "last_line": "OK"
+   },
+   "test_adoption_contract": {
+    "exit": 0,
+    "ran": "Ran 12 tests",
+    "last_line": "OK"
+   },
+   "test_apply_claude_settings": {
+    "exit": 0,
+    "ran": "Ran 23 tests",
+    "last_line": "OK"
+   },
+   "test_ecosystem_manifest": {
+    "exit": 0,
+    "ran": "Ran 56 tests",
+    "last_line": "OK"
+   },
+   "test_install_claude_profile_pyyaml": {
+    "exit": 0,
+    "ran": "Ran 58 tests",
+    "last_line": "OK"
+   }
+  },
+  "tests_note": "python3 -m unittest tests.<name> with the host python3 (no PyYAML); test_install_claude_profile_pyyaml reruns that module with the cached PyYAML on PYTHONPATH so its YAML half (the decision-record table parse) runs instead of skipping",
+  "failed_attempts": [
+   {
+    "attempt": "first git commit of this change",
+    "blocked_by": "pre-commit hook: gitleaks 8.30.1 git --pre-commit --staged (scripts/git-hooks/pre-commit)",
+    "finding": "generic-api-key on delta.json line 38: key contents_api_dir_sha holding the 40-hex git tree SHA ccbc33e (the key name contains 'api')",
+    "cause": "a key name in this receipt, not a credential; the value is the public tree SHA recorded elsewhere in this file",
+    "fix": "key renamed to tree_sha_from_contents_listing; no allowlist or --no-verify",
+    "rerun": "gitleaks staged scan: no leaks found; the commit hook passed"
+   }
+  ],
+  "reports": {
+   "component_matrix --write": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+   "new_host_grand_list --write": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+   "tracked_changes": "none (both regenerated reports were already current)"
+  },
+  "repair_round": {
+   "evidence_class": "our-integration (structural checks of this repository; no install, host change or model run)",
+   "findings_applied": [
+    "sandbox gate: the deferral's credentials.files deny for the store added to next_action and sandbox_gate.measurements, with a credentials arm and a separate strictAllowlist arm; docs/secret-storage.md and docs/harness-rules-convergence-20260922.md added to source_paths",
+    "adoption/manifest.json continuation.next_action_refs lists claude-code-sandbox-profile (precedent check only)",
+    "quoted_passages records the SKILL.md, report-schema.json and repository quotes; the addendum's completeness sentence now names what delta.json records",
+    "README ordering sentence under Not done here rewritten as a conditional",
+    "M5c harness list gains the claude plugin eval candidate with its judge and resolved-model constraints"
+   ],
+   "validate_pre_registration": {
+    "exit": 1,
+    "errors": [
+     "adoption/manifest.json: SHA-256 mismatch",
+     "adoption/manifest.json: byte count mismatch",
+     "catalogs/foundation/manifest.json: SHA-256 mismatch",
+     "catalogs/foundation/manifest.json: byte count mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: SHA-256 mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: byte count mismatch"
+    ]
+   },
+   "registration": "scripts/host_receipts.py register_file on the five changed files; manifests/evidence.json changed 10 lines (their sha256 and bytes)",
+   "validate": {
+    "exit": 0,
+    "result": "{\"components\": 69, \"hashed_files\": 7375, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}"
+   },
+   "validate_foundation": {
+    "exit": 0,
+    "result": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3"
+   },
+   "tests": {
+    "test_skills_manifest": "exit 0, Ran 21 tests, OK",
+    "test_install_skills": "exit 0, Ran 19 tests, OK",
+    "test_skills_status": "exit 0, Ran 43 tests, OK",
+    "test_install_claude_profile": "exit 0, Ran 58 tests, OK (skipped=3)",
+    "test_install_claude_profile_pyyaml": "exit 0, Ran 58 tests, OK",
+    "test_render_config": "exit 0, Ran 25 tests, OK",
+    "test_foundation_catalog": "exit 0, Ran 18 tests, OK",
+    "test_adoption_contract": "exit 0, Ran 12 tests, OK",
+    "test_apply_claude_settings": "exit 0, Ran 23 tests, OK",
+    "test_ecosystem_manifest": "exit 0, Ran 56 tests, OK"
+   },
+   "reports": {
+    "component_matrix --write": "exit 0, {\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+    "new_host_grand_list --write": "exit 0, {\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+    "tracked_changes": "none"
+   },
+   "quote_source_check": "local integration: each new quote re-read from its source. SKILL.md and report-schema.json at the pin, the saved help output and repository files at the base: 34 comparisons (hashes, lines, joins), 0 failed. The settings reference and sandboxing pages, re-fetched: both sha256 and sizes matched; the 11 new whole-line quotes and the first read's L58 matched exactly. The first read's L4168, L4169, L62, L98 and L122 quotes match as substrings of their stated lines, with indentation dropped",
+   "quote_coverage_check": "local integration: every straight-quoted passage of six or more characters in the 2026-09-27 addendum, this receipt's README and the gate text (fenced code excluded) must appear in delta.json after whitespace normalization, emphasis removal and splitting at '...'. Result: addendum 31 quoted, 0 missing; README 8 quoted, 0 missing; gate text 0 quoted",
+   "not_a_control": "tests/test_adoption_contract.py checks only that next_action_refs is a subset of the open gate ids, so the new listing has no failing control"
+  },
+  "repair_round_2": {
+   "evidence_class": "our-integration (claim corrections checked against upstream docs wording; no install, host change or model run)",
+   "finding": "cross-family GPT-6 review of PR #448, P2, changes-needed: the addendum's name-only wiring said the skill cannot fire on an ordinary security question and gets no user trigger, and the manifest gap said never by user invocation. name-only hides only the description; Claude can still invoke the skill by name, and it stays in the / menu",
+   "reproduce": [
+    {
+     "command": "rtk proxy jq -r '.native_docs.skills.L811' evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
+     "exit": 0,
+     "output": "| `\"name-only\"`           | Name only            | Yes         |",
+     "reading": "the last column is In `/` menu (skills page L808)"
+    },
+    {
+     "command": "in-memory, host python3: scripts/skills_status.py check_claude_listing({'security-audit': state}, 'ok', the manifest's security-audit row)",
+     "exit": 0,
+     "output": {
+      "name-only": "{'state': 'ok', 'actual': 'name-only'}",
+      "user-invocable-only": "{'state': 'mismatch', 'actual': 'user-invocable-only'}",
+      "off": "{'state': 'mismatch', 'actual': 'off'}"
+     },
+     "reading": "the status check compares the listing string with the manifest and accepts name-only; it checks no invocation restriction"
+    },
+    {
+     "command": "for f in $F; do git show HEAD:$f | grep -n -o -E \"cannot fire|no user trigger|never by user invocation|Driven only by workflow stages\" | sed \"s|^|$f:|\"; done (F: the four files this round changes; HEAD was 90a5c0e3)",
+     "output": [
+      "adoption/skills/manifest.json:763:Driven only by workflow stages",
+      "adoption/skills/manifest.json:763:never by user invocation",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md:546:no user trigger",
+      "docs/decisions/2026-09-25-skills-trial-and-usage.md:592:cannot fire",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json:492:Driven only by workflow stages",
+      "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json:492:never by user invocation"
+     ]
+    }
+   ],
+   "docs_reread": {
+    "at": "2026-09-28T07:07:11Z",
+    "command": "curl -sS -L -o <page>.md -w '%{http_code}' https://code.claude.com/docs/en/<page>.md into the session scratchpad, outside the checkout",
+    "skills": "HTTP 200, 120554 bytes, sha256 86137b6232cd54722549525729d1888717d5ee0eed6312a9a089097b2cadc181, the same as native_docs.skills",
+    "settings_reference": "HTTP 200, 454604 bytes, sha256 19fc12a219077c947744ba81977f1d3559d8b2ab36ac975de754aaef49e00117, the same",
+    "commands": "HTTP 200, 202541 bytes, sha256 f0b71855bab62002c1bf410afc7d0e41b825ba8b3b6b8fa13da6fa142f6b8098, the same"
+   },
+   "settings_only_answer": "No settings-only state hides the / entry and keeps model invocation. Of the four skillOverrides states (skills page L808 to L813; settings reference L4167 to L4170) only off hides the / entry, and off also hides the skill from Claude; invoking a hidden skill by its full name returns the skillOverrides error (L817). The skills page's other controls are ways to control which skills Claude can invoke (L766, L768), and the page does not document any of them as hiding the / entry. The frontmatter field user-invocable: false hides the / entry and keeps Claude's invocation (L360, L527), but it lives in SKILL.md",
+   "residual": "removing the user trigger. Stage-only use stays a usage policy even with user-invocable: false: with it \"Claude still can\" invoke the skill (L799), and disable-model-invocation: true \"removes the skill from Claude's context entirely\" (L796), which would stop the session that drives the stages too. user-invocable: false is absent from the pinned SKILL.md (frontmatter name and description only). tools/adoption/install_skills.py counts an installed SKILL.md as current only when its sha256 matches the pin (classify_skill) and rolls back an add that does not match, so a local edit would break the pin. The docs do not say how the field combines with a name-only override (L527 gives it the description always in context), so a new pin that adds it needs a native probe of both halves before any claim that the user trigger is gone",
+   "changes": [
+    "docs/decisions/2026-09-25-skills-trial-and-usage.md: the Decided-by paragraph, the W011 sentence and the name-only item describe reduced visibility and a usage policy; new Enforcement residual item and overturn condition; name-only invocation reach joins the live-run-pending row; the read-times paragraph names this round",
+    "adoption/skills/manifest.json: the security-audit gap replaces the never-by-user-invocation and triggers-on-any-security-question wording; claude_listing stays name-only",
+    "delta.json: manifest_row.gap mirrors the manifest; native_docs.skills and native_docs.settings_reference gain the lines this round cites; observed_utc and tool_versions record the round; this block",
+    "README.md: this round, its reproduce lines and two live-run-pending items"
+   ],
+   "validate_pre_registration": {
+    "exit": 1,
+    "errors": [
+     "adoption/skills/manifest.json: SHA-256 mismatch",
+     "adoption/skills/manifest.json: byte count mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: SHA-256 mismatch",
+     "docs/decisions/2026-09-25-skills-trial-and-usage.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md: byte count mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: SHA-256 mismatch",
+     "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json: byte count mismatch"
+    ]
+   },
+   "registration": "scripts/host_receipts.py register_file on the four changed files; manifests/evidence.json changed 8 lines (their sha256 and bytes). Every later edit of these files (this block, the README section, then the Decided-by sentence and the enforcement clause of the manifest gap) was followed by registering the four files again and scripts/validate.py (exit 0). After the last wording edits, validate_foundation, the ten test runs and both report regenerations were repeated with the same results",
+   "validate": {
+    "exit": 0,
+    "result": "{\"components\": 69, \"hashed_files\": 7375, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}"
+   },
+   "validate_foundation": {
+    "exit": 0,
+    "result": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3"
+   },
+   "tests": {
+    "test_skills_manifest": "exit 0, Ran 21 tests, OK",
+    "test_install_skills": "exit 0, Ran 19 tests, OK",
+    "test_skills_status": "exit 0, Ran 43 tests, OK",
+    "test_install_claude_profile": "exit 0, Ran 58 tests, OK (skipped=3)",
+    "test_install_claude_profile_pyyaml": "exit 0, Ran 58 tests, OK",
+    "test_render_config": "exit 0, Ran 25 tests, OK",
+    "test_foundation_catalog": "exit 0, Ran 18 tests, OK",
+    "test_adoption_contract": "exit 0, Ran 12 tests, OK",
+    "test_apply_claude_settings": "exit 0, Ran 23 tests, OK",
+    "test_ecosystem_manifest": "exit 0, Ran 56 tests, OK"
+   },
+   "reports": {
+    "component_matrix --write": "exit 0, {\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+    "new_host_grand_list --write": "exit 0, {\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+    "tracked_changes": "none"
+   },
+   "quote_source_check": "local integration: every native_docs line this round cites, compared with the 07:07:11Z fetch. New: skills L360, L523, L527, L766, L768, L808, L810, L813, L817 and settings reference L4163, L4167, L4170; rechecked from the first read: skills L289, L811, L812 and settings reference L4168, L4169. 17 comparisons, 0 failed. The whole-line quotes (L523, L527, L768, L808, L810 to L813, L4163) and the indentation-dropped L4167 to L4170 matched exactly; L289, L360, L766 and L817 matched as substrings of their stated lines",
+   "quote_coverage_check": "local integration: the first repair round's rule, re-implemented (straight-quoted passages of six or more characters, fenced code excluded, inline code that contains a double quote set aside, whitespace normalized, ** removed on both sides, split at '...'). On the text at 90a5c0e3 it counts addendum 32 and README 6, all present; the first round's own implementation recorded 31 and 8. After this round: addendum 39 quoted, 0 missing; README 6 quoted, 0 missing",
+   "post_fix_grep": {
+    "command": "grep -n -E 'cannot fire|no user trigger|never by user invocation|Driven only by workflow stages' adoption/skills/manifest.json docs/decisions/2026-09-25-skills-trial-and-usage.md evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md; then jq 'del(.checks.repair_round_2)' on this file piped to grep -c -E with the same pattern",
+    "exit": "1 and 1",
+    "output": "no match; 0",
+    "scope_note": "this block records the finding with those phrases, so grep matches inside checks.repair_round_2 only (9 lines of jq '.checks.repair_round_2' output)"
+   },
+   "post_fix_probe": "check_claude_listing still returns {'state': 'ok', 'actual': 'name-only'} for security-audit and the template's skillOverrides entry is still name-only: the listing stays the user's choice, and only the claims changed"
+  },
+  "repair_round_2_verification": {
+   "evidence_class": "our integration (independent Claude stack-verifier re-run of the round-2 probes, then a coordinator text correction)",
+   "verdict_before_correction": "fail: the round-2 finding is fixed, but a new claim (N1) said the frontmatter field user-invocable: false plus a probe would enforce stage-only use",
+   "source": "skills docs L799 (user-invocable: false leaves Claude's own invocation on) and L796 (disable-model-invocation: true removes the skill from Claude's context entirely); the same fetch as native_docs.skills (sha256 86137b62...)",
+   "correction": "the residual is limited to the user trigger; stage-only use stays a usage policy with or without either field. Changed: the decision addendum's Enforcement residual item and its overturn condition, README residual lines, the manifest gap (mirrored in manifest_row.gap) and checks.repair_round_2.residual",
+   "check": "the correction's quoted docs text is L796 and L799 in native_docs.skills"
+  }
+ }
+}

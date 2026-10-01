@@ -1,0 +1,57 @@
+[
+ {
+  "effort_requested": null,
+  "effort_upstream": null,
+  "model": "gpt-6-astra",
+  "path": "/v1/chat/completions",
+  "status": 200,
+  "timestamp": "2026-09-27T06:58:40.344Z",
+  "tokens_cache_read": 0,
+  "tokens_in": 21,
+  "tokens_reasoning": 0
+ },
+ {
+  "effort_requested": null,
+  "effort_upstream": null,
+  "model": "gpt-6-astra",
+  "path": "/v1/responses",
+  "status": 200,
+  "timestamp": "2026-09-27T06:58:42.029Z",
+  "tokens_cache_read": 0,
+  "tokens_in": 22,
+  "tokens_reasoning": 0
+ },
+ {
+  "effort_requested": "max",
+  "effort_upstream": "max",
+  "model": "gpt-6-astra",
+  "path": "/v1/responses",
+  "status": 200,
+  "timestamp": "2026-09-27T06:59:07.216Z",
+  "tokens_cache_read": 0,
+  "tokens_in": 13806,
+  "tokens_reasoning": 293
+ },
+ {
+  "effort_requested": "max",
+  "effort_upstream": "max",
+  "model": "gpt-6-astra",
+  "path": "/v1/responses",
+  "status": 200,
+  "timestamp": "2026-09-27T07:00:03.480Z",
+  "tokens_cache_read": 0,
+  "tokens_in": 13806,
+  "tokens_reasoning": 312
+ },
+ {
+  "effort_requested": null,
+  "effort_upstream": null,
+  "model": "gpt-6-astra",
+  "path": "/v1/responses",
+  "status": 200,
+  "timestamp": "2026-09-27T07:00:11.351Z",
+  "tokens_cache_read": 13568,
+  "tokens_in": 14206,
+  "tokens_reasoning": 0
+ }
+]

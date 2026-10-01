@@ -154,10 +154,12 @@ first establish that it contains only that task's immutable tool files, not a
 database, model cache, project checkout or account store. Package deletion was
 not required to establish the retained native execution results.
 
-The working WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure.
+The working WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0
+on the same host before the switch; 0.25.0 stays installed for rollback.
+Version 0.29.0 failed real startup with unavailable UVA support. Preserve the
+accepted environment and model/vector data; repeating installation until the
+version number is newer would not resolve such a compatibility failure, so a
+new version is qualified on an owned instance first.
 
 ## Native client integration and process lifecycle
 
@@ -222,6 +224,26 @@ retain that expected outcome explicitly. For final retirement use
 `systemctl --user disable --now "$OWNED_UNIT"` only if the run itself enabled
 that unit. Keep its data directories. The shared MCPorter daemon is not an
 owned disposable service; do not stop it to clean up another component.
+
+Added after `v2026.09.26.2`: a daily user timer keeps the next session's
+currency notice current without a check at startup.
+[`stack-currency.service`](templates/systemd/stack-currency.service) runs
+`python3 scripts/currency_due.py`, which runs the receipt, pin and saturation
+checks and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
+(mode 0600) only while something is due; a SessionStart hook prints its one
+line ([decision](../docs/decisions/2026-09-30-session-currency-notice.md)).
+Render the service from the live clone, verify both units, enable
+[the timer](templates/systemd/stack-currency.timer) and read the current report;
+the service file's header covers `PATH` on another host:
+
+```sh
+sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/stack-currency.service > ~/.config/systemd/user/stack-currency.service
+cp adoption/templates/systemd/stack-currency.timer ~/.config/systemd/user/
+systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+systemctl --user daemon-reload
+systemctl --user enable --now stack-currency.timer
+python3 scripts/currency_due.py --dry-run
+```
 
 Foreground tools should close through their native exit path. For a child
 started by the qualification shell, record its PID, verify its identity, send

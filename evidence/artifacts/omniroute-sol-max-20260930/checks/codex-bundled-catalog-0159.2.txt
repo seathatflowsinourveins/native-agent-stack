@@ -1,0 +1,5 @@
+codex --version: codex-cli 0.159.2
+models in the bundled catalog: 11
+gpt-6-astra: default low, levels ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'], context_window 272000, max_context_window 872000
+gpt-6.1-sol: default low, levels ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'], context_window 272000, max_context_window 872000
+gpt-6-sol: default medium, levels ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'], context_window 272000, max_context_window 872000

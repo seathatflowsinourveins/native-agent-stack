@@ -1,0 +1,60 @@
+## behavior (explicit rtk <cmd>, i.e. what the hook produces when not excluded)
+T1 git show REV:path | tail -n 5 | native | rc=0 | bytes=374 lines=5 sha=e2b65e57e55e | tail1=line 00400 abcdefghijklmnopqrstuvwxyz0123456789 ABCDEFGHIJKLMNOPQRSTUV | err=
+T1 git show REV:path | tail -n 5 | 050 | rc=0 | bytes=382 lines=5 sha=9f665bc9b1cd | tail1=... (+291 lines) [see remaining: rtk proxy git show 'HEAD:big.txt' | t | err=
+T1 git show REV:path | tail -n 5 | 467 | rc=0 | bytes=382 lines=5 sha=9f665bc9b1cd | tail1=... (+291 lines) [see remaining: rtk proxy git show 'HEAD:big.txt' | t | err=
+T1b git -C . show REV:path | tail -n 5 | native | rc=0 | bytes=374 lines=5 sha=e2b65e57e55e | tail1=line 00400 abcdefghijklmnopqrstuvwxyz0123456789 ABCDEFGHIJKLMNOPQRSTUV | err=
+T1b git -C . show REV:path | tail -n 5 | 050 | rc=0 | bytes=391 lines=5 sha=e08a53c29981 | tail1=... (+291 lines) [see remaining: rtk proxy git '-C' '.' show 'HEAD:big | err=
+T1b git -C . show REV:path | tail -n 5 | 467 | rc=0 | bytes=391 lines=5 sha=e08a53c29981 | tail1=... (+291 lines) [see remaining: rtk proxy git '-C' '.' show 'HEAD:big | err=
+T2 diff a missing (exit code) | native | rc=2 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=diff: missing.txt: No such file or directory 
+T2 diff a missing (exit code) | 050 | rc=1 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=rtk: No such file or directory (os error 2) 
+T2 diff a missing (exit code) | 467 | rc=2 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=rtk diff: missing.txt: No such file or directory (os error 2) 
+T2b diff a b (differ) | native | rc=1 | bytes=22 lines=4 sha=8998661a03e4 | tail1=> gamma | err=
+T2b diff a b (differ) | 050 | rc=1 | bytes=22 lines=4 sha=8998661a03e4 | tail1=> gamma | err=
+T2b diff a b (differ) | 467 | rc=1 | bytes=22 lines=4 sha=8998661a03e4 | tail1=> gamma | err=
+T3 git branch -a (linked worktree + same-name remote) | native | rc=0 | bytes=100 lines=5 sha=0a5b02920679 | tail1=  remotes/origin/main | err=
+T3 git branch -a (linked worktree + same-name remote) | 050 | rc=0 | bytes=49 lines=4 sha=ff0f158e5651 | tail1=    feature | err=
+T3 git branch -a (linked worktree + same-name remote) | 467 | rc=0 | bytes=49 lines=4 sha=ff0f158e5651 | tail1=    feature | err=
+T4 git log (commit count) | native | rc=0 | bytes=65 lines=16 sha=ffa7d07c62b5 | tail1=c0 | err=
+T4 git log (commit count) | 050 | rc=0 | bytes=51 lines=15 sha=a56f52feb047 | tail1=c0 | err=
+T4 git log (commit count) | 467 | rc=0 | bytes=51 lines=15 sha=a56f52feb047 | tail1=c0 | err=
+T4b git log (default format) | native | rc=0 | bytes=2087 lines=96 sha=7d822633122e | tail1=    c0 | err=
+T4b git log (default format) | 050 | rc=0 | bytes=325 lines=10 sha=969d7b828bbc | tail1=8c1a88b c5 (2 seconds ago) <fx> | err=
+T4b git log (default format) | 467 | rc=0 | bytes=325 lines=10 sha=969d7b828bbc | tail1=8c1a88b c5 (2 seconds ago) <fx> | err=
+T5 find missing relative dir | native | rc=1 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=find: ‘nosuchdir’: No such file or directory 
+T5 find missing relative dir | 050 | rc=0 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=
+T5 find missing relative dir | 467 | rc=0 | bytes=0 lines=1 sha=e3b0c44298fc | tail1= | err=
+T6 grep -rl file list | native | rc=0 | bytes=59 lines=3 sha=e8520726c822 | tail1=src/deep/pkg/f1.txt | err=
+T6 grep -rl file list | 050 | rc=0 | bytes=59 lines=3 sha=e8520726c822 | tail1=src/deep/pkg/f1.txt | err=
+T6 grep -rl file list | 467 | rc=0 | bytes=44 lines=4 sha=c915a4b90a47 | tail1=f1.txt | err=
+T6b grep -rl | tail -2 (pipeline) | native | rc=0 | bytes=39 lines=2 sha=6ce9a0efc3ff | tail1=src/deep/pkg/f1.txt | err=
+T6b grep -rl | tail -2 (pipeline) | 050 | rc=0 | bytes=39 lines=2 sha=6ce9a0efc3ff | tail1=src/deep/pkg/f1.txt | err=
+T6b grep -rl | tail -2 (pipeline) | 467 | rc=0 | bytes=13 lines=2 sha=c5612895fe01 | tail1=f1.txt | err=
+## T3 detail: which branches each reports
+native: + feature|* main|  remotes/origin/HEAD -> origin/main|  remotes/origin/feature|  remotes/origin/main|
+050: * main|  + feature|  remote-only (1):|    feature|
+467: * main|  + feature|  remote-only (1):|    feature|
+## T4 detail: commits listed by plain git log (count of 'commit ' or subject lines)
+native: lines=96 merge_present=1 last=    c0
+050: lines=10 merge_present=0 last=8c1a88b c5 (4 seconds ago) <fx>
+467: lines=10 merge_present=0 last=8c1a88b c5 (4 seconds ago) <fx>
+## hook check with the host config (the recipe's probe list)
+hookcheck | git show HEAD:x | tail -n 5 | 0.50.0: No rewrite for: git show HEAD:x | tail -n 5 | rc467: No rewrite for: git show HEAD:x | tail -n 5
+hookcheck | git -C . show --no-color HEAD:x | tail -n 5 | 0.50.0: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5 | rc467: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5
+hookcheck | git -C repo show HEAD:x | 0.50.0: No rewrite for: git -C repo show HEAD:x | rc467: No rewrite for: git -C repo show HEAD:x
+hookcheck | git --git-dir /r/.git show HEAD:x | 0.50.0: No rewrite for: git --git-dir /r/.git show HEAD:x | rc467: No rewrite for: git --git-dir /r/.git show HEAD:x
+hookcheck | git --work-tree /w branch -a | 0.50.0: No rewrite for: git --work-tree /w branch -a | rc467: No rewrite for: git --work-tree /w branch -a
+hookcheck | diff a missing | 0.50.0: No rewrite for: diff a missing | rc467: No rewrite for: diff a missing
+hookcheck | git branch -a | 0.50.0: No rewrite for: git branch -a | rc467: No rewrite for: git branch -a
+hookcheck | git -C . branch | 0.50.0: No rewrite for: git -C . branch | rc467: No rewrite for: git -C . branch
+hookcheck | git show HEAD~1 | 0.50.0: rtk git show HEAD~1 | rc467: rtk git show HEAD~1
+hookcheck | git show --stat HEAD | 0.50.0: rtk git show --stat HEAD | rc467: rtk git show --stat HEAD
+hookcheck | git --git-dir /r/.git status | 0.50.0: rtk git --git-dir /r/.git status | rc467: rtk git --git-dir /r/.git status
+hookcheck | git push origin branch | 0.50.0: rtk git push origin branch | rc467: rtk git push origin branch
+hookcheck | git commit -m "update branch docs" | 0.50.0: rtk git commit -m "update branch docs" | rc467: rtk git commit -m "update branch docs"
+hookcheck | git log | 0.50.0: rtk git log | rc467: rtk git log
+hookcheck | find nosuchdir -name x | 0.50.0: rtk find nosuchdir -name x | rc467: rtk find nosuchdir -name x
+hookcheck | grep -rl needle src | tail -2 | 0.50.0: rtk grep -rl needle src | tail -2 | rc467: No rewrite for: grep -rl needle src | tail -2
+## T7 standalone jq -r over 60 rows (7 rows >120 chars): native vs rtk jq (TOML filter jq.toml: max_lines=40, truncate_lines_at=120)
+T7 | native | rc=0 lines=60 bytes=2378 maxlen=162 sha=54c32389d81e tail2=59 item-059 short 59|60 item-060 short 60
+T7 | rtk 0.50.0 | rc=0 lines=42 bytes=1387 maxlen=120 sha=86621302dcd6 tail2=... (20 lines truncated)|[full output: rtk recall <omitted>]
+T7 | rtk 0.49.0 | rc=0 lines=42 bytes=1387 maxlen=120 sha=86621302dcd6 tail2=... (20 lines truncated)|[full output: rtk recall <omitted>]

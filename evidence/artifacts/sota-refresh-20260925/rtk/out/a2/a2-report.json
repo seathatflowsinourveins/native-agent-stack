@@ -1,0 +1,2456 @@
+[
+ {
+  "id": "git-status",
+  "cmd": "git status",
+  "rw049": "rtk git status",
+  "rw050": "rtk git status",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   409,
+   57,
+   57
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-status-short",
+  "cmd": "git status --short",
+  "rw049": "rtk git status --short",
+  "rw050": "rtk git status --short",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   50,
+   49,
+   49
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-3",
+  "cmd": "git log -3",
+  "rw049": "rtk git log -3",
+  "rw050": "rtk git log -3",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   407,
+   115,
+   115
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-oneline-5",
+  "cmd": "git log --oneline -5",
+  "rw049": "rtk git log --oneline -5",
+  "rw050": "rtk git log --oneline -5",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   76,
+   76,
+   76
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-plain",
+  "cmd": "git log",
+  "rw049": "rtk git log",
+  "rw050": "rtk git log",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   1863,
+   324,
+   324
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-oneline",
+  "cmd": "git log --oneline",
+  "rw049": "rtk git log --oneline",
+  "rw050": "rtk git log --oneline",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   186,
+   158,
+   158
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-p-2",
+  "cmd": "git log -p -2",
+  "rw049": "rtk git log -p -2",
+  "rw050": "rtk git log -p -2",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   39300,
+   39300,
+   39300
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-p",
+  "cmd": "git log -p",
+  "rw049": "rtk git log -p",
+  "rw050": "rtk git log -p",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   42217,
+   42217,
+   41097
+  ],
+  "err_len": [
+   0,
+   0,
+   53
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": false
+ },
+ {
+  "id": "git-log-stat-3",
+  "cmd": "git log --stat -3",
+  "rw049": "rtk git log --stat -3",
+  "rw050": "rtk git log --stat -3",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   586,
+   586,
+   586
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-diff",
+  "cmd": "git diff",
+  "rw049": "rtk git diff",
+  "rw050": "rtk git diff",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   113,
+   101,
+   101
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-diff-stat",
+  "cmd": "git diff --stat",
+  "rw049": "rtk git diff --stat",
+  "rw050": "rtk git diff --stat",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   45,
+   44,
+   45
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": true
+ },
+ {
+  "id": "git-diff-cached",
+  "cmd": "git diff --cached",
+  "rw049": "rtk git diff --cached",
+  "rw050": "rtk git diff --cached",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   149,
+   111,
+   111
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-show-c12",
+  "cmd": "git show HEAD~2",
+  "rw049": "rtk git show HEAD~2",
+  "rw050": "rtk git show HEAD~2",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   224,
+   128,
+   128
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-show-stat",
+  "cmd": "git show --stat HEAD",
+  "rw049": "rtk git show --stat HEAD",
+  "rw050": "rtk git show --stat HEAD",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   239,
+   239,
+   239
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-show-blob",
+  "cmd": "git show HEAD:big.txt",
+  "rw049": "rtk git show HEAD:big.txt",
+  "rw050": "rtk git show HEAD:big.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   34893,
+   34893,
+   8275
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": true
+ },
+ {
+  "id": "git-show-blob-tail",
+  "cmd": "git show HEAD:big.txt | tail -n 5",
+  "rw049": "rtk git show HEAD:big.txt | tail -n 5",
+  "rw050": "rtk git show HEAD:big.txt | tail -n 5",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   45,
+   45,
+   121
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": true
+ },
+ {
+  "id": "git-show-blob-head",
+  "cmd": "git show HEAD:big.txt | head -n 5",
+  "rw049": "rtk git show HEAD:big.txt | head -n 5",
+  "rw050": "rtk git show HEAD:big.txt | head -n 5",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   30,
+   30,
+   30
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-branch",
+  "cmd": "git branch",
+  "rw049": "rtk git branch",
+  "rw050": "rtk git branch",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   14,
+   14,
+   14
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-stash-list",
+  "cmd": "git stash list",
+  "rw049": "rtk git stash list",
+  "rw050": "rtk git stash list",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-compound",
+  "cmd": "git status && git log -1",
+  "rw049": "rtk git status && rtk git log -1",
+  "rw050": "rtk git status && rtk git log -1",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   531,
+   90,
+   90
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-C",
+  "cmd": "git -C repo status",
+  "rw049": "rtk git -C repo status",
+  "rw050": "rtk git -C repo status",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   409,
+   57,
+   57
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-log-badref",
+  "cmd": "git log -1 nsr-no-such-ref",
+  "rw049": "rtk git log -1 nsr-no-such-ref",
+  "rw050": "rtk git log -1 nsr-no-such-ref",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   128,
+   128,
+   128
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   196,
+   197,
+   197
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-diff-badref",
+  "cmd": "git diff nsr-no-such-ref",
+  "rw049": "rtk git diff nsr-no-such-ref",
+  "rw050": "rtk git diff nsr-no-such-ref",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   128,
+   128,
+   128
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   196,
+   196,
+   196
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "git-status-nonrepo",
+  "cmd": "git status",
+  "rw049": "rtk git status",
+  "rw050": "rtk git status",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   128,
+   128,
+   128
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   69,
+   21,
+   21
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-rn",
+  "cmd": "grep -rn needle g",
+  "rw049": "rtk grep -rn needle g",
+  "rw050": "rtk grep -rn needle g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   2614,
+   662,
+   662
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-n-file",
+  "cmd": "grep -n needle g/a.txt",
+  "rw049": "rtk grep -n needle g/a.txt",
+  "rw050": "rtk grep -n needle g/a.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   13,
+   13,
+   13
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-many",
+  "cmd": "grep -n needle g/m.txt",
+  "rw049": "rtk grep -n needle g/m.txt",
+  "rw050": "rtk grep -n needle g/m.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   1584,
+   392,
+   392
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-c",
+  "cmd": "grep -c needle g/m.txt",
+  "rw049": "rtk grep -c needle g/m.txt",
+  "rw050": "rtk grep -c needle g/m.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   4,
+   4,
+   4
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-rl",
+  "cmd": "grep -rl needle g",
+  "rw049": "rtk grep -rl needle g",
+  "rw050": "rtk grep -rl needle g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   35,
+   35,
+   35
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-missing",
+  "cmd": "grep -n needle missing.txt",
+  "rw049": "rtk grep -n needle missing.txt",
+  "rw050": "rtk grep -n needle missing.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   2,
+   2
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   45,
+   54,
+   54
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "grep-nomatch",
+  "cmd": "grep -rn zzznomatch g",
+  "rw049": "rtk grep -rn zzznomatch g",
+  "rw050": "rtk grep -rn zzznomatch g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "rg-n",
+  "cmd": "rg -n needle g",
+  "rw049": "rtk rg -n needle g",
+  "rw050": "rtk rg -n needle g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   2614,
+   662,
+   662
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "rg-many",
+  "cmd": "rg -n needle g/m.txt",
+  "rw049": "rtk rg -n needle g/m.txt",
+  "rw050": "rtk rg -n needle g/m.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   1584,
+   392,
+   392
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "rg-missing",
+  "cmd": "rg -n needle missing.txt",
+  "rw049": "rtk rg -n needle missing.txt",
+  "rw050": "rtk rg -n needle missing.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   2,
+   2
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   56,
+   56,
+   56
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "rg-nomatch",
+  "cmd": "rg -n zzznomatch g",
+  "rw049": "rtk rg -n zzznomatch g",
+  "rw050": "rtk rg -n zzznomatch g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "find-name",
+  "cmd": "find g -name '*.txt'",
+  "rw049": "rtk find g -name '*.txt'",
+  "rw050": "rtk find g -name '*.txt'",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   28,
+   22,
+   22
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "find-type-d",
+  "cmd": "find g -type d",
+  "rw049": "rtk find g -type d",
+  "rw050": "rtk find g -type d",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   8,
+   4,
+   4
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "find-missing",
+  "cmd": "find missing -name x",
+  "rw049": "rtk find missing -name x",
+  "rw050": "rtk find missing -name x",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   0,
+   0
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   47,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "ls",
+  "cmd": "ls g",
+  "rw049": "rtk ls g",
+  "rw050": "rtk ls g",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   21,
+   38,
+   38
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "ls-la",
+  "cmd": "ls -la l",
+  "rw049": "rtk ls -la l",
+  "rw050": "rtk ls -la l",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   251,
+   46,
+   46
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "ls-missing",
+  "cmd": "ls missing",
+  "rw049": "rtk ls missing",
+  "rw050": "rtk ls missing",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   2,
+   2
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   55,
+   64,
+   64
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "cat",
+  "cmd": "cat f.txt",
+  "rw049": "rtk read f.txt",
+  "rw050": "rtk read f.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   311,
+   311,
+   311
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "cat-big",
+  "cmd": "cat big2.txt",
+  "rw049": "rtk read big2.txt",
+  "rw050": "rtk read big2.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   124893,
+   124893,
+   124893
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "cat-missing",
+  "cmd": "cat missing.txt",
+  "rw049": "rtk read missing.txt",
+  "rw050": "rtk read missing.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   44,
+   57,
+   57
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "cat-pipe-head",
+  "cmd": "cat f.txt | head -3",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   21,
+   21,
+   21
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "head-3",
+  "cmd": "head -3 f.txt",
+  "rw049": "rtk read f.txt --max-lines 3",
+  "rw050": "rtk read f.txt --head-lines 3",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": false,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   21,
+   22,
+   21
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": true
+ },
+ {
+  "id": "head-bare",
+  "cmd": "head f.txt",
+  "rw049": "rtk read f.txt",
+  "rw050": "rtk read f.txt --head-lines 10",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": false,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   71,
+   311,
+   71
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": false,
+  "same_err": true
+ },
+ {
+  "id": "head-n-3",
+  "cmd": "head -n 3 f.txt",
+  "rw049": null,
+  "rw050": "rtk read f.txt --head-lines 3",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": false,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   21,
+   21,
+   21
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "tail-5",
+  "cmd": "tail -5 f.txt",
+  "rw049": "rtk read f.txt --tail-lines 5",
+  "rw050": "rtk read f.txt --tail-lines 5",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   40,
+   40,
+   40
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "tail-n-3",
+  "cmd": "tail -n 3 f.txt",
+  "rw049": "rtk read f.txt --tail-lines 3",
+  "rw050": "rtk read f.txt --tail-lines 3",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   24,
+   24,
+   24
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "wc-l",
+  "cmd": "wc -l f.txt",
+  "rw049": "rtk wc -l f.txt",
+  "rw050": "rtk wc -l f.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   9,
+   3,
+   3
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "wc-multi",
+  "cmd": "wc -l f.txt g/a.txt",
+  "rw049": "rtk wc -l f.txt g/a.txt",
+  "rw050": "rtk wc -l f.txt g/a.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   32,
+   25,
+   25
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "wc",
+  "cmd": "wc f.txt",
+  "rw049": "rtk wc f.txt",
+  "rw050": "rtk wc f.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   18,
+   13,
+   13
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "wc-missing",
+  "cmd": "wc -l missing.txt",
+  "rw049": "rtk wc -l missing.txt",
+  "rw050": "rtk wc -l missing.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   43,
+   0,
+   52
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": false
+ },
+ {
+  "id": "diff-files",
+  "cmd": "diff a.txt b.txt",
+  "rw049": "rtk diff a.txt b.txt",
+  "rw050": "rtk diff a.txt b.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   38,
+   38,
+   38
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "diff-u",
+  "cmd": "diff -u a.txt b.txt",
+  "rw049": "rtk diff -u a.txt b.txt",
+  "rw050": "rtk diff -u a.txt b.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   1,
+   1
+  ],
+  "out_len": [
+   155,
+   155,
+   155
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "diff-missing",
+  "cmd": "diff a.txt missing.txt",
+  "rw049": "rtk diff a.txt missing.txt",
+  "rw050": "rtk diff a.txt missing.txt",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   1,
+   1
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   45,
+   44,
+   44
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "du",
+  "cmd": "du -s l",
+  "rw049": "rtk du -s l",
+  "rw050": "rtk du -s l",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   4,
+   4,
+   4
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "make-ok",
+  "cmd": "make -s hello",
+  "rw049": "rtk make -s hello",
+  "rw050": "rtk make -s hello",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   16,
+   16,
+   16
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "make-fail",
+  "cmd": "make -s fail",
+  "rw049": "rtk make -s fail",
+  "rw050": "rtk make -s fail",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   2,
+   2
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   54,
+   54,
+   54
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "pytest-fake",
+  "cmd": "pytest -q nosuch_test.py",
+  "rw049": "rtk pytest -q nosuch_test.py",
+  "rw050": "rtk pytest -q nosuch_test.py",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   4,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   51,
+   0,
+   51
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": false
+ },
+ {
+  "id": "python-m-pytest",
+  "cmd": "python3 -m pytest -q nosuch_test.py",
+  "rw049": "rtk pytest -q nosuch_test.py",
+  "rw050": "rtk pytest -q nosuch_test.py",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   1,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   77,
+   0,
+   51
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": false
+ },
+ {
+  "id": "ruff-fake",
+  "cmd": "ruff check nosuch.py",
+  "rw049": "rtk ruff check nosuch.py",
+  "rw050": "rtk ruff check nosuch.py",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   2,
+   2,
+   2
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   65,
+   0,
+   65
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": false
+ },
+ {
+  "id": "uv-run-pytest",
+  "cmd": "uv run pytest -q",
+  "rw049": "uv run rtk pytest -q",
+  "rw050": "uv run rtk pytest -q",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true
+ },
+ {
+  "id": "curl-file",
+  "cmd": "curl -s file://<FX>/x.json",
+  "rw049": "rtk curl -s file://<FX>/x.json",
+  "rw050": "rtk curl -s file://<FX>/x.json",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   41,
+   42,
+   42
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "curl-missing",
+  "cmd": "curl -sS file://<FX>/missing.json",
+  "rw049": "rtk curl -sS file://<FX>/missing.json",
+  "rw050": "rtk curl -sS file://<FX>/missing.json",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   37,
+   37,
+   37
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   184,
+   197,
+   197
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "jq",
+  "cmd": "jq .b x.json",
+  "rw049": "rtk jq .b x.json",
+  "rw050": "rtk jq .b x.json",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   18,
+   18,
+   18
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "tar-tf",
+  "cmd": "tar -tf x.tar",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   32,
+   32,
+   32
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "gh-pr-view",
+  "cmd": "gh pr view 1",
+  "rw049": "rtk gh pr view 1",
+  "rw050": "rtk gh pr view 1",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   4,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   157,
+   157,
+   157
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "gh-run-view",
+  "cmd": "gh run view 1",
+  "rw049": "rtk gh run view 1",
+  "rw050": "rtk gh run view 1",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   4,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   157,
+   157,
+   157
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "gh-api",
+  "cmd": "gh api repos/rtk-ai/rtk",
+  "rw049": "rtk gh api repos/rtk-ai/rtk",
+  "rw050": "rtk gh api repos/rtk-ai/rtk",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   4,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   0,
+   0
+  ],
+  "err_len": [
+   157,
+   157,
+   157
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "systemctl-status",
+  "cmd": "systemctl status nonexistent-unit-sota-probe.service",
+  "rw049": "rtk systemctl status nonexistent-unit-sota-probe.service",
+  "rw050": "rtk systemctl status nonexistent-unit-sota-probe.service",
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   4,
+   4,
+   4
+  ],
+  "out_len": [
+   0,
+   1,
+   1
+  ],
+  "err_len": [
+   61,
+   61,
+   61
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "echo-subst",
+  "cmd": "echo $(date +%Y)",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   5,
+   5,
+   5
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "uname",
+  "cmd": "uname -s",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true,
+  "rc": [
+   0,
+   0,
+   0
+  ],
+  "out_len": [
+   6,
+   6,
+   6
+  ],
+  "err_len": [
+   0,
+   0,
+   0
+  ],
+  "same_rc": true,
+  "same_out": true,
+  "same_err": true
+ },
+ {
+  "id": "htop",
+  "cmd": "htop",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true
+ },
+ {
+  "id": "redirect",
+  "cmd": "git status > <FX>/redir.out",
+  "rw049": null,
+  "rw050": null,
+  "pd": [
+   null,
+   null
+  ],
+  "hook_rc": [
+   0,
+   0
+  ],
+  "same_rewrite": true
+ }
+]

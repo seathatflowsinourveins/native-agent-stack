@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--markitdown--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "markitdown",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v markitdown) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && D=$(ls -d \"$HOME\"/.local/share/codex-ecosystem/python-tools/markitdown/lib/python3.*/site-packages/markitdown-*.dist-info) && echo \"dist-info: $(basename \"$D\")\" && grep -m1 \"^Version:\" \"$D/METADATA\" | sed \"s/^/METADATA /\" && UV_TOOL_DIR=\"$HOME/.local/share/codex-ecosystem/python-tools\" UV_TOOL_BIN_DIR=\"$HOME/.local/share/codex-ecosystem/bin\" uv tool list 2>/dev/null | grep -A1 \"^markitdown \" | sed \"s/^/uv tool list: /\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" markitdown && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" markitdown && grep -A1 -- \"-- markitdown --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed \"s/^/bootstrap verified-versions record: /\"",
+      "exit": 0,
+      "duration_s": 0.072,
+      "output_sha256": "e702806466351789b589e0e1ecba14f67f84bd6ae155afba02d86b14d33ff29f",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/markitdown -> ~/.local/share/codex-ecosystem/python-tools/markitdown/bin/markitdown\ndist-info: markitdown-0.1.7.dist-info\nMETADATA Version: 0.1.7\nuv tool list: markitdown v0.1.7\nuv tool list: - markitdown\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.1.7']\nstack ['0.1.7'] winner pins ['0.1.7']\nbootstrap verified-versions record: markitdown 0.1.7\n"
+    },
+    {
+      "cmd": "D=$(ls -d \"$HOME\"/.local/share/codex-ecosystem/python-tools/markitdown/lib/python3.*/site-packages/markitdown-*.dist-info) && SP=$(dirname \"$D\") && if [ -e \"$D/direct_url.json\" ]; then echo \"direct_url.json: present\"; else echo \"direct_url.json: absent (no on-host record of a fetched-artifact hash for this uv tool install)\"; fi && python3 -c \"import hashlib,base64,os,sys;h=lambda p: base64.urlsafe_b64encode(hashlib.sha256(open(p,'rb').read()).digest()).rstrip(b'=').decode();sp,recdir=sys.argv[1],sys.argv[2];rows=[l.rsplit(',',2) for l in open(os.path.join(recdir,'RECORD')).read().splitlines()];pairs=[(r[0],r[1][7:]) for r in rows if len(r)==3 and r[1].startswith('sha256=')];mism=[p for p,b64 in pairs if h(os.path.normpath(os.path.join(sp,p)))!=b64];print('RECORD self-check: files_checked',len(pairs),'mismatches',len(mism));assert len(pairs)>=40 and not mism\" \"$SP\" \"$D\" && python3 -c \"import json;t=[x for x in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if x['id']=='markitdown'][0];print('adoption pin sha256 (PyPI sdist .tar.gz, not a RECORD value):',t['sha256'][:16]+'...');print('RECORD holds only per-installed-file sha256 of the unpacked wheel; no single RECORD entry or on-host archive is comparable to that sdist pin hash')\"",
+      "exit": 0,
+      "duration_s": 0.04,
+      "output_sha256": "e940dd217f1e619a8978bc58127960dfc0b3cfd1f9a08f79dbe22ade489707c8",
+      "output_excerpt": "direct_url.json: absent (no on-host record of a fetched-artifact hash for this uv tool install)\nRECORD self-check: files_checked 45 mismatches 0\nadoption pin sha256 (PyPI sdist .tar.gz, not a RECORD value): 4d1f3c69cd43b822...\nRECORD holds only per-installed-file sha256 of the unpacked wheel; no single RECORD entry or on-host archive is comparable to that sdist pin hash\n"
+    },
+    {
+      "cmd": "markitdown --version",
+      "exit": 0,
+      "duration_s": 0.303,
+      "output_sha256": "a616d88a9607b4cdafde8c0d1b9c92325e56d3b274f40faef9976afbe85e748e",
+      "output_excerpt": "markitdown 0.1.7\n"
+    }
+  ],
+  "tool_versions": {
+    "markitdown": "0.1.7"
+  },
+  "observed_at_utc": "2026-09-25T19:02:24Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), MarkItDown is installed at the document-retrieval winner pin, 0.1.7. The launcher resolves to this host's uv tool environment. The dist-info METADATA and uv tool list both report 0.1.7, matching the bootstrap pin, the stack pin, the winner pin and the bootstrap's verified-versions record. All 45 sha256 entries in the installed wheel RECORD match the files on disk. markitdown --version reports 0.1.7. Every command exits 0.",
+  "limitations": [
+    "The adoption pin sha256 is for the PyPI sdist archive. No retained archive exists on this host to compare it with, and no RECORD entry is comparable to it, so the integrity shown is install-time RECORD self-consistency, not a match against the pinned archive hash.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision), not from a pinned install checkout; the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:24Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran all 3 commands from the worktree root (markitdown --version under an empty temporary HOME); each exited 0 and printed output identical to the retained excerpt, including RECORD self-check files_checked 45 mismatches 0. Adequacy-checked (install receipt, points 3 and 4): point 3 every claim sentence maps to a retained command: launcher resolves into the markitdown uv tool env; dist-info METADATA and uv tool list both report 0.1.7; bootstrap pin, stack pin, winner pin and the bootstrap verified-versions record all print 0.1.7 (cmd 1); 45 RECORD sha256 entries match (cmd 2); markitdown --version prints 0.1.7 (cmd 3). The receipt states the adoption sha256 is for the PyPI sdist and is not comparable to RECORD, so it claims self-consistency only. Point 4: markitdown is the document-retrieval layer winner in catalogs/landscape/foundation.json; tool_versions 0.1.7 equals the winner pin and the stack version under host_receipts.pin_matches (I ran it). Claim and limitations state readiness only (conditional at most). No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:52Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

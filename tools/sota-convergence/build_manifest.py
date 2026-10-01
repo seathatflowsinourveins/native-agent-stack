@@ -75,6 +75,7 @@ import argparse
 import json
 import re
 from collections import Counter, defaultdict
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -205,14 +206,20 @@ def repository_known(repository, repositories: dict) -> bool:
 LATEST_TAG_NOT_A_RELEASE = "tag_listing_only_not_version_shaped"
 
 
-def compute_upstream(repository, repositories: dict) -> dict:
+def freshness_record(repository, repositories: dict) -> dict | None:
+    """The freshness record for ``repository``: exact URL first, then the
+    normalized GitHub slug (see ``_repositories_by_slug``); None when absent."""
     repositories = repositories or {}
     record = repositories.get(repository)
     if record is None:
         slug = github_repo_slug(repository)
         if slug:
             record = _repositories_by_slug(repositories).get(slug)
-    record = record or {}
+    return record
+
+
+def compute_upstream(repository, repositories: dict) -> dict:
+    record = freshness_record(repository, repositories) or {}
     release = record.get("latest_release") or {}
     latest = release.get("tag") or record.get("latest_tag")
     flagged_tag = None
@@ -337,6 +344,126 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict,
             entries.append(row)
         rows.append({"layer": layer_id, "entries": entries})
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Trading freshness: every pinned trading component vs upstream, plus dormancy
+# ---------------------------------------------------------------------------
+
+DORMANCY_THRESHOLD_DAYS = 180
+DORMANCY_RULE = (
+    "dormant when the newest of the latest GitHub release's published_at and the default-branch "
+    "head commit date is at least threshold_days before checked_at; pushed_at stands in only when "
+    "the head commit date is unknown (it also moves on non-default-branch pushes, so it can only "
+    "shorten the idle span); null when the run has no reliable upstream data for the repository"
+)
+
+
+def _iso_day(value):
+    text = (value or "")[:10] if isinstance(value, str) else ""
+    try:
+        return date.fromisoformat(text).isoformat()
+    except ValueError:
+        return None
+
+
+def compute_dormancy(record, as_of, threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
+    """Dormancy signal for one github-freshness.json record, relative to the
+    fixed ``as_of`` day (the manifest's ``checked_at``), so the result is
+    deterministic for fixed inputs. It never reads the wall clock.
+
+    ``dormant`` is null, never false, when the signal cannot be computed: no
+    record, a failed primary fetch (``error``), no usable activity date, or
+    no ``as_of``. See ``DORMANCY_RULE``."""
+    result = {"dormant": None, "days_since_activity": None, "last_activity_at": None,
+              "last_release_at": None, "last_commit_at": None, "basis": None,
+              "threshold_days": threshold_days}
+    if not isinstance(record, dict):
+        result["reason"] = "not_fetched"
+        return result
+    if record.get("error"):
+        result["reason"] = "fetch_error"
+        return result
+    release_at = _iso_day((record.get("latest_release") or {}).get("published_at"))
+    commit_at = _iso_day((record.get("head") or {}).get("date"))
+    result["last_release_at"], result["last_commit_at"] = release_at, commit_at
+    candidates = [day for day in (release_at, commit_at) if day]
+    basis = "release_or_default_branch_commit"
+    if commit_at is None:
+        pushed_at = _iso_day(record.get("pushed_at"))
+        if pushed_at:
+            candidates.append(pushed_at)
+            basis = "release_or_pushed_at"
+    as_of_day = _iso_day(as_of)
+    if not candidates or as_of_day is None:
+        result["reason"] = "no_activity_date" if not candidates else "no_as_of"
+        return result
+    last = max(candidates)
+    days = (date.fromisoformat(as_of_day) - date.fromisoformat(last)).days
+    result.update({"dormant": days >= threshold_days, "days_since_activity": days,
+                   "last_activity_at": last, "basis": basis})
+    return result
+
+
+def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, repositories: dict,
+                            checked_at: str, os_package_ids=DEFAULT_OS_PACKAGE_IDS,
+                            threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
+    """One row per pinned trading component, whether or not it changed since the
+    published manifest. The drift diff only lists rows that changed, and only
+    rows the published manifest already has.
+
+    Rows come from (a) the selected trading baseline (``build_baseline_trading``:
+    ``default``/``conditional`` cards, one row per card id with every taxonomy
+    layer it sits in) and (b) ``trading-pins.json``, the pins extract_layers.py
+    resolves from blueprint/runtime records that no selected card carries. Both
+    kinds use the same ``compute_upstream``/``classify_pin``/``pin_comparison_fields``
+    as the manifest rows, and each row carries ``compute_dormancy``. This is
+    report-only data: it selects nothing and is not part of the manifest."""
+    rows: dict = {}
+    for layer_row in build_baseline_trading(trading_by_layer, repositories, os_package_ids=os_package_ids):
+        for entry in layer_row["entries"]:
+            existing = rows.get(entry["id"])
+            if existing is not None:
+                existing["layers"].append(layer_row["layer"])
+                continue
+            rows[entry["id"]] = {
+                "id": entry["id"], "source": "catalog_card", "decision": entry["decision"],
+                "layers": [layer_row["layer"]], "repository": entry["repository"], "pin": entry["pin"],
+                "upstream": entry["upstream"], **pin_comparison_fields(_classification_of(entry)),
+            }
+    for pin in (trading_pins or {}).get("entries", []):
+        if pin["id"] in rows:
+            raise ValueError(f"trading pin {pin['id']!r} collides with a selected trading card id")
+        upstream = compute_upstream(pin["repository"], repositories)
+        classification = classify_pin(pin["pin"], pin["repository"], upstream.get("latest"),
+                                      component_id=pin["id"], os_package_ids=os_package_ids)
+        rows[pin["id"]] = {
+            "id": pin["id"], "source": "pin_source", "pin_source": pin.get("pin_source"),
+            "layers": [pin["layer"]], "repository": pin["repository"], "pin": pin["pin"],
+            "upstream": upstream, **pin_comparison_fields(classification),
+        }
+    entries = []
+    for row_id in sorted(rows):
+        row = rows[row_id]
+        row["dormancy"] = compute_dormancy(freshness_record(row["repository"], repositories), checked_at,
+                                           threshold_days=threshold_days)
+        entries.append(row)
+    return {
+        "schema": "trading-freshness/1",
+        "checked_at": checked_at,
+        "dormancy_threshold_days": threshold_days,
+        "dormancy_rule": DORMANCY_RULE,
+        "counts": {
+            "entries": len(entries),
+            "catalog_card": sum(1 for row in entries if row["source"] == "catalog_card"),
+            "pin_source": sum(1 for row in entries if row["source"] == "pin_source"),
+            "pin_behind_upstream": sum(1 for row in entries if row.get("pin_behind_upstream") is True),
+            "dormant": sum(1 for row in entries if row["dormancy"]["dormant"] is True),
+            "dormancy_unknown": sum(1 for row in entries if row["dormancy"]["dormant"] is None),
+            "archived": sum(1 for row in entries if row["upstream"].get("archived") is True),
+        },
+        "entries": entries,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -1706,6 +1833,13 @@ def parse_args(argv=None):
     parser.add_argument("--os-package-ids", nargs="*", default=list(DEFAULT_OS_PACKAGE_IDS),
                          help="Component/entry ids always excluded from pin-vs-upstream as OS-distribution "
                               "packages, regardless of pin format (default: %(default)s).")
+    parser.add_argument("--trading-pins", type=Path, default=None,
+                         help="extract_layers.py's trading-pins.json (default: <work-dir>/trading-pins.json "
+                              "when it exists). Read only with --trading-freshness-out.")
+    parser.add_argument("--trading-freshness-out", type=Path, default=None,
+                         help="Also write the report-only trading-freshness.json (every pinned trading "
+                              "component vs upstream, with a dormancy signal relative to --checked-at). "
+                              "The manifest itself is unchanged.")
     return parser.parse_args(argv)
 
 
@@ -1766,6 +1900,22 @@ def main(argv=None) -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(text + "\n", encoding="utf-8")
     print(json.dumps(manifest["counts"]))
+
+    if args.trading_freshness_out:
+        trading_pins_path = args.trading_pins or (work_dir / "trading-pins.json" if work_dir else None)
+        trading_pins = (load_json(trading_pins_path)
+                        if trading_pins_path and trading_pins_path.exists() else None)
+        trading_freshness = build_trading_freshness(
+            trading_by_layer, trading_pins, freshness_doc.get("repositories") or {}, args.checked_at,
+            os_package_ids=tuple(args.os_package_ids),
+        )
+        trading_text = json.dumps(sanitize_value(trading_freshness, work_dir=work_dir_for_sanitize,
+                                                 checkout_roots=checkout_roots), indent=1)
+        json.loads(trading_text)
+        assert_no_leak(trading_text)
+        args.trading_freshness_out.parent.mkdir(parents=True, exist_ok=True)
+        args.trading_freshness_out.write_text(trading_text + "\n", encoding="utf-8")
+        print(json.dumps({"trading_freshness": trading_freshness["counts"]}))
     return 0
 
 

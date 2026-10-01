@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--difftastic--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "difftastic",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v difft) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && difft --version | head -1 && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" difftastic",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "8f665f8188d9654d006b03afc4f5d0abbb985d814627fee5a9dd459fa994dd56",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/difft -> ~/.local/share/codex-ecosystem/tools/difftastic-0.71.0/payload/difft\nDifftastic 0.71.0\nstack ['0.71.0'] winner pins ['0.71.0']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-difft && git show 57fb6d89:tests/test_adoption_guarded_runners.py > /tmp/nsr-difft/before.py && git show aa0812b1:tests/test_adoption_guarded_runners.py > /tmp/nsr-difft/after.py && difft --exit-code --color never /tmp/nsr-difft/before.py /tmp/nsr-difft/after.py > /tmp/nsr-difft/out.txt; rc=$?; head -c 220 /tmp/nsr-difft/out.txt; echo; echo \"difft exit=$rc (expected 1: syntactic changes between 57fb6d89 and aa0812b1)\"; test \"$rc\" -eq 1 && grep -q -- '--- 1/' /tmp/nsr-difft/out.txt",
+      "exit": 0,
+      "duration_s": 0.062,
+      "output_sha256": "0dd7762ca6d0e23161294679b74df46483f81d49468399394cd39c7664fb12c9",
+      "output_excerpt": "/tmp/nsr-difft/after.py --- 1/3 --- Python\n557 # does not enable the cpu controlle  557 # does not enable the cpu controlle\n... r) or differs from the requested on  ... r) or differs from the requested on\n... e. The     \ndifft exit=1 (expected 1: syntactic changes between 57fb6d89 and aa0812b1)\n"
+    },
+    {
+      "cmd": "git show aa0812b1:adoption/hardware-profiles.json > /tmp/nsr-difft/profiles.json && python3 -c \"import json;d=json.load(open('/tmp/nsr-difft/profiles.json'));open('/tmp/nsr-difft/profiles-compact.json','w').write(json.dumps(d,separators=(',',':'),ensure_ascii=False))\" && cmp -s /tmp/nsr-difft/profiles.json /tmp/nsr-difft/profiles-compact.json; b=$?; difft --exit-code --color never /tmp/nsr-difft/profiles.json /tmp/nsr-difft/profiles-compact.json > /dev/null; rc=$?; echo \"cmp exit=$b (bytes differ); difft exit=$rc (expected 0: whitespace-only reformat, no syntactic change)\"; test \"$b\" -eq 1 && test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.029,
+      "output_sha256": "a61d74631a72fce48844b0e5d1935e942ccf20995dbb1228a382f3fae9b2d027",
+      "output_excerpt": "cmp exit=1 (bytes differ); difft exit=0 (expected 0: whitespace-only reformat, no syntactic change)\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-difft && test ! -e /tmp/nsr-difft && echo \"scratch directory removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "ab3f4773f1afe69729b08ed4dde8747359ab136c2bcc427e52529c53d9b0ef02",
+      "output_excerpt": "scratch directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "difftastic": "0.71.0"
+  },
+  "observed_at_utc": "2026-09-25T05:38:09Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), difftastic 0.71.0 (the catalog pin) compared real revisions structurally. For tests/test_adoption_guarded_runners.py at 57fb6d89 and aa0812b1 (the change in the catalog_revision), difft --exit-code reported syntactic changes (exit 1, with a Python hunk header). For adoption/hardware-profiles.json at aa0812b1 against a whitespace-only compact re-serialization of the same JSON, cmp reported differing bytes while difft --exit-code reported no syntactic change (exit 0). Each command exits 0 only when those exit codes hold. All commands exit 0.",
+  "limitations": [
+    "Two file pairs in two languages (Python and JSON); git difftool or external-diff integration, other grammars and large files were not exercised.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:09Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (structural diff of real revisions; control pair: a real Python change gives exit 1 while a whitespace-only JSON reformat that cmp flags gives exit 0; Difftastic 0.71.0 is backed; bound to the git-github-automation winner) and re-ran both comparisons and difft --version on this host with identical exit codes and version.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

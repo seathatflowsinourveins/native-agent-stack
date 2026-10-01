@@ -80,21 +80,21 @@
   },
   "interfaces": [
     {
-      "repository": "rhysd/actionlint",
-      "version": "1.7.12",
-      "revision": "914e7df21a07ef503a81201c76d2b11c789d3fca",
-      "source": "https://github.com/rhysd/actionlint/tree/914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "repository": "kjanat/actionlint",
+      "version": "1.17.0",
+      "revision": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "source": "https://github.com/kjanat/actionlint/tree/08bb2c4f0d039744455b87aef1c647fb8b66d37b",
       "command": "actionlint .github/workflows/*.yml",
-      "selection": "Maintained workflow expression, syntax and shell checks in routine validation; binary digest and upstream provenance verified."
+      "selection": "Workflow expression, syntax and shell checks in the required validate job; binary digest and upstream provenance verified. Selected 2026-09-28 (plan move M2): kjanat/actionlint v1.17.0, the maintained fork of rhysd/actionlint (immutable release; annotated tag 2da2ceb4 points to commit 08bb2c4f; SLSA provenance signed by kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0), replaced rhysd/actionlint 1.7.12 (914e7df2) in the required step after the non-required actionlint-successor job and the 1.7.12 step both succeeded in all 25 push runs of validate.yml on main from b60d5182 to f0219263; evidence/artifacts/actionlint-successor-swap-20260928/. Overturn if rhysd/actionlint resumes releases or GitHub ships an official workflow linter CLI. Note of 2026-09-27, kept as history: Upstream stale as re-observed with gh api on 2026-09-27 22:03 EDT (2026-09-28T02:03Z): last commit on main 2026-04-19 (011a6d15), no commit on main since 2026-06-29, latest release still v1.7.12 (2026-03-30), and rhysd/actionlint#719 \"rhysd (the author) inactive. Any active forks?\" open since 2026-08-06. The selection stays 1.7.12 until the non-required validate.yml actionlint-successor job (kjanat/actionlint v1.17.0) shows no unexplained difference; evidence/artifacts/actionlint-successor-parity-20260927/."
     },
     {
       "repository": "zizmorcore/zizmor",
       "version": "1.30.1",
-      "pin_record": ".github/requirements-ci.lock",
+      "pin_record": ".github/requirements-ci.txt",
       "source": "https://docs.zizmor.sh/usage/",
-      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows",
-      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence. Offline regular persona gates every PR in validate.yml; security-scan.yml's zizmor-online job adds the online audits on push/schedule/dispatch and uploads SARIF (category zizmor) without failing on findings.",
-      "online_command": "GH_TOKEN=<github.token> zizmor --no-config --no-ignores --no-exit-codes --persona regular --strict-collection --format sarif .github/workflows"
+      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .",
+      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence. Since 2026-09-25 the regular persona gates every PR in validate.yml with its online audits (read-only github.token; findings fail the required validate check) over the repository root, so .github/dependabot.yml is audited too; security-scan.yml's zizmor-online job still uploads SARIF (category zizmor) on push/schedule/dispatch without failing on findings.",
+      "online_command": "GH_TOKEN=<github.token> zizmor --no-config --no-ignores --persona regular --strict-collection ."
     },
     {
       "repository": "actions/setup-python",
@@ -262,7 +262,7 @@
       "workflow": ".github/workflows/security-scan.yml",
       "job": "osv-scanner",
       "schedule": "37 5 * * 3",
-      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names the deliberately vulnerable grype fixture); off PRs it also uploads SARIF (category osv-scanner).",
+      "purpose": "Runs on every PR and on push/schedule/dispatch, failing on any unignored vulnerability in the lockfiles listed in .github/osv-scanner-lockfiles.json (a reasoned excluded list names gap-wave-2 DVC-lock evidence fixtures; the deliberately vulnerable grype positive-control fixture is retained as requirements.txt.fixture, a name this scanner and Scorecard's embedded scan do not recognize, so it needs no exclusion here); off PRs it also uploads SARIF (category osv-scanner).",
       "required_check": false,
       "target_required_check": true,
       "required_check_context": "osv-scanner"

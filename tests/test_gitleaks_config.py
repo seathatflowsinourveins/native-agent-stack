@@ -5,7 +5,9 @@ underlying binary directly) in no-git `dir` mode against small synthetic fixture
 directories built under a temp dir, using the real repository `.gitleaks.toml`.
 Skips the whole test module if gitleaks is not on PATH, and skips individual
 cases if the guarded launcher reports its per-user scan lock is held by another
-scan (a busy lock is not a passing or failing result here).
+scan (a busy lock is not a passing or failing result here). A scan that does not
+complete raises _ScannerError, which unittest records as an error, never as a
+detection result (_scan_findings).
 
 `gitleaks dir` is invoked with the fixture directory as the *current working
 directory* and "." as the source argument, matching how validate.yml's
@@ -22,6 +24,8 @@ full-history scan counts, which are a separate, manually recorded evidence
 class).
 """
 
+import ast
+import io
 import json
 import os
 import re
@@ -30,9 +34,12 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / ".gitleaks.toml"
+# The dated SOTA manifests whose catalog pin ids the allowlist pins by value (one exact path each).
+REVIEWED_MANIFESTS = ("manifest-20260926.json", "manifest-20260929.json")
 
 # A 64-hex and a 40-hex synthetic digest-shaped value, plus a synthetic GitHub
 # personal-access-token-shaped value. None of these are real credentials.
@@ -65,31 +72,71 @@ class _LockBusy(Exception):
     pass
 
 
+class _ScannerError(Exception):
+    """A scan that did not complete. Deliberately not an AssertionError: unittest records an AssertionError
+    as a failure and any other exception as an error (CPython Lib/unittest/case.py, _addError), and the
+    betterleaks trial job's fixture step accepts failures only (.github/workflows/validate.yml,
+    secret-scan-betterleaks), so a scanner error fails that step instead of passing as a detection difference."""
+
+
+# The guarded launchers' busy-lock contract: exit status 75 with this message, and no scan started
+# (adoption/tools/gitleaks-guarded lines 23-32; adoption/tools/gitleaks-guarded-macos lines 29 and 125-130).
+# Any other status is an error, even one whose message contains "lock", such as the Go runtime's
+# "all goroutines are asleep - deadlock!".
+LOCK_BUSY_STATUS = 75
+LOCK_BUSY_MESSAGE = "another scan holds the per-user lock"
+
+
+def _findings(report_text: str) -> list:
+    """The findings in a JSON report. gitleaks 8.30.1 writes an empty report as `[]` (its detector
+    starts from make([]report.Finding, 0), detect/detect.go line 127); betterleaks 1.8.1 writes `null`
+    (cmd/git.go line 74 and cmd/directory.go line 72 start from a nil slice, which report/json.go
+    encodes as is). Both mean no findings, so the betterleaks trial job
+    (evidence/artifacts/betterleaks-parity-20260927/) fails only on detection differences."""
+    findings = json.loads(report_text)
+    return [] if findings is None else findings
+
+
+def _scan_findings(scan_args: list, report_path: Path, cwd=None) -> list:
+    """Run `gitleaks <scan_args>` with --exit-code 0 and a JSON report at report_path; return its findings.
+
+    With --exit-code 0 both pinned scanners exit 0 whether or not they find anything, and only after
+    writing the report. In gitleaks v8.30.1 and betterleaks v1.8.1 (cmd/root.go), findingSummaryAndExit
+    writes the report whenever --report-path is set (gitleaks lines 463-491, betterleaks 610-638), and a
+    report it cannot write is fatal (lines 489 and 636). It then exits 1 on a scan error (lines 493-495
+    and 640-642) and with --exit-code on findings (lines 497-499 and 644-646). A fatal log exits 1
+    (zerolog v1.33.0 log.go, Logger.Fatal, line 396), an unknown flag exits 126 (lines 226-228 and
+    325-327), and a Go runtime crash or a signal gives another status. Detector() creates and removes the
+    report path before the scan starts (lines 352-356 and 485-489), so a scan that dies leaves no report.
+    Any nonzero status, and a missing or empty report after status 0, therefore raise _ScannerError:
+    findings are read only from a completed scan. Raises _LockBusy for the guarded launcher's busy lock,
+    so the caller can skipTest instead.
+    """
+    argv = [GITLEAKS, *scan_args, "--no-banner", "--exit-code", "0",
+            "--report-format", "json", "--report-path", str(report_path)]
+    proc = subprocess.run(argv, cwd=None if cwd is None else str(cwd), capture_output=True, text=True, check=False)
+    if proc.returncode == LOCK_BUSY_STATUS and LOCK_BUSY_MESSAGE in proc.stderr:
+        raise _LockBusy(proc.stderr.strip())
+    stderr_tail = "\n".join(proc.stderr.strip().splitlines()[-20:])
+    if proc.returncode != 0:
+        raise _ScannerError(f"gitleaks {scan_args[0]} exited {proc.returncode} under --exit-code 0, so the scan "
+                            f"did not complete: {stderr_tail}")
+    report = report_path.read_text() if report_path.exists() else ""
+    if not report.strip():
+        raise _ScannerError(f"gitleaks {scan_args[0]} exited 0 without writing its report: {stderr_tail}")
+    return _findings(report)
+
+
 def _run_gitleaks(target_dir: Path) -> list:
     """Run `gitleaks dir .` (cwd = target_dir) with the real repo config.
 
     Returns the parsed JSON findings list. Raises _LockBusy if the guarded
     launcher reports its per-user scan lock is held by another scan, so the
-    caller can skipTest instead of failing.
+    caller can skipTest instead of failing, and _ScannerError if the scan
+    did not complete (_scan_findings).
     """
-    report_path = target_dir / "gitleaks-report.json"
-    proc = subprocess.run(
-        [
-            GITLEAKS, "dir", ".",
-            "--config", str(CONFIG_PATH),
-            "--no-banner", "--exit-code", "0",
-            "--report-format", "json", "--report-path", str(report_path),
-        ],
-        cwd=str(target_dir),
-        capture_output=True, text=True, check=False,
-    )
-    if "lock" in proc.stderr.lower():
-        raise _LockBusy(proc.stderr.strip())
-    if proc.returncode not in (0, 1):
-        raise AssertionError(f"gitleaks failed unexpectedly: {proc.returncode} {proc.stderr}")
-    if not report_path.exists():
-        return []
-    return json.loads(report_path.read_text())
+    return _scan_findings(["dir", ".", "--config", str(CONFIG_PATH)], target_dir / "gitleaks-report.json",
+                          cwd=target_dir)
 
 
 @unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
@@ -272,6 +319,75 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260924.json", [])), 2,
                              f"pin lines outside the exact reviewed path must still be detected: {by_file}")
 
+    def test_d5_retained_sweep_input_pin_lines_only(self):
+        """The retained code-navigation layer input: its "pin" lines are exempt, another 40-hex field in it
+        is still detected, and so are the same pin lines in a sibling input file."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            base = "evidence/artifacts/landscape-sweep-20260926/inputs/"
+            self._manifest_fixture(target, base + "code-navigation.json", {"token": HEX40})
+            self._manifest_fixture(target, base + "semantic-rag.json", {})
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "sourcegraph-access-token":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(len(by_file.get(base + "code-navigation.json", [])), 1,
+                             f"only the non-pin token line may be detected in the retained input: {by_file}")
+            self.assertEqual(len(by_file.get(base + "semantic-rag.json", [])), 2,
+                             f"pin lines in any other input file must still be detected: {by_file}")
+
+    @staticmethod
+    def _reviewed_manifest_ids() -> list:
+        """The git commit ids that the 2026-09-26 manifest allowlist pins by value, read from .gitleaks.toml. This
+        file names the rule, so a 40-hex literal written here would itself be a finding."""
+        text = CONFIG_PATH.read_text(encoding="utf-8")
+        block = text[text.index("manifest-20260926\\.json"):]
+        return re.findall(r"[0-9a-f]{40}", block[:block.index("[[")])
+
+    def _free_form_manifest(self, target: Path, relative: str, ids: list, extra_rows: list) -> None:
+        """The 2026-09-26 manifest's shape: free-form catalog pins holding a git commit id, in a file whose lane
+        text names the rule id sourcegraph-access-token (the keyword that makes every 40-hex value a candidate)."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        pins = [f"v0.44.0; source {ids[0]}", f"{ids[1]} (blueprints/us-equities/adaptive-paper)",
+                f"Apache Iceberg 1.11.0; PyIceberg 0.12.0; source {ids[2]}", ids[3]]
+        rows = [{"id": f"c{i}", "pin": pin} for i, pin in enumerate(pins)]
+        rows += [{"reasoning": "the repository's gitleaks config has generic-api-key and sourcegraph-access-token"},
+                 *extra_rows]
+        path.write_text(json.dumps({"trading": rows}, indent=1))
+
+    def test_d3_reviewed_manifest_pin_ids_are_not_detected(self):
+        """The reviewed git commit ids in the 2026-09-26 manifest's free-form "pin" values are exempt."""
+        ids = self._reviewed_manifest_ids()
+        self.assertGreaterEqual(len(ids), 4, "the allowlist must pin the reviewed ids by value")
+        for name in REVIEWED_MANIFESTS:
+            with self.subTest(manifest=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                self._free_form_manifest(target, f"catalogs/sota-convergence/{name}", ids, [])
+                findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
+                self.assertEqual(findings, [], "reviewed pin commit ids in the reviewed manifest must not be flagged")
+
+    def test_d4_unreviewed_values_and_other_paths_stay_detected(self):
+        """Only the reviewed ids in that exact file are exempt. An unreviewed 40-hex value (under another field, or
+        as free text in a pin), the uppercase form of a reviewed id, an sgp_-prefixed token, and the reviewed ids in
+        any other file are all still detected."""
+        ids = self._reviewed_manifest_ids()
+        extra = [{"token": HEX40}, {"pin": f"sourcegraph legacy access token {HEX40}"},
+                 {"pin": ids[0].upper()}, {"pin": f"sgp_{ids[0]}"}]
+        for name in REVIEWED_MANIFESTS:
+            with self.subTest(manifest=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                self._free_form_manifest(target, f"catalogs/sota-convergence/{name}", ids, extra)
+                self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260925.json", ids, [])
+                by_file = {}
+                for f in self._scan(target):
+                    if f["RuleID"] == "sourcegraph-access-token":
+                        by_file.setdefault(f["File"], []).append(f["StartLine"])
+                self.assertEqual(len(by_file.get(f"catalogs/sota-convergence/{name}", [])), len(extra),
+                                 f"every unreviewed value in the reviewed manifest must be detected: {by_file}")
+                self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260925.json", [])), 4,
+                                 f"reviewed ids outside the exact reviewed paths must be detected: {by_file}")
+
     # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
     # .gitleaks.toml entry pins by value.
     REVIEWED_FINGERPRINTS = ["ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db", "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0", "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1", "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9"]
@@ -310,6 +426,153 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
             self.assertEqual(len(by_file.get("observability/memory-scheduled-20260924.json", [])), 2,
                              f"fingerprint lines outside the exact reviewed path must still be detected: {by_file}")
 
+    RETURNED_REPORT_PATH = "observability/memory-scheduled-results-20260927.json"
+    RETURNED_REPORT_FINGERPRINTS = REVIEWED_FINGERPRINTS + [
+        "20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088",
+        "a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8",
+        "d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555",
+    ]
+
+    def test_e3_returned_report_reviewed_fingerprints_are_not_detected(self):
+        """The seven source-confirmed rejection digests are exempt in this exact report."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, self.RETURNED_REPORT_PATH, {},
+                                      values=self.RETURNED_REPORT_FINGERPRINTS)
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], "reviewed rejection digests must not be flagged")
+
+    def test_e4_returned_report_other_fields_values_and_paths_stay_detected(self):
+        """The new exception does not extend the old path or suppress credential fields."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._fingerprint_fixture(target, self.RETURNED_REPORT_PATH,
+                                      {"api_key": HEX64, "token": HEX64},
+                                      values=[self.RETURNED_REPORT_FINGERPRINTS[0], HEX64[::-1]])
+            self._fingerprint_fixture(target, "observability/memory-scheduled-results-20260928.json",
+                                      {}, values=self.RETURNED_REPORT_FINGERPRINTS)
+            self._fingerprint_fixture(target, "observability/memory-scheduled-20260923.json",
+                                      {}, values=self.RETURNED_REPORT_FINGERPRINTS[-3:])
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            own = [f for f in findings if f["File"] == self.RETURNED_REPORT_PATH]
+            self.assertEqual(len(own), 3, "unreviewed key, api_key and token must remain detected")
+            self.assertEqual({f["Secret"] for f in own}, {HEX64, HEX64[::-1]})
+            self.assertEqual(sum(f["File"].endswith("results-20260928.json") for f in findings), 7)
+            self.assertEqual(sum(f["File"].endswith("memory-scheduled-20260923.json") for f in findings), 3)
+
+    def test_e5_returned_report_second_secret_on_same_line_stays_detected(self):
+        """Whole-line matching must not hide an adjacent credential in compact JSON."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            path = target / self.RETURNED_REPORT_PATH
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps({"key": self.RETURNED_REPORT_FINGERPRINTS[0],
+                                        "api_key": HEX64}) + "\n")
+            findings = self._scan(target)
+            self.assertIn(HEX64, {f["Secret"] for f in findings})
+
+    SOURCE_HASHES_PATH = "blueprints/us-equities/adaptive-paper/source-hashes.json"
+
+    def _source_hashes_fixture(self, target: Path, relative: str, obj: dict, *, compact: bool = False) -> None:
+        """The shape of blueprints/us-equities/adaptive-paper/source-hashes.json: a flat
+        map of repo file paths (several containing the word "credential",
+        e.g. credential_guard.py) to their sha256."""
+        path = target / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text((json.dumps(obj) if compact else json.dumps(obj, indent=2)) + "\n")
+
+    def test_f_path_keyed_digest_in_the_reviewed_manifest_is_not_detected(self):
+        """A real-shaped `"blueprints/us-equities/adaptive-paper/<name>.py": "<64hex>"` entry
+        in the reviewed manifest -- including a path containing "credential" -- is exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+                "tests/test_adaptive_paper_credential_race.py": HEX64[::-1],
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(findings, [], f"path-keyed digests in the reviewed manifest must not be flagged: {findings}")
+
+    def test_f2_credential_shaped_key_in_the_same_file_is_detected(self):
+        """The dedicated allowlist requires the ENTIRE key to be a real adaptive-paper/tests
+        repo path: a credential-shaped key such as "credential.key" or "api_key" holding a
+        64-hex value, in the SAME reviewed file, is not a path and must still be detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+                "credential.key": HEX64[::-1],
+                "api_key": HEX64,
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64[::-1], secrets, f"a 'credential.key' value in the reviewed manifest must still be detected: {findings}")
+            self.assertIn(HEX64, secrets, f"an 'api_key' value in the reviewed manifest must still be detected: {findings}")
+
+    def test_f2b_dot_segment_path_key_holding_a_digest_is_detected(self):
+        """The dedicated allowlist refuses path segments starting with ".", so a key that only
+        looks like an adaptive-paper/tests path through "." or ".." (and names a credential)
+        is not exempted and its 64-hex value is still detected in the reviewed manifest."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "tests/../credential_store.py": HEX64,
+                "blueprints/us-equities/adaptive-paper/./api_key.py": HEX64[::-1],
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64, secrets, f"a '..' path key must not be exempted: {findings}")
+            self.assertIn(HEX64[::-1], secrets, f"a '.' path key must not be exempted: {findings}")
+
+    def test_f3_non_hex_value_under_a_path_shaped_key_is_detected(self):
+        """The allowlist's value alternative is exactly `[0-9a-f]{64}`: a same-length value that is
+        not lowercase hex (upper-case letters here) under an otherwise real path key does not match
+        the allowlist regex and must still be detected as a candidate secret."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64.upper(),
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertNotEqual(findings, [], "a non-lowercase-hex value under a path-shaped key must still be flagged")
+
+    def test_f4_second_secret_on_the_same_line_is_detected(self):
+        """Same whole-line-anchor requirement as test_c2/test_e2: a compact (single-line) JSON
+        object holding both a legitimate path-keyed digest AND an unrelated api_key means the
+        line no longer matches the allowlist's single-entry-per-line shape at all, so the
+        api_key finding on that line must still surface."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(
+                target, self.SOURCE_HASHES_PATH,
+                {"blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64, "api_key": HEX64[::-1]},
+                compact=True)
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            secrets = {f["Secret"] for f in findings}
+            self.assertIn(HEX64[::-1], secrets,
+                          f"an api_key sharing a line with an allowlisted path digest must still be detected: {findings}")
+
+    def test_f5_same_path_keyed_line_in_a_different_file_is_detected(self):
+        """The allowlist is scoped to the exact source-hashes.json path: the identical
+        path-keyed digest line in any other file must still be detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.SOURCE_HASHES_PATH, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+            })
+            other_path = "blueprints/us-equities/adaptive-paper/not-source-hashes.json"
+            self._source_hashes_fixture(target, other_path, {
+                "blueprints/us-equities/adaptive-paper/credential_guard.py": HEX64,
+            })
+            by_file = {}
+            for f in self._scan(target):
+                if f["RuleID"] == "generic-api-key":
+                    by_file.setdefault(f["File"], []).append(f["StartLine"])
+            self.assertEqual(by_file.get(self.SOURCE_HASHES_PATH, []), [],
+                             f"the reviewed manifest's own path-keyed line must stay exempt: {by_file}")
+            self.assertEqual(len(by_file.get(other_path, [])), 1,
+                             f"the identical path-keyed line in a different file must still be detected: {by_file}")
+
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.
 
@@ -320,34 +583,16 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
         exit 0"). Pass/fail must be read from the report/log output, never from the
         process exit code, whenever this flag is used. This pins that behavior
         against the installed binary so a similar mis-recorded result cannot recur
-        unnoticed.
+        unnoticed: the scan runs through _scan_findings, which raises _ScannerError
+        for any nonzero exit status, so a nonzero status here errors this test.
         """
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp)
             nonallow = target / "some" / "other" / "path"
             nonallow.mkdir(parents=True)
             (nonallow / "data.json").write_text(json.dumps({"api_key": HEX64}))
-            report_path = target / "gitleaks-report.json"
-            proc = subprocess.run(
-                [
-                    GITLEAKS, "dir", ".",
-                    "--config", str(CONFIG_PATH),
-                    "--no-banner", "--exit-code", "0",
-                    "--report-format", "json", "--report-path", str(report_path),
-                ],
-                cwd=str(target),
-                capture_output=True, text=True, check=False,
-            )
-            if "lock" in proc.stderr.lower():
-                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() else []
+            findings = self._scan(target)
             self.assertTrue(findings, "fixture must contain a detected leak for this test to be meaningful")
-            self.assertEqual(
-                proc.returncode, 0,
-                "`--exit-code 0` must yield process exit code 0 even though a leak was found "
-                f"(got {proc.returncode}); a nonzero code here means the earlier mis-recorded "
-                "exit-code finding could recur",
-            )
 
 
 class GitleaksIgnoreFingerprintTests(unittest.TestCase):
@@ -572,20 +817,11 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         # contain), so the test reflects the actual working-tree config even
         # when run before these files are committed. No --redact: the test
         # needs to find the injected marker in the report.
-        proc = subprocess.run(
-            [
-                GITLEAKS, "git", str(worktree),
-                "--config", str(CONFIG_PATH),
-                "--gitleaks-ignore-path", str(ROOT),
-                f"--log-opts=-1 {sha}",
-                "--no-banner", "--exit-code", "0",
-                "--report-format", "json", "--report-path", str(report_path),
-            ],
-            capture_output=True, text=True, check=False,
-        )
-        if "lock" in proc.stderr.lower():
-            self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-        findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+        try:
+            findings = _scan_findings(["git", str(worktree), "--config", str(CONFIG_PATH),
+                                       "--gitleaks-ignore-path", str(ROOT), f"--log-opts=-1 {sha}"], report_path)
+        except _LockBusy as exc:
+            self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
         matches = [
             f for f in findings
             if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
@@ -613,7 +849,9 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     This is a local integration check against the real git history in this
     worktree (not a synthetic fixture): it is slower (full-history scan, ~30s)
     than the synthetic-fixture tests above, and it is skipped, not failed, if
-    gitleaks is absent or its per-user scan lock is held by another scan.
+    gitleaks is absent or its per-user scan lock is held by another scan. A scan
+    that does not complete errors it (_scan_findings) instead of reading as zero
+    findings.
     """
 
     def setUp(self):
@@ -624,28 +862,138 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     def test_head_ancestry_scoped_scan_has_zero_findings(self):
         report_path = Path(tempfile.mkstemp(suffix=".json")[1])
         try:
-            proc = subprocess.run(
-                [
-                    GITLEAKS, "git", ".",
-                    "--config", str(CONFIG_PATH),
-                    "--max-target-megabytes", "2",
-                    "--no-banner", "--exit-code", "0",
-                    "--log-opts=HEAD",
-                    "--report-format", "json", "--report-path", str(report_path),
-                ],
-                cwd=str(ROOT),
-                capture_output=True, text=True, check=False,
-            )
-            if "lock" in proc.stderr.lower():
-                self.skipTest(f"gitleaks per-user lock held by another scan: {proc.stderr.strip()}")
-            findings = json.loads(report_path.read_text()) if report_path.exists() and report_path.stat().st_size else []
+            # This scan reads the real history, and CI logs on this public repository are world-readable, so
+            # it redacts like the secret-scan job (--redact: Finding.Redact masks Secret, Match and Line in
+            # gitleaks v8.30.1 report/finding.go lines 78-86; betterleaks v1.8.1 cmd/root.go line 589), and
+            # the failure message names only non-secret fields.
+            try:
+                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
+                                           "--log-opts=HEAD", "--redact"], report_path, cwd=ROOT)
+            except _LockBusy as exc:
+                self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
+            located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
             self.assertEqual(
-                findings, [],
+                located, [],
                 "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
-                f"result here is this unit's own regression, not a sibling branch: {findings}",
+                f"result here is this unit's own regression, not a sibling branch: {located}",
             )
         finally:
             report_path.unlink(missing_ok=True)
+
+
+class ScannerErrorTests(unittest.TestCase):
+    """A scan that does not complete must reach unittest as an error, never as a detection result.
+    Cross-family review of the betterleaks trial (2026-09-28, P2): _run_gitleaks turned an unexpected exit
+    status into an AssertionError, which the trial job's fixture step accepts as a detection difference, and
+    it read exit status 1 without a report as no findings. The scanner is replaced in memory, so these tests
+    need no gitleaks and run none."""
+
+    BUSY = "gitleaks: another scan holds the per-user lock; retry after it finishes\n"
+
+    @staticmethod
+    def _scanner(returncode, report=None, stderr=""):
+        """A stand-in for subprocess.run: writes `report` to the --report-path when it is not None, then
+        returns `returncode` and `stderr`."""
+        def run(argv, **kwargs):
+            if report is not None:
+                Path(argv[argv.index("--report-path") + 1]).write_text(report)
+            return subprocess.CompletedProcess(argv, returncode, "", stderr)
+        return run
+
+    def _scan_with(self, returncode, report=None, stderr=""):
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(subprocess, "run", side_effect=self._scanner(returncode, report, stderr)):
+            return _run_gitleaks(Path(tmp))
+
+    def test_a_nonzero_exit_status_is_a_scanner_error_with_or_without_a_report(self):
+        """--exit-code 0 makes findings exit 0, so any other status, a signal included, is a scan that did not
+        complete, even when a report was written first (a partial scan exits 1 after writing it)."""
+        self.assertFalse(issubclass(_ScannerError, AssertionError))
+        for returncode in (-11, -9, 139, 1, 2, 126, 78):
+            for report in (None, "null\n", "[]\n"):
+                with self.subTest(returncode=returncode, report=report), self.assertRaises(_ScannerError):
+                    self._scan_with(returncode, report)
+
+    def test_b_exit_0_needs_a_written_report(self):
+        for report in (None, "", "\n"):
+            with self.subTest(report=report), self.assertRaises(_ScannerError):
+                self._scan_with(0, report)
+        self.assertEqual(self._scan_with(0, "null\n"), [])
+        self.assertEqual(self._scan_with(0, "[]\n"), [])
+        self.assertEqual(self._scan_with(0, '[{"RuleID": "rule-a"}]\n'), [{"RuleID": "rule-a"}])
+
+    def test_c_only_the_guarded_launchers_busy_lock_skips(self):
+        with self.assertRaises(_LockBusy):
+            self._scan_with(75, stderr=self.BUSY)
+        for returncode, stderr in ((2, "fatal error: all goroutines are asleep - deadlock!\n"), (75, ""),
+                                   (1, "gitleaks: could not acquire the per-user lock; scan was not started\n")):
+            with self.subTest(returncode=returncode, stderr=stderr), self.assertRaises(_ScannerError):
+                self._scan_with(returncode, stderr=stderr)
+
+    def test_d_a_detection_test_errors_when_its_scan_does_not_complete(self):
+        """The review's probe as a test: a detection test shaped like test_a is a unittest error when its scan
+        exits -11, 139 or 1 or writes no report, and still a failure when a completed scan misses the value."""
+        class Detection(unittest.TestCase):
+            def test_detected(inner):
+                with tempfile.TemporaryDirectory() as tmp:
+                    inner.assertIn(HEX64, {f["Secret"] for f in _run_gitleaks(Path(tmp))})
+
+        for returncode, report, status_line in ((-11, None, "FAILED (errors=1)"), (139, None, "FAILED (errors=1)"),
+                                                (1, None, "FAILED (errors=1)"), (1, "null\n", "FAILED (errors=1)"),
+                                                (0, None, "FAILED (errors=1)"), (0, "null\n", "FAILED (failures=1)")):
+            with self.subTest(returncode=returncode, report=report):
+                stream = io.StringIO()
+                with mock.patch.object(subprocess, "run", side_effect=self._scanner(returncode, report)):
+                    unittest.TextTestRunner(stream=stream, verbosity=0).run(Detection("test_detected"))
+                self.assertEqual(stream.getvalue().strip().splitlines()[-1], status_line)
+
+    def test_e_every_scan_in_this_module_goes_through_scan_findings(self):
+        """Outside _scan_findings, every subprocess.run here runs git (an argument list that starts with
+        "git"), so no scan can bypass the classification above."""
+        def calls(node, function):
+            for child in ast.iter_child_nodes(node):
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    yield from calls(child, child.name)
+                    continue
+                if (isinstance(child, ast.Call) and isinstance(child.func, ast.Attribute) and child.func.attr == "run"
+                        and isinstance(child.func.value, ast.Name) and child.func.value.id == "subprocess"):
+                    first = child.args[0] if child.args else None
+                    runs_git = (isinstance(first, ast.List) and bool(first.elts)
+                                and isinstance(first.elts[0], ast.Constant) and first.elts[0].value == "git")
+                    if not runs_git:
+                        yield function, child.lineno
+                yield from calls(child, function)
+
+        module = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+        others = list(calls(module, "<module>"))
+        self.assertEqual([function for function, _ in others], ["_scan_findings"], others)
+
+    def test_f_the_history_scan_redacts_and_its_failure_names_no_secret(self):
+        """The branch-ancestry test scans the real history, and CI logs are public: it passes --redact, and a
+        failure lists rule, file, line and fingerprint only. The stand-in report here is deliberately
+        unredacted, so the message is checked on its own."""
+        sentinel = "SENTINEL-" + HEX40
+        finding = {"RuleID": "generic-api-key", "File": "a.json", "StartLine": 3, "Secret": sentinel,
+                   "Match": f"token: {sentinel}", "Line": f'"token": "{sentinel}"',
+                   "Fingerprint": "0123abcd:a.json:generic-api-key:3"}
+        argvs = []
+
+        def run(argv, **kwargs):
+            argvs.append(argv)
+            Path(argv[argv.index("--report-path") + 1]).write_text(json.dumps([finding]))
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        stream = io.StringIO()
+        with mock.patch.object(subprocess, "run", side_effect=run), \
+                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"):
+            unittest.TextTestRunner(stream=stream, verbosity=0).run(
+                GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
+        output = stream.getvalue()
+        self.assertEqual(len(argvs), 1, argvs)
+        self.assertIn("--redact", argvs[0])
+        self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
+        self.assertIn(finding["Fingerprint"], output)
+        self.assertNotIn(sentinel, output)
 
 
 class GithubAutomationDocConsistencyTests(unittest.TestCase):

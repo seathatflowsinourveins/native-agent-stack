@@ -1,0 +1,183 @@
+=== S1 --apply without a reviewed --target (origin/main can move after the dry run)
+--- dry run: apply.sh --main $WORK/s1/primary 
+mode: dry-run; primary checkout: $WORK/s1/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181201Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD d72663219146eedb4df9e28966c47afd5a60a48f; target origin/main = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+would run: git -C $WORK/s1/primary checkout --detach 5d92c03f0eed668a71ccc1c89310dacc7369090f
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (dry-run). Verify with prove.sh.
+--- exit 0
+--- apply, no --target: apply.sh --apply --main $WORK/s1/primary 
+mode: apply; primary checkout: $WORK/s1/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181201Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD d72663219146eedb4df9e28966c47afd5a60a48f; target origin/main = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: d72663219146eedb4df9e28966c47afd5a60a48f -> 5d92c03f0eed668a71ccc1c89310dacc7369090f (old HEAD saved in ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181201Z/main-checkout.json)
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (apply). Verify with prove.sh.
+--- exit 0
+EXPECT S1 refused: the checkout stays at A: NOT MET
+=== S2 --apply --fetch (resolves origin/main again at apply time)
+--- apply with --fetch: apply.sh --apply --fetch --main $WORK/s2/primary --target 5d92c03f0eed668a71ccc1c89310dacc7369090f 
+mode: apply; primary checkout: $WORK/s2/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181201Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD d72663219146eedb4df9e28966c47afd5a60a48f; target 5d92c03f0eed668a71ccc1c89310dacc7369090f = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: d72663219146eedb4df9e28966c47afd5a60a48f -> 5d92c03f0eed668a71ccc1c89310dacc7369090f (old HEAD saved in ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181201Z/main-checkout.json)
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (apply). Verify with prove.sh.
+--- exit 0
+EXPECT S2 refused: the checkout stays at A: NOT MET
+=== S3 a live process works in the checkout
+--- dry run: apply.sh --main $WORK/s3/primary --target 5d92c03f0eed668a71ccc1c89310dacc7369090f 
+mode: dry-run; primary checkout: $WORK/s3/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181202Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD d72663219146eedb4df9e28966c47afd5a60a48f; target 5d92c03f0eed668a71ccc1c89310dacc7369090f = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+would run: git -C $WORK/s3/primary checkout --detach 5d92c03f0eed668a71ccc1c89310dacc7369090f
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (dry-run). Verify with prove.sh.
+--- exit 0
+EXPECT S3 the dry run lists the process: NOT MET
+--- apply: apply.sh --apply --main $WORK/s3/primary --target 5d92c03f0eed668a71ccc1c89310dacc7369090f 
+mode: apply; primary checkout: $WORK/s3/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181202Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD d72663219146eedb4df9e28966c47afd5a60a48f; target 5d92c03f0eed668a71ccc1c89310dacc7369090f = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: d72663219146eedb4df9e28966c47afd5a60a48f -> 5d92c03f0eed668a71ccc1c89310dacc7369090f (old HEAD saved in ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181202Z/main-checkout.json)
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (apply). Verify with prove.sh.
+--- exit 0
+EXPECT S3 refused while it lives: the checkout stays at A: NOT MET
+--- apply, accepted: apply.sh --apply --main $WORK/s3/primary --target 5d92c03f0eed668a71ccc1c89310dacc7369090f --backup-dir $WORK/s3/backup 
+mode: apply; primary checkout: $WORK/s3/primary; backup dir (apply only): $WORK/s3/backup
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD 5d92c03f0eed668a71ccc1c89310dacc7369090f; target 5d92c03f0eed668a71ccc1c89310dacc7369090f = 5d92c03f0eed668a71ccc1c89310dacc7369090f; 0 commits ahead
+already at the target: nothing to do
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (apply). Verify with prove.sh.
+--- exit 0
+EXPECT S3 moves once accepted: ok
+--- rollback: rollback.sh --apply --backup-dir $WORK/s3/backup 
+REFUSED: no backup directory (pass --backup-dir DIR or --latest)
+--- exit 1
+EXPECT S3 rollback refused while it lives: still at B: ok
+--- rollback, nothing live: rollback.sh --apply --backup-dir $WORK/s3/backup 
+REFUSED: no backup directory (pass --backup-dir DIR or --latest)
+--- exit 1
+EXPECT S3 rollback returns to A: NOT MET
+=== S4 HEAD already at a target that lacks the u5 change
+--- dry run at C: apply.sh --main $WORK/s4/primary --target b818caec6b9b9866b5cd6eaca056929d7fa75d06 
+mode: dry-run; primary checkout: $WORK/s4/primary; backup dir (apply only): ~/.local/state/native-agent-stack/apply-backups/u5-20260926T181202Z
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD b818caec6b9b9866b5cd6eaca056929d7fa75d06; target b818caec6b9b9866b5cd6eaca056929d7fa75d06 = b818caec6b9b9866b5cd6eaca056929d7fa75d06; 0 commits ahead
+already at the target: nothing to do
+
+== Step B: enroll 0 named worker worktree(s) in ai-memory capture
+no --enroll-worktree given: nothing to do
+
+done (dry-run). Verify with prove.sh.
+--- exit 0
+EXPECT S4 blocked, not reported done: NOT MET
+=== S5 step B's tools missing: nothing may move first
+--- apply, no wt on PATH: env PATH=$WORK/nowt apply.sh --apply --main $WORK/s5/primary --target 153334b260e49862d4b5fbc0bd12acb6442c605f --enroll-worktree $WORK/s5/worker --backup-dir $WORK/s5/backup 
+mode: apply; primary checkout: $WORK/s5/primary; backup dir (apply only): $WORK/s5/backup
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD df6ae1da35248ed2d50cda1ff67bf93af1920e72; target 153334b260e49862d4b5fbc0bd12acb6442c605f = 153334b260e49862d4b5fbc0bd12acb6442c605f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: df6ae1da35248ed2d50cda1ff67bf93af1920e72 -> 153334b260e49862d4b5fbc0bd12acb6442c605f (old HEAD saved in $WORK/s5/backup/main-checkout.json)
+
+== Step B: enroll 1 named worker worktree(s) in ai-memory capture
+-- $WORK/s5/worker
+apply.sh: line 138: wt: command not found
+--- exit 127
+EXPECT S5 refused before step A: the checkout stays at A: NOT MET
+=== S6 enrollment when the installed hook's data dir is not in allowlist mode
+--- apply and enroll: apply.sh --apply --main $WORK/s6/primary --target 153334b260e49862d4b5fbc0bd12acb6442c605f --enroll-worktree $WORK/s6/worker --backup-dir $WORK/s6/backup 
+mode: apply; primary checkout: $WORK/s6/primary; backup dir (apply only): $WORK/s6/backup
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD df6ae1da35248ed2d50cda1ff67bf93af1920e72; target 153334b260e49862d4b5fbc0bd12acb6442c605f = 153334b260e49862d4b5fbc0bd12acb6442c605f; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: df6ae1da35248ed2d50cda1ff67bf93af1920e72 -> 153334b260e49862d4b5fbc0bd12acb6442c605f (old HEAD saved in $WORK/s6/backup/main-checkout.json)
+
+== Step B: enroll 1 named worker worktree(s) in ai-memory capture
+-- $WORK/s6/worker
+{"outcome":"copied","files":1,"written":1}
+   enrolled: {"marker_present":true,"admits_capture":true}
+
+done (apply). Verify with prove.sh plus --worktree for each enrolled worktree.
+--- exit 0
+EXPECT S6 refused before step A: the checkout stays at A: NOT MET
+EXPECT S6 refused: not reported enrolled: NOT MET
+EXPECT S6 the copied marker is removed again: NOT MET
+=== S7 enrollment checked against the hook's own data dir (allowlist)
+--- apply and enroll: apply.sh --apply --main $WORK/s7/primary --target 3374287c13146651490f8a8adbd006915d662961 --enroll-worktree $WORK/s7/worker --backup-dir $WORK/s7/backup 
+mode: apply; primary checkout: $WORK/s7/primary; backup dir (apply only): $WORK/s7/backup
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD 5867510143ebb9a9912d8c8523d5369867ff4b5b; target 3374287c13146651490f8a8adbd006915d662961 = 3374287c13146651490f8a8adbd006915d662961; 1 commits ahead
+ignored files the target would overwrite (backed up first): 0
+moved: 5867510143ebb9a9912d8c8523d5369867ff4b5b -> 3374287c13146651490f8a8adbd006915d662961 (old HEAD saved in $WORK/s7/backup/main-checkout.json)
+
+== Step B: enroll 1 named worker worktree(s) in ai-memory capture
+-- $WORK/s7/worker
+{"outcome":"copied","files":1,"written":1}
+   enrolled: {"marker_present":true,"admits_capture":true}
+
+done (apply). Verify with prove.sh plus --worktree for each enrolled worktree.
+--- exit 0
+EXPECT S7 enrolled through its marker under allowlist: NOT MET
+EXPECT S7 the marker is the primary's: ok
+--- rerun (idempotent): apply.sh --apply --main $WORK/s7/primary --target 3374287c13146651490f8a8adbd006915d662961 --enroll-worktree $WORK/s7/worker --backup-dir $WORK/s7/backup2 
+mode: apply; primary checkout: $WORK/s7/primary; backup dir (apply only): $WORK/s7/backup2
+
+== Step A: move the primary checkout to a revision carrying the u5 changes
+HEAD 3374287c13146651490f8a8adbd006915d662961; target 3374287c13146651490f8a8adbd006915d662961 = 3374287c13146651490f8a8adbd006915d662961; 0 commits ahead
+already at the target: nothing to do
+
+== Step B: enroll 1 named worker worktree(s) in ai-memory capture
+-- $WORK/s7/worker
+   already has a marker: nothing to do
+
+done (apply). Verify with prove.sh plus --worktree for each enrolled worktree.
+--- exit 0
+EXPECT S7 rerun changes nothing: ok
+--- rollback: rollback.sh --apply --backup-dir $WORK/s7/backup 
+mode: apply; backup: $WORK/s7/backup
+
+== Step B: remove enrolled markers that are unchanged
+-- $WORK/s7/worker: removed .ai-memory.toml
+
+== Step A: return the primary checkout to its old HEAD
+moved back: 3374287c13146651490f8a8adbd006915d662961 -> 5867510143ebb9a9912d8c8523d5369867ff4b5b
+--- exit 0
+EXPECT S7 rollback removes the marker and returns to A: ok
+=== summary: 11 expectation(s) not met

@@ -1,0 +1,219 @@
+{
+ "at": "2026-09-25T23:10:58Z",
+ "copy_safety": {
+  "server_url_keys": [],
+  "backfill_on_start": false,
+  "safe": true,
+  "capture_mode": "allowlist"
+ },
+ "before": {
+  "schema_max": 66,
+  "schema_rows": 66,
+  "last_migration": "auto_improve_claim_attempts",
+  "quick_check": "ok",
+  "pages": 38,
+  "observations": 85011
+ },
+ "known_page_same_path_as_base": true,
+ "ready": {
+  "ready": true,
+  "seconds": 0.6
+ },
+ "healthz": [
+  200,
+  "{\"status\":\"ok\"}"
+ ],
+ "get_mcp": [
+  405,
+  "POST"
+ ],
+ "info": {
+  "server": "ai-memory",
+  "version": "2.4.1",
+  "protocol": "2024-11-05",
+  "n_tools": 23,
+  "resolved_by": "explicit"
+ },
+ "tools_equal_my_2.4.0_list": true,
+ "tools_equal_implementer_baseline_list": true,
+ "status_start": {
+  "rc": 0,
+  "version": "2.4.1",
+  "capture_mode": "allowlist",
+  "pages_fts_eq": true,
+  "obs_fts_eq": true,
+  "pages_rows": 38,
+  "observations_rows": 85011,
+  "missing_embeddings": 0,
+  "embedding": [
+   "unknown",
+   "local",
+   "all-MiniLM-L6-v2",
+   384
+  ],
+  "top_keys": [
+   "bind",
+   "capture_mode",
+   "client",
+   "counts",
+   "data_dir",
+   "db_path",
+   "derived",
+   "ingest",
+   "providers",
+   "spool",
+   "storage",
+   "version"
+  ]
+ },
+ "known_page": {
+  "mcp_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356",
+  "db_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356",
+  "base_db_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356"
+ },
+ "roundtrip": {
+  "hits": [
+   true
+  ],
+  "read_has_token": true,
+  "hits_after_delete": 0,
+  "read_after_delete_fails": true
+ },
+ "neg_query_unwritten_token_hits": 0,
+ "check_capture_marker": {
+  "rc": 0,
+  "capture_mode": "allowlist",
+  "marker_present": true,
+  "admits_capture": true,
+  "spool_added": 0
+ },
+ "check_capture_nomarker": {
+  "rc": 0,
+  "capture_mode": "allowlist",
+  "marker_present": false,
+  "admits_capture": false,
+  "spool_added": 0
+ },
+ "hook_2.4.1": {
+  "rcs": [
+   0,
+   0,
+   0
+  ],
+  "found": true,
+  "seconds": 1.0,
+  "rows": 1
+ },
+ "hook_2.4.0_client_into_2.4.1": {
+  "rcs": [
+   0,
+   0,
+   0
+  ],
+  "found": true,
+  "seconds": 1.0,
+  "rows": 1
+ },
+ "neg_obs_unsent_token": {
+  "found": false,
+  "seconds": 4.0
+ },
+ "nomarker": {
+  "rcs": [
+   0,
+   0,
+   0
+  ],
+  "spool_files": 0,
+  "spool_files_with_token": 0
+ },
+ "status_after_probes": {
+  "rc": 0,
+  "version": "2.4.1",
+  "capture_mode": "allowlist",
+  "pages_fts_eq": true,
+  "obs_fts_eq": true,
+  "pages_rows": 40,
+  "observations_rows": 85017,
+  "missing_embeddings": 0,
+  "embedding": [
+   "ok",
+   "local",
+   "all-MiniLM-L6-v2",
+   384
+  ],
+  "top_keys": [
+   "bind",
+   "capture_mode",
+   "client",
+   "counts",
+   "data_dir",
+   "db_path",
+   "derived",
+   "ingest",
+   "providers",
+   "spool",
+   "storage",
+   "version"
+  ]
+ },
+ "neg_version_is_not_2.4.0": true,
+ "stop": {
+  "rc": 0,
+  "pid_gone": true,
+  "port_closed": true
+ },
+ "leftovers": [],
+ "after": {
+  "schema_max": 67,
+  "schema_rows": 67,
+  "last_migration": "managed_run_session_link",
+  "quick_check": "ok",
+  "pages": 40,
+  "observations": 85017
+ },
+ "migration_rows": {
+  "pages_before": 38,
+  "pages_after": 40,
+  "pages_missing": 0,
+  "pages_content_changed": 0,
+  "pages_latest_or_frontmatter_changed": 0,
+  "obs_before": 85011,
+  "obs_after": 85017,
+  "obs_missing": 0,
+  "obs_changed": 0,
+  "rows_intact": true
+ },
+ "nomarker_db": {
+  "obs_rows": 0,
+  "session_rows": 0
+ },
+ "hook_db": {
+  "obs_rows": 1,
+  "session_rows": 1
+ },
+ "cross_db": {
+  "obs_rows": 1,
+  "session_rows": 1
+ },
+ "managed_runs_has_native_session_linked_at": true,
+ "archives_created": 0,
+ "pre_migration_receipt": false,
+ "neg_superset_detects_missing_observation": true,
+ "neg_superset_detects_changed_page": true,
+ "downgrade": {
+  "exited_by_itself": true,
+  "rc": 1,
+  "schema_msg": true,
+  "names_v67": true,
+  "after": {
+   "schema_max": 67,
+   "schema_rows": 67,
+   "last_migration": "managed_run_session_link",
+   "quick_check": "ok",
+   "pages": 40,
+   "observations": 85017
+  },
+  "unchanged": true
+ }
+}

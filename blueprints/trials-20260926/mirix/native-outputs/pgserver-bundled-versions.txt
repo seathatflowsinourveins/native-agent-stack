@@ -1,0 +1,15 @@
+# pgserver-bundled PostgreSQL and pgvector used by the MIRIX trial (2026-09-26T06:37:31Z)
+# The MIRIX v0.1.6 venv's pgserver package; the trial's PostgreSQL cluster ran from these binaries.
+$ ls <venv site-packages> | grep -E '^(pgserver|pgvector)-'
+pgserver-0.1.4.dist-info
+pgvector-0.5.0.dist-info
+$ <venv site-packages>/pgserver/pginstall/bin/postgres --version
+postgres (PostgreSQL) 16.2
+$ <venv site-packages>/pgserver/pginstall/bin/pg_config --version
+PostgreSQL 16.2
+$ grep default_version <venv site-packages>/pgserver/pginstall/share/postgresql/extension/vector.control
+default_version = '0.6.2'
+$ cat <scratch>/trial-mirix/pgdata/PG_VERSION
+16
+# Note: pgvector-0.5.0 above is the Python client binding (the 'pgvector' PyPI package);
+# the server-side extension version is the vector.control default_version.

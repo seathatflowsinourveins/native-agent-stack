@@ -1,0 +1,59 @@
+{
+ "lane": "GPT-6 packaged runner (codex_call.sh start/result)",
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T03:09:15Z",
+  "finished": "2026-09-28T03:12:43Z",
+  "usage": {
+   "input_tokens": 361404,
+   "cached_input_tokens": 282624,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 6398,
+   "reasoning_output_tokens": 4652
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X9",
+    "choice": "B",
+    "reasons": "B provides the stronger verification rule. Cached MCP tools can appear before connection, making A’s presence check insufficient evidence of live activity; B explicitly distinguishes availability from execution. B also covers plugin agents, which A omits. These distinctions are supported by the verified official documentation. /plugin is a real interactive command; C4’s headless listing does not contradict that. B’s Skill restriction respects the installed-client refusals. A has the clearer unattended fallback, while B’s request for output may be unanswerable headlessly. That limitation lowers confidence but does not outweigh B’s verification safeguards. K1–K3 tied on correctness, and K4’s failed premise and notification capture leave unresolved fallback behavior untested; timing and cost do not establish superiority.",
+    "sources": [
+     {
+      "locator": "https://code.claude.com/docs/en/mcp#server-status-detail",
+      "quote": "Claude Code loaded the server’s tool list from its discovery cache, saved in a previous session, instead of connecting at startup"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/plugins",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/plugins/troubleshooting",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "C1",
+      "quote": "context is a built-in CLI command, not a skill. Ask the user to run /context themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "AGENTS.md:14",
+      "quote": "metadata, pinned source review and native execution are different evidence levels."
+     }
+    ],
+    "confidence": 0.86
+   }
+  ]
+ }
+}

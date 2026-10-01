@@ -1,3 +1,4 @@
+import errno
 import importlib.util
 import json
 import os
@@ -9,6 +10,7 @@ import signal
 import time
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 MODULE = Path(__file__).resolve().parents[1] / 'blueprints/us-equities/research-runtime/run_worker.py'
@@ -180,6 +182,37 @@ class ResearchWorkflowTests(unittest.TestCase):
                 if supervisor.poll() is None:
                     supervisor.kill()
                     supervisor.wait()
+
+    @unittest.skipUnless(hasattr(os, 'waitid'), 'needs os.waitid')
+    def test_retire_group_treats_a_refusal_after_the_leader_exited_as_gone(self):
+        # macOS answers killpg with EPERM once every member has exited but is not reaped yet.
+        m = self.implementation()
+        for script, calls in ((('refuse',), 1), (('deliver', 'refuse', 'refuse'), 3)):
+            outcomes = iter(script)
+
+            def killpg(pgid, signum):
+                if next(outcomes) == 'refuse':
+                    try:
+                        os.waitid(os.P_PID, pgid, os.WEXITED | os.WNOWAIT)  # exited but not reaped
+                    except ChildProcessError:
+                        pass  # already reaped by retire_group's poll()
+                    raise PermissionError(errno.EPERM, 'Operation not permitted')
+
+            process = subprocess.Popen([sys.executable, '-c', 'pass'], start_new_session=True)
+            with patch.object(m.os, 'killpg', side_effect=killpg) as mocked:
+                m.retire_group(process, grace=1)
+            self.assertEqual((mocked.call_count, process.returncode), (calls, 0))
+
+    def test_retire_group_raises_a_refusal_while_the_leader_runs(self):
+        m = self.implementation()
+        process = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'], start_new_session=True)
+        try:
+            with patch.object(m.os, 'killpg', side_effect=PermissionError(errno.EPERM, 'Operation not permitted')):
+                with self.assertRaises(PermissionError):
+                    m.retire_group(process, grace=1)
+        finally:
+            process.kill()
+            process.wait()
 
     def assert_retired(self, pid):
         for _ in range(30):

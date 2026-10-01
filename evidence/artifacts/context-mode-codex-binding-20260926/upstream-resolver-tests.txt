@@ -1,0 +1,134 @@
+
+> context-mode@1.0.169 pretest
+> npm run build
+
+
+> context-mode@1.0.169 build
+> tsc && node -e "if(process.platform!=='win32'){require('fs').chmodSync('build/cli.js',0o755)}" && npm run bundle && npm run assert-bundle && npm run assert-asymmetric-drift
+
+
+> context-mode@1.0.169 bundle
+> esbuild src/server.ts --bundle --platform=node --target=node18 --format=esm --outfile=server.bundle.mjs --external:better-sqlite3 --external:turndown --external:turndown-plugin-gfm --external:@mixmark-io/domino --minify && esbuild src/cli.ts --bundle --platform=node --target=node18 --format=esm --outfile=cli.bundle.mjs --external:better-sqlite3 --minify && esbuild src/session/extract.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-extract.bundle.mjs --minify && esbuild src/session/snapshot.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-snapshot.bundle.mjs --minify && esbuild src/session/db.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-db.bundle.mjs --external:better-sqlite3 --minify && esbuild src/security.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/security.bundle.mjs --minify
+
+
+  server.bundle.mjs  665.2kb
+
+⚡ Done in 54ms
+
+  cli.bundle.mjs  731.7kb
+
+⚡ Done in 57ms
+
+  hooks/session-extract.bundle.mjs  45.0kb
+
+⚡ Done in 11ms
+
+  hooks/session-snapshot.bundle.mjs  6.0kb
+
+⚡ Done in 7ms
+
+  hooks/session-db.bundle.mjs  25.5kb
+
+⚡ Done in 8ms
+
+  hooks/security.bundle.mjs  13.5kb
+
+⚡ Done in 15ms
+
+> context-mode@1.0.169 assert-bundle
+> node scripts/assert-bundle.mjs server.bundle.mjs cli.bundle.mjs hooks/session-extract.bundle.mjs hooks/session-snapshot.bundle.mjs hooks/session-db.bundle.mjs hooks/security.bundle.mjs
+
+assert-bundle: OK  server.bundle.mjs
+assert-bundle: OK  cli.bundle.mjs
+assert-bundle: OK  hooks/session-extract.bundle.mjs
+assert-bundle: OK  hooks/session-snapshot.bundle.mjs
+assert-bundle: OK  hooks/session-db.bundle.mjs
+assert-bundle: OK  hooks/security.bundle.mjs
+
+> context-mode@1.0.169 assert-asymmetric-drift
+> node scripts/assert-asymmetric-drift.mjs
+
+asymmetric-drift: OK (.mcp.json.example + .claude-plugin/plugin.json both pin args[0] to ${CLAUDE_PLUGIN_ROOT}/start.mjs; plugin skills path is ./skills/; runtime files present)
+
+> context-mode@1.0.169 test
+> vitest run tests/util/codex-session-cwd-resolution.test.ts tests/util/project-dir.test.ts tests/integration/project-dir-strict.test.ts --reporter=verbose
+
+
+ RUN  v4.1.11 <work>/clone
+
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns meta.cwd from the most-recently-modified session.jsonl 6ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns payload.cwd from Codex Desktop's dated rollout session layout 4ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > handles Codex Desktop session_meta lines larger than the old 8KB head read 5ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > prefers the most-recently-modified Codex Desktop session recursively 4ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > ignores session.jsonl older than transcriptMaxAgeMs 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns meta.cwd when newest session is within transcriptMaxAgeMs 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > rejects when meta.cwd points to plugin install path (isPluginInstallPath) 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > rejects when meta.cwd points to Codex plugin install path (isPluginInstallPath) 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > rejects when Codex Desktop payload.cwd points to Codex plugin install path 6ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns null when sessions dir does not exist 1ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns null when codexHome itself does not exist 0ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns null when sessions dir is empty 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > handles malformed session.jsonl gracefully (no throw) 3ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns null when meta.cwd is missing from the SessionMeta line 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveCodexSessionCwd > returns null when meta.cwd is non-string 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > honors CONTEXT_MODE_PROJECT_DIR env (universal escape hatch) 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > falls back to Codex session log when no workspace env is set 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > falls back to Codex Desktop session log before poisoned plugin cwd 7ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > falls through to PWD when no env and no session log 1ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > ignores foreign workspace env (CLAUDE_PROJECT_DIR) under strict codex 2ms
+ ✓ tests/util/codex-session-cwd-resolution.test.ts > resolveProjectDir({strictPlatform: 'codex'}) > rejects stale codex session log via transcriptMaxAgeMs 1ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > matches macOS / Linux plugin cache paths 2ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > matches plugin marketplace paths 0ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > matches Windows plugin cache paths (backslash + drive letter) 0ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > returns false for ordinary project paths 0ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > returns false for unrelated .claude subpaths (e.g. session storage) 0ms
+ ✓ tests/util/project-dir.test.ts > isPluginInstallPath > returns false for empty / null-ish inputs 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > returns the first non-plugin env var in priority order 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > rejects plugin path env vars and falls through to the next source 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > rejects Codex plugin path env vars and falls through to the next source 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > uses cwd as last resort when env + PWD are missing or all poisoned 1ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > falls back to cwd EVEN IF cwd is plugin path when nothing else exists (no panics) 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > respects adapter-specific env vars (GEMINI/VSCODE/OPENCODE/PI/IDEA) in the chain 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > respects CURSOR_CWD when set (Cursor MCP env override or user workaround) 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir > rejects CURSOR_CWD when it points at a plugin install path 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir — strictPlatform algorithmic mode (issue #545) > strictPlatform=pi prefers PI_PROJECT_DIR over leaked CLAUDE_PROJECT_DIR 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir — strictPlatform algorithmic mode (issue #545) > strictPlatform=pi prefers PI_WORKSPACE_DIR over PI_PROJECT_DIR (registry order) 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir — strictPlatform algorithmic mode (issue #545) > strictPlatform=qwen-code prefers QWEN_PROJECT_DIR over leaked GEMINI_PROJECT_DIR 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir — strictPlatform algorithmic mode (issue #545) > strictPlatform=zed (no workspace var) falls through CONTEXT_MODE_PROJECT_DIR > pwd > cwd 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDir — strictPlatform algorithmic mode (issue #545) > non-strict mode preserves the EXACT legacy candidate order (semver lock) 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > returns cwd from the most-recently-modified Claude Code transcript 4ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > returns undefined when projects dir does not exist 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > returns undefined when the newest transcript is older than maxAgeMs 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > returns cwd when the newest transcript is within maxAgeMs 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > returns undefined when no jsonl files exist 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > skips transcripts without a cwd field in any of their first lines 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > resolveProjectDir prefers transcript cwd over PWD when env is empty and cwd is plugin path 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > resolveProjectDir falls back to PWD when transcript yields nothing 0ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > resolveProjectDir falls back to PWD when transcript is stale 2ms
+ ✓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > compiled ESM resolver runs under Node without CommonJS require 35ms
+ ↓ tests/util/project-dir.test.ts > resolveProjectDirFromTranscript > compiled ESM resolver runs under Bun without CommonJS require
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=claude-code: strict mode prefers own workspace var over foreign leaks 2ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=gemini-cli: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=cursor: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=vscode-copilot: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=jetbrains-copilot: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=opencode: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=qwen-code: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=pi: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=omp: strict mode prefers own workspace var over foreign leaks 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=codex (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=kilo (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=kiro (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=zed (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=antigravity (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=antigravity-cli (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=copilot-cli (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > platform=openclaw (no workspace var): strict mode falls back to CONTEXT_MODE_PROJECT_DIR 0ms
+ ✓ tests/integration/project-dir-strict.test.ts > server getProjectDir wiring — strictPlatform for all adapters (issue #545) > every platform: with no own var set and no escape hatch, falls through to PWD 2ms
+ ✓ tests/integration/project-dir-strict.test.ts > getProjectDir() under Codex platform detection (issue #45) > recovers cwd from Codex session log when env is empty and Codex is the detected platform 3ms
+
+ Test Files  3 passed (3)
+      Tests  69 passed | 1 skipped (70)
+   Start at  22:30:22
+   Duration  861ms (transform 551ms, setup 0ms, import 891ms, tests 129ms, environment 0ms)
+

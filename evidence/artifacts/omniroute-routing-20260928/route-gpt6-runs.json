@@ -1,0 +1,150 @@
+{
+ "kind": "gpt6_job_runs",
+ "runner": "tools/sota-convergence/landscape-sweep/codex_call.sh (start, wait, result) in this repository",
+ "usage_rule": "Codex reports input_tokens with cached and cache-write input inside it, and output_tokens with reasoning inside it. record_usage splits input into disjoint categories: uncached_input = input - cached - cache_write; total = input + output. native_retries is null: HTTP-layer retries are not visible in the exec event stream.",
+ "jobs": [
+  {
+   "job": "route-job1",
+   "purpose": "Independent answer to the frozen routing question; the prompt carries no catalog.",
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "runner_status": "done",
+   "exit": 0,
+   "exit_file": "0",
+   "started_utc": "2026-09-28T00:14:24Z",
+   "finished_utc": "2026-09-28T00:27:52Z",
+   "usage_limit_hit": false,
+   "usage_limit_marker": false,
+   "outer_attempts": [],
+   "usage_status": "reported",
+   "codex_usage": {
+    "input_tokens": 2530158,
+    "cached_input_tokens": 2356864,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 23409,
+    "reasoning_output_tokens": 11724
+   },
+   "turn_completed_events": 1,
+   "turn_completed_usage_equals_runner_usage": true,
+   "record_usage": {
+    "uncached_input": 173294,
+    "cache_creation": 0,
+    "cache_read": 2356864,
+    "output": 23409,
+    "reasoning_in_output": 11724,
+    "total": 2553567,
+    "native_retries": null
+   },
+   "event_counts": {
+    "item.completed": 44,
+    "item.started": 38,
+    "thread.started": 1,
+    "turn.completed": 1,
+    "turn.started": 1
+   },
+   "completed_item_counts": {
+    "agent_message": 6,
+    "command_execution": 1,
+    "web_search": 37
+   },
+   "inputs": {
+    "prompt_receipt": "route-job1.prompt.txt",
+    "prompt_sha256_recorded_by_runner": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+    "prompt_sha256_of_private_source": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+    "prompt_sha256_of_receipt": "49863b44e57832ea7c2ad38fbf0d69259d4b5dd4e79a97d7ec1e9911fc9e3140",
+    "schema_receipt": "route-job1.schema.json",
+    "schema_sha256_recorded_by_runner": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a",
+    "schema_sha256_of_private_source": "df09899cfdc435635c30f74f39117190ff088488b16406b0d8ddb1c811a65f8a"
+   },
+   "output": {
+    "receipt": "route-job1.last.json",
+    "sha256": "e81ce40f4a63e4614d0be87a7484ad4a3ffbb1b2fc21129a643de7a860c9e194",
+    "equals_runner_output_text": true,
+    "schema_errors": 0,
+    "schema_validator": "jsonschema 4.26.0 Draft202012Validator"
+   },
+   "stderr_tail": "Reading additional input from stdin..."
+  },
+  {
+   "job": "route-job2",
+   "purpose": "Adversarial refutation of route-landscape's catalog (the withdrawn addendum entry removed).",
+   "model": "gpt-6-astra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.157.1",
+   "runner_status": "done",
+   "exit": 0,
+   "exit_file": "0",
+   "started_utc": "2026-09-28T00:30:32Z",
+   "finished_utc": "2026-09-28T00:49:08Z",
+   "usage_limit_hit": false,
+   "usage_limit_marker": false,
+   "outer_attempts": [],
+   "usage_status": "reported",
+   "codex_usage": {
+    "input_tokens": 3108187,
+    "cached_input_tokens": 2875776,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 34696,
+    "reasoning_output_tokens": 16448
+   },
+   "turn_completed_events": 1,
+   "turn_completed_usage_equals_runner_usage": true,
+   "record_usage": {
+    "uncached_input": 232411,
+    "cache_creation": 0,
+    "cache_read": 2875776,
+    "output": 34696,
+    "reasoning_in_output": 16448,
+    "total": 3142883,
+    "native_retries": null
+   },
+   "event_counts": {
+    "item.completed": 58,
+    "item.started": 52,
+    "thread.started": 1,
+    "turn.completed": 1,
+    "turn.started": 1
+   },
+   "completed_item_counts": {
+    "agent_message": 6,
+    "command_execution": 1,
+    "web_search": 51
+   },
+   "inputs": {
+    "prompt_receipt": "route-job2.prompt.txt",
+    "prompt_sha256_recorded_by_runner": "3911644529f4aaea8e5a8461cf742c82e2b0bc1dfa0685430c9c64291c707124",
+    "prompt_sha256_of_private_source": "3911644529f4aaea8e5a8461cf742c82e2b0bc1dfa0685430c9c64291c707124",
+    "prompt_sha256_of_receipt": "015bf2a389c9fd0823e19081486a2055d26e0e014c3d49404a7dda957edf5a1c",
+    "schema_receipt": "route-job2.schema.json",
+    "schema_sha256_recorded_by_runner": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507",
+    "schema_sha256_of_private_source": "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507"
+   },
+   "output": {
+    "receipt": "route-job2.last.json",
+    "sha256": "27a46c9ba7b160f3bad8ce3f52da030f5709117bbbd5b2cf3fe9ab52c3981246",
+    "equals_runner_output_text": true,
+    "schema_errors": 0,
+    "schema_validator": "jsonschema 4.26.0 Draft202012Validator"
+   },
+   "stderr_tail": "Reading additional input from stdin..."
+  }
+ ],
+ "command_log": [
+  "2026-09-28T00:14:24Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 start route-job1 $SCRATCH/omni-full/route-gpt6/job1.prompt.txt $SCRATCH/omni-full/route-gpt6/job1.schema.json",
+  "2026-09-28T00:14:24Z rc=0",
+  "2026-09-28T00:14:33Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 wait route-job1 540",
+  "2026-09-28T00:23:37Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 wait route-job1 540",
+  "2026-09-28T00:28:13Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 result route-job1 > $SCRATCH/omni-full/route-gpt6/route-job1.result.json (renamed from job1.result.json)",
+  "2026-09-28T00:30:21Z python3 $SCRATCH/omni-full/route-gpt6/build_job2.py $SCRATCH/omni-full/route-gpt6 $SCRATCH/omni-full/route-landscape-catalog.json",
+  "3911644529f4aaea8e5a8461cf742c82e2b0bc1dfa0685430c9c64291c707124  $SCRATCH/omni-full/route-gpt6/job2.prompt.txt",
+  "769a19bcdf72d38e40b83bb2ac7a1c5b5c1b2c3c2f1ca8ea1ee93d8167cc7507  $SCRATCH/omni-full/route-gpt6/job2.schema.json",
+  "2026-09-28T00:30:32Z quota gate: used 43% ordinary_usage_allowed True",
+  "2026-09-28T00:30:32Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 start route-job2 $SCRATCH/omni-full/route-gpt6/job2.prompt.txt $SCRATCH/omni-full/route-gpt6/job2.schema.json",
+  "2026-09-28T00:30:32Z rc=0",
+  "2026-09-28T00:30:36Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 wait route-job2 540",
+  "2026-09-28T01:20:38Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 wait route-job2 1",
+  "2026-09-28T01:20:42Z ~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/codex_call.sh --work-dir $SCRATCH/omni-full/route-gpt6 result route-job2 > $SCRATCH/omni-full/route-gpt6/route-job2.result.json"
+ ],
+ "sanitization": "Derived from the runner's result files without output_text (the receipts route-job1.last.json and route-job2.last.json hold it), the events.jsonl files (counts and the turn.completed usage only) and the command log. In the command log the home directory is written ~ and the session scratch directory $SCRATCH."
+}

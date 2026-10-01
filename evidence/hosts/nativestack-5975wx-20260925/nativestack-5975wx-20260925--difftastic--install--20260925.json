@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--difftastic--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "difftastic",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v difft) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" difftastic",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "e0fbc114ac2d21bf4ec7d9b531df95fe63c45d54014b737013b4262fe2e63a56",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/difft -> ~/.local/share/codex-ecosystem/tools/difftastic-0.71.0/payload/difft\nstack ['0.71.0'] winner pins ['0.71.0']\n"
+    },
+    {
+      "cmd": "T=\"$HOME/.local/share/codex-ecosystem/tools/difftastic-0.71.0\"; A=\"$T/downloads/difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz\"; e=$(grep 'Wilfred/difftastic / 0.71.0' recipes/README.md | grep -o '[0-9a-f]\\{64\\}'); a=$(sha256sum < \"$A\" | cut -c1-64); m=$(tar -xzOf \"$A\" difft | sha256sum | cut -c1-64); i=$(sha256sum < \"$T/payload/difft\" | cut -c1-64); echo \"recipes/README.md 0.71.0 archive sha256 $(echo $e | cut -c1-16)... | retained archive $(echo $a | cut -c1-16)...\"; echo \"archive member difft $(echo $m | cut -c1-16)... | installed payload/difft $(echo $i | cut -c1-16)...\"; test -n \"$e\" && test \"$a\" = \"$e\" && test \"$m\" = \"$i\" && echo \"retained archive matches the recorded release hash; installed binary equals its member\"",
+      "exit": 0,
+      "duration_s": 0.505,
+      "output_sha256": "bb8f8ab66af26b8e3cdbda8287706a830933c51ff74a2affb385c0946a8e494e",
+      "output_excerpt": "recipes/README.md 0.71.0 archive sha256 61aea5394a53c56f... | retained archive 61aea5394a53c56f...\narchive member difft 4d6ce594dde852cc... | installed payload/difft 4d6ce594dde852cc...\nretained archive matches the recorded release hash; installed binary equals its member\n"
+    },
+    {
+      "cmd": "difft --version",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "e4ab21f4a1cd6bf764172bcf15e51f75246faaca045719e5e95970040358879e",
+      "output_excerpt": "Difftastic 0.71.0\n\nRevision:  b7d119e 2026-09-18\nToolchain: 1.85.0\nSystem:    linux x86_64\n\n"
+    }
+  ],
+  "tool_versions": {
+    "difftastic": "0.71.0"
+  },
+  "observed_at_utc": "2026-09-25T15:35:21Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), difftastic 0.71.0 (the catalog pin) is installed from the official release: difft resolves to ~/.local/share/codex-ecosystem/tools/difftastic-0.71.0/payload/difft; the retained difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz has the sha256 recipes/README.md records (61aea539...) and its difft member is byte-identical to the installed binary; difft --version reports Difftastic 0.71.0. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Structural diffing is covered by the separate difftastic use receipt on main.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:21Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Install receipt; checked points 3 and 4 and claim support. Re-ran all three commands (exit 0, excerpts identical): difft resolves to tools/difftastic-0.71.0/payload/difft, the retained archive sha256 61aea539... equals recipes/README.md, its difft member equals the installed binary, and difft --version reports 0.71.0. Point 3 holds. I also confirmed through gh api that the GitHub 0.71.0 release asset difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz has digest sha256:61aea539..., which backs 'official release'. Point 4 holds: difftastic is the git-github-automation winner and 0.71.0 pin_matches. The readiness-only claim matches the commands; catalog_revision 74886724 is on origin/main. Host facts independently observed here: Ubuntu 24.04.5, WSL 2.7.13.0, 48 CPUs, RTX 4090 24 GB, 102.2 GiB RAM.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:26:51Z",
+      "reviewer": {
+        "identity_sha256": "559738f43703ab61d558cbe1eddb4e67c1639c5c85e72a1f9ddd56bf2519e78c",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

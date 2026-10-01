@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "kind": "coordinator_convergence_table",
+  "source_file": "local-uses-convergence.md",
+  "original_sha256": "78c79af25b46614abe0ea9aadfadbbfe296efefcc8493546ff3f21151e9553d2",
+  "original_bytes": 3883,
+  "author": "coordinator, written after both lane returns and the first two judgments",
+  "transformation": "The Markdown is embedded unchanged in text; the tables are parsed cell by cell without edits (the limits bullets are joined across their wrapped lines).",
+  "converged": [
+    {
+      "workload": "Catalyst tagging and extraction from 8-Ks and releases (ex-post labels, never live signals)",
+      "default": "Qwen3.8-27B with a JSON schema (installed)",
+      "challenger": "GLiNER2 (gliner2.5-base-v1) as a CPU student",
+      "strongest_evidence": "S: Massive (arXiv 2607.08346), 119 event types over 292,984 8-Ks; A: GLiNER2 (EMNLP 2025). Local accuracy unknown.",
+      "verdict": "Trial: 1,000 stratified 8-Ks plus 300 hand-checked, macro-F1 against frontier labels"
+    },
+    {
+      "workload": "Earnings-call transcription",
+      "default": "Cohere Transcribe 03-2026 (2B, mlx-audio)",
+      "challenger": "Parakeet-TDT-0.6B-v3 through FluidAudio on CoreML",
+      "strongest_evidence": "I: Open ASR long-form leaderboard, Earnings-21/22 WER 8.7/12.66 (Cohere) vs 9.96/14.58 (Parakeet) vs 9.84/13.1 (Whisper v3 turbo); M (S): Parakeet 155–207× real time on M4 Pro",
+      "verdict": "Trial: full Earnings-21/22 calls, WER, entity WER, real-time factor"
+    },
+    {
+      "workload": "Image-only exhibits and scans",
+      "default": "TeleOCR (1.2B)",
+      "challenger": "PaddleOCR-VL-1.6 (0.9B, official MLX-VLM path)",
+      "strongest_evidence": "I: OmniDocBench v1.6, 96.91 vs 96.34; A: EDGAR-OCR, 300 SEC tables",
+      "verdict": "Trial, narrow: XBRL and HTML already cover most filings"
+    },
+    {
+      "workload": "Time-series foundation models for volatility and volume features",
+      "default": "Chronos-2 (120M)",
+      "challenger": "TTM r2.1 (~1M, CPU)",
+      "strongest_evidence": "A: Brini 2026, only TTM beats Log-HAR on realized volatility; S: fev-bench",
+      "verdict": "Trial, low priority; never for returns (A: Rahimikia 2025, negative out-of-sample R²)"
+    },
+    {
+      "workload": "Not local",
+      "default": "Primary agent loop, authoritative judging, strategy selection",
+      "challenger": "—",
+      "strongest_evidence": "I: Artificial Analysis 34 (Qwen3.8-27B) vs 56–58 (Opus 5.5) and 52–53 (GPT-6 Astra)",
+      "verdict": "Skip"
+    }
+  ],
+  "adjudicated": [
+    {
+      "question": "Tabular foundation models (TabICLv2, TabPFN-3.5) for +200% mover prediction",
+      "claude_lane": "Skip",
+      "codex_lane": "Trial",
+      "adjudication": "Skip, the same in both presentation orders. Decisive: BeyondArena (A, arXiv 2606.30410), and TabPFN-3.5's own report, which says tuned MLPs still lead its temporal and large subsets",
+      "verdict": "Skip until a walk-forward comparison beats CatBoost"
+    }
+  ],
+  "single_lane_leads": [
+    {
+      "workload": "Point-in-time text features for backtests: dated weights as the lookahead-bias control",
+      "lane": "Claude",
+      "candidate": "PIT-4B-FT; ChronoGPT/ChronoBERT",
+      "evidence": "A: Gao et al. 2026, Zhang & Stadie 2026 (lookahead leakage); A/S: Kelly et al. 2026",
+      "next_step": "Highest north-star value. Trial on EdgarTools 8-Ks 2015–2024, out-of-sample rank-IC against Loughran-McDonald tone"
+    },
+    {
+      "workload": "Prompt-injection screening of tool output in hooks",
+      "lane": "Claude",
+      "candidate": "PIGuard (184M); Prompt Guard 2 (86M)",
+      "evidence": "A: PIArena (ACL 2026), PIDS-Bench (2026)",
+      "next_step": "Trial as flag-only, never a security boundary"
+    },
+    {
+      "workload": "Failure-log triage",
+      "lane": "Codex",
+      "candidate": "Qwen3.8-27B",
+      "evidence": "S only",
+      "next_step": "Trial, asynchronous, raw logs retained"
+    },
+    {
+      "workload": "Editor next-edit suggestions",
+      "lane": "Codex",
+      "candidate": "Sweep next-edit v2-7B",
+      "evidence": "Throughput only",
+      "next_step": "Only if editing by hand is frequent"
+    }
+  ],
+  "limits": [
+    "No workload above was executed on this Mac. Every throughput figure is measured elsewhere or estimated.",
+    "Both lanes may share training-era blind spots.",
+    "The adjudicator is from the same family as the Codex lane; the order swap mitigates this but does not remove it."
+  ],
+  "recorder_addenda": [
+    {
+      "date": "2026-09-24",
+      "note": "Added after the table was written; the text below is unchanged. The coordinator ran a third, reversed-listing judgment (skip listed first as Return A, trial second as Return B), which also chose skip. The adjudicated row's 'the same in both presentation orders' and the limit on the order swap predate it: with it, listing position is counterbalanced for this question, while the single-judge and same-family limits remain.",
+      "refs": [
+        "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+        "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json"
+      ]
+    }
+  ],
+  "text": "# Local-model workloads beyond memory and RAG: cross-family convergence (2026-09-24)\n\n## Method\n\n- One packet (`local-uses-packet.md`) went to two blind lanes. Neither lane saw the other lane's\n  output or the catalogs.\n  - Claude lane: Opus 5.5, web research (`local-uses-claude.md`).\n  - Codex lane: GPT-6 Astra, high effort, web search, user config and hooks disabled\n    (`local-uses-codex.md`).\n- One disagreement went to a blind adjudicator, GPT-6 Sol at high effort, which checked the cited\n  sources itself. It judged the two returns once in each presentation order\n  (`adjudication/`).\n- Evidence grades: I independent, A academic, S maker, C competitor, P popularity.\n\n## Converged (both lanes, independently)\n\n| Workload | Default | Challenger | Strongest evidence | Verdict |\n|---|---|---|---|---|\n| Catalyst tagging and extraction from 8-Ks and releases (ex-post labels, never live signals) | Qwen3.8-27B with a JSON schema (installed) | GLiNER2 (gliner2.5-base-v1) as a CPU student | S: Massive (arXiv 2607.08346), 119 event types over 292,984 8-Ks; A: GLiNER2 (EMNLP 2025). Local accuracy unknown. | Trial: 1,000 stratified 8-Ks plus 300 hand-checked, macro-F1 against frontier labels |\n| Earnings-call transcription | Cohere Transcribe 03-2026 (2B, mlx-audio) | Parakeet-TDT-0.6B-v3 through FluidAudio on CoreML | I: Open ASR long-form leaderboard, Earnings-21/22 WER 8.7/12.66 (Cohere) vs 9.96/14.58 (Parakeet) vs 9.84/13.1 (Whisper v3 turbo); M (S): Parakeet 155–207× real time on M4 Pro | Trial: full Earnings-21/22 calls, WER, entity WER, real-time factor |\n| Image-only exhibits and scans | TeleOCR (1.2B) | PaddleOCR-VL-1.6 (0.9B, official MLX-VLM path) | I: OmniDocBench v1.6, 96.91 vs 96.34; A: EDGAR-OCR, 300 SEC tables | Trial, narrow: XBRL and HTML already cover most filings |\n| Time-series foundation models for volatility and volume features | Chronos-2 (120M) | TTM r2.1 (~1M, CPU) | A: Brini 2026, only TTM beats Log-HAR on realized volatility; S: fev-bench | Trial, low priority; never for returns (A: Rahimikia 2025, negative out-of-sample R²) |\n| Not local | Primary agent loop, authoritative judging, strategy selection | — | I: Artificial Analysis 34 (Qwen3.8-27B) vs 56–58 (Opus 5.5) and 52–53 (GPT-6 Astra) | Skip |\n\n## Adjudicated\n\n| Question | Claude lane | Codex lane | Adjudication (both orders) | Verdict |\n|---|---|---|---|---|\n| Tabular foundation models (TabICLv2, TabPFN-3.5) for +200% mover prediction | Skip | Trial | Skip, the same in both presentation orders. Decisive: BeyondArena (A, arXiv 2606.30410), and TabPFN-3.5's own report, which says tuned MLPs still lead its temporal and large subsets | Skip until a walk-forward comparison beats CatBoost |\n\n## Single-lane leads (not converged; discovery only)\n\n| Workload | Lane | Candidate | Evidence | Next step |\n|---|---|---|---|---|\n| Point-in-time text features for backtests: dated weights as the lookahead-bias control | Claude | PIT-4B-FT; ChronoGPT/ChronoBERT | A: Gao et al. 2026, Zhang & Stadie 2026 (lookahead leakage); A/S: Kelly et al. 2026 | Highest north-star value. Trial on EdgarTools 8-Ks 2015–2024, out-of-sample rank-IC against Loughran-McDonald tone |\n| Prompt-injection screening of tool output in hooks | Claude | PIGuard (184M); Prompt Guard 2 (86M) | A: PIArena (ACL 2026), PIDS-Bench (2026) | Trial as flag-only, never a security boundary |\n| Failure-log triage | Codex | Qwen3.8-27B | S only | Trial, asynchronous, raw logs retained |\n| Editor next-edit suggestions | Codex | Sweep next-edit v2-7B | Throughput only | Only if editing by hand is frequent |\n\n## Limits\n\n- No workload above was executed on this Mac. Every throughput figure is measured elsewhere or\n  estimated.\n- Both lanes may share training-era blind spots.\n- The adjudicator is from the same family as the Codex lane; the order swap mitigates this but\n  does not remove it.\n"
+}

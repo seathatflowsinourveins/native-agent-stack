@@ -1,0 +1,1175 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "memory",
+  "task_and_failure": "Decide which memory systems, embedders, rerankers, memory LLMs and local serving runtimes to retain, trial, defer or reject for the one shared Claude Code and Codex memory, after the user asked why ai-memory is 'the best' and why the stack runs stale models. Failure addressed: the production memory stack kept the defaults its systems shipped with, without re-screening, and the durable-memory layer's keep_but_compare verdict had no matched retrieval comparison. Two frozen packets went to blind Claude and Codex lanes; three roles went to a blind GPT-6 Sol judge in three presentation orders; the convergence table sets each row, two skeptic checks per row reviewed it, and neutral Mac measurements in the LongMemEval-S harness bound the memory-system and embedder rows.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "6568f47252bc394641a32664c00eb1a700f135ed"
+    },
+    {
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "revision": "19b6429badfe17903074d2da38b5e533222d7a61"
+    },
+    {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0",
+      "revision": "b1b25219b507cf56cb7334ac1a408dc9b09eaa50"
+    },
+    {
+      "url": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29",
+      "revision": "2d38dafede67d0d4ed920cde94d2106e98825b8a"
+    },
+    {
+      "url": "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0",
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0"
+    },
+    {
+      "url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.1",
+      "revision": "f8950b0c07d9e34c76493dba802bb309f0ce60fd"
+    },
+    {
+      "url": "https://github.com/AttemorySystem/attemory/releases/tag/v0.1.3",
+      "revision": "603c03afa9a04e48b778922eae156a0024752f37"
+    },
+    {
+      "url": "https://github.com/garrytan/gbrain/releases/tag/v0.56.2.0",
+      "revision": "db56c778e8b287482e21df654e6df6dbcc9745fd"
+    },
+    {
+      "url": "https://github.com/mem0ai/mem0/releases/tag/v2.2.0",
+      "revision": "47a69e1e72dc562b6fdd49a9ef892229afc7508a"
+    },
+    {
+      "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "revision": "facd35e01359e59d938bc9418e93fb9318addee3"
+    },
+    {
+      "url": "https://github.com/plastic-labs/honcho/releases/tag/v3.2.1",
+      "revision": "79cb31645f4efdef626d1bd9316a648adb5da89b"
+    },
+    {
+      "url": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.21",
+      "revision": "3fca2577520f00b7f580d85d4ac6ae42bb9ba6f1"
+    },
+    {
+      "url": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2",
+      "revision": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048"
+    },
+    {
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.34.4",
+      "revision": "b2da9e468af2479058ae18c6d908ed29de410684"
+    },
+    {
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.34.3",
+      "revision": "6383a0fa9cbf97494b847226e189f6e36b401a08"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+      "revision": "59657a613ab0fa4ab327d6c790123dff30bfbd67"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.5.0",
+      "revision": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+    },
+    {
+      "url": "https://github.com/ml-explore/mlx/releases/tag/v0.32.2",
+      "revision": "1f8e74e3f12f31365464a6867c6579f0e9b29d85"
+    },
+    {
+      "url": "https://github.com/xiaowu0162/LongMemEval",
+      "revision": "9e0b455f4ef0e2ab8f2e582289761153549043fc"
+    },
+    {
+      "url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/blob/main/longmemeval_s_cleaned.json",
+      "revision": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442"
+    },
+    {
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1"
+    },
+    {
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615"
+    },
+    {
+      "url": "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+      "revision": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee"
+    },
+    {
+      "url": "https://huggingface.co/onnx-community/harrier-oss-v1-0.6b-ONNX",
+      "revision": "e4daffa011e666dcd2ff2a3c6c05084090ac314d"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-4B",
+      "revision": "5cf2132abc99cad020ac570b19d031efec650f2b"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-8B",
+      "revision": "1d8ad4ca9b3dd8059ad90a75d4983776a23d44af"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+      "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+    },
+    {
+      "url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+    },
+    {
+      "url": "https://huggingface.co/IAAR-Shanghai/MemReranker-4B",
+      "revision": "22890bb4adff85b83b2181ed91e940ffb5a4ec45"
+    },
+    {
+      "url": "https://huggingface.co/KaLM-Embedding/KaLM-Reranker-V1-Small",
+      "revision": "8c2141c8af7417cd4a58fe7b58f79f1c00ad1d49"
+    },
+    {
+      "url": "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1",
+      "revision": "5dca36282a5d85f368d2544002513a29159b4c9e"
+    },
+    {
+      "url": "https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2",
+      "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-4B",
+      "revision": "22e683669bc0f0bd69640a1354a6d0aebcfeede5"
+    },
+    {
+      "url": "https://huggingface.co/jinaai/jina-reranker-v3.5",
+      "revision": "e8a93f33f0b22108f8c2364f8484ce3422552fbc"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.5-9B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B",
+      "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0"
+    },
+    {
+      "url": "https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF",
+      "revision": "e7caca5d835a3901a8e0d63e94009429bafafdfc"
+    },
+    {
+      "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+      "revision": "a9904d24bcc1d289a1950fa9d2b978c47cf903b9"
+    },
+    {
+      "url": "https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking",
+      "revision": "3fcb57e5653ec5d733eea4df61f4b339d4ac0e92"
+    }
+  ],
+  "discovery_provenance": [
+    "The model-screen packet (sha256 1847b3a1a0508078076f8d114e9ea1a021a92f8322f8e13e4f2482ca18f5a51a) and the memory-system packet (sha256 31318b2121b387e4a478456a5b794e6bf1119d100f9cb3aeeb96c17f19e6e807) each went to a Claude Opus 5.5 research subagent with web tools and to Codex GPT-6 Astra through codex exec with live web search.",
+    "Neither lane of a packet was given the other's output or the repository catalogs. The Codex streams show 15 and 16 web_search items, none naming the excluded repositories, and each Codex return predates its Claude return. The memory-system Codex lane read the ecosystem-catalog skill's SKILL.md (instructions only; no catalog query followed). The Claude lanes' tool logs were not retained.",
+    "The coordinator wrote one stage-one convergence note per packet; the lanes agreed on the leading embedders and on Hindsight and Mem0 OSS, and the unions went to measurement. The coordinator's workflow then built nine blinded briefs (memory system, memory LLM and reranker, each in three orders defined by a key), ran a gpt-6-sol judge on each from the brief alone, wrote the convergence table, and ran two skeptic checks per row.",
+    "The judge never preferred the Codex return; its only non-SPLIT answers came in order b, where the Claude return was letter A and listed first. The table therefore rests on candidate positions that hold across all three orders.",
+    "Nine skeptic checks on seven rows refuted a claim or a next test; the recorder applied every such correction, named the LMEB source on every row citing it, and updated the rows C3 bears on after C3 finished (report-mac-descriptive.md). No decision changed. Pins were resolved afterwards through the GitHub and Hugging Face APIs, and the returns were sealed as JSON with their original hashes."
+  ],
+  "license_and_compatibility": "Nothing was installed, downloaded or executed for any candidate by this record. Licences as the GitHub and Hugging Face APIs report them at the pins: ai-memory, MemPalace, Hindsight, Attemory (repository; its prebuilt core SDK's coverage is unverified), GBrain, QMD, Ollama, llama.cpp and MLX MIT; agentmemory, Mem0, vLLM and transformers.js Apache-2.0; Honcho, OpenViking and Basic Memory AGPL-3.0; harrier-oss-v1-0.6b MIT; MemReranker-4B, KaLM-Reranker-V1-Small, ettin-reranker-400m-v1, Qwen3.6-35B-A3B, Qwen3.5-9B, the Qwen3-Embedding and Qwen3-Reranker models, all-MiniLM-L6-v2, ms-marco-MiniLM-L6-v2 and MemReader-4B-thinking apache-2.0; Jina Reranker v3.5 cc-by-nc-4.0; Nemotron-3-Embed, Nemotron 3.5 Lightning and LFM2.5 'other' (OpenMDW-1.1 and LFM1.0 per the lanes). Runtime compatibility with the M5 Pro and with VelaNext is unverified except for the Mac harness arms.",
+  "baseline_and_candidate": {
+    "baseline": "The production memory stack on the Mac coordinator: ai-memory 2.5-pre 19b6429 (a local cargo build) with Qwen3-Embedding-4B through Ollama 0.34.4 and LLM listwise reranking by qwen3.5-9b-64k (C4 in the preregistration; C3 is the same with the reranker off), plus QMD for selected document collections.",
+    "candidate": "The trial rows only, isolated from production: agentmemory 0.9.29, MemPalace 3.10.0 and Hindsight 0.10.1; Nemotron-3-Embed-8B/1B and harrier-oss-v1-0.6b; MemReranker-4B, KaLM-Reranker-V1-Small and ettin-reranker-400m-v1 (exploratory stage X); Qwen3.6-35B-A3B and LFM2.5-2.6B; llama.cpp llama-server and MLX/mlx-lm. Each is measured on VelaNext under A15, A15.1, A15.2 and A16 before any production change."
+  },
+  "frozen_inputs": {
+    "base_revision": "6568f47252bc394641a32664c00eb1a700f135ed",
+    "tasks": [
+      "sota-models-discovery",
+      "memory-systems-discovery",
+      "q1-memory-system-adjudication-a",
+      "q1-memory-system-adjudication-b",
+      "q1-memory-system-adjudication-c",
+      "q2-memory-llm-adjudication-a",
+      "q2-memory-llm-adjudication-b",
+      "q2-memory-llm-adjudication-c",
+      "q3-reranker-adjudication-a",
+      "q3-reranker-adjudication-b",
+      "q3-reranker-adjudication-c",
+      "longmemeval-s-retrieval-mac",
+      "convergence-record-check"
+    ],
+    "roles": [
+      "claude-lane",
+      "codex-lane",
+      "adjudicator",
+      "a1b-full-oracle",
+      "a0-official-bm25",
+      "a1-official-oracle",
+      "aimem-fts",
+      "aimem-minilm",
+      "aimem-qwen3",
+      "am-keyless",
+      "am-minilm",
+      "bm25-full",
+      "dense-qwen3",
+      "recorder"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+        "sha256": "b0bc3c145c4ac2bf20e95d1fe79e20afd5661b6c7afc25cd7eb24b9911bdc7cf"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+        "sha256": "6d1c522475b5bce6350d19a7a89b178d3dfe8dd09d4144eb9335595faa7b53b6"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "sha256": "6b6579d91f1a0d3b11fbd28a9cbeb1e31f92961eea9ba56a7957e136b51ce3c9"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+        "sha256": "5166806f08076904f3990d17d739217eec2d05776452c6f57e9450e6b0015823"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+        "sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+        "sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+        "sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+        "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/packets/sota-models.json",
+        "sha256": "8d6f1fe60f4cd2052bf647ac53571839008dbe1c2eeb0fe0966dc8c397ec28f5"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/packets/memory-systems.json",
+        "sha256": "63f5361e20fa4ef52a7110b71c36ed748f7fe168c177590c807bc61f709ffdba"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+        "sha256": "dcfe6a1db362c4555de62683db601602668e3e22b9d63aa94ec608d9da1e6db7"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+        "sha256": "8aaa24e7418cd4da2d26d47dc7a27827a539ada0fd9133c9c6994bd29ec2a3b6"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+        "sha256": "25101afbbd159b0485ec0f3df2665ab3e77cb5a2ccb2a39883de63f06c5fc328"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+        "sha256": "113ddece701e6f647151cdb7b2ad505ebcfe8e6f8d6b7c4676644f876859f8ab"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+        "sha256": "b4ea294ef737848d396d5b016f11cbb36f506e31f1787c813b6573c10c16c0a4"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+        "sha256": "ade78033b5932c1aeb7ba6bd33f62eef92d3ffe33ed4e0a80bca561ec1155a1f"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+        "sha256": "11a3d119ff06592d33d1475d35d02df90ec4f129aac67c2b176fe4802012b6c6"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+        "sha256": "f83257ee3d725d531b251324a091286e720336097938fc86701a5d18322dd2b0"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+        "sha256": "d26a14c6f2aac0bce5d5a262a5e98f02d50655225c3f97ee0cf4edeeba8d41e3"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+        "sha256": "2882221c9e895964190830c28449107a8a6fd151cf2eae7f9c1558e7d538ad51"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/provenance.json",
+        "sha256": "6dfb775a100637f3432c4316f4a48176a2ca49d7c1c1fe701edb6ca11b317a01"
+      },
+      {
+        "path": "evidence/artifacts/memory-stack-20260925/usage.json",
+        "sha256": "0a7be62925865c5d0db37ac1506b69c559b621db4c8c1fe7db6ebfd32084c31e"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Lanes: each packet's output contract (a ranked shortlist of up to 3 models per role or up to 5 systems, the benchmark replacements or adapters, and the risks, under 900 words). Judges: under 500 words ending with PREFERRED and RANKING lines. A row reaches adopt_within_scope only with NCE in our harness plus a pass of the memory-lane acceptance, so no challenger exceeds trial. Harness arms: the preregistered LongMemEval-S retrieval protocol (session-level recall_all@5 primary; full-session track n = 470 and official track n = 419; A6 oracle ceilings; the A2 rule with A5 cluster statistics and the A14 and A15.2 families). The Mac arms are descriptive and decide nothing (A15.2). Semantic quality and source truth of the discovery returns are not graded here.",
+    "usage_rule": "No savings claim. Native counters are recorded as reported and mapped to contract categories only where their scope is known (the Codex lanes and judges); unknown stays null and no new sum across runs is claimed."
+  },
+  "runtime_and_platform": {
+    "platform": "Cloud models for the lanes (Claude Opus 5.5 subagents with web tools; Codex GPT-6 Astra with live web search) and the judges (gpt-6-sol through codex exec, working from the brief alone). The harness arms ran natively on the Mac coordinator (MacBook Pro 16-inch, Apple M5 Pro, 64 GB); C3's rows 349 onward ran after the reboot into macOS 27.0 and the rest on macOS 26.5. The Mac results are descriptive under A15.2; confirmatory decisions come only from the VelaNext rerun (Threadripper, RTX 4090, WSL2 Ubuntu 24.04), which has not run.",
+    "tools": [
+      {
+        "name": "Claude Code research subagents",
+        "version": "claude-opus-5-5; client version not recorded"
+      },
+      {
+        "name": "Codex CLI (codex exec), lane runs",
+        "version": "gpt-6-astra; CLI version and effort not recorded"
+      },
+      {
+        "name": "Codex CLI (codex exec), judge runs",
+        "version": "gpt-6-sol, read-only sandbox; CLI version and effort not recorded"
+      },
+      {
+        "name": "LongMemEval-S retrieval harness",
+        "version": "official LongMemEval 9e0b455f4ef0e2ab8f2e582289761153549043fc; coordinator harness v3 (not committed); ai-memory 19b6429; agentmemory 0.9.29 with iii 0.11.2; Ollama 0.34.4 serving qwen3-embedding:4b"
+      },
+      {
+        "name": "Repository offline validators",
+        "version": "base 6568f47252bc394641a32664c00eb1a700f135ed plus this change"
+      }
+    ],
+    "isolation": "Lanes worked from their packet and the web only; the Codex lanes ran in the coordinator's lanes directory with unrecorded sandbox flags, and one read a local skill file. Judges ran codex exec with a read-only sandbox and a single read of their own brief. Each harness question used a fresh store in its own server process. No OS-enforced blindness is claimed for the Claude subagents."
+  },
+  "commands": [
+    "Claude Code research subagent (claude-opus-5-5, web tools) given the sota-models packet text; exact invocation not retained",
+    "codex exec --json (gpt-6-astra, live web search) in the coordinator's lanes directory with sota-models-packet.md; exact argv, effort and sandbox flags not retained",
+    "Claude Code research subagent (claude-opus-5-5, web tools) given the memory-systems packet text; exact invocation not retained",
+    "codex exec --json (gpt-6-astra, live web search) in the coordinator's lanes directory with memory-systems-packet.md; exact argv, effort and sandbox flags not retained",
+    "codex exec -m gpt-6-sol -s read-only --json, once per brief (three questions, three orders each), launched by the convergence workflow's runner agents; exact argv and effort not retained",
+    "LongMemEval-S retrieval harness on the Mac: the official LongMemEval 9e0b455 runners for A0, A1 and A1b and the coordinator's harness v3 for B1, B2, C1, C2, C3, D1 and D2, a fresh store per question, summarized into report-mac-descriptive.md; exact argv not retained",
+    "python3 scripts/catalog_decisions.py --write --supplement catalogs/foundation/memory-stack-20260925.json#/repository_decisions",
+    "python3 scripts/validate.py",
+    "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+    "python3 scripts/landscape.py --root .",
+    "python3 scripts/catalog_decisions.py --check",
+    "python3 scripts/evidence_manifest.py --check",
+    "shasum -a 256 -c evidence/artifacts/memory-stack-20260925/SHA256SUMS"
+  ],
+  "observations": [
+    {
+      "id": "claude-sota-models-lane",
+      "task": "sota-models-discovery",
+      "role": "claude-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the model-screen packet (embedders, rerankers and the memory LLM) (Claude Opus 5.5 subagent); discovery only. Quality is the packet's output contract (a ranked shortlist within its limit, replacements or adapters, the risks, under 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/claude/sota-models-lane-return-1.json",
+          "sha256": "b0bc3c145c4ac2bf20e95d1fe79e20afd5661b6c7afc25cd7eb24b9911bdc7cf"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-sota-models-lane",
+      "task": "sota-models-discovery",
+      "role": "codex-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the model-screen packet (embedders, rerankers and the memory LLM) (Codex GPT-6 Astra); discovery only. Quality is the packet's output contract (a ranked shortlist within its limit, replacements or adapters, the risks, under 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+          "sha256": "6b6579d91f1a0d3b11fbd28a9cbeb1e31f92961eea9ba56a7957e136b51ce3c9"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/usage.json",
+          "sha256": "0a7be62925865c5d0db37ac1506b69c559b621db4c8c1fe7db6ebfd32084c31e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 135626,
+        "cache_creation": 0,
+        "cache_read": 3044352,
+        "output": 10544,
+        "reasoning_in_output": 3041,
+        "total": 3190522,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-memory-systems-lane",
+      "task": "memory-systems-discovery",
+      "role": "claude-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the memory-system packet (Claude Opus 5.5 subagent); discovery only. Quality is the packet's output contract (a ranked shortlist within its limit, replacements or adapters, the risks, under 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/claude/memory-systems-lane-return-1.json",
+          "sha256": "6d1c522475b5bce6350d19a7a89b178d3dfe8dd09d4144eb9335595faa7b53b6"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-memory-systems-lane",
+      "task": "memory-systems-discovery",
+      "role": "codex-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the memory-system packet (Codex GPT-6 Astra); discovery only. Quality is the packet's output contract (a ranked shortlist within its limit, replacements or adapters, the risks, under 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json",
+          "sha256": "5166806f08076904f3990d17d739217eec2d05776452c6f57e9450e6b0015823"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/usage.json",
+          "sha256": "0a7be62925865c5d0db37ac1506b69c559b621db4c8c1fe7db6ebfd32084c31e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 116764,
+        "cache_creation": 0,
+        "cache_read": 2394880,
+        "output": 10597,
+        "reasoning_in_output": 3625,
+        "total": 2522241,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q1-memory-system-a",
+      "task": "q1-memory-system-adjudication-a",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q1-memory-system in order a (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-a.json",
+          "sha256": "dcfe6a1db362c4555de62683db601602668e3e22b9d63aa94ec608d9da1e6db7"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+          "sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039"
+        }
+      ],
+      "usage": {
+        "uncached_input": 22415,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2273,
+        "reasoning_in_output": 1840,
+        "total": 41840,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q1-memory-system-b",
+      "task": "q1-memory-system-adjudication-b",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q1-memory-system in order b (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-b.json",
+          "sha256": "8aaa24e7418cd4da2d26d47dc7a27827a539ada0fd9133c9c6994bd29ec2a3b6"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+          "sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039"
+        }
+      ],
+      "usage": {
+        "uncached_input": 5253,
+        "cache_creation": 0,
+        "cache_read": 34304,
+        "output": 2498,
+        "reasoning_in_output": 2094,
+        "total": 42055,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q1-memory-system-c",
+      "task": "q1-memory-system-adjudication-c",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q1-memory-system in order c (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q1-memory-system-c.json",
+          "sha256": "25101afbbd159b0485ec0f3df2665ab3e77cb5a2ccb2a39883de63f06c5fc328"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q1-memory-system-1.json",
+          "sha256": "c72f204af6acd931987b2a20ec0fc899757cb2cc102111602c9ed0ae755c2039"
+        }
+      ],
+      "usage": {
+        "uncached_input": 22390,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2011,
+        "reasoning_in_output": 1589,
+        "total": 41553,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q2-memory-llm-a",
+      "task": "q2-memory-llm-adjudication-a",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q2-memory-llm in order a (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+          "sha256": "113ddece701e6f647151cdb7b2ad505ebcfe8e6f8d6b7c4676644f876859f8ab"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+          "sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780"
+        }
+      ],
+      "usage": {
+        "uncached_input": 22627,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 1470,
+        "reasoning_in_output": 1098,
+        "total": 41249,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q2-memory-llm-b",
+      "task": "q2-memory-llm-adjudication-b",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q2-memory-llm in order b (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+          "sha256": "b4ea294ef737848d396d5b016f11cbb36f506e31f1787c813b6573c10c16c0a4"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+          "sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780"
+        }
+      ],
+      "usage": {
+        "uncached_input": 15564,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1490,
+        "reasoning_in_output": 1072,
+        "total": 41246,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q2-memory-llm-c",
+      "task": "q2-memory-llm-adjudication-c",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q2-memory-llm in order c (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+          "sha256": "ade78033b5932c1aeb7ba6bd33f62eef92d3ffe33ed4e0a80bca561ec1155a1f"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q2-memory-llm-1.json",
+          "sha256": "e16804649d0061eabda060e5164abbffd72753c11c9014033cd17a7272bff780"
+        }
+      ],
+      "usage": {
+        "uncached_input": 22612,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2237,
+        "reasoning_in_output": 1893,
+        "total": 42001,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q3-reranker-a",
+      "task": "q3-reranker-adjudication-a",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q3-reranker in order a (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-a.json",
+          "sha256": "11a3d119ff06592d33d1475d35d02df90ec4f129aac67c2b176fe4802012b6c6"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+          "sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8"
+        }
+      ],
+      "usage": {
+        "uncached_input": 22603,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 1831,
+        "reasoning_in_output": 1454,
+        "total": 41586,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q3-reranker-b",
+      "task": "q3-reranker-adjudication-b",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q3-reranker in order b (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-b.json",
+          "sha256": "f83257ee3d725d531b251324a091286e720336097938fc86701a5d18322dd2b0"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+          "sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8"
+        }
+      ],
+      "usage": {
+        "uncached_input": 15538,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1347,
+        "reasoning_in_output": 993,
+        "total": 41077,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-q3-reranker-c",
+      "task": "q3-reranker-adjudication-c",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "discovery",
+      "scope": "Blind judgment of q3-reranker in order c (gpt-6-sol, read-only sandbox, from the brief alone); the contract is under 500 words ending with PREFERRED and RANKING lines. Exit 0 as the workflow's runner agent reported it.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q3-reranker-c.json",
+          "sha256": "d26a14c6f2aac0bce5d5a262a5e98f02d50655225c3f97ee0cf4edeeba8d41e3"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/adjudication/q3-reranker-1.json",
+          "sha256": "c75539956c17030a7d8abcf72e1e87129e9ed81cb873e5f6d5755bc550f514e8"
+        }
+      ],
+      "usage": {
+        "uncached_input": 15583,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1691,
+        "reasoning_in_output": 1315,
+        "total": 41466,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-a1b-full-oracle",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "a1b-full-oracle",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm A1b-full-oracle (A1b (A6 full-session oracle)) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.994, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-a0-official-bm25",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "a0-official-bm25",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm A0-official-bm25 (A0) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.740; official track 0.742, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-a1-official-oracle",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "a1-official-oracle",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm A1-official-oracle (A1) of the preregistered LongMemEval-S retrieval harness, official track 0.993, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-aimem-fts",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "aimem-fts",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm aimem-fts (C1) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.400; official track 0.368, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-aimem-minilm",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "aimem-minilm",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm aimem-minilm (C2) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.496; official track 0.473, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-aimem-qwen3",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "aimem-qwen3",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm aimem-qwen3 (C3) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.570; official track 0.558, complete coverage with 0 missing rows, 0 errors and 0 env errors. Rows 349 onward ran on macOS 27.0; the 20-question drift check reproduced recall_all@5 on 20/20. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-am-keyless",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "am-keyless",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm am-keyless (D1) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.617; official track 0.628, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-am-minilm",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "am-minilm",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm am-minilm (D2) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.821; official track 0.814, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-bm25-full",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "bm25-full",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm bm25-full (B1) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.747; official track 0.735, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "nce-dense-qwen3",
+      "task": "longmemeval-s-retrieval-mac",
+      "role": "dense-qwen3",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac platform, descriptive under A15.2: arm dense-qwen3 (B2) of the preregistered LongMemEval-S retrieval harness, full track recall_all@5 0.753; official track 0.742, complete coverage with 0 missing rows, 0 errors and 0 env errors. No process exit status was retained; exit_code 0 records that complete coverage. It decides nothing: confirmatory decisions come only from the VelaNext rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "recorder-artifact-check",
+      "task": "convergence-record-check",
+      "role": "recorder",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Offline consistency after assembly: validate.py passed with 5,370 hashed files; validate_convergence.py --all-recorded validated 21 records, this one with 24 observations; catalog_decisions.py --check validated 861 identities (504 beyond public stars, 2,031 typed references); landscape.py, evidence_manifest.py --check, validate_catalogs.py, validate_foundation.py, build_verdicts.py --check, component_matrix.py --check, new_host_grand_list.py --check, build_ecosystem.py --check, saturation_ledger.py --check and the verdict-review gate against the base passed. Each embedded source text matched its original sha256 at assembly, and every transcription string is a substring of its source. No source truth or model quality is graded.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+          "sha256": "48b3ae02c01eb71569599292e164a921fed0a3fc750e566259ef9f395471c0ed"
+        },
+        {
+          "path": "evidence/artifacts/memory-stack-20260925/provenance.json",
+          "sha256": "6dfb775a100637f3432c4316f4a48176a2ca49d7c1c1fe701edb6ca11b317a01"
+        },
+        {
+          "path": "catalogs/foundation/memory-stack-20260925.json",
+          "sha256": "a5d2b9647e044b7140f6952d36d27c5b6f2f78490452101895d33ac748faeb45"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "Discovery only for every challenger: no candidate was installed, downloaded or executed by this record, and every lane or vendor figure is measured elsewhere or estimated.",
+    "The harness figures are Mac-platform and descriptive under A15.2. C4, production with the LLM reranker, did not run on the Mac, so the layer decision (A14) is open; D3's 12 Mac rows are excluded from every analysis; C3's rows 349 onward ran on macOS 27.0 (a 20-question drift check reproduced recall_all@5 on 20/20 and ndcg_any@5 on 18/20).",
+    "The judge is one model (gpt-6-sol) from the Codex lanes' family, working from the brief alone. It never preferred the Codex return, and its only non-SPLIT answers came when the Claude return was letter A and listed first, so a position or label effect cannot be ruled out; the table keeps only positions that hold in all three orders. No refuter was run.",
+    "The Claude lanes' tool logs were not retained, so their blindness rests on the packet instruction; the memory-system Codex lane read the ecosystem-catalog skill's instructions, though no catalog query followed.",
+    "The skeptic checks' outputs are not committed (they hold local paths); their corrections are listed in convergence.json and applied in the catalog decisions file. Optional wording suggestions from non-refuting checks were not applied.",
+    "Contract quality covers the output shape only. No process exit status was retained for the lanes or the harness arms; the judges' exit 0 is as the runner agents reported it.",
+    "Usage: only the Codex lanes' and judges' categories are known. The Claude lanes reported 414,369 and 303,563 subagent tokens with 130 and 129 tool uses; these stay native in usage.json because their scope was not established. The coordinator, the workflow's agents and the recorder are not measured.",
+    "Pins were resolved after the lanes and the table, from current release tags and Hugging Face main revisions; the Ollama manifest prefixes are the convergence writer's and were not re-checked. Production ai-memory is a local self-build, which conflicts with the official-artifact rule until the first official 2.5 release.",
+    "The convergence table predates A16 (added to PREREGISTRATION.md at 02:15 EDT) and C3's completion (02:32 EDT); both are recorded as dated addenda, and the rows C3 bears on carry measurement updates.",
+    "LongMemEval-S tests chat recall, not coding-agent memory (LongMemEval-V2, VibeMemBench); 50-session haystacks are easy, and a pooled-store run is a planned A16 diagnostic.",
+    "The coordinator's proposed CLAUDE.md text that points at this record is not published here (machine-specific client configuration); its hash is in provenance.json."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "The trial rows of catalogs/foundation/memory-stack-20260925.json only, each isolated from production on VelaNext or in a trial profile: agentmemory 0.9.29, MemPalace 3.10.0 and Hindsight 0.10.1 (memory systems); Nemotron-3-Embed-8B/1B and harrier-oss-v1-0.6b (embedders); MemReranker-4B, KaLM-Reranker-V1-Small and ettin-reranker-400m-v1 (rerankers, exploratory stage X); Qwen3.6-35B-A3B and LFM2.5-2.6B (memory LLMs); llama.cpp llama-server and MLX/mlx-lm (serving, catalog status unchanged). Production (ai-memory 19b6429 with Qwen3-Embedding-4B and Qwen3.5-9B LLM reranking on Ollama 0.34.4, and QMD for document collections) is retained unchanged; the defer and reject rows are outside this decision, and nothing is adopt_within_scope.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Nothing on any host changed. Revert the catalog decisions file, its decision-index registration and the identity counts, and the durable-memory layer's added evidence_refs and limitations; keep this sealed evidence as dated history. Each trial row carries its own rollback.",
+  "next_decision_changing_test": "C4, production with the LLM reranker (A14): the layer decision needs it, because a layer candidate must beat both C3 and C4 and C4 did not run on the Mac. Then, on VelaNext under A15, A15.1, A15.2 and A16, one GPU workload at a time: the gates (oracle ceilings, slot smoke test, reference-output and batch-invariance), C3 then C4 (the reranker decided first), E1–E3 and F1–F3, the rest of the original family, H1–H3, G0–G3, X, and the A16 arms D2h, M2 and K1. A candidate replaces production only if it passes both the C3 and C4 families under Holm (α = 0.0333; A16 at 0.0167) with a significant gain of at least +5 pp, then the deployable-artifact gate where it applies, then the memory-lane acceptance (an explicit durable decision retrievable in its intended scope with cross-scope negatives, and recovery).",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "sota-refresh-20260925-ai-memory-241-cutover",
+  "unit": "ai-memory",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-26",
+  "observed_by": "coordinator",
+  "evidence_class": "Coordinator observations of the production cutover, exported as aggregate facts only. The private window directory (~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory-cutover-241/) holds the cold copy and fingerprint files; none of its files, and no store content, is published here.",
+  "from_version": "2.4.0",
+  "to_version": "2.4.1",
+  "authorization": "The user approved the production cutover through AskUserQuestion; all live sessions were notified before the window.",
+  "sequence": [
+    {
+      "step": "pre-window gates",
+      "facts": "tools/ai-memory-2.4.1/ai-memory sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd and `--version` 'ai-memory 2.4.1'; the v2.4.1 API asset digest still sha256:15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4; v2.4.1 still the latest release; live store V66; 0 latest pages with expires_at, so the #917 date-only stale_after repair had nothing to change."
+    },
+    {
+      "at_utc": "2026-09-26T00:14:12Z",
+      "step": "stop and quiesce",
+      "facts": "systemctl --user stop nativestack-memory.service (synchronous). The quiesce loop used `pgrep -f`, matched its own command line and waited its full 5 minutes; afterwards the service was confirmed inactive (dead) with 0 ai-memory processes and 0 users of the database file."
+    },
+    {
+      "step": "quiescent fingerprint",
+      "facts": "Schema V66 (66 refinery rows), quick_check ok, 40 pages, 86,219 observations."
+    },
+    {
+      "step": "at-rest cold copy",
+      "facts": "db, wiki, config.toml and capture-mode copied at rest: 378 files, 149M, with a SHA256SUMS manifest whose sha256 begins e1651c86bb6e3846. The fingerprint compare of the cold copy against the quiescent live store printed PASS. The copy holds config.toml (auth.token_pepper) and is private."
+    },
+    {
+      "step": "switch the binary",
+      "facts": "bin/ai-memory relinked to tools/ai-memory-2.4.1/ai-memory."
+    },
+    {
+      "step": "hook rewrite through the upstream installer",
+      "facts": "install-hooks --apply for claude-code and for codex with the same flags as for 2.4.0 (--server-url http://127.0.0.1:49474 --capture-mode allowlist, plus --no-capture-prompts for Claude). Against the installer's .bak-1790381983 and .bak-1790381984 copies, the diffs were path-only on 8 Claude and 7 Codex lines, with 0 remaining 2.4.0 strings; both files are valid JSON."
+    },
+    {
+      "at_utc": "2026-09-26T00:19:51Z",
+      "step": "start",
+      "facts": "systemctl --user start nativestack-memory.service. The journal shows V67__managed_run_session_link applied; /healthz returned 200 on the first poll; NRestarts 0."
+    },
+    {
+      "step": "live verification",
+      "facts": "Fingerprint compare V66 -> V67 PASS: 0 pages changed, 0 observations missing, 86,219 observations after. GET /mcp returned 405 with allow: POST; `ai-memory status --json` reports 2.4.1; MCP memory_status returns scope resolved_by explicit; memory_read_page on the known page returned an identical body. `ss` showed keepalive timers on 2 of 2 established sockets on :49474, so the #792 fix is live."
+    },
+    {
+      "step": "real-client capture",
+      "facts": "A fresh headless `claude -p` session captured session-start, pre-tool-use, post-tool-use, stop and session-end observations after the restart."
+    }
+  ],
+  "pending": [
+    "User-only: re-trust the 7 changed Codex ai-memory hook commands in Codex /hooks. Codex skips changed hooks until they are trusted, so Codex captures nothing through 2.4.1 until then."
+  ],
+  "rollback": "Stop the service and confirm no serve process remains; set the failed db and wiki aside; copy back the private cold V66 copy; relink bin/ai-memory to tools/ai-memory-2.4.0/ai-memory; re-run both install-hooks commands with the 2.4.0 binary (or restore the .bak-1790381983/.bak-1790381984 files, which would also revert any unrelated later settings edits) and re-trust the Codex hooks; start the service. V67 is forward-only: never start 2.4.0 on the V67 store.",
+  "writing_worker_readback": "out/readback.out (2026-09-26T00:30:40Z, read-only): bin/ai-memory resolves to tools/ai-memory-2.4.1/ai-memory, `ai-memory --version` prints 'ai-memory 2.4.1', the link target's sha256 is dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, /healthz 200, GET /mcp 405 with allow: POST, the service is active with NRestarts=0 since 20:19:51 EDT, 8 Claude and 7 Codex hook commands name tools/ai-memory-2.4.1/ai-memory and 0 name 2.4.0, the installed-versions.txt record reads 'ai-memory 2.4.1', and no socket on :49474 was established at that moment (0 of 0 with keepalive timers)."
+}

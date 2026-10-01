@@ -54,7 +54,12 @@ else a pin the base's row candidates already carry, else ``unpinned``, and the c
 ``winner_evidence_refs``. A changed value may also claim no more than the same derivation gives from
 only the evidence refs and host receipts that are already at the base with the same bytes and
 registered there with that sha256 (fifth review): evidence or a receipt that raises a status lands in
-its own earlier pull request, like a single-lane authorization. A row whose only change is
+its own earlier pull request, like a single-lane authorization. On every comparison, each host receipt
+the base registers stays registered at the head with the same recorded claim and the base's reviews as a
+prefix of its own (``host_receipt_history_violations``): receipts are append-only, so a pull request cannot
+delete or rewrite one to bring back what it superseded or vetoed. The base-trusted derivation takes each
+base receipt as the base registered it (``BaseTrust.snapshot_entry``), so a review the head appends neither
+drops it, with a failure it carries, nor raises it. A row whose only change is
 ``platform_status`` needs nothing else. A changed
 grandfathered row is reported and passes here (``build_verdicts.py --check`` freezes it). Every
 row of the base keeps a row at the head whose run id is not older, never moves from a new wave back
@@ -108,7 +113,9 @@ from scripts.landscape import (  # noqa: E402
 )
 from scripts import platform_status as platform_evidence  # noqa: E402
 from scripts.catalog_decisions import identity, safe_file, unique_json  # noqa: E402
-from scripts.host_receipts import evidence_files  # noqa: E402
+from scripts.host_receipts import (  # noqa: E402
+    evidence_files, receipt_claim_sha256, review_state, reviewed_native_pass, validate_receipt_shape,
+)
 from build_manifest import sanitize_value  # noqa: E402
 from build_verdicts import LEDGER_FILES, WAVE_REGISTRY  # noqa: E402
 from record_verdicts import (  # noqa: E402
@@ -1026,6 +1033,9 @@ class RowCheck:
 UNBOUND_WINNER = {"pin": "unpinned", "evidence_refs": []}
 
 
+HOST_RECEIPTS = "evidence/hosts/"
+
+
 class BaseTrust:
     """Which evidence files a raised platform_status may rest on (fifth review): a file that is at the
     base with the same bytes as at the head and that the base's manifests/evidence.json registers with
@@ -1035,6 +1045,7 @@ class BaseTrust:
 
     def __init__(self, base, head):
         self.base, self.head, self.cache, self._base_registry = base, head, {}, None
+        self.snapshots = {}
 
     def base_registry(self):
         if self._base_registry is None:
@@ -1057,10 +1068,54 @@ class BaseTrust:
                                     and registry.get(path) == sha256(data))
         return {path for path in paths if self.cache[path]}
 
+    def base_snapshot(self, path):
+        """The base's parsed copy of the host receipt at ``path`` when the base registers it with those bytes,
+        else None."""
+        if path not in self.snapshots:
+            snapshot = None
+            if isinstance(path, str) and path.startswith(HOST_RECEIPTS) and self.base is not None:
+                data = self.base.read(path)
+                if data is not None and self.base_registry().get(path) == sha256(data):
+                    try:
+                        parsed = strict_json(data)
+                    except ValueError:
+                        parsed = None
+                    snapshot = parsed if isinstance(parsed, dict) else None
+            self.snapshots[path] = snapshot
+        return self.snapshots[path]
+
+    def snapshot_entry(self, entry):
+        """A head summary entry of a base receipt whose head bytes differ from the base's, as its base snapshot:
+        the head may only append reviews (``host_receipt_history_violations``), so its recorded claim must equal
+        the base's, and the review-derived fields (``review_state``, ``shape_ok`` and
+        ``independently_reviewed_native_proven_pass``) come from the base copy. None when there is no such base
+        receipt or the claim changed (a violation of its own)."""
+        base = self.base_snapshot(entry.get("path"))
+        if base is None:
+            return None
+        head_data = self.head.read(entry["path"])
+        try:
+            head = strict_json(head_data) if head_data is not None else None
+        except ValueError:
+            head = None
+        if not isinstance(head, dict) or receipt_claim_sha256(head) != receipt_claim_sha256(base):
+            return None
+        shape_errors = []
+        try:
+            validate_receipt_shape(self.head.root, base, entry["path"], shape_errors)
+            shape_ok = not shape_errors
+        except (OSError, ValueError):   # no readable receipt schema at the head: keep the head entry's verdict
+            shape_ok = entry.get("shape_ok")
+        snapshot = dict(entry, review_state=review_state(base), shape_ok=shape_ok)
+        snapshot["independently_reviewed_native_proven_pass"] = reviewed_native_pass(snapshot)
+        return snapshot
+
     def context(self, context, evidence_refs, component_id=None, platform_id=None):
         """(the StatusContext restricted to base-trusted receipts and evidence refs, the untrusted
         registered refs and ``component_id``'s untrusted ``platform_id`` receipts) for a winner citing
-        ``evidence_refs``."""
+        ``evidence_refs``. A base-registered receipt enters as its base snapshot (``snapshot_entry``), so a
+        review the head appends, a dissent included, neither drops it (and with it a blocking failure) nor
+        raises it."""
         receipts = {entry.get("path") for component in (context.summary.get("components") or {}).values()
                     if isinstance(component, dict)
                     for bucket in (component.get("platforms") or {}).values() if isinstance(bucket, dict)
@@ -1068,10 +1123,22 @@ class BaseTrust:
         refs = {ref.split("#", 1)[0] for ref in evidence_refs or [] if isinstance(ref, str)}
         refs = {path for path in refs if path in context.registered_paths}
         trusted = self.trusted(receipts | refs)
+        kept = set(trusted)
+
+        def restricted_entries(bucket):
+            out = []
+            for entry in bucket.get("receipts") or []:
+                if not isinstance(entry, dict):
+                    continue
+                restricted_entry = entry if entry.get("path") in trusted else self.snapshot_entry(entry)
+                if restricted_entry is not None:
+                    kept.add(entry.get("path"))
+                    out.append(restricted_entry)
+            return out
+
         summary = {**context.summary, "components": {
             component_id: {**component, "platforms": {
-                platform_id: {**bucket, "receipts": [entry for entry in bucket.get("receipts") or []
-                                                     if isinstance(entry, dict) and entry.get("path") in trusted]}
+                platform_id: {**bucket, "receipts": restricted_entries(bucket)}
                 if isinstance(bucket, dict) else bucket
                 for platform_id, bucket in (component.get("platforms") or {}).items()}}
             if isinstance(component, dict) else component
@@ -1079,7 +1146,55 @@ class BaseTrust:
         restricted = platform_evidence.StatusContext(summary=summary, registered_paths=frozenset(refs & trusted))
         own = {entry.get("path") for entry in platform_evidence._platform_receipts(context.summary, component_id,
                                                                                   platform_id)}
-        return restricted, sorted(((own & receipts) | refs) - trusted - {None})
+        return restricted, sorted(((own & receipts) | refs) - kept - {None})
+
+
+def host_receipt_history_violations(base, head):
+    """Host receipts are append-only evidence of record: a receipt the base registers stays registered at the
+    head with the same recorded claim (``host_receipts.receipt_claim_sha256``: the receipt without its
+    ``reviews``) and the base's reviews as a prefix of its own, since ``review`` only appends. Checked on every
+    comparison, not only one that changes a verdict: a successor now retires what it supersedes and a dissent
+    vetoes, so deleting or rewriting one (the dissented tip of a supersede chain, a blocking fail) would bring
+    back what it retired or vetoed, in this pull request or, once merged, for a later raise that the base-trusted
+    derivation (``BaseTrust``) then allows. A correction is a new receipt that supersedes the old one."""
+    def registered_receipts(side):
+        document = side.json("manifests/evidence.json")
+        files = document.get("files") if isinstance(document, dict) else None
+        return {record["path"] for record in files or [] if isinstance(record, dict)
+                and isinstance(record.get("path"), str) and record["path"].startswith(HOST_RECEIPTS)}
+
+    base_paths = sorted(registered_receipts(base))
+    head_paths = registered_receipts(head)
+    blobs = base.blob_ids(base_paths)
+    violations = []
+    for path in base_paths:
+        if path not in blobs:
+            continue   # registered at the base without a file there: the base's own validators report it
+        after_data = head.read(path)
+        if after_data is None or path not in head_paths:
+            violations.append({"row": "repository", "message": (
+                f"{path}: a host receipt registered at the base is {'missing' if after_data is None else 'unregistered'} "
+                "at the head; receipts are never deleted (record a superseding receipt instead)")})
+            continue
+        if git_blob_id(after_data, len(blobs[path])) == blobs[path]:
+            continue
+        try:
+            before, after = strict_json(base.read(path)), strict_json(after_data)
+        except ValueError:
+            before = after = None
+        if not isinstance(before, dict) or not isinstance(after, dict):
+            violations.append({"row": "repository", "message": f"{path}: a base host receipt is no longer a JSON "
+                               "receipt object at the head"})
+            continue
+        reviews_before = before.get("reviews") if isinstance(before.get("reviews"), list) else []
+        reviews_after = after.get("reviews") if isinstance(after.get("reviews"), list) else []
+        if receipt_claim_sha256(before) != receipt_claim_sha256(after):
+            violations.append({"row": "repository", "message": f"{path}: the head changes the recorded claim of a "
+                               "base host receipt; receipts are never rewritten (record a superseding receipt)"})
+        elif not same_value(reviews_before, reviews_after[:len(reviews_before)]):
+            violations.append({"row": "repository", "message": f"{path}: the head drops or rewrites a review the "
+                               "base host receipt carries; reviews are append-only"})
+    return violations
 
 
 def platform_status_violations(key, old, new, context, sealed_bindings, trust=None):
@@ -1104,7 +1219,7 @@ def platform_status_violations(key, old, new, context, sealed_bindings, trust=No
         for platform in platform_evidence.PLATFORMS:
             if declared.get(platform) == before.get(platform) and not binding_changed:
                 continue
-            derived = platform_evidence.platform_status(platform, sealed, context)
+            derived = platform_evidence.platform_status(platform, sealed, context, layer=f"{key[0]}/{key[1]}")
             if declared.get(platform) != derived.status:
                 violations.append({"row": label(key), "message": (
                     f"winner {winner.get('component_id')}: platform_status.{platform} changed to "
@@ -1116,7 +1231,7 @@ def platform_status_violations(key, old, new, context, sealed_bindings, trust=No
                 continue
             restricted, untrusted = trust.context(context, sealed.get("evidence_refs"), winner.get("component_id"),
                                                   platform)
-            supported = platform_evidence.platform_status(platform, sealed, restricted)
+            supported = platform_evidence.platform_status(platform, sealed, restricted, layer=f"{key[0]}/{key[1]}")
             rank = platform_evidence.STATUS_RANK
             if rank.get(declared.get(platform), len(rank)) > rank[supported.status]:
                 violations.append({"row": label(key), "message": (
@@ -1428,6 +1543,7 @@ def evaluate(root, base, head_root=None, *, validators=run_repo_validators):
                                                      check.sealed_bindings, trust))
     removed = [label(key) for key in sorted(set(base_rows) - set(head_rows), key=lambda k: tuple(map(str, k)))]
     violations.extend(row_continuity_violations(base_rows, head_rows, head_waves))
+    violations.extend(host_receipt_history_violations(base_side, head_side))
     violations.extend(wave_freeze_violations(base_side, head_side, base_waves, head_waves))
     violations.extend(new_wave_violations(base_waves, head_waves))
     violations.extend(sota_manifest_violations(base_side, head_side, base_waves, head_waves))

@@ -116,6 +116,10 @@ git checkout "$tag"
 1. If a pin file or `adoption/manifest.json` profile changed, rerun the
    bootstrap for each profile this host installed
    ([bootstrap step 2](bootstrap.md)); it installs the new pinned versions.
+   It also repoints each tool's `bin/` link at once, so when the ai-memory pin
+   changed on a host with an existing store, stop the service and take the
+   at-rest copy in [upgrading an existing store](../recipes/README.md#upgrading-an-existing-store)
+   before this re-run.
 2. If `adoption/templates/` changed, render again and compare before
    overwriting ([bootstrap step 4](bootstrap.md), `render_config.py --check`).
 3. Rerun `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --json`.
@@ -205,11 +209,91 @@ On a host that already adopted the named index:
 
 ```sh
 qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status   # read "Vectors: N embedded"
+qmd --index native-agent-stack-catalog embed    # only when N is above 0
 qmd --index native-agent-stack-catalog search "native worker" \
   -c us-equities-foundation -n 3 --format json
 ```
 
-Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
+`update` re-indexes changed files and computes no vectors. Where the index carries embeddings (`status` reports `Vectors:` above 0), `embed` then embeds only the documents still lacking current vectors, such as new or changed ones (`embed -f` would re-embed everything); without it, the `vec` and `hyde` arms of `query` miss those documents. The lexical profile of [native catalog setup](../catalogs/us-equities/native-workflows.md) carries no vectors and skips `embed`; it also avoids a plain `query`, which expands the text with one model and reranks with another, both downloaded on first use. A `query` made of typed lexical searches with `rerank` off is model-free ([recipes](../recipes/README.md)). `update`'s closing "Run 'qmd embed'" notice prints on any index with unembedded documents, lexical ones included, so it is not the signal. Sources, qmd `v2.8.3`: README [L556](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L556), [L644-L651](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644-L651) and [L1016-L1018](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016-L1018); `src/cli/qmd.ts` [L561](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L561) and [L994-L1002](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994-L1002); `src/store.ts` [L1974-L1978](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1974-L1978).
+
+Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. A host that adopted the index before 2026-09-27 adds the two foundation collections, `foundation-adoption` and `foundation-docs`, once with the commands there; the carrier names all four collections in every `query`. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
+
+## Apply the skills manifest
+
+On a host that has adopted [`adoption/skills/manifest.json`](skills/manifest.json) (added after
+`v2026.09.25.2`; see [the trial record](../docs/decisions/2026-09-25-skills-trial-and-usage.md)):
+
+```sh
+SKILLS=<tools-root>/skills-1.7.0/bin/skills
+npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0    # the manifest's cli.install (pinned, isolated)
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # prints what would change, changes nothing
+python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
+python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
+python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config, on-disk tree (informational)
+claude -p "/skill-doctor" --output-format json                             # native per-skill use count, 0 API tokens
+```
+
+Run the dry run first on a host that has never applied this manifest, and compare its printed
+changes against the manifest before running `--write`. The status script and `/skill-doctor` are
+both read-only and safe to re-run by hand on any schedule; neither installs, removes or updates
+anything, and `/skill-doctor` costs 0 API tokens (`num_turns` 0, model `<synthetic>`). Do not
+wrap either read-only command in a systemd/launchd timer: this project's `automatic_model_calls`
+policy is `false`, and a timer that invokes a model command is exactly what that policy
+excludes, whatever the command's own token cost.
+
+The `skills` step of `--configure-full-profile` (next section) runs the same `install_skills.py`,
+after installing the manifest's pinned CLI under `$ECO_INSTALL_ROOT/tools/skills-<version>` when it is
+missing.
+
+## Refresh the user profile from main
+
+Added after `v2026.09.26.2`. On Linux/WSL2, one command re-applies every user-scope layer this
+catalog manages, instead of the hand steps of [bootstrap](bootstrap.md) steps 4 and 4a and the section
+above:
+
+```sh
+git -C "$MAIN_CLONE" fetch origin && git -C "$MAIN_CLONE" checkout --detach origin/main
+bash "$MAIN_CLONE/adoption/bootstrap-linux.sh" --profile <id> --configure-full-profile --host <name>
+```
+
+`MAIN_CLONE` is a clone used only for this; it must sit at `origin/main`, or the flag refuses and
+prints both commits. The steps, in order, are `claude-profile`, `claude-settings`, `claude-md`,
+`skills`, `codex-lane`, `path-block` and `login-shell` (the table is in
+[bootstrap step 2](bootstrap.md)); each is idempotent and can be left out with `--skip <step>`. It
+writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), gives
+a Codex home without `config.toml` the rendered user-level one minus the source host's trust state
+(an existing `config.toml` is kept and only gains `features.daemon_auto_start = false` through
+`codex features disable`, after a backup), and ends by checking that `claude` in a login shell is
+the ecosystem launcher. A failed step exits 6
+after the others have run. A host installed from a release tag keeps the per-step commands until
+that release carries the flag.
+
+## Start a new repository
+
+Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the
+standing rule and the `sota-sources` check from its first commit
+([new repositories](bootstrap.md#new-repositories)):
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run
+python3 tools/adoption/scaffold_repo.py --target <repo>
+```
+
+A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force <path>` names it,
+with the path as the table prints it. To move an existing repository's workflow to a newer gate,
+commit first, then name only the workflow:
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run --force .github/workflows/sota-sources.yml
+python3 tools/adoption/scaffold_repo.py --target <repo> --force .github/workflows/sota-sources.yml
+```
+
+That replaces the workflow alone (no backup is kept) with one pinned to the current main commit.
+Every other file that differs, such as a filled-in `AGENTS.md` or this host's `.codex/config.toml`,
+is left as it is and reported `skipped`, so the run exits 3. A bare `--force`, or a path that is not
+a scaffold file, is a usage error (exit 2) and writes nothing. The new pin takes effect once that
+commit on GitHub carries `.github/workflows/sota-sources-gate.yml`.
 
 ## Current next moves
 

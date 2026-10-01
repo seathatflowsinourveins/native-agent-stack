@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "id": "headroom-039-qualification-20260925",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-26T00:34:47Z",
+  "component_ids": [
+    "headroom"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-25, headroom-ai 0.39.0 was qualified against the pinned 0.37.0 and not switched; production stays on 0.37.0. Tag v0.39.0 is 66f426171bab32692cf93d2b656a8e4be9004186 and contains d971f7c3 (#3748; compare behind_by 0). Its manylinux_2_28_x86_64 wheel (14,199,952 bytes, sha256 8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74) matched PyPI JSON, the PyPI simple API and the GitHub release asset, and was installed with uv into the new prefix tools/headroom-ai-0.39.0; 555 of 555 headroom/ RECORD digests match the verified wheel and `headroom --version` printed 'headroom, version 0.39.0'. The unchanged upstream test file tests/test_transforms/test_content_detector_timestamp_search.py (blob 23b66a27) passed 6 of 6 on 0.39.0 and 4 of 6 on 0.37.0. Through `headroom mcp serve --proxy-url http://127.0.0.1:1` over stdio, 0.39.0 listed headroom_compress, headroom_retrieve and headroom_stats; compressed the 600-line ISO-timestamped fixture A 16820 -> 257 tokens with ['router:log:0.02'] (0.37.0: 16820 -> 11429 with ['router:search:0.68'], a lossless fold), showing 7 verbatim rows including the planted CRITICAL line 313 and then '[593 lines omitted: 1 ERROR]'; compressed fixture B 39064 -> 3292 with the same output as 0.37.0; returned both originals byte-exact; resolved the summary's 'Retrieve more' hash f681f64d7ad6f5b3c5fc56c7 to the exact original; and reported compressions 2. `headroom savings --json` reported schema_version 2, calls 2 and tokens_saved 52335; `headroom telemetry --json` reported beacon_enabled false. Each version retrieved the other's stored fixtures byte-exact. ~/.headroom, the pinned prefix, the shared bin links and the running user services were unchanged. An independent verifier reproduced these with its own code and agreed. At v0.39.0 the level counts in the '[N lines omitted: ...]' notice are taken over all input lines (log_compressor.py:461-487, _format_output; log_compressor.rs format_output), so the notice reports the kept CRITICAL line as omitted.",
+  "limitations": [
+    "Not switched: 0.37.0 is retained. The omission notice's level counts include kept lines (source-verified at v0.39.0; the same code is at v0.37.0, and #3748's routing now sends the stack's timestamped logs to it), the Rust content detector still lacks the #3736 timestamp guard, #299 pins 0.37.0 in the Linux bootstrap and the token-efficiency lane's end-to-end counters (#296) run at 0.37.0. Overturn when upstream counts levels over the omitted lines only, or a measured answer-quality comparison on log inputs shows net value.",
+    "Fixture A's summary is no longer lossless in 0.39.0: 0.37.0's grep fold rebuilt all 600 rows, while 0.39.0 shows 7 rows, an omission notice and a retrievable marker; the byte-exact original is available only through headroom_retrieve. This is upstream's intended post-#3748 routing.",
+    "The fix was observed only on the pure-Python detector (no onnxruntime in the tool env; both servers logged the fallback). The native path, enabled by onnxruntime>=1.24 or ORT_DYLIB_PATH, was not executed.",
+    "The beacon defaults on in both 0.37.0 and 0.39.0 (BEACON_DEFAULT_ON = True). The opt-out (HEADROOM_OFFLINE=1, DO_NOT_TRACK=1) is owned by the token-efficiency lane (#303, #304); ~/.headroom/config/install_id already existed before this run.",
+    "The landscape ledger's token-efficiency winner pin stays headroom 0.37.0 (sealed 2026-09-22 packets); a receipt at 0.39.0 does not bind to it. Linux x86_64 only; no macOS evidence.",
+    "The fixtures are synthetic (fixture A from the use receipt's generator at 6752ede5; fixture B the retained mcp-tool-listing.json), token counts are headroom's own estimates, and only one upstream test file ran, under a minimal runner; the broader suite is evidenced only by CI on the release commit (137 success, 8 skipped, 1 failure in notify-release on a missing Slack secret).",
+    "No build provenance (no PEP 740 attestation; attestations API 404); integrity rests on three agreeing digests plus RECORD binding, and the 72 dependency wheels were resolved from PyPI with exclude-newer 2026-09-25T22:00:00Z, not individually hash-pinned.",
+    "State compatibility was measured on scratch stores only; the in-place migration of the real ~/.headroom/ccr_store.db was not exercised. During the window other sessions wrote ~/.claude/settings.json and ~/.codex/config.toml, and another session's 0.37.0 MCP server ran throughout; ~/.headroom stayed unchanged."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-25",
+    "pinned_version": "0.37.0",
+    "candidate_version": "0.39.0",
+    "switched": false,
+    "release": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0",
+    "tag_commit": "66f426171bab32692cf93d2b656a8e4be9004186",
+    "wheel_sha256": "8c7594012ce0dcd28202af471fb1bd08c6f226c8e10fc6a682b3fb233e809a74",
+    "fixture_a": {
+      "0.37.0": "16820 -> 11429 tokens, router:search:0.68, lossless fold",
+      "0.39.0": "16820 -> 257 tokens, router:log:0.02, 7 verbatim rows, '[593 lines omitted: 1 ERROR]'"
+    },
+    "upstream_test": {
+      "file_blob": "23b66a27",
+      "0.39.0": "6/6",
+      "0.37.0": "4/6"
+    },
+    "source_check": {
+      "at_utc": "2026-09-26T00:28Z",
+      "python": "headroom/transforms/log_compressor.py:461-487 (blob 0fc79887, same at v0.37.0/v0.38.0/v0.39.0)",
+      "rust": "crates/headroom-core/src/transforms/log_compressor.rs format_output 1396-1433 at v0.39.0",
+      "pr_3635": "merged 2026-09-24T16:01:40Z; changed only log_compressor.rs (summarize_omitted for the CCR marker)"
+    },
+    "independent_review": "verdict agree, production_touched false, 4 minor defects (artifact results.json verifier section)",
+    "artifacts": "evidence/artifacts/sota-refresh-20260925/headroom-039/"
+  },
+  "provenance": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/mcp_session.py",
+      "sha256": "dbf2d0ed74fdf174585218dc18ca1315c589a2f8188e58ec64b838abb2edfbb9",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/record_bind.py",
+      "sha256": "819368b66c939501d671d9e112f80e2f0927a282d33429e9a3a074e865cd1ff8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/steps/run_upstream_tests.py",
+      "sha256": "29aff31fef58348a082f9b05cb77b3913191180dce328f2ec9921af4df3263b1",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/criteria.json",
+      "sha256": "b270530c8c4bc1bd761b1d76a65c39043b9f7b2a49219b1165bd3a8d26dc3c95",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/result-session.json",
+      "sha256": "796e1a1cb451eb37e19d99d6e1a2ad4b424c5424942157596788f292268be5e7",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.37.0/result-session.json",
+      "sha256": "76a0a565cabb1676b1fff4380683529608941cdc96c3d3b230636dd5e65f544c",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/compressed-A.txt",
+      "sha256": "d09c822e7eb7d9a50893a180ec031e8756079a35e8b069d1eba4cc446bd01d86",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/savings.json",
+      "sha256": "63747bf4ff3ae1dafae176ef1db8046f9ac486470de3e6192be2abbd7c82fa63",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/0.39.0/telemetry.json",
+      "sha256": "ea060ea1d406848dd37ecf24875fc665e29339c921b4c6c185ab604af7c5e9c8",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/run-outputs.json",
+      "sha256": "6b3bb8bcdba5576a91d054c094d7adeea408329126814b8f2468a28735a697a7",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/verifier/run-outputs.json",
+      "sha256": "f1784028d4afa961f20b44b494676ea0881adba742d2524932e030a318239ec6",
+      "byte_identical_to_run_copy": false
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/out/readback.out",
+      "sha256": "5d1ec3fe191cb3e289a8872ea0a827774d0f06fac933ad648420e2d6d88b9b91",
+      "byte_identical_to_run_copy": true
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260925/headroom-039/results.json",
+      "sha256": "269d606fb623ee09f5ab22e4b76b7d3576f963f3fd94208da878df1c211bab38",
+      "byte_identical_to_run_copy": false
+    }
+  ]
+}

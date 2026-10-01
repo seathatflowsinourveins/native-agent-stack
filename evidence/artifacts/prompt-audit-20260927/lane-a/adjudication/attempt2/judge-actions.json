@@ -1,0 +1,1094 @@
+{
+ "gpt6-AB": [
+  {
+   "command": "/bin/bash -lc 'rtk ls -la'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat ~/.codex/RTK.md'",
+   "exit": 0,
+   "outside_paths": [
+    "~/.codex/RTK.md"
+   ]
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,130p' AGENTS.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,150p' examples/claude-native/CLAUDE.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '900,1005p' tests/test_install_claude_profile.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,280p' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat adoption/templates/codex.AGENTS.template.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,200p' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat ~/.agents/skills/<skill>/SKILL.md'",
+   "exit": 0,
+   "outside_paths": [
+    "~/.agents/skills/<skill>/SKILL.md"
+   ]
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=190 && NR<=260 {print NR \\\":\\\" \"'$0}'\"' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR<=60 {print NR \\\":\\\" \"'$0}'\"' adoption/templates/codex.AGENTS.template.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'source of truth|capability claims|installed client|385|120 words' docs/harness-defaults.md docs/decisions/2026-09-26-codex-worker-lane.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk rg --files -g AGENTS.md -g CLAUDE.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=340 && NR<=400 {print NR \\\":\\\" \"'$0}'\"' scripts/validate.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'TOP_RULE_SHA256|476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311|len\\\\(top.split\\\\(\\\\)\\\\)|120 words|144 words|installed client are the source of truth' tests tools adoption examples docs .github\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=54 && NR<=84 {print NR \\\":\\\" \"'$0}'\"' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=1 && NR<=90 {print NR \\\":\\\" \"'$0}'\"' tests/test_install_claude_profile.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=175 && NR<=194 {print NR \\\":\\\" \"'$0}'\"' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=1 && NR<=125 {print NR \\\":\\\" \"'$0}'\"' tools/adoption/apply_codex_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'codex.AGENTS.template.md|test_codex_worker_lane.py|CLAUDE.md|top.rule' tests/test_codex_agents.py tests/test_landscape_sweep_harness.py tools/adoption/prove_codex_lane.py .github/workflows/validate.yml scripts/evidence_manifest.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=3725 && NR<=3770 || NR>=38800 && NR<=38836 {print NR \\\":\\\" \"'$0}'\"' manifests/evidence.json\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'test_codex_worker_lane.py|test_install_claude_profile.py|tests/' manifests/evidence.json\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=1 && NR<=95 {print NR \\\":\\\" \"'$0}'\"' scripts/evidence_manifest.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=1 && NR<=90 {print NR \\\":\\\" \"'$0}'\"' tests/test_codex_agents.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=78 && NR<=90 {print NR \\\":\\\" \"'$0}'\"' recipes/claude-native-profile.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=35 && NR<=78 {print NR \\\":\\\" \"'$0}'\"' docs/decisions/2026-09-26-codex-worker-lane.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=130 && NR<=148 {print NR \\\":\\\" \"'$0}'\"' .github/workflows/validate.yml\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -A 3 -B 1 '\\\"path\\\": \\\"tests/test_(codex_worker_lane|install_claude_profile).py\\\"' manifests/evidence.json\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'evidence_manifest|register.*evidence|re-register|refresh.*(hash|evidence)|update.*(hash|manifest)' scripts/README.md docs/acceptance-evidence-policy.md docs/lanes.md .github/workflows/validate.yml\"",
+   "exit": 2,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=90 && NR<=130 {print NR \\\":\\\" \"'$0}'\"' docs/lanes.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'evidence.json|register|manifest' docs/acceptance-evidence-policy.md .github/workflows/validate.yml\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk python3 -B - <<'PY'\nimport ast\nimport hashlib\nimport io\nimport json\nfrom pathlib import Path\nfrom types import SimpleNamespace\nimport re\nimport unittest\nfrom unittest import mock\n\nroot = Path.cwd()\nmanifest = {x['path']: x for x in json.loads((root / 'manifests/evidence.json').read_text())['files']}\n\ndef digest(text):\n    return hashlib.sha256(text.encode()).hexdigest()\n\ndef pinned_status(path, text):\n    rec = manifest[path]\n    return {'sha256_matches': digest(text) == rec['sha256'], 'bytes_match': len(text.encode()) == rec['bytes']}\n\ndef run_suite(cls, methods):\n    suite = unittest.TestSuite(cls(method) for method in methods)\n    result = unittest.TestResult()\n    suite.run(result)\n    return {'tests': result.testsRun, 'failures': len(result.failures), 'errors': len(result.errors)}\n\nclaude_test_path = 'tests/test_install_claude_profile.py'\nclaude_tree = ast.parse((root / claude_test_path).read_text())\nclaude_class = next(n for n in claude_tree.body if isinstance(n, ast.ClassDef) and n.name == 'PortableTopRuleTests')\nclaude_ns = {'unittest': unittest, 'ROOT': root, 're': re}\nexec(compile(ast.Module(body=[claude_class], type_ignores=[]), str(root / claude_test_path), 'exec'), claude_ns)\ncls = claude_ns['PortableTopRuleTests']\nclaude_path = 'examples/claude-native/CLAUDE.md'\nclaude = (root / claude_path).read_text()\nold_claude = claude.splitlines()[2]\nheadline = '**Top rule: research convergence first; current upstream SOTA is the source of truth.** '\ncompounds = 'The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.'\nvariants = {\n    'original': old_claude,\n    'packet_proposal': headline + 'Never self-write without a SOTA source. ' + compounds,\n    'A': headline + 'So never self-write without a SOTA source. ' + compounds,\n    'B': headline + 'The installed client is also a source of truth; never self-write without a SOTA source. ' + compounds,\n}\nmethods = unittest.defaultTestLoader.getTestCaseNames(cls)\nfor name, new_line in variants.items():\n    text = claude.replace(old_claude, new_line, 1)\n    with mock.patch.object(cls, 'TEMPLATE', SimpleNamespace(read_text=lambda **kwargs: text)):\n        result = run_suite(cls, methods)\n    print(json.dumps({'item': 'X5a', 'variant': name, 'words': len(text.split()), 'ceiling': cls.ceiling(), 'procedure_errors': cls.errors(text), 'unit_tests': result, 'existing_manifest': pinned_status(claude_path, text)}))\n\ncodex_test_path = 'tests/test_codex_worker_lane.py'\ncodex_source = (root / codex_test_path).read_text()\ncodex_path = 'adoption/templates/codex.AGENTS.template.md'\ncodex = (root / codex_path).read_text()\nold_codex = codex.splitlines()[2]\nnew_codex = 'Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. ' + compounds\ncodex_new = codex.replace(old_codex, new_codex, 1)\nold_sha = '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311'\nnew_sha = '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f'\nfor target in ('120 words by', old_sha, 'self.assertEqual(len(top.split()), 120)'):\n    assert codex_source.count(target) == 1\ncodex_updated_source = codex_source.replace('120 words by', '144 words by').replace(old_sha, new_sha).replace('self.assertEqual(len(top.split()), 120)', 'self.assertEqual(len(top.split()), 144)')\n\ndef codex_namespace(source):\n    nodes = []\n    for node in ast.parse(source).body:\n        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id in ('TOP_RULE_SHA256', 'RTK_AWARENESS_SHA256', 'UPSTREAM_MARKER') for t in node.targets):\n            nodes.append(node)\n        if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in ('template_segments', 'TemplateTests'):\n            nodes.append(node)\n    lane = SimpleNamespace(BLOCK_BEGIN='<\"'!-- native-agent-stack:codex-user-instructions:begin'\"', BLOCK_END='<\"'!-- native-agent-stack:codex-user-instructions:end -->'\"', TOP_RULE_MARKER='native-agent-stack:top-rule', EXCEPTIONS_MARKER='native-agent-stack:rtk-exceptions', agents_block=lambda: (root / codex_path).read_text())\n    ns = {'unittest': unittest, 'hashlib': hashlib, 'TEMPLATES': root / 'adoption/templates', 'lane': lane}\n    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(root / codex_test_path), 'exec'), ns)\n    return ns\n\ncodex_methods = ['test_agents_template_is_one_managed_block', 'test_top_rule_and_upstream_text_are_verbatim', 'test_exceptions_name_every_raw_sensitive_form']\nread_text = Path.read_text\nfor name, candidate, test_source in [('original_or_B', codex, codex_source), ('A_without_cochanges', codex_new, codex_source), ('A_with_stated_test_cochanges', codex_new, codex_updated_source)]:\n    ns = codex_namespace(test_source)\n    def substitute(path, *args, **kwargs):\n        return candidate if path == root / codex_path else read_text(path, *args, **kwargs)\n    with mock.patch.object(Path, 'read_text', substitute):\n        top, upstream, exceptions = ns['template_segments']()\n        result = run_suite(ns['TemplateTests'], codex_methods)\n    print(json.dumps({'item': 'X5c', 'variant': name, 'bytes': len(candidate.encode()), 'top_words': len(top.split()), 'top_sha256': digest(top), 'unit_tests': result, 'upstream_unchanged': digest(upstream) == ns['RTK_AWARENESS_SHA256'], 'test_file_manifest': pinned_status(codex_test_path, test_source), 'test_file_actual_sha256': digest(test_source), 'test_file_actual_bytes': len(test_source.encode())}))\nPY\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0|7ce4fbc38f1994746c21d7dc5b9d9367d6c7c3b02ee4d725ea859e54ab93f313|3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf' tests tools scripts adoption manifests\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'CLAUDE.md|top.rule|Top rule' tests/test_install_claude_profile.py tests/test_harness_defaults.py\"",
+   "exit": 2,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n 'def register_file' scripts/host_receipts.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=72 && NR<=87 {print NR \\\":\\\" \"'$0}'\"' .github/workflows/validate.yml\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=700 && NR<=754 {print NR \\\":\\\" \"'$0}'\"' scripts/host_receipts.py\"",
+   "exit": 0,
+   "outside_paths": []
+  }
+ ],
+ "gpt6-BA": [
+  {
+   "command": "/bin/bash -lc 'rtk ls -la'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat ~/.codex/RTK.md'",
+   "exit": 0,
+   "outside_paths": [
+    "~/.codex/RTK.md"
+   ]
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg --files -g AGENTS.md -g CLAUDE.md -g '*packet*' -g '*x5*'\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat AGENTS.md CLAUDE.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,150p' examples/claude-native/CLAUDE.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,280p' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '905,995p' tests/test_install_claude_profile.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat ~/.agents/skills/<skill>/SKILL.md'",
+   "exit": 0,
+   "outside_paths": [
+    "~/.agents/skills/<skill>/SKILL.md"
+   ]
+  },
+  {
+   "command": "/bin/bash -lc 'rtk cat adoption/templates/codex.AGENTS.template.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,62p' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -C 7 '\\\"path\\\": \\\"(examples/claude-native/CLAUDE.md|adoption/templates/codex.AGENTS.template.md|tests/test_codex_worker_lane.py)\\\"' manifests/evidence.json\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '305,420p' scripts/validate.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -C 7 'Upstream verification|source of truth|#385|installed client|upstream' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,255p' scripts/evidence_manifest.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,105p' tests/test_codex_agents.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n --max-columns 220 --max-columns-preview 'TOP_RULE_SHA256|476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311|top-rule block|120 words|never self-write without a SOTA source|Upstream and the installed client|upstream and the installed client' tests tools adoption docs recipes examples .github/workflows\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '56,102p' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n --max-count 12 --max-columns 220 --max-columns-preview 'def .*register|register.*evidence|re-register|reregister|refresh.*hash|update.*hash' scripts/host_receipts.py scripts/register_evidence.py docs/acceptance-evidence-policy.md docs/evidence-manifest-ordering.md recipes/README.md\"",
+   "exit": 2,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '1,90p' tests/test_install_claude_profile.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n --max-columns 240 --max-columns-preview 'def agents_block|TOP_RULE_MARKER|AGENTS.template|template' tools/adoption/apply_codex_lane.py tools/adoption/prove_codex_lane.py tests/test_landscape_sweep_harness.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '105,150p' .github/workflows/validate.yml\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n --max-columns 250 --max-columns-preview 'register.*--|register_evidence|register_file|re-register|hashes|rehash' docs/acceptance-evidence-policy.md scripts/host_receipts.py scripts/validate.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '700,740p' scripts/host_receipts.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n --max-columns 220 --max-columns-preview 'register-evidence|register_evidence|refresh.*hash|re-register|registered.*evidence.json' README.md docs recipes adoption scripts .github\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk sed -n '260,285p' tools/adoption/apply_codex_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk python3 -B - <<'PY'\nimport hashlib\nimport io\nimport json\nimport runpy\nimport sys\nimport unittest\nfrom pathlib import Path\nfrom types import SimpleNamespace\nfrom unittest import mock\n\nroot = Path.cwd()\nmanifest = {row['path']: row for row in json.loads((root / 'manifests/evidence.json').read_text())['files']}\n\ndef digest(text):\n    return hashlib.sha256(text.encode('utf-8')).hexdigest()\n\ndef manifest_checks(changes, reregister):\n    result = []\n    for name, text in changes.items():\n        stored = manifest[name].copy()\n        if name in reregister:\n            stored.update(sha256=digest(text), bytes=len(text.encode('utf-8')))\n        errors = []\n        if digest(text) \"'!= stored['\"'sha256']:\n            errors.append('SHA-256 mismatch')\n        if len(text.encode('utf-8')) \"'!= stored['\"'bytes']:\n            errors.append('byte count mismatch')\n        result.append({'path':name,'errors':errors,'bytes':len(text.encode('utf-8'))})\n    return result\n\ndef run_tests(test_class, names=None):\n    suite = (unittest.defaultTestLoader.loadTestsFromTestCase(test_class) if names is None\n             else unittest.TestSuite(test_class(name) for name in names))\n    result = unittest.TextTestRunner(stream=io.StringIO(), verbosity=2).run(suite)\n    return {'run':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),\n            'diagnostics':[trace.splitlines()[-1] for _,trace in result.failures + result.errors]}\n\nclaude_path = 'examples/claude-native/CLAUDE.md'\nclaude = (root / claude_path).read_text()\nold_a = claude.splitlines()[2]\nclaude_ns = runpy.run_path(str(root / 'tests/test_install_claude_profile.py'))\nclaude_tests = claude_ns['PortableTopRuleTests']\nvariants_a = {\n    'current': old_a,\n    'packet_proposal': '**Top rule: research convergence first; current upstream SOTA is the source of truth.** Never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.',\n    'A': '**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.',\n    'B': '**Top rule: research convergence first; current upstream SOTA is the source of truth.** So never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.'\n}\nfor label,line in variants_a.items():\n    candidate = claude.replace(old_a,line,1)\n    with mock.patch.object(claude_tests,'TEMPLATE',SimpleNamespace(read_text=lambda **_:candidate)):\n        results = run_tests(claude_tests)\n    print(json.dumps({'item':'X5a','variant':label,'tests':results,'words':len(candidate.split()),\n        'ceiling':claude_tests.ceiling(),'procedure_errors':claude_tests.errors(candidate),\n        'manifest':manifest_checks({claude_path:candidate},{claude_path} if label=='B' else set())}))\n\ncodex_path = 'adoption/templates/codex.AGENTS.template.md'\ntest_path = 'tests/test_codex_worker_lane.py'\ncodex = (root / codex_path).read_text()\nold_c = codex.splitlines()[2]\nnew_c = 'Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.'\ncodex_changed = codex.replace(old_c,new_c,1)\ntest_original = (root / test_path).read_text()\ntest_changed = test_original.replace(\n '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311',\n '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f'\n).replace('top-rule block (120 words','top-rule block (144 words').replace('self.assertEqual(len(top.split()), 120)','self.assertEqual(len(top.split()), 144)')\nreal_read_text = Path.read_text\ncodex_methods = ['test_agents_template_is_one_managed_block','test_top_rule_and_upstream_text_are_verbatim','test_exceptions_name_every_raw_sensitive_form']\nfor label,template,test_source,registered in [\n ('A_current',codex,test_original,set()),\n ('proposal_without_cochanges',codex_changed,test_original,set()),\n ('B_with_named_cochanges',codex_changed,test_changed,{codex_path})\n]:\n    namespace = {'__file__':str(root/test_path),'__name__':'adjudication_x5c'}\n    exec(compile(test_source,str(root/test_path),'exec'),namespace)\n    def read_text(path,*args,**kwargs):\n        if path.resolve() == (root/codex_path):\n            return template\n        return real_read_text(path,*args,**kwargs)\n    with mock.patch.object(Path,'read_text',read_text):\n        results = run_tests(namespace['TemplateTests'],codex_methods)\n        top,upstream,exceptions = namespace['template_segments']()\n    print(json.dumps({'item':'X5c','variant':label,'tests':results,'top_words':len(top.split()),\n      'top_sha256':digest(top),'template_bytes':len(template.encode('utf-8')),\n      'manifest':manifest_checks({codex_path:template,test_path:test_source},registered)}))\nPY\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk ls -la ..'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=3748 && NR<=3752 || NR>=38814 && NR<=38818 || NR>=39929 && NR<=39933 {printf \\\"%d:%s\\\\n\\\", NR, \"'$0}'\"' manifests/evidence.json\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=368 && NR<=389 {printf \\\"%d:%s\\\\n\\\", NR, \"'$0}'\"' scripts/validate.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=1 && NR<=9 || NR>=41 && NR<=50 || NR>=185 && NR<=212 {printf \\\"%d:%s\\\\n\\\", NR, \"'$0}'\"' tests/test_codex_worker_lane.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk awk 'NR>=958 && NR<=984 {printf \\\"%d:%s\\\\n\\\", NR, \"'$0}'\"' tests/test_install_claude_profile.py\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk python3 -B - <<'PY'\nimport hashlib\nimport json\nfrom pathlib import Path\npaths = [Path('../adjudication-inputs/x5.BA.json'), Path('../packets/x5.json')]\nfor path in paths:\n    if not path.is_file():\n        print(f'{path}: not found')\n        continue\n    raw = path.read_text()\n    data = json.loads(raw)\n    print(f'{path}: keys={list(data)}')\n    if 'packet' in data:\n        print('packet_text_sha256='+hashlib.sha256(data['packet'].encode()).hexdigest())\n    for line_number,line in enumerate(raw.splitlines(),1):\n        if 'A return\\\\'s effective resolution' in line or 'Non-blocking co-change' in line or 'Required in the same commit:' in line:\n            print(f'{path}:{line_number}:{line}')\nPY\"",
+   "exit": 0,
+   "outside_paths": []
+  }
+ ],
+ "claude-AB": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/adjudication-inputs/x5.AB.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x5.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "gpt-|o3|o4|astra|opus|sonnet|haiku|fable|mythos|claude-opus|gemini|grok|llama|mistral|deepseek|qwen",
+    "path": "<judges>/adjudication-inputs/x5.AB.json",
+    "-i": true,
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "\"(lane|model|provenance|refutation)\"\\s*:",
+    "path": "<judges>/adjudication-inputs/x5.AB.json",
+    "-i": true,
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(^|[\\s\"'`(=])(/home|/Users|/tmp|/root|/var|/private|/mnt|/opt|/etc|/srv|/workspace|/data|[A-Za-z]:\\\\)",
+    "path": "<judges>/adjudication-inputs/x5.AB.json",
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": [
+    "/Users",
+    "/etc",
+    "/home",
+    "/mnt",
+    "/opt",
+    "/root",
+    "/tmp",
+    "/var"
+   ]
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(codex|claude|openai|anthropic)('s)?\\s+(lane|family|reviewer|proposal|return|review|verdict)|(lane|family|reviewer)\\s+(A|B)\\b",
+    "path": "<judges>/adjudication-inputs/x5.AB.json",
+    "-i": true,
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/examples/claude-native/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_install_claude_profile.py",
+    "offset": 905,
+    "limit": 95
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "installed client are the source of truth|research first, and never self-write|never self-write without a SOTA source",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/scripts/validate.py",
+    "offset": 360,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/adoption/templates/codex.AGENTS.template.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_codex_worker_lane.py",
+    "limit": 240
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "codex\\.AGENTS\\.template|TOP_RULE_SHA256|476b73c52ecc|71a852be0b5e|top-rule block|TOP_RULE_MARKER",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "!evidence/artifacts/**"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "71a852be",
+    "path": "<root>",
+    "output_mode": "files_with_matches"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_landscape_sweep_harness.py",
+    "offset": 1005,
+    "limit": 35
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_codex_agents.py"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "120 words|120-word|top rule",
+    "path": "<root>/docs/decisions/2026-09-26-codex-worker-lane.md",
+    "output_mode": "content",
+    "-n": true,
+    "-C": 2
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 54,
+    "limit": 48
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "120|top rule|Top rule|installed client",
+    "path": "<root>/recipes/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": ".{0,200}codex\\.AGENTS\\.template.{0,300}",
+    "path": "<root>/tools/sota-convergence/landscape-sweep/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/manifests/evidence.json",
+    "offset": 3745,
+    "limit": 10
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/manifests/evidence.json",
+    "offset": 38811,
+    "limit": 10
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "X5|top rule|Top rule",
+    "path": "<root>/docs/decisions/2026-09-27-prompt-audit-resolution.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": ".{0,250}(120|top rule).{0,250}",
+    "path": "<root>/recipes/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/recipes/claude-native-profile.md",
+    "offset": 79,
+    "limit": 12
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": ".{0,160}120.{0,160}",
+    "path": "<root>/recipes/README.md",
+    "output_mode": "content",
+    "-n": true,
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tools/adoption/prove_codex_lane.py",
+    "offset": 130,
+    "limit": 30
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "sha256|hash",
+    "path": "<root>/tools/adoption/apply_codex_lane.py",
+    "output_mode": "content",
+    "-n": true,
+    "-i": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "2026-09-26-codex-worker-lane|Top rule|top rule|source of truth",
+    "path": "<root>/tests",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "*.py"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_adoption_docs_consistency.py",
+    "offset": 785,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_codex_worker_lane.py",
+    "offset": 396,
+    "limit": 16
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/decisions/2026-09-26-codex-worker-lane.md",
+    "offset": 1,
+    "limit": 70
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "sha256|bytes|def |--write|--check",
+    "path": "<root>/scripts/evidence_manifest.py",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "\"path\": \"tests/test_codex_worker_lane\\.py\"|\"path\": \"tests/test_install_claude_profile\\.py\"",
+    "path": "<root>/manifests/evidence.json",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/manifests/evidence.json",
+    "offset": 39929,
+    "limit": 4
+   },
+   "outside_paths": []
+  }
+ ],
+ "claude-BA": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/adjudication-inputs/x5.BA.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<judges>/packets/x5.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "gpt-|astra|opus|sonnet|haiku|fable|mythos|claude-opus|o3|o4",
+    "path": "<judges>/adjudication-inputs/x5.BA.json",
+    "-i": true,
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "\"(lane|model|provenance|refutation)\"\\s*:",
+    "path": "<judges>/adjudication-inputs/x5.BA.json",
+    "-i": true,
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(/home|/Users|/tmp|/root|/var|/opt|/mnt|[A-Za-z]:\\\\\\\\|~/|claude|codex)",
+    "path": "<judges>/adjudication-inputs/x5.BA.json",
+    "-i": true,
+    "output_mode": "content",
+    "-o": true
+   },
+   "outside_paths": [
+    "/Users",
+    "/home",
+    "/mnt",
+    "/opt",
+    "/root",
+    "/tmp",
+    "/var"
+   ]
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_install_claude_profile.py",
+    "offset": 905,
+    "limit": 95
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/examples/claude-native/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/adoption/templates/codex.AGENTS.template.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_codex_worker_lane.py"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "installed client (are|is also) (the|a) source of truth",
+    "path": "<root>",
+    "-i": true,
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311|71a852be",
+    "path": "<root>",
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "never self-write|research first, and",
+    "path": "<root>",
+    "-i": true,
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "120 words|120-word",
+    "path": "<root>",
+    "output_mode": "content"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "top rule|Top rule|source of truth|#385",
+    "path": "<root>/docs/harness-defaults.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/decisions/2026-09-26-codex-worker-lane.md",
+    "offset": 40,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 1,
+    "limit": 12
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 54,
+    "limit": 70
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "\"path\": \"(examples/claude-native/CLAUDE\\.md|adoption/templates/codex\\.AGENTS\\.template\\.md|tests/test_codex_worker_lane\\.py|tests/test_install_claude_profile\\.py)\"",
+    "path": "<root>/manifests/evidence.json",
+    "output_mode": "content",
+    "-n": true,
+    "-A": 4,
+    "-B": 4
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/scripts/validate.py",
+    "offset": 350,
+    "limit": 60
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Top rule|top-rule|TOP_RULE|never self-write|source of truth",
+    "path": "<root>/tools",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Top rule|top-rule|TOP_RULE|never self-write",
+    "path": "<root>/tests",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Top rule|top-rule|TOP_RULE|never self-write",
+    "path": "<root>/scripts",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "def agents_block|TEMPLATE|codex\\.AGENTS\\.template\\.md",
+    "path": "<root>/tools/adoption/apply_codex_lane.py",
+    "output_mode": "content",
+    "-n": true,
+    "-A": 3
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "codex\\.AGENTS\\.template\\.md",
+    "path": "<root>",
+    "output_mode": "files_with_matches"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "codex\\.AGENTS\\.template\\.md",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "{examples/**,tests/test_codex_agents.py,tests/test_landscape_sweep_harness.py,tools/sota-convergence/**,recipes/README.md}"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_landscape_sweep_harness.py",
+    "offset": 1010,
+    "limit": 25
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_codex_agents.py",
+    "offset": 1,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "top rule|top-rule|staged|120",
+    "path": "<root>/evidence/artifacts/codex-worker-lane-20260926",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "7ce4fbc38f1994746c21d7dc5b9d9367d6c7c3b02ee4d725ea859e54ab93f313|bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "evidence_manifest\\.py",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "{AGENTS.md,CLAUDE.md,docs/*.md,.github/workflows/*.yml,scripts/evidence_manifest.py}"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "evidence\\.json",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "{AGENTS.md,docs/lanes.md,scripts/evidence_manifest.py,CONTRIBUTING.md,README.md}"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/lanes.md",
+    "offset": 90,
+    "limit": 50
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "python3 -m unittest|scripts/validate\\.py",
+    "path": "<root>/.github/workflows/validate.yml",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "~/\\.codex/AGENTS\\.md",
+    "path": "<root>",
+    "output_mode": "files_with_matches",
+    "head_limit": 5
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "long form",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "!evidence/**"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/tests/test_adoption_docs_consistency.py",
+    "offset": 780,
+    "limit": 70
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "claude-native[\"/ ,]+[\"]?CLAUDE\\.md|examples/claude-native/CLAUDE\\.md",
+    "path": "<root>/tests",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "CLAUDE\\.md",
+    "path": "<root>/tests",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  }
+ ]
+}

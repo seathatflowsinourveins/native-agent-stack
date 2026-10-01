@@ -52,6 +52,13 @@ DRIFT_TABLE_HEADER = (
     "upstream latest (fresh) | behind (published) | behind (fresh) |"
 )
 DRIFT_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- |"
+TRADING_FRESHNESS_FILE = "trading-freshness.json"
+TRADING_TABLE_HEADING = "## Trading components: pin vs upstream latest"
+TRADING_TABLE_HEADER = (
+    "| id | layers | pin | upstream latest | behind | last release | last commit | "
+    "days since release/commit | dormant | archived |"
+)
+TRADING_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
@@ -229,6 +236,94 @@ def render_drift_markdown(published_path, rebuilt_name: str, published: dict, re
     return "\n".join(lines) + "\n"
 
 
+def load_trading_freshness(work_dir: Path) -> dict | None:
+    """build_manifest.py's report-only trading-freshness.json, or None when this
+    work directory has none (a run from before it existed). Present but
+    unreadable fails closed, the same way github-freshness.json does."""
+    path = work_dir / TRADING_FRESHNESS_FILE
+    if not path.exists():
+        return None
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError) as error:
+        raise FreshnessProposeError(f"could not read {path}: {error}") from error
+    if not isinstance(document, dict) or not isinstance(document.get("entries"), list):
+        raise FreshnessProposeError(f"{path}: expected a JSON object with an entries list")
+    return document
+
+
+def _yes_no(value) -> str:
+    return "unknown" if value is None else ("yes" if value else "no")
+
+
+def trading_freshness_rows(document: dict, raw_repositories: dict | None = None):
+    """Rows for the trading table plus the dormant/archived/unfetched id lists.
+
+    A row whose repository has no reliable upstream data this run (no
+    ``upstream.pushed_at``, or an ``error``/``partial_errors`` freshness record)
+    has every upstream-derived cell blanked and ``dormant`` shown as unknown.
+    This is the same reliability rule ``compute_drift`` applies."""
+    rows, dormant, archived, unfetched = [], [], [], []
+    for entry in sorted(document.get("entries", []), key=lambda item: str(item.get("id"))):
+        upstream = entry.get("upstream") or {}
+        dormancy = entry.get("dormancy") or {}
+        unreliable = upstream.get("pushed_at") is None or _freshness_record_has_error(
+            entry.get("repository"), raw_repositories,
+        )
+        if entry.get("pin_comparison") == "not_compared":
+            behind = f"not compared ({entry.get('pin_comparison_reason')})"
+        else:
+            behind = _yes_no(entry.get("pin_behind_upstream"))
+        if unreliable:
+            unfetched.append(entry.get("id"))
+            cells = (None, "unknown", None, None, None, "unknown", "unknown")
+        else:
+            if dormancy.get("dormant") is True:
+                dormant.append(entry.get("id"))
+            if upstream.get("archived") is True:
+                archived.append(entry.get("id"))
+            cells = (upstream.get("latest"), behind, dormancy.get("last_release_at"),
+                     dormancy.get("last_commit_at"), dormancy.get("days_since_activity"),
+                     _yes_no(dormancy.get("dormant")), _yes_no(upstream.get("archived")))
+        rows.append((entry.get("id"), ", ".join(entry.get("layers") or []), entry.get("pin"), *cells))
+    return rows, dormant, archived, unfetched
+
+
+def render_trading_markdown(document: dict, raw_repositories: dict | None = None):
+    """The drift.md section listing every pinned trading component against
+    upstream. Returns ``(markdown, summary)``. The section is informational: it
+    has its own header (never ``DRIFT_TABLE_HEADER``), so ``drifted_component_ids``
+    never reads it, and it never sets ``drift-status.txt``."""
+    rows, dormant, archived, unfetched = trading_freshness_rows(document, raw_repositories)
+    threshold = document.get("dormancy_threshold_days")
+    lines = [
+        TRADING_TABLE_HEADING, "",
+        "Report-only. This table lists every pinned trading component, including those that did not "
+        "change since the published manifest: each selected (`default`/`conditional`) "
+        "`catalogs/us-equities` card, plus the trading pins that blueprint or runtime records declare "
+        "outside those cards (`tools/sota-convergence/extract_layers.py` `TRADING_PIN_SOURCES`). A "
+        f"dormant upstream has no GitHub release and no default-branch commit in the last {threshold} "
+        f"days as of `{document.get('checked_at')}`. Dormant and archived rows are not drift. They "
+        "select nothing.", "",
+    ]
+    if rows:
+        lines += [TRADING_TABLE_HEADER, TRADING_TABLE_SEPARATOR]
+        for row in rows:
+            lines.append("| " + " | ".join(md_cell(value) for value in row) + " |")
+    else:
+        lines.append("No pinned trading component was found.")
+    for ids, sentence in (
+        (dormant, f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
+        (archived, "archived upstream repository(ies)"),
+        (unfetched, "trading component(s) with no reliable upstream data this run"),
+    ):
+        if ids:
+            lines += ["", f"{len(ids)} {sentence}:", "", ", ".join(md_cell(item) for item in sorted(ids))]
+    summary = {"trading": [row[0] for row in rows], "dormant": sorted(dormant),
+               "archived": sorted(archived), "trading_unfetched": sorted(unfetched)}
+    return "\n".join(lines) + "\n", summary
+
+
 def _load_freshness_document(work_dir: Path) -> dict:
     """Load github-freshness.json, failing closed (N2b): raises rather than
     returning an empty/zero-like default when the file is missing,
@@ -271,7 +366,11 @@ def build_drift_report(work_dir: Path) -> dict:
     """Rebuild ``drift.md``, ``drift-status.txt``, ``upstream-errors.txt``
     and ``upstream-partial-errors.txt`` from the newest rebuilt manifest in
     ``work_dir``, the newest published manifest in the checkout (current
-    working directory), and ``work_dir``'s ``github-freshness.json``.
+    working directory), and ``work_dir``'s ``github-freshness.json``. When
+    ``work_dir`` also holds build_manifest.py's ``trading-freshness.json``,
+    ``drift.md`` gains the report-only trading table (``render_trading_markdown``),
+    and the result gains ``trading``/``dormant``/``archived``/``trading_unfetched``
+    id lists. That table never changes ``drift-status.txt``.
 
     Called both by ``catalog-freshness.yml``'s "Diff the rebuilt manifest"
     step (imported directly from a small inline script, not reimplemented
@@ -304,6 +403,11 @@ def build_drift_report(work_dir: Path) -> dict:
     # evidence; published_path is already a safe, relative repository path.
     markdown = render_drift_markdown(published_path, rebuilt_path.name, published, rebuilt,
                                       drifted, unfetched, no_release)
+    trading_summary = {"trading": [], "dormant": [], "archived": [], "trading_unfetched": []}
+    trading_document = load_trading_freshness(work_dir)
+    if trading_document is not None:
+        trading_markdown, trading_summary = render_trading_markdown(trading_document, raw_repositories)
+        markdown += "\n" + trading_markdown
     (work_dir / "drift.md").write_text(markdown, encoding="utf-8")
     (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n", encoding="utf-8")
     (work_dir / "upstream-errors.txt").write_text(f"{upstream_error_count(freshness_document)}\n", encoding="utf-8")
@@ -316,6 +420,7 @@ def build_drift_report(work_dir: Path) -> dict:
         "no_release": no_release,
         "published_path": published_path.as_posix(),
         "rebuilt_path": rebuilt_path.as_posix(),
+        **trading_summary,
     }
 
 

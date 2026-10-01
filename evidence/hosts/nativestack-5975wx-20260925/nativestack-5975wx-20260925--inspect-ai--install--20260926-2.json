@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--inspect-ai--install--20260926-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "inspect-ai",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "set -u\nPIN=$(python3 -c '\nimport json, glob\npins = sorted({w[\"pin\"] for f in glob.glob(\"catalogs/landscape/*.json\") for l in json.load(open(f)).get(\"layers\", []) for w in (l.get(\"winners\") or []) if w.get(\"component_id\") == \"inspect-ai\"})\nassert pins == [\"inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26\"], pins\nprint(\"catalogs/landscape winner pin:\", pins[0])\n') || { echo \"FAIL: the catalogs/landscape winner pins for inspect-ai are not exactly inspect-ai0.3.266\"; exit 1; }\nT=$(mktemp -d) || { echo \"FAIL: mktemp -d\"; exit 1; }\ntrap 'rm -rf \"$T\"' EXIT\ntimeout 20 curl -fsS -o \"$T/meta.json\" https://pypi.org/pypi/inspect-ai/0.3.266/json || { echo \"FAIL: PyPI JSON API fetch for inspect-ai 0.3.266 exited $?\"; exit 1; }\npython3 -c '\nimport json, sys\nd = json.load(open(sys.argv[1] + \"/meta.json\"))\nw = [f for f in d[\"urls\"] if f[\"packagetype\"] == \"bdist_wheel\"]\nassert len(w) == 1, [f[\"filename\"] for f in w]\nfor key, value in ((\"name\", w[0][\"filename\"]), (\"url\", w[0][\"url\"]), (\"sha256\", w[0][\"digests\"][\"sha256\"])):\n    open(sys.argv[1] + \"/wheel.\" + key, \"w\").write(value)\n' \"$T\" || { echo \"FAIL: the PyPI metadata for inspect-ai 0.3.266 does not list exactly one wheel\"; exit 1; }\nWNAME=$(cat \"$T/wheel.name\") && WURL=$(cat \"$T/wheel.url\") && WSHA=$(cat \"$T/wheel.sha256\") || { echo \"FAIL: reading the PyPI wheel entry\"; exit 1; }\n[ \"$WSHA\" = \"e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6\" ] || { echo \"FAIL: PyPI declares sha256 $WSHA for $WNAME, not the expected e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6\"; exit 1; }\ntimeout 60 curl -fsS -o \"$T/wheel.whl\" \"$WURL\" || { echo \"FAIL: downloading $WNAME exited $?\"; exit 1; }\nS=$(sha256sum \"$T/wheel.whl\") || { echo \"FAIL: sha256sum exited $?\"; exit 1; }\n[ \"${S%% *}\" = \"$WSHA\" ] || { echo \"FAIL: the downloaded $WNAME hashes to ${S%% *}, not the PyPI-declared $WSHA\"; exit 1; }\necho \"PASS inspect-ai 0.3.266: winner pin; $WNAME downloaded from PyPI hashes to its PyPI-declared sha256\"\necho \"sha256 $WSHA\"\necho \"$PIN\"\n",
+      "exit": 0,
+      "duration_s": 0.925,
+      "output_sha256": "a352cf857455bb40ff04023e9baffa772ddd89c67bbaffcbfc79c638e2b445ae",
+      "output_excerpt": "PASS inspect-ai 0.3.266: winner pin; inspect_ai-0.3.266-py3-none-any.whl downloaded from PyPI hashes to its PyPI-declared sha256\nsha256 e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6\ncatalogs/landscape winner pin: inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26\n"
+    },
+    {
+      "cmd": "set -u\nD=\"$HOME/.local/share/codex-ecosystem/python-tools\"\nB=\"$HOME/.local/share/codex-ecosystem/bin\"\nTL=$(UV_TOOL_DIR=\"$D\" UV_TOOL_BIN_DIR=\"$B\" timeout 30 uv tool list --show-version-specifiers --show-python --show-paths) || { echo \"FAIL: uv tool list exited $?\"; exit 1; }\nROW=$(printf '%s\\n' \"$TL\" | grep -A1 '^inspect-ai ') || { echo \"FAIL: uv tool list shows no inspect-ai tool\"; exit 1; }\nprintf '%s\\n' \"$ROW\" | grep -qxF \"inspect-ai v0.3.266 [required: ==0.3.266] [CPython 3.13.15] ($D/inspect-ai)\" || { echo \"FAIL: unexpected uv tool list row: $ROW\"; exit 1; }\nprintf '%s\\n' \"$ROW\" | grep -qxF -- \"- inspect ($B/inspect)\" || { echo \"FAIL: uv tool list does not show the inspect entrypoint in $B: $ROW\"; exit 1; }\nC=$(timeout 30 uv pip check --python \"$D/inspect-ai/bin/python\" 2>&1) || { echo \"FAIL: uv pip check exited $?: $C\"; exit 1; }\nT=$(mktemp -d) || { echo \"FAIL: mktemp -d\"; exit 1; }\ntrap 'rm -rf \"$T\"' EXIT\ntimeout 30 uv venv --offline --quiet --python \"$D/inspect-ai/bin/python\" \"$T/v\" || { echo \"FAIL: creating the control venv exited $?\"; exit 1; }\nSITE=$(\"$T/v/bin/python\" -c 'import sysconfig; print(sysconfig.get_path(\"purelib\"))') || { echo \"FAIL: reading the control venv site-packages path\"; exit 1; }\nmkdir \"$SITE/ctl_probe-0.0.0.dist-info\" \\\n&& printf 'Metadata-Version: 2.1\\nName: ctl-probe\\nVersion: 0.0.0\\nRequires-Dist: ctl-absent-dep\\n' >\"$SITE/ctl_probe-0.0.0.dist-info/METADATA\" \\\n&& printf 'Wheel-Version: 1.0\\nGenerator: control\\nRoot-Is-Purelib: true\\nTag: py3-none-any\\n' >\"$SITE/ctl_probe-0.0.0.dist-info/WHEEL\" \\\n&& : >\"$SITE/ctl_probe-0.0.0.dist-info/RECORD\" || { echo \"FAIL: writing the control package\"; exit 1; }\nN=$(timeout 30 uv pip check --python \"$T/v/bin/python\" 2>&1); NRC=$?\n[ \"$NRC\" -ne 0 ] || { echo \"FAIL: uv pip check exited 0 on the control venv, whose ctl-probe requires the absent ctl-absent-dep: $N\"; exit 1; }\nCTL=$(printf '%s\\n' \"$N\" | grep -F 'requires `ctl-absent-dep`') || { echo \"FAIL: uv pip check on the control venv (exit $NRC) does not report the missing dependency: $N\"; exit 1; }\necho \"PASS uv tool list, uv pip check, control\"\necho \"$ROW\"\nprintf '%s\\n' \"$C\" | grep -v '^Using Python'\necho \"control exit $NRC: $CTL\"\n",
+      "exit": 0,
+      "duration_s": 0.353,
+      "output_sha256": "805574268eb7c8cecfbea45990131e48a56197d234b55dcf087361d08914abfa",
+      "output_excerpt": "PASS uv tool list, uv pip check, control\ninspect-ai v0.3.266 [required: ==0.3.266] [CPython 3.13.15] (~/.local/share/codex-ecosystem/python-tools/inspect-ai)\n- inspect (~/.local/share/codex-ecosystem/bin/inspect)\nChecked 79 packages in 2ms\nAll installed packages are compatible\ncontrol exit 1: The package `ctl-probe` requires `ctl-absent-dep`, but it's not installed\n"
+    },
+    {
+      "cmd": "set -u\nD=\"$HOME/.local/share/codex-ecosystem/python-tools\"\np=$(command -v inspect) || { echo \"FAIL: inspect is not on PATH\"; exit 1; }\nr=$(readlink -f \"$p\") || { echo \"FAIL: readlink -f $p exited $?\"; exit 1; }\n[ \"$r\" = \"$D/inspect-ai/bin/inspect\" ] || { echo \"FAIL: inspect on PATH ($p) resolves to $r, not $D/inspect-ai/bin/inspect\"; exit 1; }\nV=$(DO_NOT_TRACK=1 timeout 20 inspect --version) || { echo \"FAIL: inspect --version exited $?\"; exit 1; }\n[ \"$V\" = \"0.3.266\" ] || { echo \"FAIL: inspect --version printed '$V', expected 0.3.266\"; exit 1; }\nM=$(\"$D/inspect-ai/bin/python\" -c 'import importlib.metadata as m, platform; print(m.version(\"inspect-ai\"), \"on\", platform.python_implementation(), platform.python_version())') || { echo \"FAIL: importlib.metadata in the tool environment exited $?\"; exit 1; }\n[ \"${M%% *}\" = \"0.3.266\" ] || { echo \"FAIL: importlib.metadata reports inspect-ai $M, expected 0.3.266\"; exit 1; }\necho \"PASS inspect --version $V | importlib.metadata inspect-ai $M\"\necho \"PATH inspect: $p -> $r\"\n",
+      "exit": 0,
+      "duration_s": 4.397,
+      "output_sha256": "b4dedcdd542da0dd189dbd9a3349531dc635176d9f9ed1a55341284ed5d21a7c",
+      "output_excerpt": "PASS inspect --version 0.3.266 | importlib.metadata inspect-ai 0.3.266 on CPython 3.13.15\nPATH inspect: ~/.local/share/codex-ecosystem/bin/inspect -> ~/.local/share/codex-ecosystem/python-tools/inspect-ai/bin/inspect\n"
+    }
+  ],
+  "tool_versions": {
+    "inspect-ai": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26"
+  },
+  "observed_at_utc": "2026-09-26T02:27:15Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), inspect-ai 0.3.266 (catalogs/landscape pin 'inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'), the evaluation-experiments winner, is present as a uv tool under ~/.local/share/codex-ecosystem/python-tools/inspect-ai. The landscape winner pin is cross-checked; PyPI's JSON API lists one wheel for the release, inspect_ai-0.3.266-py3-none-any.whl, declares its sha256 e30e1c2abf2844a9db221d5307b9b380e2da5fb1d29a9f2bff9094262c1044e6, and a fresh download of it hashes to that value. uv tool list, with UV_TOOL_DIR and UV_TOOL_BIN_DIR set to this host's ecosystem layout, shows inspect-ai v0.3.266 [required: ==0.3.266] on CPython 3.13.15 with its inspect entrypoint in ~/.local/share/codex-ecosystem/bin; uv pip check finds the tool environment's 79 packages compatible, and exits 1 on a synthetic control environment whose one package requires an absent dependency. The inspect on PATH resolves into that tool environment, inspect --version prints 0.3.266 and importlib.metadata in the environment reports 0.3.266. Install-stage readiness only; each command exits non-zero when any of its steps fails, and all three exit 0.",
+  "limitations": [
+    "Supersedes nativestack-5975wx-20260925--inspect-ai--install--20260926 after an independent Codex review (2026-09-26): its commands exited 0 even when a step failed (reproduced with a failing catalog-pin assertion and with inspect --version forced to exit 73), and its claim asserted the uv tool install invocation and install-time settings without retaining the installer's output. Every step here exits non-zero on failure; this generation claims only the installed state its own commands read back, and the installer invocation and its output were not retained.",
+    "Install stage: readiness evidence, not functional acceptance; it supports conditional at most and changes no platform_status.",
+    "Functional use is not shown here. The separate use receipt nativestack-5975wx-20260925--inspect-ai--use--20260925-2 ran inspect-ai 0.3.266 from a temporary Python 3.12 environment created with uv venv and uv pip install (visible in its retained command), not from this uv tool install.",
+    "The installed files are not compared with the downloaded wheel: the digest check shows what PyPI serves for 0.3.266, and uv's tool records and the version readbacks show which version is installed. Only the wheel is hashed; the sdist is not downloaded. The PyPI fetches contact the public PyPI service; the other commands are local.",
+    "The uv pip check control is a synthetic environment created offline from the tool environment's own interpreter in a temporary directory that the command removes; it shows only that uv pip check reports a missing dependency.",
+    "Recorded from a Claude Code session in a git worktree of this repository at a published origin/main commit (the catalog_revision); the install is on the host filesystem under ~/.local/share/codex-ecosystem, outside any repository checkout.",
+    "second_physical_machine is declared, not proven by this file; independent review is what a reader relies on for that, per docs/contributing-evidence.md."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:27:15Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent reviewer session (claude-opus-5-5), 2026-09-26; reproduce + adequacy-checked (install stage). Re-ran all 3 commands once with /bin/sh (dash) from the worktree root: exit 0 each. cmd1 and cmd3 output_excerpt and raw sha256 are identical; cmd2 is identical except the run-varying 'Checked 79 packages in 3ms' (recorded 2ms). Fail-closed: every step is guarded (assignment || {FAIL; exit 1}, [ ] ||, grep -qxF ||, and the control's exit and message are both asserted). Confirmed with one mutated re-run: cmd3 with inspect --version forced to exit 73 exits 1 ('FAIL: inspect --version exited 73'), the exact fault that exited 0 in the original. Also confirmed with a real fault: unmodified cmd1 in a network-less namespace (unshare -rn) exits 1 ('curl: (6) Could not resolve host: pypi.org'). The recorder's 21 inspect-ai mutation results are held outside the repository and not relied on here. Backed claims: the winner pin, the single PyPI wheel and its sha256, the uv tool list row (==0.3.266, CPython 3.13.15, entrypoint), uv pip check over 79 packages, the control's exit 1 naming the missing ctl-absent-dep, PATH resolution, inspect --version and importlib.metadata are all in retained output. The wheel sha256 independently matches PyPI's PEP 691 simple index. The use-2 receipt's retained command runs uv venv --python 3.12 and uv pip install inspect-ai==0.3.266 in a mktemp directory. catalog_revision c09dd6df is an ancestor of GitHub main (behind_by 0). 'The other commands are local' holds: cmd2 (including its --offline control) and cmd3 pass unchanged with no network. Winner binding: component_id inspect-ai; tool_versions 'inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26' pin_matches the evaluation-experiments winner pin in new-host-grand-list.json and us-equities.json, and GitHub tag 0.3.266 resolves to that source commit. Install: ~/.local/share/codex-ecosystem/python-tools/inspect-ai is on ext4 root; uv-receipt.toml records inspect-ai ==0.3.266 and python 3.13; bin/inspect symlinks into the tool venv; a fresh env -i login shell resolves inspect there. The host was observed as a Threadripper PRO 5975WX with an RTX 4090, matching its hardware profile and distinct from the authoring laptop. Residual, not a defect: the Codex review and reproduction cited in the supersession note are not retained in the repository; their substance is confirmed from the retained original's command text and a dash semantics probe.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:50:59Z",
+      "reviewer": {
+        "identity_sha256": "7d53892bea622f647629485d3080436dc714f62922f65349e05947ad40e7863f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--inspect-ai--install--20260926"
+}

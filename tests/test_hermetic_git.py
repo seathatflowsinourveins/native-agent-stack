@@ -2,14 +2,18 @@
 
 import contextlib
 import io
+import json
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 import tests
+
+ROOT = Path(__file__).resolve().parents[1]
 
 # Every hook that git add, status, commit, checkout or worktree add can run in a scratch repository.
 HOOKS = ("pre-commit", "prepare-commit-msg", "commit-msg", "post-commit", "post-checkout",
@@ -48,13 +52,15 @@ class HermeticGitTests(unittest.TestCase):
         self.assertEqual(path.read_text(encoding="utf-8"), tests.HERMETIC_GIT_SETTINGS)
 
     def test_no_global_or_system_setting_is_visible(self):
-        # Only the settings that stop git reading ~/.config/git/ignore and attributes by default.
+        # Only the settings that stop git reading ~/.config/git/ignore and attributes by default,
+        # and the one that stops writing commands from starting background maintenance.
         listing = subprocess.run(
             ["git", "config", "--show-scope", "--list", "--global"],
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(listing.stdout.splitlines(), ["global\tcore.excludesfile=/dev/null",
-                                                       "global\tcore.attributesfile=/dev/null"])
+                                                       "global\tcore.attributesfile=/dev/null",
+                                                       "global\tmaintenance.auto=false"])
         hooks = subprocess.run(
             ["git", "config", "--get", "core.hooksPath"],
             capture_output=True, text=True, check=False, cwd=tempfile.gettempdir(),
@@ -66,6 +72,84 @@ class HermeticGitTests(unittest.TestCase):
             environment = tests.hermetic_git_environment()
         self.assertEqual({key: value for key, value in environment.items() if key.startswith("GIT_")},
                          tests.HERMETIC_GIT_ENVIRONMENT)
+
+    def test_a_commit_in_a_scratch_repository_starts_no_maintenance(self):
+        # Since Git 2.47 the maintenance git commit starts runs detached, and a scratch repository's
+        # TemporaryDirectory cleanup can then race its objects/maintenance.lock (CI, git 2.55.0).
+        environment = tests.hermetic_git_environment()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            subprocess.run(["git", "init", "-q", str(root / "repository")], env=environment, check=True)
+
+            def commit(name, *config):
+                """The git maintenance or gc child processes a commit starts, from its trace2 events."""
+                (root / "repository" / name).write_text(name, encoding="utf-8")
+                git = ["git", "-C", str(root / "repository"), "-c", "user.name=t", "-c", "user.email=t@example.invalid",
+                       *config]
+                subprocess.run([*git, "add", name], env=environment, check=True)
+                trace = root / f"{name}.trace2.json"
+                subprocess.run([*git, "commit", "-q", "-m", name], check=True,
+                               env={**environment, "GIT_TRACE2_EVENT": str(trace)})
+                events = [json.loads(line) for line in trace.read_text(encoding="utf-8").splitlines()]
+                return [event["argv"][1:3] for event in events
+                        if event.get("event") == "child_start" and event["argv"][1:2] in (["maintenance"], ["gc"])]
+
+            hermetic = commit("hermetic")
+            # Non-vacuous: with auto maintenance re-enabled, in the foreground, the trace records its child.
+            enabled = commit("enabled", "-c", "maintenance.auto=true", "-c", "maintenance.autoDetach=false")
+        self.assertEqual(hermetic, [])
+        self.assertIn(["maintenance", "run"], enabled)
+
+    @staticmethod
+    def outer_repository(root):
+        """A repository standing in for the one a git hook's GIT_DIR names, and the variables that select it."""
+        outer = root / "outer"
+        subprocess.run(["git", "init", "-q", str(outer)], env=tests.hermetic_git_environment(), check=True)
+        return outer, {**tests.hermetic_git_environment(), "GIT_DIR": str(outer / ".git"),
+                       "GIT_WORK_TREE": str(outer), "GIT_INDEX_FILE": str(outer / ".git" / "index")}
+
+    @staticmethod
+    def outer_state(outer):
+        """(the outer repository's local config, whether it has any commit)."""
+        environment = tests.hermetic_git_environment()
+        config = subprocess.run(["git", "-C", str(outer), "config", "--local", "--list"], env=environment,
+                                capture_output=True, text=True, check=True).stdout
+        head = subprocess.run(["git", "-C", str(outer), "rev-parse", "--verify", "-q", "HEAD"], env=environment,
+                              capture_output=True, text=True, check=False)
+        return config, head.returncode == 0
+
+    def test_importing_the_package_drops_inherited_variables_that_select_a_repository(self):
+        # A scratch repository's git init and git config, in a process that imported this package.
+        probe = ("import os, subprocess, sys, tempfile{imports}\n"
+                 "scratch = tempfile.mkdtemp(dir=sys.argv[1])\n"
+                 "subprocess.run(['git', 'init', '-q'], cwd=scratch, check=True)\n"
+                 "subprocess.run(['git', 'config', 'core.hooksPath', '/probe'], cwd=scratch, check=True)\n"
+                 "print(sorted(key for key in os.environ if key.startswith('GIT_')))\n")
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            outer, environment = self.outer_repository(root)
+            before = self.outer_state(outer)
+            result = subprocess.run([sys.executable, "-c", probe.format(imports=", tests"), temporary], cwd=ROOT,
+                                    env=environment, capture_output=True, text=True, check=True)
+            after = self.outer_state(outer)
+            # Non-vacuous: without the package, the same commands write into the outer repository.
+            subprocess.run([sys.executable, "-c", probe.format(imports=""), temporary], cwd=ROOT,
+                           env=environment, capture_output=True, text=True, check=True)
+            exposed = self.outer_state(outer)
+        self.assertEqual(result.stdout.strip(), str(sorted(tests.HERMETIC_GIT_ENVIRONMENT)))
+        self.assertEqual(after, before)
+        self.assertIn("core.hookspath=/probe", exposed[0])
+
+    def test_the_pre_commit_gate_tests_leave_the_repository_a_hook_names_untouched(self):
+        # Their setUp writes an absolute core.hooksPath, which an inherited GIT_DIR would send to that repository.
+        with tempfile.TemporaryDirectory() as temporary:
+            outer, environment = self.outer_repository(Path(temporary))
+            before = self.outer_state(outer)
+            subprocess.run([sys.executable, "-m", "unittest", "tests.test_pre_commit_gate"], cwd=ROOT,
+                           env=environment, capture_output=True, text=True, check=False, timeout=600)
+            after = self.outer_state(outer)
+        self.assertEqual(after, before)
+        self.assertNotIn("hookspath", after[0])
 
     @staticmethod
     def scratch(root, environment):

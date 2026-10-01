@@ -544,7 +544,8 @@ class ExitRules(unittest.TestCase):
 class BookHarness:
     """A MoverBook over mutable fake positions and quotes, with the example config's caps."""
 
-    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None, exit_orders=None):
+    def __init__(self, test, *, exit_rule="X2", symbols=None, timing=None, regime=None, exit_orders=None,
+                 halted=None):
         data = config_data()
         data["mover"]["exit"] = exit_rule
         data["mover"]["exit_orders"].update(exit_orders or {})
@@ -561,7 +562,7 @@ class BookHarness:
                                      evidence_class="SYN", t0=self.t0, equity=D(10000), timing=self.timing)
         self.positions, self.quotes, self.events = {}, {}, []
         self.book = mover.MoverBook(self.plan, positions=lambda: dict(self.positions), quote=self.quotes.get,
-                                    limits=self.limits, trial_id="t1", event_sink=self.events.append)
+                                    limits=self.limits, trial_id="t1", event_sink=self.events.append, halted=halted)
 
     def quote(self, symbol, bid, ask, at, halted=False):
         self.quotes[symbol] = Quote(symbol, str(bid), str(ask), at, halted=halted)
@@ -806,9 +807,10 @@ class BookStateMachine(unittest.TestCase):
 class ExitBudgetAndHandoff(unittest.TestCase):
     """What an exit may cost, and when the runner hands a residual to recovery.recover."""
 
-    def exit_due(self, max_orders):
+    def exit_due(self, max_orders, halted=None):
         """ABCD held (61 shares at 3.22) with its X2 exit due at the returned time."""
-        h = BookHarness(self, symbols=scan_dict()["symbols"][:1], exit_orders={"max_orders_per_symbol": max_orders})
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1], exit_orders={"max_orders_per_symbol": max_orders},
+                        halted=halted)
         now = h.t0 + 1
         h.quote("ABCD", "3.21", "3.22", now)
         buy = submits(h.evaluate(now), "buy")[0]
@@ -830,6 +832,71 @@ class ExitBudgetAndHandoff(unittest.TestCase):
         h.quote("ABCD", "3.20", "3.21", at + 5)                     # the halt lifts; the one budgeted exit is intact
         sell = submits(h.evaluate(at + 5), "sell")[0]
         self.assertEqual((sell.qty, sell.reason, leg.exit_wait_reason), (D(61), "x2_time", None))
+
+    def test_a_resting_exit_is_not_repriced_while_halted_and_reprices_after_the_resume(self):
+        # E4: a LULD pause lasts 5-10 minutes; re-pricing every 10 s would spend the 20-order
+        # exit budget in about 200 s. The resting exit waits; re-pricing resumes after the pause.
+        h, at = self.exit_due(20)
+        h.quote("ABCD", "3.20", "3.21", at)
+        sell = submits(h.evaluate(at), "sell")[0]
+        for second in range(10, 601, 10):               # a ten-minute pause, evaluated every 10 s
+            h.quote("ABCD", "3.20", "3.21", at + second, halted=True)
+            self.assertEqual(h.evaluate(at + second), [])
+        leg = h.book.legs["ABCD"]
+        self.assertEqual((sell.cancel_requested, len(leg.exits)), (False, 1))   # one exit spent, still resting
+        h.quote("ABCD", "3.15", "3.16", at + 610)       # trading again
+        self.assertEqual(cancels(h.evaluate(at + 610)), [sell.client_id])
+        self.assertEqual(sell.cancel_reason, "exit_reprice")
+        h.book.on_terminal(sell.client_id, "canceled")
+        again = submits(h.evaluate(at + 610.5), "sell")[0]
+        self.assertEqual((again.qty, again.limit_price), (D(61), D("3.14")))
+
+    def test_with_the_runners_halt_state_the_quote_flag_waits_entries_but_never_exits(self):
+        # B6: the runner gives the book Controller.is_halted (status stream and startup seed).
+        # A quote carrying only the best-effort condition flag then holds neither an exit nor
+        # its re-pricing back, while it still holds an entry; a status halt holds both.
+        status_halted = set()
+        h, at = self.exit_due(20, halted=lambda symbol: symbol in status_halted)
+        h.quote("ABCD", "3.20", "3.21", at, halted=True)
+        sell = submits(h.evaluate(at), "sell")[0]                    # the flag does not wait the exit
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, None)
+        h.quote("ABCD", "3.20", "3.21", at + 10, halted=True)
+        self.assertEqual(cancels(h.evaluate(at + 10)), [sell.client_id])   # nor its re-pricing
+        h.book.on_terminal(sell.client_id, "canceled")
+        status_halted.add("ABCD")                                     # a status halt waits both
+        h.quote("ABCD", "3.20", "3.21", at + 11)
+        self.assertEqual(submits(h.evaluate(at + 11)), [])
+        self.assertEqual(h.book.legs["ABCD"].exit_wait_reason, "quote_halted")
+        entry = BookHarness(self, symbols=scan_dict()["symbols"][:1], halted=lambda symbol: False)
+        now = entry.t0 + 1
+        entry.quote("ABCD", "3.21", "3.22", now, halted=True)
+        self.assertEqual(submits(entry.evaluate(now)), [])            # the flag still waits the entry
+        self.assertEqual(entry.book.legs["ABCD"].wait_reason, "quote_halted")
+
+    def test_a_halt_through_the_hard_flatten_rests_the_exit_and_hands_off(self):
+        # B3: the hard flatten (or the close) falls inside a halt. Nothing is re-priced or re-sent
+        # while halted; the book hands the residual to recovery after its no-progress bound.
+        t0 = SCAN_TIME + 25
+        h = BookHarness(self, symbols=scan_dict()["symbols"][:1],
+                        timing=mover.Timing(t0, t0 + 30, 60.0, 10.0, t0 + 100, t0 + 4200, None, 3600.0))
+        now = h.t0 + 1
+        h.quote("ABCD", "3.21", "3.22", now)
+        buy = submits(h.evaluate(now), "buy")[0]
+        h.fill(buy, 61, "3.22", now)
+        h.quote("ABCD", "3.30", "3.31", h.timing.hard_flatten_at)
+        sell = submits(h.evaluate(h.timing.hard_flatten_at), "sell")[0]
+        self.assertEqual(h.book.force_reason, "hard_flatten")
+        halted_until = h.timing.hard_flatten_at + mover.HANDOFF_EXIT_TIMEOUTS * h.timing.exit_timeout_seconds
+        at = h.timing.hard_flatten_at + 10
+        while at < halted_until:
+            h.quote("ABCD", "3.30", "3.31", at, halted=True)
+            self.assertEqual(h.evaluate(at), [])
+            self.assertIsNone(h.book.handoff_reason(at))
+            at += 10
+        h.quote("ABCD", "3.30", "3.31", at, halted=True)
+        self.assertEqual(h.evaluate(at), [])
+        self.assertFalse(sell.cancel_requested)
+        self.assertEqual(h.book.handoff_reason(at), "no_exit_progress")
 
     def test_a_pre_wire_refusal_backs_off_and_is_not_charged(self):
         h, at = self.exit_due(2)
@@ -1094,6 +1161,62 @@ class RecoveryAdoptionScope(unittest.TestCase):
                 self.assertEqual(port.received, ["mvr-s2-0000002"])
                 with self.assertRaises(TransportError):
                     normalize_intent(payloads[3], port.symbols)
+            finally:
+                ledger.close()
+
+
+class RecoveryPortSubscription(unittest.TestCase):
+    """#215: a mover recovery port's readiness waits on the benchmark quotes only, so the
+    transport no longer shows that the port subscribes every held symbol. recover_mover
+    fails closed (held_symbol_not_subscribed) before recovery starts the port."""
+
+    def test_a_held_or_unresolved_symbol_the_port_does_not_subscribe_fails_closed(self):
+        import asyncio
+        import recovery
+        _, limits, settings = mover.load_mover_config(CONFIG)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "ledger.sqlite3", limits)
+            try:
+                now, close = SCAN_TIME + 30, SCAN_TIME + 36000
+                ledger.begin_next_trial(now, "s1")
+                for cid, symbol, status, filled, price in (("mvr-s1-0000001", "BBB", "filled", "10", "8.01"),
+                                                           ("mvr-s1-0000002", "CCC", "new", "0", None)):
+                    ledger.reserve_intent(cid, symbol, "buy", "10", "8.05", quote=Quote(symbol, "8.00", "8.01", now),
+                                          now=now, market_open=True, session_close=close)
+                    ledger.record_order(cid, "b-" + cid, status, filled, price, timestamp=now)
+                self.assertEqual((sorted(ledger.positions()), [i.symbol for i in ledger.unresolved()]),
+                                 (["BBB"], ["CCC"]))                  # BBB is held; CCC has an open buy only
+                controller = mover_runner.MoverController(ledger, close, market_open=True, clock=lambda: now,
+                                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+                calls = []
+
+                class Port:
+                    def __init__(self, symbols):
+                        self.symbols = symbols
+
+                    def adopt_intents(self, intents):
+                        calls.append("adopt_intents")
+
+                    async def start(self, on_quote, on_order):
+                        calls.append("start")
+
+                async def recover(controller, metadata, config, *, reconcile_fn=None):
+                    calls.append("recover")
+                    return {"status": "passed", "flat": True, "errors": []}
+
+                metadata = {"trial_id": "s1", "baseline_cash": "100000"}
+                with patch.object(recovery, "recover", recover):
+                    for symbols in (("CCC", "SPY"), ("BBB", "SPY")):
+                        with self.subTest(symbols=symbols):
+                            controller.port = Port(symbols)
+                            with self.assertRaises(SafetyError) as refused:
+                                asyncio.run(mover_runner.recover_mover(controller, metadata, {}))
+                            self.assertEqual(str(refused.exception), "held_symbol_not_subscribed")
+                            self.assertEqual(calls, [])       # refused before recovery or any port call
+                    controller.port = Port(("BBB", "CCC", "SPY"))
+                    result = asyncio.run(mover_runner.recover_mover(controller, metadata, {}))
+                self.assertEqual(calls, ["recover"])
+                self.assertEqual((result["status"], result["unsellable_positions"]), ("passed", []))
             finally:
                 ledger.close()
 

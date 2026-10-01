@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-vectorize-io-hindsight",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/vectorize-io/hindsight",
+ "reviewed_commit": "42104fff620d6a0c7af567e79554a4bf3a23a7be",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of vectorize-io/hindsight at commit 42104fff620d6a0c7af567e79554a4bf3a23a7be (license MIT), read from README.md at that commit. Repository description: \"Hindsight: Agent Memory That Learns\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 42184,
+  "pushed_at": "2026-09-29T14:14:11Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@42104fff620d6a0c7af567e79554a4bf3a23a7be",
+   "text": "[Documentation](https://hindsight.vectorize.io) • [Integrations](https://hindsight.vectorize.io/integrations) • [Cookbook](https://hindsight.vectorize.io/cookbook) • [Benchmarks](https://benchmarks.hindsight.vectorize.io/) • [Paper](https://arxiv.org/abs/2512.12818) • [Hindsight Cloud](https://ui.hindsight.vectorize.io)"
+  },
+  {
+   "source": "README.md@42104fff620d6a0c7af567e79554a4bf3a23a7be",
+   "text": "Hindsight™ is an agent memory system built to create smarter agents that learn over time. Most agent memory systems focus on recalling conversation history. Hindsight is focused on making agents that learn, not just remember."
+  },
+  {
+   "source": "README.md@42104fff620d6a0c7af567e79554a4bf3a23a7be",
+   "text": "It eliminates the shortcomings of alternative techniques such as RAG and knowledge graph and delivers state-of-the-art performance on long term memory tasks."
+  }
+ ]
+}

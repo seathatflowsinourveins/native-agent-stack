@@ -1,0 +1,140 @@
+{
+ "label": "after",
+ "at": "2026-09-25T23:14:12Z",
+ "active_units": {
+  "dagu-equities.service": {
+   "MainPID": "2692217",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 02:57:16 EDT",
+   "ActiveState": "active",
+   "InvocationID": "37d163da4296"
+  },
+  "dbus.service": {
+   "MainPID": "1630416",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 08:42:47 EDT",
+   "ActiveState": "active",
+   "InvocationID": "5086c138282f"
+  },
+  "ecosystem-alertmanager.service": {
+   "MainPID": "456",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "526c1959fcc0"
+  },
+  "ecosystem-grafana.service": {
+   "MainPID": "457",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "e2a29e9c75e5"
+  },
+  "ecosystem-loki.service": {
+   "MainPID": "458",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "ce7f0a3ff0da"
+  },
+  "ecosystem-ntfy.service": {
+   "MainPID": "459",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "04f42fd24e37"
+  },
+  "ecosystem-otelcol.service": {
+   "MainPID": "3729895",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 04:44:59 EDT",
+   "ActiveState": "active",
+   "InvocationID": "a0e4426ed529"
+  },
+  "ecosystem-prometheus.service": {
+   "MainPID": "461",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "b4ef3c502e92"
+  },
+  "native-stack-embeddings.service": {
+   "MainPID": "1387970",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 11:52:14 EDT",
+   "ActiveState": "active",
+   "InvocationID": "ab50e1f32a05"
+  },
+  "native-stack-qdrant.service": {
+   "MainPID": "463",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "b063a7776be2"
+  },
+  "nativestack-generation.service": {
+   "MainPID": "464",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Thu 2026-09-24 00:23:13 EDT",
+   "ActiveState": "active",
+   "InvocationID": "204a595306e2"
+  },
+  "nativestack-memory.service": {
+   "MainPID": "448487",
+   "NRestarts": "0",
+   "ExecMainStartTimestamp": "Fri 2026-09-25 16:44:37 EDT",
+   "ActiveState": "active",
+   "InvocationID": "73aa0e010e10"
+  }
+ },
+ "memory_unit_sha256": "2ba4386ba9d284cab4a57b7757aa5aeffd68d216fd00767ec92d8c2f93b5c686",
+ "memory_dropins": "",
+ "bin_symlinks": {
+  "count": 59,
+  "digest": "2c1b245c7e2f297a",
+  "ai-memory": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory",
+  "latest_ctime": "2026-09-25T20:44:53Z"
+ },
+ "bin_ai_memory_resolves_to": "~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0/ai-memory",
+ "v240_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+ "v241_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd",
+ "tool_prefixes": [
+  "ai-memory-2.3.2",
+  "ai-memory-2.4.0",
+  "ai-memory-2.4.1"
+ ],
+ "claude_settings": {
+  "sha256": "012f7c354c2c827dd7f3f9e46f022a85d9bde757878eeb3b2028fe563a2c7ccd",
+  "hooks_subtree_sha256": "3a1c2cc8d1b5107896bfc5676cd1fb5e0e6388848deeb016b6eee546235a73cd",
+  "mtime": "2026-09-25T22:51:48Z",
+  "cmds_2.4.0": 8,
+  "cmds_2.4.1": 0,
+  "cmds_2.3.2": 0
+ },
+ "codex_hooks": {
+  "sha256": "4abc3b6a758cf8a490f8b488ad7de0da2b74e6f35c080661c742e46ba83faadd",
+  "hooks_subtree_sha256": "8294450f0f46d53da53f12eb1f13fd3b7d062c1c9f37d0a55be1d992be3351f2",
+  "mtime": "2026-09-25T20:44:20Z",
+  "cmds_2.4.0": 7,
+  "cmds_2.4.1": 0,
+  "cmds_2.3.2": 0
+ },
+ "live_db": {
+  "schema_max": 66,
+  "schema_rows": 66,
+  "last_migration": "auto_improve_claim_attempts",
+  "quick_check": "ok",
+  "pages": 38,
+  "observations": 85808
+ },
+ "live_pre_migration_receipt": false,
+ "home_backup_archives": 0,
+ "home_cache_ai_memory": false,
+ "live_endpoints": {
+  "healthz": 200,
+  "healthz_body": "{\"status\":\"ok\"}",
+  "get_mcp": 405,
+  "allow": "POST"
+ },
+ "scratch_procs": []
+}

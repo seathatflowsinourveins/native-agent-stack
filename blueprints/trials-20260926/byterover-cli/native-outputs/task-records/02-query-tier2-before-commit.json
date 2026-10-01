@@ -1,0 +1,18 @@
+{
+  "clientCwd": "<scratch>/trial-byterover/brv-project",
+  "content": "How is authentication implemented?",
+  "createdAt": 1790386302634,
+  "id": "tsk-<uuid>",
+  "logId": "qry-1790386302635",
+  "model": "qwen3.8-27b-local",
+  "projectPath": "<scratch>/trial-byterover/brv-project",
+  "provider": "openai-compatible",
+  "schemaVersion": 1,
+  "taskId": "<uuid>",
+  "type": "query",
+  "worktreeRoot": "<scratch>/trial-byterover/brv-project",
+  "completedAt": 1790386302655,
+  "result": "**Summary**: No matching knowledge found for \"How is authentication implemented?\".\n\n**Details**: The topic does not appear to be covered in the context tree. This could mean the topic hasn't been curated yet.\n\n**Sources**: None\n\n**Gaps**: Try rephrasing your query with different terms, or use /curate to add knowledge about this topic.\n\n---\nSource: ByteRover Knowledge Base",
+  "startedAt": 1790386302641,
+  "status": "completed"
+}

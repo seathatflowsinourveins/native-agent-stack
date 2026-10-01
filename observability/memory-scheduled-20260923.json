@@ -1,0 +1,435 @@
+{
+  "schema_version": 1,
+  "id": "memory-scheduled-lifecycle-20260923",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "socraticode",
+    "qmd"
+  ],
+  "recorded_at_utc": "2026-09-23T13:05:33Z",
+  "claim": "Actual daily heartbeat received and bounded native memory/RAG observations returned; existing hourly learning scheduler applied two pages with MCP and store readback, while a later failed learning attempt is retained.",
+  "limitations": [
+    "Scheduler provenance is the native task's heartbeat envelope; no separate scheduler dispatch database or restart evidence was available.",
+    "Two applied pages establish completed writes and retrieval, not improved future answers or causal token savings.",
+    "One later native learning attempt failed with HTTP response decoding; it has a scheduler claim and no persisted learning run. The root cause and retry recovery remain unqualified.",
+    "The current native memory setup decision still describes the original one-project deployment; current observer sees two scheduler scopes. This turn retrieved only the explicitly adopted agent-lab scope.",
+    "One exact RAG excerpt and QMD document matched current source; no broad retrieval benchmark or new cross-client comparison was performed.",
+    "Existing upstream component tests and dated both-client/recovery results were not rerun or relabeled as current execution.",
+    "No runtime upgrade, restart, account/model/scope/configuration change, manual learning/consolidation invocation, broker order or new monitor occurred."
+  ],
+  "trigger": {
+    "automation_id": "maintain-native-foundation-and-trading-catalogs",
+    "scheduled_heartbeat_timestamp_utc": "2026-09-23T13:01:02.931Z",
+    "provenance": "Native task received the scheduler-provided heartbeat message carrying this automation ID and timestamp.",
+    "actual_operation": "Read-only scoped memory decision, native learning report, completed-session and consolidation metadata, source-matched semantic retrieval, QMD retrieval and existing monitors.",
+    "separate_scheduler_dispatch_id": null,
+    "previous_20260922_wake_execution": null,
+    "restart_persistence": {
+      "app": null,
+      "service": null,
+      "physical_pc": null
+    }
+  },
+  "upstream_results": "observability/memory-scheduled-results-20260923.json",
+  "learning": {
+    "report": {
+      "workspace": "agent-lab",
+      "project": "agent-lab",
+      "generated_at": "2026-09-23T13:02:08.178606265Z",
+      "since_created_at": 1787576528178606,
+      "summary": "42 run(s), 2 terminal learning proposal(s), 100.0% approved in the last 30 day(s).",
+      "params": {
+        "since_days": 30,
+        "top_limit": 10
+      },
+      "aggregate": {
+        "run_count": 42,
+        "runs_with_learning_proposals": 1,
+        "proposals_by_status": [
+          {
+            "key": "approved",
+            "count": 2
+          }
+        ],
+        "proposals_by_operation": [
+          {
+            "key": "create",
+            "count": 2
+          }
+        ],
+        "proposals_by_edit_mode": [
+          {
+            "key": "full_page",
+            "count": 2
+          }
+        ],
+        "proposals_by_kind": [
+          {
+            "key": "concept",
+            "count": 1
+          },
+          {
+            "key": "gotcha",
+            "count": 1
+          }
+        ],
+        "maintenance_proposals_by_kind": [],
+        "top_targets": [
+          {
+            "key": "concepts/evidence-receipt-qualification.md",
+            "count": 1
+          },
+          {
+            "key": "gotchas/prompt-cache-is-not-token-savings.md",
+            "count": 1
+          }
+        ],
+        "rejections_by_reason": [
+          {
+            "key": "too_few_observations",
+            "count": 24
+          },
+          {
+            "key": "session_too_short",
+            "count": 14
+          },
+          {
+            "key": "insufficient_durable_evidence",
+            "count": 3
+          },
+          {
+            "key": "input_budget_sampled",
+            "count": 2
+          },
+          {
+            "key": "broad_catalog_activity_is_not_a_durable_lesson",
+            "count": 1
+          },
+          {
+            "key": "credentials_and_account_setup_are_sensitive_and_transient",
+            "count": 1
+          },
+          {
+            "key": "dashboard_and_login_activity_is_not_a_reusable_lesson",
+            "count": 1
+          },
+          {
+            "key": "duplicate_or_not_new",
+            "count": 1
+          },
+          {
+            "key": "not_durable_project_knowledge",
+            "count": 1
+          },
+          {
+            "key": "not_project_policy",
+            "count": 1
+          }
+        ],
+        "repeated_rejection_fingerprints": [
+          {
+            "key": "ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db",
+            "count": 10
+          },
+          {
+            "key": "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0",
+            "count": 8
+          },
+          {
+            "key": "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1",
+            "count": 4
+          },
+          {
+            "key": "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9",
+            "count": 2
+          }
+        ],
+        "rejected_targets": [
+          {
+            "key": "3 observations below configured minimum 8",
+            "count": 10
+          },
+          {
+            "key": "4 observations below configured minimum 8",
+            "count": 8
+          },
+          {
+            "key": "6 observations below configured minimum 8",
+            "count": 4
+          },
+          {
+            "key": "9s below configured minimum 120s",
+            "count": 2
+          },
+          {
+            "key": "102s below configured minimum 120s",
+            "count": 1
+          },
+          {
+            "key": "14s below configured minimum 120s",
+            "count": 1
+          },
+          {
+            "key": "18s below configured minimum 120s",
+            "count": 1
+          },
+          {
+            "key": "2 observations below configured minimum 8",
+            "count": 1
+          },
+          {
+            "key": "22s below configured minimum 120s",
+            "count": 1
+          },
+          {
+            "key": "24s below configured minimum 120s",
+            "count": 1
+          }
+        ]
+      },
+      "terminal_rates": {
+        "denominator": 2,
+        "approved_rate": 1,
+        "rejected_rate": 0,
+        "conflict_rate": 0,
+        "failed_rate": 0
+      },
+      "findings": [
+        {
+          "kind": "repeated_rejection_fingerprint",
+          "severity": "warning",
+          "message": "Rejection fingerprint ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db appeared 10 times.",
+          "detail": {
+            "fingerprint": "ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db",
+            "count": 10
+          }
+        },
+        {
+          "kind": "repeated_rejection_fingerprint",
+          "severity": "warning",
+          "message": "Rejection fingerprint ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0 appeared 8 times.",
+          "detail": {
+            "fingerprint": "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0",
+            "count": 8
+          }
+        },
+        {
+          "kind": "repeated_rejection_fingerprint",
+          "severity": "warning",
+          "message": "Rejection fingerprint 125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1 appeared 4 times.",
+          "detail": {
+            "fingerprint": "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1",
+            "count": 4
+          }
+        },
+        {
+          "kind": "repeated_rejection_fingerprint",
+          "severity": "warning",
+          "message": "Rejection fingerprint 683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9 appeared 2 times.",
+          "detail": {
+            "fingerprint": "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9",
+            "count": 2
+          }
+        }
+      ],
+      "blind_spots": [
+        "Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.",
+        "Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.",
+        "Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator."
+      ]
+    },
+    "independent_store_observation": {
+      "latest_completed": {
+        "session": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-23T05:29:41.029078+00:00",
+          "ended_at": "2026-09-23T05:32:15.451771+00:00",
+          "ended_observation_count": 23,
+          "summary_page_present": true
+        },
+        "job": {
+          "generation": 23,
+          "state": "completed",
+          "requested_at": "2026-09-23T05:32:15.511861+00:00",
+          "started_at": "2026-09-23T05:32:23.148405+00:00",
+          "completed_at": "2026-09-23T05:32:39.163124+00:00",
+          "attempts": 1,
+          "last_error": null
+        },
+        "scheduler_claims": [],
+        "learning_runs": []
+      },
+      "learned_source": {
+        "session": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-19T04:49:55.394822+00:00",
+          "ended_at": "2026-09-20T06:49:02.084831+00:00",
+          "ended_observation_count": 14982,
+          "summary_page_present": true
+        },
+        "job": null,
+        "scheduler_claims": [
+          "2026-09-23T10:04:19.042606+00:00"
+        ],
+        "learning_runs": [
+          {
+            "provider": "codex",
+            "model": "gpt-5.6-luna",
+            "created_at": "2026-09-23T10:04:49.742504+00:00",
+            "proposals": [
+              {
+                "status": "approved",
+                "operation": "create",
+                "target_path": "concepts/evidence-receipt-qualification.md",
+                "applied_page_present": true
+              },
+              {
+                "status": "approved",
+                "operation": "create",
+                "target_path": "gotchas/prompt-cache-is-not-token-savings.md",
+                "applied_page_present": true
+              }
+            ]
+          }
+        ]
+      },
+      "failed_scheduler_source": {
+        "session": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-20T01:33:53.448865+00:00",
+          "ended_at": "2026-09-20T08:03:51.982662+00:00",
+          "ended_observation_count": 3156,
+          "summary_page_present": true
+        },
+        "job": null,
+        "scheduler_claims": [
+          "2026-09-23T11:04:49.786051+00:00"
+        ],
+        "learning_runs": []
+      },
+      "consolidated_source": {
+        "session": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-21T19:53:29.168828+00:00",
+          "ended_at": "2026-09-23T01:07:58.144710+00:00",
+          "ended_observation_count": 1993,
+          "summary_page_present": true
+        },
+        "job": {
+          "generation": 1767,
+          "state": "completed",
+          "requested_at": "2026-09-22T09:00:50.126810+00:00",
+          "started_at": "2026-09-22T09:07:32.357366+00:00",
+          "completed_at": "2026-09-22T09:08:13.837022+00:00",
+          "attempts": 1,
+          "last_error": null
+        },
+        "scheduler_claims": [],
+        "learning_runs": []
+      }
+    },
+    "scheduler_applied_at_utc": "2026-09-23T10:04:49Z",
+    "retrieved_pages": [
+      "concepts/evidence-receipt-qualification.md",
+      "gotchas/prompt-cache-is-not-token-savings.md"
+    ],
+    "interpretation": "The journal, run/proposal store records, non-null applied-page IDs, and native page reads agree. The 12:05 tick with zero proposals is not a second successful learned edit; admission and semantic rejection counts can overlap and are not model-call counts."
+  },
+  "retrieval": {
+    "socraticode": {
+      "path": "tools/ecosystem/e2e-upstream-commands.json",
+      "start": 336,
+      "end": 370,
+      "source_sha256": "175d3344a8087ec54097c939fb30e74cb0722a2d517388418e964abbc65328ed",
+      "matches_native_excerpt": true
+    },
+    "qmd": {
+      "native_exit": 0,
+      "source_path": "docs/tasks/2026-09-21-memory-rag-lifecycle.md",
+      "source_sha256": "cdb6f4a6d6f46d5e9da7443d8d22a1c4e6420337bdbbf18cc3dbb47f4fe3f130",
+      "scope": "agent-lab-docs BM25; no new embeddings",
+      "source_matches_after_removing_native_line_numbers": true,
+      "initial_raw_substring_test": false,
+      "initial_test_failure_reason": "QMD adds numeric line prefixes; removing only those prefixes yielded exact source agreement."
+    }
+  },
+  "independent_monitor_observation": {
+    "classification": "Independent read-only observer summary; native API/service outputs remained in that worker's tool records.",
+    "observed_at_utc": "2026-09-23T13:04:51Z",
+    "memory_qdrant_embedding_services": "active/running/enabled/success",
+    "native_inventory": {
+      "published_at_utc": "2026-09-23T13:03:08.433Z",
+      "observed_at_utc": "2026-09-23T13:03:08.092Z",
+      "http_status": 204,
+      "rows": 78,
+      "markers": 1,
+      "unknown_count": 0,
+      "stale_count": 5,
+      "stale_scope": "Old token-counter source captures; fresh publication does not update their timestamps.",
+      "latest_pages": 145,
+      "all_versions": 454,
+      "sessions": 223,
+      "observations": 203079,
+      "missing_latest_embeddings": 0,
+      "unresolved_embedding_failures": 0,
+      "snapshot_sha256": "cf4ed5f39fcad70dbf059ff2cc3e9bb1724f28f1d2474c1b13f9184ec47ef3f2"
+    },
+    "qmd": {
+      "files": 101,
+      "vectors": 0,
+      "mode": "intentional BM25"
+    },
+    "qdrant": {
+      "points": 1215,
+      "status": "green"
+    },
+    "progress": {
+      "rows": 87,
+      "checkpoint_utc": "2026-09-22T08:05:00Z",
+      "last_observed_emission_utc": "2026-09-23T13:03:08.143Z"
+    },
+    "prometheus_targets": {
+      "up": 8,
+      "total": 8
+    },
+    "existing_warnings": [
+      {
+        "name": "OmniRouteHealthUnexpected",
+        "active_since_utc": "2026-09-22T14:52:49Z"
+      },
+      {
+        "name": "FreeLLMAPIHealthUnexpected",
+        "active_since_utc": "2026-09-22T14:52:49Z"
+      },
+      {
+        "name": "SwapUsedHigh",
+        "active_since_utc": "2026-09-23T04:02:49Z",
+        "observed_approx_gib": 3.08
+      }
+    ],
+    "limits": "These predate the wake. No memory/RAG stall observed; swap use alone does not prove a runaway process. No gateway or host repair attempted."
+  },
+  "retained_observation_errors": [
+    "An initial skill lookup used the wrong skill root; the current project-managed skill was loaded successfully.",
+    "An observer discovery command referenced a nonexistent docs glob and returned exit2; focused discovery recovered.",
+    "The first QMD comparison did not remove line-number display prefixes and returned false; exact normalized comparison passed.",
+    "Initial publication check caught identifiers adjacent to encoded journal colors. Public output was corrected; private original retained. No unredacted evidence was committed or pushed."
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  },
+  "validation": {
+    "classification": "Project publication and integration checks; not upstream tests",
+    "project_tests": {
+      "command": "ecosystem-bounded-run python3 -m unittest tests.test_grand_dashboard tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "tests": 60
+    },
+    "initial_publication_check": {
+      "exit_code": 1,
+      "reason": "Possible local session identifier in sanitized journal string; corrected before publication."
+    }
+  }
+}

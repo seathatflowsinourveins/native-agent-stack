@@ -1,0 +1,25 @@
+# Drafted, not run: no host has loaded, started or enabled this unit (the
+# coordinator deploys it after review; this repository's worktree that
+# authored it made no host changes). @REPOSITORY@ is this repository's
+# checkout path and must be substituted before installing this unit; %h is
+# systemd's own specifier for the invoking user's home directory and needs
+# no substitution. See docs/decisions/2026-09-25-codex-broker-reaper.md for
+# why this reaper exists, its guards, and what would remove it again.
+#
+# This unit has no [Install] section: it is triggered only by
+# codex-broker-reaper.timer, matching this repository's existing
+# timer-triggered oneshot convention (observability/native-data/
+# native-data.service.example + its paired .timer.example).
+[Unit]
+Description=Guarded reaper for orphaned openai-codex Claude Code plugin brokers
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+# Worst case is several eligible brokers in one run, each up to ~5s RPC +
+# 15s exit wait (+15s more if a future --escalate deployment adds it); this
+# stays well under the timer's own 1h interval so a pileup after a long gap
+# still finishes before the next scheduled run.
+TimeoutStartSec=1800
+ExecStart=/usr/bin/python3 @REPOSITORY@/adoption/tools/codex-broker-reaper --apply --receipt %h/codex-ecosystem/state/codex-broker-reaper/last.json

@@ -1,0 +1,20 @@
+2026-09-25 21:35:14 - Mirix - INFO - Logging to: console (level: INFO)
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/client/remote_client.py", line 520, in _request
+    response.raise_for_status()
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: http://127.0.0.1:18531/agents/meta/initialize
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/quickstart_add_retrieve.py", line 27, in <module>
+    init_result = client.initialize_meta_agent(config=config, update_agents=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/client/remote_client.py", line 1425, in initialize_meta_agent
+    data = self._request(
+           ^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/client/remote_client.py", line 527, in _request
+    raise requests.HTTPError(f"API request failed: {error_detail}") from e
+requests.exceptions.HTTPError: API request failed: Embedding model validation failed: Error code: 404 - {'error': {'message': 'The model `text-embedding-ada-002` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--prometheus--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "prometheus",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v prometheus) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && q=$(command -v promtool) && echo \"resolves: $q -> $(readlink -f \"$q\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" prometheus",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "14fe01369c34bfd63fe823bf02f4e398608c1543145fde6ba439ef1d58faa55d",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/prometheus -> ~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/prometheus\nresolves: ~/.local/share/codex-ecosystem/bin/promtool -> ~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/promtool\nstack ['3.14.0'] winner pins ['3.14.0']\n"
+    },
+    {
+      "cmd": "prometheus --version",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "f4fb2bbef0666e8bae54708993ad367cc01360ee6f10ec1a3ef7540c7d0efbc8",
+      "output_excerpt": "prometheus, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)\n  build user:       root@f423027f4410\n  build date:       20260817-16:49:19\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo,builtinassets\n"
+    },
+    {
+      "cmd": "promtool --version",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "c0d45587de1d95f6d80a37fab11368998671e4e90fbfd9fa9f214002de85d9cb",
+      "output_excerpt": "promtool, version 3.14.0 (branch: HEAD, revision: d7598b7141418fa35be2b5ec5d0fefb634199610)\n  build user:       root@f423027f4410\n  build date:       20260817-16:49:19\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo,builtinassets\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,subprocess;r=[c for c in json.load(open('observability/receipt.json'))['components'] if c.get('id')=='prometheus'][0];outs=[subprocess.run([b,'--version'],capture_output=True,text=True) for b in ('prometheus','promtool')];revs=[(o.stdout+o.stderr).split('revision: ')[1].split(')')[0] for o in outs];ok=all(v==r['source_commit'] for v in revs) and all('version 3.14.0 ' in (o.stdout+o.stderr) for o in outs);print('prometheus/promtool revisions',revs,'| observability/receipt.json prometheus',r['version'],'source_commit',r['source_commit'],'| equal:',ok);raise SystemExit(0 if ok else 1)\"",
+      "exit": 0,
+      "duration_s": 0.091,
+      "output_sha256": "ec138bdd9f0c7f20571680d257537e0fda4a90d2bd7376799e4558cdbba633aa",
+      "output_excerpt": "prometheus/promtool revisions ['d7598b7141418fa35be2b5ec5d0fefb634199610', 'd7598b7141418fa35be2b5ec5d0fefb634199610'] | observability/receipt.json prometheus 3.14.0 source_commit d7598b7141418fa35be2b5ec5d0fefb634199610 | equal: True\n"
+    }
+  ],
+  "tool_versions": {
+    "prometheus": "3.14.0"
+  },
+  "observed_at_utc": "2026-09-25T15:34:25Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), Prometheus 3.14.0 (the catalog pin) is installed: prometheus and promtool resolve to ~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.14.0/, both report version 3.14.0 with revision d7598b7141418fa35be2b5ec5d0fefb634199610, which equals the upstream source commit observability/receipt.json records for Prometheus 3.14.0. Readiness only. All commands exit 0.",
+  "limitations": [
+    "Install stage: the resolved path, pin records, the listed integrity or identity comparisons and the version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "The release archive is not retained on this host, so the binaries were not compared with the archive sha256 recorded in observability/receipt.json; the binding is the embedded version and revision. Serving is covered by the separate prometheus use receipt on main; the running unit was not touched.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:34:25Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session reviewing on this host. Reproduced: re-ran all 4 commands (path and pin resolution for prometheus and promtool; prometheus --version; promtool --version; the revision-equality check against observability/receipt.json). Each exited 0, and each output is identical to its retained excerpt. Adequacy (install stage: points 3 and 4 plus claim support): 3 holds. The path, pin, version and revision claims each have retained output. git ls-remote shows upstream v3.14.0^{} at d7598b7141418fa3..., equal to both binaries' revision. The limitation that no release archive is retained is true, the prometheus use receipt is on main (202e0517), and the host description matches this host live (48 CPUs, AMD Ryzen Threadripper PRO 5975WX, 102 GiB, RTX 4090 24 GB, Ubuntu 24.04.5 LTS, WSL 2.7.13.0), also retained in the hw profile and this host's vllm use -2 receipt. 4 holds. component_id prometheus is the foundation winner, and 3.14.0 pin_matches 3.14.0. The pin sources (catalogs/landscape foundation/us-equities, manifests/stack.json entry, observability/receipt.json, recipes/README.md entry) are unchanged for this component between catalog_revision 74886724 and 6b2f71fa. The running unit was not touched.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:23:27Z",
+      "reviewer": {
+        "identity_sha256": "e891850f9e8918c14a188be398d923e1f684e7c4cad57a9b78e0501a7cab7b2a",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

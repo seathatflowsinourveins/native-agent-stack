@@ -1,0 +1,32 @@
+# Drafted, not installed: no host has loaded, started or enabled this unit (the worktree that
+# authored it made no host changes). It polls GitHub host requests for the workstation role from
+# the read-only live clone that ecosystem-live-clone-sync keeps detached at origin/main, so the
+# code it runs is reviewed main. %h is systemd's specifier for the invoking user's home directory
+# and needs no substitution. Installation: recipes/host-request-lane.md. Why a user timer rather
+# than a self-hosted runner, a cloud routine or a session scheduler:
+# docs/decisions/2026-09-25-host-request-lane.md.
+#
+# The poll reads GitHub only: `gh api` GET calls through the native gh sign-in, plus a local
+# state file, plus one POST to a loopback ntfy topic only if --notify-url is added. It runs no
+# model, executes no issue text and never writes to the clone. No [Install] section:
+# host-requests-workstation.timer triggers it, matching this directory's timer-triggered oneshot
+# convention (codex-broker-reaper.service).
+[Unit]
+Description=Poll GitHub host requests for the workstation role (read-only)
+Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/recipes/host-request-lane.md
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=120
+# The native gh sits outside systemd's default PATH on this workstation (the live-clone sync unit
+# uses the same directory). On another host, use the directory that holds its `gh`.
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:/usr/local/bin:/usr/bin:/bin
+# $XDG_STATE_HOME/native-agent-stack/host-requests, created 0700: the script's default state path.
+StateDirectory=native-agent-stack/host-requests
+StateDirectoryMode=0700
+ExecStart=/usr/bin/python3 %h/code/native-agent-stack-live/scripts/host_requests.py poll --role workstation

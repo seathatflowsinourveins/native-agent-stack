@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "kind": "blind_ab_adjudication",
+  "question_id": "q2-memory-llm",
+  "question": "Which local model or models should be trialled for this role, in priority order, and should Qwen3.5-9B be retained as the control? Weigh the evidence quality (independent or vendor), latency within 20 s, licence, and local runtime support.\n\nJudge only from this brief. Do not browse or search. Answer in under 500 words, ending with one line: PREFERRED: A | B | SPLIT | NEITHER, and one line: RANKING: <comma-separated candidate names>.",
+  "shared_context": "Role: a small, fast local LLM for memory consolidation and listwise reranking within a hard 20 s budget, served locally (Ollama or an OpenAI-compatible endpoint) on a 64 GB M5 Pro Mac. The current model is Qwen3.5-9B (2026-03-02, NVFP4 on MLX). Use ONLY section 3 (memory or consolidation LLM) of each return; ignore sections 1 and 2.",
+  "items": [
+    {
+      "name": "Qwen3.6-35B-A3B",
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B"
+    },
+    {
+      "name": "LFM2.5-2.6B",
+      "url": "https://huggingface.co/LiquidAI/LFM2.5-2.6B"
+    }
+  ],
+  "method": "Blind A/B adjudication by one judge model (gpt-6-sol through codex exec with a read-only sandbox; the effort was not recorded) in three presentation orders defined by the key: a (Codex return as A, listed first), b (Claude return as A, listed first) and c (Codex return as A, Claude return as B listed first). The brief told the judge to judge only from the brief, not to browse or search, to answer in under 500 words, and to end with a PREFERRED line (A, B, SPLIT or NEITHER) and a RANKING line. Each run's event stream shows one command, a read of its own brief (exit 0), and no web search. The runs were launched from agents of the coordinator's convergence workflow, outside the Claude sandbox so that codex could reach its provider; no refuter was run, so refuting_votes 0 is not a survived refutation.",
+  "judgments": [
+    {
+      "packet_order": "a",
+      "order_definition": "original: Return A = first lane listed in the brief spec (codex); Return A listed first",
+      "run_label": "adjudicator-q2-memory-llm-a",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+      "original_input_sha256": "4209e482980f68a062ed570b02a235d538266cbd976d0e3c91cee4efb0b378ce",
+      "claude_position": "B",
+      "claude_listed": "second",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "Qwen3.6-35B-A3B",
+        "LFM2.5-2.6B"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **Qwen3.6-35B-A3B first**, with thinking off. It has the strongest relevant independent evidence in the brief: a 64.3 long-context reasoning score versus 46.0 for Qwen3.5-9B in the same mode. Its Apache-2.0 licence and listed Ollama and MLX builds support a local trial on the 64 GB Mac. That score is only a proxy for memory consolidation, and completion within 20 seconds remains unmeasured.\n\nTrial **LFM2.5-2.6B second** as a speed candidate. Its smaller size and official GGUF make it plausible for the deadline, but the brief gives no direct memory score or M5 Pro latency measurement. Review its custom licence before adoption.\n\n**Retain Qwen3.5-9B as the control** and measure consolidation fidelity, listwise ranking quality, and complete-request latency on the same 4K and 8K inputs. I would defer Nemotron 3.5 Lightning: its reported score requires reasoning and is below the control’s reasoning score. MemReader’s result covers a four-tool pipeline and does not establish standalone performance for this role.",
+      "why_words": 156,
+      "returned_words": 161,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **Qwen3.6-35B-A3B first**, with thinking off. It has the strongest relevant independent evidence in the brief: a 64.3 long-context reasoning score versus 46.0 for Qwen3.5-9B in the same mode. Its Apache-2.0 licence and listed Ollama and MLX builds support a local trial on the 64 GB Mac. That score is only a proxy for memory consolidation, and completion within 20 seconds remains unmeasured.\n\nTrial **LFM2.5-2.6B second** as a speed candidate. Its smaller size and official GGUF make it plausible for the deadline, but the brief gives no direct memory score or M5 Pro latency measurement. Review its custom licence before adoption.\n\n**Retain Qwen3.5-9B as the control** and measure consolidation fidelity, listwise ranking quality, and complete-request latency on the same 4K and 8K inputs. I would defer Nemotron 3.5 Lightning: its reported score requires reasoning and is below the control’s reasoning score. MemReader’s result covers a four-tool pipeline and does not establish standalone performance for this role.\n\nPREFERRED: SPLIT  \nRANKING: Qwen3.6-35B-A3B, LFM2.5-2.6B",
+      "returned_sha256": "21d2e60533c30400252055f8d0268794a234c96ffa94f425e30c890eb6d0a7ba",
+      "native_usage": {
+        "input_tokens": 39779,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1470,
+        "reasoning_output_tokens": 1098
+      }
+    },
+    {
+      "packet_order": "b",
+      "order_definition": "label-swapped: the other lane (claude) is labelled Return A; Return A listed first",
+      "run_label": "adjudicator-q2-memory-llm-b",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+      "original_input_sha256": "159751e31bfcc9d750b1697158c855101c17fddcb2c777b38482ac8a57acdf63",
+      "claude_position": "A",
+      "claude_listed": "first",
+      "preferred_position": "A",
+      "preferred_lane": "claude",
+      "ranking": [
+        "Qwen3.6-35B-A3B",
+        "LFM2.5-2.6B"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **Qwen3.6-35B-A3B first**, with thinking off. It has the strongest relevant evidence in the brief: an independent long-context reasoning score of 64.3 without reasoning, versus 46.0 for the current Qwen3.5-9B. Its Apache-2.0 licence and listed Ollama and MLX builds make a local trial practical. The score is a proxy, though; neither memory consolidation quality nor completion within 20 seconds has been measured on this Mac.\n\nTrial **LFM2.5-2.6B second** as a speed candidate. Its smaller size and official GGUF justify testing, but its structured-output score says little about memory quality, it always reasons, and the cited speed result is from an M5 Max. Its custom licence also needs review for the intended use.\n\n**Defer Nemotron 3.5 Lightning** unless those trials expose a gap: its independent score is lower than Qwen3.6’s reasoning score, its non-reasoning score is absent, and its local latency is unknown. MemReader’s reported result depends on a four-tool pipeline and does not establish standalone consolidation or listwise performance.\n\n**Retain Qwen3.5-9B as the control.** Compare consolidation fidelity, listwise quality, and complete-request p95 latency at 4K and 8K under the 20-second limit.",
+      "why_words": 181,
+      "returned_words": 186,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **Qwen3.6-35B-A3B first**, with thinking off. It has the strongest relevant evidence in the brief: an independent long-context reasoning score of 64.3 without reasoning, versus 46.0 for the current Qwen3.5-9B. Its Apache-2.0 licence and listed Ollama and MLX builds make a local trial practical. The score is a proxy, though; neither memory consolidation quality nor completion within 20 seconds has been measured on this Mac.\n\nTrial **LFM2.5-2.6B second** as a speed candidate. Its smaller size and official GGUF justify testing, but its structured-output score says little about memory quality, it always reasons, and the cited speed result is from an M5 Max. Its custom licence also needs review for the intended use.\n\n**Defer Nemotron 3.5 Lightning** unless those trials expose a gap: its independent score is lower than Qwen3.6’s reasoning score, its non-reasoning score is absent, and its local latency is unknown. MemReader’s reported result depends on a four-tool pipeline and does not establish standalone consolidation or listwise performance.\n\n**Retain Qwen3.5-9B as the control.** Compare consolidation fidelity, listwise quality, and complete-request p95 latency at 4K and 8K under the 20-second limit.\n\nPREFERRED: A  \nRANKING: Qwen3.6-35B-A3B, LFM2.5-2.6B",
+      "returned_sha256": "53a0e12eea3f9c907e4681afb274ff43f50f3a76e57a667a2544c9474637798a",
+      "native_usage": {
+        "input_tokens": 39756,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1490,
+        "reasoning_output_tokens": 1072
+      }
+    },
+    {
+      "packet_order": "c",
+      "order_definition": "reversed listing: labels as in order a (A = codex); Return B listed first",
+      "run_label": "adjudicator-q2-memory-llm-c",
+      "input": "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+      "original_input_sha256": "316938aea9967e5d750834e98fe8f375a4f6d38166a30207774bd1413aeb8546",
+      "claude_position": "B",
+      "claude_listed": "first",
+      "preferred_position": "SPLIT",
+      "preferred_lane": null,
+      "ranking": [
+        "Qwen3.6-35B-A3B",
+        "LFM2.5-2.6B"
+      ],
+      "judge": {
+        "model": "gpt-6-sol",
+        "family": "openai",
+        "effort": null
+      },
+      "why": "Trial **Qwen3.6-35B-A3B first, with thinking off**. Its independent AA-LCR score is 64.3 versus 46.0 for Qwen3.5-9B in that mode. It has an Apache-2.0 license and published Ollama and MLX options. Its complete-request latency on the M5 Pro is unmeasured, so the 20-second limit remains a trial gate.\n\nTrial **LFM2.5-2.6B second** as a smaller latency candidate with an official GGUF. Its memory accuracy is unproven, it always reasons, and its custom license needs review before adoption.\n\n**Retain Qwen3.5-9B as the control.** Deprioritize Nemotron 3.5 Lightning: its reported reasoning score trails the control, its non-reasoning score is missing, and its 20-second latency is unverified. MemReader’s score depends on a four-tool pipeline and does not establish performance for this role.",
+      "why_words": 117,
+      "returned_words": 122,
+      "within_word_limit": true,
+      "ends_with_required_lines": true,
+      "votes": 1,
+      "refuting_votes": 0,
+      "refuters_run": 0,
+      "exit_code_reported": 0,
+      "returned_text": "Trial **Qwen3.6-35B-A3B first, with thinking off**. Its independent AA-LCR score is 64.3 versus 46.0 for Qwen3.5-9B in that mode. It has an Apache-2.0 license and published Ollama and MLX options. Its complete-request latency on the M5 Pro is unmeasured, so the 20-second limit remains a trial gate.\n\nTrial **LFM2.5-2.6B second** as a smaller latency candidate with an official GGUF. Its memory accuracy is unproven, it always reasons, and its custom license needs review before adoption.\n\n**Retain Qwen3.5-9B as the control.** Deprioritize Nemotron 3.5 Lightning: its reported reasoning score trails the control, its non-reasoning score is missing, and its 20-second latency is unverified. MemReader’s score depends on a four-tool pipeline and does not establish performance for this role.\n\nPREFERRED: SPLIT  \nRANKING: Qwen3.6-35B-A3B, LFM2.5-2.6B",
+      "returned_sha256": "793b0469c8f519f7e316cf6b7698d3fa1444c780a91c789f7c6ff87827421a3e",
+      "native_usage": {
+        "input_tokens": 39764,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2237,
+        "reasoning_output_tokens": 1893
+      }
+    }
+  ],
+  "lane_preference_counts": {
+    "SPLIT": 2,
+    "claude": 1
+  },
+  "convergence_table_row": {
+    "question": "q2 memory LLM",
+    "order_a": "SPLIT. Qwen3.6-35B-A3B > LFM2.5-2.6B",
+    "order_b": "A = **Claude**. Same ranking",
+    "order_c": "SPLIT. Same ranking",
+    "lane_preference_across_orders": "SPLIT 2/3, Claude 1/3",
+    "holds_in_all_orders": "Identical ranking in 3/3. Qwen3.5-9B stays the control. Nemotron 3.5 Lightning deferred. MemReader set aside."
+  },
+  "adjudicated_outcome": "Identical ranking in all three orders: trial Qwen3.6-35B-A3B first (thinking off) and LFM2.5-2.6B second; keep Qwen3.5-9B as the control; Nemotron 3.5 Lightning not ranked (deferred or deprioritized); MemReader set aside.",
+  "evidence_refs": [
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-a.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-b.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/q2-memory-llm-c.json",
+    "evidence/artifacts/memory-stack-20260925/adjudication-inputs/adjudication-key.json",
+    "evidence/artifacts/memory-stack-20260925/convergence.json"
+  ],
+  "votes": 3,
+  "refuting_votes": 0,
+  "limitations": [
+    "One judge model (gpt-6-sol), from the same model family as the Codex lanes: three runs of one model are not independent judges, and varying the presentation does not remove family bias.",
+    "The judge never preferred the Codex return. Its only non-SPLIT answers came in order b, where the Claude return held letter A and was listed first; in order a the Codex return held that position and got SPLIT, so the order-b preference cannot be separated from a position or label effect.",
+    "The judge worked from the brief alone: it did not check the lanes' cited sources, so its reading of the evidence is only as good as the returns.",
+    "The judge effort, the Codex CLI version and the exact prompt were not retained; the exit status 0 is as the workflow's runner agents reported it.",
+    "Discovery-level evidence: no model was installed, downloaded or executed for any candidate named here."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "control": "binding_check.py request deadline",
+  "command": "python deadline_control.py binding_check.original.py binding_check.py",
+  "python": "3.13.15",
+  "driver_sha256": "04688ec2f569a315d3f1ebf7bfb38f9725355afb3f9f11f47e7683152da022d4",
+  "started_at_utc": "2026-09-26T09:59:19Z",
+  "ended_at_utc": "2026-09-26T09:59:19Z",
+  "results": [
+    {
+      "script": "binding_check.original.py",
+      "sha256": "0c6ed66d8ec370b2f3a3bac30bb8bfdc945f62d062af5d7db42fb2779f810c32",
+      "bound_ms": 50,
+      "outcome": "returned the answer",
+      "elapsed_ms": 323,
+      "messages_taken": 31,
+      "stub_exit": 0,
+      "stub_stderr_bytes": 0
+    },
+    {
+      "script": "binding_check.py",
+      "sha256": "d506e1de3f8bb424d2398b4b7054ce66d52d77149c3cda7e4b265c01fdf09ae0",
+      "bound_ms": 50,
+      "outcome": "raised Empty",
+      "elapsed_ms": 50,
+      "messages_taken": 3,
+      "stub_exit": 0,
+      "stub_stderr_bytes": 0
+    }
+  ]
+}

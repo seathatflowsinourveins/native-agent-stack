@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--exchange-calendars--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "exchange-calendars",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "\"$HOME/.local/share/codex-ecosystem/sdk-py313/bin/python\" -m unittest tests.test_adaptive_paper_sessions.SessionClockTests.test_year_outside_calendar_refused",
+      "exit": 1,
+      "duration_s": 0.654,
+      "output_sha256": "5bc6ef843973b170b797f86770cc5962a1b2387327c5fb6b49527eb95f870b8b",
+      "output_excerpt": "F\n======================================================================\nFAIL: test_year_outside_calendar_refused (tests.test_adaptive_paper_sessions.SessionClockTests.test_year_outside_calendar_refused)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack-evidence/tests/test_adaptive_paper_sessions.py\", line 15"
+    }
+  ],
+  "tool_versions": {
+    "exchange-calendars": "4.13.2"
+  },
+  "observed_at_utc": "2026-09-24T04:22:00Z",
+  "result": "fail",
+  "claim": "Reproduced the SDK-environment test assumption conflict with the optional calendar backend installed; this receipt is expected to report fail and is retained as failure, not a passing check.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:22:00Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

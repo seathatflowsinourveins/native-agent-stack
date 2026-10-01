@@ -1,0 +1,8 @@
+ext-20260928-2 scan start 16:24:45 ET
+scan rc=0 end 16:24:50 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 7, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "KNRX"], "regime_factor": 1.0, "sha256": "fa686ae9b4094a94685f53606024bd0afb86ccb5e1e067e859193e7c422f447f"}
+check rc=0 16:24:50 ET
+synthetic rc=0 16:24:56 ET
+paper start 16:24:56 ET
+paper rc=2 end 16:24:57 ET
+{"status": "not_started", "stage": "preflight", "reason": "benchmark_quotes_not_ready", "orders_submitted": 0}

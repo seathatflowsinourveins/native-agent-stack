@@ -1,0 +1,761 @@
+# The WORK guard of drivers/: lint, tests/test_bootstrap_integrity_drivers.py red and green, then the
+# guarded drivers rerun and compared with the retained outputs. Produced by one scratch script, which
+# captured every start and end time and exit status below.
+# red 1: the module in a scratch copy of this change's tree (tests/ and this directory) with bootstrap_once.sh,
+#   e2e.sh and uv_forms.sh replaced by their as-run originals (mode 0755, as run).
+# red 2: the same, with work_guard.sh and the four shell drivers of the guard's first revision (06:34Z to
+#   06:42Z); the diff below turns that revision into this change's.
+# green: the module in this change's tree.
+# Sanitized: each tree is printed as <tree>, the tests' temporary directories as <tmp>, the rerun work
+# directories as <work>; the tests set TMPDIR, so each test's own directory is <tmp>/tmp....
+
+== python: Python 3.13.15; bash: 5.2.21(1)-release; shellcheck: version: 0.11.0
+
+== lint of this change's drivers: cd <tree>/evidence/artifacts/bootstrap-integrity-20260926/drivers
+shellcheck -x work_guard.sh bootstrap_once.sh e2e.sh uv_forms.sh upstream_checks.sh: exit 0
+bash -n work_guard.sh: exit 0
+bash -n bootstrap_once.sh: exit 0
+bash -n e2e.sh: exit 0
+bash -n uv_forms.sh: exit 0
+bash -n upstream_checks.sh: exit 0
+node --check mcp_list_tools.mjs (node v24.21.0): exit 0
+
+== red 1 (as-run drivers): cd <tree> && TMPDIR=<tmp> python -B -m unittest tests.test_bootstrap_integrity_drivers -v
+started 2026-09-26T10:03:39Z
+evidence/artifacts/bootstrap-integrity-20260926/drivers/work_guard.sh sha256 b30c246008475e1aa5dec45ec967ec7deae1ff90750a922b81a5681b40f0b73e
+evidence/artifacts/bootstrap-integrity-20260926/drivers/bootstrap_once.sh sha256 867f4f163571bc94b3c35c36e21315b436fbfa2ca62917ec0cf3c7e738464cf0
+evidence/artifacts/bootstrap-integrity-20260926/drivers/e2e.sh sha256 6324b2d6cffacd018b91325a6f59b46b5fe86a9bbf9d2c9f6703dc7b5d458314
+evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh sha256 706260004cdbab2bde23d30e1bc39e422cb7c8876dea38a4611399a72cefe701
+evidence/artifacts/bootstrap-integrity-20260926/drivers/upstream_checks.sh sha256 114b1355f49085f80c4cd7f3923d835c50dd98843f281e9668abe80670f79f39
+tests/test_bootstrap_integrity_drivers.py sha256 5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a
+test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) ... 
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [bootstrap_once.sh] ... FAIL
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [e2e.sh] ... FAIL
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [uv_forms.sh] ... FAIL
+test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) ... 
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [e2e.sh] ... FAIL
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [uv_forms.sh] ... FAIL
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [bootstrap_once.sh] ... FAIL
+test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes) ... ok
+test_a_directory_that_cannot_be_listed_is_refused (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_directory_that_cannot_be_listed_is_refused) ... ok
+test_a_failed_listing_refuses_rather_than_reading_as_empty (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_failed_listing_refuses_rather_than_reading_as_empty) ... ok
+test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched) ... ok
+test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) ... ok
+test_anything_else_is_refused_with_exit_2_and_left_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_anything_else_is_refused_with_exit_2_and_left_untouched) ... ok
+test_mark_work_writes_the_marker_that_claim_work_accepts (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_mark_work_writes_the_marker_that_claim_work_accepts) ... ok
+test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) ... 
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='empty') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='empty') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='empty') ... FAIL
+test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) ... 
+  test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='e2e.sh') ... FAIL
+  test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='uv_forms.sh') ... FAIL
+  test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='bootstrap_once.sh') ... FAIL
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [bootstrap_once.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 270, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertIn(line, added)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: '. "$here/work_guard.sh" || exit 2' not found in []
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [e2e.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 270, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertIn(line, added)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: '. "$here/work_guard.sh" || exit 2' not found in []
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [uv_forms.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 270, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertIn(line, added)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: '. "$here/work_guard.sh" || exit 2' not found in []
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [e2e.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [uv_forms.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : uv_forms.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [bootstrap_once.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : bootstrap_once.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 127 != 2 : id2sk/lone/bootstrap_once.sh: No such file or directory
+<tmp>/tmp42lid2sk/lone/e2e.sh: line 35: <tmp>/tmp42lid2sk/lone/bootstrap_once.sh: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 127 != 2 : 0187q/lone/bootstrap_once.sh: No such file or directory
+<tmp>/tmpuly0187q/lone/e2e.sh: line 35: <tmp>/tmpuly0187q/lone/bootstrap_once.sh: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : %20%231%20%3B%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl
+<tmp>/tmpmrbo0m3z/lone/uv_forms.sh: line 32: <tmp>/tmpmrbo0m3z/missing: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : %20%231%20%3B%25%C3%A9/downloads/demo_tool-1.0.0-py3-none-any.whl
+<tmp>/tmpoi8jk876/lone/uv_forms.sh: line 32: <tmp>/tmpoi8jk876/missing: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : cp: cannot stat '<tmp>/tmpqs1azhla/missing': No such file or directory
+cp: cannot stat '<tmp>/tmpqs1azhla/missing': No such file or directory
+copy differs
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : cp: cannot stat '<tmp>/tmpxc2q8s00/missing': No such file or directory
+cp: cannot stat '<tmp>/tmpxc2q8s00/missing': No such file or directory
+copy differs
+
+
+======================================================================
+FAIL: test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='e2e.sh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 224, in test_each_driver_refuses_a_non_empty_work_it_did_not_create
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : <tmp>/tmp4dlo2zvn/missing/adoption/bootstrap-linux.sh': No such file or directory
+cp: cannot stat '<tmp>/tmp4dlo2zvn/missing/adoption/pins-linux-x86_64.json': No such file or directory
+copy differs
+
+
+======================================================================
+FAIL: test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='uv_forms.sh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 224, in test_each_driver_refuses_a_non_empty_work_it_did_not_create
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : ol-1.0.0-py3-none-any.whl
+<tree>/evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh: line 32: <tmp>/tmpw1b1erpq/missing: No such file or directory
+
+
+======================================================================
+FAIL: test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) (driver='bootstrap_once.sh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 224, in test_each_driver_refuses_a_non_empty_work_it_did_not_create
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : cp: cannot stat '<tmp>/tmp6dyxkyoz/missing': No such file or directory
+cp: cannot stat '<tmp>/tmp6dyxkyoz/missing': No such file or directory
+copy differs
+
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.455s
+
+FAILED (failures=15)
+exit 1, ended 2026-09-26T10:03:41Z
+
+== the guard's first revision against this change's (diff -u first final)
+--- first/work_guard.sh
++++ final/work_guard.sh
+@@ -3,16 +3,23 @@
+ # The drivers delete and rewrite paths under the WORK directory they are given, so they only accept a
+ # WORK they may own: a path that does not exist, an empty directory, or a directory holding the marker
+ # file that mark_work writes into every WORK a driver creates. Anything else ends the driver with exit
+-# status 2 before it deletes, downloads or writes anything.
++# status 2 before it deletes, downloads or writes anything. So does a WORK that begins with '-', which
++# rm, mkdir and find would read as an option (pass ./-name for such a directory). Each driver sources
++# this file with `|| exit 2` and calls claim_work with `|| exit 2`, so a driver copied without this file
++# stops too.
+ 
+ work_marker=.bootstrap-integrity-work
+ 
+ claim_work() {  # claim_work DIR: return if the drivers may delete and rewrite DIR, else exit 2
+-  local dir="$1" entry
++  local dir="$1" listed entry
+   if [[ -z "$dir" ]]; then
+     echo "refusing: WORK is an empty string" >&2
+     exit 2
+   fi
++  if [[ "$dir" == -* ]]; then
++    echo "refusing: WORK begins with '-', which rm, mkdir and find read as an option: $dir (pass ./$dir)" >&2
++    exit 2
++  fi
+   if [[ -L "$dir" ]]; then
+     echo "refusing: WORK is a symbolic link: $dir" >&2
+     exit 2
+@@ -27,8 +34,12 @@
+   if [[ -f "$dir/$work_marker" && ! -L "$dir/$work_marker" ]]; then
+     return 0
+   fi
+-  # A listing that fails (no find, no permission) refuses too: an unreadable directory is not empty.
+-  if [[ ! -r "$dir" || ! -x "$dir" ]] || ! entry="$(find "$dir" -mindepth 1 -maxdepth 1 -print -quit)"; then
++  # find takes a lone '!' or '(' as part of its expression, not as a path, so a relative WORK is listed
++  # as ./WORK. A listing that fails (no find, no permission) refuses too: an unreadable directory is not
++  # empty.
++  listed="$dir"
++  [[ "$listed" == /* ]] || listed="./$listed"
++  if [[ ! -r "$dir" || ! -x "$dir" ]] || ! entry="$(find "$listed" -mindepth 1 -maxdepth 1 -print -quit)"; then
+     echo "refusing: WORK cannot be listed: $dir" >&2
+     exit 2
+   fi
+--- first/bootstrap_once.sh
++++ final/bootstrap_once.sh
+@@ -16,8 +16,8 @@
+ here="$(cd "$(dirname "$0")" && pwd -P)"
+ # WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).
+ # shellcheck source-path=SCRIPTDIR source=work_guard.sh
+-. "$here/work_guard.sh"
+-claim_work "$work"
++. "$here/work_guard.sh" || exit 2
++claim_work "$work" || exit 2
+ mkdir -p "$work"
+ mark_work "$work"
+ rm -rf "$root" "$work/home-$label" "$work/npm-cache-$label"
+--- first/e2e.sh
++++ final/e2e.sh
+@@ -14,8 +14,8 @@
+ here="$(cd "$(dirname "$0")" && pwd -P)"
+ # WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).
+ # shellcheck source-path=SCRIPTDIR source=work_guard.sh
+-. "$here/work_guard.sh"
+-claim_work "$work"
++. "$here/work_guard.sh" || exit 2
++claim_work "$work" || exit 2
+ rm -rf "$work"
+ mkdir -p "$work"
+ mark_work "$work"
+--- first/uv_forms.sh
++++ final/uv_forms.sh
+@@ -13,8 +13,8 @@
+ here="$(cd "$(dirname "$0")" && pwd -P)"
+ # WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).
+ # shellcheck source-path=SCRIPTDIR source=work_guard.sh
+-. "$here/work_guard.sh"
+-claim_work "$work"
++. "$here/work_guard.sh" || exit 2
++claim_work "$work" || exit 2
+ rm -rf "$work"
+ mkdir -p "$work/plain"
+ mark_work "$work"
+--- first/upstream_checks.sh
++++ final/upstream_checks.sh
+@@ -3,13 +3,18 @@
+ # not an upstream test suite and not CI). In order:
+ # 1. bootstrap_once.sh installs profile {headroom, socraticode} with the checkout's
+ #    adoption/bootstrap-linux.sh and pins over the network, as e2e.sh's pass scenario does.
+-# 2. headroom's own evaluation `headroom evals adversarial`, which its --help documents as "Offline and
++# 2. What the installed packages hold, read from their files and help texts: the headroom wheel's
++#    entries and README, headroom's evals and doctor help, socraticode's package.json, README and the
++#    dist/ lines behind its startup and codebase_health behaviour. These show which upstream checks
++#    apply offline; nothing in this step installs, indexes or calls a model.
++# 3. headroom's own evaluation `headroom evals adversarial`, which its --help documents as "Offline and
+ #    deterministic - no LLM, no API key, no model download", runs twice; the JSON reports are compared.
+-# 3. socraticode's documented launch, its installed `socraticode` bin as an MCP stdio server, is asked
+-#    for its identity and tool list by mcp_list_tools.mjs. The same client then starts a node process
+-#    that exits at once (the control: no MCP server answers, so the check must fail).
+-# Steps 2 and 3 run in a new network namespace (unshare --map-current-user --net: no interface is up,
+-# not even loopback) with HOME, the XDG directories and TMPDIR under WORK and with
++# 4. socraticode's documented launch, its installed `socraticode` bin as an MCP stdio server, is asked
++#    for its identity and tool list by mcp_list_tools.mjs, with SOCRATICODE_LOG_FILE set so the
++#    server's own log is kept. The same client then starts a node process that exits at once (the
++#    control: no MCP server answers, so the check must fail).
++# Steps 2 (the help texts), 3 and 4 run in a new network namespace (unshare --map-current-user --net:
++# no interface is up, not even loopback) with HOME, the XDG directories and TMPDIR under WORK and with
+ # SOCRATICODE_AUTO_RESUME=off, which socraticode reads before any Docker or Qdrant access.
+ #   usage: upstream_checks.sh CHECKOUT WORK
+ set -uo pipefail
+@@ -17,8 +22,8 @@
+ here="$(cd "$(dirname "$0")" && pwd -P)"
+ # WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).
+ # shellcheck source-path=SCRIPTDIR source=work_guard.sh
+-. "$here/work_guard.sh"
+-claim_work "$work"
++. "$here/work_guard.sh" || exit 2
++claim_work "$work" || exit 2
+ rm -rf "$work"
+ mkdir -p "$work"
+ mark_work "$work"
+@@ -30,6 +35,9 @@
+ eco="$work/eco"
+ home="$work/home-checks"
+ printf 'checkout HEAD %s (working tree)\n' "$(git -C "$checkout" rev-parse HEAD)"
++printf 'driver sha256: upstream_checks.sh %s, mcp_list_tools.mjs %s, bootstrap_once.sh %s, work_guard.sh %s\n' \
++  "$(sha256sum <"$here/upstream_checks.sh" | cut -d' ' -f1)" "$(sha256sum <"$here/mcp_list_tools.mjs" | cut -d' ' -f1)" \
++  "$(sha256sum <"$here/bootstrap_once.sh" | cut -d' ' -f1)" "$(sha256sum <"$here/work_guard.sh" | cut -d' ' -f1)"
+ "$here/bootstrap_once.sh" upstream "$checkout/adoption/bootstrap-linux.sh" "$pins" "$work" "$work/uv-cache" \
+   '["headroom","socraticode"]' "$eco" | san
+ printf '\n--- the version report the run wrote (installed-versions.txt)\n'
+@@ -55,6 +63,45 @@
+   .on("connect", () => { console.log("TCP connect to 1.1.1.1:443 succeeded"); process.exit(1); })
+   .on("error", (error) => console.log("TCP connect to 1.1.1.1:443 fails: " + error.code));' 2>&1 | san
+ 
++version="$(jq -r '.tools[] | select(.id == "socraticode") | .version' "$pins")"
++package="$eco/tools/socraticode-$version/lib/node_modules/socraticode"
++wheel="$eco/downloads/$(jq -r '.tools[] | select(.id == "headroom") | .url | split("/") | last' "$pins")"
++printf '\n=== what the installed packages hold, and which upstream checks apply offline\n'
++printf -- '--- the headroom wheel (%s), its entries and its README (METADATA)\n' "${wheel##*/}"
++python3 - "$wheel" <<'EOF'
++import re, sys, zipfile
++wheel = zipfile.ZipFile(sys.argv[1])
++names = wheel.namelist()
++rows = [row for row in wheel.read(next(n for n in names if n.endswith(".dist-info/RECORD"))).decode().splitlines() if row.strip()]
++print(f"{len(names)} entries; RECORD: {len(rows)} rows, {sum(1 for row in rows if row.split(',')[1])} with a hash")
++tests = [n for n in names if re.search(r"(^|/)(tests?|testing)(/|$)|(^|/)test_[^/]*\.py$|_test\.py$|(^|/)conftest\.py$", n)]
++print(f"entries whose path looks like a test: {len(tests)}: {' '.join(tests) or 'none'}")
++for line in wheel.read(next(n for n in names if n.endswith(".dist-info/METADATA"))).decode().splitlines():
++    if re.search(r"uv run pytest|^headroom doctor\s+#|evals suite --tier", line):
++        print(f"README: {line.strip()}")
++EOF
++for args in "evals adversarial --help" "evals probes --help" "doctor --help"; do
++  printf -- '--- $ headroom %s\n' "$args"
++  # shellcheck disable=SC2086  # the arguments are split on purpose
++  offline "$eco/bin/headroom" $args 2>&1 | san
++done
++printf -- '--- $ python -m headroom.evals suite --help (the tool environment'"'"'s python)\n'
++offline "$eco/python-tools/headroom-ai/bin/python" -m headroom.evals suite --help 2>&1 | san
++printf -- '--- socraticode %s: package.json files and test scripts\n' "$version"
++jq -c '{files, test_scripts: (.scripts | with_entries(select(.key | startswith("test"))))}' "$package/package.json"
++printf -- '--- its README: a stdio launch as an MCP server, and the codebase_health row\n'
++# shellcheck disable=SC2016  # the backticks are the README's own text
++grep -n -F -e 'claude mcp add --scope user socraticode -- npx -y --prefer-online socraticode@latest' \
++  -e 'Register `node /absolute/path/to/socraticode/dist/index.js`' -e '| `codebase_health` |' "$package/README.md" | cut -c1-160
++printf -- '--- dist/services/startup.js: SOCRATICODE_AUTO_RESUME=off returns before the Docker and Qdrant checks\n'
++grep -n -F -e 'const resumeMode = process.env.SOCRATICODE_AUTO_RESUME' -e 'Auto-resume: disabled by SOCRATICODE_AUTO_RESUME=off' \
++  -e 'if (QDRANT_MODE === "managed")' -e 'await isDockerAvailable()' "$package/dist/services/startup.js"
++printf -- '--- codebase_health and codebase_about: dist/index.js, dist/tools/manage-tools.js, dist/services/docker.js\n'
++grep -n -F 'server.tool("codebase_health"' "$package/dist/index.js" | cut -c1-200
++grep -n -F -e 'case "codebase_health"' -e 'case "codebase_about"' -e 'const infraStatus = await getInfraStatusSummary()' \
++  -e 'const docker = await isDockerAvailable()' "$package/dist/tools/manage-tools.js"
++grep -n -F 'await run("docker", ["info"])' "$package/dist/services/docker.js"
++
+ printf '\n=== headroom (%s)\n' "$(offline "$eco/bin/headroom" --version 2>&1)"
+ for n in 1 2; do
+   started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+@@ -80,13 +127,14 @@
+   printf '\nthe two JSON reports differ or are missing\n'
+ fi
+ 
+-version="$(jq -r '.tools[] | select(.id == "socraticode") | .version' "$pins")"
+-package="$eco/tools/socraticode-$version/lib/node_modules/socraticode"
+ printf '\n=== socraticode %s: MCP initialize and tools/list over stdio, server <work>/eco/bin/socraticode\n' "$version"
+ started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+-offline "$eco/bin/node" "$here/mcp_list_tools.mjs" "$package" "$eco/bin/socraticode" 2>&1 | san
++offline env SOCRATICODE_LOG_FILE="$work/socraticode.log" "$eco/bin/node" "$here/mcp_list_tools.mjs" "$package" \
++  "$eco/bin/socraticode" 2>&1 | san
+ rc=${PIPESTATUS[0]}
+ printf 'started %s, ended %s, exit %s\n' "$started" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$rc"
++printf -- '- the server'"'"'s own log (SOCRATICODE_LOG_FILE=<work>/socraticode.log):\n'
++if [[ -f "$work/socraticode.log" ]]; then san <"$work/socraticode.log"; else printf 'not written\n'; fi
+ printf '\n=== control: the same client, server a node process that exits at once\n'
+ offline "$eco/bin/node" "$here/mcp_list_tools.mjs" "$package" "$eco/bin/node" -e '' 2>&1 | san
+ rc=${PIPESTATUS[0]}
+
+== red 2 (the guard's first revision): cd <tree> && TMPDIR=<tmp> python -B -m unittest tests.test_bootstrap_integrity_drivers -v
+started 2026-09-26T10:03:41Z
+evidence/artifacts/bootstrap-integrity-20260926/drivers/work_guard.sh sha256 ef27a43d0ad0c46eeeed72a38965e0e671f125580cc0dd35b43ce61b89544a0c
+evidence/artifacts/bootstrap-integrity-20260926/drivers/bootstrap_once.sh sha256 6d61d752faded09cbba30bd0367e1963459a1d2bde6ed278c7ed3e8a9b754ff3
+evidence/artifacts/bootstrap-integrity-20260926/drivers/e2e.sh sha256 3c8396299f7404f8cd37896217a8d003dd3e61a2dc2909631d1467407f43f820
+evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh sha256 e535c9062e1f26445e29bb99dbf005b0934f66b0f55a8d0f2b60abc42a68589e
+evidence/artifacts/bootstrap-integrity-20260926/drivers/upstream_checks.sh sha256 766fb48ae06d79d90b96ede3a97bd1b6de82325ac1b2e4535c68f1d571f3db87
+tests/test_bootstrap_integrity_drivers.py sha256 5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a
+test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) ... 
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [bootstrap_once.sh] ... FAIL
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [e2e.sh] ... FAIL
+  test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [uv_forms.sh] ... FAIL
+test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) ... 
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [e2e.sh] ... FAIL
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [uv_forms.sh] ... FAIL
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [bootstrap_once.sh] ... FAIL
+  test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [upstream_checks.sh] ... FAIL
+test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes) ... ok
+test_a_directory_that_cannot_be_listed_is_refused (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_directory_that_cannot_be_listed_is_refused) ... ok
+test_a_failed_listing_refuses_rather_than_reading_as_empty (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_failed_listing_refuses_rather_than_reading_as_empty) ... ok
+test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched) ... ok
+test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) ... 
+  test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='-delete') ... FAIL
+  test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='-new') ... FAIL
+  test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='!') ... FAIL
+test_anything_else_is_refused_with_exit_2_and_left_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_anything_else_is_refused_with_exit_2_and_left_untouched) ... ok
+test_mark_work_writes_the_marker_that_claim_work_accepts (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_mark_work_writes_the_marker_that_claim_work_accepts) ... ok
+test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) ... 
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='empty') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='empty') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='empty') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='upstream_checks.sh', guard='missing') ... FAIL
+  test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='upstream_checks.sh', guard='empty') ... FAIL
+test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) ... ok
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [bootstrap_once.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 268, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertLessEqual(set(added), GUARD_LINES)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', 'here="$(cd "$(dirname "$0")" && pwd -P)"', '. "$here/work_guard.sh"', 'claim_work "$work"', 'mark_work "$work"', 'mkdir -p "$work"'} not less than or equal to {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', 'claim_work "$work" || exit 2', 'here="$(cd "$(dirname "$0")" && pwd -P)"', 'mark_work "$work"', 'mkdir -p "$work"', '. "$here/work_guard.sh" || exit 2'}
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [e2e.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 268, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertLessEqual(set(added), GUARD_LINES)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', '. "$here/work_guard.sh"', 'claim_work "$work"', 'mark_work "$work"'} not less than or equal to {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', 'claim_work "$work" || exit 2', 'here="$(cd "$(dirname "$0")" && pwd -P)"', 'mark_work "$work"', 'mkdir -p "$work"', '. "$here/work_guard.sh" || exit 2'}
+
+======================================================================
+FAIL: test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) [uv_forms.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 268, in test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only
+    self.assertLessEqual(set(added), GUARD_LINES)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', 'here="$(cd "$(dirname "$0")" && pwd -P)"', '. "$here/work_guard.sh"', 'claim_work "$work"', 'mark_work "$work"'} not less than or equal to {'# WORK must be new, an empty directory, or a directory these drivers created (work_guard.sh).', '# shellcheck source-path=SCRIPTDIR source=work_guard.sh', 'claim_work "$work" || exit 2', 'here="$(cd "$(dirname "$0")" && pwd -P)"', 'mark_work "$work"', 'mkdir -p "$work"', '. "$here/work_guard.sh" || exit 2'}
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [e2e.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [uv_forms.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : uv_forms.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [bootstrap_once.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : bootstrap_once.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) [upstream_checks.sh]
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 277, in test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action
+    self.assertTrue(line in lines, f"{name} has no line {line!r}")
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : upstream_checks.sh has no line '. "$here/work_guard.sh" || exit 2'
+
+======================================================================
+FAIL: test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='-delete')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 176, in test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched
+    self.assertEqual(tree(cwd), before)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: {'!':[113 chars]a\n")} != {'!':[113 chars]a\n"), 'bystander.txt': ('file', b"someone's f[15 chars]\n")}
+  {'!': ('dir',),
+   '!/data': ('file', b"someone's data\n"),
+   '-delete': ('dir',),
+-  '-delete/data': ('file', b"someone's data\n")}
+?                                               ^
+
++  '-delete/data': ('file', b"someone's data\n"),
+?                                               ^
+
++  'bystander.txt': ('file', b"someone's file beside WORK\n")}
+
+======================================================================
+FAIL: test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='-new')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 173, in test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : claimed
+
+
+======================================================================
+FAIL: test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) (work='!')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 173, in test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : claimed
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 127 != 2 : _4ol1/lone/bootstrap_once.sh: No such file or directory
+<tmp>/tmpryi_4ol1/lone/e2e.sh: line 40: <tmp>/tmpryi_4ol1/lone/bootstrap_once.sh: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='e2e.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 127 != 2 : 3u70o/lone/bootstrap_once.sh: No such file or directory
+<tmp>/tmphgh3u70o/lone/e2e.sh: line 40: <tmp>/tmphgh3u70o/lone/bootstrap_once.sh: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : pxii9pdn4/lone/uv_forms.sh: line 20: mark_work: command not found
+<tmp>/tmpxii9pdn4/lone/uv_forms.sh: line 38: <tmp>/tmpxii9pdn4/missing: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='uv_forms.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : pqc8nmyyb/lone/uv_forms.sh: line 20: mark_work: command not found
+<tmp>/tmpqc8nmyyb/lone/uv_forms.sh: line 38: <tmp>/tmpqc8nmyyb/missing: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : ot found
+cp: cannot stat '<tmp>/tmpwj1r7ryx/missing': No such file or directory
+cp: cannot stat '<tmp>/tmpwj1r7ryx/missing': No such file or directory
+copy differs
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='bootstrap_once.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 90 != 2 : ot found
+cp: cannot stat '<tmp>/tmp_d4jkhpt/missing': No such file or directory
+cp: cannot stat '<tmp>/tmp_d4jkhpt/missing': No such file or directory
+copy differs
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='upstream_checks.sh', guard='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2 : ins-linux-x86_64.json: No such file or directory
+<tmp>/tmph34db5db/lone/upstream_checks.sh: line 96: <tmp>/tmph34db5db/work/upstream.log: No such file or directory
+
+
+======================================================================
+FAIL: test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) (driver='upstream_checks.sh', guard='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<tree>/tests/test_bootstrap_integrity_drivers.py", line 247, in test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work
+    self.assertEqual(result.returncode, 2, (result.stdout + result.stderr)[-400:])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2 : ins-linux-x86_64.json: No such file or directory
+<tmp>/tmppx548ka_/lone/upstream_checks.sh: line 96: <tmp>/tmppx548ka_/work/upstream.log: No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.052s
+
+FAILED (failures=18)
+exit 1, ended 2026-09-26T10:03:42Z
+
+== green (this change): cd <tree> && TMPDIR=<tmp> python -B -m unittest tests.test_bootstrap_integrity_drivers -v
+started 2026-09-26T10:03:42Z
+evidence/artifacts/bootstrap-integrity-20260926/drivers/work_guard.sh sha256 b30c246008475e1aa5dec45ec967ec7deae1ff90750a922b81a5681b40f0b73e
+evidence/artifacts/bootstrap-integrity-20260926/drivers/bootstrap_once.sh sha256 58d8d60b51c71384b74f32b33dab37b97b2f8234c185d2477a2c25a7fc42a311
+evidence/artifacts/bootstrap-integrity-20260926/drivers/e2e.sh sha256 16d584796dac98948ea8743072962360e2d914351210181d9a91e551ebd71382
+evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh sha256 c8dd7fb2de7db5f2f434eb1c1ddeaff63a47b0519f663eec56cd15203e4f24da
+evidence/artifacts/bootstrap-integrity-20260926/drivers/upstream_checks.sh sha256 114b1355f49085f80c4cd7f3923d835c50dd98843f281e9668abe80670f79f39
+tests/test_bootstrap_integrity_drivers.py sha256 5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a
+test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_each_guarded_driver_is_its_as_run_original_plus_guard_lines_only) ... ok
+test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_every_shell_driver_sources_and_calls_the_guard_fail_closed_before_any_action) ... ok
+test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes (tests.test_bootstrap_integrity_drivers.AsRunOriginalTests.test_the_as_run_originals_are_kept_byte_for_byte_and_the_readme_names_their_hashes) ... ok
+test_a_directory_that_cannot_be_listed_is_refused (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_directory_that_cannot_be_listed_is_refused) ... ok
+test_a_failed_listing_refuses_rather_than_reading_as_empty (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_failed_listing_refuses_rather_than_reading_as_empty) ... ok
+test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_new_path_an_empty_directory_and_a_marked_directory_are_claimed_untouched) ... ok
+test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_a_work_that_rm_mkdir_or_find_would_read_as_syntax_is_refused_and_nothing_is_touched) ... ok
+test_anything_else_is_refused_with_exit_2_and_left_untouched (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_anything_else_is_refused_with_exit_2_and_left_untouched) ... ok
+test_mark_work_writes_the_marker_that_claim_work_accepts (tests.test_bootstrap_integrity_drivers.ClaimWorkTests.test_mark_work_writes_the_marker_that_claim_work_accepts) ... ok
+test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_a_driver_whose_guard_is_missing_or_defines_nothing_exits_2_before_touching_work) ... ok
+test_each_driver_refuses_a_non_empty_work_it_did_not_create (tests.test_bootstrap_integrity_drivers.DriverRefusalTests.test_each_driver_refuses_a_non_empty_work_it_did_not_create) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.200s
+
+OK
+exit 0, ended 2026-09-26T10:03:42Z
+
+== the guarded drivers rerun over new work directories, compared with the retained outputs
+
+-- cd <tree> && bash evidence/artifacts/bootstrap-integrity-20260926/drivers/e2e.sh <tree> <work>
+started 2026-09-26T10:03:42Z
+exit 0, ended 2026-09-26T10:04:41Z; stderr 0 bytes; stdout:
+checkout HEAD 5c1961e49b89dd56ef5626950a5448735caabe4c
+fixed script  eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135 (working tree)
+HEAD script   458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456 (git show HEAD:adoption/bootstrap-linux.sh)
+[pass] script sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+[pass] pins sha256   af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339
+[pass] profile       ["headroom","socraticode"]
+[pass] started       2026-09-26T10:03:43Z
+[pass] ended         2026-09-26T10:04:03Z
+[pass] bootstrap exit 0
+[fixed-bad-hash] script sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+[fixed-bad-hash] pins sha256   07daebf5b6e843d9598c8c1ce00891a3a38a2b2c7bd96ac29eaf4a32d3df849e
+[fixed-bad-hash] profile       ["headroom"]
+[fixed-bad-hash] started       2026-09-26T10:04:03Z
+[fixed-bad-hash] ended         2026-09-26T10:04:07Z
+[fixed-bad-hash] bootstrap exit 1
+[head-bad-hash] script sha256 458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456
+[head-bad-hash] pins sha256   07daebf5b6e843d9598c8c1ce00891a3a38a2b2c7bd96ac29eaf4a32d3df849e
+[head-bad-hash] profile       ["headroom","socraticode"]
+[head-bad-hash] started       2026-09-26T10:04:07Z
+[head-bad-hash] ended         2026-09-26T10:04:25Z
+[head-bad-hash] bootstrap exit 0
+[t1-head] script sha256 458fb9c4329d54ca206ceda75d2d2a7d063a7b707897af0857e2a890930ef456
+[t1-head] pins sha256   af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339
+[t1-head] profile       ["headroom"]
+[t1-head] started       2026-09-26T10:04:25Z
+[t1-head] ended         2026-09-26T10:04:31Z
+[t1-head] bootstrap exit 0
+[t2-fixed] script sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+[t2-fixed] pins sha256   af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339
+[t2-fixed] profile       ["headroom"]
+[t2-fixed] started       2026-09-26T10:04:31Z
+[t2-fixed] ended         2026-09-26T10:04:36Z
+[t2-fixed] bootstrap exit 0
+[t3-fixed] script sha256 eb68717b4bf3f95bdfbba40c12a342d939ba4388dca7fd1584e7c90d9d423135
+[t3-fixed] pins sha256   af8a2486915d911ea2430150e57278e54d53715bf43d2316d8e40e86760ed339
+[t3-fixed] profile       ["headroom"]
+[t3-fixed] started       2026-09-26T10:04:36Z
+[t3-fixed] ended         2026-09-26T10:04:41Z
+[t3-fixed] bootstrap exit 0
+
+-- cd <tree> && python3 -B evidence/artifacts/bootstrap-integrity-20260926/drivers/check.py <tree> <work> <e2e.sh stdout> (python3: Python 3.13.15)
+started 2026-09-26T10:04:41Z
+exit 0, ended 2026-09-26T10:04:42Z; stderr 0 bytes; last line: == 0 check(s) failed
+-- diff of the check.py part of e2e-check.txt (<) against this output (>)
+73,74c73,74
+< INFO   t1-head uv: Resolved 73 packages in 15ms
+< INFO   t1-head uv: Installed 73 packages in 428ms
+---
+> INFO   t1-head uv: Resolved 73 packages in 18ms
+> INFO   t1-head uv: Installed 73 packages in 604ms
+77,80c77,80
+< INFO   t2-fixed uv: Resolved 73 packages in 15ms
+< INFO   t2-fixed uv: Prepared 1 package in 73ms
+< INFO   t2-fixed uv: Uninstalled 1 package in 15ms
+< INFO   t2-fixed uv: Installed 1 package in 35ms
+---
+> INFO   t2-fixed uv: Resolved 73 packages in 21ms
+> INFO   t2-fixed uv: Prepared 1 package in 98ms
+> INFO   t2-fixed uv: Uninstalled 1 package in 14ms
+> INFO   t2-fixed uv: Installed 1 package in 40ms
+85,86c85,86
+< PASS t1-head installs headroom-ai from the index: ['Resolved 73 packages in 15ms', 'Installed 73 packages in 428ms', ' + headroom-ai==0.37.0']
+< PASS t2-fixed replaces it with the verified wheel: ['Resolved 73 packages in 15ms', 'Prepared 1 package in 73ms', 'Uninstalled 1 package in 15ms', 'Installed 1 package in 35ms', ' - headroom-ai==0.37.0', ' + headroom-ai==0.37.0 (from file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl)']
+---
+> PASS t1-head installs headroom-ai from the index: ['Resolved 73 packages in 18ms', 'Installed 73 packages in 604ms', ' + headroom-ai==0.37.0']
+> PASS t2-fixed replaces it with the verified wheel: ['Resolved 73 packages in 21ms', 'Prepared 1 package in 98ms', 'Uninstalled 1 package in 14ms', 'Installed 1 package in 40ms', ' - headroom-ai==0.37.0', ' + headroom-ai==0.37.0 (from file://<work>/eco-transition/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl)']
+diff exit 1
+
+-- cd <tree> && bash evidence/artifacts/bootstrap-integrity-20260926/drivers/uv_forms.sh <upstream-checks work>/eco/bin/uv <work>
+(the uv 0.12.17 that the install of upstream-checks.txt put in place)
+started 2026-09-26T10:04:42Z
+exit 0, ended 2026-09-26T10:04:46Z; stderr 0 bytes
+-- diff of uv-forms.txt without its 3 header lines (<) against this output (>), the fixture wheel line left out
+diff exit 0
+uv-forms.txt: fixture wheel sha256: 70076a558d07f179a41044b72e2d7da5782d17bdfa58d85b1dd48230e59183e2
+this rerun:   fixture wheel sha256: 62a42efa21c83c3d062759daa2c7cbcb50c5e3c017bbe68feca1645718a33bc1

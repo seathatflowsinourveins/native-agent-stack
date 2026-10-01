@@ -1,0 +1,9 @@
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.283 binary> <checkout>
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.284 binary> <checkout>
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.285 binary> <checkout>
+exit 0 <- python3 -B scan_reader_mutants.py <checkout> <the three release binaries>
+exit 0 <- python3 -B replace_bell_group_controls.py <checkout>
+exit 0 <- python3 -B replace_bell_group_mutants.py <checkout>
+see the file <- python3 -B replace_bell_group.py <checkout> local, then polaris (no --apply)
+exit 0 <- python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings
+see the file <- python3 -B overlay_noop_check.py <checkout> (this host's live settings)

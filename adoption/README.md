@@ -2,13 +2,13 @@
 
 Start from a reviewed checkout, select capabilities, and record new local evidence. Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.
 
-For a single ordered new-machine walkthrough, use [the bootstrap page](bootstrap.md). It links each step to this reference's profiles below and to the per-platform page: [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (accepted) and [macOS arm64](platforms/macos-arm64.md) (drafted, not accepted). Render native client configs for a selected host with [`tools/adoption/render_config.py`](../tools/adoption/render_config.py) and its [templates](templates/).
+For a single ordered new-machine walkthrough, use [the bootstrap page](bootstrap.md). It links each step to this reference's profiles below and to the per-platform page: [Linux/WSL2 x86_64](platforms/linux-wsl2.md) (accepted) and [macOS arm64](platforms/macos-arm64.md) (drafted, not accepted). Render native client configs for a selected host with [`tools/adoption/render_config.py`](../tools/adoption/render_config.py) and its [templates](templates/). The rendered Claude settings keep ai-memory's automatic assistant capture off; a host opts in explicitly with `AI_MEMORY_CAPTURE_ASSISTANT=true` in its host value file or `--set`, which adds `--capture-assistant` to the Stop hook only (the ai-memory server's own `capture_assistant` setting must also be enabled).
 
 Use the [grand catalog handbook](../docs/grand-catalog-handbook.md) to connect
 repository quality, native runtime review, profile selection and the current
 [clean-install evidence](../blueprints/catalog-clean-install/README.md).
 
-For daily Codex use, environment setup, reload decisions and the complete 24-repository token workflow, use the [session handbook](../docs/token-session-handbook.md). It maps native integration and upstream commands to the task that needs each capability.
+For daily Codex use, environment setup, reload decisions and the complete 24-repository token workflow, use the [session handbook](../docs/token-session-handbook.md). It maps native integration and upstream commands to the task that needs each capability. Its Context Mode section changed after `v2026.09.26.2`: the install check also accepts a default-branch revision whose only change from the reviewed one is `stats.json`, and the new [executor and session-store notes](../docs/token-session-handbook.md#context-mode-executor-and-session-store) give the working rules for coordinators, children and Codex workers.
 
 The initial target is **Linux/WSL2 x86_64**. The SDK was recreated in a new prefix on the existing host with **Python 3.13.15 and uv 0.12.17**. A second physical machine, macOS, Windows-native and ARM are not accepted by that result. See [the receipt](receipt.json) and [SDK lock/replay](sdk/README.md).
 
@@ -36,12 +36,13 @@ which you install through their recipes ([bootstrap step 2](bootstrap.md)).
 
 | Adoption profile | Selects | Linux pins | macOS pins | Next native acceptance |
 | --- | --- | --- | --- | --- |
-| `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | all 7 | 5 of 7 | Native client setup; one useful context/document call and scoped memory retrieval. On macOS use `macos-arm64-foundation` |
-| `macos-arm64-foundation` | macOS only, drafted: Codex, Claude Code, Context Mode, ai-memory, MCPorter, llama.cpp Metal embedding, Qdrant, SocratiCode | 5 of 8 | all 8 | The macOS acceptance lane on [the macOS page](platforms/macos-arm64.md); not accepted |
+| `foundation-cpu` | Codex, Claude Code, Context Mode, RTK, QMD BM25, explicitly scoped ai-memory, MCPorter | all 7 | all 7 (5 of 7 at `v2026.09.26`) | Native client setup; one useful context/document call and scoped memory retrieval. On macOS use `macos-arm64-foundation` |
+| `macos-arm64-foundation` | macOS only, drafted: Codex, Claude Code, Context Mode, ai-memory, MCPorter, llama.cpp Metal embedding, Qdrant, SocratiCode | 6 of 8 (5 of 8 at `v2026.09.25.2`) | all 8 | The macOS acceptance lane on [the macOS page](platforms/macos-arm64.md); not accepted |
+| `token-efficiency` | Accepted 2026-09-30 as the selection ([routing record](../docs/decisions/2026-09-30-task-model-routing.md)), and changed after `v2026.09.25.1`, whose manifest lacks it: the selected token practice (RTK, Context Mode, explicit-file Repomix, guarded Headroom and TOON, ccusage, QMD, MarkItDown, Serena, SocratiCode, ai-memory, MCPorter) wired into both native clients | all 14 (8 of 14 at `v2026.09.25.2`) | all 14 (6 of 14 at `v2026.09.26`) | The [coverage check](../docs/token-efficiency-stack.md#coverage-check) for command presence and client wiring, then pinned-version evidence and one useful native call per tool in each client, recorded through a PR. Both bootstraps now pin all of it; the macOS pins changed after `v2026.09.26` |
 | `research-runtime` | Historical hash-locked SDK/DuckDB, Dagu and LEAN comparison lane | 2 of 11 | 2 of 11 | Reproduce the retained comparison; this profile does not override the Nautilus destination |
 | `trading-nautilus` | Selected pinned Nautilus engine and separate Alpaca boundary | none of 2 | none of 2 | Reproduce the bounded engine check; qualify each broker independently |
 | `observability` | Collector, Prometheus, Loki, Grafana, Alertmanager, ntfy | none of 6 | none of 6 | Native config validation, actual task/event delivery, matching usage categories |
-| `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | none of 4 | 2 of 4 | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
+| `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | 1 of 4 (none of 4 at `v2026.09.25.2`) | 2 of 4 | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | 1 of 3 | 2 of 3 | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
 
 The [reference manifest](manifest.json) maps **every selected component ID** to its native guide, including optional components outside these starting profiles. The offline HTML setup guide (`docs/ecosystem/index.html`) generates current counts and embeds these recipes alongside layer/profile selection, scoped acceptance and measured baseline choices; it is generated, not committed -- build it with `python3 scripts/build_ecosystem.py --write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only). The [lifecycle guide](lifecycle.md) covers ownership, restart, recovery and rollback. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
@@ -55,7 +56,7 @@ acceptance on a destination host and do not enable broker access.
 
 1. Clone this repository and check out the pinned release ([bootstrap step 0](bootstrap.md)); when a newer release is pinned later, follow [moving a host to a new release](update.md#moving-a-host-to-a-new-release). Read `AGENTS.md`; Claude's `CLAUDE.md` imports the same instructions. Record `git rev-parse HEAD` privately. Inspect upstream installers, version pins and checksums in the selected recipes.
 2. Run the two portable integrity validators below. Choose explicit installation/project paths. Install only the selected native tools through their recipe links, preserving existing client settings.
-3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance.
+3. Run the nonmutating prerequisite report. It reports executable presence, platform compatibility and recipe references. It never logs in, edits client configuration, starts services, executes catalog commands or certifies functional acceptance. Its opt-in `--client-wiring` also parses fixed Claude Code and Codex configuration files and reports, as booleans, counts and a computed `complete` only, whether the selected token practice is wired into both clients; the exit code stays the prerequisite result (changed after `v2026.09.25.1`: that release's `adoption_status.py` has no `--client-wiring` and its manifest has no `token-efficiency` profile, so run that check from a default-branch clone). Its `complete` changed after `v2026.09.26.2` as well: it now also needs RTK's instructions inline in the instructions file Codex loads, not an `@RTK.md` pointer, and every Codex ai-memory hook trusted, with a `hooks.json` Codex's own parse rejects reported as `null`, and `--pinned-versions` adds a top-level `pinned_versions_match` ([coverage check](../docs/token-efficiency-stack.md#coverage-check)).
 4. Recreate the SDK only for the research profile using the [transitive lock](sdk/README.md). Run useful local fixtures before any model request. Base tests can skip DuckDB-dependent checks; the locked SDK acceptance must retain test and skip counts.
 5. Register selected plugins/MCP tools through each client's native commands. Resolve template placeholders deliberately. JSON/TOML strings do not generally expand shell variables. Select the memory workspace/project pair and explicit QMD/code-RAG project scope.
 6. Use native sign-in on the target host. Then verify the actual client's tool discovery and one bounded useful call. Treat Linux Codex, Linux Claude and Desktop as separate client scopes. No authentication store is copied.
@@ -69,6 +70,9 @@ python3 scripts/validate_catalogs.py
 "$PYTHON_BIN" scripts/adoption_status.py --profile foundation-cpu --json
 # Or select the supported interpreter through native uv:
 uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
+# The selected token practice: command presence plus native client wiring (booleans and counts only;
+# changed after v2026.09.25.1, so run it from a later release or a default-branch clone):
+"$PYTHON_BIN" scripts/adoption_status.py --profile token-efficiency --client-wiring --json
 # After the SDK recipe, use that environment to check research prerequisites:
 "$SDK_ENV/bin/python" scripts/adoption_status.py --profile research-runtime --json
 ```
@@ -130,6 +134,11 @@ After the native observability services are accepted on the new host, install th
 using explicit checkout/config/data paths. Its native user timer refreshes public
 checkpoint metadata automatically while the Linux/WSL user manager runs. It does
 not transfer credentials or make another machine's historical results local E2E.
+Then deploy the [native data adapter](../observability/native-data/README.md#scheduled-deployment)
+on its user timer, so the token tools' own savings counters and the memory
+inventory reach Loki and the `native-foundation-data` dashboard, each scope as its
+own series (changed after `v2026.09.26.2`, whose `observability` profile does not
+list this recipe).
 The current [seventeen-requirement map](../blueprints/us-equities/convergence-program/coverage.md)
 and [program plan](../blueprints/us-equities/convergence-program/plan.json) identify
 the next concrete acceptance without reloading the entire repository catalog.

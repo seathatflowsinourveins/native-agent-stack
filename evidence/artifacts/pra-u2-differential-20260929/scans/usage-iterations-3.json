@@ -1,0 +1,34 @@
+{
+ "advisor_calls_vs_iterations": {
+  "calls=1 results=1 advisor_iterations=1": 2042,
+  "calls=2 results=2 advisor_iterations=2": 10
+ },
+ "advisor_ids": {
+  "advisor_message_on_counted_row=False calls=1 results=0 result_kinds= counted_types=(no iterations key)": 14,
+  "advisor_message_on_counted_row=False calls=1 results=0 result_kinds= counted_types=message": 33,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_redacted_result counted_types=(no iterations key)": 105,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:execution_time_exceeded counted_types=(no iterations key)": 1,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:execution_time_exceeded counted_types=message+message": 28,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:overloaded counted_types=message+message": 11,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:too_many_requests counted_types=(no iterations key)": 12,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:too_many_requests counted_types=message+message": 206,
+  "advisor_message_on_counted_row=False calls=1 results=1 result_kinds=advisor_tool_result_error:unavailable counted_types=message+message": 3,
+  "advisor_message_on_counted_row=False calls=2 results=2 result_kinds=advisor_tool_result_error:execution_time_exceeded counted_types=message+message+message": 1,
+  "advisor_message_on_counted_row=True calls=1 results=1 result_kinds=advisor_redacted_result counted_types=message+advisor_message+message": 2042,
+  "advisor_message_on_counted_row=True calls=2 results=2 result_kinds=advisor_redacted_result counted_types=message+advisor_message+message+advisor_message+message": 10
+ },
+ "fallback_counted": {
+  "types=message+fallback_message model=claude-opus-4-8 blocks=fallback,text,thinking,tool_use stop=tool_use": 1
+ },
+ "fallback_entries": {
+  "fallback_message model=claude-opus-4-8 total_zero=False output_zero=False": 1,
+  "message model=claude-opus-5-5 total_zero=False output_zero=False": 1
+ },
+ "zero_top_any_row": {
+  "counted_row=False rows_in_id=5": 4,
+  "counted_row=True rows_in_id=5": 1
+ },
+ "zero_top_counted": {
+  "model=claude-opus-5-5 version=2.1.283 stop=tool_use blocks=text,thinking,tool_use": 1
+ }
+}

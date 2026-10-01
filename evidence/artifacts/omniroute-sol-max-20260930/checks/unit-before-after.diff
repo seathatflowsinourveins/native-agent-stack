@@ -1,0 +1,27 @@
+--- <STATE>/omniroute-tokensave-20260929/switch-2026-09-30T06:32:49Z/omniroute.service	2026-09-30 02:32:49.417181837 -0400
++++ <HOME>/.config/systemd/user/omniroute.service	2026-09-30 02:32:49.417267550 -0400
+@@ -1,5 +1,5 @@
+ [Unit]
+-Description=OmniRoute gateway 3.8.51 (release/v3.8.51 2f42a9ac1 + upstream #13788 as two commits + local session-affinity patch 045aa81f3; canary build ae5539a56), loopback only
++Description=OmniRoute gateway 3.8.51 (release/v3.8.51 2f42a9ac1 + upstream #13788 as two commits + local session-affinity patch 045aa81f3 + upstream #15167 f5d8e150b; canary build cf6748d04; lsof shim v2), loopback only
+ Documentation=https://github.com/diegosouzapw/OmniRoute
+ After=network-online.target
+ 
+@@ -7,7 +7,7 @@
+ Type=simple
+ EnvironmentFile=%h/.local/share/omniroute/server.env
+ # shim/ holds the lsof no-match adaptation for serve's port preflight (see shim/lsof; remove when upstream fixes it).
+-Environment=PATH=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/shim:%h/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin
++Environment=PATH=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167/shim:%h/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin
+ Environment=OMNIROUTE_MEMORY_MB=16384
+ # Caller-version fallback for paths that do not forward the Codex client's own version (src/shared/constants/codexClient.ts).
+ Environment=CODEX_CLIENT_VERSION=0.159.1
+@@ -19,7 +19,7 @@
+ Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
+ # Templates stay the single writer for Codex/Claude configs (src/shared/services/cliRuntime.ts).
+ Environment=CLI_ALLOW_CONFIG_WRITES=false
+-ExecStart=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/bin/omniroute serve --port 20128 --no-open --no-tray
++ExecStart=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167/bin/omniroute serve --port 20128 --no-open --no-tray
+ Restart=on-failure
+ RestartSec=5
+ TimeoutStopSec=30

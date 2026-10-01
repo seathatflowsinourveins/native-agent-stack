@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "$IMPL/run_arm.py", line 67, in <module>
+    assert not os.path.exists(RUN_DIR), "RUN_DIR must be new"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: RUN_DIR must be new

@@ -99,7 +99,8 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   instrument is registered at 4 decimals: a symbol scanned above 1 USD can fall below it
   (X4's stop does for any entry up to about 1.17 USD), and a 2-decimal instrument can
   neither price a marketable limit under a sub-penny bid nor carry the sub-penny fill
-  (the native adapter refuses it as `cumulative_fill_precision_requires_reconciliation`).
+  (the native adapter refuses such an execution price as
+  `execution_price_precision_requires_reconciliation`).
 - **Two caps.** `mover.max_entry_notional_usd` (200 USD) sizes and bounds each buy;
   `MoverController` also refuses a larger buy before the ledger reserves it
   (`mover_entry_notional_cap_exceeded`). The ledger's `max_order_notional_usd` (2000
@@ -112,8 +113,16 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   about a twentyfold rise. A sell is never sent while that symbol's buy is open, because a
   wash-trade refusal would stop the run.
 - **Exit budget.** Each leg may send `exit_orders.max_orders_per_symbol` exits, counted
-  from the latest grant. No exit is sent on a halted quote (it could not fill; the leg
-  waits). A sell refused before any broker request (the ledger or NautilusTrader
+  from the latest grant. No exit is sent while the symbol is halted (a trading halt,
+  LULD pause or quotation-only period, from the SIP status stream or an unexpired
+  startup halt seed; `Controller.is_halted`): it could not fill, so the leg waits. A
+  resting exit is not cancelled for re-pricing then either: one re-price per exit
+  timeout would spend the 20-order budget in about 200 s against 5-10 minute pauses. It
+  rests, and re-pricing resumes once the symbol trades; a force reason or hard flatten
+  inside a halt hands the leg to recovery after the no-progress bound. The quote's own
+  best-effort condition flag waits entries only, never an exit, and a halt only the
+  seed asserts expires (at its resumption time, or 12 minutes after a LULD pause
+  began). A sell refused before any broker request (the ledger or NautilusTrader
   refused it, so the ledger holds no sent intent) is not charged; it is retried after
   1 s and has its own bound of the same size. A latched force reason grants each leg one
   fresh budget. A leg that exhausts its budget before any force latches the book-wide
@@ -136,24 +145,39 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   for three exit timeouts (30 s in the example) since the latch or the last fill. That
   covers exits resting unfilled, refused, waiting on a halt, or impossible without fresh
   quotes, so a stuck position is not left unmanaged until the sell window ends. Before a
-  force, a blocked leg keeps retrying and the other legs keep their rules: recovery stops
-  at its first failed symbol, so an early hand-off could leave sellable legs unsold. The
-  receipt's `handoff_to_recovery` records the reason and the seconds after the force.
+  force, a blocked leg keeps retrying and the other legs keep their rules: recovery
+  defers a symbol without a fresh quote (#215) but stops at its first other failed
+  symbol (an unfilled exit, a quantity it cannot represent) and once a whole exit no
+  longer fits before its deadline, so an early hand-off could leave sellable legs
+  unsold. The receipt's `handoff_to_recovery` records the reason and the seconds after
+  the force.
 - **Gross guard.** When marked gross exposure reaches `gross_guard_fraction` of the
   ledger cap, the largest position exits (`gross_cap_guard`). The ledger halts
   permanently above its cap, and a rising mover would otherwise trip it.
 - **Reconciliation.** It runs at start (flat, no open orders), every 30 s while nothing
-  is in flight, and at the end: flat, and cash delta equal to this trial's fills. The
-  baseline is this trial's own starting cash. The engine's between-trial cash check is
-  kept as an observation rather than a refusal: the receipt carries
-  `inter_trial_cash_changed`, and the private `trial.json` holds the delta. Quote-driven
-  orders are suspended while a snapshot is in flight.
+  is in flight, and at the end: flat, and cash delta equal to this trial's fills plus
+  the broker FEE activities recorded from the snapshot. Before every trial, a budgeted
+  F1/account/F2 checkpoint refuses differing fee maps, books stable fees, then computes
+  baseline as checkpoint cash minus ledger cash delta before beginning the trial. The
+  lineage's `fee_window_start` is saved and reused by every paper/recover snapshot;
+  legacy recovery without that key retains `current_trial_started_at`. This assumes
+  fee activity visibility coincides with its inclusion in cash. A checkpoint refusal
+  leaves the trial unentered for a later retry. The receipt and the recovery receipt
+  report `fees_recorded` (count,
+  total and sub-types, no ids); see README-safety.md, "Broker FEE activities". The
+  engine's between-trial cash check is kept as an observation rather than a refusal:
+  the receipt carries `inter_trial_cash_changed`, and the private `trial.json` holds
+  the delta. Quote-driven orders are suspended while a snapshot is in flight.
 
 ## Recovery
 
 A residual after the native loop, and the `recover` command, go through
 `recovery.recover` (sell-only, no strategy restart) on a fresh transport that subscribes
-the residual's symbols (or the benchmarks when flat). The mover ledger keeps every
+the residual's symbols (or the benchmarks when flat). Its readiness waits on the
+benchmark quotes only, and each exit on its own symbol's fresh quote (#215). Readiness
+therefore no longer shows that the port subscribes every held symbol, so
+`recover_mover` refuses with `held_symbol_not_subscribed` before the port starts when a
+held or unresolved symbol is not subscribed. The mover ledger keeps every
 session's intents and each scan trades other symbols, while a transport can only adopt
 an intent for a symbol it subscribes (at most 30). So a mover recovery port adopts every
 unresolved intent and only those terminal intents whose symbol it subscribes. A skipped
@@ -270,9 +294,10 @@ credential.
   retry are code constants (`mover.HANDOFF_EXIT_TIMEOUTS`, `PRE_WIRE_RETRY_SECONDS`)
   chosen without a paper measurement; a broker run that shows slower fills is the
   comparison that would change them.
-- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. A cumulative
-  average finer than that (several partial fills at different prices) still stops the
-  native adapter, as it does for the adaptive lane.
+- **Sub-penny fills.** A 4-decimal instrument carries fills to 0.0001. Each execution
+  is booked at its own price, so a cumulative average finer than that (several partial
+  fills at different prices) no longer stops the native adapter; an execution price
+  finer than the instrument's precision still does, in both lanes.
 - **Evidence.** Everything here is SYN until an actual broker run: unit tests, the
   native end-to-end tests with `mover_simulation.py` and `synthetic`. Alpaca paper
   fills are the broker's simulation, not exchange executions.

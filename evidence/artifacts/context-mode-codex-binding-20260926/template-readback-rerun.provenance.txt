@@ -1,0 +1,9 @@
+# template rerun with retained provenance (2026-09-26)
+provenance_rerun.py sha256 1df810e5175b1d09781eb8f6fdce38d46e0a252d4c0eef175e9861c33f0cdc36
+adoption/templates/codex.config.template.toml sha256 1044688dd6c1d4f82441edc349b60d6b1d182d30e6cea8bd5fc9f06b119f7146
+adoption/hosts/example.json sha256 7ec6a782fd2e19c989f4b4deb3428f17b5550608cedd38cbac454db33ab3c876
+tools/adoption/render_config.py sha256 d9502772cb2e58b452ea5fa03584719f16b226ef341ebe18a90dae815c3e8b82
+command: python template_readback.py --checkout <this repository> --plugin ~/.codex/plugins/cache/context-mode/context-mode/1.0.169 --work <work>
+interpreter: Python 3.13.15; template_readback.py sha256 a6d017275cf730f4bc1dc732b9d4a67ea3c9949b96c54d0a0f6914994655af58
+UTC: 2026-09-26T06:49:39Z to 2026-09-26T06:49:56Z; exit status: 0; stderr: 0 bytes
+stdout: template-readback-rerun.json, sha256 73836cc5dd779a023485d021eec2f431358d87bb391d8e871056694474687d3a, 2542 bytes

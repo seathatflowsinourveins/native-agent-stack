@@ -1,0 +1,322 @@
+[
+ {
+  "pkg": "@iarna/toml@2.2.5",
+  "bytes": 23412,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@modelcontextprotocol/client@2.1.0",
+  "bytes": 1603220,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@modelcontextprotocol/core@2.1.0",
+  "bytes": 154649,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@modelcontextprotocol/server@2.1.0",
+  "bytes": 1523527,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@oxc-project/types@0.150.0",
+  "bytes": 7677,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@rolldown/binding-linux-x64-gnu@1.2.9",
+  "bytes": 7926785,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "@rolldown/pluginutils@1.0.1",
+  "bytes": 6681,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "acorn@8.18.0",
+  "bytes": 133521,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "ansi-regex@6.3.0",
+  "bytes": 2971,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "chalk@5.6.2",
+  "bytes": 13831,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "cli-cursor@5.0.0",
+  "bytes": 1927,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "cli-spinners@3.4.0",
+  "bytes": 6905,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "commander@15.0.0",
+  "bytes": 52736,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "cross-spawn@7.0.6",
+  "bytes": 6255,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "es-toolkit@1.52.0",
+  "bytes": 515327,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "eventsource@3.0.7",
+  "bytes": 24507,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "eventsource-parser@3.1.1",
+  "bytes": 23303,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "get-east-asian-width@1.7.0",
+  "bytes": 5431,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "is-interactive@2.0.0",
+  "bytes": 2391,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "is-unicode-supported@2.1.0",
+  "bytes": 2048,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "isexe@2.0.0",
+  "bytes": 3756,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "jose@6.2.12",
+  "bytes": 48946,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "jsonc-parser@3.3.1",
+  "bytes": 27354,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "log-symbols@7.0.1",
+  "bytes": 2148,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "mimic-function@5.0.1",
+  "bytes": 3203,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "onetime@7.0.0",
+  "bytes": 2366,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "ora@9.4.1",
+  "bytes": 11145,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "path-key@3.1.1",
+  "bytes": 2258,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "pkce-challenge@5.0.1",
+  "bytes": 4210,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "restore-cursor@5.1.0",
+  "bytes": 1684,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "rolldown@1.2.9",
+  "bytes": 197948,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "shebang-command@2.0.0",
+  "bytes": 1506,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "shebang-regex@3.0.0",
+  "bytes": 1503,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "signal-exit@4.1.0",
+  "bytes": 13369,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "stdin-discarder@0.3.2",
+  "bytes": 2267,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "string-width@8.3.0",
+  "bytes": 4510,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "strip-ansi@7.2.0",
+  "bytes": 2156,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "which@2.0.2",
+  "bytes": 4496,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "yoctocolors@2.2.0",
+  "bytes": 4538,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ },
+ {
+  "pkg": "zod@4.6.5",
+  "bytes": 1052733,
+  "registry_integrity_eq_download": true,
+  "lock_integrity_eq_registry": true,
+  "diff_rc": 0,
+  "diff_lines": 0
+ }
+]

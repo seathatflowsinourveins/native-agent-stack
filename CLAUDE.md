@@ -1,7 +1,15 @@
 @AGENTS.md
 
-Use the shared catalog and evidence rules from AGENTS.md. Inspect native loaded
-tools with `/mcp` and loaded context with `/context` before claiming a plugin is
-active. The catalog is an on-demand reference, not content to preload wholesale.
-For another machine or a resumed ecosystem task, start with the small
-`adoption/manifest.json` and load only the selected native recipe.
+Before claiming a plugin or MCP server is active, verify the relevant component in this
+session: tools (including deferred tools via ToolSearch), skills, agents or hooks.
+Distinguish listed availability from successful execution. Use available read-only
+diagnostics first; if the claim remains unresolved, ask for the relevant `/plugin`,
+`/mcp` or `/context` output. Invoke a command through Skill only if the installed
+client exposes it there.
+
+## Compact Instructions
+
+When compacting, preserve each modified file's branch or worktree, each test or
+acceptance command with its exit code, each open claim's provenance (URL,
+repo@pin:path:line or command), failed attempts, open review findings,
+unresolved gaps and any workflow run ID needed to resume.

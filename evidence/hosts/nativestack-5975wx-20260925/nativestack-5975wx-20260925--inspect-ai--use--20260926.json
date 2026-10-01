@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--inspect-ai--use--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "inspect-ai",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "timeout 30 python3 - <<'PY'\nimport glob, json, re, subprocess, sys\nc = 'inspect-ai'\nwinners = [w for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id') == c]\npins = sorted({w['pin'] for w in winners})\nrepos = sorted({w['repository'] for w in winners})\nstack = [x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id'] == c]\npin_commit = re.search(r'[0-9a-f]{40}', pins[0]).group(0) if len(pins) == 1 and re.search(r'[0-9a-f]{40}', pins[0]) else ''\nout = subprocess.run(['git', 'ls-remote', repos[0], 'refs/tags/0.3.266', 'refs/tags/0.3.266^{}'], capture_output=True, text=True, timeout=20, check=True) if len(repos) == 1 else None\nlines = [l for l in (out.stdout.splitlines() if out else []) if l.strip()]\ntag_commit = lines[-1].split('\\t')[0] if lines else ''\nok = bool(pin_commit) and tag_commit == pin_commit\nprint('INSPECT_PIN_' + ('OK' if ok else 'FAIL'), '| winner pin', pins, '| repository', repos, '| upstream tag 0.3.266 ->', tag_commit, '| equals the pin commit:', ok, '| manifests/stack.json entry:', stack or 'none (winner-only component)')\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 0.375,
+      "output_sha256": "2a66dd426b314d95f35caebe60d5a82d6146a1f612ee3799656d13820992a061",
+      "output_excerpt": "INSPECT_PIN_OK | winner pin ['inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26'] | repository ['https://github.com/UKGovernmentBEIS/inspect_ai'] | upstream tag 0.3.266 -> ec4dfc6953784dc45b79de3147530c89868c6e26 | equals the pin commit: True | manifests/stack.json entry: none (winner-only component)\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$d\"' EXIT\nA=evidence/artifacts/eval-native-reports-20260926/inspect-ai\ntimeout 120 uv venv --python 3.12 \"$d/venv\" > \"$d/venv.log\" 2>&1 || { echo \"INSPECT_EVAL_FAIL: venv creation failed\"; tail -20 \"$d/venv.log\"; exit 1; }\ntimeout 300 uv pip install --python \"$d/venv/bin/python\" 'inspect-ai==0.3.266' 'openai==3.19.2' > \"$d/install.log\" 2>&1 || { echo \"INSPECT_EVAL_FAIL: install failed\"; tail -20 \"$d/install.log\"; exit 1; }\niv=$(\"$d/venv/bin/python\" -c \"import importlib.metadata as m; print(m.version('inspect-ai'), m.version('openai'))\") || { echo \"INSPECT_EVAL_FAIL: installed versions unreadable\"; exit 1; }\nKEYFILE=$(systemctl --user show nativestack-generation.service -p ExecStart --value | grep -oP -- '--api-key-file \\K\\S+')\n[ -n \"$KEYFILE\" ] && [ -r \"$KEYFILE\" ] || { echo \"INSPECT_EVAL_FAIL: the generation service key file was not found\"; exit 1; }\ncat > \"$d/task.py\" <<'PYEOF'\nfrom inspect_ai import Task, task\nfrom inspect_ai.dataset import Sample\nfrom inspect_ai.scorer import includes\n\n\n@task\ndef tiny_local_eval():\n    samples = [\n        Sample(id=\"add\", input=\"What is 7 plus 5? Reply with only the number, nothing else.\", target=\"12\"),\n        Sample(id=\"capital\", input=\"What is the capital of France? Reply with only the city name, nothing else.\", target=\"Paris\"),\n        Sample(id=\"reverse\", input=\"Spell the word cat backwards. Reply with only the result, nothing else.\", target=\"tac\"),\n        Sample(id=\"wrong_target_control\", input=\"What is 2 plus 2? Reply with only the number, nothing else.\", target=\"5\"),\n    ]\n    return Task(dataset=samples, scorer=includes())\nPYEOF\n( cd \"$d\" && LLAMACPP_API_KEY=\"$(cat \"$KEYFILE\")\" timeout 540 ./venv/bin/inspect eval task.py --model openai-api/llamacpp/qwen3.8-27b-local --model-base-url http://127.0.0.1:18232/v1 --temperature 0 --max-tokens 192 --log-dir logs --log-format json --display none --no-log-realtime ) > \"$d/eval.out\" 2>&1\nrc=$?\nLOG=$(ls \"$d\"/logs/*.json 2>/dev/null | head -1)\n[ -n \"$LOG\" ] || { echo \"INSPECT_EVAL_FAIL: no native eval log (inspect exit $rc)\"; tail -15 \"$d/eval.out\"; exit 1; }\nmkdir -p \"$A\" || exit 1\npython3 - \"$d\" \"$LOG\" \"$rc\" \"$A/eval-log.json\" \"$KEYFILE\" \"$iv\" <<'PY'\nimport hashlib, json, os, re, sys\nfrom pathlib import Path\nsys.path.insert(0, 'scripts')\nfrom host_receipts import sanitize\nfrom validate import scan_file_for_private_content\nd, log, rc, dest, keyfile, iv = sys.argv[1], Path(sys.argv[2]), int(sys.argv[3]), Path(sys.argv[4]), sys.argv[5], sys.argv[6]\nraw = log.read_text()\ntext = sanitize(raw.replace(d, '<tmp>'))\nkey = Path(keyfile).read_text().strip()\nkey_absent = bool(key) and key not in raw and key not in text\nkey = None\ndata = json.loads(text)\ndest.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\\n')\nsha = hashlib.sha256(dest.read_bytes()).hexdigest()\nprivate = scan_file_for_private_content(dest)\nemails = re.findall(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}', dest.read_text())\nstatus = data.get('status')\nscore_list = (data.get('results') or {}).get('scores') or []\nacc = score_list[0]['metrics']['accuracy']['value'] if score_list else None\nscores = {s.get('id'): ((s.get('scores') or {}).get('includes') or {}).get('value') for s in (data.get('samples') or [])}\nok = (rc == 0 and status == 'success' and acc == 0.75 and scores == {'add': 'C', 'capital': 'C', 'reverse': 'C', 'wrong_target_control': 'I'}\n      and iv.split() == ['0.3.266', '3.19.2'] and key_absent and not private and not emails)\nprint('INSPECT_EVAL_' + ('OK' if ok else 'FAIL'), '| inspect eval exit', rc, '| log status', status, '| accuracy', acc, '| retained native log', dest.as_posix(), 'sha256', sha)\nprint('inspect-ai/openai', iv, '| per-sample scores', scores, '| wrong-target control scored I:', scores.get('wrong_target_control') == 'I', '| native log file', os.path.basename(str(log)), '| sanitized: key absent', key_absent, 'private-content findings', len(private), 'emails', len(emails))\nsys.exit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 53.074,
+      "output_sha256": "ead12763ee0edb53d96493dcdfe0a7d8f64a1c4c43f839f2e6ff0d1ab6a96939",
+      "output_excerpt": "INSPECT_EVAL_OK | inspect eval exit 0 | log status success | accuracy 0.75 | retained native log evidence/artifacts/eval-native-reports-20260926/inspect-ai/eval-log.json sha256 70d1187ffac8bb95ce97040306fe0730ed2069aa8581e381de8eb9eb83117f54\ninspect-ai/openai 0.3.266 3.19.2 | per-sample scores {'add': 'C', 'capital': 'C', 'reverse': 'C', 'wrong_target_control': 'I'} | wrong-target control scored I"
+    },
+    {
+      "cmd": "u=nativestack-generation.service\ne=$(systemctl --user show -p ExecStart \"$u\") || { echo \"MODEL_SERVER_FAIL: unit not readable\"; exit 1; }\nm=$(printf '%s' \"$e\" | grep -o -- '--model [^ ;]*' | head -1 | sed 's#.*/##')\na=$(printf '%s' \"$e\" | grep -o -- '--alias [^ ;]*' | head -1 | cut -d' ' -f2)\nb=$(printf '%s' \"$e\" | grep -o 'llama-cpp-b[0-9]*' | head -1)\ns=$(systemctl --user is-active \"$u\")\nh=$(curl -fsS --max-time 5 http://127.0.0.1:18232/health)\nif [ \"$m\" = \"Qwen3.8-27B-UD-Q4_K_M.gguf\" ] && [ \"$a\" = \"qwen3.8-27b-local\" ] && [ \"$s\" = \"active\" ] && [ \"$h\" = '{\"status\":\"ok\"}' ]; then\n  echo \"MODEL_SERVER_OK | served model file: $m | alias: $a | runtime: $b | unit: $s | /health: $h\"\nelse\n  echo \"MODEL_SERVER_FAIL | served model file: $m | alias: $a | runtime: $b | unit: $s | /health: $h\"\n  exit 1\nfi",
+      "exit": 0,
+      "duration_s": 0.052,
+      "output_sha256": "021445e5d4f1b8416e8c6739242ff0d44379b9d42d9981d9d89286e76b11b84c",
+      "output_excerpt": "MODEL_SERVER_OK | served model file: Qwen3.8-27B-UD-Q4_K_M.gguf | alias: qwen3.8-27b-local | runtime: llama-cpp-b11146 | unit: active | /health: {\"status\":\"ok\"}\n"
+    }
+  ],
+  "tool_versions": {
+    "inspect-ai": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26"
+  },
+  "observed_at_utc": "2026-09-26T02:52:04Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Inspect 0.3.266, the evaluation-experiments winner, runs an evaluation against this host's local model end to end, and its native eval log is retained. The upstream tag 0.3.266 of UKGovernmentBEIS/inspect_ai resolves to the winner pin commit ec4dfc6953784dc45b79de3147530c89868c6e26. A fresh uv environment installs inspect-ai==0.3.266 and openai==3.19.2 from PyPI and reports those versions. inspect eval runs a four-sample task with deterministic generation (temperature 0) against the host's OpenAI-compatible llama.cpp server on loopback. The native log reports status success and accuracy 0.75: add, capital and reverse score correct, and the deliberately wrong-target control scores incorrect (positive control). The native JSON log is retained, sanitized, as evidence/artifacts/eval-native-reports-20260926/inspect-ai/eval-log.json; the command prints its sha256 and confirms that the model server's key is absent from it and that it has no private-content findings. A final read-only command shows the server's systemd unit is active, serves the model file Qwen3.8-27B-UD-Q4_K_M.gguf under alias qwen3.8-27b-local on the llama.cpp b11146 runtime, and answers /health. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--inspect-ai--use--20260925-2 as this host's latest Inspect use receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. They still count in scripts/platform_status.py, which counts every independently agreed native_proven pass, unless a reviewer records needs_changes on them. The cross-family review of #281 found that its cleanup deleted Inspect's native eval log, leaving only a summary printed by the command's own Python, and that its install limitation (an existing install under ~/.local/share/codex-ecosystem) contradicted its ephemeral environment. This receipt retains the native log as an artifact whose sha256 is in command 2's output and states the install source.",
+    "Sanitization of the retained log: the temporary directory is replaced by <tmp>, and scripts/host_receipts.py sanitize() replaces the home path, the user name and private-content matches with ~, <user> and [redacted]. The command checks, without printing it, that the model server key is absent from the raw and the sanitized log.",
+    "Install source: an ephemeral uv virtual environment (Python 3.12) created per run with inspect-ai==0.3.266 and openai==3.19.2 from PyPI; there is no hash lock and no persistent host install, and the wheel is not compared with the tag commit. The tag lookup uses GitHub over the network. Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "Four tiny samples measure harness behaviour, not model quality; the model server's API key is read from its private file inside the command and is never printed.",
+    "A pre-recording dry run of command 2 failed while the shared model server was busy: inspect eval hit its then 240 s budget and the command's parser stopped on the incomplete log (KeyError). The eval budget is now 540 s, and the parser reports a FAIL status line instead of a traceback.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:52:04Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: cmd1 (tag -> pin) is identical to -2 and reproduced byte-identically in a throwaway copy. nativestack-generation was inactive during this review, so nothing calling 127.0.0.1:18232 (and nothing reading the key file) was run; cmd2 and cmd3 were not run. Independent E2E check: I parsed the retained eval-log.json: sha256 70d1187f equals the printed sha and manifests/evidence.json; created 02:52:11Z after observed_at 02:52:04Z; status success, accuracy 0.75, C/C/C/I, from real llama.cpp model events (system_fingerprint b11146). needs_changes (point 3): LIM2 says \"there is no hash lock and no persistent host install\". That is false: a persistent inspect-ai==0.3.266 uv tool install exists, recorded by inspect-ai--install--20260926-2 at 02:27:15Z, before this run, and -2 imports inspect_ai from it. The \"(Python 3.12)\" detail is in no retained output. Also, cmd2 unconditionally rewrites the tracked, registered eval-log.json, so a reviewer re-run replaces the retained artifact. Superseded by -2.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

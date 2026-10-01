@@ -407,15 +407,14 @@ def sanitize_values(value):
     """Recursively rebuild ``value`` (a JSON-decoded structure), running
     ``host_receipts.sanitize()`` over every string that is a dict *value* or list *item* --
     walking the object the way ``host_receipts.iter_receipt_strings()`` does, but never
-    sanitizing a dict *key*. ``host_receipts.sanitize()`` replaces every occurrence of $USER
-    in the text it is given; $USER is often a short, common word ("ram", "gpu", "cores",
-    "max", "mac", "runner", ...) that legitimately appears inside a JSON *key* this or a
-    prior --record-host run wrote (``effective_ram_gb``, ``gpu``, ``cores``,
-    ``ecosystem_job_memory_max_gb``, an id like ``github-macos-15-arm64-runner``, or a field
-    kept from a re-recorded entry). Sanitizing the serialized text as one blob -- even of
-    only the new report or entry -- corrupts those key names instead of just redacting
-    anything personal in a value; numbers, booleans, ``None`` and every key pass through
-    unchanged."""
+    sanitizing a dict *key*. ``host_receipts.sanitize()`` replaces $USER wherever it stands
+    as a whole token in the text it is given; $USER is often a short, common word ("gpu",
+    "cores", "runner", ...) that legitimately is, or is a token of, a JSON *key* this or a
+    prior --record-host run wrote (``gpu``, ``cores``, an id like
+    ``github-macos-15-arm64-runner``, or a field kept from a re-recorded entry). Sanitizing
+    the serialized text as one blob -- even of only the new report or entry -- corrupts
+    those key names instead of just redacting anything personal in a value; numbers,
+    booleans, ``None`` and every key pass through unchanged."""
     if isinstance(value, str):
         return host_receipts.sanitize(value)
     if isinstance(value, dict):

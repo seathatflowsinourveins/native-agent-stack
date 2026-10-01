@@ -25,6 +25,17 @@ CHECK_SYNTAX = ROOT / "examples" / "claude-native" / "workflows" / "check-syntax
 spec = importlib.util.spec_from_file_location("adjudicate", TOOL_DIR / "adjudicate.py")
 adjudicate = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adjudicate)
+# The suite does not depend on the PATH this host's login shell ends up with (independent review of #206, R2-3).
+_SHELL_PATH = mock.patch.object(adjudicate.codex_lane, "login_shell_path",
+                                return_value=adjudicate.codex_lane.BLIND_CHILD_PATH)
+
+
+def setUpModule():
+    _SHELL_PATH.start()
+
+
+def tearDownModule():
+    _SHELL_PATH.stop()
 # adjudicate put the repo root on sys.path.
 from scripts.landscape import (  # noqa: E402
     SEALED_CANDIDATE_FIELDS, judge_adjudication, sealed_candidate_labels, sealed_candidates_sha256)
@@ -74,6 +85,14 @@ def quiet(function, *args):
         code = function(*args)
     return code, err.getvalue()
 
+
+
+class IdentityWordsTests(unittest.TestCase):
+    def test_family_names_are_reported(self):
+        # Model families the verdict wave now uses: GPT-6 (astra, sol, luna) and Claude (fable, mythos).
+        found = adjudicate.identity_mentions({"reasoning": "Per GPT-6-Astra and gpt-6-sol, astra agrees; Fable and "
+                                                           "mythos wrote this; gpt-5.6-terra; a solution on terra firma"})
+        self.assertEqual(found, ["astra", "fable", "gpt-5.6-terra", "gpt-6-astra", "gpt-6-sol", "mythos"])
 
 class AdjudicateFixture(unittest.TestCase):
     def setUp(self):

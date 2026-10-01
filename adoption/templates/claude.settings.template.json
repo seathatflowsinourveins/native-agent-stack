@@ -12,30 +12,84 @@
     "OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE": "cumulative",
     "OTEL_LOG_USER_PROMPTS": "false",
     "OTEL_LOG_ASSISTANT_RESPONSES": "false",
-    "OTEL_LOG_TOOL_DETAILS": "false",
+    "OTEL_LOG_TOOL_DETAILS": "1",
     "OTEL_LOG_TOOL_CONTENT": "false",
     "OTEL_LOG_RAW_API_BODIES": "false",
     "OTEL_METRICS_INCLUDE_ACCOUNT_UUID": "false",
-    "OTEL_METRICS_INCLUDE_SESSION_ID": "false",
+    "OTEL_METRICS_INCLUDE_SESSION_ID": "true",
     "OTEL_METRICS_INCLUDE_VERSION": "true",
     "PATH": "${ECO_ROOT}/bin:${HOME}/.local/bin:${HOST_PATH}",
     "RTK_TELEMETRY_DISABLED": "1",
+    "MCP_AUTO_OPEN_ENABLED": "false",
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
+    "BASH_MAX_TIMEOUT_MS": "1800000",
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   },
   "permissions": {
     "deny": [
       "Agent(codex:codex-rescue)",
+      "Agent(claude-code-guide)",
       "Read(~/.config/native-agent-stack/**)",
+      "Read(**/.config/native-agent-stack/**)",
       "Edit(~/.config/native-agent-stack/**)",
       "Read(~/.config/ecosystem-observability/*.env)",
+      "Read(**/.config/ecosystem-observability/*.env)",
       "Read(~/.config/nativestack/*.key)",
+      "Read(**/.config/nativestack/*.key)",
       "Read(~/.claude/.credentials.json)",
+      "Read(**/.claude/.credentials.json)",
       "Read(~/.codex/auth.json)",
+      "Read(**/.codex/auth.json)",
       "Read(~/.config/gh/hosts.yml)",
+      "Read(**/.config/gh/hosts.yml)",
+      "Read(~/.cache/huggingface/token)",
+      "Read(**/.cache/huggingface/token)",
+      "Read(~/.cache/huggingface/stored_tokens)",
+      "Read(**/.cache/huggingface/stored_tokens)",
+      "Read(~/.ssh/**)",
+      "Read(**/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Read(**/.gnupg/**)",
+      "Read(~/.aws/**)",
+      "Read(**/.aws/**)",
+      "Read(~/.azure/**)",
+      "Read(**/.azure/**)",
+      "Read(~/.kube/**)",
+      "Read(**/.kube/**)",
+      "Read(~/.docker/config.json)",
+      "Read(**/.docker/config.json)",
+      "Read(~/.git-credentials)",
+      "Read(**/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(**/.netrc)",
+      "Read(~/.npmrc)",
+      "Read(**/.npmrc)",
+      "Read(~/.pypirc)",
+      "Read(**/.pypirc)",
+      "Read(~/.omniroute/**)",
+      "Read(**/.omniroute/**)",
+      "Read(~/.config/omniroute/**)",
+      "Read(**/.config/omniroute/**)",
+      "Read(~/.codex/shell_snapshots/**)",
+      "Read(**/.codex/shell_snapshots/**)",
+      "Read(//mnt/*/Users/*/AppData/Roaming/omniroute/**)",
+      "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
+      "Read(//mnt/*/Users/*/.omniroute/**)",
+      "Read(**/mnt/*/Users/*/.omniroute/**)",
+      "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+      "Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+      "Edit(~/.bashrc)",
+      "Edit(~/.profile)",
+      "Edit(~/.zshrc)",
       "Read(//proc/*/environ)",
+      "Read(**/proc/*/environ)",
       "Read(.env)",
+      "Read(**/.env)",
       "Read(.env.*)",
+      "Read(**/.env.*)",
       "Read(!.env.example)",
       "Read(!.env.*.example)",
       "Bash(printenv)",
@@ -43,14 +97,32 @@
       "Bash(env)",
       "Bash(gh auth token)",
       "Bash(gh auth token *)",
+      "Bash(hf auth token)",
+      "Bash(hf auth token *)",
       "Bash(* --show-token*)",
       "Bash(git credential fill*)",
       "Bash(gh auth git-credential *)",
-      "Bash(security find-generic-password *)"
+      "Bash(security find-generic-password *)",
+      "Bash(git push --force *)",
+      "Bash(git push * --force)",
+      "Bash(git push * --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(rtk git push --force *)",
+      "Bash(rtk git push * --force)",
+      "Bash(rtk git push * --force *)",
+      "Bash(rtk git push -f *)",
+      "Bash(rtk git push * -f)",
+      "Bash(rtk git push * -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -f*)",
+      "Bash(git clean -*f*)"
     ],
     "defaultMode": "bypassPermissions"
   },
   "model": "opus[1m]",
+  "advisorModel": "fable",
   "hooks": {
     "PreToolUse": [
       {
@@ -72,7 +144,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -91,7 +163,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       },
@@ -104,6 +176,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/currency-due-notice.py\" 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -112,7 +194,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -123,7 +205,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -134,7 +216,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       }
@@ -145,7 +227,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL} --capture-assistant"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}"
           }
         ]
       }
@@ -156,7 +238,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://${AI_MEMORY_URL}"
           }
         ]
       },
@@ -176,7 +258,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${ECO_ROOT}/tools/ai-memory-2.3.2/ai-memory --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
+            "command": "${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/token-lanes-subagent-start.py\" 2>/dev/null || true",
+            "timeout": 5
           }
         ]
       }
@@ -185,7 +277,8 @@
   "workflowSizeGuideline": "unrestricted",
   "statusLine": {
     "type": "command",
-    "command": "bash -c 'cols=$${COLUMNS:-}; case \"$$cols\" in \"\"|*[!0-9]*) cols=$$(stty size 2>/dev/null </dev/tty | awk '\"'\"'{print $$2}'\"'\"');; esac; case \"$$cols\" in \"\"|*[!0-9]*) cols=120;; esac; export COLUMNS=$$(( cols > 4 ? cols - 4 : 1 )); plugin_dir=$$(ls -d \"$${CLAUDE_CONFIG_DIR:-$$HOME/.claude}\"/plugins/cache/*/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $$(NF-1) \"\\t\" $$(0) }'\"'\"' | grep -E '\"'\"'^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); exec \"${ECO_ROOT}/bin/node\" \"$${plugin_dir}dist/index.js\"'"
+    "command": "bash -c 'cols=$${COLUMNS:-}; case \"$$cols\" in \"\"|*[!0-9]*) cols=$$(stty size 2>/dev/null </dev/tty | awk '\"'\"'{print $$2}'\"'\"');; esac; case \"$$cols\" in \"\"|*[!0-9]*) cols=120;; esac; export COLUMNS=$$(( cols > 4 ? cols - 4 : 1 )); plugin_dir=$$(ls -d \"$${CLAUDE_CONFIG_DIR:-$$HOME/.claude}\"/plugins/cache/*/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $$(NF-1) \"\\t\" $$(0) }'\"'\"' | grep -E '\"'\"'^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); exec \"${ECO_ROOT}/bin/node\" \"$${plugin_dir}dist/index.js\"'",
+    "refreshInterval": 5
   },
   "enabledPlugins": {
     "context-mode@context-mode": true,
@@ -218,6 +311,9 @@
   "modelSettings": {
     "claude-opus-5-5": {
       "effortLevel": "xhigh"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "xhigh"
     }
   },
   "autoUpdatesChannel": "latest",
@@ -228,5 +324,37 @@
   "enableWorkflows": true,
   "showThinkingSummaries": true,
   "cleanupPeriodDays": 3650,
-  "autoContinueAtUsageLimit": true
+  "autoContinueAtUsageLimit": true,
+  "switchModelsOnFlag": false,
+  "syncClaudeAiSkills": false,
+  "skillOverrides": {
+    "typesafe-ai": "name-only",
+    "gh-fix-ci": "on",
+    "security-best-practices": "on",
+    "iterative-retrieval": "name-only",
+    "search-first": "name-only",
+    "diagnosing-bugs": "on",
+    "tdd": "on",
+    "codebase-design": "on",
+    "resolving-merge-conflicts": "on",
+    "grill-me": "user-invocable-only",
+    "improve-codebase-architecture": "user-invocable-only",
+    "security-threat-model": "on",
+    "gh-address-comments": "on",
+    "semgrep": "on",
+    "codeql": "on",
+    "supply-chain-risk-auditor": "on",
+    "agentic-actions-auditor": "on",
+    "property-based-testing": "on",
+    "modern-python": "on",
+    "sarif-parsing": "on",
+    "fp-check": "on",
+    "mcp-builder": "on",
+    "frontend-design": "on",
+    "agent-browser": "name-only",
+    "find-skills": "user-invocable-only",
+    "variant-analysis": "on",
+    "writing-for-agents": "on",
+    "security-audit": "name-only"
+  }
 }

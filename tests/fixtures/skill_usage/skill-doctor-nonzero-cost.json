@@ -1,0 +1,42 @@
+[
+  {
+    "type": "system",
+    "subtype": "init",
+    "cwd": "REDACTED",
+    "session_id": "REDACTED",
+    "model": "claude-opus-5-5[1m]",
+    "permissionMode": "bypassPermissions"
+  },
+  {
+    "type": "assistant",
+    "message": {
+      "id": "REDACTED",
+      "role": "assistant",
+      "type": "message",
+      "content": [
+        {
+          "type": "text",
+          "text": "Skills loaded this session\n\n  skill                           source          context  7d tokens   uses  last used\n  gh-fix-ci                       userSettings       ~110         340    6×  2 days ago\n  typesafe-ai                     userSettings       ~230           -    0×  never\n  tdd                             userSettings        ~40           -    0×  never\n  diagnosing-bugs                 userSettings        ~60           -    0×  never\n  grill-me                        userSettings          -           -    0×  never\n  codeql                          userSettings        ~80           -    0×  never\n\n  context = this skill's one-line listing in the system prompt, included every turn\n  (dash = not in the current listing, costs nothing; full SKILL.md loads only when it runs)\n  7d tokens = tokens attributed to the skill over the last 7 days of sessions on this machine\n\n5 skills loaded but never invoked. Each one adds to the system prompt every turn. Disable in /skills, or remove from .claude/skills."
+        }
+      ]
+    },
+    "session_id": "REDACTED",
+    "uuid": "REDACTED",
+    "local_command_run": {
+      "command": "skill-doctor",
+      "args": ""
+    }
+  },
+  {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 1234,
+    "num_turns": 1,
+    "session_id": "REDACTED",
+    "total_cost_usd": 0.004,
+    "result": "Skills loaded this session\n\n  skill                           source          context  7d tokens   uses  last used\n  gh-fix-ci                       userSettings       ~110         340    6×  2 days ago\n  typesafe-ai                     userSettings       ~230           -    0×  never\n  tdd                             userSettings        ~40           -    0×  never\n  diagnosing-bugs                 userSettings        ~60           -    0×  never\n  grill-me                        userSettings          -           -    0×  never\n  codeql                          userSettings        ~80           -    0×  never\n\n  context = this skill's one-line listing in the system prompt, included every turn\n  (dash = not in the current listing, costs nothing; full SKILL.md loads only when it runs)\n  7d tokens = tokens attributed to the skill over the last 7 days of sessions on this machine\n\n5 skills loaded but never invoked. Each one adds to the system prompt every turn. Disable in /skills, or remove from .claude/skills.",
+    "local_command": "skill_doctor",
+    "uuid": "REDACTED"
+  }
+]

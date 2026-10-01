@@ -1,0 +1,7 @@
+predicateType https://github.com/npm/attestation/tree/main/specs/publish/v0.1
+ subject [('pkg:npm/%40modelcontextprotocol/inspector@2.8.0', {'sha512': 'ce7d00f1f22b3c381edfabc87745cca63d052f4142848190bc0bd5ffe8914ef518912cd348800b1e3859c8b220293cc13e7cebc432677d16eb3dc12551c5d1e9'})]
+predicateType https://slsa.dev/provenance/v1
+ subject [('pkg:npm/%40modelcontextprotocol/inspector@2.8.0', {'sha512': 'ce7d00f1f22b3c381edfabc87745cca63d052f4142848190bc0bd5ffe8914ef518912cd348800b1e3859c8b220293cc13e7cebc432677d16eb3dc12551c5d1e9'})]
+ workflow {'ref': 'refs/tags/2.8.0', 'repository': 'https://github.com/modelcontextprotocol/inspector', 'path': '.github/workflows/main.yml'}
+ resolvedDependencies [{'uri': 'git+https://github.com/modelcontextprotocol/inspector@refs/tags/2.8.0', 'digest': {'gitCommit': '1e31c78fbf81a989e8eb47021c6281d7876ad7fd'}}]
+ builder https://github.com/actions/runner/github-hosted  invocation https://github.com/modelcontextprotocol/inspector/actions/runs/35901302524/attempts/1

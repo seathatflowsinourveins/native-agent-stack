@@ -1,0 +1,156 @@
+{
+  "evidence_class": "sim_engine_crosscheck",
+  "generated_at_utc": "2026-09-25T07:56:53Z",
+  "task": "Phase C: engine-vs-engine cross-check of the simulation lane -- NautilusTrader 2.0.0rc5 (sim-capacity) vs hftbacktest 2.4.4 (sim-crosscheck-hftbacktest), replaying one shared deterministic order stream over one bounded, already-retained Alpaca SIP sample.",
+  "claim_boundary": "This is an engine-execution-semantics comparison only, on a fixture-scoped, non-reactive order stream -- it is infrastructure/methodology evidence, never strategy evidence and never a broker-throughput claim (docs/harness-rules-convergence-20260922.md NS-06; sim-capacity/README.md's claim_boundary). No order here reacts to price direction, volatility or any signal.",
+  "prerequisites_merged_on_main": {
+    "sim_capacity_commit": "1e11a894 (PR #235)",
+    "sim_crosscheck_hftbacktest_commit": "merged before #235 (blueprints/us-equities/sim-crosscheck-hftbacktest/ present at 1e11a894)",
+    "head_verified_equal_to_origin_main": true
+  },
+  "sample": {
+    "source": "Already-retained private cache written by sim-capacity/runner.py fetch (~/.local/state/native-agent-stack/sim-capacity/catalog); no network request and no credential file opened by this task (sample.py never imports fetcher.load_credentials).",
+    "window": {"start": "2026-09-24T14:05:00Z", "end": "2026-09-24T14:13:00Z", "duration_minutes": 8},
+    "window_choice": "Inside sim-capacity's reported 14:00:00Z-14:30:00Z analysis window (avoiding the session open, already avoided by sim-capacity itself, and clear of its own +5min flatten-pad tail).",
+    "symbols": ["SPY", "NVDA"],
+    "symbol_choice": "SPY: the stable, heavily-arbed index-ETF proxy already used throughout sim-capacity. NVDA: a high-volume single name from the same 8-symbol universe (sim-capacity/fetcher.py SYMBOLS), deliberately more volatile/gappier than SPY -- see mechanistic_findings below for why that contrast turned out to be decision-relevant, not incidental.",
+    "counts": {"SPY": {"quotes": 61926, "trades": 12175}, "NVDA": {"quotes": 32786, "trades": 47027}},
+    "trades_retained_but_unused": "Trades were extracted alongside quotes for completeness/documentation only; neither engine is fed trade data in this cross-check (quotes-only on both sides -- see engines_config below).",
+    "sample_sha256": "cc57aef36e454c56d78abda5b2a3d9d77fe3d0a6d0c207ce0e3ce639b43fe0f2",
+    "sample_bytes": 17358256,
+    "sample_manifest_sha256": "32413b9d5dfd60a0870b35f08ea8a80ac37265244daef658b374418f3ce201b1",
+    "source_fetch_manifest_sha256": "f6866a5f2aa2321e244d65fe881a75b89ad4dff32565cc2dbc11aaa84f421126",
+    "extraction_wall_seconds": 2.465,
+    "note": "The bounded sample and every per-order engine outcome file are private, host-local artifacts (~/.local/state/native-agent-stack/sim-engine-crosscheck/) -- never committed. Only this receipt's aggregates and hashes are committed, per task instructions."
+  },
+  "order_stream": {
+    "generator": "order_stream.generate_order_stream, reusing sim-capacity/schedule.py's RoundRobin, clamp_sell_quantity and tick_interval_ns directly (imported, not reimplemented).",
+    "cadence_submits_per_sec": 3.0,
+    "cadence_justification": "3.0/sec = sim-capacity's paper-parity RiskEngineConfig budget (180/00:01:00 -> 180/60 = 3.0 exactly), and independently also CapacityExerciserParams' own submits_per_sec dataclass default (exerciser.py) -- NOT either real sim-capacity profile's own attempted cadence (paper-parity attempts 5.0/sec = 300/min against its 180/min budget specifically to force rate-limiter denials; elite-tier attempts ~16.67/sec against 900/min). Submitting within the paper-parity budget keeps the stream from tripping Nautilus's rate limiter -- a Nautilus-only artifact with no hftbacktest counterpart at all -- so the comparison measures execution/queue semantics, not limiter interaction.",
+    "precompute_vs_live_feedback": "Precomputed ONCE from the retained quotes with an ASSUMED-full-fill running position per symbol (not real engine feedback), because the exerciser's real inventory-aware side selection depends on realized fills, which differ BY CONSTRUCTION between the two engines -- replaying two independently-fed-back streams would compare different order sequences, not the same orders under two engines. See order_stream.py's module docstring for the full justification.",
+    "assumed_vs_real_fill_divergence_measured": "3 of 1439 orders (0.21%), all on NautilusTrader, all SELL orders whose immediately preceding same-symbol BUY was assumed-filled for stream generation but did NOT actually fill in the real Nautilus run (confirmed directly: order_ids 221/293/606 all resolved NO_FILL) -- the following SELL then asked to sell more than the real (zero) position and was REJECTED by the CASH-account venue. Accepted, not hidden: counted as a normal REJECTED outcome, not treated as fatal. hftbacktest shows zero REJECTED outcomes in any configuration, consistent with it modeling no account-level short-sale restriction at all.",
+    "n_orders": 1439,
+    "by_symbol": {"NVDA": 720, "SPY": 719},
+    "by_side": {"BUY": 720, "SELL": 719},
+    "qty_per_order": 5,
+    "qty_note": "qty_max=5 (matching sim-capacity's actual runner.run_one CapacityExerciserParams(qty_max=5), not exerciser.py's own dataclass default of 3) was the binding constraint on every single order: displayed top-of-book size for SPY and NVDA in this sample never fell below 5 shares.",
+    "collar_usd": "0.01",
+    "stream_file_sha256": "0e095e88451da921c8858e3d8cd0cb87c9add865fd4a0f7ad7bc0aef9b673e60"
+  },
+  "engines": {
+    "nautilus_trader": {"version": "2.0.0rc5", "runtime": "~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python", "python_version": "3.12.3"},
+    "hftbacktest": {"version": "2.4.4", "runtime": "~/.local/share/native-agent-stack/hftbacktest-2.4.4 (rebuilt for this task; see cleanup)", "python_version": "3.12.3", "venv_status": "removed after this task's verification -- see cleanup"}
+  },
+  "engines_config": {
+    "shared": "Both engines replay the identical precomputed order_stream (same submit times, symbols, sides, quantities, limit prices). Fees are computed post-hoc, uniformly, by metrics.py using sim-capacity's own fee_model.commission_usd(commission_plan='none') -- neither engine's own native fee/commission model is used (NautilusTrader fee_model=None; hftbacktest trading_value_fee_model(0.0, 0.0)) so 'total simulated cost' means the same thing for both.",
+    "nautilus_trader": {
+      "book_type": "L1_MBP", "feed": "QuoteTicks only (no TradeTicks added to the engine -- matches sim-capacity's own H1 fix)",
+      "trade_execution": true, "liquidity_consumption": true, "queue_position": true,
+      "latency_model": "StaticLatencyModel(base_latency_nanos=latency_ms*1e6)",
+      "account": "CASH, starting balance 10,000,000 USD", "order_type": "marketable LIMIT, TimeInForce.IOC, one-cent collar (baked into the precomputed stream)"
+    },
+    "hftbacktest": {
+      "depth_representation": "L1 DEPTH_EVENT pairs per side per quote tick: a zero-old-level event when price changed, a set-new-level event always -- matches sim-crosscheck-hftbacktest/l1_feasibility.py's established convention (docs/data.rst: qty==0 removes a price level; HashMapMarketDepth is keyed by price, so a new price does not implicitly retire the old one).",
+      "feed": "Quotes only (no TRADE_EVENT built at all -- trades are side-less on this SIP feed anyway per l1_feasibility.py's own finding, so they would be dropped before either exchange model's trade-driven fill path regardless)",
+      "queue_model": "power_prob_queue_model(2.0)", "latency_model": "constant_order_latency(latency_ns, latency_ns) -- same value for entry and response",
+      "tick_size": 0.01, "lot_size": 1.0, "order_type": "LIMIT, TimeInForce.IOC, same one-cent collar"
+    }
+  },
+  "config_matrix": [
+    {"engine": "nautilus_trader", "latency_ms": 70, "exchange": null},
+    {"engine": "nautilus_trader", "latency_ms": 250, "exchange": null},
+    {"engine": "hftbacktest", "latency_ms": 70, "exchange": "partial_fill"},
+    {"engine": "hftbacktest", "latency_ms": 70, "exchange": "no_partial_fill"},
+    {"engine": "hftbacktest", "latency_ms": 250, "exchange": "partial_fill"},
+    {"engine": "hftbacktest", "latency_ms": 250, "exchange": "no_partial_fill"}
+  ],
+  "difference_table": [
+    {"dimension": "Liquidity consumption across orders", "nautilus_trader": "liquidity_consumption=True: apply_liquidity_consumption (rc5 matching_engine/mod.rs:330-392) keeps a separate per-price-level consumed-size tally that resets only when the displayed size at that level actually changes (matching_engine/mod.rs:371-375)", "hftbacktest": "Neither exchange model decrements self.depth from a fill; PartialFillExchange caps a single order's fill at the displayed size but never depletes it for the next order (Scenario I, l1_feasibility.py); NoPartialFillExchange ignores displayed size entirely on any cross (nopartialfillexchange.rs:330-339)"},
+    {"dimension": "Latency release semantics", "nautilus_trader": "A deferred order is released at the first of: (a) the next quote tick on its own instrument, or (b) any due clock timer, from any source -- so a sparsely-quoted instrument's order can be released by the exerciser's own shared submit-schedule timer even with no fresh quote for that instrument", "hftbacktest": "constant_order_latency(latency_ns, latency_ns): the exchange evaluates the order against whatever the book literally is at exactly submit_ts + entry_latency, with no analogous 'wait for a fresh quote' allowance"},
+    {"dimension": "Queue position for takers", "nautilus_trader": "Not applied to taker fills at all (crates/execution/src/matching_engine/mod.rs ~3555-3583 sets LiquiditySide::Taker and fills immediately; snapshot_queue_position is only called in the passive/maker branch)", "hftbacktest": "ProbQueueModel is consulted only for RESTING (GTC/GTX) orders (ack_new's queue_model.new_order call sits only in the non-crossing branch); our stream is IOC-only, so this never applies to either engine here"},
+    {"dimension": "Aggressor side on trade prints", "nautilus_trader": "Moot for this cross-check: no TradeTick is fed to the engine at all", "hftbacktest": "Moot for this cross-check: no TRADE_EVENT is built at all"}
+  ],
+  "metrics_table": {
+    "overall": {
+      "nautilus_70ms":              {"fill_rate_pct": 97.64, "partial_fill_share_pct": 0.0, "rejected": 3, "median_time_to_fill_ms": 111.23, "p90_time_to_fill_ms": 287.40, "touch_share_pct": 100.0, "fees_usd": "35.14", "total_simulated_cost_usd": "96.1650"},
+      "hftbacktest_70ms_partial_fill":    {"fill_rate_pct": 75.96, "partial_fill_share_pct": 0.0, "rejected": 0, "median_time_to_fill_ms": 73.33, "p90_time_to_fill_ms": 76.67, "touch_share_pct": 66.42, "fees_usd": "35.02", "total_simulated_cost_usd": "-432.155"},
+      "hftbacktest_70ms_no_partial_fill": {"fill_rate_pct": 75.68, "partial_fill_share_pct": 0.0, "rejected": 0, "median_time_to_fill_ms": 73.33, "p90_time_to_fill_ms": 76.67, "touch_share_pct": 66.30, "fees_usd": "35.10", "total_simulated_cost_usd": "-446.875"},
+      "nautilus_250ms":              {"fill_rate_pct": 94.23, "partial_fill_share_pct": 0.0, "rejected": 3, "median_time_to_fill_ms": 290.60, "p90_time_to_fill_ms": 333.33, "touch_share_pct": 100.0, "fees_usd": "33.70", "total_simulated_cost_usd": "85.3500"},
+      "hftbacktest_250ms_partial_fill":    {"fill_rate_pct": 74.08, "partial_fill_share_pct": 0.0, "rejected": 0, "median_time_to_fill_ms": 253.33, "p90_time_to_fill_ms": 256.67, "touch_share_pct": 65.57, "fees_usd": "33.66", "total_simulated_cost_usd": "-438.065"},
+      "hftbacktest_250ms_no_partial_fill": {"fill_rate_pct": 74.08, "partial_fill_share_pct": 0.0, "rejected": 0, "median_time_to_fill_ms": 253.33, "p90_time_to_fill_ms": 256.67, "touch_share_pct": 65.57, "fees_usd": "33.66", "total_simulated_cost_usd": "-438.065"}
+    },
+    "by_symbol_fill_rate_pct": {
+      "SPY":  {"nautilus_70ms": 98.33, "hftbacktest_70ms_partial_fill": 98.61, "hftbacktest_70ms_no_partial_fill": 98.61, "nautilus_250ms": 94.71, "hftbacktest_250ms_partial_fill": 94.85, "hftbacktest_250ms_no_partial_fill": 94.85},
+      "NVDA": {"nautilus_70ms": 96.94, "hftbacktest_70ms_partial_fill": 53.33, "hftbacktest_70ms_no_partial_fill": 52.78, "nautilus_250ms": 93.75, "hftbacktest_250ms_partial_fill": 53.33, "hftbacktest_250ms_no_partial_fill": 53.33}
+    },
+    "by_symbol_touch_share_pct": {
+      "SPY":  {"nautilus_70ms": 100.0, "hftbacktest_70ms_partial_fill": 100.0, "nautilus_250ms": 100.0, "hftbacktest_250ms_partial_fill": 100.0},
+      "NVDA": {"nautilus_70ms": 100.0, "hftbacktest_70ms_partial_fill": 4.43, "nautilus_250ms": 100.0, "hftbacktest_250ms_partial_fill": 4.43}
+    },
+    "relative_fill_rate_divergence_vs_hftbacktest_partial_fill": {"overall_70ms_pct": 28.55, "overall_250ms_pct": 27.20, "NVDA_70ms_pct": 81.77, "SPY_70ms_pct": -0.28},
+    "median_time_to_fill_ratio_nautilus_over_hftbacktest_partial_fill": {"70ms": 1.517, "250ms": 1.147}
+  },
+  "mechanistic_findings": [
+    {
+      "id": "F1-nvda-fill-rate-gap",
+      "summary": "The overall fill-rate gap (NautilusTrader ~94-98% vs hftbacktest ~74-76%) is driven almost entirely by NVDA, not SPY. SPY's fill rate agrees closely between engines at both latencies (98.33% vs 98.61% at 70ms; 94.71% vs 94.85% at 250ms, hftbacktest even slightly higher) -- well inside any reasonable tolerance. NVDA diverges by 81.8% relative at 70ms (96.94% Nautilus vs 53.33% hftbacktest) and remains at 53.33% for hftbacktest at 250ms while Nautilus falls only to 93.75%.",
+      "mechanism": "Latency release-timing semantics interacting with NVDA's sparser, gappier quote stream (32,786 NVDA quotes vs 61,926 SPY quotes over the identical 8-minute window; NVDA's touch also drifts roughly $0.80 over the window, a much larger relative move than SPY's). NautilusTrader releases a deferred order at the first of its own instrument's next quote OR any due clock timer -- for NVDA, which updates far less often, the exerciser's own shared 3/sec submit-schedule timer very often becomes the release trigger even with no fresh NVDA quote in between, so the order is frequently re-evaluated against essentially the SAME touch it saw at submission (which has not had a chance to move away), keeping it marketable. hftbacktest's constant_order_latency has no such allowance: it evaluates the order against whatever the book literally is at exactly submit + entry_latency, catching genuine price movement that occurred during that fixed window on a name that moves by more than one tick more often than SPY does.",
+      "supporting_evidence": "NVDA touch_share for hftbacktest fills is only ~4.4% (vs 100% for SPY and 100% for NVDA on Nautilus) -- when hftbacktest DOES fill an NVDA order, it is usually NOT at the touch the order was generated against, consistent with the order only surviving to fill because the touch moved substantially (and favorably) during the fixed latency window. This also explains NVDA's large-magnitude, sign-flipped cost_vs_mid on hftbacktest (~-11.5 to -12.0 bps, vs Nautilus NVDA's ~+0.45 to +0.50 bps): the reference mid is captured at submit time, and a fill that only survives because price already moved past the limit before the fixed latency elapsed is a materially different, favorably-selected sub-population, not a fair like-for-like execution-cost comparison for that name.",
+      "classification": "Documented model-semantics difference, not a matching bug in either engine or in this harness."
+    },
+    {
+      "id": "F2-partialfill-nopartialfill-nvda-70ms-artifact",
+      "summary": "A SEPARATE, smaller effect: at 70ms latency only, hftbacktest's two exchange models disagree on 344 of 1439 orders (all NVDA, none SPY) -- PartialFillExchange fills 384/720 NVDA orders, NoPartialFillExchange fills 380/720 (4-order net difference; 344 orders actually flip status between the two runs, 329 of them NoPartialFillExchange filling where PartialFillExchange did not). At 250ms latency the two exchange models agree EXACTLY (1066/1439 filled, byte-identical), so this artifact is latency- and instrument-specific, not a general property of either exchange model.",
+      "mechanism_investigated": "Read hftbacktest/src/backtest/proc/{partialfillexchange,nopartialfillexchange}.rs at the pinned tag (py-v2.4.4, commit a244a14250b42d97fc305569c93c4117cd5e1dff, cloned read-only to a session scratchpad, not committed). The IOC crossing check (order.price_tick >= self.depth.best_ask_tick(), and the mirrored <= for sells) is textually IDENTICAL in both files (partialfillexchange.rs:396, nopartialfillexchange.rs:323). NoPartialFillExchange fills directly at best_ask_tick() on any cross (nopartialfillexchange.rs:334-339, ignoring displayed size); PartialFillExchange walks best_ask_tick()..=order.price_tick checking ask_qty_at_tick(t) per tick (partialfillexchange.rs:437-452). Direct instrumentation (submitting order_id=1 against both exchange models on the identical multi-asset setup, polling hbt.depth(0) at the moment of order resolution) showed PartialFillExchange's depth reporting best_ask_tick as the sentinel 'no ask' value (i64::MAX) and best_bid_tick as the sentinel 'no bid' value (i64::MIN) at the SAME simulated timestamp where NoPartialFillExchange's depth (fed the byte-identical event array) reported valid, correct best_bid/best_ask ticks -- i.e., PartialFillExchange's book momentarily 'lost' NVDA's touch while NoPartialFillExchange's did not, causing PartialFillExchange's crossing check to fail and expire the order that NoPartialFillExchange filled.",
+      "root_cause_status": "NOT fully pinned to a specific source line: the crossing-check code itself is identical, so whatever causes PartialFillExchange's depth object to (at least sometimes) show the sentinel values that NoPartialFillExchange's does not, at the same simulated instant, on the same fed data, must originate in code shared with or upstream of ack_new (event dispatch / depth application), not in the crossing-check logic read directly here. This is reported as directly observed and reproduced, not as a fully traced root cause.",
+      "why_not_the_dominant_explanation_for_F1": "This artifact only ever produces a NET four-order difference between the two hftbacktest exchange models at 70ms (384 vs 380), a small fraction of NVDA's ~340-order fill-rate gap versus Nautilus at either latency -- it cannot by itself account for F1's ~82% relative NVDA divergence, and it does not occur at all at 250ms, where the NVDA gap versus Nautilus is just as large.",
+      "classification": "Suspected hftbacktest-internal inconsistency between its two exchange models' event/depth processing -- documented here as a probable bug. Per task policy: not filed externally.",
+      "proposed_next_steps": [
+        "Build a minimal (2-3 event) reproduction isolating a single price-touch update sequence that reproduces best_ask_tick reverting to the sentinel value under partial_fill_exchange but not no_partial_fill_exchange, suitable for an eventual upstream issue (not filed by this task).",
+        "Until resolved, treat hftbacktest partial_fill_exchange results on any sparsely-quoted or gappy instrument at short (<=70-100ms) latency as having an unquantified additional downward fill-rate bias beyond the F1 model-semantics effect, and prefer no_partial_fill_exchange as a cross-check bracket for such instruments specifically.",
+        "Re-run this specific check once hftbacktest's dormancy checkpoint (2026-12-23, sim-crosscheck-hftbacktest/README.md) is revisited, in case a later release changes this behavior."
+      ]
+    }
+  ],
+  "overturn_evaluation": {
+    "condition_from_sim_capacity_experiment_json": "Overturn if hftbacktest diverges from sim-capacity's NautilusTrader results by more than 20% (fill rate) or 2x (median time-to-fill), with no attributable Nautilus matching bug.",
+    "fill_rate_divergence_gt_20pct": true,
+    "fill_rate_divergence_detail": "28.55% (70ms) and 27.20% (250ms) relative divergence overall, both driven almost entirely by NVDA (81.77% relative divergence at 70ms) with SPY inside tolerance (-0.28%, i.e. hftbacktest slightly higher).",
+    "median_time_to_fill_divergence_gt_2x": false,
+    "median_time_to_fill_detail": "1.517x (70ms) and 1.147x (250ms) overall -- both under the 2x threshold, including the NVDA-only breakdown (1.75x at 70ms).",
+    "attributable_to_a_matching_bug": "Partially. The DOMINANT effect (F1, the >20% overall fill-rate divergence) is attributed to a documented model-semantics difference (latency-release timing x instrument volatility), not a bug in either engine. A SEPARATE, smaller effect (F2, NVDA-only, 70ms-only, a net 4-order / up to 344-order-flip difference) is attributed to a suspected hftbacktest-internal inconsistency between its own two exchange models, documented as a probable bug per task policy (not filed externally) -- but F2 is not large enough to itself explain the >20% threshold breach (see F2's why_not_the_dominant_explanation_for_F1).",
+    "conclusion": "DIVERGE (fill rate, both latencies) FOR A DOCUMENTED MODEL-SEMANTICS REASON, WHICH IS NOT A BUG (F1, the dominant effect) -- median time-to-fill stays within tolerance at both latencies. A separate, smaller suspected hftbacktest bug (F2) is documented alongside this conclusion, not conflated with it, per the conclusion categories in this task's brief."
+  },
+  "unverified": [
+    "F2's exact root cause within hftbacktest's Rust source was not pinned to a specific line beyond the shared, identical crossing-check code -- flagged as a probable bug with proposed next steps, not conclusively traced.",
+    "The EMO/Lee-Ready aggressor-side inference from sim-crosscheck-hftbacktest/l1_feasibility.py was not applied here: this cross-check replays quotes only, and trades are side-less on this feed for both engines regardless (see engines_config.hftbacktest.feed).",
+    "Only two latency points (70ms, 250ms) and two exchange models were run, on one 8-minute, 2-symbol sample -- not a claim of coverage across the full sim-capacity 8-symbol, 30-minute universe or its 0/70/250/1000ms sweep.",
+    "hftbacktest's maintenance-dormancy checkpoint (2026-12-23, sim-crosscheck-hftbacktest/README.md) is unaffected by and unrelated to this task's findings."
+  ],
+  "inputs": {
+    "sample_py_sha256": "441c35e063fbd842e2721fb94d7dfbbacad7ebd14895b0d26086bcaa2ab3556a",
+    "order_stream_py_sha256": "9c84b90384d8462aa52500e29096532ce3332020ccd89793ca9c1bc30db4ff4e",
+    "metrics_py_sha256": "9fbf51998c63845a4642e6cdbff499452a537f102f0bb71def6e6d18b81f2d0d",
+    "run_nautilus_py_sha256": "8e087f2cedc1903426f5394ff175c5ee3494898e121782e07358d21f7bc56f6c",
+    "run_hftbacktest_py_sha256": "04dcdd4b507cfbdffd9226066fc3dae711f9f219ec1b49cf39882b842fae69b8",
+    "crosscheck_py_sha256": "9fd21a104a5a93d6e850d34a21a838256ebbb2abe76f7003e32797ed8544dcf6",
+    "report_json_sha256": "02ca445cba7111ac074006be5c1db6af8c6665f7a267b411a990df574d93e6f7",
+    "nt_70_outcomes_sha256": "fa9a3118ec23f156649ae1f441763b810ba52658792cc08c770f64132110d4b5",
+    "nt_250_outcomes_sha256": "872fad2e831fa67bcccf1473e3171c6703e828b569834fe20b7efb5587233778",
+    "hft_70_partial_outcomes_sha256": "ae8e0bbf1480c5dd828f16a60dfe2a2e86d5743588a555436073fc60ef9dbe4b",
+    "hft_70_nopartial_outcomes_sha256": "d793ef7ee434bd78a7a04b728179cd3b4603966b7a8c3f880ae714d4f1ec35c4",
+    "hft_250_partial_outcomes_sha256": "351b7cb3982cdecf0797e53825f873f0fa0f15a39968115de01d2628b3cce79b",
+    "hft_250_nopartial_outcomes_sha256": "017e7045c0fa2e39616afe19a6b5369a00682c3e1d8bc2dd5a4b6856b31680e3"
+  },
+  "commands": [
+    "python3 blueprints/us-equities/sim-engine-crosscheck/sample.py",
+    "python3 blueprints/us-equities/sim-engine-crosscheck/crosscheck.py stream --out <private>/stream.json",
+    "<nautilus python> crosscheck.py run-nautilus --stream <private>/stream.json --latency-ms {70,250} --out <private>/nt_{70,250}.json",
+    "<hftbacktest python> crosscheck.py run-hftbacktest --stream <private>/stream.json --latency-ms {70,250} --exchange {partial_fill,no_partial_fill} --out <private>/hft_{...}.json",
+    "python3 crosscheck.py report --runs <private>/runs.json --commission-plan none --out <private>/report.json"
+  ],
+  "cleanup": {
+    "hftbacktest_venv": "~/.local/share/native-agent-stack/hftbacktest-2.4.4, rebuilt for this task per sim-crosscheck-hftbacktest/README.md (uv venv --python 3.12 + uv pip sync --require-hashes requirements.lock); removed after this task's verification completed (rm -rf), matching that blueprint's own established cleanup convention. Rebuild with the exact commands in sim-crosscheck-hftbacktest/README.md's \"Pinned install\" section.",
+    "scratch_hftbacktest_clone": "A read-only, depth-1 clone of nkaz001/hftbacktest at tag py-v2.4.4 (commit a244a14250b42d97fc305569c93c4117cd5e1dff) was made under this session's scratchpad (outside the repository) solely to read partialfillexchange.rs/nopartialfillexchange.rs for F2's mechanistic citations; not committed, not retained."
+  }
+}

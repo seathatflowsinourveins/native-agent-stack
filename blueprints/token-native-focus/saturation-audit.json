@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 69,
-    "catalog_identities": 850,
-    "nonselected_catalog_identities": 781,
+    "catalog_identities": 875,
+    "nonselected_catalog_identities": 806,
     "exclusive_identity_groups": {
       "star_review": 281,
       "component_record": 69,
       "catalog_card": 114,
-      "research_supplement": 384,
-      "legacy_candidate": 2
+      "research_supplement": 395,
+      "legacy_candidate": 16
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. The ten identities first recorded by the 2026-09-26 SOTA-gap audit (manifests/candidates.json, audit_batch sota-gap-audit-20260926) enter as legacy candidates, and so do the four identities of that audit's P1 trial batch (blueprints/trials-20260926). Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
@@ -481,7 +481,7 @@
     {
       "component_id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.3.2",
+      "version": "2.4.1",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
       "installation_assessment": "runtime present at retained native operation date",
@@ -603,6 +603,16 @@
             "id": "memory-lifecycle-probe-20260921",
             "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ai-memory-240-qualification-20260925",
+            "path": "evidence/receipts/ai-memory-240-qualification-20260925.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ai-memory-241-qualification-20260925",
+            "path": "evidence/receipts/ai-memory-241-qualification-20260925.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -621,7 +631,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "353841d91618d20b110b208de284a74d0b960379",
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
@@ -1249,7 +1259,7 @@
     {
       "component_id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
-      "version": "20.0.24",
+      "version": "20.0.26",
       "profile": "supporting",
       "role": "Read existing native provider usage logs",
       "installation_assessment": "runtime present at retained native operation date",
@@ -1299,6 +1309,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ccusage-20026-qualification-20260927",
+            "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1318,7 +1333,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "source_pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -1371,7 +1386,7 @@
     {
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
-      "version": "2.1.278",
+      "version": "2.1.284",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -1898,7 +1913,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.155.1",
+      "version": "0.159.2",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2073,6 +2088,16 @@
           {
             "id": "portable-claude-native-qualification-20260921",
             "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01571-qualification-20260926",
+            "path": "evidence/receipts/codex-01571-qualification-20260926.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01592-qualification-20260930",
+            "path": "evidence/receipts/codex-01592-qualification-20260930.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4702,8 +4727,8 @@
     },
     {
       "component_id": "markitdown",
-      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
-      "version": "0.1.7",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8",
+      "version": "0.1.8",
       "profile": "supporting",
       "role": "Convert supported source documents to readable Markdown",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4747,6 +4772,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "markitdown-018-qualification-20260925",
+            "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4831,7 +4861,7 @@
     {
       "component_id": "mcp-inspector",
       "repository": "https://github.com/modelcontextprotocol/inspector",
-      "version": "2.7.0",
+      "version": "2.8.0",
       "profile": "supporting",
       "role": "Upstream direct stdio tool inspection/calls",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4839,7 +4869,7 @@
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/mcp-inspector",
         "documented_commands": [
-          "npx @modelcontextprotocol/inspector@2.7.0 --help"
+          "npx @modelcontextprotocol/inspector@2.8.0 --help"
         ],
         "scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate.",
         "recipe_document": "recipes/README.md",
@@ -4865,6 +4895,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcp-inspector-280-qualification-20260926",
+            "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4935,8 +4970,8 @@
     },
     {
       "component_id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
-      "version": "0.13.13",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4980,6 +5015,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "mcporter-0141-qualification-20260925",
+            "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5058,10 +5098,10 @@
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "Dated selected-role acceptance exists; this matrix reconciliation performs no new installation.",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.5",
+      "version": "16.3.6",
       "profile": "supporting",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/nextjs",
         "recipe_document": "blueprints/convergence-practice/application-delivery/README.md",
@@ -6272,7 +6312,7 @@
     {
       "component_id": "prometheus",
       "repository": "https://github.com/prometheus/prometheus",
-      "version": "3.14.0",
+      "version": "3.15.0",
       "profile": "observability",
       "role": "Native operational metric storage and alert evaluation",
       "installation_assessment": "runtime present at retained native operation date",
@@ -6373,6 +6413,11 @@
             "id": "portable-claude-native-qualification-20260921",
             "path": "evidence/receipts/portable-claude-native-qualification-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "prometheus-3150-qualification-20260926",
+            "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6391,7 +6436,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "source_pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -7308,8 +7353,8 @@
     },
     {
       "component_id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
-      "version": "0.49.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "version": "0.50.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7403,6 +7448,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "rtk-050-qualification-20260925",
+            "path": "evidence/receipts/rtk-050-qualification-20260925.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -8158,7 +8208,7 @@
     {
       "component_id": "socraticode",
       "repository": "https://github.com/giancarloerra/SocratiCode",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "profile": "core",
       "role": "Automatically refreshed semantic code retrieval and native code graph",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8259,6 +8309,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "socraticode-1150-qualification-20260927",
+            "path": "evidence/receipts/socraticode-1150-qualification-20260927.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8277,7 +8332,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -8735,7 +8790,7 @@
     {
       "component_id": "vllm",
       "repository": "https://github.com/vllm-project/vllm",
-      "version": "0.25.0",
+      "version": "0.30.0",
       "profile": "core",
       "role": "Native GPU serving for pinned recent local embeddings",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8805,6 +8860,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "vllm-030-switch-20260925",
+            "path": "evidence/receipts/vllm-030-switch-20260925.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8823,7 +8883,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+      "source_pin": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
@@ -9235,6 +9295,11 @@
           {
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "tavily-research-qualification-20260926",
+            "path": "evidence/receipts/tavily-research-qualification-20260926.json",
             "kind": "native_cli_e2e"
           }
         ],

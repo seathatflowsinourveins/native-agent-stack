@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "id": "wsl-authoring-20260923--rtk--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "wsl-authoring-20260923",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "ae3d3d37377022fe63112dcb10c93c765d6d2601",
+  "recorded_by": {
+    "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && rtk --version",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "27c3358e4e4d8fa03473b95913f1d2e47c2aa826f00e8400676b90ac925c0d93",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\nrtk 0.49.0\n"
+    },
+    {
+      "cmd": "rtk gain --format json | python3 -c 'import json,sys;s=json.load(sys.stdin)[\"summary\"];print(\"rtk gain (global, all retained projects):\",{k:s[k] for k in (\"total_commands\",\"total_input\",\"total_output\",\"total_saved\")});assert s[\"total_saved\"]>0 and s[\"total_input\"]>=s[\"total_output\"];print(\"asserted: total_saved > 0 and total_input >= total_output\")'",
+      "exit": 0,
+      "duration_s": 0.144,
+      "output_sha256": "c46ccf5e5ec7885100e2c02b5c56bb2a7af104372d23c1c5ad1326d52bd04fbe",
+      "output_excerpt": "rtk gain (global, all retained projects): {'total_commands': 78606, 'total_input': 957147316, 'total_output': 219174914, 'total_saved': 741192849}\nasserted: total_saved > 0 and total_input >= total_output\n"
+    },
+    {
+      "cmd": "g=$(rtk gain --format json | python3 -c 'import json,sys;print(json.load(sys.stdin)[\"summary\"][\"total_saved\"])') && cd \"$HOME/code/agent-lab\" && rtk gain --project --format json | python3 -c 'import json,sys;g=int(sys.argv[1]);s=json.load(sys.stdin)[\"summary\"];print(\"rtk gain --project (agent-lab):\",{k:s[k] for k in (\"total_commands\",\"total_input\",\"total_output\",\"total_saved\")});assert 0<s[\"total_saved\"]<=g;print(\"asserted: 0 < project total_saved <= global total_saved read just before\")' \"$g\"",
+      "exit": 0,
+      "duration_s": 0.254,
+      "output_sha256": "a84adb1ebed63d821fd10d883d625b35e30ff163fdd8cb7dd12928cfc735d710",
+      "output_excerpt": "rtk gain --project (agent-lab): {'total_commands': 30750, 'total_input': 694282062, 'total_output': 85843940, 'total_saved': 608442853}\nasserted: 0 < project total_saved <= global total_saved read just before\n"
+    },
+    {
+      "cmd": "python3 -c 'import sqlite3,os;c=sqlite3.connect(\"file:\"+os.path.expanduser(\"~/.local/share/rtk/history.db\")+\"?mode=ro\",uri=True);r=list(c.execute(\"select input_tokens,output_tokens,saved_tokens from commands order by saved_tokens desc\"));t=sum(x[2] for x in r);s=lambda n:sum(x[2] for x in r[:n])/t;cap=7500;k=sum(max(0,min(i,cap)-o) for i,o,_ in r);print(\"history rows\",len(r),\"saved\",t,\"| top 1 %.1f%%, top 10 %.1f%%, top 100 %.1f%% of saved\"%(100*s(1),100*s(10),100*s(100)));print(\"each raw output capped at\",cap,\"estimated tokens:\",k,\"saved (%.1f%% of the uncapped total)\"%(100*k/t));assert s(10)>0.5 and k<0.1*t;print(\"asserted: top 10 commands hold > 50% of saved; the capped total is < 10% of it\")'",
+      "exit": 0,
+      "duration_s": 0.067,
+      "output_sha256": "d5ffa3f6812d6712e2c4d4d9128cdd47f04711620508b82cc0222d0d049cd079",
+      "output_excerpt": "history rows 78606 saved 741192849 | top 1 28.7%, top 10 74.4%, top 100 93.5% of saved\neach raw output capped at 7500 estimated tokens: 15327487 saved (2.1% of the uncapped total)\nasserted: top 10 commands hold > 50% of saved; the capped total is < 10% of it\n"
+    },
+    {
+      "cmd": "b=$(readlink -f \"$HOME/.local/bin/claude\") && v=$(\"$b\" --version | head -1) && m=$(grep -a -o -m1 -E '\\(default 30000; values clamp to 4000-128000\\)' \"$b\") && test -n \"$m\" && grep -a -q -m1 -E 'bashOutputMaxChars:[^;]{0,220}\\(default 30000; values clamp to 4000-128000\\)' \"$b\" && echo \"claude $v ($(basename \"$b\")): bashOutputMaxChars description $m\" && echo \"asserted: this client's inline Bash output default is 30000 characters, 7,500 estimated tokens at RTK's bytes/4 for ASCII\"",
+      "exit": 0,
+      "duration_s": 0.104,
+      "output_sha256": "21421e2bc2613e6078e5e3b21552fae99499785fa9770f99a20be04c54fefb52",
+      "output_excerpt": "claude 2.1.282 (Claude Code) (2.1.282): bashOutputMaxChars description (default 30000; values clamp to 4000-128000)\nasserted: this client's inline Bash output default is 30000 characters, 7,500 estimated tokens at RTK's bytes/4 for ASCII\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-25T18:31:58Z",
+  "result": "pass",
+  "claim": "On host wsl-authoring-20260923 (WSL2 x86_64: Intel Core Ultra 9 275HX, NVIDIA RTX 5090 Laptop GPU; the catalog's WSL authoring laptop), rtk 0.49.0 (the catalog pin), resolved from the ecosystem PATH, returned its retained savings through its own rtk gain --format json for all retained projects and, with --project from the agent-lab checkout, for that project; the project total is positive and no larger than the global total read just before it (asserted). A read-only query of the commands table behind rtk gain showed that the estimate is concentrated: the ten largest commands hold more than half of the saved total (asserted; exact shares in the excerpt). Upstream estimates tokens as bytes/4 of raw output minus bytes/4 of filtered output, with no cap (estimate_tokens in src/core/tracking.rs at v0.49.0). Capping each raw output at 7,500 estimated tokens, the 30,000-character inline Bash output default of the installed Claude Code 2.1.282 (its bashOutputMaxChars settings description, asserted from the client binary), leaves less than a tenth of the uncapped total (asserted). All commands exit 0.",
+  "limitations": [
+    "No model session ran. rtk gain values are upstream bytes/4 estimates, not provider token measurements. They count every harness that ran rtk on this host (Claude hook rewrites, explicit Codex rtk commands, scripts), and the project figure is a subset of the global one, so neither may be summed with the other or with another tool's counter.",
+    "The capped figure is this receipt's own counterfactual, not an upstream number. It assumes each raw output would otherwise have reached a model inline up to 30,000 characters (7,500 bytes/4 tokens, exact only for ASCII). Claude Code saves longer output to a file and shows a preview that a model may then read in part, and Codex sessions use their own output limits, so the avoided context lies between the capped and uncapped figures; this receipt does not measure where.",
+    "Counters grow while other sessions run commands, so the excerpts differ from each other and from any later read; the assertions are bounds, not exact values. The history query opens ~/.local/share/rtk/history.db in SQLite read-only mode and prints only aggregates.",
+    "Recorded from a Claude Code session in a git worktree of this repository at catalog_revision (origin/main when this branch started), not a pinned install checkout. The tools are this host's existing installs under ~/.local/share/codex-ecosystem (and, for the client check, the native Claude Code install under ~/.local/share/claude/versions), resolved as the commands show."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T18:31:58Z",
+      "reviewer": {
+        "identity_sha256": "a62650d0061c27ffda78d57ce0387b635234cde41a78ff2b34f0f36a7b2f77c2",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #270 independent session review",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T18:49:43Z",
+      "reviewer": {
+        "identity_sha256": "770fed978e9b0044b40247f768fdbb8b35da160b45d4175260e0ecac31999f16",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

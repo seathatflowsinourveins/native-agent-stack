@@ -1,0 +1,2633 @@
+{
+ "bars": 49,
+ "evidence_class": "synthetic fixture under the run sandbox (engine executed; no SPY rows, frozen inputs or LEAN data mount)",
+ "probe": "Lumibot decision-hook probe (synthetic bars)",
+ "probe_sha256": "91d03a38a7438d77edd6791508e745dea0e13825ad9ffeb0f7144e0a8304209e",
+ "reports": {
+  "after_market_closes": {
+   "decision_hook": "after_market_closes",
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "record": {
+    "calls": [
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615212000,
+      "hook": "before_market_opens",
+      "local": "2021-03-08 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615219200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615222800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615226400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615230000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615233600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615237200,
+      "hook": "after_market_closes",
+      "local": "2021-03-08 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615298400,
+      "hook": "before_market_opens",
+      "local": "2021-03-09 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "before_starting_trading",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615305600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615309200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615312800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615316400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615320000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "local": "2021-03-09 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615471200,
+      "hook": "before_market_opens",
+      "local": "2021-03-11 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-11 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615478400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615482000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615485600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615489200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615492800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615496400,
+      "hook": "after_market_closes",
+      "local": "2021-03-11 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615557600,
+      "hook": "before_market_opens",
+      "local": "2021-03-12 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615564800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615568400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615572000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615575600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615579200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615582800,
+      "hook": "after_market_closes",
+      "local": "2021-03-12 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615813200,
+      "hook": "before_market_opens",
+      "local": "2021-03-15 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615820400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615824000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615827600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615831200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615834800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "local": "2021-03-15 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615899600,
+      "hook": "before_market_opens",
+      "local": "2021-03-16 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615906800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615910400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615914000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615917600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615921200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615924800,
+      "hook": "after_market_closes",
+      "local": "2021-03-16 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615986000,
+      "hook": "before_market_opens",
+      "local": "2021-03-17 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615993200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615996800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616000400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616004000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616007600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616011200,
+      "hook": "after_market_closes",
+      "local": "2021-03-17 16:00",
+      "position": "0"
+     }
+    ],
+    "fills": [
+     {
+      "avg_fill_price": "101.61",
+      "bar_indexed_at_fill_clock": null,
+      "clock_utc_seconds": 1615471200,
+      "local": "2021-03-11 09:00",
+      "price": "101.61",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615323600,
+        "local_start": "15:00",
+        "session_date": "2021-03-09"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "buy"
+     },
+     {
+      "avg_fill_price": "104.61",
+      "bar_indexed_at_fill_clock": null,
+      "clock_utc_seconds": 1615899600,
+      "local": "2021-03-16 09:00",
+      "price": "104.61",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615838400,
+        "local_start": "15:00",
+        "session_date": "2021-03-15"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "sell"
+     }
+    ],
+    "orders": [
+     {
+      "ordinal": 1,
+      "reason": "entry",
+      "side": "buy",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615323600,
+      "time_in_force": "gtc"
+     },
+     {
+      "ordinal": 2,
+      "reason": "exit",
+      "side": "sell",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615838400,
+      "time_in_force": "gtc"
+     }
+    ],
+    "reads": [
+     {
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615323600,
+        "bar_session": "2021-03-09",
+        "close": "101.66",
+        "label": "timeshift=-1",
+        "open": "101.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615320000,
+        "bar_session": "2021-03-09",
+        "close": "101.56",
+        "label": "timeshift=0",
+        "open": "101.51",
+        "timeshift": 0
+       }
+      ]
+     },
+     {
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615838400,
+        "bar_session": "2021-03-15",
+        "close": "104.66",
+        "label": "timeshift=-1",
+        "open": "104.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615834800,
+        "bar_session": "2021-03-15",
+        "close": "104.56",
+        "label": "timeshift=0",
+        "open": "104.51",
+        "timeshift": 0
+       }
+      ]
+     }
+    ]
+   },
+   "session_last_bar_end": {
+    "2021-03-08": 1615237200,
+    "2021-03-09": 1615323600,
+    "2021-03-11": 1615496400,
+    "2021-03-12": 1615582800,
+    "2021-03-15": 1615838400,
+    "2021-03-16": 1615924800,
+    "2021-03-17": 1616011200
+   },
+   "trade_events": [
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "buy",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615323600,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "101.61",
+     "price_source": null,
+     "side": "buy",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615323600,
+     "trade_cost": "0.0"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "sell",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615838400,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "104.61",
+     "price_source": null,
+     "side": "sell",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615838400,
+     "trade_cost": "0.0"
+    }
+   ],
+   "variant": "after_market_closes",
+   "wall_seconds": 0.65
+  },
+  "before_market_opens": {
+   "decision_hook": "before_market_opens",
+   "final_cash": "100260.0",
+   "final_position": "0",
+   "record": {
+    "calls": [
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615212000,
+      "hook": "before_market_opens",
+      "local": "2021-03-08 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615219200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615222800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615226400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615230000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615233600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615237200,
+      "hook": "after_market_closes",
+      "local": "2021-03-08 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615298400,
+      "hook": "before_market_opens",
+      "local": "2021-03-09 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "before_starting_trading",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615305600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615309200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615312800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615316400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615320000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "local": "2021-03-09 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615471200,
+      "hook": "before_market_opens",
+      "local": "2021-03-11 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-11 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615478400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615482000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615485600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615489200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615492800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615496400,
+      "hook": "after_market_closes",
+      "local": "2021-03-11 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615557600,
+      "hook": "before_market_opens",
+      "local": "2021-03-12 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615564800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615568400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615572000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615575600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615579200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615582800,
+      "hook": "after_market_closes",
+      "local": "2021-03-12 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615813200,
+      "hook": "before_market_opens",
+      "local": "2021-03-15 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615820400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615824000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615827600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615831200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615834800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "local": "2021-03-15 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615899600,
+      "hook": "before_market_opens",
+      "local": "2021-03-16 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615906800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615910400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615914000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615917600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615921200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615924800,
+      "hook": "after_market_closes",
+      "local": "2021-03-16 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615986000,
+      "hook": "before_market_opens",
+      "local": "2021-03-17 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615993200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1615996800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1616000400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1616004000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1616007600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100260.0",
+      "clock_utc_seconds": 1616011200,
+      "hook": "after_market_closes",
+      "local": "2021-03-17 16:00",
+      "position": "0"
+     }
+    ],
+    "fills": [
+     {
+      "avg_fill_price": "102.01",
+      "bar_indexed_at_fill_clock": {
+       "local_start": "09:00",
+       "session_date": "2021-03-11"
+      },
+      "clock_utc_seconds": 1615474800,
+      "local": "2021-03-11 10:00",
+      "price": "102.01",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615474800,
+        "local_start": "09:00",
+        "session_date": "2021-03-11"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "buy"
+     },
+     {
+      "avg_fill_price": "104.61",
+      "bar_indexed_at_fill_clock": {
+       "local_start": "09:00",
+       "session_date": "2021-03-16"
+      },
+      "clock_utc_seconds": 1615903200,
+      "local": "2021-03-16 10:00",
+      "price": "104.61",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615838400,
+        "local_start": "15:00",
+        "session_date": "2021-03-15"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "sell"
+     }
+    ],
+    "orders": [
+     {
+      "ordinal": 1,
+      "reason": "entry",
+      "side": "buy",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615471200,
+      "time_in_force": "gtc"
+     },
+     {
+      "ordinal": 2,
+      "reason": "exit",
+      "side": "sell",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615899600,
+      "time_in_force": "gtc"
+     }
+    ],
+    "reads": [
+     {
+      "clock_utc_seconds": 1615471200,
+      "hook": "before_market_opens",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615323600,
+        "bar_session": "2021-03-09",
+        "close": "101.66",
+        "label": "timeshift=-1",
+        "open": "101.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615320000,
+        "bar_session": "2021-03-09",
+        "close": "101.56",
+        "label": "timeshift=0",
+        "open": "101.51",
+        "timeshift": 0
+       }
+      ]
+     },
+     {
+      "clock_utc_seconds": 1615899600,
+      "hook": "before_market_opens",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615838400,
+        "bar_session": "2021-03-15",
+        "close": "104.66",
+        "label": "timeshift=-1",
+        "open": "104.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615834800,
+        "bar_session": "2021-03-15",
+        "close": "104.56",
+        "label": "timeshift=0",
+        "open": "104.51",
+        "timeshift": 0
+       }
+      ]
+     }
+    ]
+   },
+   "session_last_bar_end": {
+    "2021-03-08": 1615237200,
+    "2021-03-09": 1615323600,
+    "2021-03-11": 1615496400,
+    "2021-03-12": 1615582800,
+    "2021-03-15": 1615838400,
+    "2021-03-16": 1615924800,
+    "2021-03-17": 1616011200
+   },
+   "trade_events": [
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "buy",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615471200,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "102.01",
+     "price_source": null,
+     "side": "buy",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615474800,
+     "trade_cost": "0.0"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "sell",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615899600,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "104.61",
+     "price_source": null,
+     "side": "sell",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615899600,
+     "trade_cost": "0.0"
+    }
+   ],
+   "variant": "before_market_opens",
+   "wall_seconds": 0.642
+  },
+  "before_starting_trading": {
+   "decision_hook": "before_starting_trading",
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "record": {
+    "calls": [
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615212000,
+      "hook": "before_market_opens",
+      "local": "2021-03-08 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615219200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615222800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615226400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615230000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615233600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615237200,
+      "hook": "after_market_closes",
+      "local": "2021-03-08 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615298400,
+      "hook": "before_market_opens",
+      "local": "2021-03-09 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "before_starting_trading",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615305600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615309200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615312800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615316400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615320000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "local": "2021-03-09 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615471200,
+      "hook": "before_market_opens",
+      "local": "2021-03-11 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-11 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615478400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615482000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615485600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615489200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615492800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615496400,
+      "hook": "after_market_closes",
+      "local": "2021-03-11 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615557600,
+      "hook": "before_market_opens",
+      "local": "2021-03-12 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615564800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615568400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615572000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615575600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615579200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615582800,
+      "hook": "after_market_closes",
+      "local": "2021-03-12 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615813200,
+      "hook": "before_market_opens",
+      "local": "2021-03-15 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615820400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615824000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615827600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615831200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615834800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "local": "2021-03-15 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615899600,
+      "hook": "before_market_opens",
+      "local": "2021-03-16 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-16 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89799.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615906800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615910400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615914000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615917600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615921200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615924800,
+      "hook": "after_market_closes",
+      "local": "2021-03-16 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615986000,
+      "hook": "before_market_opens",
+      "local": "2021-03-17 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615993200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615996800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616000400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616004000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616007600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616011200,
+      "hook": "after_market_closes",
+      "local": "2021-03-17 16:00",
+      "position": "0"
+     }
+    ],
+    "fills": [
+     {
+      "avg_fill_price": "102.01",
+      "bar_indexed_at_fill_clock": {
+       "local_start": "09:00",
+       "session_date": "2021-03-11"
+      },
+      "clock_utc_seconds": 1615474800,
+      "local": "2021-03-11 10:00",
+      "price": "102.01",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615474800,
+        "local_start": "09:00",
+        "session_date": "2021-03-11"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "buy"
+     },
+     {
+      "avg_fill_price": "105.01",
+      "bar_indexed_at_fill_clock": {
+       "local_start": "09:00",
+       "session_date": "2021-03-16"
+      },
+      "clock_utc_seconds": 1615903200,
+      "local": "2021-03-16 10:00",
+      "price": "105.01",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615903200,
+        "local_start": "09:00",
+        "session_date": "2021-03-16"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "sell"
+     }
+    ],
+    "orders": [
+     {
+      "ordinal": 1,
+      "reason": "entry",
+      "side": "buy",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615474800,
+      "time_in_force": "gtc"
+     },
+     {
+      "ordinal": 2,
+      "reason": "exit",
+      "side": "sell",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615903200,
+      "time_in_force": "gtc"
+     }
+    ],
+    "reads": [
+     {
+      "clock_utc_seconds": 1615474800,
+      "hook": "before_starting_trading",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615474800,
+        "bar_session": "2021-03-11",
+        "close": "102.06",
+        "label": "timeshift=-1",
+        "open": "102.01",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615323600,
+        "bar_session": "2021-03-09",
+        "close": "101.66",
+        "label": "timeshift=0",
+        "open": "101.61",
+        "timeshift": 0
+       }
+      ]
+     },
+     {
+      "clock_utc_seconds": 1615903200,
+      "hook": "before_starting_trading",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615903200,
+        "bar_session": "2021-03-16",
+        "close": "105.06",
+        "label": "timeshift=-1",
+        "open": "105.01",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615838400,
+        "bar_session": "2021-03-15",
+        "close": "104.66",
+        "label": "timeshift=0",
+        "open": "104.61",
+        "timeshift": 0
+       }
+      ]
+     }
+    ]
+   },
+   "session_last_bar_end": {
+    "2021-03-08": 1615237200,
+    "2021-03-09": 1615323600,
+    "2021-03-11": 1615496400,
+    "2021-03-12": 1615582800,
+    "2021-03-15": 1615838400,
+    "2021-03-16": 1615924800,
+    "2021-03-17": 1616011200
+   },
+   "trade_events": [
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "buy",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615474800,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "102.01",
+     "price_source": null,
+     "side": "buy",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615474800,
+     "trade_cost": "0.0"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "sell",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615903200,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "105.01",
+     "price_source": null,
+     "side": "sell",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615903200,
+     "trade_cost": "0.0"
+    }
+   ],
+   "variant": "before_starting_trading",
+   "wall_seconds": 0.708
+  },
+  "dividend_column": {
+   "decision_hook": "after_market_closes",
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "record": {
+    "calls": [
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615212000,
+      "hook": "before_market_opens",
+      "local": "2021-03-08 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615215600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615219200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615222800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615226400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615230000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615233600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-08 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615237200,
+      "hook": "after_market_closes",
+      "local": "2021-03-08 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615298400,
+      "hook": "before_market_opens",
+      "local": "2021-03-09 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "before_starting_trading",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615302000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615305600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615309200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615312800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615316400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615320000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-09 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100000.0",
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "local": "2021-03-09 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615471200,
+      "hook": "before_market_opens",
+      "local": "2021-03-11 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-11 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615474800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615478400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615482000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615485600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615489200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615492800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-11 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615496400,
+      "hook": "after_market_closes",
+      "local": "2021-03-11 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615557600,
+      "hook": "before_market_opens",
+      "local": "2021-03-12 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615561200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615564800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615568400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615572000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615575600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615579200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-12 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615582800,
+      "hook": "after_market_closes",
+      "local": "2021-03-12 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615813200,
+      "hook": "before_market_opens",
+      "local": "2021-03-15 09:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "before_starting_trading",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615816800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 10:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615820400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 11:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615824000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 12:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615827600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 13:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615831200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 14:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615834800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-15 15:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "89839.0",
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "local": "2021-03-15 16:00",
+      "position": "100.0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615899600,
+      "hook": "before_market_opens",
+      "local": "2021-03-16 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "before_starting_trading",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615903200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615906800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615910400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615914000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615917600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615921200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-16 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615924800,
+      "hook": "after_market_closes",
+      "local": "2021-03-16 16:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615986000,
+      "hook": "before_market_opens",
+      "local": "2021-03-17 09:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "before_starting_trading",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615989600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 10:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615993200,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 11:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1615996800,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 12:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616000400,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 13:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616004000,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 14:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616007600,
+      "hook": "on_trading_iteration",
+      "local": "2021-03-17 15:00",
+      "position": "0"
+     },
+     {
+      "cash": "100300.0",
+      "clock_utc_seconds": 1616011200,
+      "hook": "after_market_closes",
+      "local": "2021-03-17 16:00",
+      "position": "0"
+     }
+    ],
+    "fills": [
+     {
+      "avg_fill_price": "101.61",
+      "bar_indexed_at_fill_clock": null,
+      "clock_utc_seconds": 1615471200,
+      "local": "2021-03-11 09:00",
+      "price": "101.61",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615323600,
+        "local_start": "15:00",
+        "session_date": "2021-03-09"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "buy"
+     },
+     {
+      "avg_fill_price": "104.61",
+      "bar_indexed_at_fill_clock": null,
+      "clock_utc_seconds": 1615899600,
+      "local": "2021-03-16 09:00",
+      "price": "104.61",
+      "price_is_open_of_bar": [
+       {
+        "end_utc_seconds": 1615838400,
+        "local_start": "15:00",
+        "session_date": "2021-03-15"
+       }
+      ],
+      "quantity": "100.0",
+      "side": "sell"
+     }
+    ],
+    "orders": [
+     {
+      "ordinal": 1,
+      "reason": "entry",
+      "side": "buy",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615323600,
+      "time_in_force": "gtc"
+     },
+     {
+      "ordinal": 2,
+      "reason": "exit",
+      "side": "sell",
+      "status_after_submit": "new",
+      "submitted_clock_utc_seconds": 1615838400,
+      "time_in_force": "gtc"
+     }
+    ],
+    "reads": [
+     {
+      "clock_utc_seconds": 1615323600,
+      "hook": "after_market_closes",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615323600,
+        "bar_session": "2021-03-09",
+        "close": "101.66",
+        "label": "timeshift=-1",
+        "open": "101.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615320000,
+        "bar_session": "2021-03-09",
+        "close": "101.56",
+        "label": "timeshift=0",
+        "open": "101.51",
+        "timeshift": 0
+       }
+      ]
+     },
+     {
+      "clock_utc_seconds": 1615838400,
+      "hook": "after_market_closes",
+      "reads": [
+       {
+        "bar_end_utc_seconds": 1615838400,
+        "bar_session": "2021-03-15",
+        "close": "104.66",
+        "label": "timeshift=-1",
+        "open": "104.61",
+        "timeshift": -1
+       },
+       {
+        "bar_end_utc_seconds": 1615834800,
+        "bar_session": "2021-03-15",
+        "close": "104.56",
+        "label": "timeshift=0",
+        "open": "104.51",
+        "timeshift": 0
+       }
+      ]
+     }
+    ]
+   },
+   "session_last_bar_end": {
+    "2021-03-08": 1615237200,
+    "2021-03-09": 1615323600,
+    "2021-03-11": 1615496400,
+    "2021-03-12": 1615582800,
+    "2021-03-15": 1615838400,
+    "2021-03-16": 1615924800,
+    "2021-03-17": 1616011200
+   },
+   "trade_events": [
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "buy",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615323600,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "101.61",
+     "price_source": null,
+     "side": "buy",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615323600,
+     "trade_cost": "0.0"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "nan",
+     "price": "nan",
+     "price_source": null,
+     "side": "sell",
+     "status": "new",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615838400,
+     "trade_cost": "nan"
+    },
+    {
+     "event_kind": "trade",
+     "filled_quantity": "100.0",
+     "price": "104.61",
+     "price_source": null,
+     "side": "sell",
+     "status": "fill",
+     "time_in_force": "gtc",
+     "time_utc_seconds": 1615838400,
+     "trade_cost": "0.0"
+    }
+   ],
+   "variant": "dividend_column",
+   "wall_seconds": 0.937
+  }
+ },
+ "runs": {
+  "after_market_closes": {
+   "blocked_host_lookups": 0,
+   "exit_code": 0,
+   "relative_tilde_directory_created": false,
+   "stderr_bytes": 0,
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "wall_seconds": 2.802,
+   "working_directory_entries": [
+    "logs",
+    "report.json",
+    "stderr.log",
+    "stdout.log"
+   ]
+  },
+  "before_market_opens": {
+   "blocked_host_lookups": 0,
+   "exit_code": 0,
+   "relative_tilde_directory_created": false,
+   "stderr_bytes": 0,
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "wall_seconds": 2.749,
+   "working_directory_entries": [
+    "logs",
+    "report.json",
+    "stderr.log",
+    "stdout.log"
+   ]
+  },
+  "before_starting_trading": {
+   "blocked_host_lookups": 0,
+   "exit_code": 0,
+   "relative_tilde_directory_created": false,
+   "stderr_bytes": 0,
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "wall_seconds": 2.804,
+   "working_directory_entries": [
+    "logs",
+    "report.json",
+    "stderr.log",
+    "stdout.log"
+   ]
+  },
+  "dividend_column": {
+   "blocked_host_lookups": 0,
+   "exit_code": 0,
+   "relative_tilde_directory_created": false,
+   "stderr_bytes": 0,
+   "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "wall_seconds": 3.841,
+   "working_directory_entries": [
+    "logs",
+    "report.json",
+    "stderr.log",
+    "stdout.log"
+   ]
+  }
+ },
+ "sessions": [
+  "2021-03-08",
+  "2021-03-09",
+  "2021-03-11",
+  "2021-03-12",
+  "2021-03-15",
+  "2021-03-16",
+  "2021-03-17"
+ ],
+ "summary": {
+  "after_market_closes": {
+   "cash_events": 0,
+   "fills": 2,
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "orders": 2,
+   "per_order": [
+    {
+     "equals_decision_bar_open": true,
+     "equals_next_session_first_bar_end": false,
+     "equals_next_session_first_bar_open": false,
+     "fill_clock_utc_seconds": 1615323600,
+     "fill_price": "101.61",
+     "on_filled_order_delivered_utc_seconds": 1615471200,
+     "reason": "entry",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615323600
+    },
+    {
+     "equals_decision_bar_open": true,
+     "equals_next_session_first_bar_end": false,
+     "equals_next_session_first_bar_open": false,
+     "fill_clock_utc_seconds": 1615838400,
+     "fill_price": "104.61",
+     "on_filled_order_delivered_utc_seconds": 1615899600,
+     "reason": "exit",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615838400
+    }
+   ]
+  },
+  "before_market_opens": {
+   "cash_events": 0,
+   "fills": 2,
+   "final_cash": "100260.0",
+   "final_position": "0",
+   "orders": 2,
+   "per_order": [
+    {
+     "equals_decision_bar_open": false,
+     "equals_next_session_first_bar_end": true,
+     "equals_next_session_first_bar_open": true,
+     "fill_clock_utc_seconds": 1615474800,
+     "fill_price": "102.01",
+     "on_filled_order_delivered_utc_seconds": 1615474800,
+     "reason": "entry",
+     "submitted_before_fill": true,
+     "submitted_clock_utc_seconds": 1615471200
+    },
+    {
+     "equals_decision_bar_open": true,
+     "equals_next_session_first_bar_end": false,
+     "equals_next_session_first_bar_open": false,
+     "fill_clock_utc_seconds": 1615899600,
+     "fill_price": "104.61",
+     "on_filled_order_delivered_utc_seconds": 1615903200,
+     "reason": "exit",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615899600
+    }
+   ]
+  },
+  "before_starting_trading": {
+   "cash_events": 0,
+   "fills": 2,
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "orders": 2,
+   "per_order": [
+    {
+     "equals_decision_bar_open": false,
+     "equals_next_session_first_bar_end": true,
+     "equals_next_session_first_bar_open": true,
+     "fill_clock_utc_seconds": 1615474800,
+     "fill_price": "102.01",
+     "on_filled_order_delivered_utc_seconds": 1615474800,
+     "reason": "entry",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615474800
+    },
+    {
+     "equals_decision_bar_open": false,
+     "equals_next_session_first_bar_end": true,
+     "equals_next_session_first_bar_open": true,
+     "fill_clock_utc_seconds": 1615903200,
+     "fill_price": "105.01",
+     "on_filled_order_delivered_utc_seconds": 1615903200,
+     "reason": "exit",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615903200
+    }
+   ]
+  },
+  "dividend_column": {
+   "cash_events": 0,
+   "fills": 2,
+   "final_cash": "100300.0",
+   "final_position": "0",
+   "orders": 2,
+   "per_order": [
+    {
+     "equals_decision_bar_open": true,
+     "equals_next_session_first_bar_end": false,
+     "equals_next_session_first_bar_open": false,
+     "fill_clock_utc_seconds": 1615323600,
+     "fill_price": "101.61",
+     "on_filled_order_delivered_utc_seconds": 1615471200,
+     "reason": "entry",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615323600
+    },
+    {
+     "equals_decision_bar_open": true,
+     "equals_next_session_first_bar_end": false,
+     "equals_next_session_first_bar_open": false,
+     "fill_clock_utc_seconds": 1615838400,
+     "fill_price": "104.61",
+     "on_filled_order_delivered_utc_seconds": 1615899600,
+     "reason": "exit",
+     "submitted_before_fill": false,
+     "submitted_clock_utc_seconds": 1615838400
+    }
+   ]
+  }
+ }
+}

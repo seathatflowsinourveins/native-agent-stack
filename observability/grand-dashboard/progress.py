@@ -14,6 +14,9 @@ import time
 import urllib.request
 
 MAX_BYTES = 2_000_000
+# manifests/evidence.json lists every registered evidence file and passed MAX_BYTES on 2026-09-28; the snapshot reads
+# only its receipt count. When it nears this bound, count receipts from a smaller source instead of raising it again.
+SOURCE_MAX_BYTES = {'manifests/evidence.json': 8_000_000}
 # Includes catalog checkpoints and up to HISTORY_LIMIT native runs plus summary.
 # The combined foundation/paper inventory has already exceeded the former 80 rows.
 MAX_ENTITIES = 128
@@ -35,7 +38,7 @@ def read(root, relative):
     path = root / relative
     if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
         raise ValueError('source must remain inside the public repository')
-    if path.stat().st_size > MAX_BYTES:
+    if path.stat().st_size > SOURCE_MAX_BYTES.get(relative, MAX_BYTES):
         raise ValueError('source exceeds size limit')
     return json.loads(path.read_text())
 

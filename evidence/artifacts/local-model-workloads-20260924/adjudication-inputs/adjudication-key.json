@@ -1,0 +1,36 @@
+{
+  "a": {
+    "packet_order": "original",
+    "source_file": "adjudication/tabular-question.md",
+    "A": "codex",
+    "B": "claude",
+    "listing_order": [
+      "A",
+      "B"
+    ],
+    "listed_first": "trial"
+  },
+  "b": {
+    "packet_order": "swapped",
+    "source_file": "adjudication/tabular-question-swapped.md",
+    "A": "claude",
+    "B": "codex",
+    "listing_order": [
+      "B",
+      "A"
+    ],
+    "listed_first": "trial"
+  },
+  "c": {
+    "packet_order": "reversed",
+    "source_file": "adjudication/tabular-question-reversed.md",
+    "A": "claude",
+    "B": "codex",
+    "listing_order": [
+      "A",
+      "B"
+    ],
+    "listed_first": "skip"
+  },
+  "note": "The swapped input (b) exchanged the letter labels only, so a and b both list the codex (trial) return first. The reversed input (c) is the counterbalanced run: it lists the claude (skip) return first as Return A and the trial return second as Return B. Across a, b and c the skip return appears in both listing positions and under both letters."
+}

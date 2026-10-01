@@ -1,0 +1,65 @@
+observed_utc=2026-09-30T19:29:02Z
+receipt: blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json; record openhands-sdk-150-pyjwt-215-post-cutoff-linux-relock; observed 2026-09-30T17:23:50.486587+00:00; status bounded_source_checks_passed; shared_registration_and_exact_lock_acceptance_pending
+manifests/evidence.json: 8908 registered files
+artifacts: 62 entries | file present and sha256 equal: 62 | missing 0 | sha256 differs 0 | size differs 0 | not registered in manifests/evidence.json 0 | registered hash differs from the file 0
+bound_files: 6 entries | file present and sha256 equal: 5 | missing 0 | sha256 differs 1 | size differs 1 | not registered in manifests/evidence.json 0 | registered hash differs from the file 0
+    digest: .github/workflows/security-scan.yml
+    size: .github/workflows/security-scan.yml
+checks: 53 | ledger commands: 53 | ids only in the ledger: [] | checks whose returned output is missing, differs in sha256 or records another exit code than the ledger: 0
+   (informational: the ledger's sanitized-stdout sha256 equals the returned output's sha256 for 0 of 53; the returned outputs are written files, not the raw stdout)
+checks with a non-zero recorded exit code: 5 [('baseline-osv-current-config', 1), ('baseline-osv-empty-config', 1), ('installed-bd1-unchanged-regression-control', 1), ('candidate-osv-empty-config', 1), ('repository-validation-before-integration', 1)]
+ledger ids ending in a recorded failure marker (exit != 0): [('baseline-osv-current-config', 1), ('baseline-osv-empty-config', 1), ('installed-bd1-unchanged-regression-control', 1), ('candidate-osv-empty-config', 1), ('repository-validation-before-integration', 1)]
+source_archive_and_test_bindings.archive_and_installed_checks: 4 entries
+    shape of first entry: {"archive": "sdk-source.tar.gz", "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c", "extraction": "source", "original_regular_files_compared": 1800, "mismatches": []}
+source_archive_and_test_bindings.tag_sdist_selected_test_inputs: 5 entries bind paths INSIDE the PyJWT 2.15.0 sdist (['tests/test_api_jwt.py', 'tests/test_jwks_client.py', 'tests/utils.py', 'tox.ini', 'pyproject.toml']), not repository files; they are recomputed from the PyPI sdist in external-hashes.txt
+cutoff_and_owner_boundary: {
+"coordinator_authorized_observation_utc": "2026-09-30T16:57:15Z",
+"conservative_cutoff_utc": "2026-09-30T16:57:00Z",
+"native_worker_clock_check_utc": "2026-09-30T17:01:25Z",
+"latest_pyjwt_215_artifact_upload_utc": "2026-09-23T16:56:00.689307Z",
+"full_relative_exclude_newer": "7 days",
+"absolute_cutoff_override": false,
+"owner_handoff": "Coordinator explicitly authorized this bounded candidate relock after receiving the BC source handoff. Main/macOS adoption and issue #518 coordination remain separate ownership."
+}
+PyPI PyJWT 2.15.0 uploads (from the OSV/PyPI reads of the coordinator review): 2026-09-23T16:55:59.241512Z, 2026-09-23T16:56:00.689307Z -> 7 days after the later one: 2026-09-30T16:56:00.689307+00:00
+native worker clock check: 2026-09-30T17:01:25Z | after the window end: True
+resolution keys: ['upstream_sdk_repository', 'upstream_sdk_commit', 'sdk_tools_versions', 'sdk_archive_sha256', 'sdk_upstream_uv_lock_sha256', 'tool', 'target', 'policy', 'constraint_origin', 'predicted_digest_comparison', 'requirements_sha256', 'native_line_count', 'requirements_count', 'unchanged_from_bd1', 'unchanged_from_original_00aa', 'changes_from_bd1', 'changes_from_original_00aa', 'added', 'removed', 'only_pyjwt_version_and_two_hashes_changed_from_bd1', 'retained_versions', 'native_control_reproduced_bd1_byte_identically', 'native_fresh_extraction_reproduction_byte_identical', 'pristine_archive_checks', 'relative_cutoff_limit']
+  upstream_sdk_commit: "dcf401af7a9a302ef92cb7d092e1df9bb659daa5"
+  sdk_tools_versions: "1.50.0"
+  sdk_archive_sha256: "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c"
+  sdk_upstream_uv_lock_sha256: "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801"
+  tool: "uv 0.12.17"
+native_install: {
+"hashed_build_install_exit_code": 0,
+"hashed_runtime_install_exit_code": 0,
+"pip_check_before_and_after_test_tools_exit_code": 0,
+"native_import_exit_code": 0
+}
+osv: {
+"version": "2.6.0",
+"binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+"bd1_current_config_control_exit_code": 1,
+"bd1_current_config_control_findings": [
+{
+"package": "pyjwt",
+"version": "2.14.0",
+"ids": [
+"GHSA-42vr-xj54-vc7v"
+]
+}
+],
+"bd1_empty_config_control_exit_code": 1,
+"candidate_current_config_exit_code": 0,
+"candidate_current_config_findings": [],
+"candidate_empty_config_exit_code": 1,
+"candidate_empty_config_findings": [
+{
+"package": "oauthlib",
+"version": "3.3.1",
+"ids": [
+"GHSA-hj66-6f7g-4r5v",
+"GHSA-xpv3-w29h-x7cv"
+]
+}
+]
+}

@@ -11,12 +11,20 @@ a full commit SHA.
 
 from datetime import date
 from pathlib import Path
+import fnmatch
 import hashlib
+import json
 import os
 import re
+import shlex
+import shutil
 import subprocess
+import sys
 import tempfile
+import textwrap
 import unittest
+
+import tests
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
@@ -25,14 +33,21 @@ UPLOAD_SARIF = "github/codeql-action/upload-sarif@"
 # Workflows whose exact bytes are pinned by retained evidence; editing them would detach that
 # evidence from the file, so their jobs stay unhardened until the evidence is re-run. Each maps
 # to a file that records the workflow's current SHA-256.
-HASH_FROZEN = {
-    # plan.json frozen_sources, enforced by tests/test_active_recovery_plans.py
-    "native-offhost-app-state.yml": "blueprints/convergence-practice/offhost-app-state/plan.json",
-    # hosted-plan.json, enforced by tests/test_active_recovery_plans.py
-    "native-offhost-restore.yml": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-    # four dated execution receipts record it (docs/github-automation-evidence.json)
-    "native-token-e2e.yml": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt.json",
-}
+HASH_FROZEN = {}
+# Empty since 2026-09-26 (docs/decisions/2026-09-26-token-workflow-hardening.md); the filters that read
+# it stay for a future named exemption. native-token-e2e.yml left it when local --install runs
+# re-recorded its harness receipts against the new workflow bytes (evidence/artifacts/
+# token-workflow-hardening-20260926/); those runs call scripts/native_token_ci.py directly, so the
+# pull request's hosted run is the step's first execution and completes the overturn named in
+# docs/decisions/2026-09-22-actions-hardening-fix-round.md. The two off-host workflows gained the step
+# with a refresh of only their recovery plans' prospective bindings (plan.json, hosted-plan.json, still
+# enforced by tests/test_active_recovery_plans.py), as on 2026-09-20; their next dispatch is the first
+# run with it. Putting one of the three back here also means dropping it from FORMERLY_HASH_FROZEN.
+FORMERLY_HASH_FROZEN = ("native-offhost-app-state.yml", "native-offhost-restore.yml", "native-token-e2e.yml")
+# An exact release in a pin's comment, such as `# v7.0.1`. A major-only `# v7` names a tag that
+# moves: zizmor's online ref-version-mismatch audit (a Medium finding at the regular persona, which
+# fails the validate job) reports it as soon as upstream moves that tag off the pinned commit.
+EXACT_RELEASE_COMMENT = re.compile(r"#\s*v\d+\.\d+\.\d+\s*$")
 # step-security/harden-runner's pinned version supports macOS runners too,
 # in audit mode -- its README, read at this exact pinned commit
 # (e14015d583714f6e62063499dc959a02595150a1) on 2026-09-23: "GitHub-hosted
@@ -152,9 +167,37 @@ class HardenRunnerTests(unittest.TestCase):
         self.assertIn("egress-policy: audit", step)
 
     def test_hash_frozen_exemptions_are_still_pinned(self):
+        if not HASH_FROZEN:
+            # Reported as skipped rather than passed: with no exemption there is nothing to check.
+            self.skipTest("no workflow is hash-frozen (empty since 2026-09-26)")
         for name, pin in HASH_FROZEN.items():
             digest = hashlib.sha256((WORKFLOWS / name).read_bytes()).hexdigest()
             self.assertIn(digest, (ROOT / pin).read_text(encoding="utf-8"), f"{name} is no longer pinned by {pin}")
+
+    def test_formerly_exempt_workflows_stay_hardened(self):
+        # Regression guard: none of the three returns to HASH_FROZEN, and each of their four jobs
+        # starts with the audit step.
+        found = []
+        for name in FORMERLY_HASH_FROZEN:
+            self.assertNotIn(name, HASH_FROZEN)
+            for job_id, job_text in jobs((WORKFLOWS / name).read_text(encoding="utf-8")).items():
+                step = first_step(job_text)
+                self.assertIn(HARDEN, step, f"{name}:{job_id}")
+                self.assertIn("egress-policy: audit", step, f"{name}:{job_id}")
+                found.append(f"{name}:{job_id}")
+        self.assertEqual(sorted(found), ["native-offhost-app-state.yml:destination", "native-offhost-app-state.yml:source",
+                                         "native-offhost-restore.yml:synthetic-restore", "native-token-e2e.yml:native-token-tools"])
+
+    def test_github_automation_cites_only_existing_tests(self):
+        # docs/github-automation.md cites tests as the proof of its hardening claims. After the
+        # ubuntu-only test was renamed for macOS coverage, the page kept citing the old name for a
+        # test that no longer existed (2026-09-26 review).
+        cited = set(re.findall(r"`(test_\w+)`", (ROOT / "docs/github-automation.md").read_text(encoding="utf-8")))
+        defined = {name for path in (ROOT / "tests").glob("test_*.py")
+                   for name in re.findall(r"(?m)^\s*(?:async\s+)?def (test_\w+)\(", path.read_text(encoding="utf-8"))}
+        self.assertIn("test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode", defined)
+        self.assertTrue(cited, "the page cites no test by name")
+        self.assertEqual(sorted(cited - defined), [], "tests cited in docs/github-automation.md but not defined")
 
     def test_job_parser_matches_yaml_when_available(self):
         try:
@@ -231,13 +274,14 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
-        for tool_job, upload_job in (("osv-scanner", "osv-sarif-upload"), ("zizmor-online", "zizmor-sarif-upload")):
+        # osv-sarif-upload sends two reports (the ordinary scan and the frozen-artifact scan), each under its own category.
+        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 2), ("zizmor-online", "zizmor-sarif-upload", 1)):
             upload = jobs(self.text)[upload_job]
             self.assertIn(f"needs: {tool_job}", upload, upload_job)
             self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
             actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
-            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
-                                       "actions/download-artifact", "github/codeql-action/upload-sarif"], upload_job)
+            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout", "actions/download-artifact"]
+                             + ["github/codeql-action/upload-sarif"] * uploads, upload_job)
 
     def test_osv_scanner_fails_on_findings_and_uploads_sarif_off_pull_requests(self):
         job = jobs(self.text)["osv-scanner"]
@@ -252,12 +296,18 @@ class SecurityScanTests(unittest.TestCase):
         upload = jobs(self.text)["osv-sarif-upload"]
         self.assertIn("github.event_name != 'pull_request'", block_if(upload))
         self.assertIn(UPLOAD_SARIF, upload)
-        self.assertIn("category: osv-scanner", upload)
+        self.assertIn("category: osv-scanner\n", upload)
+        self.assertIn("category: osv-scanner-frozen-macos", upload)
+        # Both native scans write a report, and the step fails on the worse of their two statuses.
+        for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif"):
+            self.assertIn(report, job)
+            self.assertIn(report, upload)
+        self.assertIn("frozen_status", job)
 
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]
         self.assertIn("if: github.event_name != 'pull_request'", job)
-        self.assertIn("-r .github/requirements-ci.lock", job)
+        self.assertIn("-r .github/requirements-ci.txt", job)
         self.assertIn("--require-hashes", job)
         self.assertIn("GH_TOKEN: ${{ github.token }}", job)
         self.assertIn("--no-exit-codes", job)
@@ -315,6 +365,66 @@ class SecurityScanTests(unittest.TestCase):
                              "should only run after zizmor-online actually produced an artifact")
 
 
+def zizmor_step(job_text):
+    """The one step of a job whose ``run:`` invokes zizmor."""
+    lines = job_text.splitlines()
+    hits = [i for i, line in enumerate(lines) if re.search(r"(^|\s)zizmor\s+--", line) and not line.lstrip().startswith("#")]
+    if len(hits) != 1:
+        raise AssertionError(f"expected one zizmor invocation, found {len(hits)}")
+    start = next(i for i in range(hits[0], -1, -1) if re.match(r"^      - ", lines[i]))
+    end = next((i for i in range(hits[0] + 1, len(lines)) if re.match(r"^      - ", lines[i])), len(lines))
+    return "\n".join(lines[start:end])
+
+
+def uncommented(text):
+    return "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+
+
+def zizmor_inputs(step):
+    """The positional inputs of a step's zizmor invocation (backslash continuations joined,
+    option values and any shell redirection dropped)."""
+    command = re.sub(r"\\\n\s*", " ", uncommented(step))
+    invocation = re.search(r"(?:^|\s)zizmor\s+([^\n>|;&]*)", command).group(1).split()
+    inputs, skip = [], False
+    for token in invocation:
+        if skip:
+            skip = False
+        elif token in {"--persona", "--format", "--cache-dir", "--min-severity", "--min-confidence", "--config"}:
+            skip = True
+        elif not token.startswith("-"):
+            inputs.append(token)
+    return inputs
+
+
+class ValidateZizmorGateTests(unittest.TestCase):
+    """The required validate check runs zizmor's online audits and fails on findings
+    (docs/decisions/2026-09-22-github-automation-closure.md, "GitHub hardening follow-up
+    (2026-09-25)"). zizmor 1.30.1 with no token silently falls back to offline mode and
+    exits 0, so the token line is what keeps the online audits in the gate."""
+
+    step = zizmor_step(jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"])
+
+    def test_online_audits_get_the_read_only_job_token(self):
+        self.assertIn("GH_TOKEN: ${{ github.token }}", self.step)
+        self.assertEqual(scopes((WORKFLOWS / "validate.yml").read_text(encoding="utf-8").split("\njobs:\n", 1)[0]),
+                         [{"contents": "read"}])
+        self.assertIsNone(re.search(r"(?m)^    permissions:", jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))["validate"]),
+                          "the validate job adds no job-level scope")
+
+    def test_findings_fail_the_required_check(self):
+        command = uncommented(self.step)
+        for forbidden in ("--offline", "--no-exit-codes", "--format sarif", "--format=sarif", "continue-on-error"):
+            self.assertNotIn(forbidden, command)
+        self.assertIn("--persona regular", command)
+        self.assertIn("--no-config --no-ignores", command)
+        self.assertIn("--strict-collection", command)
+
+    def test_both_ci_runs_audit_the_repository_root_so_dependabot_yml_is_collected(self):
+        online = zizmor_step(jobs((WORKFLOWS / "security-scan.yml").read_text(encoding="utf-8"))["zizmor-online"])
+        for label, step in (("validate", self.step), ("zizmor-online", online)):
+            self.assertEqual(zizmor_inputs(step), ["."], label)
+
+
 class PublishReleaseTests(unittest.TestCase):
     text = (WORKFLOWS / "publish-catalog.yml").read_text(encoding="utf-8")
 
@@ -369,9 +479,36 @@ class TargetRulesetTests(unittest.TestCase):
         (checks,) = self.rule("required_status_checks")
         contexts = {check["context"]: check.get("integration_id") for check in checks["parameters"]["required_status_checks"]}
         for context in ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
-                        "verdict-review-gate"):
+                        "verdict-review-gate", "validate-macos"):
             self.assertEqual(contexts.get(context), 15368, context)
         self.assertEqual(len(self.rule("code_scanning")), 1)
+
+
+class AgentBranchRulesetTests(unittest.TestCase):
+    """The committed agent-branch ruleset, applied as 24132241 (docs/github-automation.md, "Agent branch ruleset").
+
+    The resolver driver pushes with the owner's login, so an admin-role or owner bypass would free it too: only a
+    no-bypass rule binds it. Deletion stays allowed because delete_branch_on_merge is on.
+    """
+
+    PATH = ROOT / ".github/agent-branch-ruleset.json"
+
+    def ruleset(self):
+        return json.loads(self.PATH.read_text(encoding="utf-8"))
+
+    def test_blocks_history_rewrite_on_both_agent_prefix_patterns_without_bypass(self):
+        ruleset = self.ruleset()
+        self.assertEqual((ruleset["target"], ruleset["enforcement"]), ("branch", "active"))
+        self.assertEqual(ruleset["bypass_actors"], [])
+        self.assertEqual(ruleset["conditions"]["ref_name"],
+                         {"include": ["refs/heads/openhands/*", "refs/heads/openhands/**/*"], "exclude": []})
+        self.assertEqual(ruleset["rules"], [{"type": "non_fast_forward"}])
+
+    def test_never_targets_main_or_blocks_post_merge_branch_deletion(self):
+        ruleset = self.ruleset()
+        for pattern in ruleset["conditions"]["ref_name"]["include"]:
+            self.assertTrue(pattern.startswith("refs/heads/openhands/"), pattern)
+        self.assertNotIn("deletion", {rule["type"] for rule in ruleset["rules"]})
 
 
 class VerdictReviewGateTests(unittest.TestCase):
@@ -451,7 +588,8 @@ class VerdictReviewGateTests(unittest.TestCase):
         stub = scratch / "bin" / "python3"
         stub.write_text('#!/bin/sh\necho "gate-invoked $*"\n')
         stub.chmod(0o755)
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        # Drops inherited GIT_* but keeps the package's hermetic config (no global hooks or auto maintenance).
+        environment = tests.hermetic_git_environment()
         environment.update(PATH=f"{scratch / 'bin'}:{environment['PATH']}", EVENT_NAME=event,
                            PR_BASE_SHA=self.commits["base"], PR_HEAD_SHA=pr_head, PUSH_BEFORE_SHA="",
                            PR_BASE_REF=base_ref,
@@ -635,6 +773,25 @@ class PinningTests(unittest.TestCase):
                     unpinned.append(f"{path.name}:{line_number}: {match.group(1)}")
         self.assertEqual(unpinned, [])
 
+    @staticmethod
+    def imprecise_comments(name, text):
+        """SHA-pinned `uses:` lines whose comment does not name an exact release."""
+        return [f"{name}:{number}: {line.strip()}" for number, line in enumerate(text.splitlines(), 1)
+                if re.search(r"uses:\s*[\w.-]+/[\w./-]+@[0-9a-f]{40}", line) and not EXACT_RELEASE_COMMENT.search(line)]
+
+    def test_pin_comments_name_an_exact_release_outside_hash_frozen_workflows(self):
+        # Offline guard for zizmor's online ref-version-mismatch audit. A HASH_FROZEN workflow would keep
+        # its recorded bytes until its own evidence is re-run; none is frozen since 2026-09-26.
+        found = [error for path in sorted(WORKFLOWS.glob("*.yml")) if path.name not in HASH_FROZEN
+                 for error in self.imprecise_comments(path.name, path.read_text(encoding="utf-8"))]
+        self.assertEqual(found, [])
+
+    def test_the_comment_check_rejects_a_major_only_or_missing_comment(self):
+        sha = "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        text = "\n".join(f"      - uses: actions/upload-artifact@{sha}{comment}"
+                         for comment in (" # v7.0.1", " # v7", "", " # latest"))
+        self.assertEqual([error.split(":", 2)[1] for error in self.imprecise_comments("x.yml", text)], ["2", "3", "4"])
+
 
 
 SHELL_BREAK = {"|", "||", "&&", ";", ">", ">>", "2>&1", "&>", "2>", "<"}
@@ -715,6 +872,566 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         install = job.index("Install checksum-verified pinned gitleaks")
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
+
+
+class BetterleaksTrialJobTests(unittest.TestCase):
+    """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
+    evidence/artifacts/betterleaks-parity-20260927/): it stays out of the required contexts and cannot be
+    forced green past a verification, scanner or test-run error, reads only, runs bash with pipefail, runs
+    cosign only after its digest check and betterleaks only after the signed checksums and the pinned digest
+    verify, redacts both scans with gitleaks's archive and ignore-file behaviour, uploads nothing and never
+    turns on live --validation requests. It is report-only through betterleaks's own --exit-code option
+    and unittest's split of failures from errors, a scan that does not complete in the real fixture module
+    is an error that fails the fixture step, and its step summary holds counts, never values. The
+    repository carries none of the suppression channels that only betterleaks reads."""
+
+    JOB = "secret-scan-betterleaks"
+    job = jobs((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))[JOB]
+    FIXTURE_CLASSES = ("GitleaksPresenceTests", "GitleaksConfigContextRestrictionTests",
+                       "GitleaksIgnoreFingerprintTests")
+    SCAN_STEPS = ("Scan git history", "Scan working tree")
+    FIXTURE_STEP = "fixture tests with betterleaks"
+    # Stands in for betterleaks 1.8.1's exit status (cmd/root.go at the v1.8.1 tag): --exit-code (line 82,
+    # default 1) is the status for findings (lines 644-645), a scan error exits 1 whatever it says (lines
+    # 640-641), and the report is written before either. STUB_MODE is clean, findings or scan-error.
+    SCAN_STUB = textwrap.dedent("""\
+        #!/usr/bin/env bash
+        report="" exit_code=1
+        while [ "$#" -gt 0 ]; do
+          case "$1" in
+            --report-path) report="$2"; shift ;;
+            --report-path=*) report="${1#*=}" ;;
+            --exit-code) exit_code="$2"; shift ;;
+            --exit-code=*) exit_code="${1#*=}" ;;
+          esac
+          shift
+        done
+        case "$STUB_MODE" in
+          clean) echo null > "$report"; exit 0 ;;
+          findings) cp "$STUB_REPORT" "$report"; exit "$exit_code" ;;
+          scan-error) cp "$STUB_REPORT" "$report"; exit 1 ;;
+        esac
+        exit 99
+        """)
+    VERSION_STUB = '#!/bin/sh\n[ "$1" = version ] && echo "${STUB_VERSION:-1.8.1}" && exit 0\nexit 99\n'
+    # Stands in for tests/test_gitleaks_config.py: FIXTURE_OUTCOME names the outcomes to produce.
+    FIXTURE_MODULE = textwrap.dedent('''\
+        import atexit
+        import os
+        import unittest
+
+        FLAGS = set(os.environ["FIXTURE_OUTCOME"].split("+"))
+
+
+        class GitleaksPresenceTests(unittest.TestCase):
+            pass
+
+
+        class GitleaksConfigContextRestrictionTests(unittest.TestCase):
+            pass
+
+
+        class GitleaksIgnoreFingerprintTests(unittest.TestCase):
+            pass
+
+
+        def fails(self):
+            self.fail("a detection difference")
+
+
+        def errors(self):
+            raise RuntimeError("not an assertion")
+
+
+        if "ok" in FLAGS:
+            GitleaksPresenceTests.test_ok = lambda self: None
+        if "fail" in FLAGS:
+            GitleaksConfigContextRestrictionTests.test_fail = fails
+        if "error" in FLAGS:
+            GitleaksConfigContextRestrictionTests.test_error = errors
+        if "skip" in FLAGS:
+            GitleaksIgnoreFingerprintTests.test_skip = lambda self: self.skipTest("lock busy")
+        if "crash" in FLAGS:
+            atexit.register(os._exit, 3)
+        ''')
+    # Stands in for betterleaks under the real fixture module; STUB_MODE is how each scan ends. Under
+    # --exit-code 0 a completed scan exits 0 after writing its report (cmd/root.go at v1.8.1, lines 610-646),
+    # so every mode but detections-missing is a scan that did not complete. SIGKILL stands for a signal: a
+    # SIGSEGV would start the host's crash reporter.
+    SCAN_END_STUB = textwrap.dedent("""\
+        #!/usr/bin/env bash
+        [ "$1" = version ] && echo 1.8.1 && exit 0
+        report=""
+        while [ "$#" -gt 0 ]; do
+          [ "$1" = --report-path ] && report="$2"
+          shift
+        done
+        case "$STUB_MODE" in
+          detections-missing) echo null > "$report"; exit 0 ;;
+          partial-scan) echo null > "$report"; exit 1 ;;
+          scan-error) exit 1 ;;
+          no-report) exit 0 ;;
+          exit-139) exit 139 ;;
+          killed) kill -KILL "$$" ;;
+          deadlock) echo 'fatal error: all goroutines are asleep - deadlock!' >&2; exit 2 ;;
+        esac
+        exit 99
+        """)
+
+    def run_script(self, name):
+        """A step's `run: |` script, as the file GitHub writes and runs."""
+        block = step_block(self.job, name)
+        return "\n".join(line[10:] for line in block.split("\n        run: |\n", 1)[1].splitlines()) + "\n"
+
+    def run_step(self, name, stub, environment, cwd=None):
+        """Run step ``name`` as GitHub runs the job's `shell: bash`: `bash --noprofile --norc -eo pipefail {0}`
+        (workflow syntax, jobs.<job_id>.steps[*].shell). RUNNER_TEMP and GITHUB_STEP_SUMMARY are in scratch,
+        ``stub`` is the betterleaks binary and `python3` is this interpreter. Returns the exit status, the
+        output and the step summary."""
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        runner_temp = scratch / "runner-temp"
+        (runner_temp / "betterleaks").mkdir(parents=True)
+        tools = scratch / "bin"
+        tools.mkdir()
+        for path, text in ((runner_temp / "betterleaks" / "betterleaks", stub),
+                           (tools / "python3", f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n')):
+            path.write_text(text, encoding="utf-8")
+            path.chmod(0o755)
+        script = scratch / "step.sh"
+        script.write_text(self.run_script(name), encoding="utf-8")
+        summary = scratch / "summary.md"
+        env = {"PATH": f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", "HOME": str(scratch), "LC_ALL": "C",
+               "PYTHONDONTWRITEBYTECODE": "1", "RUNNER_TEMP": str(runner_temp),
+               "GITHUB_STEP_SUMMARY": str(summary), **environment}
+        proc = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", str(script)], cwd=cwd or scratch,
+                              env=env, capture_output=True, text=True, timeout=120)
+        return (proc.returncode, proc.stdout + proc.stderr,
+                summary.read_text(encoding="utf-8") if summary.exists() else "")
+
+    def scans(self):
+        """Each betterleaks scan command, with its backslash continuation lines joined."""
+        lines, found = self.job.splitlines(), []
+        for index, line in enumerate(lines):
+            if re.search(r'/betterleaks" (?:git|dir) ', line):
+                command = line.strip()
+                while command.endswith("\\"):
+                    index += 1
+                    command = command[:-1] + " " + lines[index].strip()
+                found.append(command)
+        return found
+
+    def test_is_not_a_required_context_and_cannot_be_forced_green(self):
+        ruleset = __import__("json").loads((ROOT / ".github/main-ruleset.json").read_text(encoding="utf-8"))
+        contexts = {check["context"] for rule in ruleset["rules"] if rule["type"] == "required_status_checks"
+                    for check in rule["parameters"]["required_status_checks"]}
+        self.assertIn("secret-scan", contexts)
+        self.assertNotIn(self.JOB, contexts)
+        self.assertNotRegex(self.job, r"(?m)^    name:", "a job name would become its check context")
+        self.assertNotIn("continue-on-error", self.job)
+
+    def test_read_only_hardened_and_uploads_nothing(self):
+        self.assertEqual(scopes(self.job), [{"contents": "read"}])
+        step = first_step(self.job)
+        self.assertIn(HARDEN, step)
+        self.assertIn("egress-policy: audit", step)
+        self.assertIn("persist-credentials: false", step_block(self.job, "Check out repository"))
+        self.assertNotIn("upload-artifact", self.job)
+        self.assertNotIn("GH_TOKEN", self.job)
+
+    def test_runs_bash_with_pipefail(self):
+        """GitHub runs an unspecified shell as `bash -e {0}` and `shell: bash` as
+        `bash --noprofile --norc -eo pipefail {0}` (workflow syntax, jobs.<job_id>.steps[*].shell), so only
+        an explicit bash makes a check that fails inside a pipeline fail its step."""
+        head, steps = self.job.split("\n    steps:\n", 1)
+        self.assertRegex(head, r"(?m)^    defaults:\n      run:\n(?:        #.*\n)*        shell: bash[ \t]*$")
+        self.assertNotRegex(steps, r"(?m)^\s+shell:", "a step must not override the job's bash default")
+
+    def test_binaries_run_only_after_verification(self):
+        cosign = step_block(self.job, "Install cosign")
+        self.assertRegex(cosign, r"(?m)^          COSIGN_SHA256: [0-9a-f]{64}$")
+        order = [cosign.index(marker) for marker in ('"$COSIGN_SHA256" "$RUNNER_TEMP/cosign/cosign" | sha256sum --check',
+                                                     'chmod +x "$RUNNER_TEMP/cosign/cosign"',
+                                                     '"$RUNNER_TEMP/cosign/cosign" version')]
+        self.assertEqual(order, sorted(order))
+        install = step_block(self.job, "Install betterleaks")
+        order = [install.index(marker) for marker in ('cosign" verify-blob',
+                                                      "sha256sum --check --ignore-missing --strict checksums.txt",
+                                                      '"$BETTERLEAKS_SHA256" "$archive" | sha256sum --check',
+                                                      "tar -xzf", "./betterleaks version")]
+        self.assertEqual(order, sorted(order))
+        verify_blob = install[order[0]:order[1]]
+        for constraint in ("--bundle checksums.txt.sigstore.json",
+                           '--certificate-identity-regexp "$SIGNER_IDENTITY_REGEXP"',
+                           "--certificate-oidc-issuer https://token.actions.githubusercontent.com",
+                           "--certificate-github-workflow-repository betterleaks/betterleaks",
+                           '--certificate-github-workflow-ref "refs/tags/v${BETTERLEAKS_VERSION}"',
+                           '--certificate-github-workflow-sha "$SIGNER_COMMIT"',
+                           "--certificate-github-workflow-trigger push"):
+            self.assertIn(constraint, verify_blob)
+        self.assertIn(r"SIGNER_IDENTITY_REGEXP: '^https://github\.com/betterleaks/betterleaks/\.github/workflows/"
+                      r"release\.yml@refs/tags/v1\.8\.1$'", install)
+        self.assertRegex(install, r"(?m)^          SIGNER_COMMIT: [0-9a-f]{40}$")
+        self.assertRegex(install, r"(?m)^          BETTERLEAKS_SHA256: [0-9a-f]{64}$")
+
+    def test_later_steps_need_the_verified_install_and_both_scans_redact(self):
+        self.assertIn("id: install", step_block(self.job, "Install betterleaks"))
+        for name in ("fixture tests with betterleaks", "Scan git history", "Scan working tree"):
+            self.assertEqual(block_if(step_block(self.job, name)),
+                             "${{ !cancelled() && steps.install.outcome == 'success' }}", name)
+        scans = self.scans()
+        self.assertEqual([re.search(r'" (git|dir) ', scan).group(1) for scan in scans], ["git", "dir"])
+        for scan in scans:
+            # A bare --redact redacts 100%; --redact=0 would print values (cmd/root.go lines 94-95).
+            self.assertRegex(scan, r"(?:^|\s)--redact(?:=100)?(?:\s|$)")
+            self.assertIn("--config .gitleaks.toml", scan)
+            # gitleaks 8.30.1 opens no archives by default (its cmd/root.go line 92) and betterleaks
+            # 1.8.1 opens them to depth 8 (cmd/root.go line 103); an ignore-file path always loads the
+            # reviewed fingerprints (cmd/root.go lines 450-455).
+            self.assertIn("--max-archive-depth 0", scan)
+            self.assertIn("--gitleaks-ignore-path .gitleaksignore", scan)
+        self.assertNotIn("--validation", self.job)
+        self.assertNotIn("--experiments", self.job)
+
+    def test_findings_exit_0_through_the_scanners_own_option(self):
+        """Report-only through betterleaks's own option: each scan passes --exit-code 0 (cmd/root.go line 82,
+        default 1), which sets the exit status for findings only (lines 644-645). A scan error exits 1 before
+        it is used (lines 640-641) and a report that cannot be written is fatal (line 636). Each scan step keeps
+        that status and exits with it, at its end and nowhere else."""
+        scans = self.scans()
+        self.assertEqual(len(scans), 2)
+        for scan in scans:
+            self.assertEqual(re.findall(r"--exit-code(?:=|\s+)(\S+)", scan), ["0"], scan)
+            self.assertTrue(scan.endswith(" || status=$?"), scan)
+        for name in self.SCAN_STEPS:
+            script = uncommented(self.run_script(name))
+            self.assertEqual(re.findall(r"\bstatus=\S*", script), ["status=0", "status=$?"], name)
+            self.assertEqual(re.findall(r"(?m)^\s*exit\b.*$", script), ['exit "$status"'], name)
+            self.assertEqual(script.rstrip().splitlines()[-1], 'exit "$status"', name)
+
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("jq"), "the scan steps need bash and jq, as the runner has")
+    def test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule(self):
+        """With a stand-in scanner, each scan step exits 0 with findings or none and 1 on a scan error, and its
+        step summary counts findings by rule without a value or a path."""
+        sentinel = "-".join(("never", "in", "the", "summary"))
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        report = scratch / "report.json"
+        report.write_text(json.dumps([{"RuleID": rule, "File": path, "StartLine": line, "Secret": sentinel,
+                                       "Match": sentinel}
+                                      for rule, path, line in (("rule-alpha", "one/first.txt", 3),
+                                                               ("rule-alpha", "two/second.txt", 5),
+                                                               ("rule-beta", "one/first.txt", 9))]),
+                          encoding="utf-8")
+        for name in self.SCAN_STEPS:
+            for mode, expected in (("findings", 0), ("clean", 0), ("scan-error", 1)):
+                with self.subTest(step=name, mode=mode):
+                    rc, output, summary = self.run_step(name, self.SCAN_STUB,
+                                                        {"STUB_MODE": mode, "STUB_REPORT": str(report)})
+                    self.assertEqual(rc, expected, output)
+                    self.assertNotIn(sentinel, output + summary)
+                    self.assertNotIn("first.txt", summary)
+                    counts = re.findall(r"(?m)^(Findings: \d+|- [\w-]+: \d+)$", summary)
+                    self.assertEqual(counts, ["Findings: 0"] if mode == "clean"
+                                     else ["Findings: 3", "- rule-alpha: 2", "- rule-beta: 1"], summary)
+                    self.assertIn(f"betterleaks exit status: {expected}", summary)
+
+    @unittest.skipUnless(shutil.which("bash"), "the fixture step needs bash, as the runner has")
+    def test_fixture_step_reports_assertion_failures_and_fails_on_anything_else(self):
+        """Over a stand-in test module, the fixture step exits 0 when every problem is an assertion failure.
+        It fails on an error, on no test run (unittest exits 5 since Python 3.12), on any other unittest exit
+        status and on a betterleaks version other than the pinned one. Its step summary holds unittest's
+        counts and never a failure message."""
+        checkout = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, checkout, ignore_errors=True)
+        (checkout / "tests").mkdir()
+        (checkout / "tests" / "__init__.py").write_text("", encoding="utf-8")
+        (checkout / "tests" / "test_gitleaks_config.py").write_text(self.FIXTURE_MODULE, encoding="utf-8")
+        no_test_run = (5, "NO TESTS RAN") if sys.version_info >= (3, 12) else (0, "OK")
+        for outcome, version, expected, status_line in (("ok", "1.8.1", 0, "OK"),
+                                                        ("ok+fail", "1.8.1", 0, "FAILED (failures=1)"),
+                                                        ("ok+fail+skip", "1.8.1", 0, "FAILED (failures=1, skipped=1)"),
+                                                        ("ok+error", "1.8.1", 1, "FAILED (errors=1)"),
+                                                        ("ok+fail+error", "1.8.1", 1, "FAILED (failures=1, errors=1)"),
+                                                        ("ok+fail+crash", "1.8.1", 3, "FAILED (failures=1)"),
+                                                        ("none", "1.8.1", *no_test_run),
+                                                        ("ok", "1.8.0", 1, None)):
+            with self.subTest(outcome=outcome, version=version):
+                rc, output, summary = self.run_step(self.FIXTURE_STEP, self.VERSION_STUB,
+                                                    {"FIXTURE_OUTCOME": outcome, "STUB_VERSION": version,
+                                                     "GITLEAKS_TESTS_REQUIRED": "1"}, cwd=checkout)
+                # Indented, so the stand-in's own FAIL:/ERROR: headers do not read as this test's.
+                self.assertEqual(rc, expected, textwrap.indent(output, "    | "))
+                if status_line is None:
+                    self.assertEqual(summary, "", "the version check comes before the tests")
+                    continue
+                self.assertRegex(summary, r"(?m)^Ran \d+ tests? in [\d.]+s; ")
+                self.assertIn(f"; {status_line}; unittest exit status ", summary)
+                self.assertNotIn("a detection difference", summary)
+                self.assertNotIn("not an assertion", summary)
+
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "the fixture step needs bash and git, as the runner has")
+    def test_fixture_step_fails_when_a_scan_does_not_complete_in_the_real_fixture_module(self):
+        """Cross-family review (2026-09-28, P2): a scanner error must not pass the fixture step as a detection
+        difference. The step runs over the real tests/test_gitleaks_config.py, copied with .gitleaks.toml and
+        .gitleaksignore into a checkout outside any repository (the fingerprint test that commits in a worktree
+        of HEAD skips there), and a stand-in scanner. A scan that does not complete (exit 1 with or without a
+        report, 139, a signal, a Go runtime error whose message names a lock, exit 0 without a report) is a
+        unittest error in every scanning test, so the step fails. A completed scan that misses the detections
+        is a failure, which the step reports without failing."""
+        checkout = Path(tempfile.mkdtemp()).resolve()
+        self.addCleanup(shutil.rmtree, checkout, ignore_errors=True)
+        (checkout / "tests").mkdir()
+        (checkout / "tests" / "__init__.py").write_text("", encoding="utf-8")
+        for name in ("tests/test_gitleaks_config.py", ".gitleaks.toml", ".gitleaksignore"):
+            shutil.copyfile(ROOT / name, checkout / name)
+        environment = {"GITLEAKS_TESTS_REQUIRED": "1", "GIT_CEILING_DIRECTORIES": str(checkout.parent)}
+        for mode in ("detections-missing", "partial-scan", "scan-error", "no-report", "exit-139", "killed", "deadlock"):
+            with self.subTest(mode=mode):
+                rc, output, summary = self.run_step(self.FIXTURE_STEP, self.SCAN_END_STUB,
+                                                    {**environment, "STUB_MODE": mode}, cwd=checkout)
+                # Indented, so the real module's own FAIL:/ERROR: headers do not read as this test's.
+                quoted = textwrap.indent(output, "    | ")
+                status = re.search(r"(?m)^Ran \d+ tests? in [\d.]+s; (.+); unittest exit status (\d+)$", summary)
+                self.assertIsNotNone(status, quoted)
+                if mode == "detections-missing":
+                    self.assertEqual((rc, status.group(2)), (0, "1"), quoted)
+                    self.assertRegex(status.group(1), r"^FAILED \(failures=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
+                else:
+                    self.assertEqual((rc, status.group(2)), (1, "1"), quoted)
+                    self.assertRegex(status.group(1), r"^FAILED \(errors=[1-9]\d*(?:, skipped=\d+)?\)$", quoted)
+
+    def test_fixture_tests_leave_out_the_unredacted_history_class(self):
+        """Exactly the three fixture classes run. GitleaksBranchAncestryHistoryTests is left out: the job's
+        redacted history scan covers that ground. Until 2026-09-28 that class also scanned without --redact
+        and quoted its findings; it now redacts (tests/test_gitleaks_config.py ScannerErrorTests.test_f)."""
+        step = step_block(self.job, "fixture tests with betterleaks")
+        self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
+        self.assertEqual(len(unittest_invocations(self.job)), 1, "the fixture step is the job's only unittest run")
+        (args,) = unittest_invocations(step)
+        (module,) = re.findall(r"(?m)^\s*m=(\S+)\s*$", step)
+        named = [arg.strip('"').replace("$m", module) for arg in args if arg not in QUIET_FLAGS]
+        self.assertEqual(named, [f"tests.test_gitleaks_config.{name}" for name in self.FIXTURE_CLASSES])
+
+    def test_no_suppression_channel_that_only_betterleaks_reads(self):
+        """betterleaks 1.8.1 reads three suppression channels that gitleaks does not: a .betterleaksignore
+        in the scanned directory (cmd/root.go lines 281-291 and 465-469), a .betterleaks.toml wherever a run
+        gives no --config (lines 269-279), and an inline allow comment that names betterleaks
+        (detect/detect.go lines 57 and 962). None of them gets the review that .gitleaksignore and
+        .gitleaks.toml get, so none may exist."""
+        tracked = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
+                                 check=True).stdout.decode("utf-8", "replace").split("\0")
+        for name in (".betterleaksignore", ".betterleaks.toml"):
+            self.assertFalse((ROOT / name).exists(), f"{name} at the repository root")
+            self.assertEqual([path for path in tracked if path.rsplit("/", 1)[-1] == name], [], name)
+        marker = "betterleaks" + ":allow"  # assembled, so this file does not carry the marker itself
+        grep = subprocess.run(["git", "-C", str(ROOT), "grep", "-l", "-I", "-F", "-e", marker],
+                              capture_output=True, text=True)
+        self.assertEqual(grep.returncode, 1, f"{marker!r} in tracked files: {grep.stdout.split()} {grep.stderr}")
+
+
+class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
+    """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
+    "validate-macos required (2026-09-25)"): validate-macos must report a status on every
+    pull_request (a required check that never reports blocks the PR forever), while the
+    three real-install bootstrap-* jobs stay path-gated exactly as before."""
+
+    text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+    job_map = jobs(text)
+
+    def test_pull_request_trigger_has_no_path_filter(self):
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
+        self.assertNotIn("paths", pull_request)
+
+    def test_validate_macos_is_reachable_on_every_pull_request(self):
+        # No `needs:` (so it is never withheld pending another job) and no job-level `if:`
+        # (so no expression can skip the job itself for a pull_request): a required check
+        # must be reachable on every PR. Step-level `if: always()` (log upload) is fine and
+        # deliberately not what this checks.
+        job = self.job_map["validate-macos"]
+        header = job.split("\n    steps:\n", 1)[0]
+        self.assertNotIn("needs:", header)
+        self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
+
+    def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
+        # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
+        # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
+        # an implicit `success()`, and `changes` itself only runs `if:
+        # github.event_name == 'pull_request'`, so on push/schedule/workflow_dispatch
+        # `changes` is skipped and a bare `if: github.event_name != 'pull_request' ||
+        # needs.changes.outputs.bootstrap == 'true'` (no status function) is never even
+        # evaluated -- the implicit success() check fails first and the job is skipped
+        # too. Confirmed live: dispatch run 36085789483 showed `changes` skipped and all
+        # three bootstrap-* jobs completing as skipped (docs/decisions/
+        # 2026-09-22-github-automation-closure.md, "validate-macos required
+        # (2026-09-25)", "Measured (before the fix)"). The fix needs both a status
+        # function (`!cancelled()` or `always()`) so the `if:` is evaluated at all when
+        # `changes` was skipped, and `!= 'false'` rather than `== 'true'` so a `changes`
+        # job that itself failed or was cancelled (empty output, not the string
+        # `'false'`) still runs these jobs (`changes`' own fail-safe default is
+        # `bootstrap=true`, never a skip).
+        for job_id in ("bootstrap-linux", "bootstrap-macos", "bootstrap-macos-brew"):
+            job = self.job_map[job_id]
+            self.assertIn("needs: changes", job, job_id)
+            condition = block_if(job)
+            self.assertIsNotNone(condition, job_id)
+            self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
+                              f"{job_id}: if: needs a status function (!cancelled() or always()) "
+                              f"or an implicit success() from `needs: changes` skips it whenever "
+                              f"changes itself is skipped (every push/schedule/dispatch run); got: {condition!r}")
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", condition, job_id)
+            self.assertNotIn("needs.changes.outputs.bootstrap == 'true'", condition,
+                              f"{job_id}: '== ' true would keep the fail-open behaviour a "
+                              f"missing/empty output (changes skipped, failed or cancelled) needs "
+                              f"'!= \\'false\\'' to avoid")
+            self.assertIn("github.event_name != 'pull_request'", condition, job_id)
+
+    def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
+        # Proof the strengthened assertions above are not vacuous: the exact `if:` text
+        # this branch shipped before the fix round (a bare `if:`, no status function, and
+        # `== 'true'`) must fail them.
+        pre_fix_condition = "github.event_name != 'pull_request' || needs.changes.outputs.bootstrap == 'true'"
+        with self.assertRaises(AssertionError):
+            self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
+        with self.assertRaises(AssertionError):
+            self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
+
+    def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
+        job = self.job_map["changes"]
+        self.assertEqual(block_if(job), "github.event_name == 'pull_request'")
+        # The push trigger's `paths:` list stays the source of truth this job's own
+        # PATTERNS array must match once both are normalized to the same glob spelling;
+        # this is a textual comparison of the two lists, not a re-derivation of GitHub's
+        # own `paths:` matching semantics (a case pattern's single `*` matches `/`, so it
+        # is a strictly wider match than `paths:`'s `**` -- always in the safe,
+        # over-matching direction; see the job's own in-file comment).
+        trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        push = trigger.split("push:", 1)[1].split("pull_request:", 1)[0]
+        push_paths = re.findall(r"(?m)^      - '([^']+)'$", push)
+        self.assertTrue(push_paths)
+
+        def normalize(path):
+            # PATTERNS uses bash case-glob syntax ('adoption/*'); push uses
+            # gitignore-style globs ('adoption/**'). Both mean "everything under".
+            return path.replace("/**", "/*")
+
+        job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
+        self.assertTrue(job_patterns)
+        self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
+
+    def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors(self):
+        # Item 2/3 of the independent review: a missing payload SHA or a failed `git
+        # diff` must still write bootstrap=true (never leave the job to fail and skip
+        # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
+        # so a non-ASCII quoted filename still matches a PATTERNS glob.
+        job = self.job_map["changes"]
+        script = step_block(job, "Detect whether any bootstrap-relevant path changed")
+        (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
+        self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
+        # `shell: bash` runs as `bash -eo pipefail`, so errexit must be turned off explicitly.
+        self.assertRegex(script, r"(?m)^\s+set \+e\s*$", "errexit is on under shell: bash unless the script runs set +e")
+        self.assertIn('diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }', script)
+        self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
+
+        def if_block(needle):
+            # A same-indentation-anchored match (not a naive string split on "fi", which
+            # false-positives inside "$diff_file"): captures from the matched "if" line
+            # through the "fi" at the same leading whitespace.
+            match = re.search(rf"(?ms)^([ \t]*)if\b[^\n]*{re.escape(needle)}.*?\n(.*?)\n\1fi\b", script)
+            self.assertIsNotNone(match, needle)
+            return match.group(0)
+
+        missing_sha_block = if_block('-z "${BASE_SHA:-}"')
+        self.assertIn('echo "bootstrap=true"', missing_sha_block)
+        self.assertIn("exit 0", missing_sha_block)
+        self.assertIn("git diff -z --no-renames --name-only", script)
+        diff_failure_block = if_block("git diff -z")
+        self.assertIn('echo "bootstrap=true"', diff_failure_block)
+        self.assertIn("exit 0", diff_failure_block)
+        self.assertIn("read -r -d ''", script)
+
+
+class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):
+    """`can_approve_pull_request_reviews` stays on because one toggle also lets GITHUB_TOKEN
+    create the catalog-freshness `propose` PR (docs/decisions/2026-09-23-bot-pr-dispatch.md,
+    "Approval guard (2026-09-25)"). Since the setting also lets any workflow approve a PR, these
+    cross-workflow checks keep the approve capability unused: `pull-requests: write` only on
+    `catalog-freshness.yml:propose` (whose exact scopes tests/test_catalog_freshness_propose.py
+    pins), no `actions: write` (the scope `POST /actions/runs/{run_id}/approve` needs), and no
+    review/approve call anywhere."""
+
+    texts = {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.y*ml"))}
+
+    def test_every_permissions_key_is_a_parsed_block(self):
+        # permission_blocks() only parses block-form mappings; any other form would slip past the
+        # scope checks below, so every non-comment `permissions:` key must be one it parsed.
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            self.assertNotIn("write-all", body, name)
+            self.assertNotRegex(body, r"(?m)^\s*permissions:[ \t]*[^\s#]", f"{name}: inline permissions form")
+            keys = len(re.findall(r"(?m)^\s*permissions:", body))
+            self.assertEqual(keys, len(permission_blocks(body)), f"{name}: unparsed permissions key")
+
+    def test_pull_requests_write_is_granted_only_to_the_propose_job(self):
+        grants = set()
+        for name, text in self.texts.items():
+            sections = {"<top-level>": text.split("\njobs:\n", 1)[0], **jobs(text)}
+            for section, section_text in sections.items():
+                if any(block.get("pull-requests") == "write" for block in scopes(section_text)):
+                    grants.add(f"{name}:{section}")
+        self.assertEqual(grants, {"catalog-freshness.yml:propose"})
+
+    def test_no_workflow_holds_actions_write(self):
+        for name, text in self.texts.items():
+            for block in scopes(text):
+                self.assertNotEqual(block.get("actions"), "write", name)
+
+    def test_no_workflow_reviews_or_approves_a_pull_request(self):
+        patterns = (r"gh\s+pr\s+review", r"--approve\b", r"pulls/[^/\s]+/reviews", r"\bAPPROVE\b",
+                    r"(?mi)^\s*(?:- )?uses:\s*\S*approve")
+        for name, text in self.texts.items():
+            body = uncommented(text)
+            for pattern in patterns:
+                self.assertNotRegex(body, pattern, name)
+
+
+class ActionsAllowListTests(unittest.TestCase):
+    """The Actions allow-list target (docs/decisions/2026-09-22-github-automation-closure.md,
+    "2026-09-25 re-check against current practice"): every `uses:` in every workflow is either
+    GitHub-owned or matches .github/actions-permissions.json's own patterns_allowed, so moving
+    the live allowed_actions setting from "all" to "selected" with that file's
+    github_owned_allowed/patterns_allowed would not block anything this repository already runs."""
+
+    permissions = __import__("json").loads((ROOT / ".github/actions-permissions.json").read_text(encoding="utf-8"))
+
+    def test_settings_target_selected_actions_with_sha_pinning_required(self):
+        self.assertEqual(self.permissions["allowed_actions"], "selected")
+        self.assertIs(self.permissions["sha_pinning_required"], True)
+
+    def test_every_uses_is_github_owned_or_in_the_pattern_allow_list(self):
+        # Reuses PinningTests' own `uses:` extraction (the same regex, the same
+        # per-line walk over every workflow file), skipping a local `./` action and
+        # a `docker://` one exactly as that scan does, then checks ownership instead
+        # of the pin format.
+        patterns = self.permissions["patterns_allowed"]
+        not_allowed = []
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                match = re.search(r"uses:\s*([^\s#]+)", line)
+                if not match:
+                    continue
+                target = match.group(1)
+                if target.startswith("./") or target.startswith("docker://"):
+                    continue
+                owner = target.split("/", 1)[0]
+                if owner in {"actions", "github"}:
+                    continue
+                if any(fnmatch.fnmatch(target, pattern) for pattern in patterns):
+                    continue
+                not_allowed.append(f"{path.name}:{line_number}: {target}")
+        self.assertEqual(not_allowed, [])
+
 
 if __name__ == "__main__":
     unittest.main()

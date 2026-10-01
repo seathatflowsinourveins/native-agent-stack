@@ -104,7 +104,10 @@ SCRUB_KEEP = ("winner_keys", "why_selected", "winner_evidence_class", "winner_ev
               "challenger_preferred", "overturn_when", "overturn_protocol", "open_gaps", "sources_read", "limits")
 # Words that can name a lane in the kept prose. Only reported (index.json identity_mentions), never
 # redacted: a candidate can legitimately be called "codex" or "claude".
-IDENTITY_WORDS = re.compile(r"\b(claude|codex|anthropic|openai|opus|sonnet|haiku|gpt-[\w.-]+)\b", re.IGNORECASE)
+# The GPT-6 and Claude family names (astra, fable, mythos) as bare words too; gpt-6-sol, gpt-6-luna and
+# gpt-5.6-terra are caught by the gpt- form, since bare sol, luna and terra are ordinary words.
+IDENTITY_WORDS = re.compile(r"\b(claude|codex|anthropic|openai|opus|sonnet|haiku|fable|mythos|astra|gpt-[\w.-]+)\b",
+                            re.IGNORECASE)
 MIN_WHY = 60
 DEFAULT_TIMEOUT = 900.0
 INPUTS_DIR = "adjudication-inputs"
@@ -809,6 +812,9 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
         event_model = found_model or event_model
         if result["timed_out"] or result["exit_code"] != 0:
             failure = "timed out" if result["timed_out"] else f"codex exec exited {result['exit_code']}"
+            detail = codex_lane.child_failure_detail(result)
+            if detail:
+                print(f"adjudicate: {failure}: {detail}", file=sys.stderr)
             continue
         try:
             data = load_json(out_tmp)
@@ -887,7 +893,8 @@ def run_codex(args) -> int:
         return 2
     with contextlib.ExitStack() as stack:
         if pending:
-            issue = codex_lane.codex_home_issue(work_dir, repo)
+            issue = (codex_lane.codex_home_issue(work_dir, repo) or codex_lane.blind_path_issue()
+                     or codex_lane.codex_launch_issue())
             if issue:
                 print(f"adjudicate: {issue}", file=sys.stderr)
                 return 2
@@ -1707,7 +1714,8 @@ def parse_args(argv=None):
     codex.add_argument("--model", required=True,
                        help="Model passed to codex exec -m and recorded on each judgment; must match the openai "
                             "pattern of scripts/landscape.py FAMILY_MODEL_PATTERNS.")
-    codex.add_argument("--effort", default="high")
+    codex.add_argument("--effort", default="max",
+                       help="model_reasoning_effort for the judge and the refuter (default max, the standing GPT-6 lane setting; a judgment made at another effort is rerun).")
     codex.add_argument("--jobs", type=int, default=1)
     codex.add_argument("--layers", default=None)
     codex.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT)

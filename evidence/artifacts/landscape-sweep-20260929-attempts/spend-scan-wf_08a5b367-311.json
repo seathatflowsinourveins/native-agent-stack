@@ -1,0 +1,524 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack evidence/artifacts/claude-spend-scan.py.txt",
+  "tool_commit": "b2767df2",
+  "tool_sha256": "44be91b27be36efa3fb7b75c565ee6fd6c33d9020abffef69bdf9f845d4e7ab4",
+  "command": "python3 claude_spend_scan.py --root <scratch root holding the run's agent transcripts as <project>/<session>/subagents/workflows/wf_08a5b367-311/agent-*.jsonl> --workers 4",
+  "group_rule": "one scan per group over that group's transcripts; the agent ids, labels and phases come from child-usage-wf_08a5b367-311.json (children and superseded_attempts); round 'follow-up' is phase Follow-up, every other phase is 'first'; role is the label before the colon",
+  "exit_code": 0,
+  "raw_output_sha256": "9658cde1cb37f904d68757582ec7316ccbd42d1f35f966370d0931ad0d3fb09a",
+  "measured_at_utc": "2026-09-29T16:06:55Z",
+  "note": "List-price dollars from provider usage in the retained native transcripts (message ids counted once): executor tokens with cache writes at the 5m class (the only class these transcripts report) plus advisor inference from usage.iterations[type=advisor_message], priced at the advisor model's rates. child-usage.mjs does not count advisor iterations: the retained child-usage record prices to executor_usd at the same rates and cache class. wall_clock is a one-off read of the assistant-message timestamps of the same 140 transcripts (first, last, longest gap between consecutive calls). The GPT-6 tokens are Codex usage, retained per job in the run's returns, and are not in these dollars."
+ },
+ "whole_run": {
+  "transcripts": 140,
+  "api_calls": 3385,
+  "total_usd": 425.12,
+  "model_usd": {
+   "claude-opus-5-5": 399.96,
+   "claude-sonnet-5-5": 25.16
+  },
+  "advisor_usd": 101.14,
+  "advisor_iterations": 117,
+  "executor_usd": 323.98,
+  "effort_calls": {
+   "max": {
+    "calls": 3385,
+    "output_tokens": 7705284
+   }
+  },
+  "scan": {
+   "advisor": {
+    "by_model": {
+     "advisor(claude-opus-5-5)": {
+      "cost_usd": 101.14,
+      "input_tokens": 20817807,
+      "iterations": 117,
+      "output_tokens": 893237
+     }
+    },
+    "cost_share": 0.237901,
+    "cost_usd": 101.14,
+    "iterations": 117,
+    "iterations_by_utc_date": {
+     "2026-09-29": {
+      "advisor(claude-opus-5-5)": 117
+     }
+    }
+   },
+   "api_calls": 3385,
+   "cache_creation": {
+    "calls_where_split_exceeds_reported": 0,
+    "calls_with_unsplit_remainder": 117,
+    "miss_gap_5m_1h_5m_class_tokens": 2165152,
+    "miss_gap_5m_1h_cache_write_tokens": 2165152,
+    "miss_gap_5m_1h_events": 52,
+    "miss_gap_le_5m_5m_class_tokens": 392779,
+    "miss_gap_le_5m_cache_write_tokens": 392779,
+    "miss_gap_le_5m_events": 3,
+    "reported_top_level": 21106953,
+    "split_1h": 0,
+    "split_5m": 20769373,
+    "unsplit_remainder": 337580
+   },
+   "cache_creation_by_population": {
+    "workflow": {
+     "calls_where_split_exceeds_reported": 0,
+     "calls_with_unsplit_remainder": 117,
+     "miss_gap_5m_1h_5m_class_tokens": 2165152,
+     "miss_gap_5m_1h_cache_write_tokens": 2165152,
+     "miss_gap_5m_1h_events": 52,
+     "miss_gap_le_5m_5m_class_tokens": 392779,
+     "miss_gap_le_5m_cache_write_tokens": 392779,
+     "miss_gap_le_5m_events": 3,
+     "reported_top_level": 21106953,
+     "split_1h": 0,
+     "split_5m": 20769373,
+     "unsplit_remainder": 337580
+    }
+   },
+   "cache_creation_children": {
+    "calls_where_split_exceeds_reported": 0,
+    "calls_with_unsplit_remainder": 117,
+    "miss_gap_5m_1h_5m_class_tokens": 2165152,
+    "miss_gap_5m_1h_cache_write_tokens": 2165152,
+    "miss_gap_5m_1h_events": 52,
+    "miss_gap_le_5m_5m_class_tokens": 392779,
+    "miss_gap_le_5m_cache_write_tokens": 392779,
+    "miss_gap_le_5m_events": 3,
+    "reported_top_level": 21106953,
+    "split_1h": 0,
+    "split_5m": 20769373,
+    "unsplit_remainder": 337580
+   },
+   "cache_misses": {
+    "gap_5m_1h_5m_class_tokens": 2165152,
+    "gap_5m_1h_cache_write_tokens": 2165152,
+    "gap_5m_1h_events": 52,
+    "gap_le_5m_5m_class_tokens": 392779,
+    "gap_le_5m_cache_write_tokens": 392779,
+    "gap_le_5m_events": 3
+   },
+   "children": {
+    "calls_max": 56,
+    "calls_p50": 28,
+    "calls_p75": 38,
+    "calls_p90": 45,
+    "calls_p99": 55,
+    "count": 140,
+    "median_first_call_context_tokens": 54044,
+    "over_60_calls": {
+     "count": 0,
+     "share_of_all_cost": 0.0
+    }
+   },
+   "children_by_agent_type": {
+    "landscape-sweep-worker": {
+     "cost_share": 0.936351,
+     "count": 86,
+     "median_calls": 36,
+     "median_first_call_context_tokens": 56011
+    },
+    "workflow-subagent": {
+     "cost_share": 0.063649,
+     "count": 54,
+     "median_calls": 6,
+     "median_first_call_context_tokens": 51608
+    }
+   },
+   "client_versions_by_transcript_file": {
+    "2.1.284": 140
+   },
+   "context_bins": {
+    "100-200K": {
+     "cache_read_tokens": 293742712,
+     "calls": 1994,
+     "cost_usd": 238.94
+    },
+    "200-400K": {
+     "cache_read_tokens": 62175992,
+     "calls": 245,
+     "cost_usd": 83.28
+    },
+    "400-700K": {
+     "cache_read_tokens": 0,
+     "calls": 0,
+     "cost_usd": 0
+    },
+    "50-100K": {
+     "cache_read_tokens": 70450305,
+     "calls": 1026,
+     "cost_usd": 93.11
+    },
+    "<50K": {
+     "cache_read_tokens": 3122092,
+     "calls": 120,
+     "cost_usd": 9.8
+    },
+    ">=700K": {
+     "cache_read_tokens": 0,
+     "calls": 0,
+     "cost_usd": 0
+    }
+   },
+   "cost_share_by_class": {
+    "advisor": 0.237901,
+    "cr": 0.202058,
+    "cw1": 0.0,
+    "cw5": 0.215386,
+    "cwx": 0.003873,
+    "in": 0.000139,
+    "out": 0.340642
+   },
+   "cost_usd_list_price": 425.12,
+   "default_typed_children": {
+    "cost_share": 0.063649,
+    "count": 54,
+    "count_share": 0.385714,
+    "median_calls": 6,
+    "median_first_call_context_tokens": 51608,
+    "types": [
+     "Explore",
+     "claude",
+     "general-purpose",
+     "workflow-subagent"
+    ]
+   },
+   "effort_calls": {
+    "max": {
+     "calls": 3385,
+     "output_tokens": 7705284
+    }
+   },
+   "executor_class_tokens": {
+    "cr": 429491101,
+    "cw1": 0,
+    "cw5": 20769373,
+    "cwx": 337580,
+    "in": 16985,
+    "out": 7705284
+   },
+   "mcp_calls_by_server": {
+    "plugin_context-mode_context-mode": 1994
+   },
+   "model_cost_share": {
+    "claude-opus-5-5": 0.940816,
+    "claude-sonnet-5-5": 0.059184
+   },
+   "model_cost_usd": {
+    "claude-opus-5-5": 399.96,
+    "claude-sonnet-5-5": 25.16
+   },
+   "populations": {
+    "workflow": {
+     "api_calls": 3385,
+     "cost_share": 1.0,
+     "cost_usd": 425.12,
+     "files": 140
+    }
+   },
+   "scanned": {
+    "files_with_calls": 140,
+    "projects": 1,
+    "since": null,
+    "transcript_files": 140
+   },
+   "session_trees": {
+    "count": 1,
+    "top_11_share": 1.0,
+    "top_1_share": 1.0,
+    "top_4_share": 1.0,
+    "trees_covering_50pct": 1,
+    "trees_covering_80pct": 1
+   },
+   "skill_tool_calls": {
+    "top": [
+     [
+      "supply-chain-risk-auditor",
+      80
+     ],
+     [
+      "fp-check",
+      67
+     ],
+     [
+      "iterative-retrieval",
+      34
+     ],
+     [
+      "search-first",
+      30
+     ]
+    ],
+    "total": 211
+   },
+   "thinking_tokens_share_of_output": 0.65908,
+   "tokens_by_model": {
+    "advisor(claude-opus-5-5)": {
+     "calls": 117,
+     "cr": 0,
+     "cw5": 0,
+     "in": 20817807,
+     "out": 893237
+    },
+    "claude-opus-5-5": {
+     "calls": 3029,
+     "calls_with_unsplit_cache_write": 111,
+     "cr": 411814194,
+     "cw1": 0,
+     "cw5": 15856457,
+     "cw_reported": 16177511,
+     "cwx": 321054,
+     "in": 12648,
+     "out": 6776019,
+     "think": 4740265,
+     "unsplit_cache_write_usd": 1.61
+    },
+    "claude-sonnet-5-5": {
+     "calls": 356,
+     "calls_with_unsplit_cache_write": 6,
+     "cr": 17676907,
+     "cw1": 0,
+     "cw5": 4912916,
+     "cw_reported": 4929442,
+     "cwx": 16526,
+     "in": 4337,
+     "out": 929265,
+     "think": 338133,
+     "unsplit_cache_write_usd": 0.04
+    }
+   },
+   "tool_calls": {
+    "builtin_top": [
+     [
+      "Bash",
+      932
+     ],
+     [
+      "Skill",
+      211
+     ],
+     [
+      "Read",
+      159
+     ],
+     [
+      "Write",
+      150
+     ],
+     [
+      "WebSearch",
+      138
+     ],
+     [
+      "StructuredOutput",
+      131
+     ],
+     [
+      "ToolSearch",
+      86
+     ],
+     [
+      "Edit",
+      6
+     ]
+    ],
+    "mcp_total": 1994,
+    "total": 3807
+   },
+   "toolsearch_loads_by_server": {
+    "(builtin or unknown)": 84,
+    "plugin_context-mode_context-mode": 344,
+    "qmd": 12,
+    "serena": 4
+   },
+   "totals_comparable_to_ccusage": {
+    "cacheCreationTokens": 20769373,
+    "cacheReadTokens": 429491101,
+    "inputTokens": 20834792,
+    "note": "executor plus advisor tokens; cache creation is the 5m plus 1h split, without the unsplit remainder",
+    "outputTokens": 8598521
+   },
+   "unpriced_model_tokens": {},
+   "unsplit_cache_write_cost_usd": 1.65,
+   "window": {
+    "first_call_date": "2026-09-29",
+    "last_call_date": "2026-09-29"
+   }
+  }
+ },
+ "wall_clock": {
+  "first_call_utc": "2026-09-29T06:58:29Z",
+  "last_call_utc": "2026-09-29T14:03:42Z",
+  "elapsed_hours": 7.09,
+  "longest_idle_gap": {
+   "hours": 2.61,
+   "from_utc": "2026-09-29T08:44:43Z",
+   "to_utc": "2026-09-29T11:21:20Z"
+  }
+ },
+ "rounds": {
+  "first": {
+   "children": 110,
+   "api_calls": 2677,
+   "total_usd": 337.1,
+   "advisor_usd": 79.32,
+   "advisor_iterations": 90
+  },
+  "follow-up": {
+   "children": 30,
+   "api_calls": 708,
+   "total_usd": 88.02,
+   "advisor_usd": 21.81,
+   "advisor_iterations": 27
+  }
+ },
+ "roles": {
+  "first/critic/children": {
+   "children": 1,
+   "api_calls": 36,
+   "total_usd": 5.5,
+   "advisor_usd": 0.72,
+   "advisor_iterations": 1
+  },
+  "first/discover/children": {
+   "children": 20,
+   "api_calls": 825,
+   "total_usd": 114.48,
+   "advisor_usd": 29.92,
+   "advisor_iterations": 33
+  },
+  "first/discover/superseded": {
+   "children": 2,
+   "api_calls": 73,
+   "total_usd": 7.9,
+   "advisor_usd": 1.31,
+   "advisor_iterations": 2
+  },
+  "first/gpt6-discover/children": {
+   "children": 20,
+   "api_calls": 109,
+   "total_usd": 7.0,
+   "advisor_usd": 0.0,
+   "advisor_iterations": 0
+  },
+  "first/gpt6-refute-fit/children": {
+   "children": 20,
+   "api_calls": 154,
+   "total_usd": 13.53,
+   "advisor_usd": 1.07,
+   "advisor_iterations": 3
+  },
+  "first/gpt6-refute-fit/superseded": {
+   "children": 2,
+   "api_calls": 9,
+   "total_usd": 0.84,
+   "advisor_usd": 0.0,
+   "advisor_iterations": 0
+  },
+  "first/refute-facts/children": {
+   "children": 20,
+   "api_calls": 655,
+   "total_usd": 82.87,
+   "advisor_usd": 19.46,
+   "advisor_iterations": 22
+  },
+  "first/refute-facts/superseded": {
+   "children": 3,
+   "api_calls": 93,
+   "total_usd": 9.2,
+   "advisor_usd": 1.99,
+   "advisor_iterations": 2
+  },
+  "first/refute-fit/children": {
+   "children": 20,
+   "api_calls": 711,
+   "total_usd": 94.45,
+   "advisor_usd": 24.86,
+   "advisor_iterations": 27
+  },
+  "first/refute-fit/superseded": {
+   "children": 2,
+   "api_calls": 12,
+   "total_usd": 1.33,
+   "advisor_usd": 0.0,
+   "advisor_iterations": 0
+  },
+  "follow-up/discover/children": {
+   "children": 6,
+   "api_calls": 263,
+   "total_usd": 32.48,
+   "advisor_usd": 9.09,
+   "advisor_iterations": 10
+  },
+  "follow-up/gpt6-discover/children": {
+   "children": 6,
+   "api_calls": 44,
+   "total_usd": 2.64,
+   "advisor_usd": 0.24,
+   "advisor_iterations": 1
+  },
+  "follow-up/gpt6-refute-fit/children": {
+   "children": 6,
+   "api_calls": 40,
+   "total_usd": 3.05,
+   "advisor_usd": 0.59,
+   "advisor_iterations": 2
+  },
+  "follow-up/refute-facts/children": {
+   "children": 6,
+   "api_calls": 184,
+   "total_usd": 24.63,
+   "advisor_usd": 5.81,
+   "advisor_iterations": 7
+  },
+  "follow-up/refute-fit/children": {
+   "children": 6,
+   "api_calls": 177,
+   "total_usd": 25.22,
+   "advisor_usd": 6.08,
+   "advisor_iterations": 7
+  }
+ },
+ "per_counted_child": {
+  "discover": {
+   "children": 26,
+   "total_usd": 146.96,
+   "advisor_usd": 39.01,
+   "average_usd": 5.65
+  },
+  "refute-fit": {
+   "children": 26,
+   "total_usd": 119.67,
+   "advisor_usd": 30.94,
+   "average_usd": 4.6
+  },
+  "refute-facts": {
+   "children": 26,
+   "total_usd": 107.5,
+   "advisor_usd": 25.27,
+   "average_usd": 4.13
+  },
+  "critic": {
+   "children": 1,
+   "total_usd": 5.5,
+   "advisor_usd": 0.72,
+   "average_usd": 5.5
+  },
+  "gpt6-discover": {
+   "children": 26,
+   "total_usd": 9.64,
+   "advisor_usd": 0.24,
+   "average_usd": 0.37
+  },
+  "gpt6-refute-fit": {
+   "children": 26,
+   "total_usd": 16.58,
+   "advisor_usd": 1.66,
+   "average_usd": 0.64
+  }
+ },
+ "wrappers_usd": 27.06,
+ "superseded_attempts_usd": 19.27
+}

@@ -1,0 +1,1024 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-26T10:13:41Z",
+  "evidence_class": "synthetic_fixture",
+  "evidence_class_note": "Classes follow docs/acceptance-evidence-policy.md. red_first, green and discriminating_controls run stub-qmd contract tests, so they are synthetic and produce no native QMD results. bench_rule_on_committed_output, patch_checks, scoring_code_unchanged and real_qmd_receipts_rederived are structural validation of committed files. upstream_source is an independent observation of the pinned QMD source. Nothing in this record ran the real qmd: the committed run.py has made no run against it.",
+  "subject": {
+    "run_py": {
+      "path": "blueprints/retrieval-quality-v2/run.py",
+      "sha256": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1"
+    },
+    "tests": {
+      "path": "tests/test_retrieval_quality_v2.py",
+      "sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee"
+    },
+    "reviewed_run_py_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+    "reviewed_tests_sha256": "75cde97957787ef99b80d2d453f0e452885739b09ec58b78bdbbcdee688c4a83"
+  },
+  "results_scope": "No committed result comes from the committed run.py. results-20260925.json came from the run.py merged in #293; results-20260926T022931Z.json and results-20260926T024558Z.json from run.py efba31d5 (efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004); the real-qmd checks in repair-review-20260926/ from run.py 0792745e. The changes since 0792745e affect only the acceptance of empty or incomplete qmd bench output, the sanitization of rejected hits' reasons and of the other strings a receipt copies from qmd's output, the interruption bookkeeping (the running call, limitations before the benchmark, a failure after a stop), the receipt schema number for those fields and the wording of the qmd bench limitation. The full comparison was not re-run.",
+  "review": {
+    "scope": "Two reviews of run.py 0792745e, its tests and this directory's documents: a cross-family verification pass (read-only), which confirmed that the eight #293 findings are resolved and reported V1 to V5, and an independent Claude session's review of the change's 13 files, which reported H1 to H4.",
+    "defects": [
+      {
+        "id": "V1",
+        "severity": "medium",
+        "source": "cross-family verification",
+        "defect": "run_native_bench accepted {\"summary\": {}, \"results\": []} as a completed benchmark (native_query_count 0), and the report said all four backends ran.",
+        "verified": "red_first: test_empty_or_incomplete_bench_output_is_not_completed fails against run.py 0792745e in all five subtests ('completed' != 'incomplete').",
+        "resolution": "bench_output_problems() requires exactly one result for each fixture query id, a top_files list for each of QMD's four backends in every result and a summary object for each backend. Otherwise the benchmark's status is 'incomplete', 'error' names the problems, and neither native_summary nor exact_identity_audit is kept. The restart's retained output passes the rule (bench_rule_on_committed_output), so its 'completed' status stands.",
+        "checks": [
+          "test_empty_or_incomplete_bench_output_is_not_completed",
+          "discriminating_controls P1",
+          "bench_rule_on_committed_output"
+        ]
+      },
+      {
+        "id": "V2",
+        "severity": "medium",
+        "source": "cross-family verification",
+        "defect": "A rejected hit's reason bypassed sanitization: for a hit naming /home/example-user/private/report.md, 'file' was sanitized but rejected_hits[].reason kept the path.",
+        "verified": "red_first: test_every_scored_query_links_to_its_retained_native_output fails against 0792745e because the reason keeps '/home/example-user/private/report.md' where '~/private/report.md' is required.",
+        "resolution": "run_arm sanitizes the reason like the hit's file and docid. The same change sanitizes qmd_version_raw, qmd pull's hf_uri, hf_repo_id, filename, pull_note and pull_size_reported, and qmd embed's upstream_reported_duration. The retention test plants host paths in two rejected hits (another user's home and the scratch HOME), the version banner and a pull note, and requires that no such path reaches any output. The URI, repository id, file name, size and embed-duration sanitization has no mutant of its own.",
+        "checks": [
+          "test_every_scored_query_links_to_its_retained_native_output",
+          "discriminating_controls P2",
+          "discriminating_controls P2b",
+          "discriminating_controls P2c"
+        ]
+      },
+      {
+        "id": "V3",
+        "severity": "low",
+        "source": "cross-family verification",
+        "defect": "A stop during qmd bench, or one pending at its checkpoint, left a receipt with the decision but limitations [] and an empty 'Known limitations' section in the report.",
+        "verified": "red_first: test_a_stop_during_the_benchmark_keeps_the_decisions_limitations fails against 0792745e ('[] is not true').",
+        "resolution": "The decision's limitations are recorded right after the decision, before the benchmark starts; the qmd bench caveat is appended only when the benchmark returned.",
+        "checks": [
+          "test_a_stop_during_the_benchmark_keeps_the_decisions_limitations",
+          "discriminating_controls P3"
+        ]
+      },
+      {
+        "id": "V4",
+        "severity": "low",
+        "source": "cross-family verification",
+        "defect": "'no qmd call was in flight' covered only a call the runner killed. In real-qmd check 20260926T050511Z (run.py 0792745e), arm_a:nl-01 ran from 2026-09-26T05:05:13.400Z to 05:05:13.556Z, across the SIGTERM received at 05:05:13.420Z, and the receipt said no qmd call was in flight.",
+        "verified": "repair-review-20260926/native-20260926T050511Z.json and results-20260926T050511Z.json; red_first: test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short fails against 0792745e.",
+        "resolution": "StopRequests.current_call holds the native record id of the qmd call QmdRunner.run is running, and each handled signal records it. Receipt schema 4 keeps interruption.qmd_call_running_when_received and signals_received[].qmd_call apart from interruption.cut_short_native_record_id (schema 3's in_flight_native_record_id). abort_reason names a running call that finished before the stop was acted on and says that no qmd call was cut short, or says 'no qmd call was running'.",
+        "checks": [
+          "test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short",
+          "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+          "discriminating_controls P4"
+        ]
+      },
+      {
+        "id": "V5",
+        "severity": "low",
+        "source": "cross-family verification",
+        "defect": "README.md read the unchanged LLM cache row count (787 -> 787) as proof that qmd bench wrote no new expansion or rerank result, and attributed the full-vs-Arm-B ranking differences to the SDK path rather than to model calls.",
+        "verified": "upstream_source: setCachedResult rewrites an existing key in place, expandQuery caches only a non-empty expansion, and the hybrid pipeline drops a cached expansion whose sub-queries all came back empty, so model calls can leave the count unchanged.",
+        "resolution": "README.md calls cache reuse consistent with the count but not shown by it and leaves the four ranking differences unexplained. run.py's qmd bench limitation says the latencies 'may be' warm and that the row counts do not show which results the cache served.",
+        "checks": [
+          "upstream_source"
+        ]
+      },
+      {
+        "id": "H1",
+        "severity": "low",
+        "source": "independent session",
+        "defect": "With a stop pending, the Arm B setup handler turned any RunFailure into RunInterrupted without passing the failure on, so a failure that followed a stop was dropped from the receipt (for example an unreachable Hugging Face after Ctrl-C).",
+        "verified": "red_first: test_a_setup_failure_after_a_stop_is_recorded_with_the_stop fails against 0792745e (abort_reason 'stopped by SIGTERM during arm_b_pull; no qmd call was in flight').",
+        "resolution": "The handler re-raises the RunFailure once a stop was requested; main records it in abort_reason ('the run was already stopping when this failure followed: [slug] ...') and Arm B becomes 'interrupted'.",
+        "checks": [
+          "test_a_setup_failure_after_a_stop_is_recorded_with_the_stop",
+          "discriminating_controls P5"
+        ]
+      },
+      {
+        "id": "H2",
+        "severity": "evidence",
+        "source": "independent session",
+        "defect": "review-293-repro-20260926.json: F2 to F6 depended on a stub qmd, scenario files and a driver that were neither committed nor hashed; stub runs were labelled local_integration; its discriminating controls (run.py efba31d5, tests 8fbd6c42...) cannot be re-run.",
+        "resolution": "The driver, the stub and the eight scenario files are committed in review-293-repro-20260926/ and hashed in the record's inputs, each with the sha256 of the file that ran. The driver's host user name became <user> and the scenarios' scratch directory <SCRATCH>. F2 to F6 and the controls are labelled synthetic_fixture, F1 local_integration and F7 structural_validation. discriminating_controls.rerunnable is false, with the reason. corrections keeps the as-recorded sha256 and how to recover those bytes."
+      },
+      {
+        "id": "H3",
+        "severity": "evidence",
+        "source": "independent session",
+        "defect": "repair-review-20260926.json counted the SIGTERM-during-search check for D1 although its receipt misreported the running call (V4), and the three real-qmd runs' outputs and the drivers that counted qmd processes existed only in scratch.",
+        "resolution": "The nine output files, byte-identical to the sha256 values the record keeps, and the three driver files are committed in repair-review-20260926/ and listed in real_qmd_checks.retained_outputs. The check carries a correction, and corrections keeps the as-recorded sha256."
+      },
+      {
+        "id": "H4",
+        "severity": "evidence",
+        "source": "independent session",
+        "defect": "README.md called the real-qmd signal runs retained although their outputs stayed in scratch, cited a check of the host's default QMD configuration and cache directories that no committed file backs, and gave evidence-class labels that contradicted repair-review-20260926.json.",
+        "resolution": "The outputs are committed, the default-directory claim is withdrawn, and each file's classes in README.md match its record."
+      }
+    ]
+  },
+  "red_first": {
+    "method": "The final tests/test_retrieval_quality_v2.py against run.py 0792745e, in a copy that holds this directory's JSON files: python -m unittest tests.test_retrieval_quality_v2 (CPython 3.13.15). Each new or changed test must fail.",
+    "run_py_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+    "tests_sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
+    "ran": "Ran 30 tests in 28.345s",
+    "unittest_summary": "FAILED (failures=10, errors=3)",
+    "failing": [
+      {
+        "outcome": "ERROR",
+        "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "KeyError: 'qmd_call_running_when_received'"
+      },
+      {
+        "outcome": "ERROR",
+        "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "KeyError: 'qmd_call_running_when_received'"
+      },
+      {
+        "outcome": "ERROR",
+        "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "KeyError: 'cut_short_native_record_id'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "AssertionError: 'the qmd call that was running when the signal arrived (arm_a:nl-01) finished before the runner acted on the stop, so no qmd call was cut short' not found in 'stopped by SIGTERM during arm_a; no qmd call "
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_a_setup_failure_after_a_stop_is_recorded_with_the_stop",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "AssertionError: 'the run was already stopping when this failure followed: [arm_b_model_revision_unresolved]' not found in 'stopped by SIGTERM during arm_b_pull; no qmd call was in flight'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_a_stop_during_the_benchmark_keeps_the_decisions_limitations",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "AssertionError: [] is not true : []"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+        "class": "InterruptTests",
+        "subtest": null,
+        "last_line": "ValueError: not enough values to unpack (expected 4, got 3)"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "class": "NativeBenchTests",
+        "subtest": "empty",
+        "last_line": "AssertionError: 'completed' != 'incomplete'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "class": "NativeBenchTests",
+        "subtest": "missing query",
+        "last_line": "AssertionError: 'completed' != 'incomplete'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "class": "NativeBenchTests",
+        "subtest": "duplicated query",
+        "last_line": "AssertionError: 'completed' != 'incomplete'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "class": "NativeBenchTests",
+        "subtest": "missing backend",
+        "last_line": "AssertionError: 'completed' != 'incomplete'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "class": "NativeBenchTests",
+        "subtest": "summary lacks a backend",
+        "last_line": "AssertionError: 'completed' != 'incomplete'"
+      },
+      {
+        "outcome": "FAIL",
+        "test": "test_every_scored_query_links_to_its_retained_native_output",
+        "class": "NativeRetentionTests",
+        "subtest": null,
+        "last_line": "AssertionError: \"unex[14 chars]eld (no qmd:// prefix): '/home/example-user/private/report.md'\" != \"unex[14 chars]eld (no qmd:// prefix): '~/private/report.md'\""
+      }
+    ],
+    "note": "The three errors are existing interrupt tests that now read schema 4's interruption fields, and the STOP_REQUESTS failure reads the qmd call that schema 4 adds to each recorded signal."
+  },
+  "green": {
+    "method": "The same command in the worktree against the committed run.py.",
+    "run_py_sha256": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1",
+    "tests_sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
+    "ran": "Ran 30 tests in 28.214s",
+    "unittest_summary": "OK"
+  },
+  "discriminating_controls": {
+    "recorded_at_utc": "2026-09-26T09:46:59Z",
+    "python": "3.13.15",
+    "harness_sha256": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1",
+    "tests_sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
+    "method": "Each mutant changes one repair in a copy of the committed run.py (the patch below); the named tests from tests/test_retrieval_quality_v2.py then run against that copy, one `python -m unittest <test>` each, and must fail. The same tests first run against an unmodified copy and must pass.",
+    "baseline": [
+      {
+        "test": "test_committed_receipts_rederive_from_their_native_output",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.008s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_env_binds_owned_storage_and_drops_caller_routing",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.038s",
+        "unittest_summary": "OK",
+        "seconds": 0.1
+      },
+      {
+        "test": "test_index_content_mismatch_aborts_before_any_arm",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.427s",
+        "unittest_summary": "OK",
+        "seconds": 0.5
+      },
+      {
+        "test": "test_no_qmd_call_follows_the_callers_routing_variables",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.843s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.606s",
+        "unittest_summary": "OK",
+        "seconds": 0.7
+      },
+      {
+        "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.834s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_a_setup_failure_after_a_stop_is_recorded_with_the_stop",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.658s",
+        "unittest_summary": "OK",
+        "seconds": 0.8
+      },
+      {
+        "test": "test_a_stop_during_the_benchmark_keeps_the_decisions_limitations",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 1.007s",
+        "unittest_summary": "OK",
+        "seconds": 1.1
+      },
+      {
+        "test": "test_an_ignored_sighup_is_left_alone",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 3.962s",
+        "unittest_summary": "OK",
+        "seconds": 4.1
+      },
+      {
+        "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.958s",
+        "unittest_summary": "OK",
+        "seconds": 1.1
+      },
+      {
+        "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.763s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.100s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_qmd_cached_etag_is_read_from_its_uri_file_name",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.891s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_unresolved_revision_fails_arm_b_closed",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.684s",
+        "unittest_summary": "OK",
+        "seconds": 0.8
+      },
+      {
+        "test": "test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.879s",
+        "unittest_summary": "OK",
+        "seconds": 1.0
+      },
+      {
+        "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 3.965s",
+        "unittest_summary": "OK",
+        "seconds": 4.1
+      },
+      {
+        "test": "test_every_scored_query_links_to_its_retained_native_output",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.831s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_existing_output_is_never_overwritten",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.042s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_docid_must_match_the_pinned_content_hash",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.040s",
+        "unittest_summary": "OK",
+        "seconds": 0.2
+      },
+      {
+        "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.729s",
+        "unittest_summary": "OK",
+        "seconds": 0.9
+      },
+      {
+        "test": "test_one_unverifiable_hit_rejects_the_whole_query",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 0.723s",
+        "unittest_summary": "OK",
+        "seconds": 0.8
+      },
+      {
+        "test": "test_embed_timeout_marks_arm_b_not_evaluated",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 1.496s",
+        "unittest_summary": "OK",
+        "seconds": 1.6
+      },
+      {
+        "test": "test_pull_timeout_marks_arm_b_not_evaluated_and_kills_the_process_group",
+        "exit_code": 0,
+        "ran": "Ran 1 test in 5.445s",
+        "unittest_summary": "OK",
+        "seconds": 5.6
+      }
+    ],
+    "baseline_all_passed": true,
+    "mutants": [
+      {
+        "mutant": "F1-inherit-caller-env",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -515,3 +515,3 @@\n     tmp_dir = scratch_home / \"tmp\"\n-    env = {key: caller[key] for key in QMD_ENV_PASSTHROUGH if key in caller}\n+    env = dict(caller)\n     env.update(\n@@ -523,4 +523,2 @@\n             \"TMPDIR\": str(tmp_dir),\n-            \"INDEX_PATH\": str(cache_home / \"qmd\" / f\"{index_name}.sqlite\"),\n-            \"QMD_CONFIG_DIR\": str(config_home / \"qmd\"),\n             # Hard-rule CPU boundary: the GPU is shared and must not be\n",
+        "tests": [
+          {
+            "test": "test_no_qmd_call_follows_the_callers_routing_variables",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.706s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_env_binds_owned_storage_and_drops_caller_routing",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.033s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F2-revision-fail-open",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1120,2 +1120,3 @@\n     if not isinstance(revision, str) or not HF_REVISION_RE.fullmatch(revision):\n+        return {\"revision\": None, \"lfs_sha256\": None, \"lfs_size\": None}\n         raise RunFailure(\n",
+        "tests": [
+          {
+            "test": "test_unresolved_revision_fails_arm_b_closed",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.733s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3-docid-unchecked",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -935,3 +935,4 @@\n         return None, f\"resolved path {repository_path!r} is not one of the pinned corpus files\"\n-    match = DOCID_RE.fullmatch(docid_field) if isinstance(docid_field, str) else None\n+    return repository_path, \"ok\"\n+    match = None\n     if match is None:\n",
+        "tests": [
+          {
+            "test": "test_docid_must_match_the_pinned_content_hash",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.033s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.765s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3c-unverifiable-hit-scored-as-grade-0",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1050,3 +1050,3 @@\n                     ranked_paths.append(path)\n-                if rejected_hits:\n+                if False:\n                     error = (\n",
+        "tests": [
+          {
+            "test": "test_one_unverifiable_hit_rejects_the_whole_query",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.731s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F3b-index-content-unverified",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -818,3 +818,3 @@\n         indexed[f\"{prefix}/{path}\"] = digest\n-    pinned = {d[\"path\"]: d[\"sha256\"] for d in corpus}\n+    pinned = dict(indexed)\n     missing = sorted(set(pinned) - set(indexed))\n",
+        "tests": [
+          {
+            "test": "test_index_content_mismatch_aborts_before_any_arm",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.960s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F4-json-shape-unchecked",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -952,6 +952,8 @@\n         return None, f\"malformed JSON output: {exc}\"\n-    if not isinstance(doc, list):\n+    if doc is None:\n+        return [],\n+    if False:\n         return None, f\"malformed JSON response: expected an array of hits, got {type(doc).__name__}\"\n     for rank, hit in enumerate(doc, start=1):\n-        if not isinstance(hit, dict):\n+        if False:\n             return None, f\"malformed hit at rank {rank}: expected an object, got {type(hit).__name__}\"\n",
+        "tests": [
+          {
+            "test": "test_malformed_and_unverifiable_responses_score_zero_and_the_arm_continues",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.442s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.6,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F5a-timeout-propagates",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -620,3 +620,5 @@\n             remaining = deadline - time.monotonic()\n-            if stopping or remaining <= 0:\n+            if remaining <= 0 and not stopping:\n+                raise subprocess.TimeoutExpired(argv, timeout)\n+            if stopping:\n                 _kill_process_group(proc)\n",
+        "tests": [
+          {
+            "test": "test_embed_timeout_marks_arm_b_not_evaluated",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.499s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 1.7,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F5b-kill-launcher-only",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -574,3 +574,3 @@\n     with contextlib.suppress(ProcessLookupError, PermissionError):\n-        os.killpg(proc.pid, signal.SIGKILL)\n+        proc.kill()\n \n",
+        "tests": [
+          {
+            "test": "test_pull_timeout_marks_arm_b_not_evaluated_and_kills_the_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 25.488s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 25.6,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 20.994s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 21.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F6-overwrite-outputs",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1845,3 +1845,3 @@\n     \"\"\"Creates ``path``; raises FileExistsError rather than replacing anything.\"\"\"\n-    with open(path, \"x\", encoding=\"utf-8\") as fh:\n+    with open(path, \"w\", encoding=\"utf-8\") as fh:\n         fh.write(text)\n@@ -1932,3 +1932,3 @@\n     outputs = run_outputs(output_dir, run_id)\n-    existing = [p.name for p in outputs.values() if p.exists()]\n+    existing = []\n     if existing:\n",
+        "tests": [
+          {
+            "test": "test_existing_output_is_never_overwritten",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.763s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "F7-no-native-retention",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -739,3 +739,2 @@\n         record.update(stderr_fields)\n-        self.records.append(record)\n         return record, stdout, stderr\n",
+        "tests": [
+          {
+            "test": "test_every_scored_query_links_to_its_retained_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.750s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "evidence-receipt-hand-edited",
+        "patch": "results-20260926T024558Z.json: arm_b.per_query[0].ranked_paths rotated by one position (first path moved to the end); run.py unchanged",
+        "tests": [
+          {
+            "test": "test_committed_receipts_rederive_from_their_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.008s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "bench-audit-trusts-native",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1333,3 +1333,3 @@\n             gold = expected.get(result.get(\"id\"), [])\n-            exact_recall5 = (sum(1 for g in gold if g in top[:5]) / len(gold)) if gold else 0.0\n+            exact_recall5 = backend_result.get(\"recall_at_5\")\n             first = next((i for i, p in enumerate(top) if p is not None and p in gold), None)\n",
+        "tests": [
+          {
+            "test": "test_bench_runs_on_the_same_index_with_a_derived_fixture_and_an_exact_audit",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.771s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I1-no-stop-handlers",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -320,3 +320,3 @@\n     def arm(self) -> None:\n-        for signum in self.signals():\n+        for signum in ():\n             default = signal.default_int_handler if signum == signal.SIGINT else signal.SIG_DFL\n",
+        "tests": [
+          {
+            "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.589s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.7,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_stop_requests_record_every_signal_and_raise_only_at_a_checkpoint",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.082s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I2-stop-not-polled",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -618,3 +618,3 @@\n         while True:\n-            stopping = stop is not None and stop()\n+            stopping = False\n             remaining = deadline - time.monotonic()\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 120.755s",
+            "unittest_summary": "FAILED (errors=1)",
+            "seconds": 120.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I3-stopped-call-not-recorded",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -706,5 +706,5 @@\n             self.stops.current_call = None\n-        record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)\n         if result.stopped:\n             self.checkpoint()\n+        record, stdout, stderr = self._append(record_id, phase, argv, started_at, start, timeout, result, None)\n         return NativeCall(record, stdout, stderr)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.960s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I4-group-not-killed-on-stop",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -621,3 +621,4 @@\n             if stopping or remaining <= 0:\n-                _kill_process_group(proc)\n+                if not stopping:\n+                    _kill_process_group(proc)\n                 stdout, stderr, complete = _collect_after_kill(proc)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 22.006s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 22.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I5-no-interrupted-status",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2062,3 +2062,3 @@\n         name = signal_name(signum)\n-        receipt[\"status\"] = \"aborted_interrupted\"\n+        receipt[\"status\"] = \"started\"\n         receipt[\"interruption\"] = {\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.976s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I6-statuses-not-settled",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2301,3 +2301,2 @@\n         try:\n-            settle_statuses(receipt)\n             receipt.pop(\"status_note\", None)\n",
+        "tests": [
+          {
+            "test": "test_sigint_stops_an_arm_b_query_and_kills_its_process_group",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.294s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.5,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I7-script-exits-with-a-code",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2380,2 +2380,2 @@\n if __name__ == \"__main__\":\n-    exit_process(main())\n+    sys.exit(main())\n",
+        "tests": [
+          {
+            "test": "test_sigterm_to_the_runner_and_then_its_group_like_gnu_timeout",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.847s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I8-caller-dispositions-replaced",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -322,4 +322,2 @@\n             default = signal.default_int_handler if signum == signal.SIGINT else signal.SIG_DFL\n-            if signal.getsignal(signum) is not default:\n-                continue\n             try:\n",
+        "tests": [
+          {
+            "test": "test_an_ignored_sighup_is_left_alone",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.693s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.8,
+            "result": "failed_as_required"
+          },
+          {
+            "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.829s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "I9-exception-leaves-group-running",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -632,5 +632,4 @@\n     except BaseException as exc:\n-        _kill_process_group(proc)\n         try:\n-            stdout, stderr, complete = _collect_after_kill(proc)\n+            stdout, stderr, complete = b\"\", b\"\", False\n         except BaseException:  # anything further while collecting: keep stopping\n",
+        "tests": [
+          {
+            "test": "test_a_callers_own_sigint_handler_still_leaves_an_interrupted_receipt",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 10.932s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 11.1,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "E1-etag-at-downloaded-file-name",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1206,3 +1206,3 @@\n         pin = resolve_hf_pin(hf_repo_id, filename, file_sha256, size_bytes)\n-        etag_path = qmd_etag_path(model_cache_dir, uri)\n+        etag_path = local_path.with_name(local_path.name + \".etag\")\n         hf_content_etag = etag_path.read_text(encoding=\"utf-8\").strip() if etag_path.is_file() else None\n",
+        "tests": [
+          {
+            "test": "test_qmd_cached_etag_is_read_from_its_uri_file_name",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.989s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P1-bench-accepts-incomplete-output",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1491,3 +1491,3 @@\n     problems = bench_output_problems(doc, fixture)\n-    if problems:\n+    if False:\n         section[\"status\"] = \"incomplete\"\n",
+        "tests": [
+          {
+            "test": "test_empty_or_incomplete_bench_output_is_not_completed",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 4.519s",
+            "unittest_summary": "FAILED (failures=5)",
+            "seconds": 4.7,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P2-rejection-reason-unsanitized",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1046,3 +1046,3 @@\n                                 \"docid\": runner.san(hit[\"docid\"]),\n-                                \"reason\": runner.san(note),\n+                                \"reason\": note,\n                             }\n",
+        "tests": [
+          {
+            "test": "test_every_scored_query_links_to_its_retained_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.873s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P2b-version-banner-unsanitized",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2122,3 +2122,3 @@\n             ver = runner.setup(\"qmd:version\", \"setup\", [\"--index\", args.index_name, \"--version\"], 30, \"qmd_version\")\n-            receipt[\"qmd_version_raw\"] = san(ver.stdout.strip() or ver.stderr.strip())\n+            receipt[\"qmd_version_raw\"] = ver.stdout.strip() or ver.stderr.strip()\n             # \"qmd --version\" prints \"qmd 2.8.3 (facd35e)\"; keep just the semver for\n",
+        "tests": [
+          {
+            "test": "test_every_scored_query_links_to_its_retained_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.818s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.0,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P2c-pull-note-unsanitized",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -1237,3 +1237,3 @@\n                 # Free text from qmd's own output, sanitized like the rest of it.\n-                \"pull_note\": san(entry[\"note\"]),\n+                \"pull_note\": entry[\"note\"],\n                 \"pull_size_reported\": san(entry[\"size\"]),\n",
+        "tests": [
+          {
+            "test": "test_every_scored_query_links_to_its_retained_native_output",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.791s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P3-limitations-set-after-the-benchmark",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2241,2 +2241,3 @@\n \n+        pending_limitations, receipt[\"limitations\"] = receipt[\"limitations\"], []\n         if args.skip_native_bench:\n@@ -2261,2 +2262,3 @@\n                 )\n+        receipt[\"limitations\"] = pending_limitations\n         if receipt[\"native_bench\"].get(\"status\") != \"not_run\":\n",
+        "tests": [
+          {
+            "test": "test_a_stop_during_the_benchmark_keeps_the_decisions_limitations",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 1.057s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.2,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P4-running-call-not-recorded",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -317,3 +317,3 @@\n     def _handle(self, signum, frame) -> None:\n-        self.received.append((int(signum), utc_now_iso_ms(), self.phase, self.current_call))\n+        self.received.append((int(signum), utc_now_iso_ms(), self.phase, None))\n \n",
+        "tests": [
+          {
+            "test": "test_a_call_that_ends_after_the_signal_is_named_but_not_cut_short",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.762s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 0.9,
+            "result": "failed_as_required"
+          }
+        ]
+      },
+      {
+        "mutant": "P5-setup-failure-after-a-stop-dropped",
+        "patch": "--- run.py\n+++ run.py (mutant)\n@@ -2182,6 +2182,3 @@\n             except RunFailure as exc:\n-                if stops.requested():\n-                    # A failure that follows a stop request is part of stopping, not a\n-                    # finding about Arm B: the handler below records it with the stop.\n-                    raise\n+                stops.checkpoint()\n                 # PREREGISTRATION.md: Arm B fails closed and is reported as not evaluated.\n",
+        "tests": [
+          {
+            "test": "test_a_setup_failure_after_a_stop_is_recorded_with_the_stop",
+            "exit_code": 1,
+            "ran": "Ran 1 test in 0.931s",
+            "unittest_summary": "FAILED (failures=1)",
+            "seconds": 1.1,
+            "result": "failed_as_required"
+          }
+        ]
+      }
+    ],
+    "all_mutants_caught": true,
+    "tool": {
+      "path": "blueprints/retrieval-quality-v2/verification-review-20260926/controls.py",
+      "sha256": "07cdb9604eac81d559234bf71efd290e5f13e3fcea438da7cb5c8d0b803ba886",
+      "usage": "python3 controls.py <checkout> <out-dir> <python> [mutant ...], each path absolute: every test runs with its copy as the working directory",
+      "note": "The tool behind repair-review-20260926.json's controls with mutants P1 to P5 added; each mutant restores one behaviour of run.py 0792745e or earlier."
+    },
+    "committed_tool_rerun": {
+      "recorded_at_utc": "2026-09-26T10:04:51Z",
+      "method": "The committed controls.py run from its committed path with mutants P1 to P5 only; the baseline still runs every named test.",
+      "harness_sha256": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1",
+      "tests_sha256": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee",
+      "baseline_tests": 23,
+      "baseline_all_passed": true,
+      "mutants": {
+        "P1-bench-accepts-incomplete-output": [
+          "FAILED (failures=5)"
+        ],
+        "P2-rejection-reason-unsanitized": [
+          "FAILED (failures=1)"
+        ],
+        "P3-limitations-set-after-the-benchmark": [
+          "FAILED (failures=1)"
+        ],
+        "P4-running-call-not-recorded": [
+          "FAILED (failures=1)"
+        ],
+        "P5-setup-failure-after-a-stop-dropped": [
+          "FAILED (failures=1)"
+        ]
+      },
+      "all_mutants_caught": true
+    }
+  },
+  "bench_rule_on_committed_output": {
+    "evidence_class": "structural_validation",
+    "method": "verification-review-20260926/bench_rule_check.py rebuilds the fixture from queries.json as run.py does, takes the native_bench record's retained stdout from native-20260926T024558Z.json and applies bench_output_problems(). The retained stdout differs from the bytes qmd returned only in the fixture path, which the runner sanitized to <SCRATCH_HOME>/bench/fixture.json.",
+    "script_sha256": "049508dd46c4f32aa7d79f38ccfc6c53fb5d8bee5678d8500b1c411adb4fdf85",
+    "run_id": "20260926T024558Z",
+    "run_py_sha256": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1",
+    "fixture_sha256": "0559c6fb31c588568e692de32cc093bf69a79b510c843dd8f1e85692fb8d932f",
+    "receipt_fixture_sha256": "0559c6fb31c588568e692de32cc093bf69a79b510c843dd8f1e85692fb8d932f",
+    "stdout_sha256": "ae961ec2f7b5f968f1165ce286005dc6802b952bf616348ce3cb03e20e8a8744",
+    "record_stdout_sha256": "ae961ec2f7b5f968f1165ce286005dc6802b952bf616348ce3cb03e20e8a8744",
+    "receipt_stdout_sha256": "ae961ec2f7b5f968f1165ce286005dc6802b952bf616348ce3cb03e20e8a8744",
+    "stdout_identical_to_raw": false,
+    "receipt_status": "completed",
+    "results": 30,
+    "fixture_queries": 30,
+    "summary_backends": [
+      "bm25",
+      "full",
+      "hybrid",
+      "vector"
+    ],
+    "problems": []
+  },
+  "patch_checks": {
+    "evidence_class": "structural_validation",
+    "restore_patch": {
+      "path": "restore-0792745e.patch",
+      "sha256": "3d5e040eff083caa6caf9e3184285b2ac5fb80e4b5c7cf2e630fb0cd134c560b",
+      "applies_at": "the checkout root",
+      "input": {
+        "run_py": "7a04a37842674b9494e3cb37b2915c5269847445d437e63a4192ebe0ed32ecd1",
+        "tests": "d1f61612522dc3de6bb78b9bf953668d920fe3778567e935d1b609131dab87ee"
+      },
+      "git_apply": {
+        "exit_code": 0,
+        "run_py": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+        "tests": "75cde97957787ef99b80d2d453f0e452885739b09ec58b78bdbbcdee688c4a83"
+      },
+      "gnu_patch_p1": {
+        "exit_code": 0,
+        "run_py": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+        "tests": "75cde97957787ef99b80d2d453f0e452885739b09ec58b78bdbbcdee688c4a83"
+      }
+    },
+    "then_efba31d5_patch": {
+      "path": "run-efba31d5.patch",
+      "sha256": "6a197ab9155d158feb048f311fc72760c7434f92dde3e7da7de8adaefeae2629",
+      "applies_at": "next to run.py",
+      "git_apply": {
+        "exit_code": 0,
+        "run_py": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+      },
+      "gnu_patch": {
+        "exit_code": 0,
+        "run_py": "efba31d53c4a36ac482e71d796146d600c76299952055c72005b5b27196f6004"
+      }
+    },
+    "tools": "git 2.43.0; GNU patch 2.7.6"
+  },
+  "scoring_code_unchanged": {
+    "evidence_class": "structural_validation",
+    "method": "AST comparison with docstrings removed, committed run.py against run.py efba31d5 and against 0792745e.",
+    "identical": [
+      "parse_hits",
+      "resolve_repository_path",
+      "compute_query_metrics",
+      "dcg",
+      "summarize_arm",
+      "paired_bootstrap_ci",
+      "decide",
+      "audit_native_bench",
+      "build_bench_fixture",
+      "virtual_path",
+      "repository_path_from_virtual"
+    ],
+    "run_arm": "Differs from efba31d5 only by the results= argument that keeps an interrupted arm's scored queries (0792745e) and by sanitizing rejected_hits[].reason; neither changes a score."
+  },
+  "real_qmd_receipts_rederived": {
+    "evidence_class": "structural_validation",
+    "method": "verification-review-20260926/rederive_real_qmd_receipts.py re-derives every Arm A row of the three receipts in repair-review-20260926/ from its native record: stdout sha256, pinned docids, ranked paths and nDCG@10 recomputed from queries.json.",
+    "script_sha256": "df268219b74a432cfc49b1e53e9911cfd8c632fc86d07a963719472ab26022fa",
+    "receipts": {
+      "results-20260926T050504Z.json": {
+        "schema_version": 3,
+        "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+        "status": "completed_arm_b_not_run",
+        "arm_a_rows": 30,
+        "mismatched_rows": [],
+        "arm_a_mean_ndcg_at_10": 0.2227878901522255
+      },
+      "results-20260926T050511Z.json": {
+        "schema_version": 3,
+        "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+        "status": "aborted_interrupted",
+        "arm_a_rows": 1,
+        "mismatched_rows": [],
+        "arm_a_mean_ndcg_at_10": 0.0
+      },
+      "results-20260926T050555Z.json": {
+        "schema_version": 3,
+        "harness_sha256": "0792745e7262dfed2488e50b090560598582f523a1ebfdb76d998e539a490ad7",
+        "status": "aborted_interrupted",
+        "arm_a_rows": 30,
+        "mismatched_rows": [],
+        "arm_a_mean_ndcg_at_10": 0.2227878901522255
+      }
+    }
+  },
+  "blind_checkout_classification": {
+    "evidence_class": "structural_validation",
+    "change": "tools/sota-convergence/blind_checkout.py: LABEL_TEXT_SHA256 gains f51f57469603d6adced2f73751b15dc14ce48abac71723fc121cc1b64baacb58, the sha256 of 'BM25 (Arm A) stays the default'.",
+    "reason": "That decision text appears under 'decision' in the committed real-qmd receipt repair-review-20260926/results-20260926T050504Z.json. tests/test_blind_checkout.py::test_every_blueprint_value_under_a_label_key_is_classified fails on any unclassified value under a label key in blueprints/, and it failed on this one in the first full-suite run of this round. The text states a selection, so it is a label that a blind checkout strips.",
+    "check": "python -m unittest tests.test_blind_checkout: Ran 40 tests, OK"
+  },
+  "upstream_source": {
+    "evidence_class": "independent_observation",
+    "observed_at_utc": "2026-09-26T10:13:41Z",
+    "method": "Fetched each file from raw.githubusercontent.com at commit facd35e01359e59d938bc9418e93fb9318addee3 (tag v2.8.3) and read the named lines.",
+    "files": [
+      {
+        "url": "https://raw.githubusercontent.com/tobi/qmd/facd35e01359e59d938bc9418e93fb9318addee3/src/store.ts",
+        "sha256": "de59c01f3066451dd74ef916f4708169b105519598d3093bdab39b7398876239",
+        "lines": {
+          "2653": "db.prepare(`INSERT OR REPLACE INTO llm_cache (hash, result, created_at) VALUES (?, ?, ?)`).run(cacheKey, result, now);",
+          "2655": "db.exec(`DELETE FROM llm_cache WHERE hash NOT IN (SELECT hash FROM llm_cache ORDER BY created_at DESC LIMIT 1000)`);",
+          "4505": "if (expanded.length > 0) {",
+          "4506": "setCachedResult(db, cacheKey, JSON.stringify(expanded));",
+          "4517": "export function deleteExpansionCacheEntry(db: Database, query: string, model: string = DEFAULT_QUERY_MODEL): void {",
+          "5571": "store.invalidateExpansionCache(query);"
+        },
+        "reading": "setCachedResult (L2651-L2657) writes with INSERT OR REPLACE and, on 1% of writes, keeps only the newest 1000 rows; expandQuery caches an expansion only when it is not empty (L4505-L4507); the hybrid pipeline deletes a cached expansion whose sub-queries all came back empty (L5562-L5573, via deleteExpansionCacheEntry at L4517). An unchanged row count therefore does not show that no model ran."
+      },
+      {
+        "url": "https://raw.githubusercontent.com/tobi/qmd/facd35e01359e59d938bc9418e93fb9318addee3/src/bench/bench.ts",
+        "sha256": "a42023c6394ce2025d30a016c9649a3d770a32bd5c2f51f4d6355052e7a756f0",
+        "lines": {
+          "179": "} catch {",
+          "180": "// Backend may not be available (e.g., no embeddings for vector search)",
+          "192": "top_files: [],"
+        },
+        "reading": "runQuery (L177-L196) turns a backend exception into a result with every score 0 and top_files [], so bench output cannot tell a failed backend call from one that found nothing."
+      }
+    ]
+  }
+}

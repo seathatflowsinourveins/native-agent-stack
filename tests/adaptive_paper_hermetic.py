@@ -28,6 +28,7 @@ value and restores over top of it.
 """
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -85,3 +86,27 @@ def restore_default_stop(token):
     for module, original in originals:
         module.DEFAULT_STOP = original
     tmpdir.cleanup()
+
+
+def real_tmp_root(name) -> Path:
+    """Path(name), with every symlink in it resolved (os.path.realpath).
+
+    Shared by tests/test_adaptive_market_research.py and
+    tests/test_adaptive_paper_credential_race.py for every fixture root a
+    `follow_symlinks=False` caller (`market_research.credentials()`) will
+    traverse. On Linux, `tempfile`'s default temp root is ordinarily
+    already symlink-free and this is a no-op. On macOS it is not: the
+    default TMPDIR lives under `/var/folders/...`, and `/var` (like `/tmp`)
+    is itself a root-owned symlink to `/private/var` (`/private/tmp`) --
+    `credential_guard.open_verified(..., follow_symlinks=False)` correctly
+    refuses that symlinked ancestor component with the `symlink` reason
+    code, which is the guard behaving exactly as documented (see its module
+    docstring and docs/decisions/2026-09-22-broker-credential-handling.md:
+    no-follow mode refuses every symlink component, including OS-provided
+    ones), not a bug to work around in the guard -- only a fixture that
+    must hand it an already-symlink-free path, the same way a real caller's
+    documented credential store under `$HOME` (e.g.
+    `~/.config/<tool>/paper.env`, `/Users/<name>/.config/...` on macOS)
+    contains none.
+    """
+    return Path(os.path.realpath(name))

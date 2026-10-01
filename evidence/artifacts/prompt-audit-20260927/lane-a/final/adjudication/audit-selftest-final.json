@@ -1,0 +1,402 @@
+{
+ "real": {
+  "gpt6-probe-r3": {
+   "hit_parts": [],
+   "hits": 0,
+   "items": {
+    "agent_message": 2,
+    "command_execution": 1,
+    "web_search": 2
+   }
+  },
+  "lane-a-gpt6": {
+   "hit_parts": [],
+   "hits": 0,
+   "items": {
+    "agent_message": 5,
+    "command_execution": 36,
+    "web_search": 7
+   }
+  },
+  "adj2-gpt6-AB": {
+   "hit_parts": [],
+   "hits": 0,
+   "items": {
+    "agent_message": 4,
+    "command_execution": 37
+   }
+  },
+  "adj2-gpt6-BA": {
+   "hit_parts": [],
+   "hits": 0,
+   "items": {
+    "agent_message": 4,
+    "command_execution": 32
+   }
+  },
+  "final-gpt6-probe": {
+   "hit_parts": [],
+   "hits": 0,
+   "items": {
+    "agent_message": 2,
+    "command_execution": 2,
+    "web_search": 2
+   }
+  },
+  "final-gpt6-lane": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 1,
+   "items": {
+    "agent_message": 5,
+    "command_execution": 48,
+    "web_search": 5
+   }
+  },
+  "adj2-claude-AB": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 35,
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 82,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 27,
+    "text": 6,
+    "tool_use": 35,
+    "tool_result": 35,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 15,
+    "attachment hook_additional_context": 10,
+    "server_tool_use": 2,
+    "advisor_tool_result": 2
+   }
+  },
+  "adj2-claude-BA": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 39,
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 87,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 21,
+    "tool_use": 39,
+    "tool_result": 39,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 20,
+    "attachment hook_additional_context": 7,
+    "attachment read_truncation_notice": 1,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  },
+  "final-claude-lane": {
+   "hit_parts": [
+    "ACCESS:hold_and_work_dirs"
+   ],
+   "hits": 63,
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 136,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 41,
+    "tool_use": 63,
+    "tool_result": 63,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 51,
+    "attachment hook_additional_context": 8,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ },
+ "synthetic": {
+  "/bin/bash -lc 'cat ~/.codex/sessions/2026/09/28/rollout-x.jsonl'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'rtk rg -n Top ~/.codex'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'rtk cat ~/.codex/RTK.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'rtk cat ~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/skills/<skill>/SKILL.md'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'ls ~/.codex/plugins/cache'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'cat ~/.codex/skills/<skill>/sessions/x.jsonl'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc 'cat ~/.codex/plugins/cache/m/p/../../../history.jsonl/skills/x'": {
+   "want": [
+    "ACCESS:codex_home"
+   ],
+   "got": [
+    "ACCESS:codex_home"
+   ]
+  },
+  "/bin/bash -lc \"sed -n '1,80p' ~/.agents/skills/<skill>/SKILL.md\"": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'cat <projects>/p/memory/MEMORY.md'": {
+   "want": [
+    "ACCESS:claude_home"
+   ],
+   "got": [
+    "ACCESS:claude_home"
+   ]
+  },
+  "/bin/bash -lc 'ls ~/.local/share/ai-memory'": {
+   "want": [
+    "ACCESS:memory_store"
+   ],
+   "got": [
+    "ACCESS:memory_store"
+   ]
+  },
+  "/bin/bash -lc 'cat <tmp-root>/p/<session-id>/subagents/agent-x.jsonl'": {
+   "want": [
+    "ACCESS:session_transcripts"
+   ],
+   "got": [
+    "ACCESS:session_transcripts"
+   ]
+  },
+  "/bin/bash -lc 'cat ~/code/native-agent-stack/AGENTS.md'": {
+   "want": [
+    "ACCESS:live_checkout"
+   ],
+   "got": [
+    "ACCESS:live_checkout"
+   ]
+  },
+  "/bin/bash -lc 'cat <k2>/work/gpt6/a2-gpt6/events.jsonl'": {
+   "want": [
+    "ACCESS:hold_and_work_dirs",
+    "ACCESS:other_lane",
+    "MAPPING"
+   ],
+   "got": [
+    "ACCESS:hold_and_work_dirs",
+    "ACCESS:other_lane",
+    "MAPPING"
+   ]
+  },
+  "/bin/bash -lc 'ls <k2>/work/gpt6'": {
+   "want": [
+    "ACCESS:hold_and_work_dirs",
+    "ACCESS:other_lane"
+   ],
+   "got": [
+    "ACCESS:hold_and_work_dirs",
+    "ACCESS:other_lane"
+   ]
+  },
+  "/bin/bash -lc 'cat <lane-a2>/returns/claude.json'": {
+   "want": [
+    "ACCESS:hold_and_work_dirs",
+    "MAPPING"
+   ],
+   "got": [
+    "ACCESS:hold_and_work_dirs",
+    "MAPPING"
+   ]
+  },
+  "/bin/bash -lc 'ls ../gpt6'": {
+   "want": [
+    "ACCESS:adjudication_runs"
+   ],
+   "got": [
+    "ACCESS:adjudication_runs"
+   ]
+  },
+  "/bin/bash -lc 'cat <judges>/runs/gpt6/x5c-final-BA/events.jsonl'": {
+   "want": [
+    "ACCESS:adjudication_runs"
+   ],
+   "got": [
+    "ACCESS:adjudication_runs"
+   ]
+  },
+  "/bin/bash -lc 'sed -n 1,60p <root>/amended/tests/test_codex_worker_lane.py'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'git diff --no-index <root>/proposed/adoption <root>/amended/adoption'": {
+   "want": [],
+   "got": []
+  },
+  "/bin/bash -lc 'cd <root>/amended && python3 -B -m unittest tests.test_codex_worker_lane'": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Read\", \"input\": {\"file_path\": \"<tmp-root>/<project-dir>": {
+   "want": [
+    "ACCESS:hold_and_work_dirs",
+    "MAPPING"
+   ],
+   "got": [
+    "ACCESS:hold_and_work_dirs",
+    "MAPPING"
+   ]
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Glob\", \"input\": {\"path\": \"<tmp-root>/<project-dir>": {
+   "want": [
+    "ACCESS:adjudication_runs"
+   ],
+   "got": [
+    "ACCESS:adjudication_runs"
+   ]
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"Read\", \"input\": {\"file_path\": \"/tmp/c/<session-id>": {
+   "want": [
+    "ACCESS:session_transcripts"
+   ],
+   "got": [
+    "ACCESS:session_transcripts"
+   ]
+  },
+  "[{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"tool_use\", \"id\": \"t1\", \"name\": \"mcp__ai-memory__memory_query\", \"input\": {\"query\": \"x\"}}]}}]": {
+   "want": [
+    "mcp__ call"
+   ],
+   "got": [
+    "mcp__ call"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"{\\\"X5a\\\": {\\\"lanes\\\": {\\\"gpt6\\\": [\\\"agree\\\", 0.98], \\\"claude\\\": [\\\"agree\\": {
+   "want": [
+    "INJECTED",
+    "MAPPING"
+   ],
+   "got": [
+    "INJECTED",
+    "MAPPING"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"===== gpt6 ['items']\\n-- X5a agree 0.98\\nTEXT: \\nREASONS: The proposed li": {
+   "want": [
+    "INJECTED"
+   ],
+   "got": [
+    "INJECTED"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"X5c split: the GPT-6 lane accepted the proposal, and the Claude lane amen": {
+   "want": [
+    "INJECTED"
+   ],
+   "got": [
+    "INJECTED"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"So never self-write without a SOTA source.\"]}}]": {
+   "want": [
+    "PHRASES"
+   ],
+   "got": [
+    "PHRASES"
+   ]
+  },
+  "[{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"advisor_tool_result\", \"tool_use_id\": \"t1\", \"content\": \"Return B keeps the clause; the Claude lane amended it": {
+   "want": [
+    "INJECTED"
+   ],
+   "got": [
+    "INJECTED"
+   ]
+  },
+  "[{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"t1\", \"content\": \"docs: the GPT-6 lane and the Claude lane agreed on F1 (round ": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"user\", \"message\": {\"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"t1\", \"content\": \"see lane-a/claude.json\"}]}}]": {
+   "want": [
+    "MAPPING"
+   ],
+   "got": [
+    "MAPPING"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"<context_guidance><tip>Reading to Edit the file? Read is correct.</tip></": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"hook_additional_context\", \"content\": [\"{\\\"gpt6\\\": {\\\"verdict\\\": \\\"amend\\\", \\\"confidence\\\": 0.6}}\"]}}]": {
+   "want": [
+    "INJECTED",
+    "MAPPING"
+   ],
+   "got": [
+    "INJECTED",
+    "MAPPING"
+   ]
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"prompt_snapshot\", \"systemPrompt\": [\"a phrase that attributes a return to a reviewer family, such as \\\"the Codex ": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"session_context\", \"context\": {\"gitStatus\": \"4f31ef46 OmniRoute routing convergence: GPT-6 lane account-routing a": {
+   "want": [],
+   "got": []
+  },
+  "[{\"type\": \"attachment\", \"attachment\": {\"type\": \"session_context\", \"context\": {\"gitStatus\": \"{\\\"gpt6\\\": [\\\"agree\\\", 0.94]}\"}}}]": {
+   "want": [
+    "MAPPING"
+   ],
+   "got": [
+    "MAPPING"
+   ]
+  }
+ },
+ "disagreements": []
+}

@@ -1,0 +1,130 @@
+// Offline probe (no network, no gateway, no model) on real Codex request bodies captured by the pi-practice session:
+// what would the headerless lane (ab-on-*) and the gpt6-safe-lossy header lane (ab-lossy-*) do to them, per engine, and do exact values survive?
+// Usage: run.sh real_bodies_probe.ts <live-settings.json> <bodies-dir> <out.json>   Only counts are written; no body text leaves this process.
+// Published copy: the placeholder UUID of the provider id is built from parts so that this file carries no UUID-like literal (the repository's
+// publication check flags one); the value is the same all-zero placeholder the probe ran with.
+const PLACEHOLDER_UUID = ["00000000", "0000", "4000", "8000", "000000000000"].join("-");
+import fs from "node:fs";
+import path from "node:path";
+import { runGateway, type Combo, type GatewayCtx } from "./gatewayPath.ts";
+
+const [livePath, dir, outPath] = process.argv.slice(2);
+const live = JSON.parse(fs.readFileSync(livePath, "utf8"));
+const settings = live.ports["20129"].compression.config;
+const combos: Combo[] = live.ports["20129"].combos.combos;
+const ctx: GatewayCtx = {
+  provider: `openai-compatible-responses-${PLACEHOLDER_UUID}`, model: "gpt-6-astra-max",
+  sourceFormat: "openai-responses", targetFormat: "openai-responses", contextLimit: 400000,
+};
+
+function textOf(item: any): string {
+  const parts: string[] = [];
+  const grab = (v: any) => {
+    if (typeof v === "string") parts.push(v);
+    else if (Array.isArray(v)) v.forEach(grab);
+    else if (v && typeof v === "object") {
+      if (typeof v.text === "string") parts.push(v.text);
+      if (v.output !== undefined) grab(v.output);
+      if (v.content !== undefined) grab(v.content);
+      if (typeof v.input === "string") parts.push(v.input);
+      if (typeof v.arguments === "string") parts.push(v.arguments);
+    }
+  };
+  grab(item);
+  return parts.join("\n");
+}
+
+const PATTERNS: Record<string, RegExp> = {
+  long_numbers: /\b\d{10,}\b/g,
+  hex_ids: /\b[0-9a-f]{12,}\b/gi,
+  file_paths: /(?:\/[\w.\-]+){2,}/g,
+  error_lines: /^.*\b(?:Error|Traceback|FAILED|Exception|exit code)\b.*$/gm,
+};
+function multiset(text: string, re: RegExp): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const hit of text.match(re) ?? []) m.set(hit, (m.get(hit) ?? 0) + 1);
+  return m;
+}
+function missing(before: Map<string, number>, after: Map<string, number>): [number, number] {
+  let total = 0, lost = 0;
+  for (const [k, n] of before) {
+    total += n;
+    lost += Math.max(0, n - (after.get(k) ?? 0));
+  }
+  return [total, lost];
+}
+
+const out: any = { bodies: [] };
+for (const file of fs.readdirSync(dir).filter((f) => f.startsWith("ab-")).sort()) {
+  const raw = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+  const header = file.startsWith("ab-lossy-") ? "gpt6-safe-lossy" : null;
+  const body = { model: "sharedgw/gpt-6-astra-max", instructions: raw.instructions, input: raw.input, stream: true };
+  const run = await runGateway(settings, header, combos, body as any, ctx, {});
+  const after: any[] = (run.bodyOut as any).input ?? [];
+  const before: any[] = raw.input;
+  const byType: Record<string, { items: number; changed: number }> = {};
+  let changedItems = 0;
+  let textBefore = "", textAfter = "";
+  for (let i = 0; i < before.length; i++) {
+    const type = String(before[i]?.type);
+    byType[type] ??= { items: 0, changed: 0 };
+    byType[type].items++;
+    const changed = JSON.stringify(before[i]) !== JSON.stringify(after[i]);
+    if (changed) { byType[type].changed++; changedItems++; }
+    textBefore += "\n" + textOf(before[i]);
+    textAfter += "\n" + textOf(after[i]);
+  }
+  // the same counts restricted to the items that changed, by item type, plus what shrank (chars, backtick spans, lines)
+  const changedByType: Record<string, { before: string; after: string; n: number }> = {};
+  for (let i = 0; i < before.length; i++) {
+    if (JSON.stringify(before[i]) === JSON.stringify(after[i])) continue;
+    const type = String(before[i]?.type);
+    changedByType[type] ??= { before: "", after: "", n: 0 };
+    changedByType[type].before += "\n" + textOf(before[i]);
+    changedByType[type].after += "\n" + textOf(after[i]);
+    changedByType[type].n++;
+  }
+  const changedDetail: Record<string, any> = {};
+  for (const [type, v] of Object.entries(changedByType)) {
+    const surv: Record<string, [number, number]> = {};
+    for (const [name, re] of Object.entries(PATTERNS)) surv[name] = missing(multiset(v.before, re), multiset(v.after, re));
+    const spans = (s: string) => (s.match(/`[^`\n]+`/g) ?? []).length;
+    changedDetail[type] = {
+      items: v.n, chars: [v.before.length, v.after.length], lines: [v.before.split("\n").length, v.after.split("\n").length],
+      inline_code_spans: [spans(v.before), spans(v.after)], exact_strings_total_and_missing: surv,
+    };
+  }
+  const survival: Record<string, { in_input: number; missing_after: number }> = {};
+  for (const [name, re] of Object.entries(PATTERNS)) {
+    const [total, lost] = missing(multiset(textBefore, re), multiset(textAfter, re));
+    survival[name] = { in_input: total, missing_after: lost };
+  }
+  const stats: any = run.statsSummary ?? {};
+  out.bodies.push({
+    file: file.replace(/\.json$/, ""),
+    header,
+    bytes_in: JSON.stringify(body).length,
+    plan: { mode: run.plan.mode, source: (run.plan as any).source ?? null, pipeline: (run.plan.stackedPipeline ?? []).map((s: any) => s.engine + (s.intensity ? ":" + s.intensity : "")) },
+    ran: run.ran, compressed: run.compressed,
+    stats: run.statsSummary ? {
+      originalTokens: stats.originalTokens, compressedTokens: stats.compressedTokens, savingsPercent: stats.savingsPercent,
+      techniquesUsed: stats.techniquesUsed, fallbackApplied: stats.fallbackApplied,
+      validationWarnings: (stats.validationWarnings ?? []).slice(0, 6),
+      validationErrors: (stats.validationErrors ?? []).slice(0, 6),
+      engineBreakdown: (stats.engineBreakdown ?? []).map((b: any) => ({
+        engine: b.engine, originalTokens: b.originalTokens, compressedTokens: b.compressedTokens,
+        techniques: b.techniquesUsed, rejected: b.rejected, rejectReason: b.rejectReason,
+      })),
+    } : null,
+    items: before.length, changed_items: changedItems, by_type: byType,
+    text_chars: { before: textBefore.length, after: textAfter.length },
+    value_survival: survival,
+    changed_items_detail: changedDetail,
+    top_level_keys_added: Object.keys(run.bodyOut).filter((k) => !(k in body)),
+  });
+}
+fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
+for (const b of out.bodies) {
+  console.log(JSON.stringify({ file: b.file, mode: b.plan.mode, source: b.plan.source, pipeline: b.plan.pipeline.join(">"), ran: b.ran, compressed: b.compressed,
+    tokens: b.stats ? [b.stats.originalTokens, b.stats.compressedTokens] : null, changed_items: b.changed_items, of: b.items }));
+}

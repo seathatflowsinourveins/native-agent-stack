@@ -63,8 +63,8 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and its retained **357-star coverage ledger**. Its current combined index includes
-**850 repository identities**, including the 357 public stars and
-493 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
+**861 repository identities**, including the 357 public stars and
+504 identities beyond them (`python3 scripts/catalog_decisions.py --check` prints the current counts),
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -254,10 +254,10 @@ local embedding-backend steps on macOS remain unrun outside that hosted runner
 — see
 [`adoption/platforms/macos-arm64.md`](adoption/platforms/macos-arm64.md).
 
-To reproduce the public text measurement with the same upstream tokenizer:
+To reproduce the public text measurement with the pinned upstream tokenizer (the pair was first counted with 3.4.0; 4.0.0 returns the same counts):
 
 ```bash
-npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@3.4.0
+npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 TOKENIZER_PREFIX="$PWD/.runtime/tokenizer" node scripts/recount-tokens.cjs
 ```
 

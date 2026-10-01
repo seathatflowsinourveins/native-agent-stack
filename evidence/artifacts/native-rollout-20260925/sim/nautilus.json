@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "native-rollout-20260925-sim-nautilus",
+  "kind": "native_cli_e2e",
+  "component_ids": ["nautilus-trader"],
+  "claim": "Built nautilus-2.0.0rc5-r20260925 the same way as the existing tools/nautilus-2.0.0rc5 recipe recorded in evidence/receipts/native-nautilus-v2-20260920.json: uv venv + uv pip install --pre nautilus_trader==2.0.0rc5 numpy pandas. The resulting freeze is byte-identical to that record's own freeze output.",
+  "track": "sota-rollout-20260925/w1/sim",
+  "base_commit": "57fb6d89",
+  "new_root": "${STACK_HOME}/nautilus-2.0.0rc5-r20260925",
+  "existing_root_untouched": "${STACK_HOME}/nautilus-2.0.0rc5",
+  "source_recipe": "evidence/receipts/native-nautilus-v2-20260920.json#commands.install",
+  "commands": [
+    {
+      "label": "venv",
+      "argv": ["uv", "--no-config", "venv", "--python", "/usr/bin/python3.12", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925"],
+      "exit_code": 0
+    },
+    {
+      "label": "install",
+      "argv": ["uv", "--no-config", "pip", "install", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--pre", "--index-url", "https://pypi.org/simple", "nautilus_trader==2.0.0rc5", "numpy", "pandas"],
+      "exit_code": 0,
+      "installed_packages": 5,
+      "superseded_by": "install-link-mode-copy (see hardlink_entanglement_incident); this original invocation used uv's Linux default --link-mode hardlink and is the root cause of the incident below. Kept here unmodified as the accurate historical record of what actually ran."
+    },
+    {
+      "label": "install-link-mode-copy",
+      "argv": ["uv", "--no-config", "pip", "install", "--link-mode", "copy", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python",
+        "--pre", "--index-url", "https://pypi.org/simple", "nautilus_trader==2.0.0rc5", "numpy", "pandas"],
+      "exit_code": 0,
+      "installed_packages": 5,
+      "note": "This fix round's remediation for hardlink_entanglement_incident. ${STACK_HOME}/nautilus-2.0.0rc5-r20260925 was removed and recreated (uv venv) before this install so no pre-existing hardlinked file could remain. No new PyPI network access was needed (already-warm local cache: \"Resolved 5 packages in 4ms\"). Raw log: ${PRIVATE_RUN_DIR}/sim/venv-relink-fix/nautilus.log."
+    },
+    {
+      "label": "pip-check",
+      "argv": ["uv", "--no-config", "pip", "check", "--python", "${STACK_HOME}/nautilus-2.0.0rc5-r20260925/bin/python"],
+      "exit_code": 0,
+      "stdout": "All installed packages are compatible",
+      "note": "Re-run after install-link-mode-copy; identical result."
+    }
+  ],
+  "hardlink_entanglement_incident": {
+    "discovered_by": "This fix round, in response to review finding 'adaptive.json:11,22,35,61 ... made adaptive-paper-r20260925 and nautilus-2.0.0rc5-r20260925 share inodes with tools/adaptive-paper-20260921'.",
+    "note_on_which_root": "This root's entanglement was with the FORBIDDEN live paper venv tools/adaptive-paper-20260921 (via the nautilus-trader/numpy/pandas/six/python-dateutil versions this install shares with that venv's package set -- corrected round 3 to include nautilus-trader itself, see root_cause above), not with the existing_root_untouched named above (tools/nautilus-2.0.0rc5); a direct inode comparison against tools/nautilus-2.0.0rc5 found 0 shared inodes, so that root's own 'existing_root_modified: false' claim (below) was never at risk. The at-risk claim was isolation.existing_root_modified for the live venv, which this receipt did not previously mention at all.",
+    "root_cause": "The original install command above did not pass --link-mode, so uv 0.12.17's Linux default (hardlink from the shared ~/.cache/uv content-addressed cache) made this root's files hardlinks to the same cache-backed inodes already used by tools/adaptive-paper-20260921. CORRECTED IN ROUND 3: this was not limited to numpy/pandas/six/python-dateutil as previously stated -- nautilus_trader==2.0.0rc5 itself is also installed in the live venv (adaptive-paper.json's own package_set includes it), at the identical pinned version this root installs, so uv's content-addressed cache hardlinked its files too. See root_cause_package_accounting_round3 for the corrected, independently-verified breakdown; the understatement (naming only the 4 indirect dependency packages) is a previously-undisclosed gap in round 2's own receipt, not a re-measurement of what actually happened (the pre-fix root no longer exists to re-inspect directly).",
+    "root_cause_package_accounting_round3": {
+      "installed_distributions_all_five": "nautilus_trader, numpy, pandas, python-dateutil, six -- all 5 are the complete installed_distributions list below; ALL 5 are also present in the live venv at the identical pinned version (adaptive-paper.json's package_set), so all 5 were candidates for cache-based hardlinking, not just the 4 previously named.",
+      "current_root_file_count_by_package": "Measured directly on the current (already-copy-mode-fixed) root, since the pre-fix hardlinked state no longer exists to re-inspect: of 2592 non-__pycache__ site-packages files, nautilus_trader accounts for 104 (path contains '/nautilus_trader'), numpy 940, pandas 1523, six 8, python-dateutil(dateutil) 27 -- these overlap slightly (e.g. a handful of shared .libs/RECORD-adjacent paths), so they do not sum to exactly 2592, but nautilus_trader's 104 files are unambiguously present and none of them are numpy/pandas/six/dateutil files.",
+      "arithmetic_consistency_with_pre_fix_count": "measured_before_fix.result below records 2575 of 2593 files shared pre-fix -- more than the ~2486 files round 2's own review estimate attributed to numpy+pandas+six+dateutil alone (and more than can be accounted for without nautilus_trader, given nautilus_trader is 104 of this root's 2592-2593 files and the only OTHER installed package). This is consistent with, not merely asserted from, at least part of nautilus_trader's own 104 files having been among the 2575 shared pre-fix; the exact split is not independently re-measurable now that the root is already fixed (copy-mode, 0 shared inodes), so this receipt states the corrected mechanism (all 5 packages were candidates, not 4) without a false-precision exact count for nautilus_trader specifically."
+    },
+    "measured_before_fix": {
+      "method": "os.lstat st_ino comparison, nautilus-2.0.0rc5-r20260925 vs adaptive-paper-20260921 (the live venv), both lib/python3.12/site-packages trees",
+      "result": "2575 of 2593 new-root files shared an inode with the live venv. Round 2's own root_cause text (corrected above) named only 4 of the 5 installed packages as the shared mechanism; nautilus_trader itself (104 files in the current, already-fixed root) was omitted."
+    },
+    "fix": "Rebuilt nautilus-2.0.0rc5-r20260925 from scratch (uv venv, fresh directory) and reinstalled the identical package set with `uv pip install --link-mode copy`.",
+    "measured_after_fix": {
+      "method": "same os.lstat st_ino comparison, re-run after the copy-mode rebuild",
+      "result": "0 of 2592 new-root files share an inode with the live venv or anything outside the new root.",
+      "freeze_unchanged": "Regenerated installed-freeze.txt after the rebuild: 94 bytes, sha256 9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75 -- byte-identical to this receipt's originally recorded value, confirming the package set/versions are unaffected by link mode.",
+      "backtest_reconfirmed": "Two fresh equity-replay confirmation runs (run-3, run-4, see evidence/artifacts/native-rollout-20260925/sim/equity-replay.json) were executed against this corrected root after the fix and both still reproduced the oracle's account.csv hashes exactly, so the relink did not change runtime behavior.",
+      "live_venv_second_metadata_change_round3": "Round 3 correction: this root's own rm -rf-and-rebuild (nautilus.log START/END 09:10:52Z/09:10:52Z) removed this root's hardlinks to its 2575 pre-fix shared live-venv files, which decrements nlink and updates ctime on those live-venv files a second time (the original hardlink creation already changed them once; see root_cause). This receipt previously did not mention a live-venv-side checkpoint at all. See adaptive-paper.json's round3_cache_and_metadata_correction.live_venv_second_metadata_change for the combined, independently-reproduced count (2,575 of these files' FINAL ctime is 09:10:52Z, i.e. this root's own rm -rf ran last and its ctime write is the one that persisted) and the RECORD-hash content check (verify_live_venv_content.py: 3678/3678 verify, 0 mismatches -- content unaffected). This root's own install wrote 0 bytes to ~/.cache/uv (already correctly noted below); the live-venv metadata change is a distinct, non-cache mechanism (hardlink removal on the live venv's own inodes, not a cache write)."
+    }
+  },
+  "installed_distributions": [
+    "nautilus-trader==2.0.0rc5", "numpy==2.5.3", "pandas==3.0.6",
+    "python-dateutil==2.9.0.post0", "six==1.17.0"
+  ],
+  "artifacts": {
+    "installed-freeze.txt": {"bytes": 94, "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75"}
+  },
+  "comparison_to_recorded_recipe": {
+    "method": "diff of sorted freeze output against native-nautilus-v2-20260920.json's recorded installed_distributions and freeze.stdout sha256",
+    "result": "IDENTICAL package set/versions; installed-freeze.txt sha256 exactly matches the recorded freeze.stdout sha256 (9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75)"
+  },
+  "isolation": {
+    "network_used": "PyPI package resolution/download only (https://pypi.org/simple); no Alpaca or other market-data endpoint contacted. The copy-mode rebuild needed no additional network access (already-warm local uv cache).",
+    "credentials_read": 0,
+    "orders_placed": 0,
+    "existing_root_modified": false,
+    "existing_root_modified_note": "True and unaffected by the incident below: tools/nautilus-2.0.0rc5 shares 0 inodes with this new root, confirmed by direct comparison. See hardlink_entanglement_incident for a *different* root (the forbidden live paper venv tools/adaptive-paper-20260921) that this receipt did not previously disclose being entangled with at all."
+  },
+  "limitations": [
+    "Release candidate build (2.0.0rc5), not a production/live-capital acceptance.",
+    "This receipt covers environment construction only; the equity-replay backtest receipt in this same directory covers the runtime E2E acceptance on this root.",
+    "PyPI wheel hashes are trusted from the index at install time; no separate re-hash/signature verification of the downloaded wheel was performed for this build (matching the source recipe's own documented scope).",
+    "See hardlink_entanglement_incident: the original build hardlinked this root's files (nautilus_trader included -- round 3 correction, see root_cause) to the FORBIDDEN live paper venv tools/adaptive-paper-20260921 via uv's Linux default link mode -- an undisclosed scope/isolation issue in the prior round's receipt, distinct from and in addition to the adaptive-paper.json incident. Fixed this round (round 2) by rebuilding with --link-mode copy (0 shared inodes verified after).",
+    "Round 3: round 2's own fix (the rm -rf-and-rebuild above) itself changed the live venv's nlink/ctime a second time (see measured_after_fix.live_venv_second_metadata_change_round3), which round 2 did not disclose. Content integrity is unaffected (RECORD-hash reverified 3678/3678 in adaptive-paper.json's check, which covers the whole live venv including the files this root shares)."
+  ],
+  "sanitization": "Host paths use the ${STACK_HOME} placeholder for ~/.local/share/codex-ecosystem/tools. No credential values or session identifiers appear in this receipt."
+}

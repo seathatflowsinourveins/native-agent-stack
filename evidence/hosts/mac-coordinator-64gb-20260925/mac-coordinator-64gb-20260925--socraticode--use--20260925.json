@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--socraticode--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "720e294b5c10211d8f75a939bc478af734279d74",
+  "recorded_by": {
+    "identity_sha256": "03a62a68a9785fc83dda29f85fab2c687befe8433887f4e705d2443dde35f354",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "socraticode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "echo \"macOS $(sw_vers -productVersion) ($(sw_vers -buildVersion)) $(uname -m)\" && python3 -c \"import tomllib,os;a=tomllib.load(open(os.path.expanduser('~/.codex/config.toml'),'rb'))['mcp_servers']['socraticode']['args'];print('codex socraticode entry launches tools/socraticode-1.14.0:', any('/tools/socraticode-1.14.0/' in x for x in a))\" && node -p \"'package.json version ' + require(process.env.HOME + '/.local/share/agent-ecosystem/tools/socraticode-1.14.0/node_modules/socraticode/package.json').version\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}),'macos pin file',[t['version'] for t in json.load(open('adoption/pins-macos-arm64.json'))['tools'] if t['id']==c])\" socraticode && printf 'ollama ' && curl -fsS http://127.0.0.1:11434/api/version && printf '\\nqdrant ' && curl -fsS http://127.0.0.1:6333/ | python3 -c \"import json,sys;print(json.load(sys.stdin)['version'])\"",
+      "exit": 0,
+      "duration_s": 0.246,
+      "output_sha256": "38b168e4e5fa04e723ef3207e1635a0712fcd344265be235090d79fb706442c0",
+      "output_excerpt": "macOS 27.0 (26A428) arm64\ncodex socraticode entry launches tools/socraticode-1.14.0: True\npackage.json version 1.14.0\nstack ['1.14.0'] winner pins ['1.14.0'] macos pin file ['1.14.0']\nollama {\"version\":\"0.34.4\"}\nqdrant 1.19.1\n"
+    },
+    {
+      "cmd": "d=\"$(mktemp -d)\" && mkdir \"$d/probe\" && cp scripts/release_due.py scripts/hardware_profile.py scripts/credential_status.py \"$d/probe/\" && python3 - \"$d/probe\" <<'PY'\nimport json, os, subprocess, sys, time, urllib.request as u\nproj = sys.argv[1]\nhome = os.path.expanduser('~')\nenv = dict(os.environ, EMBEDDING_PROVIDER='ollama', OLLAMA_MODE='external', OLLAMA_URL='http://127.0.0.1:11434', EMBEDDING_MODEL='qwen3-embedding:4b', EMBEDDING_DIMENSIONS='2560', EMBEDDING_CONTEXT_LENGTH='4096', QDRANT_MODE='external', QDRANT_URL='http://127.0.0.1:6333')\ndef collections():\n    return sorted(c['name'] for c in json.load(u.urlopen('http://127.0.0.1:6333/collections', timeout=30))['result']['collections'])\nbefore = collections()\np = subprocess.Popen(['node', home + '/.local/share/agent-ecosystem/tools/socraticode-1.14.0/node_modules/socraticode/dist/index.js'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env, text=True, cwd=proj)\nn = [0]\ndef call(name, args):\n    n[0] += 1\n    p.stdin.write(json.dumps({'jsonrpc': '2.0', 'id': n[0], 'method': 'tools/call', 'params': {'name': name, 'arguments': args}}) + '\\n'); p.stdin.flush()\n    while True:\n        m = json.loads(p.stdout.readline())\n        if m.get('id') == n[0]:\n            r = m.get('result', {})\n            return r.get('isError', False), ''.join(c.get('text', '') for c in r.get('content', []) if c.get('type') == 'text')\np.stdin.write(json.dumps({'jsonrpc': '2.0', 'id': 0, 'method': 'initialize', 'params': {'protocolVersion': '2025-03-26', 'capabilities': {}, 'clientInfo': {'name': 'nas-receipt-probe', 'version': '0'}}}) + '\\n'); p.stdin.flush()\ninfo = json.loads(p.stdout.readline())['result']['serverInfo']\np.stdin.write(json.dumps({'jsonrpc': '2.0', 'method': 'notifications/initialized'}) + '\\n'); p.stdin.flush()\nerr, _ = call('codebase_index', {'projectPath': proj})\nfor _ in range(240):\n    _, st = call('codebase_status', {'projectPath': proj})\n    if 'in progress' not in st and 'Indexed chunks: 0' not in st and 'Indexed chunks:' in st:\n        break\n    time.sleep(1)\nchunks = [l.strip() for l in st.splitlines() if 'chunks' in l.lower()][:1]\ndef top(q):\n    e, t = call('codebase_search', {'query': q, 'projectPath': proj, 'limit': 3})\n    return [l.split(' (lines')[0].replace('---', '').strip().split('/')[-1] for l in t.splitlines() if l.startswith('--- ')]\na = top('measure the unified memory and CPU core count of this host')\nb = top('is a new release due against the pinned release tag')\nc = top('check whether a provider credential file exists without reading its value')\nrerr, _ = call('codebase_remove', {'projectPath': proj})\np.stdin.close(); p.terminate()\nafter = collections()\nprint(info['name'], info['version'], '| index err', err, chunks, '| top-1:', a[:1], b[:1], c[:1], '| remove err', rerr, '| qdrant collections before/after', len(before), len(after), before == after)\nok = not err and not rerr and a[:1] == ['hardware_profile.py'] and b[:1] == ['release_due.py'] and c[:1] == ['credential_status.py'] and before == after\nraise SystemExit(0 if ok else 1)\nPY\nok=$?; rm -rf \"$d\"; exit $ok",
+      "exit": 0,
+      "duration_s": 31.024,
+      "output_sha256": "3bc7ab425f48e147e9de627d7937494a88456d80cfed495fd02b31c5cbf9f90d",
+      "output_excerpt": "socraticode 1.14.0 | index err False ['Indexed chunks: 59'] | top-1: ['hardware_profile.py'] ['release_due.py'] ['credential_status.py'] | remove err False | qdrant collections before/after 5 5 True\n"
+    }
+  ],
+  "tool_versions": {
+    "socraticode": "1.14.0"
+  },
+  "observed_at_utc": "2026-09-25T14:17:34Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory), SocratiCode 1.14.0 (the catalog pin; the first command confirms that this host's Codex MCP entry launches that build) indexed a temporary copy of three of this repository's scripts through its MCP stdio interface, embedding the chunks with this host's Ollama (qwen3-embedding:4b) into this host's Qdrant 1.19.1 (both versions are in the first command's output), and answered three natural-language questions with the expected file ranked first for each: hardware_profile.py, release_due.py and credential_status.py. It then removed the index with codebase_remove, leaving the Qdrant collection list unchanged. The second command exits 0 only when all of these hold. All commands exit 0.",
+  "limitations": [
+    "Recorded from a Claude Code 2.1.280 session, outside the Seatbelt sandbox, in a fresh clone of origin/main at 720e294b (the catalog_revision), not in a pinned install checkout. The tools are this host's existing installs under ~/.local/share/agent-ecosystem and mise, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json: Apple M5 Pro, 18 cores, 64 GB unified memory) differs from the catalog's WSL authoring laptop and from the earlier 24 GB Mac (macos-m5pro-20260924). The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status.",
+    "A separate SocratiCode process started by the command with the same embedding and Qdrant settings as this host's Codex MCP entry, written into the command (node from PATH, not the configured node path), on a three-file temporary project removed afterwards. The host's existing SocratiCode index and the MCP servers the clients run were not used; the code graph, context artifacts, file watcher and incremental updates were not exercised.",
+    "Three questions written by the recorder with the answers known: a smoke check, not a retrieval benchmark. Ollama 0.34.4, the embedder, is not a catalog component and has no receipt of its own."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:17:34Z",
+      "reviewer": {
+        "identity_sha256": "03a62a68a9785fc83dda29f85fab2c687befe8433887f4e705d2443dde35f354",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+09/26/2026 12:12:49 AM - INFO - vidore_benchmark.utils.logging_utils:22 - Logging level set to info
+09/26/2026 12:12:49 AM - INFO - vidore_benchmark.cli.main:93 - Logging level set to `info`
+09/26/2026 12:12:50 AM - INFO - root:13 - FastPlaid is not installed.If you want to use it:Instal with `pip install --no-deps fast-plaid fastkmeans`
+09/26/2026 12:12:50 AM - INFO - vidore_benchmark.utils.torch_utils:26 - Using device: cpu
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 28.86it/s]
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Evaluating dataset(s):   0%|          | 0/1 [00:00<?, ?it/s]
+---------------------------
+/tmp/tmp.ZtWUzYFdCO/slice
+
+Generating test split: 0 examples [00:00, ? examples/s][AGenerating test split: 12 examples [00:00, 1351.87 examples/s]
+
+Map:   0%|          | 0/12 [00:00<?, ? examples/s][AMap: 100%|██████████| 12/12 [00:00<00:00, 1587.40 examples/s]
+
+Dataloader pre-batching for queries:   0%|          | 0/1 [00:00<?, ?it/s][A
+
+Forward pass queries...:   0%|          | 0/3 [00:00<?, ?it/s][A[A
+
+Forward pass queries...:  33%|███▎      | 1/3 [00:03<00:07,  3.76s/it][A[A
+
+Forward pass queries...:  67%|██████▋   | 2/3 [00:07<00:03,  3.75s/it][A[A
+
+Forward pass queries...: 100%|██████████| 3/3 [00:12<00:00,  4.24s/it][A[A
+
+                                                                      [A[A
+Dataloader pre-batching for queries: 100%|██████████| 1/1 [00:12<00:00, 12.34s/it][A
+                                                                                  [A
+Dataloader pre-batching for passages:   0%|          | 0/1 [00:00<?, ?it/s][A
+
+Forward pass documents...:   0%|          | 0/3 [00:00<?, ?it/s][A[A
+
+Forward pass documents...:  33%|███▎      | 1/3 [02:29<04:58, 149.39s/it][A[A
+
+Forward pass documents...:  67%|██████▋   | 2/3 [04:58<02:29, 149.31s/it][A[A
+
+Forward pass documents...: 100%|██████████| 3/3 [07:28<00:00, 149.65s/it][A[A
+
+                                                                         [A[A
+Dataloader pre-batching for passages: 100%|██████████| 1/1 [07:28<00:00, 448.85s/it][ADataloader pre-batching for passages: 100%|██████████| 1/1 [07:28<00:00, 448.85s/it]
+09/26/2026 12:21:26 AM - INFO - root:69 - 
+
+09/26/2026 12:21:26 AM - INFO - vidore_benchmark.cli.main:196 - ViDoRe Benchmark results for "/tmp/tmp.ZtWUzYFdCO/slice" saved to `/tmp/tmp.ZtWUzYFdCO/out-colpali/colpali_vidore_colpali-v1.3/_tmp_tmp.ZtWUzYFdCO_slice_metrics.json`
+Evaluating dataset(s): 100%|██████████| 1/1 [08:31<00:00, 511.95s/it]Evaluating dataset(s): 100%|██████████| 1/1 [08:31<00:00, 511.95s/it]
+nDCG@5 on /tmp/tmp.ZtWUzYFdCO/slice: 0.89682
+ViDoRe Benchmark results saved to `/tmp/tmp.ZtWUzYFdCO/out-colpali/colpali_vidore_colpali-v1.3_metrics.json`

@@ -1,0 +1,69 @@
+{
+ "schema_version": 1,
+ "rule": "run_discipline.pinned_copies: each named definition in copy is identical to the same definition extracted with ast from the source blob; the study tree imports nothing from the source paths.",
+ "copies": [
+  {
+   "source_path": "blueprints/us-equities/mover-early-entry/rules.py",
+   "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+   "git_blob": "9be164c9e1a49a451d3a2381205349ed5003a993",
+   "sha256": "d66156b3e57c6299f10e41a3f25c921c8be52571bd84417040190d926bf49450",
+   "copy": "pinned/rules_copy.py",
+   "definitions": [
+    "ET",
+    "TIME_BUCKETS",
+    "PRICE_TIERS",
+    "DV_TIERS",
+    "et_epoch",
+    "Bars",
+    "time_bucket",
+    "price_tier",
+    "dv_tier"
+   ]
+  },
+  {
+   "source_path": "blueprints/us-equities/mover-early-entry/sessions_io.py",
+   "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+   "git_blob": "0f7791a87685c73635efe94c226031d9afe7bd7c",
+   "sha256": "2a753cb8f9164f48c1dceb952eb42eeae17811f636fddf5fca082731c708e59a",
+   "copy": "pinned/sessions_io_copy.py",
+   "definitions": [
+    "official_price"
+   ]
+  },
+  {
+   "source_path": "blueprints/us-equities/mover-early-entry/quotes.py",
+   "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+   "git_blob": "caebf6f6a72fee6bb7ae637ebb698f8c5f6b3850",
+   "sha256": "4116bf2809e0952f842f0e0fe35fd8b5ab11ea295637734ffe0d719ca72ee85e",
+   "copy": "pinned/quotes_copy.py",
+   "definitions": [
+    "valid_quote"
+   ]
+  },
+  {
+   "source_path": "blueprints/us-equities/broad-universe/coverage.py",
+   "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+   "git_blob": "d08c5ec2f11a70717f6e7470d611ab307c6efd63",
+   "sha256": "ea88f5d7a9fd4d5f957b559ee4afc035134c7d267e4a1afa52c45afe3f48ebbd",
+   "copy": "pinned/coverage_copy.py",
+   "definitions": [
+    "DUPLICATE_SERIES_MIN_SESSIONS",
+    "DUPLICATE_SERIES_MIN_SPAN_COVERAGE",
+    "CONTINUITY_RATIO",
+    "_rename_terminus",
+    "_components",
+    "dedupe_identity"
+   ]
+  },
+  {
+   "source_path": "blueprints/us-equities/broad-universe/collect_daily.py",
+   "commit": "aa6fc791bbd4af3499317673989d2e90a522c257",
+   "git_blob": "8df7d3485b848847a372d264768945e3a6d8b9c1",
+   "sha256": "4557cd9b0fc6aa6781a31748bfc97d53b6c9234648480177daa2f78bca2bbfaf",
+   "copy": "pinned/collect_daily_copy.py",
+   "definitions": [
+    "DATA_SYMBOL"
+   ]
+  }
+ ]
+}

@@ -24,7 +24,9 @@ usage() {
     'ECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an' \
     'isolated tools/<name>-<version> prefix with bin/ symlinks. Every archive' \
     'is SHA-256 verified with shasum -a 256 before extraction; a pin with a' \
-    'null sha256 refuses to install (fail closed). A selected component with' \
+    'null sha256 refuses to install (fail closed), except a uv-tool-from-git' \
+    'pin (serena), which has no archive to hash and instead pins and verifies' \
+    'an exact git commit. A selected component with' \
     'no pin at all also fails closed (exit 3) before installing anything, and' \
     'in --plan mode too, unless it is named in --allow-unpinned, in which case' \
     'it is skipped and echoed to the run log.' \
@@ -32,11 +34,15 @@ usage() {
     'shellcheck that brew list --versions reports missing, before the' \
     'curl/git/tar/jq presence check unless --skip-system-packages is given,' \
     'in which case that check lists what is missing and exits 4.' \
+    'After installing, checks each installed pin with the version_probe its' \
+    'pin declares (bounded, stdin closed; servers are never started) and' \
+    'writes installed-versions.txt; exits 5 if any probe fails.' \
     'Never edits a shell profile.' \
     '' \
     '  --plan  resolve and print each pinned component (version, asset,' \
-    '          sha256) without any network access or installation; still' \
-    '          exits 1 on a pin with no verified sha256 and 3 on a selected' \
+    '          sha256, or the commit of a uv-tool-from-git pin) without any' \
+    '          network access or installation; still exits 1 on a pin with' \
+    '          no verified sha256 (or 40-hex commit) and 3 on a selected' \
     '          component with no pin at all.'
 }
 
@@ -288,6 +294,13 @@ cleanup() {
   # here on is checked explicitly rather than relied on to abort the whole
   # function via errexit.
   set +e
+  # An interrupted version report leaves its probe and watchdog running in
+  # their own process groups (run_version_probe, below); stop both.
+  # Reaped under a silenced stderr, so bash prints no job notice for them.
+  local group
+  for group in "${version_probe_pid:-}" "${version_watchdog_pid:-}"; do
+    if [[ -n "$group" ]]; then { kill -KILL -- "-$group" && wait "$group"; } 2>/dev/null; fi
+  done
   if [[ -n "$pending_migration_prefix" && -e "$pending_migration_prefix" && -n "$pending_migration_dest" ]]; then
     if [[ ! -e "$pending_migration_dest" ]]; then
       mv -- "$pending_migration_prefix" "$pending_migration_dest" 2>/dev/null && pending_migration_prefix=""
@@ -326,14 +339,24 @@ else
 fi
 stage_dir="$(mktemp -d "$ecosystem_root/staging.XXXXXXXX")"
 
+verify_sha256() {
+  # Prefer macOS's native checker when available; Linux also supports the
+  # GNU coreutils fallback. Both consume checksum lines on standard input.
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 --check --status
+  else
+    sha256sum --check --status
+  fi
+}
+
 fetch() {
   local url="$1" checksum="$2" destination="$3"
-  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | shasum -a 256 --check --status; then
+  if [[ -f "$destination" ]] && printf '%s  %s\n' "$checksum" "$destination" | verify_sha256; then
     return
   fi
   curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
     "$url" --output "$destination.partial"
-  printf '%s  %s\n' "$checksum" "$destination.partial" | shasum -a 256 --check --status || {
+  printf '%s  %s\n' "$checksum" "$destination.partial" | verify_sha256 || {
     printf 'Checksum mismatch: %s\n' "$url" >&2; exit 1
   }
   mv -- "$destination.partial" "$destination"
@@ -1027,14 +1050,46 @@ EOF
 # (no DISABLE_AUTOUPDATER opt-out). This replaces claude-code's prior
 # npm + platform_dependency + postinstall-copy pin design (round 3d/3h
 # above): the native installer needs none of that verified-copy machinery.
+#
+# The pin is a floor, not a ceiling (2026-09-24): `"$bin" install <pin>`
+# moves the installer's own launcher back to the pin, dropping a newer
+# auto-updated release's fixes. A launcher at $HOME/.local/bin/<bin> whose
+# `--version` first word ("2.1.284" of "2.1.284 (Claude Code)") is a dotted
+# numeric version at or above the pin is kept: nothing is downloaded or
+# installed, and install_pin logs "Kept" instead of "Installed". Fields are
+# compared as base-10 numbers (2.1.99 is older than 2.1.284). No launcher, a
+# failing --version, a non-numeric version or an older one takes the
+# unchanged checksum-verified install. Self-contained on purpose:
+# tests/test_adoption_bootstrap.py runs install_native extracted alone.
 install_native() {
   # $5 is the command the native installer creates (the pin's `bin`, e.g.
   # claude-code installs ~/.local/bin/claude); it defaults to the pin id.
   local id="$1" version="$2" url="$3" sha256="$4" bin_name="${5:-$1}"
-  local download="$cache_dir/${id}-${version}-native"
-  fetch "$url" "$sha256" "$download"
-  chmod 0755 "$download"
-  "$download" install "$version"
+  local launcher="$HOME/.local/bin/$bin_name" installed="" keep=0 have want have_field want_field
+  if [[ -x "$launcher" ]] && installed="$("$launcher" --version </dev/null 2>/dev/null)"; then
+    installed="${installed%%[[:space:]]*}"
+    keep=1
+    case "$installed" in ''|*[!0-9.]*|.*|*.|*..*) keep=0 ;; esac
+    case "$version" in ''|*[!0-9.]*|.*|*.|*..*) keep=0 ;; esac
+    have="$installed" want="$version"
+    while [[ "$keep" == 1 && -n "$have$want" ]]; do
+      have_field="${have%%.*}" want_field="${want%%.*}"
+      if [[ "$have" == *.* ]]; then have="${have#*.}"; else have=""; fi
+      if [[ "$want" == *.* ]]; then want="${want#*.}"; else want=""; fi
+      if (( 10#${have_field:-0} > 10#${want_field:-0} )); then break; fi
+      if (( 10#${have_field:-0} < 10#${want_field:-0} )); then keep=0; fi
+    done
+  fi
+  if [[ "$keep" == 1 ]]; then
+    native_floor_kept="$installed"
+    printf 'Kept installed %s %s: at or above the pinned floor %s, so nothing was downloaded or installed (installing the pin would downgrade it).\n' \
+      "$id" "$installed" "$version"
+  else
+    local download="$cache_dir/${id}-${version}-native"
+    fetch "$url" "$sha256" "$download"
+    chmod 0755 "$download"
+    "$download" install "$version"
+  fi
   # When bin_dir is the installer's own ~/.local/bin, its launcher (a symlink
   # into ~/.local/share/claude/versions) already provides the command; writing
   # ours there would replace it with a script that execs itself.
@@ -1046,10 +1101,171 @@ install_native() {
   {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    if [[ "$bin_name" == claude ]]; then
+      # Interactive default effort max (docs/decisions/2026-09-29-max-default-effort.md): the client cannot save max, so the
+      # documented --effort flag is added, and only when nothing has chosen an effort. The quoted heredoc keeps $HOME and $@ literal.
+      cat <<'LAUNCHER_EFFORT'
+# Interactive default effort: max. Claude Code cannot save max in settings (effortLevel and modelSettings take low to
+# xhigh) and CLAUDE_CODE_EFFORT_LEVEL would override every --effort, /effort and child effort, so the documented --effort
+# flag is added here, and only when nothing has chosen an effort: stdin and stdout are a terminal, no -p/--print (also as
+# a short-flag cluster such as -pc), no --effort, no CLAUDE_CODE_EFFORT_LEVEL, nothing after a "--", and a client at
+# 2.1.284 or newer (on 2.1.281 a max session turned Ultracode's orchestration off). An operand that merely equals one of
+# these flags, such as the value of --system-prompt, also suppresses the default. To bypass, pass --effort <level> or run
+# ~/.local/bin/claude directly.
+if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then
+  for arg in "$@"; do
+    case "$arg" in
+      --) break ;;
+      -p* | -[!-]*p* | --print | --print=* | --effort | --effort=*) exec "$HOME/.local/bin/claude" "$@" ;;
+    esac
+  done
+  version="$("$HOME/.local/bin/claude" --version 2>/dev/null < /dev/null)"
+  version="${version%%[[:space:]]*}"
+  case "$version" in
+    [0-9]*.[0-9]*.[0-9]*)
+      major="${version%%.*}"; rest="${version#*.}"; minor="${rest%%.*}"; patch="${rest#*.}"; patch="${patch%%.*}"
+      case "$major$minor$patch" in
+        *[!0-9]*) ;;
+        *)
+          if [ "$((10#$major))" -gt 2 ] || { [ "$((10#$major))" -eq 2 ] && { [ "$((10#$minor))" -gt 1 ] ||
+            { [ "$((10#$minor))" -eq 1 ] && [ "$((10#$patch))" -ge 284 ]; }; }; }; then
+            exec "$HOME/.local/bin/claude" --effort max "$@"
+          fi ;;
+      esac ;;
+  esac
+fi
+LAUNCHER_EFFORT
+    fi
     # shellcheck disable=SC2016
     printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
   } > "$bin_dir/$bin_name"
   chmod 0755 "$bin_dir/$bin_name"
+}
+
+# install_uv_tool and install_uv_tool_from_git below (with the comments
+# between them) are copied verbatim from adoption/bootstrap-linux.sh, and
+# rtk_config_reminder's config-file check is the Linux reminder's own
+# five-entry text check, applied to the file rtk reads on macOS (not the
+# Linux path); all three were added here 2026-09-26 for the macOS
+# headroom/markitdown (uv-tool), serena (uv-tool-from-git) and rtk pins.
+# tests/test_adoption_bootstrap_macos.py asserts the two install functions
+# and their checksum/download helpers stay byte-identical to the Linux ones
+# and the reminder's text check matches
+# the Linux reminder's line for line, and runs all three under a real bash
+# 3.2: they use no mapfile, associative array or ${var,,}.
+# install_uv_tool was re-ported on 2026-09-26 after bootstrap-linux.sh's
+# (#334) started downloading and sha256-verifying a wheel url (headroom's
+# darwin arm64 wheel here) before uv runs. The shared fetch() and
+# verify_sha256() helpers prefer `shasum -a 256`, with a GNU sha256sum
+# fallback on Linux; both exit 1 on a mismatch before uv runs. jq is a
+# checked prerequisite and cache_dir is this script's download directory.
+install_uv_tool() {
+  # $3 (always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself) is the actual
+  # installable spec when it differs from the component id -- e.g.
+  # headroom's PyPI distribution is "headroom-ai[mcp]", not "headroom".
+  # $4 and $5 are the pin's url and sha256. A wheel url (headroom) is
+  # consumed: fetch downloads that wheel and verifies its sha256 (exit 1 on
+  # a mismatch, before uv runs), and uv installs the local file as the
+  # direct reference "<package> @ file://<wheel>", which keeps the extras and
+  # which uv refuses when the wheel's filename names another distribution. A
+  # direct reference carries no ==version, so the filename's version must
+  # equal the pin's first. The wheel's own dependencies still resolve from
+  # uv's index, and uv's receipt records the wheel's path under downloads/.
+  # An sdist url (markitdown, tavily-cli) is not consumed: uv resolves
+  # "$package==$version" from its index, and that sha256 remains the
+  # cross-check its install_note describes.
+  local id="$1" version="$2" package="$3" url="$4" sha256="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  local spec="${package}==${version}"
+  if [[ "$url" == *.whl ]]; then
+    # {distribution}-{version}(-{build tag})?-{python}-{abi}-{platform}.whl;
+    # neither the escaped distribution name nor the version contains "-".
+    local wheel_file="${url##*/}" wheel_version wheel_uri
+    wheel_version="${wheel_file#*-}"
+    wheel_version="${wheel_version%%-*}"
+    [[ "$wheel_version" == "$version" ]] || {
+      printf 'Refusing to install %s %s: its pinned wheel %s is version %s.\n' \
+        "$id" "$version" "$wheel_file" "$wheel_version" >&2
+      exit 1
+    }
+    fetch "$url" "$sha256" "$cache_dir/$wheel_file"
+    # PEP 508 reads a URI after "@", so the wheel is named by a file:// URL
+    # with each path segment percent-encoded (jq's @uri). As a bare path, a
+    # "#" in ECO_INSTALL_ROOT would start a fragment and a " ;" a marker, and
+    # uv would refuse the install.
+    wheel_uri="file://$(jq -rn --arg path "$cache_dir/$wheel_file" '$path | split("/") | map(@uri) | join("/")')"
+    spec="${package} @ ${wheel_uri}"
+  fi
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "$spec"
+}
+
+# Installs a uv tool pinned to an exact upstream git commit instead of a
+# released version (serena: upstream ships no PyPI release of its current
+# 2.0.0.dev0). The 40-hex commit is itself the integrity anchor -- git
+# refuses to resolve a rev that is not that exact object -- so there is no
+# downloaded archive to sha256; install_pin's own fail-closed gate checks
+# the commit's shape for this kind instead of a sha256. After install this
+# also reads back UV_TOOL_DIR's own uv-receipt.toml and refuses (exit 1)
+# unless uv actually resolved that same commit, so a stale prior install of
+# a different revision under the same tool name can never pass silently.
+install_uv_tool_from_git() {
+  # $5 is always given: install_pin below passes the pin's "package" field,
+  # falling back to its own "id" in the jq expression itself.
+  local id="$1" version="$2" repo_url="$3" commit="$4" package="$5"
+  command -v uv >/dev/null || { printf 'uv is required to install %s; install uv first.\n' "$id" >&2; exit 1; }
+  UV_TOOL_DIR="$ecosystem_root/python-tools" UV_TOOL_BIN_DIR="$bin_dir" \
+    uv tool install --python 3.13 "git+${repo_url}@${commit}"
+  local receipt="$ecosystem_root/python-tools/$package/uv-receipt.toml"
+  [[ -f "$receipt" ]] || {
+    printf 'Refusing %s %s: no uv-receipt.toml at %s after install; cannot verify the resolved commit.\n' \
+      "$id" "$version" "$receipt" >&2
+    exit 1
+  }
+  grep -Fq "rev=${commit}" "$receipt" || {
+    printf 'Refusing %s %s: %s does not record the pinned commit %s.\n' "$id" "$version" "$receipt" "$commit" >&2
+    exit 1
+  }
+}
+
+# rtk 0.50.0's Claude hook windows `git show <rev>:<path>` blobs (a piped
+# `| tail` then reads the window, not the file's end), and a rewritten `diff`
+# exits 1 instead of 2 on a missing file. The bare "^git show [^ ]*:" pattern
+# misses a `git -C <dir> show HEAD:path` form (still windowed), and separately
+# `git branch -a`'s filter_branch_output always keeps git's `+ ` prefix on a
+# local branch checked out in a linked worktree, but only misreports it as
+# remote-only when a remote-tracking branch of the same name also exists.
+# The two added patterns anchor to the git subcommand position (only
+# -C/-c/--git-dir/--work-tree with a value, or another --flag, may precede
+# show/branch -- the same global options rtk's own discovery strips before
+# dispatch), so an ordinary command that merely mentions "show" or "branch"
+# as an argument is not misclassified.
+# recipes/README.md#native-context-mode-and-hooks excludes all four, and plain
+# jq (F2 in docs/decisions/2026-09-26-token-practice-f1-f9.md), through
+# rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
+# A duplicate key or table is invalid TOML and rtk silently falls back to
+# defaults, so the reminder says to replace the whole value inside the existing
+# [hooks] table, adding the key or table only when missing.
+# The file is the one rtk reads on a Mac, not the Linux reminder's
+# ${XDG_CONFIG_HOME:-$HOME/.config}/rtk/config.toml: rtk 0.50.0's
+# get_config_path() is dirs::config_dir()/rtk/config.toml
+# (src/core/config.rs:495-498 at the v0.50.0 tag commit 1d87b8e7), and the
+# dirs crate its Cargo.lock pins (5.0.1) answers $HOME/Library/Application
+# Support on macOS whatever XDG_CONFIG_HOME says (src/mac.rs:7,10); rtk reads
+# no config-path variable of its own, and its README gives the same macOS
+# path (evidence/artifacts/macos-token-pins-20260926/rtk-config-path.txt).
+# Print-only: never writes that file.
+rtk_config_reminder() {
+  local config="$HOME/Library/Application Support/rtk/config.toml"
+  if [[ -f "$config" ]] \
+    && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" && grep -Fq '"jq"' "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
+    && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
+    return 0
+  fi
+  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"', "jq"] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
 }
 
 install_pin() {
@@ -1060,21 +1276,36 @@ install_pin() {
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
   fi
-  local version kind url sha256 note ignore_scripts
+  local version kind url sha256 note ignore_scripts commit
   version="$(jq -r '.version' <<<"$entry")"
   kind="$(jq -r '.kind' <<<"$entry")"
   url="$(jq -r '.url' <<<"$entry")"
   sha256="$(jq -r '.sha256' <<<"$entry")"
   note="$(jq -r '.install_note' <<<"$entry")"
   ignore_scripts="$(jq -r '.ignore_scripts // false' <<<"$entry")"
-  if [[ "$sha256" == "null" || -z "$sha256" ]]; then
+  if [[ "$kind" == "uv-tool-from-git" ]]; then
+    commit="$(jq -r '.commit' <<<"$entry")"
+    [[ "$commit" =~ ^[0-9a-f]{40}$ ]] || {
+      printf 'Refusing to install %s %s: pin has no verified 40-hex commit (%s)\n' "$id" "$version" "$note" >&2
+      exit 1
+    }
+  elif [[ "$sha256" == "null" || -z "$sha256" ]]; then
     printf 'Refusing to install %s %s: pin has no verified sha256 (%s)\n' "$id" "$version" "$note" >&2
     exit 1
   fi
   if [[ "$plan_mode" == 1 ]]; then
-    printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    # A uv-tool-from-git pin (serena) has no archive and a null sha256; its
+    # plan line names the commit it pins instead of printing "sha256=null".
+    if [[ "$kind" == "uv-tool-from-git" ]]; then
+      printf 'plan %-13s %-10s %-9s %s commit=%s\n' "$id" "$version" "$kind" "${url##*/}" "$commit"
+    else
+      printf 'plan %-13s %-10s %-9s %s sha256=%s\n' "$id" "$version" "$kind" "${url##*/}" "$sha256"
+    fi
     return 0
   fi
+  # install_native sets this when it keeps an installed launcher at or above
+  # the pin (the pin is a floor); it has already logged that decision.
+  native_floor_kept=""
   case "$id-$kind" in
     node-tarball) install_node "$version" "$url" "$sha256" ;;
     uv-tarball) install_uv "$version" "$url" "$sha256" ;;
@@ -1083,10 +1314,21 @@ install_pin() {
     *-tarball) install_single_binary_tarball "$id" "$version" "$url" "$sha256" ;;
     *-npm) install_npm "$id" "$version" "$url" "$sha256" "$ignore_scripts" ;;
     *-native) install_native "$id" "$version" "$url" "$sha256" "$(jq -r '.bin // .id' <<<"$entry")" ;;
+    *-uv-tool) install_uv_tool "$id" "$version" "$(jq -r '.package // .id' <<<"$entry")" "$url" "$sha256" ;;
+    *-uv-tool-from-git) install_uv_tool_from_git "$id" "$version" "$url" "$commit" "$(jq -r '.package // .id' <<<"$entry")" ;;
     *) printf 'Unknown pin kind %s for %s.\n' "$kind" "$id" >&2; exit 1 ;;
   esac
+  # A kept native launcher (at or above its floor) is still an installed
+  # pin: the version report probes it like any other.
+  installed_pin_ids+=("$id")
+  [[ -z "$native_floor_kept" ]] || return 0
   printf 'Installed %s %s (%s)\n' "$id" "$version" "$kind"
+  [[ "$id" != rtk ]] || rtk_config_reminder
 }
+
+# The pins this run installed, in install order; the version report below
+# observes exactly these.
+installed_pin_ids=()
 
 # node, uv and gh are core prerequisites the npm-kind pins and gh-based
 # verification below depend on; install them before the profile's own list.
@@ -1119,28 +1361,223 @@ if [[ "$plan_mode" == 1 ]]; then
   exit 0
 fi
 
-{
-  printf 'Verified executable versions at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
+# Version report ($ECO_INSTALL_ROOT/installed-versions.txt). Each pin declares
+# how its installed version is observed (version_probe in the pins file), as
+# nixpkgs versionCheckHook and Homebrew test blocks are declared per package,
+# instead of one flag run against every file in bin_dir: MCP Inspector,
+# context-mode and socraticode have no --version, and each starts a server
+# (Inspector its web UI) on an unknown argument, so that loop blocked on an
+# interactive terminal. An exec probe runs only the declared command, with
+# stdin from /dev/null, in its own process group and under a wall-clock bound;
+# an npm-metadata probe runs only bin/npm, to read the package version without
+# running the package. Other executables in bin_dir are listed with their link
+# target and not run. A failed probe stops the run with exit 5 once the report
+# is written, before the closing steps.
+# Everything from version_probe_seconds to the end of the script's report
+# step is kept identical in bootstrap-linux.sh; only this hook, the platform
+# lines at the top of the report, differs. Homebrew formulae float to
+# whatever was current at install time, so their resolved versions are
+# recorded here.
+version_report_platform() {
   printf 'macOS %s (%s)\n' "$macos_version" "$(uname -m)"
-  git --version
-  # Homebrew formulae float to whatever was current at install time; record the
-  # resolved versions here so the retained log keeps them.
   if command -v brew >/dev/null; then
     printf -- '-- brew list --versions --\n'
-    brew list --versions || printf 'brew list --versions exited %s\n' "$?"
+    brew list --versions </dev/null || printf 'brew list --versions exited %s\n' "$?"
   else
     printf -- '-- brew not installed; no formula versions recorded --\n'
   fi
-  # Every symlink or wrapper actually placed in bin_dir gets its own --version
-  # run, not a fixed subset, so the retained log matches what was really
-  # executed.
-  for installed_executable in "$bin_dir"/*; do
-    [[ -e "$installed_executable" ]] || continue
-    installed_name="$(basename "$installed_executable")"
-    printf -- '-- %s --\n' "$installed_name"
-    "$installed_executable" --version 2>&1 || printf '%s --version exited %s\n' "$installed_name" "$?"
+}
+
+version_probe_seconds=30
+version_probe_failed=0
+version_probe_failed_ids=""
+version_probe_pid=""
+version_watchdog_pid=""
+
+# run_version_probe SECONDS STDOUT STDERR COMMAND [ARG...]: runs COMMAND with
+# stdin from /dev/null and descriptor 9 closed (bootstrap-linux.sh holds its
+# flock there; nothing is open on it in bootstrap-macos.sh), sends TERM to its
+# whole process group after SECONDS and KILL 2 s later, and returns its
+# status, or 124 when the bound expired. Anything the probe left running in
+# its group is killed once it exits. While it runs, the probe and watchdog
+# group ids stay in version_probe_pid and version_watchdog_pid, so cleanup
+# can stop both if the script is interrupted.
+run_version_probe() {
+  local seconds="$1" stdout_file="$2" stderr_file="$3" expired="$2.expired" status=0
+  shift 3
+  rm -f -- "$expired"
+  # Job control puts each background job in its own process group, so the
+  # watchdog also reaches a server the probe forked, not only the probe.
+  set -m
+  "$@" </dev/null >"$stdout_file" 2>"$stderr_file" 9>&- &
+  version_probe_pid=$!
+  (
+    sleep "$seconds"
+    kill -0 -- "-$version_probe_pid" 2>/dev/null || exit 0
+    : >"$expired"
+    kill -TERM -- "-$version_probe_pid" 2>/dev/null || exit 0
+    sleep 2
+    kill -KILL -- "-$version_probe_pid" 2>/dev/null || exit 0
+  ) </dev/null >/dev/null 2>&1 9>&- &
+  version_watchdog_pid=$!
+  set +m
+  # Braced so bash's own job-status notice for a killed probe is discarded too.
+  { wait "$version_probe_pid"; } 2>/dev/null || status=$?
+  { kill -KILL -- "-$version_probe_pid"; } 2>/dev/null || true
+  # KILL, not TERM: a watchdog still starting up carries the script's own
+  # TERM trap and would exit without its already-forked sleep.
+  { kill -KILL -- "-$version_watchdog_pid"; wait "$version_watchdog_pid"; } 2>/dev/null || true
+  version_probe_pid=""
+  version_watchdog_pid=""
+  if [[ -e "$expired" ]]; then
+    rm -f -- "$expired"
+    return 124
+  fi
+  return "$status"
+}
+
+# version_at_least OBSERVED FLOOR: dot-separated numeric comparison; a
+# missing trailing component counts as 0 (bash 3.2: no array length).
+version_at_least() {
+  local observed_parts floor_parts index=0 observed_part floor_part
+  IFS=. read -r -a observed_parts <<<"$1"
+  IFS=. read -r -a floor_parts <<<"$2"
+  while [[ -n "${observed_parts[index]:-}" || -n "${floor_parts[index]:-}" ]]; do
+    observed_part="${observed_parts[index]:-0}"
+    floor_part="${floor_parts[index]:-0}"
+    [[ "$observed_part" =~ ^[0-9]+$ && "$floor_part" =~ ^[0-9]+$ ]] || return 1
+    if ((10#$observed_part > 10#$floor_part)); then
+      return 0
+    elif ((10#$observed_part < 10#$floor_part)); then
+      return 1
+    fi
+    index=$((index + 1))
   done
-} | tee "$ecosystem_root/installed-versions.txt"
+  return 0
+}
+
+# version_output_matches EXPECTED MATCH FILE...: "exact" finds EXPECTED as a
+# whole version, not inside a longer one; "minimum" takes the first dotted
+# version in the output and requires it to be at least EXPECTED.
+version_output_matches() {
+  local expected="$1" match="$2" pattern observed
+  shift 2
+  case "$match" in
+    exact)
+      pattern="$(printf '%s' "$expected" | sed 's/[][\.*^$+?(){}|/]/\\&/g')"
+      grep -Eq "(^|[^0-9.])${pattern}([^0-9.]|\$)" "$@"
+      ;;
+    minimum)
+      observed="$(cat -- "$@" | grep -Eo '[0-9]+(\.[0-9]+)+' | head -n 1 || true)"
+      [[ -n "$observed" ]] && version_at_least "$observed" "$expected"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+# Prints the report for every pin this run installed, then every executable
+# in bin_dir; counts failed pins in version_probe_failed(_ids).
+write_version_report() {
+  local id entry version method expected match package status observed result executable target argument seconds
+  local probe_stdout="$stage_dir/version-probe.stdout" probe_stderr="$stage_dir/version-probe.stderr"
+  local verified=0
+  local probe_argv
+  printf 'Version report at %s for profile %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$profile_id"
+  printf 'Each installed pin is checked with its version_probe from %s; other executables are listed, not run (npm-metadata probes run only bin/npm).\n' "${pins_path##*/}"
+  version_report_platform
+  git --version
+  for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do
+    entry="$(jq -c --arg id "$id" '.tools[] | select(.id == $id)' "$pins_path")"
+    version="$(jq -r '.version' <<<"$entry")"
+    method="$(jq -r '.version_probe.method // "undeclared"' <<<"$entry")"
+    expected="$(jq -r '.version_probe.expect // .version' <<<"$entry")"
+    match="$(jq -r '.version_probe.match // "exact"' <<<"$entry")"
+    # A pin may declare a longer bound, e.g. a first launch that the OS
+    # assesses before running it.
+    seconds="$(jq -r --argjson default "$version_probe_seconds" '.version_probe.timeout_seconds // $default' <<<"$entry")"
+    status=0
+    : >"$probe_stdout"
+    : >"$probe_stderr"
+    case "$method" in
+      exec)
+        probe_argv=("$bin_dir/$(jq -r '.version_probe.command' <<<"$entry")")
+        while IFS= read -r argument; do
+          probe_argv+=("$argument")
+        done < <(jq -r '.version_probe.args[]?' <<<"$entry")
+        printf -- '-- %s %s: %s --\n' "$id" "$version" "${probe_argv[*]#"$bin_dir"/}"
+        run_version_probe "$seconds" "$probe_stdout" "$probe_stderr" ${probe_argv[@]+"${probe_argv[@]}"} || status=$?
+        sed -n '1,20p' "$probe_stdout" "$probe_stderr"
+        if [[ "$status" == 124 ]]; then
+          result="FAILED (no exit within ${seconds}s; its process group was killed)"
+        elif [[ "$status" != 0 ]]; then
+          result="FAILED (exit $status)"
+        elif version_output_matches "$expected" "$match" "$probe_stdout" "$probe_stderr"; then
+          result="verified ($match $expected)"
+        else
+          result="FAILED (output does not report $match $expected)"
+        fi
+        ;;
+      npm-metadata)
+        package="$(npm_package_name "$(jq -r '.url' <<<"$entry")")"
+        printf -- '-- %s %s: npm ls %s (package metadata; the package is not run) --\n' "$id" "$version" "$package"
+        # npm ls exits nonzero for unrelated tree problems while still
+        # printing the installed version, so the version decides the result.
+        run_version_probe "$seconds" "$probe_stdout" "$probe_stderr" \
+          "$bin_dir/npm" ls --global --prefix "$ecosystem_root/tools/$id-$version" --depth=0 --json "$package" || status=$?
+        observed="$(jq -r --arg package "$package" '.dependencies[$package].version // empty' "$probe_stdout" 2>/dev/null || true)"
+        printf '%s@%s\n' "$package" "${observed:-(not installed)}"
+        if [[ "$status" == 124 ]]; then
+          result="FAILED (npm ls did not exit within ${seconds}s)"
+        elif [[ "$observed" == "$expected" ]]; then
+          result="verified (exact $expected)"
+        else
+          result="FAILED (npm reports ${observed:-no installed package}, pinned $expected)"
+        fi
+        ;;
+      *)
+        printf -- '-- %s %s --\n' "$id" "$version"
+        result="FAILED (no supported version_probe in ${pins_path##*/})"
+        ;;
+    esac
+    printf 'result: %s\n' "$result"
+    case "$result" in
+      verified*) verified=$((verified + 1)) ;;
+      *)
+        version_probe_failed=$((version_probe_failed + 1))
+        version_probe_failed_ids="$version_probe_failed_ids $id"
+        ;;
+    esac
+  done
+  printf -- '-- every entry in %s with its link target (this listing runs nothing) --\n' "${bin_dir##*/}"
+  for executable in "$bin_dir"/*; do
+    [[ -e "$executable" || -L "$executable" ]] || continue
+    if [[ -L "$executable" ]]; then
+      target="$(readlink "$executable")"
+      case "$target" in
+        "$ecosystem_root"/*) target="${target#"$ecosystem_root"/}" ;;
+        "$HOME"/*) target="\$HOME/${target#"$HOME"/}" ;;
+      esac
+      [[ -e "$executable" ]] || target="$target (missing)"
+    else
+      target="(file)"
+    fi
+    printf '%s -> %s\n' "${executable##*/}" "$target"
+  done
+  printf 'summary: %s verified, %s failed\n' "$verified" "$version_probe_failed"
+}
+
+version_report="$ecosystem_root/installed-versions.txt"
+printf 'Checking installed versions (at most %ss per probe unless its pin declares more)...\n' "$version_probe_seconds"
+write_version_report >"$version_report"
+cat -- "$version_report"
+if [[ "$version_probe_failed" -gt 0 ]]; then
+  printf '\nVersion check failed for:%s. The report is in %s; nothing was removed.\n' \
+    "$version_probe_failed_ids" "$version_report" >&2
+  printf 'Stopped before the PATH hint and --configure-claude-user-profile: fix or re-pin those components, then re-run this script.\n' >&2
+  exit 5
+fi
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \

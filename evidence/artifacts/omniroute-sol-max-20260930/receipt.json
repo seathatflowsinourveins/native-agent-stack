@@ -1,0 +1,149 @@
+{
+ "schema": "omniroute-sol-max-receipt/1",
+ "id": "omniroute-sol-max-20260930",
+ "host": {
+  "name": "nativestack-5975wx-20260925",
+  "profile": "linux-wsl2-x86_64",
+  "scope": "one workstation; the 20128 user unit only"
+ },
+ "subject": "20128 restarted at 2026-09-30T06:32:50Z onto build cf6748d04: the running build plus upstream PR 15167, so gpt-6.1-sol reaches max effort; the lsof shim v2 in the new prefix",
+ "status": "applied and read back; 20129 and hindsight-live untouched",
+ "recordings": {
+  "calllog-effort-counts-after-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-after-switch.json",
+  "calllog-effort-counts-before-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-before-switch.json",
+  "codex-bundled-catalog-0159.2.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/codex-bundled-catalog-0159.2.txt",
+  "effort-wire-candidate-B3.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/effort-wire-candidate-B3.json",
+  "effort-wire-running-build-B2.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/effort-wire-running-build-B2.json",
+  "omniroute.service.after-switch.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/omniroute.service.after-switch.txt",
+  "owner-record-after-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-after-switch.json",
+  "owner-record-before-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-before-switch.json",
+  "owner-record-diff.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-diff.txt",
+  "preflight-scratch-port-reproduction.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-scratch-port-reproduction.json",
+  "preflight-scratch-port-table.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-scratch-port-table.json",
+  "preflight-second-instance-shim-v2.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-second-instance-shim-v2.txt",
+  "preflight-trap-shim-v1-control.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-trap-shim-v1-control.txt",
+  "preflight-trap-shim-v2.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-trap-shim-v2.txt",
+  "probe-gate-after-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-after-switch.json",
+  "probe-gate-before-switch.json": "evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-before-switch.json",
+  "qualification-install.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-install.txt",
+  "qualification-pack-boot.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-pack-boot.txt",
+  "qualification-pipeline-times.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-pipeline-times.txt",
+  "qualification-smoke-shim-v1.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-smoke-shim-v1.txt",
+  "qualification-targeted-B2-baseline.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-targeted-B2-baseline.txt",
+  "qualification-targeted-B3.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-targeted-B3.txt",
+  "readback-after-switch.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/readback-after-switch.txt",
+  "sharedgw-connection-expiry-20260930.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/sharedgw-connection-expiry-20260930.txt",
+  "switch-output.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/switch-output.txt",
+  "unit-before-after.diff": "evidence/artifacts/omniroute-sol-max-20260930/checks/unit-before-after.diff",
+  "upstream-pr-15167-identity.txt": "evidence/artifacts/omniroute-sol-max-20260930/checks/upstream-pr-15167-identity.txt"
+ },
+ "evidence_classes": {
+  "source_review": "reads of upstream source and Codex 0.159.2's bundled catalog (git protocol, offline)",
+  "unchanged_upstream_check": "upstream's own scripts on our build: check:pack-artifact, check:pack-boot",
+  "our_integration_check": "our scripts and outputs: offline wire table, boot smokes, targeted tests, preflight tests, switch read-backs, owner record, call_logs reads",
+  "live_model_call": "tiny requests through the gateway (one prompt, a small multiplication), effort read from call_logs"
+ },
+ "switch": {
+  "at_utc": "2026-09-30T06:32:50Z",
+  "tool": "scripts/switch_gateways.py.txt --only 20128",
+  "rollback_directory": "switch-2026-09-30T06:32:49Z",
+  "unit_sha256_before": "899e4fdb06775216094953815ed2836c2df9be12e26b459558a600742694b097",
+  "unit_sha256_after": "b7797d7898160c858de7d56695bb97a3ac569c8cfded49affcb66b908528be45",
+  "main_pid_after": "3262255",
+  "candidate_head": "cf6748d04c1e0dd033fb6b6effa9bbaf5ed5466b",
+  "previous_build": "ae5539a5623457a2e8bb7f5dddd3d0736a2ddeb7",
+  "shim_v2_sha256": "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854",
+  "shim_v1_sha256": "b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56"
+ },
+ "claims": [
+  {
+   "id": "C1",
+   "class": [
+    "source_review",
+    "our_integration_check"
+   ],
+   "text": "upstream PR 15167 is one commit, f5d8e150b79e0901fa18241c7f29bff889b87c14, 5 files +23/-0, on release/v3.8.52 a1a2dce1a64a4b123f80ec899fc88bb2aa34d1a4 (the tip at the read); its stable patch-id 14ec6648f50fc499d430f28d2af7840cd2d46055 equals the patch-id of its cherry-pick cf6748d04c1e0dd033fb6b6effa9bbaf5ed5466b on the running 20128 build ae5539a5623457a2e8bb7f5dddd3d0736a2ddeb7; it adds gpt-6.1-sol and its effort aliases to the Codex registry with the capabilities block whose context is 872000 (the live catalog's value), gpt-6.1-sol to both alias sets of reasoningSuffix.ts, to the fast-tier default list (inert while codexServiceTier is absent, as on both stores) and to the pricing table",
+   "at": "checks/upstream-pr-15167-identity.txt; checks/codex-bundled-catalog-0159.2.txt (Codex 0.159.2's own catalog lists max for gpt-6.1-sol)"
+  },
+  {
+   "id": "C2",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "before the restart 20128 sent every max request for gpt-6.1-sol as xhigh: its call_logs held 1495 gpt-6.1-sol rows since 2026-09-30T00:00Z at 2026-09-30T06:14:30Z, 1154 of them with max requested and xhigh sent upstream; gpt-6-astra rows were sent max upstream (381 rows)",
+   "at": "checks/calllog-effort-counts-before-switch.json (metadata columns only, read-only sqlite)"
+  },
+  {
+   "id": "C3",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "offline, on the source of the running build and of the candidate (CodexExecutor.transformRequest, network blocked, nothing sent), exactly these requests change their wire model and effort, and no other: gpt-6.1-sol with body max: gpt-6.1-sol / xhigh -> gpt-6.1-sol / max; gpt-6.1-sol with body ultra: gpt-6.1-sol / xhigh -> gpt-6.1-sol / max; gpt-6.1-sol-max: gpt-6.1-sol-max / medium -> gpt-6.1-sol / max; gpt-6.1-sol-ultra: gpt-6.1-sol-ultra / medium -> gpt-6.1-sol / max; gpt-6.1-sol-max with body low: gpt-6.1-sol-max / low -> gpt-6.1-sol / max; 8 other rows (xhigh, high, astra, gpt-6-sol) are unchanged",
+   "at": "checks/effort-wire-running-build-B2.json, checks/effort-wire-candidate-B3.json"
+  },
+  {
+   "id": "C4",
+   "class": [
+    "unchanged_upstream_check",
+    "our_integration_check"
+   ],
+   "text": "the candidate cf6748d04c1e0dd033fb6b6effa9bbaf5ed5466b (the running build plus the PR's commit) built with upstream's scripts (build:release and build:cli-api from 2026-09-30T05:40:16Z to 2026-09-30T05:50:33Z, npm pack, check:pack-artifact exit 0), installed into a new unreferenced prefix (tarball sha256 5d31e2489d7e239c2a12b77693df7bd7992233a105381ba5930fbf3fdb00273c, BUILD_SHA cf6748d04), booted in a network-less namespace (health 200 after 4 s), passed upstream's check:pack-boot (two boots, persistence proven) and 147 of 147 targeted tests, equal to 147 of 147 on the running build's source with the same 14 files",
+   "at": "checks/qualification-*.txt"
+  },
+  {
+   "id": "C5",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "upstream's serve port preflight (pid.mjs findListeningPids: lsof -ti :PORT) counts client sockets, so a client's dead pooled connection (CLOSE-WAIT) refuses the next start: control with shim v1, real omniroute serve of the candidate prefix: 'Port 20197 is already in use by PID <client>'; with shim v2 (sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854, exit 2 for that one query so upstream's bind-probe fallback #14518 is the guard) the same restart reaches health 200 after 5 s; a second real instance is still refused (exit 1) and the first stays healthy; a scratch-port run of upstream's resolveServeBusyPids gives v1 busy and v2 not busy with the client in CLOSE-WAIT, and v2 busy with a real listener",
+   "at": "checks/preflight-*.txt, checks/preflight-*.json"
+  },
+  {
+   "id": "C6",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the restart: switch_gateways.py --only 20128 at 2026-09-30T06:32:50Z; the unit file changed in exactly three lines (Description, the PATH shim segment, ExecStart: prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2 to ...-pr15167); unit sha256 899e4fdb06775216094953815ed2836c2df9be12e26b459558a600742694b097 to b7797d7898160c858de7d56695bb97a3ac569c8cfded49affcb66b908528be45; MainPID 950031 to 3262255, NRestarts 0; 20129 (omniroute-fw.service sha256 fbdace7eeec524e37794432aa4c57ac5a8b4b925ef0b700f70b5e299a951c802, MainPID 945817, NRestarts 0, BUILD_SHA 87c4c488d) and hindsight-live (MainPID 948478) unchanged; no settings write; rollback copy and the old prefix kept in the switch directory switch-2026-09-30T06:32:49Z",
+   "at": "checks/switch-output.txt, checks/readback-after-switch.txt, checks/unit-before-after.diff, checks/omniroute.service.after-switch.txt"
+  },
+  {
+   "id": "C7",
+   "class": [
+    "live_model_call",
+    "our_integration_check"
+   ],
+   "text": "probe gate, same script before (05:59Z) and after (06:33Z), tiny requests, effort from 20128's call_logs: cx/gpt-6.1-sol with body max: requested max / upstream xhigh before, max / max after; cx/gpt-6.1-sol-max: HTTP 400 (not in the live catalog) before, 200 with upstream max after; cx/gpt-6.1-sol-xhigh: 400 before, 200 with xhigh after; the bare id gpt-6.1-sol-max (what the sharedgw node forwards): 401 before, 200 with max after; cx/gpt-6-astra-max: upstream max before and after; a request carrying the 0.157.1 User-Agent and Version header on cx/gpt-6-sol: 200, low / low before and after; a made-up id: 400 before and after; one request through sharedgw/gpt-6.1-sol-max, sent only because the bare id answered 200: 200",
+   "at": "checks/probe-gate-before-switch.json, checks/probe-gate-after-switch.json, checks/calllog-effort-counts-after-switch.json"
+  },
+  {
+   "id": "C8",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the owner record (gateway_record.py, schema omniroute-gateway-record/2) differs in 13 paths between 06:14:30Z and 06:33:02Z: build_sha, prefix, taken_utc, the unit hash, main_pid and exec_main_start of 20128, and, made by the gateway's own context-window reconciler on restart, the removal of the automatic override row (context_length, gpt-6.1-sol, codex, codex/gpt-6.1-sol, 872000), because the registry now carries that id with the same value (overrides_rows 6 to 5; route model_capability_overrides_stable digest changed); the effective context is unchanged; nothing on 20129 differs",
+   "at": "checks/owner-record-before-switch.json, checks/owner-record-after-switch.json, checks/owner-record-diff.txt"
+  },
+  {
+   "id": "C9",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "an unknown id through 20129's sharedgw node parks the node's only connection as expired for every caller: the baseline run of the probe gate sent sharedgw/gpt-6.1-sol-max at 05:50:13Z, 20128 could not place the bare id and answered 401, 20129 marked the connection expired, and requests through the node answered 401 until 05:54:45Z, when the dashboard's Test connection (POST /api/providers/<id>/test) restored it; no restart and no other change; upstream has no fix (release/v3.8.52 and main checked by commit message)",
+   "at": "checks/sharedgw-connection-expiry-20260930.txt (a transcription of the printed outputs)"
+  }
+ ],
+ "residuals": [
+  "PR 15167 is open upstream; drop the carry when a release has it (the decision record's overturn conditions).",
+  "The sharedgw hazard is not fixed: any id through 20129's sharedgw node that 20128 resolves to a provider without credentials parks the node's connection for everyone; upstream has no fix and we have no cited reference for a local one. The probe gate now sends the lane request only after the bare id answered 200.",
+  "Only prefixes with shim v2 are protected from a dead client connection blocking a restart: the previous 20128 prefix (the rollback target) and 20129's prefix still carry shim v1, so a rollback, or a crash restart of 20129, can fail its preflight while a client such as hindsight-api holds a CLOSE-WAIT socket; then restart that client first and tell the Gate A owner.",
+  "The candidate's boot smoke ran with shim v1 in its prefix; the shim was replaced by v2 afterwards, and the boots with v2 are the first phases of the preflight smokes (same prefix, real omniroute serve). install.sh's recorded shim check shows v1.",
+  "The targeted tests do not cover the alias sets (the PR's one test edit is the fast-tier list); the effort evidence is the offline wire table and the live rows of the probe gate. a2's own two probe rows of 06:36Z carry no effort values because a 5-token answer has no reasoning item.",
+  "Effort max costs more tokens per request than xhigh on a pool with a tight weekly meter; no quota effect was measured here.",
+  "switch_gateways.py was extended after the 2026-09-30T00:02Z switch (--only, shim v2 accepted); the published copy is the current text and the diff is published; the earlier switch ran through the earlier text.",
+  "The previous prefix and the switch directory stay until Gate A's window closes; a rollback is itself a change and is announced to the Gate A owner first."
+ ],
+ "provenance": {
+  "scripts": "scripts/ (the harness as it ran; host paths are masks such as <NS>, <B3>, <TOOLS>, <HOME>); post_switch.sh runs tools/omniroute/gateway_record.py (scratch copy of the repository file)",
+  "edits_to_outputs": "host paths are replaced by named placeholders and colour codes are removed; nothing else; the sharedgw transcription is a hand copy of printed outputs and says so"
+ }
+}

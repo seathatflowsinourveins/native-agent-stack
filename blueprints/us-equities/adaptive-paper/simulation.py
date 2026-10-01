@@ -2,12 +2,16 @@
 
 This fixture does not model queue priority, market impact, fees, corporate
 actions, fills missed during disconnect, or profitable strategy performance.
+Each fill is one execution: the streamed row carries its execution_id, qty and price
+as transport.py forwards a trade_updates fill, and fill_activities() returns the
+executions in transport.AlpacaPaperTransport.fill_activities' shape.
 """
 from __future__ import annotations
 import asyncio
 from decimal import Decimal
 import inspect
 import time
+import uuid
 
 
 async def invoke(fn, value):
@@ -24,12 +28,17 @@ class SimulatedPort:
         self.ready = False
         self.health = {"ready": False, "simulation": True}
         self.orders, self.positions = {}, {}
+        self.executions = {}   # broker order id -> executions, oldest first
         self.cash = Decimal("100000")
         self.started = self.stopped = 0
         self.ticks = 0
         self.submitted_at = []
         self.on_quote = self.on_order = None
         self.task = None
+
+    @property
+    def sink_observation(self):
+        return self.controller.observe
 
     async def start(self, on_quote, on_order):
         self.on_quote, self.on_order = on_quote, on_order
@@ -76,12 +85,21 @@ class SimulatedPort:
         self.positions[symbol] = {"symbol": symbol, "qty": new_qty, "avg_entry_price": str(price)}
         self.cash += (-qty if side == "buy" else qty) * price
         self.orders[payload["client_order_id"]] = order
-        self.controller.observe(order)
-        await invoke(self.on_order, dict(order))
+        execution_id = str(uuid.uuid4())
+        self.executions[order["id"]] = [{"trade_id": execution_id, "qty": str(qty), "price": str(price),
+                                         "cum_qty": str(qty), "symbol": symbol, "side": side,
+                                         "transaction_time_ns": order["updated_at_ns"], "source": "activity"}]
+        fill = dict(order, event="fill", execution_id=execution_id, event_qty=str(qty), event_price=str(price))
+        await invoke(self.sink_observation, dict(fill))
+        await invoke(self.on_order, dict(fill))
         return dict(order)
 
+    async def fill_activities(self, order_id):
+        await self.controller.before_request("read")
+        return [dict(row) for row in self.executions.get(order_id, [])]
+
     async def cancel(self, client_id):
-        await self.controller.before_request("cancel")
+        await self.controller.before_request("cancel", client_id=client_id)
         return self.orders.get(client_id)
 
     async def snapshot(self):

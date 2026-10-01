@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "verify_rustup_init.py",
+    "--binary",
+    "<scratch>/dl/rustup-init",
+    "--sidecar",
+    "<scratch>/dl/rustup-init.sha256",
+    "--rustup-version",
+    "1.29.1",
+    "--scratch",
+    "<scratch>"
+  ],
+  "rustup_version": "1.29.1",
+  "started_utc": "2026-09-26T04:16:30.686158+00:00",
+  "binary": "<scratch>/dl/rustup-init",
+  "binary_bytes": 21113232,
+  "binary_mtime_utc": "2026-09-26T02:04:25.894472+00:00",
+  "binary_sha256": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71",
+  "sidecar": "<scratch>/dl/rustup-init.sha256",
+  "sidecar_mtime_utc": "2026-09-26T02:04:25.967556+00:00",
+  "sidecar_line": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71 *./rustup-init",
+  "official_url": "https://static.rust-lang.org/rustup/archive/1.29.1/x86_64-unknown-linux-gnu/rustup-init.sha256",
+  "official_http_status": 200,
+  "official_line": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71 *./rustup-init",
+  "binary_matches_sidecar": true,
+  "binary_matches_official_archive": true,
+  "control": {
+    "mutation": "last byte of the binary flipped in memory",
+    "sha256": "ee0152624fbee75b824987634da0b6af17ca7c26c3926878546b6e96eec915a7",
+    "matches_official_archive": false,
+    "failed_as_expected": true
+  },
+  "verdict": "passed",
+  "finished_utc": "2026-09-26T04:16:30.819694+00:00"
+}

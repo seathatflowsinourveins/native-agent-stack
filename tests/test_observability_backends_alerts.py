@@ -10,11 +10,17 @@ fails, when those binaries are absent on the host.
 """
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+import fcntl
+import json
 import re
+import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = ROOT / "observability/backends/templates"
@@ -25,9 +31,13 @@ CONFIGURE = ROOT / "observability/backends/configure.py"
 
 # Documented installed-binary layout (observability/backends/README.md):
 # $HOME/.local/share/codex-ecosystem/tools/ecosystem-<name>-<pinned-version>/<binary>
+# The pinned version comes from observability/backends/pins.json, the file install.py and configure.py read,
+# so a pin move runs the new binaries here instead of the retained rollback prefix.
 _TOOLS_ROOT = Path.home() / ".local/share/codex-ecosystem/tools"
-PROMTOOL = _TOOLS_ROOT / "ecosystem-prometheus-3.14.0/promtool"
-AMTOOL = _TOOLS_ROOT / "ecosystem-alertmanager-0.34.1/amtool"
+_PINNED = {item["id"]: item["version"]
+           for item in json.loads((ROOT / "observability/backends/pins.json").read_text())["components"]}
+PROMTOOL = _TOOLS_ROOT / f"ecosystem-prometheus-{_PINNED['prometheus']}/promtool"
+AMTOOL = _TOOLS_ROOT / f"ecosystem-alertmanager-{_PINNED['alertmanager']}/amtool"
 
 EXPECTED_ALERTS = {
     "EquitiesOrderStateDivergence",
@@ -75,8 +85,11 @@ class RulesTemplateTests(unittest.TestCase):
     def test_ledger_frozen_alert_aggregates_by_reason(self):
         self.assertIn('max by (reason) (paper_ledger_frozen) == 1', self.text)
 
-    def test_metrics_missing_alert_uses_absent(self):
-        self.assertIn('absent(paper_trial_active)', self.text)
+    def test_metrics_missing_alert_is_scoped_to_registered_exporters(self):
+        # absent(paper_trial_active) fired permanently on a host with no trial; the job's
+        # targets now come from file_sd, so only a registered exporter can raise the alert.
+        self.assertIn('up{job="adaptive-paper"} unless on(job, instance) paper_trial_active', self.text)
+        self.assertNotIn('absent(paper_trial_active)', self.text)
 
     def test_ledger_unreadable_alert_uses_readable_gauge(self):
         self.assertIn('paper_ledger_readable == 0', self.text)
@@ -96,21 +109,84 @@ class RulesTemplateTests(unittest.TestCase):
         self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
 
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_fourteen_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_seventeen_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 14)
+        self.assertEqual(rule_count, 17)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
 
 class ScrapeTemplateTests(unittest.TestCase):
-    def test_adaptive_paper_job_targets_the_exporter_port(self):
+    def test_adaptive_paper_job_scrapes_only_registered_exporters(self):
         text = SCRAPE.read_text()
         self.assertIn("job_name: adaptive-paper", text)
         job = text.split("job_name: adaptive-paper", 1)[1].split("job_name:", 1)[0]
-        self.assertIn("127.0.0.1:18890", job)
+        self.assertIn("file_sd_configs:", job)
+        self.assertIn("'@CONFIG_ROOT@/adaptive-paper-targets.json'", job)
+        self.assertNotIn("static_configs:", job)
+        self.assertNotIn("127.0.0.1:18890", job)
+
+
+class ConfigureTargetsTests(unittest.TestCase):
+    """configure.py ships an empty adaptive-paper target list and keeps one exporters already wrote."""
+
+    def render(self, root):
+        subprocess.run(
+            ["python3", str(CONFIGURE),
+             "--tools-root", str(root / "tools"), "--config-root", str(root / "config"),
+             "--data-root", str(root / "data"), "--unit-root", str(root / "unit")],
+            check=True, capture_output=True, text=True,
+        )
+        return root / "config" / "adaptive-paper-targets.json"
+
+    def test_an_empty_list_is_shipped_and_an_existing_one_is_kept(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            targets = self.render(root)
+            self.assertEqual(targets.read_text(), "[]\n")
+            registered = '[{"targets": ["127.0.0.1:18890"], "labels": {}}]\n'
+            targets.write_text(registered)
+            self.render(root)
+            self.assertEqual(targets.read_text(), registered)
+
+    def test_initialization_keeps_a_registration_created_after_observing_an_absent_list(self):
+        update_file_sd = runpy.run_path(str(ROOT / "blueprints/us-equities/adaptive-paper/metrics.py"))[
+            "update_file_sd"]
+        with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor(max_workers=1) as workers:
+            root = Path(tmp)
+            targets = root / "config" / "adaptive-paper-targets.json"
+            registrations = []
+            exists = Path.exists
+
+            def exists_then_register(path):
+                observed = exists(path)
+                if path == targets and not observed and not registrations:
+                    # Inject the exporter after the absence check. If configure holds the sibling lock,
+                    # the real exporter writer must wait until initialization releases it.
+                    with open(targets.with_name(targets.name + ".lock"), "a") as probe:
+                        try:
+                            fcntl.flock(probe, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        except BlockingIOError:
+                            locked = True
+                        else:
+                            locked = False
+                    registration = workers.submit(update_file_sd, targets, "127.0.0.1:18890", registered=True)
+                    registrations.append(registration)
+                    if not locked:
+                        registration.result(timeout=10)
+                return observed
+
+            argv = [str(CONFIGURE), "--tools-root", str(root / "tools"), "--config-root", str(root / "config"),
+                    "--data-root", str(root / "data"), "--unit-root", str(root / "unit")]
+            with patch.object(sys, "argv", argv), patch.object(Path, "exists", exists_then_register):
+                runpy.run_path(str(CONFIGURE), run_name="__main__")
+            self.assertEqual(len(registrations), 1)
+            registrations[0].result(timeout=10)
+            self.assertEqual(json.loads(targets.read_text()),
+                             [{"targets": ["127.0.0.1:18890"], "labels": {}}],
+                             "initialization erased the concurrent exporter's registration")
 
 
 class AlertmanagerTemplateTests(unittest.TestCase):
@@ -161,7 +237,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("14 rules found", result.stdout)
+        self.assertIn("17 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(
@@ -176,6 +252,68 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+@unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
+class PaperMetricsMissingRuleTests(unittest.TestCase):
+    """``promtool test rules`` over configure.py's rendered rules: EquitiesPaperMetricsMissing fires only for a
+    registered adaptive-paper target that returns no paper_trial_active, and never while nothing is registered.
+
+    native_proven when it runs: the installed promtool evaluates the real rendered rule over synthetic series.
+    Skipped (not failed) when promtool is absent on the host."""
+
+    INSTANCE = "127.0.0.1:18890"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        subprocess.run(
+            ["python3", str(CONFIGURE),
+             "--tools-root", str(self.root / "tools"), "--config-root", str(self.root / "config"),
+             "--data-root", str(self.root / "data"), "--unit-root", str(self.root / "unit")],
+            check=True, capture_output=True, text=True,
+        )
+        self.rules = self.root / "config" / "ecosystem-prometheus-rules.yml"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def firing(self):
+        # promtool compares annotations exactly, so take them from the rendered rule itself.
+        block = self.rules.read_text().split("- alert: EquitiesPaperMetricsMissing\n", 1)[1].split("\n      - alert:")[0]
+        annotations = {key: re.search(rf"^ +{key}: '((?:[^']|'')*)'$", block, re.M).group(1).replace("''", "'")
+                       for key in ("summary", "description")}
+        annotations["summary"] = annotations["summary"].replace("{{ $labels.instance }}", self.INSTANCE)
+        return [{"exp_labels": {"severity": "warning", "scope": "equities-broker", "job": "adaptive-paper",
+                                "instance": self.INSTANCE},
+                 "exp_annotations": annotations}]
+
+    def test_fires_only_for_a_registered_exporter_without_paper_metrics(self):
+        up = f'up{{job="adaptive-paper", instance="{self.INSTANCE}"}}'
+        active = f'paper_trial_active{{job="adaptive-paper", instance="{self.INSTANCE}"}}'
+        cases = [
+            # registered and down: pending at 1m, firing once down for two minutes
+            ([(up, "0x5")], {"1m": [], "3m": self.firing()}),
+            # registered and answering with the always-exported gauge: silent
+            ([(up, "1x5"), (active, "0x5")], {"3m": []}),
+            # registered, answering, but another process on the port: no paper_trial_active
+            ([(up, "1x5")], {"3m": self.firing()}),
+            # nothing registered (no adaptive-paper series at all): silent
+            ([('up{job="prometheus", instance="127.0.0.1:19090"}', "1x5")], {"3m": []}),
+            # deregistered after a clean stop: the stale series clears the pending alert
+            ([(up, "0 0 stale")], {"1m": [], "4m": []}),
+        ]
+        document = {"rule_files": [str(self.rules)], "evaluation_interval": "1m", "tests": [
+            {"interval": "1m",
+             "input_series": [{"series": series, "values": values} for series, values in inputs],
+             "alert_rule_test": [{"eval_time": at, "alertname": "EquitiesPaperMetricsMissing", "exp_alerts": alerts}
+                                 for at, alerts in expected.items()]}
+            for inputs, expected in cases]}
+        unit_tests = self.root / "paper-metrics-missing.test.yml"
+        unit_tests.write_text(json.dumps(document, indent=2))  # JSON is valid YAML
+        result = subprocess.run([str(PROMTOOL), "test", "rules", str(unit_tests)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("SUCCESS", result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

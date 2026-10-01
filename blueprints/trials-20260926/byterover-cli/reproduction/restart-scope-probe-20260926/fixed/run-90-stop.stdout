@@ -1,0 +1,3 @@
+{"pid": 192, "role": "daemon", "script": "brv-server.js", "signals_sent": ["SIGTERM"], "gone": true}
+{"pid": 485, "role": "descendant of the daemon", "script": "agent-process.js", "signals_sent": [], "gone": true}
+{"event": "summary", "recorded": 2, "all_gone": true, "seconds": 5.41}

@@ -463,12 +463,13 @@ def component_ids_for(lane_data: dict, candidates_by_key: dict) -> set:
 
 
 def platform_status_for(evidence_class: str, evidence_refs=(), status_context=None, *,
-                        component_id=None, pin=None) -> dict:
+                        component_id=None, pin=None, layer=None) -> dict:
     """Per-platform status of one winner. ``status_context`` None is the grandfathered 2026-09-22
     rule, kept only so --check reproduces that frozen wave (linux from the lane's own evidence
     class, macos-arm64 untested); otherwise every platform's status is
     scripts/platform_status.py ``platform_status(platform_id, winner, status_context)``, with
-    ``status_context`` from one ``load_context(root)`` per run."""
+    ``status_context`` from one ``load_context(root)`` per run, and ``layer`` (``"<catalog>/<layer_id>"``)
+    the row, which a host receipt with ``layer_refs`` must name."""
     if status_context is None:
         if evidence_class in {"native_proven", "measured_comparison"}:
             linux_status = "accepted"
@@ -479,7 +480,7 @@ def platform_status_for(evidence_class: str, evidence_refs=(), status_context=No
         return {"linux-wsl2-x86_64": linux_status, "macos-arm64": "untested"}
     winner = {"component_id": component_id, "pin": pin, "evidence_class": evidence_class,
               "evidence_refs": list(evidence_refs or ())}
-    return {platform_id: platform_status(platform_id, winner, status_context).status
+    return {platform_id: platform_status(platform_id, winner, status_context, layer=layer).status
             for platform_id in PLATFORMS}
 
 
@@ -556,7 +557,7 @@ def normalize_evidence_refs(citations, root: Path):
 
 def build_winners(lane_data: dict, candidates_by_key: dict, ledger_path: str,
                    v1_candidates_by_repository: dict, root: Path = None, unresolved: list = None,
-                   status_context=None) -> list:
+                   status_context=None, layer=None) -> list:
     why_selected = lane_data["why_selected"]
     evidence_class = lane_data["winner_evidence_class"]
     if root is None:
@@ -583,7 +584,7 @@ def build_winners(lane_data: dict, candidates_by_key: dict, ledger_path: str,
             "evidence_refs": evidence_refs,
             "recipe_ref": candidate.get("recipe_ref") or ledger_path,
             "platform_status": platform_status_for(evidence_class, evidence_refs, status_context,
-                                                   component_id=component_id, pin=pin),
+                                                   component_id=component_id, pin=pin, layer=layer),
         })
     return winners
 
@@ -992,7 +993,8 @@ def process_row(row: dict, root: Path, catalog: str, layer_id: str, work_dir: Pa
         data = valid[chosen_lane]
         winners = build_winners(data, candidates_by_key, LEDGER_FILES[catalog], v1_candidates_by_repository,
                                 root, unresolved_citations,
-                                status_context=None if grandfathered else status_context)
+                                status_context=None if grandfathered else status_context,
+                                layer=f"{catalog}/{layer_id}")
         # The losing lane (or a lane's own list) can name a winner as an alternative;
         # a recorded row never lists its winner among its alternatives.
         winner_ids = {canonical(safe_identity(w["repository"]), aliases) for w in winners

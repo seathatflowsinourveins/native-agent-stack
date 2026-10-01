@@ -1,0 +1,187 @@
+#!/bin/sh
+# Self-contained reproduction of the ByteRover CLI offline store/retrieve path.
+#
+# Usage: sh reproduce-vc-search.sh <output-dir>
+#
+# Fixed copy of ../reproduce-vc-search.sh, which stays byte-identical as the version that
+# run-20260926T1131Z and the cleanup-scope probe's current variant ran. That version ignored a
+# failed process recording, after each command and in its cleanup: with no ledger, its cleanup
+# signalled nothing, removed the workspace and could exit 0 while the daemon kept running.
+# This copy stops at the first failed recording, fails its cleanup whenever ownership of the
+# daemon was not established, and then keeps the workspace for recovery. Its helper
+# (owned_processes.py here) signals only through pidfds, so the script checks pidfd support
+# before it starts ByteRover.
+#
+# Installs the pinned npm release byterover-cli@3.16.1 into a fresh mktemp prefix after
+# checking the registry's published integrity against the pinned value, points every
+# ByteRover config/data/state/cache directory into the same mktemp workspace
+# (XDG_CONFIG_HOME, XDG_DATA_HOME and XDG_STATE_HOME, which src/server/utils/global-*-path.ts
+# honour at v3.16.1, and XDG_CACHE_HOME, which the bundled @oclif/core uses for the CLI cache
+# directory; BRV_DATA_DIR, BRV_CONFIG_DIR and BRV_CACHE_DIR, which would override them, are
+# unset), disables the bundled @oclif/plugin-update background autoupdate
+# (BRV_DISABLE_AUTOUPDATE=1), records the installed @oclif/core, @oclif/plugin-update and
+# transport-client versions (`npm ls`; a global tarball install resolves package.json's
+# ranges, not the tag's package-lock.json), commits two notes to a project's context tree
+# with `brv vc`, runs `brv search --format json` for a positive, a second positive and a
+# negative query, and checks every retained output with check_search.py, including two
+# deliberately wrong expectations that must fail. It also checks that the autoupdate hook
+# never ran: without BRV_DISABLE_AUTOUPDATE every command touches <cache dir>/lastrun and
+# may spawn a detached `brv update --autoupdate`, which is not a daemon descendant.
+#
+# Processes: cleanup signals only processes this script started, and only through pidfds.
+# Before anything is installed, `owned_processes.py preflight` must show that pidfds work;
+# otherwise the script stops with exit 1 and ByteRover never starts. After every command,
+# owned_processes.py records the daemon named by the workspace's own daemon.json (one of its
+# arguments must be a brv-server.js under the workspace prefix) and that daemon's
+# descendants, each with its start time. When a recording fails, the script stops at once.
+# On exit it records once more, sends SIGTERM to the recorded daemon, which stops its agents,
+# and SIGKILL to any recorded process still running 10 s later. No other process is looked
+# at or signalled. Ownership counts as established only when every recording succeeded and,
+# once `brv vc init` has run, a daemon was recorded. The workspace is removed only when
+# ownership was established and every recorded process is gone. Otherwise the script keeps
+# the workspace (its daemon.json, owned-processes.ledger and the install), logs its path, and
+# exits 4 when ownership was not established or 3 when a recorded process outlived the stop.
+#
+# This script does not use `brv restart`. At v3.16.1 that command reads the command line of
+# every process in /proc and sends SIGKILL to each one containing bin/brv,
+# byterover-cli/bin/run.js, brv-server.js or agent-process.js, whatever its install or data
+# directory (../../source-review.json#restart-*). The earlier versions of this script, kept in
+# ../run-20260926T0424Z/ and ../run-20260926T0454Z/, end with it and are unsafe to run on a
+# shared host.
+#
+# No LLM, network model endpoint or cloud account is used, and no ByteRover state is
+# written outside the workspace. npm uses its download cache for the package download, and
+# npm 11 writes Node's module compile cache to <os.tmpdir()>/node-compile-cache (its
+# lib/cli.js calls module.enableCompileCache()). Apart from those two npm caches, only
+# <output-dir> receives files, and the workspace when cleanup keeps it. The shell/Python
+# checks are local integration glue; the brv outputs are the tool's own.
+set -u
+
+here=$(cd "$(dirname "$0")" && pwd)
+out=${1:?usage: sh reproduce-vc-search.sh <output-dir>}
+mkdir -p "$out"
+out=$(cd "$out" && pwd)
+# The EXIT trap removes $work, so it must be the fresh mktemp directory and nothing else:
+# `cd ""` succeeds in the current directory, so an empty mktemp result must stop the script here.
+if ! work=$(mktemp -d) || [ ! -d "$work" ]; then echo "mktemp -d failed" >&2; exit 1; fi
+work=$(cd "$work" && pwd -P) || exit 1
+brv="$work/prefix/bin/brv"
+ledger="$work/owned-processes.ledger"
+daemon_file="$work/xdg/data/brv/daemon.json"
+ownership=established  # "lost" once a recording failed or an expected daemon was never recorded
+daemon_expected=no     # "yes" once a brv command that may start the daemon has run
+daemon_recorded=no     # "yes" once owned_processes.py has recorded the daemon
+
+log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$out/steps.log"; }
+fail() { log "FAIL: $*"; exit 1; }
+record_processes() {  # the daemon this workspace's own daemon.json names, and its descendants
+  [ -f "$daemon_file" ] || return 0
+  if python3 "$here/owned_processes.py" record "$ledger" "$daemon_file" "$work/prefix/" \
+      >> "$out/80-owned-processes.stdout" 2>> "$out/80-owned-processes.stderr"; then
+    daemon_recorded=yes
+    return 0
+  fi
+  ownership=lost
+  log "80-owned-processes: FAIL: the daemon named by the workspace's daemon.json could not be recorded"
+  return 1
+}
+# shellcheck disable=SC2329  # invoked by the EXIT trap
+cleanup() {  # exits 4 when ownership was not established, 3 when a recorded process outlived the stop
+  cleanup_status=0
+  record_processes
+  if [ -f "$ledger" ]; then
+    python3 "$here/owned_processes.py" stop "$ledger" > "$out/90-stop.stdout" 2> "$out/90-stop.stderr"
+    stop_status=$?
+    log "90-stop: exit=$stop_status: signals only to the processes recorded in the ledger"
+    [ "$stop_status" -eq 0 ] || cleanup_status=3
+  else
+    log "90-stop: no daemon was recorded, so no process was signalled"
+  fi
+  if [ "$daemon_expected" = yes ] && [ "$daemon_recorded" = no ]; then
+    ownership=lost
+    log "90-stop: FAIL: brv commands that may start the daemon ran, but no daemon was recorded"
+  fi
+  [ "$ownership" = established ] || cleanup_status=4
+  if [ "$cleanup_status" -ne 0 ]; then
+    log "cleanup: exit $cleanup_status: the workspace is kept for recovery: $work"
+    echo "reproduce-vc-search.sh: cleanup exit $cleanup_status; workspace kept for recovery: $work" >&2
+    exit "$cleanup_status"
+  fi
+  rm -rf "$work"
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+PIN_VERSION=3.16.1
+PIN_INTEGRITY=sha512-uI6zETcy5QO6H29/sdn4BKGWzJl658sjHWxcpO+LHYcmxQj1mAmmi9lluqQZYoXXrnrbp+an8NYhjd5MKmDTcw==
+
+unset BRV_DATA_DIR BRV_CONFIG_DIR BRV_CACHE_DIR
+export XDG_CONFIG_HOME="$work/xdg/config" XDG_DATA_HOME="$work/xdg/data" XDG_STATE_HOME="$work/xdg/state"
+export XDG_CACHE_HOME="$work/xdg/cache" BRV_DISABLE_AUTOUPDATE=1
+export DO_NOT_TRACK=1 NO_UPDATE_NOTIFIER=1 npm_config_update_notifier=false BRV_ENV=production MCP_AUTO_OPEN_ENABLED=false
+
+run() {  # run <label> <command...>: retain stdout/stderr and the exit code, then record owned processes
+  label=$1; shift
+  "$@" > "$out/$label.stdout" 2> "$out/$label.stderr"
+  status=$?
+  log "$label: exit=$status: $*"
+  record_processes || exit 4  # without the record, cleanup could not tell what this run started
+  return $status
+}
+
+log "start; workspace is a fresh mktemp directory"
+run 00-pidfd-preflight python3 "$here/owned_processes.py" preflight \
+  || fail "no working pidfd support, so the daemon could not be stopped safely; ByteRover not started"
+published=$(npm view "byterover-cli@$PIN_VERSION" dist.integrity 2> "$out/00-npm-view.stderr")
+printf '%s\n' "$published" > "$out/00-npm-view.stdout"
+[ "$published" = "$PIN_INTEGRITY" ] || fail "registry integrity differs from the pinned value"
+mkdir -p "$work/pack"
+run 01-npm-pack npm pack "byterover-cli@$PIN_VERSION" --pack-destination "$work/pack" || fail "npm pack"
+tarball="$work/pack/byterover-cli-$PIN_VERSION.tgz"
+python3 -c 'import base64,hashlib,sys; print("sha512-" + base64.b64encode(hashlib.sha512(open(sys.argv[1], "rb").read()).digest()).decode())' \
+  "$tarball" > "$out/02-tarball-integrity.stdout" 2> "$out/02-tarball-integrity.stderr" || fail "tarball digest"
+[ "$(cat "$out/02-tarball-integrity.stdout")" = "$PIN_INTEGRITY" ] || fail "downloaded tarball differs from the pinned integrity"
+run 03-npm-install npm install --global --no-audit --no-fund --prefix "$work/prefix" "$tarball" || fail "npm install"
+run 04-version "$brv" --version || fail "brv --version"
+run 05-npm-ls npm ls --global --prefix "$work/prefix" --all @oclif/core @oclif/plugin-update @campfirein/brv-transport-client
+
+mkdir -p "$work/project" || fail "project directory"
+cd "$work/project" || fail "project directory"
+daemon_expected=yes  # any ByteRover client may start the daemon through the transport client from here on
+run 10-vc-init "$brv" vc init || fail "vc init"
+mkdir -p .brv/context-tree/auth .brv/context-tree/billing
+printf '%s\n' '# Auth' '' 'Auth uses a fixed-window rate limiter and issues a JWT-like token with a 24 hour (86400s) expiry via issueToken() in src/auth.ts.' > .brv/context-tree/auth/notes.md
+printf '%s\n' '# Billing' '' 'Monthly invoices go out on the first business day; each invoice PDF is stored in the billing bucket.' > .brv/context-tree/billing/notes.md
+run 11-vc-add "$brv" vc add . || fail "vc add"
+run 12-vc-config-name "$brv" vc config user.name "trial-check" || fail "vc config user.name"
+run 13-vc-config-email "$brv" vc config user.email "trial-check@example.invalid" || fail "vc config user.email"
+run 14-vc-commit "$brv" vc commit -m "Add auth and billing notes" || fail "vc commit"
+run 15-vc-log "$brv" vc log || fail "vc log"
+run 16-status "$brv" status --format json || fail "status"
+
+run 20-search-positive "$brv" search "rate limiter" --format json
+run 21-search-second-positive "$brv" search "invoices" --format json
+run 22-search-negative "$brv" search "zzznonexistentxyz123" --format json
+
+checks_ok=0
+check() {  # check <label> <expected exit: 0 pass, 1 fail> <checker args...>
+  label=$1; want=$2; shift 2
+  python3 "$here/check_search.py" "$@" > "$out/$label.stdout" 2> "$out/$label.stderr"
+  got=$?
+  log "$label: checker exit=$got (intended $want)"
+  [ "$got" -eq "$want" ] || checks_ok=1
+}
+check 30-check-positive 0 "$out/20-search-positive.stdout" --total 1 --path auth/notes.md --text "fixed-window rate limiter"
+check 31-check-second-positive 0 "$out/21-search-second-positive.stdout" --total 1 --path billing/notes.md --text "Monthly invoices"
+check 32-check-negative 0 "$out/22-search-negative.stdout" --total 0
+check 33-check-wrong-path-must-fail 1 "$out/20-search-positive.stdout" --total 1 --path billing/notes.md --text "Monthly invoices"
+check 34-check-wrong-count-must-fail 1 "$out/20-search-positive.stdout" --total 10 --path auth/notes.md --text "fixed-window rate limiter"
+hook_files=$(cd "$XDG_CACHE_HOME" 2>/dev/null && find . -path "./brv/lastrun" -o -path "./brv/autoupdate" -o -path "./brv/autoupdate.log")
+if [ -z "$hook_files" ]; then
+  log "35-check-autoupdate-hook-idle: no brv/lastrun, brv/autoupdate or brv/autoupdate.log in the workspace cache directory (intended)"
+else
+  log "35-check-autoupdate-hook-idle: FAIL: the autoupdate hook ran: $(printf '%s' "$hook_files" | tr '\n' ' ')"
+  checks_ok=1
+fi
+log "done: every check matched its intended outcome: $([ "$checks_ok" -eq 0 ] && echo yes || echo no)"
+exit "$checks_ok"

@@ -1,0 +1,81 @@
+{
+ "arm": "pa",
+ "version": "0.14.1",
+ "started_at": "2026-09-25T19:30:37Z",
+ "snapshot_rev": "7783682fe6c9f10675d930b021f125028f21d8f1",
+ "scratch_config_equals_implementer_x_after_path_mapping": true,
+ "cleanup": {
+  "final_stop_exit": 1,
+  "terminated_in_cleanup": [
+   4060462,
+   4060474,
+   4060475
+  ],
+  "alive_after_cleanup": [],
+  "arm_daemons_after_cleanup": [],
+  "listeners_under_daemon_dir_after_cleanup": []
+ },
+ "ended_at": "2026-09-25T19:31:04Z",
+ "steps": [
+  {
+   "name": "M0-minimal-path-resolution",
+   "arm": "pa (0.14.1)",
+   "cmd": "command -v mcporter; command -v ps; mcporter --version",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter\nps: not on PATH\n0.14.1",
+   "pass": true,
+   "wall_s": 0.1,
+   "at_utc": "2026-09-25T19:30:37Z"
+  },
+  {
+   "name": "M1-keepalive-probe-without-ps-on-PATH",
+   "arm": "pa (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Transport ownership could not be verified; inspect it before recovery.\nError: Transport ownership could not be verified; inspect it before recovery.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:134:20) {\n  code: 'transport_retirement_failed'\n}",
+   "pass": false,
+   "wall_s": 0.8,
+   "at_utc": "2026-09-25T19:30:38Z",
+   "ppid": null
+  },
+  {
+   "name": "M2-daemon-ownership",
+   "arm": "pa (0.14.1)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 4060462, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 4060462, \"kernel_socket_owner_pids\": [4060462], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:30:38Z",
+   "ownership": {
+    "status_pid": 4060462,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 4060462,
+    "kernel_socket_owner_pids": [
+     4060462
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   }
+  },
+  {
+   "name": "M3-daemon-stop-no-leftovers",
+   "arm": "pa (0.14.1)",
+   "cmd": "mcporter daemon stop",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Retirement is unverified; inspect the previous transport before stopping this owner.\nError: Retirement is unverified; inspect the previous transport before stopping this owner.\n    at DaemonClient.sendRequest (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:206:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async DaemonClient.stop (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/ ... js:44:9)\n    at async runCli (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js:151:9)\n    at async main (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js:379:5) {\n  code: 'transport_retirement_failed'\n}",
+   "pass": false,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:30:53Z",
+   "tracked_processes": 3,
+   "leftover_tracked": [
+    4060462,
+    4060474,
+    4060475
+   ]
+  }
+ ],
+ "passed": false
+}

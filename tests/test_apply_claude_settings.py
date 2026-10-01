@@ -117,6 +117,50 @@ class MergeSettingsTests(unittest.TestCase):
         self.assertEqual([h["command"] for h in groups[0]["hooks"]], ["a", "c"])
         self.assertEqual([h["command"] for h in groups[1]["hooks"]], ["b", "d"])
 
+    def test_list_union_inserts_a_new_template_entry_after_its_template_neighbour(self):
+        # Base entries keep their order; a template entry the base lacks lands right after the template
+        # entry that precedes it (else right before the one that follows it), never simply at the end.
+        base = {"permissions": {"deny": ["A", "C", "H"]}}
+        template = {"permissions": {"deny": ["A", "B", "C", "D"]}}
+        self.assertEqual(acs.merge_settings(base, template)["permissions"]["deny"], ["A", "B", "C", "D", "H"])
+        base = {"permissions": {"deny": ["H", "C"]}}
+        template = {"permissions": {"deny": ["B", "C"]}}
+        self.assertEqual(acs.merge_settings(base, template)["permissions"]["deny"], ["H", "B", "C"])
+        # With no template entry in the base, template entries follow the host's, as before.
+        base = {"permissions": {"allow": ["Bash(ls)"]}}
+        template = {"permissions": {"allow": ["Bash(pwd)", "Bash(date)"]}}
+        self.assertEqual(acs.merge_settings(base, template)["permissions"]["allow"],
+                         ["Bash(ls)", "Bash(pwd)", "Bash(date)"])
+
+    def test_credential_twins_merge_before_an_existing_hosts_carve_outs(self):
+        # A host applied before the Context Mode twins existed already holds the `.env` rules and their `!`
+        # carve-outs. The twins must land before the carve-outs: a carve-out reaches only rules listed before
+        # it (code.claude.com/docs/en/permissions), so an appended `Read(**/.env.*)` would deny .env.example.
+        template_deny = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
+                                   .read_text(encoding="utf-8"))["permissions"]["deny"]
+        twins = [rule for rule in template_deny if rule.startswith("Read(**/")]
+        self.assertIn("Read(**/.env)", twins)
+        self.assertIn("Read(**/.env.*)", twins)
+        host_only = "Read(~/private/notes/**)"
+        base = {"permissions": {"deny": [rule for rule in template_deny if rule not in twins] + [host_only]}}
+        merged = acs.merge_settings(base, {"permissions": {"deny": template_deny}})["permissions"]["deny"]
+        self.assertEqual(merged, template_deny + [host_only])
+        for twin in ("Read(**/.env)", "Read(**/.env.*)"):
+            for carve_out in ("Read(!.env.example)", "Read(!.env.*.example)"):
+                self.assertLess(merged.index(twin), merged.index(carve_out))
+        self.assertEqual(acs.merge_settings({"permissions": {"deny": merged}},
+                                            {"permissions": {"deny": template_deny}})["permissions"]["deny"], merged)
+
+    def test_a_status_line_refresh_interval_joins_the_hosts_status_line(self):
+        # Synthesis H8/B1 (2026-09-27): a partial template with only the refresh interval keeps the host's own
+        # status-line command; the full template's scalars win as for every nested object.
+        base = {"statusLine": {"type": "command", "command": "host-hud", "padding": 1}}
+        merged = acs.merge_settings(base, {"statusLine": {"refreshInterval": 5}})
+        self.assertEqual(merged["statusLine"], {"type": "command", "command": "host-hud", "padding": 1,
+                                                "refreshInterval": 5})
+        full = acs.merge_settings(base, {"statusLine": {"type": "command", "command": "tpl", "refreshInterval": 5}})
+        self.assertEqual(full["statusLine"], {"type": "command", "command": "tpl", "padding": 1, "refreshInterval": 5})
+
     def test_host_only_nested_keys_are_kept(self):
         base = {"permissions": {"allow": ["Bash(ls)"], "deny": ["X"], "defaultMode": "default"},
                 "enabledPlugins": {"host@plugin": True},

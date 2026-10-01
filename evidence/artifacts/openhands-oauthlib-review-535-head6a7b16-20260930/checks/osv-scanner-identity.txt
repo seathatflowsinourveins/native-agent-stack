@@ -1,0 +1,5 @@
+observed_utc=2026-09-30T09:26:02Z
+osv-scanner binary sha256: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+CI pin (.github/workflows/security-scan.yml): ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2

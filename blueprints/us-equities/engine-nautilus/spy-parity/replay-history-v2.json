@@ -1,6 +1,6 @@
 {
   "schema": "spy-parity-v2-replay-history/1",
-  "note": "Every v2 execution of the harness on the frozen SPY inputs, in time order, enumerated from the retained private output directories of the implementing session. run.py copies this list into each new receipt under preconditions.prior_v2_replays; after a run, the operator appends that run here before the next one. Runs whose output directory was not retained cannot be enumerated from disk; none is known. The sealed probes under probes/v2 are preregistration evidence recorded in mapping-manifest-v2.json and are not listed here. Receipt hashes name private files that are not published. Every replay listed is superseded; none was reviewed before it ran. harness_local_source_sha256, where present, is the replay's reviewed-harness file set as run.py hashed it; compare.py fails a run whose reviewed files equal any listed replay's, and re-hashes this file at comparison time, accepting only an append-only extension of the list the run recorded.",
+  "note": "Every v2 execution of the harness on the frozen SPY inputs, in time order. The first seven entries were enumerated from the retained private output directories of the implementing session; each later entry was appended by the operator of its run. run.py copies this list into each new receipt under preconditions.prior_v2_replays; after a run, the operator appends that run here before the next one. Runs whose output directory was not retained cannot be enumerated from disk; none is known. The sealed probes under probes/v2 are preregistration evidence recorded in mapping-manifest-v2.json and are not listed here. Receipt hashes name private files that are not published. The first six replays listed are superseded, and none of them was reviewed before it ran. bwrap-cc4503f-qualifying ran after the review of cc4503f and is the qualifying replay; later entries are reproductions of the reviewed harness that cannot qualify. harness_local_source_sha256, where present, is the replay's reviewed-harness file set as run.py hashed it; compare.py fails a run whose reviewed files equal any listed replay's, and re-hashes this file at comparison time, accepting only an append-only extension of the list the run recorded.",
   "replays": [
     {
       "id": "dev1-dev5",
@@ -120,6 +120,28 @@
       },
       "reviewed_before_run": true,
       "status": "qualifying: the first and only replay from the reviewed harness cc4503f; no retry from cc4503f can qualify"
+    },
+    {
+      "id": "bwrap-cc4503f-host-nativestack-5975wx-20260925",
+      "observed_utc": [
+        "2026-09-25T14:27:36.104174+00:00"
+      ],
+      "harness": "worktree at 720e294b (origin/main at the time) plus one local host-receipt commit that touches no spy-parity file; the reviewed harness files hash exactly as cc4503f",
+      "isolation": "documented README bwrap two-run replay (loopback only, cleared environment, read-only harness, data and interpreter mounts) without --review-record or --harness-commit, on a second physical host (nativestack-5975wx-20260925, CPU only); interpreter ~/.local/share/codex-ecosystem/nautilus-py312 and data root ~/.local/share/codex-ecosystem/lean/Lean/Data instead of the README's tools/ paths",
+      "outcome": "run.py exit 0 with the five frozen inputs accepted; fills +304 @ 323.5800 and -304 @ 291.6900, distributions 0.00 and 428.64 engine-posted, native end cash 90734.08, zero ERROR lines, two runs equal after UUID normalization; every economic field and both normalized economic hashes equal receipt-v2.json. compare.py --lean-data on this receipt: FAIL, complete, 106/106 execution checks, failed 2: retained_record_before_run, because the README's run.py command omits --review-record although review-record-v2-cc4503f.json exists, and, by design, no_prior_replay_ran_the_reviewed_harness, which names bwrap-cc4503f-qualifying. compare.py --lean-data on receipt-v2.json on this host: PASS, equal to verdict-v2.json except the replay-history check's observed text",
+      "receipt_sha256": [
+        "ba724497881ba21702c15ca623b6f634a875953c2e02977fba59b708f8772a91"
+      ],
+      "verdict_sha256": "a12fcddbce73ec68aee7d2ca9fa30d775cfc49bef10a786cc5af07ac308646b7",
+      "harness_local_source_sha256": {
+        "compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+        "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+        "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+        "fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+        "run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2"
+      },
+      "reviewed_before_run": false,
+      "status": "host reproduction, not qualifying: a later retry of the reviewed harness cc4503f on another host, which the accepted deviation cannot qualify; receipt and verdicts published in evidence/artifacts/workstation-lane-20260925/spy-parity/"
     }
   ]
 }

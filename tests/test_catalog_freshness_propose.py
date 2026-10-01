@@ -28,6 +28,7 @@ against the committed YAML bytes, without a YAML dependency.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -662,6 +663,15 @@ def _init_scratch_git(path: Path) -> None:
     git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
     subprocess.run(["git", "init", "-q"], cwd=path, check=True)
     subprocess.run(["git", *git_env, "add", "-A"], cwd=path, check=True)
+    # `add -A` skips files that match .gitignore, but the source checkout tracks some of
+    # them on purpose (force-added evidence such as *.jsonl excerpts). Track those too so
+    # the copy matches a clone: scripts/validate.py rejects a hash-listed file that is
+    # ignored and untracked, because a commit would leave it out.
+    tracked = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True).stdout
+    present = [name for name in (os.fsdecode(item) for item in tracked.split(b"\0") if item)
+               if (path / name).is_file() and not (path / name).is_symlink()]
+    subprocess.run(["git", *git_env, "add", "--force", "--pathspec-from-file=-", "--pathspec-file-nul"],
+                   cwd=path, check=True, input=b"\0".join(os.fsencode(name) for name in present))
     subprocess.run(["git", *git_env, "commit", "-q", "-m", "scratch snapshot"], cwd=path, check=True)
 
 
@@ -844,12 +854,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         block = match.group(1)
         self.assertIn(f"group: {EXPECTED_PROPOSE_CONCURRENCY_GROUP}", block)
         self.assertIn("cancel-in-progress: false", block)
-        # queue: max is the documented fix for the same problem, but this
-        # repository's pinned actionlint 1.7.12 rejects that key (checked
-        # directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md); it must not
-        # be reintroduced as an actual concurrency key without re-verifying
-        # actionlint support first (the surrounding prose may still *mention*
-        # `queue:` to explain why it is not used).
+        # queue: max is the documented fix for the same problem, but the
+        # actionlint pinned on 2026-09-23 (rhysd/actionlint 1.7.12) rejected that
+        # key (checked directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md).
+        # kjanat/actionlint 1.17.0, pinned since 2026-09-28, accepts it; adopting
+        # it is a separate change that updates this assertion (the surrounding
+        # prose may still *mention* `queue:` to explain why it is not used).
         active_keys = [
             line.strip().split(":", 1)[0] for line in block.splitlines()
             if line.strip() and not line.strip().startswith("#")

@@ -1,0 +1,337 @@
+{
+  "task": "Phase-B prep: hftbacktest as the independent cross-check engine for the simulation lane",
+  "date_utc": "2026-09-25",
+  "followup_1_date_utc": "2026-09-25",
+  "followup_2_date_utc": "2026-09-25",
+  "followup_3_date_utc": "2026-09-25",
+  "followup_3_note": "Final wording/rule fix round. No new CI failures found by the delta review; fixes: PartialFillExchange no-depletion bias (Scenario I, new), cross-check plan liquidity/queue-setting parity with sim-capacity (verified via git show against its remote branch), NautilusTrader taker-queue claim corrected against actual matching_engine/mod.rs source, A-D/G wording corrected to A-D/G1/G3/G4 (G2 diverges), NBER citation corrected (author + rule scope), EMO rule restricted to exact-quote equality with new boundary tests, D1 inferred-side claim now actually run, stale cleanup record corrected, pip-audit re-run with full 43-package coverage, maintenance precondition reframed as dormancy tied to a 2026-12-23 overturn checkpoint, several sourcing nits (maturin not twine, __init__.py not name collision, algo.rs packaging not API drift, FOK/IOC importable, IOC-only status-understates caveat, Scenario E hand-verified).",
+  "upstream": {
+    "project": "hftbacktest (nkaz001/hftbacktest)",
+    "license": "MIT",
+    "python_release_tag": "py-v2.4.4",
+    "rust_release_tag": "rust-v0.9.4",
+    "pinned_version": "2.4.4",
+    "pinned_commit": "a244a14250b42d97fc305569c93c4117cd5e1dff",
+    "source_url": "https://github.com/nkaz001/hftbacktest",
+    "pypi_url": "https://pypi.org/pypi/hftbacktest/json"
+  },
+  "maintenance_precondition": {
+    "requirement": "catalogs/sota-convergence/manifest-20260922.json's candidate card for this repository (~L6321) records: 'note upstream has not pushed since 2025-12-23, so maintenance would need re-checking first.'",
+    "checked_utc": "2026-09-25",
+    "check_method": "GitHub REST API: GET /repos/nkaz001/hftbacktest (default_branch, pushed_at, open_issues_count) and GET /repos/nkaz001/hftbacktest/tags",
+    "result": {
+      "default_branch": "master",
+      "default_branch_pushed_at": "2025-12-23T15:57:58Z",
+      "default_branch_head_commit": "5f3ec40b2afb",
+      "default_branch_head_commit_date": "2025-12-23T15:31:05Z",
+      "open_issues_count": 17,
+      "latest_py_tag": "py-v2.4.4",
+      "latest_py_tag_is_pinned_tag": true,
+      "months_since_last_push_as_of_check": "~9"
+    },
+    "classification": "DORMANCY, recorded as a risk -- NOT a pass. ~9 months with no push and 17 open issues is a maintenance risk signal, not confirmation that upstream is fine. An earlier version of this receipt's conclusion field read as reassurance ('nothing has moved, confirmed not assumed') without stating the risk framing explicitly.",
+    "overturn_condition": "If upstream has made NO commits by 2026-12-23 (12 full months of inactivity from the 2025-12-23 push), re-score the maintenance posture as abandoned rather than dormant before further investment in this cross-check depends on upstream fixes or releases. This is a new, concrete checkpoint this task is establishing, not a pre-existing clause quoted from the manifest.",
+    "conclusion": "Confirmed via live API check: default branch unchanged since the already-reviewed 2025-12-23/5f3ec40 commit; py-v2.4.4 remains the latest tag. Re-checked, not assumed -- but the result is a dormancy risk to track against the 2026-12-23 checkpoint above, not a clean bill of health."
+  },
+  "versions": {
+    "python_interpreter": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "venv_path": "~/.local/share/native-agent-stack/hftbacktest-2.4.4 (host-local; rebuilt and re-deleted for this fix round -- see cleanup)",
+    "hftbacktest": "2.4.4",
+    "numpy": "2.2.6",
+    "numba": "0.67.0",
+    "polars": "1.44.2",
+    "uv": "0.12.17",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
+    "rustup": "1.29.1 (d95a37b6a 2026-08-13)"
+  },
+  "reproduce": {
+    "venv": "uv venv --python 3.12 ~/.local/share/native-agent-stack/hftbacktest-2.4.4 && uv pip sync --python ~/.local/share/native-agent-stack/hftbacktest-2.4.4/bin/python3 --require-hashes blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
+    "note": "The venv referenced by venv_path above does not currently exist on this host (deleted after verification, per cleanup); this is the exact rebuild command, not a path to a still-live install."
+  },
+  "wheel": {
+    "filename": "hftbacktest-2.4.4-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "sha256": "7df29f3f600e74cde4b7223dbc65d64caed7ae16c67dd4a85d33a5bf4e2e36b5",
+    "provenance_note": "This sha256 is the digest PyPI's JSON API (pypi.org/pypi/hftbacktest/json, urls[].digests.sha256) reports for this exact filename, and it matches the wheel uv actually downloaded and installed. That is a consistency check between the downloaded artifact and PyPI's own served record, NOT independent third-party provenance: PyPI provides no build attestations (e.g. Sigstore/Trusted Publishing) for this project's wheels. Upstream publishes via PyO3/maturin-action@v1's `command: upload` step (.github/workflows/release-python.yml at the pinned tag, verified by reading it), i.e. `maturin upload --non-interactive --skip-existing wheels-*/*` authenticated with a maintainer-held MATURIN_PYPI_TOKEN GitHub Actions secret -- NOT `twine`, which an earlier version of this receipt said without checking. Either way, a compromised token or PyPI account could in principle serve a wheel whose sha256 matches its own JSON API entry; this was NOT independently re-verified against any source outside PyPI itself."
+  },
+  "evidence": [
+    {
+      "item": "isolated venv + pinned install",
+      "evidence_class": "structural_validation",
+      "commands": [
+        {"cmd": "uv venv --python 3.12 ~/.local/share/native-agent-stack/hftbacktest-2.4.4", "exit_code": 0},
+        {"cmd": "uv pip compile --python <venv>/bin/python3 --generate-hashes requirements.in -o requirements.lock", "exit_code": 0},
+        {"cmd": "uv pip sync --python <venv>/bin/python3 --require-hashes requirements.lock", "exit_code": 0}
+      ],
+      "requirements_lock_sha256": "c6a3e11fef05209374aae054b303513246771663f8c69349fb0d93e4d8c4ff35",
+      "package_count": 43,
+      "rebuild_note": "This exact venv was rebuilt from scratch for this fix round (to re-run pip-audit properly and exercise the new Scenario I / D1-inferred-side code), then deleted again after verification -- same commands, same lock, same hashes, reproducibly."
+    },
+    {
+      "item": "supply-chain scan of the pinned lock -- corrected, full coverage",
+      "evidence_class": "independent_observation",
+      "tool": "pip-audit 2.10.1 (via `uv tool run pip-audit`); osv-scanner CLI binary was not found on this host",
+      "commands": [
+        {"cmd": "uv tool run pip-audit -r requirements.lock --disable-pip --no-deps --format json", "exit_code": 0}
+      ],
+      "result": "0 known vulnerabilities across ALL 43 pinned packages (including `packaging`, which the earlier plain `pip-audit -r requirements.lock` invocation silently omitted).",
+      "correction_of": "An earlier version of this receipt ran plain `uv tool run pip-audit -r requirements.lock --format json`, which enumerated only 42 packages (silently skipping `packaging`) and described that as \"pip-audit's own behavior, not a scan gap\" without trying the flags that fix it. `--disable-pip --no-deps` makes pip-audit resolve directly from the lock's own pins instead of re-resolving via pip, bringing `packaging` into scope. This matches the coverage an independent reviewer reported (0 findings on PyPI and OSV, all 43 packages).",
+      "stdout_sha256": "3eb5f82a37b185f2a931cae0bcc497ce03103dd3d57db9d2628c9704da818e50",
+      "not_scanned": "osv-scanner CLI was not run locally (binary absent on this host). No scan was run for transitive native/Rust extension code inside the wheel itself."
+    },
+    {
+      "item": "upstream Python test suite at the pinned tag",
+      "evidence_class": "upstream_test",
+      "source": "git clone --depth 1 --branch py-v2.4.4 https://github.com/nkaz001/hftbacktest.git (commit a244a14250b42d97fc305569c93c4117cd5e1dff)",
+      "commands": [
+        {"cmd": "python3 -m unittest test_hftbacktest.py (in py-hftbacktest/tests, run with the pinned venv interpreter)", "exit_code": 1}
+      ],
+      "cwd": "py-hftbacktest/tests (inside the scratch clone)",
+      "stdout_stderr_sha256": "b655df5181026937ee96e9b34fc7e1355ebaf8cf650dbe665c18b80e72977dac",
+      "result": "1 test, 1 error: FileNotFoundError: 'tmp_20240501.npz' -- the sole upstream unittest requires a private/undistributed binary market-data fixture not present in the tagged source tree and not fetched by any script or CI workflow in the repository.",
+      "additional_finding": "The repository's own CI (.github/workflows/release-python.yml, codeql.yml, stale.yml at this tag) contains no workflow that runs this test file."
+    },
+    {
+      "item": "Rust toolchain installation",
+      "evidence_class": "structural_validation",
+      "commands": [
+        {"cmd": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh", "exit_code": 0},
+        {"cmd": "sh rustup-init.sh -y --profile minimal --no-modify-path", "exit_code": 0}
+      ],
+      "result": "rustup 1.29.1, rustc 1.98.1, cargo 1.98.1 installed into ~/.rustup and ~/.cargo, shell profile untouched. Satisfies the crate's pinned rust-version = \"1.91.1\". No rust-toolchain.toml/rust-toolchain file exists anywhere in the tagged tree.",
+      "removed": "rustup self uninstall -y, run 2026-09-25 after the second fix round's verification completed; not reinstalled for this (third) fix round since no Rust work was needed."
+    },
+    {
+      "item": "resolved Rust dependency versions",
+      "evidence_class": "structural_validation",
+      "note": "The tagged tree's .gitignore contains **/Cargo.lock and **/target -- confirmed with `git ls-files Cargo.lock` (empty) and `git status --porcelain` (clean) before any build. No Cargo.lock is committed upstream at this tag; the one present after building is entirely generated by this task's own cargo invocation.",
+      "generated_cargo_lock_sha256": "908990e1951581638307122bbaa8555314a125ee07c51462ed7662ae2023b6f4",
+      "generated_cargo_lock_line_count": 4663,
+      "cargo_tree_depth1_backtest_feature": "hftbacktest v0.9.4 direct deps: anyhow 1.0.104, bincode 2.0.1, dyn-clone 1.0.20, hftbacktest-derive 0.2.0 (proc-macro, path dep), nom 8.0.0, thiserror 2.0.21, tracing 0.1.44, uuid 1.26.1, zip 6.0.0; dev-dependencies: clap 4.6.7, tracing-subscriber 0.3.23",
+      "cargo_tree_full_line_count_backtest_feature": 144,
+      "command": "cargo tree -p hftbacktest --no-default-features --features backtest [--depth 1]",
+      "not_committed": "This Cargo.lock is a host-local build artifact of an upstream-gitignored file; it is not added to this repository."
+    },
+    {
+      "item": "upstream Rust test suite -- default-features build attempt",
+      "evidence_class": "upstream_test",
+      "commands": [
+        {"cmd": "cargo test -p hftbacktest (default features = backtest+live)", "exit_code": 101}
+      ],
+      "stdout_stderr_sha256": "b0cd5160f808137539bc86027d0b7d8109402366faca1d0bf498c026aba34e44",
+      "result": "Build failure: iceoryx2-pal-posix's build script (pulled in only by the `live` feature) needs bindgen -> libclang. No libclang.so and no C standard headers reachable by clang were present on this host, and there is no passwordless sudo to install libclang-dev."
+    },
+    {
+      "item": "upstream Rust test suite -- backtest-only, all-targets build (examples included)",
+      "evidence_class": "upstream_test",
+      "commands": [
+        {"cmd": "cargo test -p hftbacktest --no-default-features --features backtest", "exit_code": 101}
+      ],
+      "result": "Compiles the library and its unit tests successfully, but fails to build SIX examples: gridtrading_live, logging_order_latency, gridtrading_live_bybit, live_order_error_handling (reference the `live` feature's API without an upstream `required-features = [\"live\"]` guard); custom_evhandling (E0599: calls `process_recv_order2`, which does not exist on the current `Local` struct -- genuine API drift); algo (E0601: no `main` function).",
+      "algo_rs_correction": "An earlier version of this receipt called algo's failure 'upstream example/API drift', grouped with custom_evhandling. Reading algo.rs shows this is wrong: it defines `pub fn gridtrading(...)`, a shared helper with no `main` at all, and SIX other examples (gridtrading_live.rs, gridtrading_backtest_args.rs, logging_order_latency.rs, gridtrading_backtest.rs, live_order_error_handling.rs, gridtrading_live_bybit.rs) include it via `mod algo;`. Cargo's examples/ auto-discovery ALSO independently treats algo.rs as its own example target (every top-level .rs file directly under examples/ becomes an example binary by default) -- that is what fails to compile. This is a PACKAGING issue (upstream never excluded algo.rs from auto-discovery, e.g. via examples/common/ or an impossible required-features marker), not API drift like custom_evhandling genuinely is.",
+      "conclusion": "Two of six failures (algo, custom_evhandling) are unrelated to the `live` feature or to libclang either way, so installing libclang alone would not get a bare `cargo test -p hftbacktest --no-default-features --features backtest` (without --lib) to pass on any host."
+    },
+    {
+      "item": "upstream Rust test suite -- backtest-feature --lib run (actually executed)",
+      "evidence_class": "upstream_test",
+      "source": "git clone --depth 1 --branch py-v2.4.4 (commit a244a14250b42d97fc305569c93c4117cd5e1dff); no repository workflow defines a cargo test invocation at this tag.",
+      "commands": [
+        {"cmd": "cargo test -p hftbacktest --no-default-features --features backtest --lib", "exit_code": 0}
+      ],
+      "cwd": "scratch clone root (hftbacktest-src), CARGO_TARGET_DIR pointed at the scratchpad",
+      "stdout_sha256": "605cf5d19104d0971e3723088601f57bafadb651c4c90d19d36764a338eb7c65",
+      "wall_time_measurement": {
+        "value_seconds": 0.145,
+        "method": "bash `time` builtin around the exact cargo test invocation (its `real` field)",
+        "caveat": "INCREMENTAL build (dependencies already compiled from the immediately preceding failed attempts), not a from-scratch build."
+      },
+      "result": "22 passed; 0 failed; 0 ignored. Source files: 7, not 8 -- an earlier version of this receipt wrongly included connector/src/utils.rs (5 #[test] functions there), which is in the SEPARATE connector crate, excluded by -p hftbacktest. The 7 files actually run: hftbacktest/src/types.rs (test_event_is), backtest/mod.rs (skips_unseen_events), backtest/models/queue.rs (l3_tests::fill_in_queue, l3_tests::fill_by_crossing), depth/{btreemarketdepth,hashmapmarketdepth,roivectormarketdepth}.rs (4 L3 tests each), depth/fuse.rs (6 tests).",
+      "coverage_boundary": "None of these 22 tests exercises exchange fill logic (backtest/proc/*.rs has zero #[test] functions), IOC/FOK/GTX handling, ProbQueueModel/RiskAdverseQueueModel, or HashMapMarketDepth's own update_bid_depth/update_ask_depth (only Fuse's, a different struct, is unit-tested). All of that coverage in this cross-check comes from OUR synthetic fixture.",
+      "doctest_exclusion": "--lib excludes 2 doctests (types.rs ~line 461, latency.rs ~line 89) that `cargo test --doc` would run."
+    },
+    {
+      "item": "L1 top-of-book feasibility fixture (Scenarios A-I, NoPartialFillExchange and PartialFillExchange)",
+      "evidence_class": "synthetic_fixture",
+      "constructed_by": "this task, blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py",
+      "commands": [
+        {"cmd": "python3 l1_feasibility.py", "exit_code": 0}
+      ],
+      "stdout_sha256": "a060e4121d770583d224eafa61b29c96326deb88a3069e1eb1996a6263d7accb",
+      "script_sha256": "6ce9ff6b3cd66d781ff15ec1fe4f343259231eddfc3d4ba44ce1d6198f4be22c",
+      "test_file_sha256": "0821717fb58e78424712c65b1c4e57ac71d12a97e7691da2e3be020dee9ef7cc",
+      "scenarios": {
+        "A_marketable_ioc_fill": "FILLED at 10.02, exec_qty=10.0 under both exchange models -- identical (order size <= touch size)",
+        "B_ioc_expiry": "EXPIRED under both -- identical",
+        "C_queue_trade_depletion_needs_side": "with_side FILLED (exec_qty=5.0); without_side NEW. Identical under both exchange models.",
+        "D_passive_fill_paths": {
+          "d1_trade_through": "with_side FILLED (exec_qty=5.0); without_side NEW -- the event never reaches check_if_buy_filled at all without a side bit.",
+          "d2_depth_zeroed_no_trade": "NEW in all runs -- on_bid_qty_chg only calls queue_model.depth(), never is_filled().",
+          "d3_ask_crosses_down": "FILLED (exec_qty=5.0) via on_best_ask_update, from depth alone.",
+          "identical_under_both_exchange_models": true
+        },
+        "E_optimistic_queue_bias_HAND_VERIFIED": {
+          "correction_of": "An earlier version of this receipt labeled this 'MEASURED, not hand-verified'. It IS hand-verifiable: ProbQueueModel.depth() (queue.rs) has an early-return path for a quantity INCREASE (`chg = prev_qty - new_qty; if chg < 0.0 { front_q_qty = front_q_qty.min(new_qty); return; }`) that never touches the probability formula.",
+          "hand_trace": [
+            "1. new_order() at acceptance: front_q_qty = bid_qty_at_tick(9.99) = 0 (nothing quoted there yet).",
+            "2. Bid re-quotes to 9.99/50: on_bid_qty_chg -> depth(prev_qty=0, new_qty=50) -> chg = 0-50 = -50 < 0 -> early return, front_q_qty = min(0, 50) = 0. Still exactly 0.",
+            "3. 5-share sell-aggressor print at 9.99: trade() -> front_q_qty -= 5 = -5. is_filled() -> exec = round(-(-5)/1.0) = 5 > 0 -> returns 5.0 filled.",
+            "4. fill() executes the full remaining leaves_qty (5.0) at the order's own price (9.99), maker=True."
+          ],
+          "actual_result": "FILLED, exec_qty=5.0, exec_price=9.99 -- exactly matches the hand trace. No probabilistic/random step was ever actually invoked in this specific fixture."
+        }
+      },
+      "identical_under_both_exchange_models_for_scenarios_a_to_d_and_g1_g3_g4": true,
+      "correction_of_a_to_d_and_g_wording": "An earlier version of this receipt (and README) said Scenarios A-D and G 'coincide' between exchange models, or that they are 'NOT equivalent... except G' without naming which G sub-case actually diverges. G2 (oversized FOK) diverges; G1/G3/G4 coincide, same as A-D. The fixture's own scenario_g2_fok_insufficient_diverges_between_exchange_models flag is true.",
+      "source_citations": [
+        "hftbacktest/src/backtest/proc/nopartialfillexchange.rs (ack_new IOC/FOK/GTX/GTC branches; check_if_buy_filled/check_if_sell_filled; on_best_bid_update/on_best_ask_update; on_bid_qty_chg/on_ask_qty_chg; EXCH_BUY_TRADE_EVENT/EXCH_SELL_TRADE_EVENT dispatch)",
+        "hftbacktest/src/backtest/proc/partialfillexchange.rs (same functions; FOK/IOC depth-walking arms ~lines 403-452; struct doc comment ~lines 40-70)",
+        "hftbacktest/src/backtest/models/queue.rs (ProbQueueModel::new_order/trade/depth/is_filled, ~lines 165-207)",
+        "docs/data.rst (qty==0 at a DEPTH_EVENT price removes that level)"
+      ]
+    },
+    {
+      "item": "Scenario F: NoPartialFillExchange vs PartialFillExchange genuinely diverge (oversized single order)",
+      "evidence_class": "synthetic_fixture",
+      "setup": "IOC buy for 150 shares against a touch quoting only 100 shares at 10.02.",
+      "actual_result": {
+        "no_partial_fill": "FILLED in full: exec_qty=150.0, status=FILLED. Fills the ENTIRE requested quantity unconditionally on any cross, never checking quoted size -- documented upstream: 'this may cause unrealistic fill simulations if you attempt to execute a large quantity' (nopartialfillexchange.rs struct doc, ~lines 58-62).",
+        "partial_fill": "EXPIRED, but exec_qty=100.0 (not 0), leaves_qty=50.0. Walks quoted depth, executes what is available (100), then overwrites status to Expired even though a partial fill already executed and updated state."
+      },
+      "status_understates_caveat_scope": "This 'status alone understates what happened' caveat is IOC-SPECIFIC. Scenario G2 (FOK, insufficient depth, PartialFillExchange) correctly expires with exec_qty EXACTLY 0 -- FOK computes cumulative available quantity BEFORE executing anything and only proceeds if it is sufficient, so there is nothing partial to understate. An earlier version of this receipt did not scope this caveat to IOC.",
+      "conclusion": "The two exchange models are NOT equivalent in general. They coincided on Scenarios A-D and G1/G3/G4 only because those fixtures kept order size at or below the touch's quoted size -- and even that coincidence set excludes G2, which diverges."
+    },
+    {
+      "item": "Scenario G: FOK and GTX time-in-force",
+      "evidence_class": "synthetic_fixture",
+      "setup": "Same 100-share-at-10.02 touch as Scenario F.",
+      "results": {
+        "g1_fok_sufficient_depth_qty10": "FILLED under both exchange models (10 <= 100 quoted) -- coincides",
+        "g2_fok_insufficient_depth_qty150": {
+          "no_partial_fill": "FILLED in full (exec_qty=150.0) -- FOK has NO distinct all-or-none behavior in this exchange model at all, bundled with GTC/IOC.",
+          "partial_fill": "EXPIRED with exec_qty=0.0 -- FOK arm sums cumulative available quantity (100) and compares to required (150) BEFORE executing anything; 100 < 150 -> never calls fill() -- DIVERGES from no_partial_fill."
+        },
+        "g3_gtx_crossing_qty10": "EXPIRED under both exchange models -- never a distinct 'Rejected' status -- coincides",
+        "g4_gtx_resting_price10.00_qty1": "NEW under both exchange models, like a non-crossing GTC order -- coincides"
+      }
+    },
+    {
+      "item": "Scenario H: nonzero fee accounting",
+      "evidence_class": "synthetic_fixture",
+      "setup": "Scenario A's marketable IOC fill (exec_price=10.02, exec_qty=10.0), with trading_value_fee_model(0.0, 0.001) (0.1% taker fee).",
+      "actual_result": "state_values(0).fee == 0.1002, exactly equal to exec_price * exec_qty * taker_fee. Confirms cost accounting is actually applied, not merely that a zero-fee call doesn't error."
+    },
+    {
+      "item": "Scenario I: PartialFillExchange's own no-depletion bias (NEW this round)",
+      "evidence_class": "synthetic_fixture",
+      "reviewer_probe": "Three back-to-back 100-share IOCs against a touch that always shows exactly 100 shares (never re-quoted, for the whole 10s run).",
+      "upstream_citation": "partialfillexchange.rs struct doc comment, ~lines 66-69 (verified by reading the pinned source): 'Liquidity-taking orders will be executed based on the quantity of the order book, EVEN THOUGH THE BEST PRICE AND QUANTITY DO NOT CHANGE DUE TO YOUR EXECUTION. Be aware that this may cause unrealistic fill simulations if you attempt to execute a large quantity.'",
+      "actual_result": {
+        "order_1": {"status": "FILLED", "exec_qty": 100.0},
+        "order_2": {"status": "FILLED", "exec_qty": 100.0},
+        "order_3": {"status": "FILLED", "exec_qty": 100.0},
+        "final_position": 300.0
+      },
+      "conclusion": "PartialFillExchange caps a SINGLE order's fill at the displayed size, but never actually depletes that display for the NEXT order -- so at a high enough submission rate it over-fills, structurally similar to Scenario F/G2's single-oversized-order case but spread across multiple orders. Calling PartialFillExchange 'realistic' (an earlier version of this receipt implied this by contrast with NoPartialFillExchange, without qualification) overstates it; this bias is now listed next to Scenario E in the verdict."
+    },
+    {
+      "item": "EMO at-quote rule and Lee-Ready rule, offered separately -- exact-quote condition corrected, citation corrected",
+      "evidence_class": "synthetic_fixture",
+      "constructed_by": "this task, blueprints/us-equities/sim-crosscheck-hftbacktest/l1_feasibility.py (infer_side_emo, infer_side_lee_ready, _tick_test, run_scenario_c_emo, run_scenario_d1_with_inferred_side, run_tick_test_coverage_demo, run_emo_boundary_demo)",
+      "citation_correction": "Verified directly against the NBER page's own metadata (citation_author, citation_title meta tags): NBER Working Paper No. 14158 is 'Short Sales and Trade Classification Algorithms' by Paul Asquith, Rebecca Oman, and Christopher Safaya (2008), a study measuring how often EMO/Lee-Ready/tick-test misclassify SHORT SALES specifically -- not a general literature review, and not authored by 'Diether, Lee & Werner' as an earlier version of this receipt claimed without checking.",
+      "exact_quote_correction": "An earlier version of infer_side_emo used `trade_px >= ask` / `trade_px <= bid` (at-or-through the quote). EMO's own at-quote condition is EQUALITY: now `trade_px == ask` / `trade_px == bid`, with everything else -- including strictly-inside-the-spread prints AND prints outside the quotes entirely (above the ask or below the bid) -- falling to the tick test. run_emo_boundary_demo() (prices [10.00, 10.02, 10.03, 9.98]) confirms: exactly-at-bid -> direct sell; exactly-at-ask -> direct buy; strictly-above-ask (10.03) -> tick test (an uptick from the ask, happens to also resolve 'buy', but via the fallback, not the at-quote condition); strictly-below-bid (9.98) -> tick test (a downtick, resolves 'sell'). Directly confirmed with no prior trade history at all, infer_side_emo(10.05,...) and infer_side_emo(9.90,...) both return None (undetermined) -- proof the at-quote condition itself is not what classified the boundary-demo prints.",
+      "existing_disagreement_tape_unaffected": "TICK_TEST_TRIGGER_PRICES's EMO-vs-Lee-Ready disagreement (index 1, price 10.015) is UNCHANGED by the exact-quote fix: that print was always strictly inside the spread, never at either quote, so it always used the tick test under both the old and new EMO implementations.",
+      "d1_inferred_side_actually_run": {
+        "correction_of": "An earlier version of this receipt claimed inference 'restores trade-through fills in this fixture' on the D1 tape WITHOUT ever running it.",
+        "setup": "The D1 print (9.99) is OUTSIDE the quotes (below the bid, not at it, bid=10.00/ask=10.02), so a bare single-trade tape gives EMO no prior price for the tick test (returns None/undetermined). run_scenario_d1_with_inferred_side() adds one unambiguous seed trade at the ask (400ms) before the 9.99 print (500ms), giving the tick test a genuine prior price.",
+        "actual_result": "inferred_sides = ['buy' (seed, direct at-quote), 'sell' (9.99, tick test: downtick from 10.02)]. Applying these inferred bits: FILLED, exec_qty=5.0 -- inference DOES restore the trade-through fill, now genuinely verified rather than assumed."
+      },
+      "scenario_c_emo_result": "Applying EMO to Scenario C's original trade tape (all 5 prints exactly at the bid) classifies every one as a sell aggressor -- FILLED, exec_qty=5.0, matching with_side=True.",
+      "claim_boundary": "This is OUR proposed data-preparation step, not an hftbacktest feature. Only demonstrated on hand-constructed synthetic tapes, not on real Alpaca SIP data."
+    }
+  ],
+  "test_location_and_ci_collection_fix": {
+    "problem": "tests/test_sim_crosscheck_hftbacktest.py previously lived at blueprints/us-equities/sim-crosscheck-hftbacktest/tests/ -- the ONLY blueprint-local tests/ directory in this repository. It never actually ran in CI.",
+    "root_cause_corrected": "An earlier version of this receipt (and the test file's own docstring) attributed this to a dotted-name COLLISION with the top-level tests package. Verified with a minimal reproduction (a scratch directory with blueprints/foo/tests/test_nested_no_init.py, no __init__.py anywhere under blueprints/, alongside a normal top-level tests/ package with its own __init__.py): bare `python3 -m unittest` from the reproduction root found only the top-level test, with NO error, warning, or indication that the nested one was ever considered -- it is invisible to discovery, not colliding with anything. The actual, verified cause: `blueprints/` (and every directory under it) has no `__init__.py` anywhere in this repository (confirmed: `ls blueprints/__init__.py` -> No such file; the OLD blueprint-local tests/ directory also had no __init__.py, confirmed via `git show` on its last commit before removal), so unittest's package-based discovery never descends into that path at all.",
+    "fix": "Moved to tests/test_sim_crosscheck_hftbacktest.py at the repository root, matching every other blueprint's convention (all of which put their tests in the top-level tests/, which DOES have __init__.py). Verified with `python3 -m unittest tests.test_sim_crosscheck_hftbacktest` (direct module import) AND `python3 -m unittest discover -s tests -p test_sim_crosscheck_hftbacktest.py` (discovery mechanism) on both the system interpreter and the pinned venv.",
+    "secondary_fix": "The module-level `import numpy as np` in l1_feasibility.py meant even the pure-Python EMO/Lee-Ready classification tests failed to import on an interpreter lacking numpy. numpy is now imported lazily inside each function that actually builds an event array, so TickTestClassificationTests and LockfileAndReceiptStructureTests run unconditionally in CI."
+  },
+  "l1_feasibility_verdict": {
+    "verdict": "feasible-with-limits",
+    "feasible_for": [
+      "Order acceptance and marketable-crossing fills driven by top-of-book depth alone (Scenarios A, D3)",
+      "IOC/FOK/GTX time-in-force semantics for G1/G3/G4 (sufficient-depth FOK, crossing GTX -> Expired never Rejected, non-crossing GTX rests like GTC) -- G2 (oversized FOK) diverges between exchange models, see below",
+      "Constant order latency (entry + response), independent of depth granularity (Scenarios A/B)",
+      "TradingValueFeeModel cost accounting on realized fills, verified with a nonzero taker fee (Scenario H)",
+      "Both exchange models for depth-crossing fill/expiry paths on Scenarios A-D and G1/G3/G4's specific order sizes -- NOT a general equivalence"
+    ],
+    "not_feasible_or_meaningless_for": [
+      "Any trade-driven fill path without an aggressor side (Scenarios C, D1) -- neither exchange model reaches the trade-driven code path at all for a side-less TRADE_EVENT.",
+      "Distinguishing NoPartialFillExchange from PartialFillExchange in general: they diverge on order-exceeds-touch-size (Scenario F), FOK-with-insufficient-depth (Scenario G2), AND on repeated orders against a constant-size touch (Scenario I, new) -- a cross-check plan must pick one deliberately and account for its specific gap, not treat 'PartialFillExchange' as simply 'the realistic one'.",
+      "PartialFillExchange as a stand-in for genuine liquidity consumption across orders: it never depletes `self.depth` from a fill at all (Scenario I) -- three 100-share IOCs against an always-100 touch all fill in full, position 300.",
+      "Trusting a resting order's queue position as realistic when accepted at a price the L1 feed had never quoted: zero queue-ahead, producing an optimistic fill-speed bias (Scenario E, now HAND-VERIFIED, not merely measured).",
+      "The L3 FIFO queue model (needs per-order add/cancel/execute events); categorically unavailable from L1 or standard L2 SIP quotes.",
+      "Any depth-percentile / multi-level queue heuristic reading levels beyond the touch."
+    ],
+    "mitigation": "An EMO or Lee-Ready aggressor-side inference step, applied as data preparation, restores trade-driven queue depletion AND trade-through fills (Scenario D1, now actually run with a seed trade) -- at the cost of classification error not quantified here on real data. Scenario E's queue-position optimism and Scenario I's no-depletion bias have no mitigation identified; they are inherent properties of hftbacktest's exchange models as applied to L1 data at a submission rate exceeding what the displayed size alone would support.",
+    "not_exercised": [
+      "IntpOrderLatency (interpolated, recorded-data-driven latency) and per-symbol latency variation.",
+      "FlatPerTradeFeeModel and TradingQtyFeeModel -- only TradingValueFeeModel was exercised (Scenario H).",
+      "L3FIFOQueueModel and RiskAdverseQueueModel (a conservative queue-position estimator, per upstream's own naming) -- only ProbQueueModel was exercised. Scenario E's bias almost certainly generalizes to RiskAdverseQueueModel too (identical zero-queue-ahead-on-a-fresh-price new_order() behavior, queue.rs ~lines 67-74), not separately measured."
+    ],
+    "reasoning": "Confirmed by reading hftbacktest/src/backtest/proc/{nopartialfillexchange,partialfillexchange}.rs and hftbacktest/src/backtest/models/queue.rs line-by-line for every code path this fixture exercises, then reproducing each path with a hand-verified fixture where tractable (Scenarios A-D, E, G, D1-inferred-side) and an explicitly labeled observed run where not (none remain unlabeled as of this round)."
+  },
+  "cross_check_plan": {
+    "goal": "Cross-check the NautilusTrader sim-capacity run against hftbacktest on the same bounded private SIP sample, with matched (or explicitly tabulated-as-different) liquidity/queue settings.",
+    "sim_capacity_config_verified": {
+      "how": "git fetch origin claude/sim-capacity-20260925 && git show <ref>:blueprints/us-equities/sim-capacity/{experiment.json,runner.py} -- read-only, no checkout into this worktree, no modification of that branch.",
+      "commit": "0e0740e7",
+      "runner_py_venue_config": "book_type=BookType.L1_MBP, trade_execution=True, liquidity_consumption=True, queue_position=True",
+      "replay": "Both QuoteTick and TradeTick are used (each TradeTick tagged AggressorSide.NO_AGGRESSOR); 'quotes-only replay' was mentioned by the coordinator but NOT independently confirmed at this commit -- recorded as unconfirmed, not repeated as fact.",
+      "submit_budgets_per_minute": "paper-parity profile: '180/min submit budget' (receipts/20260924-paper-parity.json); elite-tier profile: '900/min submit budget' (receipts/20260924-elite-tier.json) -- both directly quoted from experiment.json's predeclared_metrics/observations, not relayed secondhand.",
+      "correction_of": "An earlier version of this receipt attributed the 180/900 figures to 'the coordinator's sim-capacity plan' with no committed source. Now cited to the actual file and commit.",
+      "later_change": "From sim-capacity commit f47160b7 the engine is fed quotes only; trades are fetched and catalogued but not added to the engine, because rc5 L1 trade ticks overwrite both book sides. The cross-check must use the merged sim-capacity commit."
+    },
+    "sim_paper_compare_config_verified": "liquidity_consumption=False, queue_position=False (blueprints/us-equities/sim-paper-compare/replay_compare.py, read directly in this worktree).",
+    "parity_statement": "hftbacktest has NO setting equivalent to Nautilus's liquidity_consumption=True: neither NoPartialFillExchange nor PartialFillExchange actually depletes `self.depth` from a fill (Scenario I demonstrates this for PartialFillExchange; NoPartialFillExchange doesn't even check depth on a cross). A comparison that leaves this unmatched measures configuration, not engines. The plan is an explicit per-engine difference table (see README.md's Cross-check plan section), not a claim of achievable parity.",
+    "nautilus_taker_queue_claim_corrected": {
+      "old_claim": "An earlier version of this receipt said 'Nautilus does not make the same zero-queue-ahead assumption' for IOC takers -- implying Nautilus has a queue mechanism that behaves differently for a taker in a comparable situation.",
+      "verification": "Fetched crates/execution/src/matching_engine/mod.rs at the v2.0.0rc5 tag (raw.githubusercontent.com/nautechsystems/nautilus_trader/v2.0.0rc5/..., 11347 lines) and read the immediate-fill code path directly (~lines 3555-3583): for a taker fill, the code sets `order.set_liquidity_side(LiquiditySide::Taker)` and calls `self.fill_limit_order(...)` immediately; `self.snapshot_queue_position(order, price)` is called ONLY in the separate passive/maker branch (the `else` arm), never for a taker.",
+      "corrected_claim": "For IOC/marketable takers, NautilusTrader's queue-position mechanism (snapshot_queue_position) is simply never invoked at all -- it is not a matter of Nautilus assuming a different queue state, there IS no queue state involved for a taker fill in either engine, for related but distinct reasons (Nautilus: no notion of queue position applies to an immediate fill at all; hftbacktest: queue position applies only to RESTING orders, and a taker order by definition doesn't rest). Separately, the sim-paper-compare lane specifically had queue_position=False configured anyway."
+    },
+    "sample": "A bounded 5-minute window of 2 symbols' Alpaca SIP quotes+trades, reused from whatever anchored sample sim-capacity/sim-paper-compare already retained (no new market-data acquisition here).",
+    "conversion": "Alpaca SIP best-bid/best-ask -> paired DEPTH_EVENT; trades -> bare TRADE_EVENT (no side) by default, optionally with an EMO- or Lee-Ready-inferred side.",
+    "exchange_model_choice": "PartialFillExchange -- the configuration CLOSEST to Nautilus's consumption semantics available in hftbacktest, explicitly NOT equivalent to it (see parity_statement and Scenario I).",
+    "latency": "A SWEEP across a small set of latency values, not a single seeded point. The 69.2ms figure in sim-paper-compare's receipt is labeled there 'Sensitivity check, not a calibration'.",
+    "queue_model": "ProbQueueModel (power_prob_queue_model), with Scenario E's optimism bias AND Scenario I's no-depletion bias both flagged as known, uncorrected skews.",
+    "comparison_metrics": ["fill_rate", "median_time_to_fill", "fill_share_at_touch", "cost (fees + realized slippage vs decision price)"],
+    "status": "not yet run -- sim-capacity is not merged to main at the time of this task.",
+    "does_not_touch": "blueprints/us-equities/sim-capacity/ (owned by a parallel builder; not read into or modified in this worktree -- inspected only via `git show` against its remote branch for citation accuracy)"
+  },
+  "cleanup": {
+    "status": "EXECUTED -- an earlier version of this field said removal_commands_not_yet_run after the removal had already actually happened in this session; that was a stale record, corrected here with the actual dates.",
+    "host_state_created_by_this_task": [
+      "~/.local/share/native-agent-stack/hftbacktest-2.4.4 (isolated venv)",
+      "$HOME/.rustup and $HOME/.cargo (user-level Rust toolchain, --no-modify-path)",
+      "/tmp/libclang-venv (throwaway venv holding the libclang PyPI package)",
+      "The scratch clone of hftbacktest-src and its CARGO_TARGET_DIR under this session's scratchpad (already outside the repository)"
+    ],
+    "removal_log": [
+      {"command": "rm -rf ~/.local/share/native-agent-stack/hftbacktest-2.4.4", "date_utc": "2026-09-25", "when": "after the second fix round's verification completed"},
+      {"command": "rm -rf /tmp/libclang-venv", "date_utc": "2026-09-25", "when": "same pass as above"},
+      {"command": "$HOME/.cargo/bin/rustup self uninstall -y", "date_utc": "2026-09-25", "when": "same pass as above; removed ~/.rustup and ~/.cargo entirely"},
+      {"command": "uv venv --python 3.12 ~/.local/share/native-agent-stack/hftbacktest-2.4.4 && uv pip sync --require-hashes requirements.lock", "date_utc": "2026-09-25", "when": "rebuilt for THIS (third) fix round's own re-verification (pip-audit re-run, Scenario I, D1-inferred-side, moved-test re-run)"},
+      {"command": "rm -rf ~/.local/share/native-agent-stack/hftbacktest-2.4.4", "date_utc": "2026-09-25", "when": "removed again after this round's verification completed, per the same cleanup commitment"}
+    ],
+    "ownership": "All of the above are host-local artifacts of THIS host's verification runs, referenced only by absolute path for reproducibility. Nothing in the committed repository depends on them existing."
+  },
+  "unverified": [
+    "cargo test -p hftbacktest with default features, or without --lib: blocked by libclang (live feature) AND two examples (algo -- packaging issue; custom_evhandling -- genuine API drift) broken independent of any feature flag.",
+    "cargo test --doc (2 doctests in types.rs and latency.rs, excluded by --lib)",
+    "osv-scanner CLI scan itself (binary not found on this host; pip-audit with --disable-pip --no-deps substituted, now covering all 43 packages)",
+    "Actual side-by-side numeric comparison against the NautilusTrader sim-capacity run (not merged to main at the time of this task)",
+    "IntpOrderLatency / per-symbol latency, FlatPerTradeFeeModel / TradingQtyFeeModel, L3FIFOQueueModel / RiskAdverseQueueModel -- moved to l1_feasibility_verdict.not_exercised",
+    "Real-world accuracy of the EMO/Lee-Ready aggressor-side inference on actual Alpaca SIP data (only shown on hand-constructed synthetic tapes)",
+    "Whether upstream is dormant-but-maintained or effectively abandoned -- the 2026-12-23 no-further-commits checkpoint is the concrete re-check point, not yet reached",
+    "sim-capacity engine feed: quotes-only from commit f47160b7 onward (trades are fetched and catalogued but not added to the engine, because rc5 L1 trade ticks overwrite both book sides); this task read 0e0740e7, before that change. The cross-check must use the merged sim-capacity commit"
+  ]
+}

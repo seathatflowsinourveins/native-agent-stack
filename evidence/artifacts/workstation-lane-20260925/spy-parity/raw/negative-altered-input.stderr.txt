@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py", line 908, in <module>
+    main()
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py", line 736, in main
+    conversion = CONVERT.convert(args.lean_data, WINDOW["symbol"], WINDOW["start"], WINDOW["end"],
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/convert.py", line 270, in convert
+    input_hashes = verify_inputs(data_root)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/convert.py", line 60, in verify_inputs
+    raise ValueError("input_hash_mismatch:" + relative)
+ValueError: input_hash_mismatch:equity/usa/map_files/spy.csv

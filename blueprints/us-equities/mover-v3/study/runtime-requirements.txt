@@ -1,0 +1,11 @@
+# The pinned study runtime (study/runtime.lock lists the same versions; tests/test_runtime.py checks both).
+duckdb==1.5.5
+exchange-calendars==4.13.2
+korean-lunar-calendar==0.4.0
+numpy==2.5.3
+pandas==3.0.6
+pyluach==2.3.0
+python-dateutil==2.9.0.post0
+six==1.17.0
+toolz==1.1.0
+tzdata==2026.4

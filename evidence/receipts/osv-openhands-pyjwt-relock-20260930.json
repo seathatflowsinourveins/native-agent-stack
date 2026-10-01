@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "record": "osv-openhands-pyjwt-relock-20260930",
+  "purpose": "Records the relock of the OpenHands recipe lock (blueprints/runtime-workers/openhands/requirements.lock) from PyJWT 2.13.0 to 2.14.0. Nine PyJWT advisories published on 2026-09-29 (one Critical, five High, three Medium) failed the required osv-scanner check on the lock, and a tenth, GHSA-w6j9-cwv2-h6wq, had been ignored until 2026-10-13; OSV and GitHub list 2.14.0 as the first patched release for all ten. The change removes that ignore and its IGNORE_SCOPES entry and rebinds the lock's IGNORE_ALLOWED_LOCKS entry to the relocked sha256 for the two oauthlib advisories it still needs, carrying the 2026-09-29 reachability review forward at the new digest. The 2026-09-29 record planned one relock onto oauthlib 4.0.0 and PyJWT 2.14.0; this record does the PyJWT half and gives the reason for leaving oauthlib at 3.3.1.",
+  "checked_commit": "e45328d3951417c5ae69676f2ac2cc8896948f81",
+  "observed_utc": "2026-09-30T04:30:20Z",
+  "authorization": "The lock's owner session (token-save-practice-e2e-status) could not be reached on 2026-09-29 and is gone (session 21, 2026-09-30). The Gate A owner (2d) and the pi-practice session (a2) each asked the coordinator for this relock; session 21 claimed it, then withdrew and reviewed this record.",
+  "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's config and the workflow's command line, a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv (a host install check on the host network, with no model request: not the image, not an OpenHands run), requests-oauthlib 2.0.0's own unit tests run by us under two oauthlib versions (unchanged upstream test code on our scratch tree, section J), and reads of registry and advisory records (PyPI JSON API, OSV API, GitHub advisories API, the PyJWT 2.14.0 sdist and wheel). The diff and hash-equality comparisons are structural checks, not executions. The CI failure is read from the log of one run (gh run view --log-failed). Returned outputs: blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt.",
+  "limitations": [
+    "The relock covers only the recipe venv. The agent-server image's server is a PyInstaller build of upstream's unchanged uv.lock, which still pins PyJWT 2.13.0 (SDK@fcc102a, read from the pinned archive: section B of the returned outputs), and the 2026-09-28 grype record of that image predates these advisories, does not contain PyJWT and was not rerun. Which of the ten advisories reach the image's binary is unmeasured.",
+    "The grader venv is outside this lock. install-grader.sh syncs OpenHands/benchmarks@405bae7's uv.lock (digest equal to pins.json grader.uv_lock_sha256), which pins PyJWT 2.10.1 (section I). By the advisories' ranges (section H), 2.10.1 is affected by GHSA-2gx3-rcp4-g85q, GHSA-9v7f-9g4p-ffgj, GHSA-ffc3-869f-jxw9, GHSA-hxm8-2xgr-2p9m, GHSA-p4g4-x82p-q773 and GHSA-w6j9-cwv2-h6wq. That lock is not in .github/osv-scanner-lockfiles.json, so no check scans it; whether the grader path executes JWT code is unmeasured.",
+    "An existing recipe installation that recorded the old requirements_sha256 must re-run install (host.py install) before the next run: host.py:1432-1433 refuses with matching_successful_installation_required. This host has no installation record (checked 2026-09-30), so nothing here is affected.",
+    "No OpenHands task ran with the relocked venv. The install check ran the SDK's import check and uv pip check only, on the host network (the SDK import can trigger litellm's remote model-cost fetch, which falls back offline; the 2026-09-27 check ran under bwrap --unshare-net); the image installation, model behavior and any runtime path through PyJWT 2.14.0 are unmeasured.",
+    "oauthlib stays at 3.3.1. The 2026-09-29 non-reachability review of that pin is carried forward, not rerun (see carried_forward_review); its static text search shows which installed code references the vulnerable APIs, not a runtime trace, and read one hash-verified artifact per requirement, not every artifact the lock lists.",
+    "The OSV database is the live API at scan time. The clean result holds for 2026-09-30 only: an advisory published later for any pinned package fails the required check again. Every window statement in this record (oauthlib 4.0.0, PyJWT 2.15.0 and 2.15.1 inside the 7-day window) is as of 2026-09-30T04:30:20Z: PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI, fractional seconds rounded up to the next second).",
+    "One CI log was read (run 36657687493). The three main-branch push runs listed under ci_failure concluded failure and their logs were not read; the first two were created (23:33:17Z, 23:39:59Z) before the last two advisories were published (23:43:06Z, 23:43:19Z), so they most likely did not fail on all nine (the inference rests on the runs' createdAt, not their logs).",
+    "The 2.14.0 changelog names nine of the ten advisories. GHSA-9j54-fg26-wv3r (PyJWK accepts empty HMAC keys) is not named; its fix appears in the changelog's Fixed section as 'Reject empty HMAC keys when represented as JWKs', under GHSA-pxh4-856f-4h89, which GitHub's advisory API and OSV do not serve (404, as does GHSA-mvj7-wp6q-v59j, the changelog's other extra id). The claim that 2.14.0 fixes all ten rests on the OSV and GitHub ranges (all ten: first patched 2.14.0) and on the scan of the relocked tree, not on the changelog.",
+    "The PyJWT importer and caller search (section K) is a static text search of the installed .py files of the relocked venv (all packages except PyJWT's own files and installer tooling): it follows `import jwt`, `import jwt as X` and `from jwt import ...` in the importing files, treats a file whose only jwt-named binding is another module (google-auth's own jwt) as not calling PyJWT, and searches the recipe recursively (12 files); a name assembled at run time (getattr, importlib with a computed string) would not match, code the OpenHands agent writes and runs inside its container is out of scope, and it says where PyJWT's decode API is called, not what any run executed. The outside-reference check for google-auth excludes only google/auth and google/oauth2, not the rest of the google namespace.",
+    "The tool's 'Filtered 7 vulnerabilities' count exceeds the six per-lock 'filtered out' lines it prints (oauthlib pair twice, nltk, setuptools); the two counts were not reconciled."
+  ],
+  "ci_failure": {
+    "run_id": 36657687493,
+    "event": "pull_request",
+    "head": "ccde43de363cac9dfa206aab58cb87e59deb548a",
+    "created": "2026-09-30T01:59:12Z",
+    "conclusion": "failure",
+    "summary": "Total 1 package affected by 9 known vulnerabilities (1 Critical, 5 High, 3 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+    "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+    "other_failed_runs_logs_not_read": [
+      {
+        "run_id": 36645830933,
+        "event": "push",
+        "branch": "main",
+        "head": "5cf0354d6cb3dc5c02da55113d8440561c7093b9",
+        "created": "2026-09-29T23:33:17Z"
+      },
+      {
+        "run_id": 36646406088,
+        "event": "push",
+        "branch": "main",
+        "head": "a02ff13f79422744ee7aca6519b4495edb01c80f",
+        "created": "2026-09-29T23:39:59Z"
+      },
+      {
+        "run_id": 36647290868,
+        "event": "push",
+        "branch": "main",
+        "head": "e45328d3951417c5ae69676f2ac2cc8896948f81",
+        "created": "2026-09-29T23:50:24Z"
+      }
+    ]
+  },
+  "advisories": [
+    {
+      "id": "GHSA-2gx3-rcp4-g85q",
+      "aliases": [
+        "CVE-2026-101917"
+      ],
+      "severity": "MODERATE",
+      "cvss": 5.3,
+      "published": "2026-09-29T23:11:51Z",
+      "introduced": [
+        "0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "<= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: PyJWKClient still amplifies unauthenticated JWKS fetches on unknown kid values (incomplete fix of CVE-2026-48524)",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-8wjv-2p76-3863",
+      "aliases": [
+        "CVE-2026-102265"
+      ],
+      "severity": "MODERATE",
+      "cvss": 5.3,
+      "published": "2026-09-29T23:43:06Z",
+      "introduced": [
+        "2.13.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": ">= 2.13.0, < 2.14.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: Uncaught RecursionError in jwt.decode() on deeply nested token header",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-9j54-fg26-wv3r",
+      "aliases": [
+        "CVE-2026-102266"
+      ],
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "published": "2026-09-29T23:43:19Z",
+      "introduced": [
+        "2.13.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": ">= 2.13.0, < 2.14.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": false,
+      "summary": "PyJWT: PyJWK accepts empty HMAC keys, bypassing PyJWT's empty-key validation",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-9v7f-9g4p-ffgj",
+      "aliases": [
+        "CVE-2026-102267"
+      ],
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "published": "2026-09-29T23:15:00Z",
+      "introduced": [
+        "0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "<= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: PyJWKClient follows redirects when fetching JWKS",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-ffc3-869f-jxw9",
+      "aliases": [
+        "CVE-2026-102268"
+      ],
+      "severity": "CRITICAL",
+      "cvss": 9.1,
+      "published": "2026-09-29T23:17:33Z",
+      "introduced": [
+        "0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "<= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: Asymmetric-PEM detection bypass: whitespace/line-ending-mutated public keys skip the HS/asymmetric confusion guard",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-hxm8-2xgr-2p9m",
+      "aliases": [
+        "CVE-2026-102269"
+      ],
+      "severity": "MODERATE",
+      "cvss": 4.8,
+      "published": "2026-09-29T23:17:55Z",
+      "introduced": [
+        "0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "<= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: Non-canonical signature segments enable raw-token revocation bypass",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-p4g4-x82p-q773",
+      "aliases": [
+        "CVE-2026-102271"
+      ],
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "published": "2026-09-29T23:14:33Z",
+      "introduced": [
+        "2.4.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": ">= 2.4.0, < 2.14.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: Public keys in DER form are accepted as HMAC secrets, bypassing the CVE-2022-29217 guard",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-r6x4-923q-g947",
+      "aliases": [
+        "CVE-2026-102272"
+      ],
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "published": "2026-09-29T23:14:00Z",
+      "introduced": [
+        "2.13.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT BOM Bypass",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-w2cx-738m-mc7w",
+      "aliases": [
+        "CVE-2026-102273"
+      ],
+      "severity": "HIGH",
+      "cvss": 7.4,
+      "published": "2026-09-29T23:16:55Z",
+      "introduced": [
+        "2.13.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": "= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT accepts public JWK containers as HMAC secrets",
+      "status_before": "failed the required check"
+    },
+    {
+      "id": "GHSA-w6j9-cwv2-h6wq",
+      "aliases": [
+        "CVE-2026-102274"
+      ],
+      "severity": "MODERATE",
+      "cvss": 5.9,
+      "published": "2026-09-29T18:23:01Z",
+      "introduced": [
+        "2.9.0"
+      ],
+      "osv_fixed": [
+        "2.14.0"
+      ],
+      "github_range": ">= 2.9.0, <= 2.13.0",
+      "github_first_patched": "2.14.0",
+      "named_in_2_14_0_changelog": true,
+      "summary": "PyJWT: Malformed RSA JWK aborts parsing of an entire JWK Set",
+      "status_before": "ignored until 2026-10-13"
+    }
+  ],
+  "locks": [
+    {
+      "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+      "previous_sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+      "lines": 1133,
+      "diff": "3 lines, 530-532: the pyjwt requirement line and its two hashes. Every other line is byte-identical.",
+      "pin": {
+        "before": "pyjwt==2.13.0, sha256 41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423 (sdist) and 66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728 (wheel)",
+        "after": "pyjwt==2.14.0, sha256 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 (sdist) and ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc (wheel)"
+      },
+      "method": {
+        "source": "pins.json source_archive (OpenHands/software-agent-sdk@fcc102a697874d54a357e36004e02c95040dbdc0), tarball sha256 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8 and uv.lock sha256 d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910, both equal to the pins",
+        "command": "In a fresh extraction, the one [tool.uv] environments line of research.md, then: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 (uv 0.12.17, no UV_NO_CONFIG); then uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace and the two wheel entries of pins.json appended in file order",
+        "uv_lock_sha256": "1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a9cc3427a77e8f6, which differs from the 2026-09-27 reproduction (30e608b1fdb091db1609e8261a787020df12e0350911079cc2177c772a9ccffd) only in the pyjwt package entry",
+        "reproduced": "the single-command run in a fresh extraction printed exit 0 for uv lock, uv lock --check and uv export, and cmp of the result against the committed lock exited 0 (section C). An earlier scratch pair (the 2026-09-27 reproduction, then a second lock with the pyjwt upgrade) produced the same digests; its outputs are not retained",
+        "uv_output": "Updated pyjwt v2.13.0 -> v2.14.0 and the 09-27 updates; no other version changed"
+      },
+      "pypi_check": "both PyJWT 2.14.0 files' sha256 equal the lock's (PyPI JSON API, not yanked); released 2026-09-11T13:11:53Z (wheel) and 13:11:54Z (sdist), 18 days before this record",
+      "install_check": "the recipe's install-container.sh sequence with UV_NO_CONFIG=1 in a scratch CPython 3.13.15 venv on the host network: build-requirements.lock installed (exit 0), the runtime lock installed with --require-hashes --no-deps --no-build-isolation (175 packages, exit 0), uv pip check exit 0 (All installed packages are compatible), the script's import check printed 'SDK/tools 1.49.6 imports passed; no model request' (exit 0); pyjwt 2.14.0, cryptography 50.0.0, oauthlib 3.3.1 installed"
+    }
+  ],
+  "osv_scanner": {
+    "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6)",
+    "binary": "osv-scanner_linux_amd64 of release v2.6.0, sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, checked with sha256sum --check against the value pinned in .github/workflows/security-scan.yml; kept outside every checkout",
+    "runs": [
+      {
+        "name": "control: the previous lock with the config of this change",
+        "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve --lockfile=requirements.txt:<previous requirements.lock>",
+        "lock_sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+        "exit_code": 1,
+        "summary": "Total 1 package affected by 10 known vulnerabilities (1 Critical, 5 High, 4 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+        "note": "the same nine advisories as the CI run, plus GHSA-w6j9-cwv2-h6wq, which the removed ignore used to hide"
+      },
+      {
+        "name": "the workflow's command over the inventory on the relocked tree",
+        "command": "osv-scanner scan source --config .github/osv-scanner.toml --no-resolve over the 49 lockfiles of .github/osv-scanner-lockfiles.json",
+        "lock_sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+        "exit_code": 0,
+        "summary": "No issues found",
+        "filtered": "the tool prints 'Filtered 7 vulnerabilities from output'. The per-lock 'filtered out' lines it prints are GHSA-8mgp-746c-j5xp (nltk) once, GHSA-h35f-9h28-mq5c (setuptools) once, and GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv (oauthlib) twice each, one per lock that pins the package; the 7 is not reconciled with those six lines (see limitations). No PyJWT advisory is filtered, so no scanned lock pins an affected PyJWT (the Lumibot lock pins 2.15.0)."
+      }
+    ]
+  },
+  "carried_forward_review": {
+    "reviewed_record": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json (locks[0], reviewed at sha256 02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394)",
+    "advisories": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "why_it_still_holds": "The review's inputs are unchanged. The lock diff is the three PyJWT lines, so the oauthlib pin (line 384) and its two hashes, requests-oauthlib 2.0.0, google-auth-oauthlib 1.2.2, browser-use 0.11.9 and the openhands-sdk and openhands-tools wheels keep the sha256 the review searched. The replaced artifacts are the two files of one release, PyJWT 2.14.0's wheel (the one the installer uses) and sdist, in place of 2.13.0's. Neither has an oauthlib reference: 0 matches for 'oauthlib' in the wheel (19 files) and in the sdist (88 files), and the same search over the requests-oauthlib 2.0.0 wheel, the artifact the 2026-09-29 review searched, gives 80 matches, so the search can hit (section G of the returned outputs). The uv.lock diff (section C) changes only the version, sdist and wheel lines of the pyjwt entry, so 2.14.0 declares no new dependency.",
+    "not_rerun": "the static search of the other artifacts; PyJWT's own JWK and HMAC paths are moot for the two oauthlib advisories"
+  },
+  "oauthlib_4_0_0_precheck": {
+    "what": "requests-oauthlib 2.0.0's unit tests (tests/test_compliance_fixes.py, test_core.py, test_oauth1_session.py, test_oauth2_auth.py, test_oauth2_session.py from its sdist, whose sha256 b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9 is one the lock lists; tests/examples needs selenium and was not run) and `import requests_oauthlib, google_auth_oauthlib.flow`, in scratch CPython 3.13.15 venvs with google-auth-oauthlib 1.2.2, requests 2.34.2, requests-mock 1.12.1, mock 5.2.0, pytest 9.1.1 and pyjwt 2.14.0 (cryptography resolved to 50.0.1, not the lock's 50.0.0), under oauthlib 3.3.1 and under 4.0.0 (section J, full pytest output kept)",
+    "result": "the same outcome for each test under both: imports OK; 72 passed and 2 failed, the same two (MailChimpComplianceFixTest and PlentymarketsComplianceFixTest test_fetch_access_token). Both failures are timing assertions: assertAlmostEqual of an integer expiry timestamp against a float one within 2 places (e.g. 1790746229 != 1790746228.6590455), off by 0.16 to 0.34 s in the four retained failures. The miss follows the fractional second of the run's clock (an earlier run printed 0.22 to 0.28 s, kept in this file's git history at f77612b6; a first run printed 0.38 to 0.43 s in a terminal and was not retained), so these two tests fail on almost any run and under 3.3.1 as well; they say nothing about oauthlib 4.0.0. The runs are not byte-identical (durations and the misses differ)",
+    "limits": "not the OpenHands venv; oauthlib is reached there only through requests-oauthlib from google-auth-oauthlib from browser_use's gmail integration, which no OpenHands task in this record exercised; the relock repeats the checks on the real lock"
+  },
+  "release_choice": {
+    "as_of": "2026-09-30T04:30:20Z",
+    "windows": "PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI, fractional seconds rounded up to the next second)",
+    "selected": "pyjwt 2.14.0: the first release OSV and GitHub list as patched for all ten advisories, and the newest one outside the 7-day window the upstream workspace's exclude-newer applies as of 2026-09-30T04:30:20Z (2.15.0 was released 2026-09-23T16:55:59Z-16:56:00Z and 2.15.1 2026-09-28T18:40:41Z-18:40:42Z, both inside the window then)",
+    "decision_point_2_15_0": {
+      "at": "2026-09-30T16:56:01Z",
+      "owner": "bc, session native-agent-stack-bc",
+      "reason_recorded_now": "as of 2026-09-30T04:30:20Z: no decode of an attacker-controlled token through PyJWT is reachable in the recipe venv by static search of its 10,746 installed .py files other than PyJWT's own and installer tooling (section K of the returned outputs; import aliases and from-imports included). The venv's PyJWT importers are google-auth (oauth2/id_token.py:146, through `import jwt as jwt_lib`; the module is imported by nothing outside google/auth and google/oauth2, and the :153 `jwt.decode` next to it is google-auth's own jwt module, not PyJWT), LiteLLM (seven proxy server modules, one through `import jwt as _jwt` at mcp_management_endpoints.py:1516; nothing outside litellm references litellm.proxy, and the recipe runs no LiteLLM proxy), oauthlib (common.py:221 verify_signed_token, no reference outside oauthlib), redis 7.2.1 (auth/token.py:89, a decode with verify_signature false of a token that a configured credential provider supplies; nothing outside redis references redis.auth.token or JWToken, and none of the recipe's 12 .py files, searched recursively, imports redis or jwt) and mcp 1.28.1 (jwt.encode of client assertions only). 2.15.0's Security item (recursion errors from deeply nested payloads wrapped in DecodeError, no advisory id) is the payload counterpart of GHSA-8wjv-2p76-3863, which 2.14.0 fixed for headers, so 2.14.0 most likely still raises a raw RecursionError on such a payload; that matters only where a decode of untrusted tokens is reachable, and none was found",
+      "action_at_the_decision_point": "confirm that reason still holds; if a decode of attacker-controlled JWTs has become reachable in the recipe venv, move the lock to 2.15.0 before the joint relock"
+    },
+    "alternatives": [
+      {
+        "option": "pyjwt 2.15.1 (latest) or 2.15.0",
+        "why_not": "the scan of the relocked tree is clean at 2.14.0, and both releases were inside the window on 2026-09-30 (as of 2026-09-30T04:30:20Z); 2.15.0's changelog has one Security item without an advisory id (see decision_point_2_15_0) and 2.15.1 fixes Base64URL '=' padding handling. Nothing keyed by advisory id fires on them, so the record carries a dated decision point for 2.15.0 and the joint relock takes 2.15.1 with oauthlib 4.0.0"
+      },
+      {
+        "option": "also relock oauthlib to 4.0.0 now (PyPI, released 2026-09-28T06:01:17Z-06:01:18Z)",
+        "why_not": "inside the same 7-day window as of 2026-09-30T04:30:20Z (until 2026-10-05T06:01:19Z) and a new major version whose only consumer here is requests-oauthlib 2.0.0 (oauthlib>=3.0.0); both advisories it fixes are unreachable per the 2026-09-29 review and ignored until 2026-10-13. The 2026-09-30 pre-check found the same test outcome as under 3.3.1, so the relock waits only for the window"
+      },
+      {
+        "option": "extend the ignores to the nine new PyJWT advisories",
+        "why_not": "one is Critical (CVSS 9.1) and a fixed release exists; the 2026-09-29 reachability review covered only GHSA-w6j9-cwv2-h6wq, and the nine were never reviewed"
+      }
+    ],
+    "overturn": "(a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0."
+  },
+  "tracking_issue": {
+    "number": 518,
+    "updated_at": "2026-09-30T03:44:18Z",
+    "note": "a live issue: owner, dates, scope and checks of the follow-up; edited after this record's first push, and possibly again later"
+  },
+  "failed_attempts": [
+    "The first unit run after the edits (tests.test_osv_lockfile_coverage and tests.test_runtime_worker_openhands, 151 tests) failed one test, test_every_allowed_lock_names_existing_evidence, because this record did not exist yet: exit 1. It passes once this record is written.",
+    "The first draft of the returned outputs cut diff lines at 260 characters, printed no exit lines for uv lock and uv lock --check, and described itself as unedited although it carried derived lines; two independent reviews found this. It was rebuilt with no truncation, exit lines and '(derived)' labels. A second review then found that sections G, H and J still showed composite or abridged lines as if printed (a jq filter without its @tsv, one summed number shown as a sentence, only the pytest summary line) and that the oauthlib pre-check was called 'identical'; the file was rebuilt again with each command as run, the full pytest output, the sdist hash and the test dependency versions, and the wording is 'the same outcome for each test'.",
+    "A third review (session 21's read of the follow-up) found that section K's first version matched only the literal `jwt.decode(`: it missed aliased imports (google-auth's PyJWT decode at id_token.py:146 was cited as :153, which is google-auth's own jwt module; LiteLLM's `import jwt as _jwt` decode at mcp_management_endpoints.py:1516 was not listed), excluded the whole google namespace from its outside-reference check, searched the recipe non-recursively (8 of 12 files) and had no outside-reference check for litellm.proxy; the 0.38 to 0.43 s figure cited as kept in the file's git history never appeared in any committed output file, only as receipt wording; and the outputs header still had unnamed exceptions. The script, the outputs and the wording are fixed in this follow-up's repair round.",
+    "A second review's delta check on the first repair found, in this record: the reason for staying on 2.14.0 omitted redis 7.2.1's jwt.decode (searched in the follow-up, section K); the timing range of the two failing tests did not match the retained outputs (now computed from them); unlabelled exceptions in the outputs header rule, a prose line shown as a command, an undeclared home-directory substitution, an unpublished builder script and unrounded window times. The follow-up text PR fixes them.",
+    "The first version of this record and of its follow-up gave no time for its window statements, no owner beyond a role and no decision point for PyJWT 2.15.0; a second review found this and the issue's state was not yet recorded here."
+  ],
+  "registrations": [
+    ".github/osv-scanner.toml: the GHSA-w6j9-cwv2-h6wq ignore removed; the comment above the 2026-09-29 entries and the expiry plan, evidence paths and search wording of the two oauthlib reasons updated.",
+    "tests/test_osv_lockfile_coverage.py: the GHSA-w6j9-cwv2-h6wq IGNORE_SCOPES entry removed; the OpenHands IGNORE_ALLOWED_LOCKS entry lists the two oauthlib advisories at the relocked sha256 and names this record as its evidence.",
+    "blueprints/runtime-workers/openhands/: requirements.lock (3 lines), pins.json requirements_sha256, research.md and README.md notes, and evidence/relock-2026-09-30.txt (the returned outputs).",
+    "docs/decisions/2026-09-22-github-automation-closure.md: a dated addendum to the 2026-09-29 entry.",
+    "evidence/relock-2026-09-30.builder.sh.txt and evidence/relock-2026-09-30.jwt-callers.py.txt (under blueprints/runtime-workers/openhands/): the builder that wrote the returned outputs and the section K search, with host paths as placeholders.",
+    "manifests/evidence.json: sha256 and byte counts of the changed files and of this record and the returned outputs."
+  ],
+  "follow_up": "Tracked in #518 (updated 2026-09-30T03:44:18Z; the issue is live and may have been edited since). Owner: bc, session native-agent-stack-bc, unless reassigned there. Decision point 2026-09-30T16:56:01Z (PyJWT 2.15.0 leaves the window). Joint relock: earliest 2026-10-05T18:40:43Z, due 2026-10-08, before the 2026-10-13 expiry: rerun the relock command with --upgrade-package oauthlib==4.0.0 added and --upgrade-package pyjwt==2.14.0 replaced by --upgrade-package pyjwt==2.15.1 (or a recorded reason for staying on 2.14.0), repeat the install sequence with `import requests_oauthlib, google_auth_oauthlib.flow` and requests-oauthlib 2.0.0's unit tests under oauthlib 4.0.0 (the 2026-09-30 pre-check in section J of the returned outputs: the same outcome for each test as under 3.3.1), and delete the OpenHands entry of IGNORE_ALLOWED_LOCKS in the same change. The Lumibot lock still pins oauthlib 3.3.1, so on 2026-10-13 the scan and test_allowed_advisories_are_scoped_active_ignores fail again by design: renew the two oauthlib ignores for that lock alone with a new dated reason, or delete that lock."
+}

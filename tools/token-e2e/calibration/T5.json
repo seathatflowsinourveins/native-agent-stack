@@ -1,0 +1,73 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T5",
+ "clauses": [
+  "Definition and each listed call site agree with original source",
+  "comments and string literals do not count as invocations"
+ ],
+ "sources": [
+  {
+   "label": "definition",
+   "text": "scripts/host_receipts.py:710-727"
+  },
+  {
+   "label": "direct calls",
+   "text": "scripts/a.py:12\nscripts/b.py:30"
+  },
+  {
+   "label": "attribute calls, not direct invocations",
+   "text": "scripts/c.py:7"
+  },
+  {
+   "label": "imports",
+   "text": "scripts/d.py:2"
+  },
+  {
+   "label": "mentions in comments or strings, not invocations",
+   "text": "scripts/e.py:5"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "register_file is defined at scripts/host_receipts.py:710-727. Its direct calls are scripts/a.py:12 and scripts/b.py:30. The attribute call scripts/c.py:7, the import scripts/d.py:2 and the mention scripts/e.py:5 are not invocations.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "The definition spans lines 710 to 727 of scripts/host_receipts.py, and the only direct invocations are in scripts/a.py (line 12) and scripts/b.py (line 30); the attribute call in scripts/c.py, the import in scripts/d.py and the mention in scripts/e.py merely name the function and are left out.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "register_file is defined at scripts/host_receipts.py:42-60 and called from scripts/a.py:12, scripts/b.py:30 and scripts/f.py:5. The mention in scripts/e.py is not counted.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "Defined at scripts/host_receipts.py:710-727; direct calls at scripts/a.py:12 and scripts/b.py:30. The comment in scripts/e.py:5 also invokes register_file(path), so I count it as a third invocation.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

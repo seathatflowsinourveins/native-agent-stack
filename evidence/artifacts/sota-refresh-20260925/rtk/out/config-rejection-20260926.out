@@ -1,0 +1,27 @@
+## rtk rtk 0.50.0
+## recommended
+  | [hooks]
+  | exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]
+  tomllib: valid; [hooks].exclude_commands = ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', 'diff']
+  rc=1 [git show HEAD:x | tail -n 5] :: No rewrite for: git show HEAD:x | tail -n 5
+  rc=1 [git -C . show --no-color HEAD:x | tail -n 5] :: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5
+  rc=1 [diff a missing] :: No rewrite for: diff a missing
+## tracking-without-history-days
+  | [hooks]
+  | exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]
+  | [tracking]
+  | enabled = false
+  tomllib: valid; [hooks].exclude_commands = ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', 'diff']
+  rc=0 [git show HEAD:x | tail -n 5] :: rtk git show HEAD:x | tail -n 5
+  rc=0 [git -C . show --no-color HEAD:x | tail -n 5] :: rtk git -C . show --no-color HEAD:x | tail -n 5
+  rc=0 [diff a missing] :: rtk diff a missing
+## tracking-with-history-days
+  | [hooks]
+  | exclude_commands = ['^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)', "diff"]
+  | [tracking]
+  | enabled = false
+  | history_days = 90
+  tomllib: valid; [hooks].exclude_commands = ['^git(\\s+\\S+)*\\s+show(\\s+\\S+)*\\s+(:\\S|[^\\s-]\\S*:)', 'diff']
+  rc=1 [git show HEAD:x | tail -n 5] :: No rewrite for: git show HEAD:x | tail -n 5
+  rc=1 [git -C . show --no-color HEAD:x | tail -n 5] :: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5
+  rc=1 [diff a missing] :: No rewrite for: diff a missing

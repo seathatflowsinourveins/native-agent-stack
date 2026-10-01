@@ -33,7 +33,10 @@ winner, records a landscape verdict, or flips a `platform_status`):
    `--qualified-model '{"model_id": ..., "revision": ..., "runtime": ..., "runtime_version": ..., "bars": "<short text>", "result": "pass"|"fail"}'`
    (repeatable) or `--qualified-models-file <path to a JSON array of such
    objects>`. This is optional and additive to the receipt; it records which
-   weights you qualified, not a platform acceptance.
+   weights you qualified, not a platform acceptance. A `use` receipt of a
+   component that several layers list also names the layer(s) it exercised
+   with `--layer-ref <catalog>/<layer_id>` (section 3 step 3;
+   changed after `v2026.09.26`).
 4. **Refresh the derived views.** `python3 scripts/component_matrix.py
    --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
    below). The grand list's "Qualified local models" section is built from
@@ -143,7 +146,8 @@ Every receipt also names one `stage`. Two decide a platform status:
    python3 scripts/host_receipts.py record \
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
-     --component-id <a manifests/stack.json component id> \
+     --component-id <the winner component_id from docs/component-evidence-matrix.md> \
+     --layer-ref <that matrix row's catalog/layer_id> \
      --stage use \
      --evidence-class native_proven \
      --cmd "<a command that makes the component do its job>"
@@ -157,7 +161,8 @@ Every receipt also names one `stage`. Two decide a platform status:
    python3 scripts/host_receipts.py record \
      --host-id <your-host-id-yyyymmdd> \
      --platform-id <linux-wsl2-x86_64|macos-arm64> \
-     --component-id <a manifests/stack.json component id> \
+     --component-id <the winner component_id from docs/component-evidence-matrix.md> \
+     --layer-ref <that matrix row's catalog/layer_id> \
      --stage use \
      --evidence-class native_proven \
      --identity "$identity" \
@@ -166,16 +171,37 @@ Every receipt also names one `stage`. Two decide a platform status:
 
    `--host-id` must match `^[a-z0-9-]+-[0-9]{8}$` (lowercase, digits,
    hyphens, ending in an eight-digit date, for example
-   `my-macbook-20261015`). `--component-id` accepts a `manifests/stack.json`
-   id or a `catalogs/landscape/*.json` `winners[]`/`alternatives[]`
-   `component_id`, including a repository-style id containing `/` (for
-   example `affaan-m/ECC`) or a `candidate:*` alternative id containing `:`
-   (for example `candidate:cli-cli`); `/` and `:` are each percent-escaped to
+   `my-macbook-20261015`). For a component that is a landscape layer winner,
+   pass the winner's `component_id` exactly as the needs-host list in
+   [`docs/component-evidence-matrix.md`](component-evidence-matrix.md) names
+   it (for example `data-alpaca-py`, not `alpaca-py`); use a
+   `manifests/stack.json` id only for a component no layer selects. A receipt
+   binds to a winner only through the winner's own `component_id`, so the
+   recorder refuses (exit 2) a `manifests/stack.json` id whose repository is a
+   winner's repository, naming the winner id and its current pin, and
+   `validate` rejects such a receipt. Receipts recorded under such an alias
+   before that refusal existed stay unchanged: each is grandfathered in
+   `scripts/host_receipts.py` `GRANDFATHERED_ALIAS_RECEIPTS` by path and
+   recorded-claim digest (`claim_sha256`: the receipt without its
+   append-only `reviews`, in canonical JSON; an appended review keeps the
+   exemption, an edited claim loses it and fails `validate`), listed as uncounted alias receipts in the matrix (and reported
+   as informational `stack_alias_grandfathered`, never bound and not flagged,
+   by `scripts/receipt_staleness.py`), and the winner gains that host's
+   evidence only once the host re-records under the winner's `component_id`
+   with the full pin. `--component-id` accepts a `manifests/stack.json` id
+   that is not such an alias, or a `catalogs/landscape/*.json` `winners[]`
+   `component_id`; an id that appears only under a layer's `alternatives[]` is
+   not accepted (`validate` rejects the receipt). An accepted id may be a
+   repository-style id containing `/` (for example `affaan-m/ECC`) or a
+   `candidate:*` winner id containing `:` (for example `candidate:cli-cli`);
+   `/` and `:` are each percent-escaped to
    a distinct, reversible filename token (`/` -> `%2F`, `:` -> `%3A`) only in
    the receipt's filename, never in the `id` field itself, so it stays a flat
    file under `evidence/hosts/<host_id>/` instead of crashing on a `:` a
    filesystem path segment cannot contain. `--from-stack-commands` reuses the
-   component's own documented command(s) from `manifests/stack.json`; add
+   component's own documented command(s) from `manifests/stack.json` (for a
+   winner with no stack entry of its own, such as `data-alpaca-py`, those of
+   the one stack id sharing its repository, here `alpaca-py`); add
    explicit `--cmd "<shell command>"` flags (repeatable) instead or in
    addition when you need a different check. Those documented commands are
    often only `--help` or `--version` checks (for example `ccusage --help`):
@@ -211,9 +237,34 @@ Every receipt also names one `stage`. Two decide a platform status:
    re-records. The
    recorder runs your commands with a bounded timeout,
    sanitizes `$HOME` to `~` and your username to `<user>` in the captured
-   excerpt, writes the receipt under `evidence/hosts/<host_id>/`, and
+   excerpt (the name only as a whole token, so a short one such as `ed` is
+   not cut out of `used`), writes the receipt under `evidence/hosts/<host_id>/`, and
    registers it in `manifests/evidence.json`. It never uploads anything over
-   the network. `--os`/`--architecture` default to the actual host's values
+   the network. A receipt is never overwritten: recording the same
+   host/component/stage again on the same day -- "same day" means the same
+   `yyyymmdd` carried in the receipt's own `id`, not any other clock --
+   refuses (exit 2, naming the existing file and its review kinds/verdicts,
+   and the latest existing generation to supersede) instead of silently
+   erasing it and any appended independent review. Pass `--supersedes
+   <existing-receipt-id>` to record a new receipt for that same
+   host/component/stage/date instead: `--supersedes` must name the *latest*
+   existing generation (superseding an older one while a newer one already
+   exists is refused, naming the actual latest), writes the next free `-N`
+   generation of the base id (for example, once `X-2` exists, superseding it
+   writes `X-3`, not another `X-2`), records `supersedes` in the new
+   receipt, and leaves the original file byte-identical. When both record
+   the same component version, the superseded receipt then supports no
+   status, whatever its reviews: only the latest generation speaks for that
+   host/component/stage/date. A receipt retires the nearest earlier
+   generation of the chain at its own version: a re-record at another
+   version retires nothing there, since it records a different version and
+   the pin binding decides which one counts, while a later run at the first
+   version still retires the earlier one through it (v1, then v2, then v1:
+   the third retires the first). A superseded `native_proven` fail still blocks until a
+   later native pass (Section 5). A chain stays linear: `validate` rejects
+   two receipts that supersede the same one, and a forked chain supports no
+   status from the fork on.
+   `--os`/`--architecture` default to the actual host's values
    but can be overridden; nothing in this repository can verify from the
    receipt's JSON alone that a claimed `platform_id`,
    `second_physical_machine` or `os`/`architecture` combination is honest —
@@ -221,6 +272,24 @@ Every receipt also names one `stage`. Two decide a platform status:
    and recorder identities are self-declared too: the checks below stop a
    session from reviewing its own receipt by accident or by default, not a
    contributor who deliberately passes a false `--identity`.
+
+   `--layer-ref <catalog>/<layer_id>` (repeatable) names the
+   `catalogs/landscape/{foundation,us-equities}.json` layer(s) whose role the
+   commands exercise and writes them as the receipt's `layer_refs`; the
+   receipt then counts only for rows (winners and alternatives) in those
+   layers. One tool can play a different role in each layer that lists it: a
+   read-only `codex exec` does the native-clients job, not the workers
+   layer's owned writing child. So `record` refuses (exit 2, listing the
+   layers) a `--stage use` receipt without `--layer-ref` for a component that
+   more than one layer catalogues, by `component_id` or repository. An
+   unscoped receipt, such as every one recorded before the flag, still binds
+   to each layer its `component_id` wins, and verifies an alternative only
+   when that alternative's repository is catalogued in one layer. Name a layer
+   only when the commands do that layer's job; step 8 checks it.
+   Changed after `v2026.09.26`: that release's schema already defines
+   `layer_refs`, but its recorder has no `--layer-ref`, nothing there scopes a
+   receipt by it, and a superseded receipt still counted, so record from current
+   `main` (step 1).
 4. **Sanitize and scan.** Re-read the receipt file yourself before opening a
    PR: sanitization is best-effort, not a guarantee. Then run the guarded
    secret scanner over just the files you touched:
@@ -277,7 +346,9 @@ Every receipt also names one `stage`. Two decide a platform status:
    1. **Layer role.** The commands make the component do the job its layer
       names, not just run. A server is observed serving, through a query or
       a request. A build's output is served or used. A verifier's verdict is
-      read.
+      read. With `layer_refs`, that is the job of every layer it names; a
+      layer whose job the commands do not do is a `needs_changes`
+      (changed after `v2026.09.26`, whose recorder cannot write `layer_refs`).
    2. **Positive control.** Where a clean result proves nothing (a scanner,
       a test runner, a linter, a gate), the receipt also shows the component
       failing on a deliberate fault, as #185's gitleaks fixture does.
@@ -410,13 +481,20 @@ for running them.
   to the winner's current pin, independently reviewed (step 8) with no
   standing dissent, declares `host.second_physical_machine: true`, and has
   `host.os`/`host.architecture` consistent with `adoption/manifest.json`'s
-  `platform_profiles[]` entry for that platform id. The same receipt at stage
+  `platform_profiles[]` entry for that platform id, and counts for the
+  winner's layer: no later generation at the same version supersedes it,
+  it is not on a forked chain, and its `layer_refs`,
+  if any, name that layer (changed after `v2026.09.26`, where a superseded
+  receipt still counted and `layer_refs` scoped nothing). The same receipt at stage
   `install` (for example a version call) supports `conditional` at most: it
   shows the binary resolves, not that the component does its layer's job
   ([decision 2026-09-24](decisions/2026-09-24-accepted-needs-use-stage.md)).
   A `native_proven` fail at `use` or `install` that is the latest receipt for
-  its host and stage is *blocking*, whatever its review, until that host
-  records a later pass. The two platforms then differ:
+  its host and stage is *blocking*, whatever its review and even once
+  superseded, until that host records a later current `native_proven` pass
+  at the same pin, platform, stage and layer; a superseding partial,
+  `synthetic` or other-platform receipt does not clear it. The two platforms
+  then differ:
 
   - **`macos-arm64`.** `accepted` needs a qualifying receipt and no blocking
     fail; there is no other route. `conditional` needs a pin-bound,
@@ -429,7 +507,9 @@ for running them.
     winner whose own `evidence_class` is `native_proven` or
     `measured_comparison` and whose `evidence_refs` cite at least one
     `evidence/` file registered in `manifests/evidence.json` (not a sealed
-    layer-verdict packet, lane return or adjudication), and in both cases no
+    layer-verdict packet, lane return or adjudication, and not a host receipt
+    under `evidence/hosts/`, which counts only as a receipt, with the checks
+    above; changed after `v2026.09.26`), and in both cases no
     blocking fail. The second route needs no host receipt and no second
     physical machine, so a single WSL host's receipt is not what makes a
     Linux winner `accepted`; it can only add a passing receipt (towards

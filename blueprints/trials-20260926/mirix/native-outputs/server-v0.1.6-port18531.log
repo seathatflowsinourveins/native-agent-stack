@@ -1,0 +1,560 @@
+Starting Mirix server in DEVELOPMENT mode...
+  Host: 0.0.0.0
+  Port: 18531
+  Log level: info
+  Auto-reload: False
+
+Server will be available at:
+  http://0.0.0.0:18531
+  http://localhost:18531 (if host is 0.0.0.0)
+
+API documentation available at:
+  http://localhost:18531/docs (Swagger UI)
+  http://localhost:18531/redoc (ReDoc)
+
+Press CTRL+C to stop the server
+
+2026-09-25 21:31:28 - Mirix - INFO - Logging to: console (level: INFO)
+2026-09-25 21:31:30 - Mirix - INFO - Redis is disabled (MIRIX_REDIS_ENABLED=false)
+2026-09-25 21:31:30 - Mirix - INFO - Redis integration disabled or unavailable
+INFO:     Started server process [2657580]
+INFO:     Waiting for application startup.
+2026-09-25 21:31:30 - Mirix - INFO - Starting Mirix REST API server
+2026-09-25 21:31:30 - Mirix - INFO - Creating SyncServer instance
+2026-09-25 21:31:30 - Mirix - INFO - SyncServer initialized
+2026-09-25 21:31:30 - Mirix - INFO - 🚀 Initializing queue manager: type=memory, num_workers=1, server=provided
+2026-09-25 21:31:30 - Mirix - INFO - 📝 Creating queue instance...
+2026-09-25 21:31:30 - Mirix - INFO - ✅ Queue created: type=MemoryQueue
+2026-09-25 21:31:30 - Mirix - INFO - 👷 Creating single background worker...
+2026-09-25 21:31:30 - Mirix - INFO - ▶️  Starting 1 background worker thread(s)...
+2026-09-25 21:31:30 - Mirix - INFO - 🚀 Starting queue worker thread...
+2026-09-25 21:31:30 - Mirix - INFO - 📝 Creating daemon thread for message consumption...
+2026-09-25 21:31:30 - Mirix - INFO - ✅ Thread created: <Thread(QueueWorker, initial daemon)>
+2026-09-25 21:31:30 - Mirix - INFO - ▶️  Starting thread...
+2026-09-25 21:31:30 - Mirix - INFO - 🎯 Queue worker thread ENTERED _consume_messages()
+2026-09-25 21:31:30 - Mirix - INFO -    _running=True, _server=True
+2026-09-25 21:31:30 - Mirix - INFO - ✅ Thread.start() called, is_alive=True
+2026-09-25 21:31:30 - Mirix - INFO - ✅ Queue worker thread started successfully
+2026-09-25 21:31:30 - Mirix - INFO - 🔍 Worker status: running=1/1, threads_alive=1/1
+2026-09-25 21:31:30 - Mirix - INFO - ✅ All 1 queue worker(s) started successfully!
+2026-09-25 21:31:30 - Mirix - INFO - ✅ Queue manager initialized successfully
+2026-09-25 21:31:30 - Mirix - INFO - Queue service started with SyncServer integration (num_workers=1)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:18531 (Press CTRL+C to quit)
+INFO:     127.0.0.1:26183 - "GET /health HTTP/1.1" 200 OK
+2026-09-25 21:35:17 - Mirix - ERROR - Embedding model validation failed
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/rest_api.py", line 251, in validate_embedding_config
+    embedding_model(embedding_config).get_text_embedding(test_sentence)
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index_instrumentation/dispatcher.py", line 413, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index/core/base/embeddings/base.py", line 406, in get_text_embedding
+    text_embedding = self._get_text_embedding(text)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index_instrumentation/dispatcher.py", line 413, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index/embeddings/openai/base.py", line 434, in _get_text_embedding
+    return _retryable_get_embedding()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/tenacity/__init__.py", line 331, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/tenacity/__init__.py", line 393, in <lambda>
+    self._add_action_func(lambda rs: rs.outcome.result())
+                                     ^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index/embeddings/openai/base.py", line 427, in _retryable_get_embedding
+    return get_embedding(
+           ^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/llama_index/embeddings/openai/base.py", line 129, in get_embedding
+    client.embeddings.create(input=[text], model=engine, **kwargs).data[0].embedding
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/resources/embeddings.py", line 132, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'message': 'The model `text-embedding-ada-002` does not exist.', 'type': 'NotFoundError', 'param': None, 'code': 404}}
+INFO:     127.0.0.1:24447 - "POST /agents/meta/initialize HTTP/1.1" 400 Bad Request
+2026-09-25 21:37:15 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 21:37:15 - Mirix - INFO - Creating default template user for organization demo-org
+2026-09-25 21:37:15 - Mirix - INFO - ✅ Created default template user user-default-demo-org for organization demo-org
+2026-09-25 21:37:15 - Mirix - INFO - Child agents specified - configuring meta_memory_agent with trigger_memory_update
+INFO:     127.0.0.1:24439 - "POST /agents/meta/initialize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:24439 - "POST /users/create_or_get HTTP/1.1" 200 OK
+INFO:     127.0.0.1:24439 - "POST /memory/add HTTP/1.1" 200 OK
+2026-09-25 21:37:15 - Mirix - INFO - Processing message via server: agent_id=agent-<uuid>, client_id=demo-client-id (from actor), user_id=demo-user, input_messages_count=1, use_cache=True, filter_tags={'scope': 'read_write'}, occurred_at=None
+2026-09-25 21:37:15 - Mirix - INFO - 🏷️  Loading MetaMemoryAgent with filter_tags={'scope': 'read_write'}, client_id=demo-client-id, user_id=demo-user
+2026-09-25 21:37:53 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+INFO:     127.0.0.1:24439 - "POST /memory/retrieve/conversation HTTP/1.1" 200 OK
+2026-09-25 21:38:23 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Error in extracting the topic from the messages: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 21:38:23 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: No topics extracted from the input messages
+2026-09-25 21:38:23 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Starting agent step - step_count: 0, chaining: False
+2026-09-25 21:39:53 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 1 failed: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type. Retrying in 0.5 seconds...
+2026-09-25 21:44:57 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 2 failed: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type. Retrying in 1.0 seconds...
+2026-09-25 21:47:42 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: Retry limit reached. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 21:47:42 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed
+messages = [Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 1, 37, 15, 952869, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[USER]\nThe moon now has a president.\n[ASSISTANT]\nNoted.')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None), Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 1, 37, 15, 952916, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[System Message] As the meta memory manager, analyze the provided content. Based on the content, determine what memories need to be updated (episodic, procedural, knowledge, semantic, core, and resource)')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None)]
+error = Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 21:47:42 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed with an unrecognized exception: 'Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type'
+2026-09-25 21:47:42 - Mirix - ERROR - Error in server._step: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 62, in send_llm_request
+    chat_completion_data = self.convert_response_to_chat_completion(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 430, in convert_response_to_chat_completion
+    chat_completion_response = ChatCompletionResponse(**response_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/pydantic/main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 801, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 21:47:42 - Mirix - ERROR - None
+2026-09-25 21:47:42 - Mirix - ERROR - Error processing message for agent_id=agent-<uuid>: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 62, in send_llm_request
+    chat_completion_data = self.convert_response_to_chat_completion(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 430, in convert_response_to_chat_completion
+    chat_completion_response = ChatCompletionResponse(**response_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/pydantic/main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/queue/worker.py", line 251, in _process_message
+    usage = server.send_messages(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 996, in send_messages
+    return self._step(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 801, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 22:01:27 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+INFO:     127.0.0.1:24897 - "POST /agents/meta/initialize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:24897 - "POST /users/create_or_get HTTP/1.1" 200 OK
+INFO:     127.0.0.1:24897 - "POST /memory/add HTTP/1.1" 200 OK
+2026-09-25 22:01:28 - Mirix - INFO - Processing message via server: agent_id=agent-<uuid>, client_id=demo-client-id (from actor), user_id=receipt-check-user, input_messages_count=1, use_cache=True, filter_tags={'scope': 'read_write'}, occurred_at=None
+2026-09-25 22:01:28 - Mirix - INFO - 🏷️  Loading MetaMemoryAgent with filter_tags={'scope': 'read_write'}, client_id=demo-client-id, user_id=receipt-check-user
+2026-09-25 22:08:20 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 22:15:19 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:19 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Error in extracting the topic from the messages: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.
+2026-09-25 22:15:19 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: No topics extracted from the input messages
+2026-09-25 22:15:19 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Starting agent step - step_count: 0, chaining: False
+2026-09-25 22:15:19 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:19 - Mirix - ERROR - Error in extracting topics and temporal info: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.
+2026-09-25 22:15:21 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:21 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 1 failed: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.. Retrying in 0.5 seconds...
+2026-09-25 22:15:21 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:21 - Mirix - ERROR - Error in extracting topics and temporal info: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.
+2026-09-25 22:15:22 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:22 - Mirix - ERROR - Error in extracting topics and temporal info: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.
+2026-09-25 22:15:23 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:23 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 2 failed: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.. Retrying in 1.0 seconds...
+2026-09-25 22:15:25 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:25 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: Retry limit reached. Final error: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.
+2026-09-25 22:15:26 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:26 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 1 failed: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.. Retrying in 0.5 seconds...
+2026-09-25 22:15:28 - Mirix - WARNING - [OpenAI] API connection error: Connection error.
+2026-09-25 22:15:28 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 2 failed: INTERNAL_SERVER_ERROR: Failed to connect to OpenAI: Connection error.. Retrying in 1.0 seconds...
+2026-09-25 22:15:31 - Mirix - WARNING - [OpenAI] API status error (503): Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+2026-09-25 22:15:31 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: Retry limit reached. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+2026-09-25 22:15:31 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed
+messages = [Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 2, 1, 28, 478868, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[USER]\nThe receipt check fact: the sky is teal today.')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None), Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 2, 1, 28, 479100, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[System Message] As the meta memory manager, analyze the provided content. Based on the content, determine what memories need to be updated (episodic, procedural, knowledge, semantic, core, and resource)')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None)]
+error = Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+2026-09-25 22:15:31 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed with an unrecognized exception: 'Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}'
+2026-09-25 22:15:31 - Mirix - ERROR - Error in server._step: Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 56, in send_llm_request
+    response_data = self.request(request_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 403, in request
+    response: ChatCompletion = client.chat.completions.create(**request_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.InternalServerError: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 60, in send_llm_request
+    raise self.handle_llm_error(e)
+mirix.errors.LLMServerError: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 860, in _get_ai_reply
+    return self._get_ai_reply(
+           ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 857, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+2026-09-25 22:15:31 - Mirix - ERROR - None
+2026-09-25 22:15:31 - Mirix - ERROR - Error processing message for agent_id=agent-<uuid>: Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 56, in send_llm_request
+    response_data = self.request(request_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 403, in request
+    response: ChatCompletion = client.chat.completions.create(**request_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1147, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1259, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.InternalServerError: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 60, in send_llm_request
+    raise self.handle_llm_error(e)
+mirix.errors.LLMServerError: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/queue/worker.py", line 251, in _process_message
+    usage = server.send_messages(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 996, in send_messages
+    return self._step(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 860, in _get_ai_reply
+    return self._get_ai_reply(
+           ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 857, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: INTERNAL_SERVER_ERROR: OpenAI API error: Error code: 503 - {'error': {'message': 'Loading model', 'type': 'unavailable_error', 'code': 503}}
+2026-09-25 23:18:26 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Clearing embedding_config for agent agent-<uuid>
+2026-09-25 23:18:27 - Mirix - INFO - Meta agent has children - using meta_memory_agent.txt system prompt
+2026-09-25 23:18:28 - Mirix - INFO - Configuring meta_memory_agent with trigger_memory_update (has children)
+INFO:     127.0.0.1:25071 - "POST /agents/meta/initialize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25071 - "POST /users/create_or_get HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25071 - "POST /memory/add HTTP/1.1" 200 OK
+2026-09-25 23:18:28 - Mirix - INFO - Processing message via server: agent_id=agent-<uuid>, client_id=demo-client-id (from actor), user_id=demo-user, input_messages_count=1, use_cache=True, filter_tags={'scope': 'read_write'}, occurred_at=None
+2026-09-25 23:18:28 - Mirix - INFO - 🏷️  Loading MetaMemoryAgent with filter_tags={'scope': 'read_write'}, client_id=demo-client-id, user_id=demo-user
+2026-09-25 23:19:49 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:20:43 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Error in extracting the topic from the messages: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:20:43 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: No topics extracted from the input messages
+2026-09-25 23:20:43 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] INFO: Starting agent step - step_count: 0, chaining: False
+2026-09-25 23:22:29 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:27:05 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 1 failed: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type. Retrying in 0.5 seconds...
+2026-09-25 23:28:08 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:30:28 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] WARNING: Attempt 2 failed: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type. Retrying in 1.0 seconds...
+2026-09-25 23:31:18 - Mirix - ERROR - Error in extracting topics and temporal info: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:31:19 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 23:31:19 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 23:31:19 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 23:31:19 - Mirix - WARNING - build_embeddings_for_memory is false; ignoring embedding_config from request
+2026-09-25 23:35:29 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: Retry limit reached. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:35:29 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed
+messages = [Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 3, 18, 28, 635104, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[USER]\nThe moon now has a president.\n[ASSISTANT]\nNoted.')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None), Message(created_by_id=None, last_updated_by_id=None, created_at=datetime.datetime(2026, 9, 26, 3, 18, 28, 635321, tzinfo=datetime.timezone.utc), updated_at=None, id='message-<uuid>', organization_id=None, user_id=None, client_id=None, agent_id='agent-<uuid>', model=None, role=<MessageRole.user: 'user'>, content=[TextContent(type=<MessageContentType.text: 'text'>, text='[System Message] As the meta memory manager, analyze the provided content. Based on the content, determine what memories need to be updated (episodic, procedural, knowledge, semantic, core, and resource)')], name=None, tool_calls=None, tool_call_id=None, step_id=None, otid=None, tool_returns=None, group_id=None, sender_id=None, filter_tags=None)]
+error = Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:35:29 - Mirix - INFO - [Mirix.Agent.meta_memory_agent] ERROR: step() failed with an unrecognized exception: 'Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type'
+2026-09-25 23:35:29 - Mirix - ERROR - Error in server._step: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 62, in send_llm_request
+    chat_completion_data = self.convert_response_to_chat_completion(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 430, in convert_response_to_chat_completion
+    chat_completion_response = ChatCompletionResponse(**response_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/pydantic/main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 801, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+2026-09-25 23:35:29 - Mirix - ERROR - None
+2026-09-25 23:35:29 - Mirix - ERROR - Error processing message for agent_id=agent-<uuid>: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 694, in _get_ai_reply
+    response = active_llm_client.send_llm_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/llm_client_base.py", line 62, in send_llm_request
+    chat_completion_data = self.convert_response_to_chat_completion(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/llm_api/openai_client.py", line 430, in convert_response_to_chat_completion
+    chat_completion_response = ChatCompletionResponse(**response_data)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/venv/lib/python3.11/site-packages/pydantic/main.py", line 263, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-src/mirix/queue/worker.py", line 251, in _process_message
+    usage = server.send_messages(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 996, in send_messages
+    return self._step(
+           ^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/server/server.py", line 656, in _step
+    usage_stats = mirix_agent.step(
+                  ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 2051, in step
+    step_response = self.inner_step(
+                    ^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3333, in inner_step
+    raise e
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 3018, in inner_step
+    response = self._get_ai_reply(
+               ^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/tracing.py", line 222, in sync_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-src/mirix/agent/agent.py", line 801, in _get_ai_reply
+    raise Exception(
+Exception: Retries exhausted and no valid response received. Final error: 1 validation error for ChatCompletionResponse
+usage.prompt_tokens_details.audio_tokens
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_type
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-09-26 00:53:57 - Mirix - INFO - Shutting down Mirix REST API server
+2026-09-26 00:53:57 - Mirix - INFO - Queue service stopped
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2657580]

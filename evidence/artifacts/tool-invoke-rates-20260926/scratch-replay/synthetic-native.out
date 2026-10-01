@@ -1,0 +1,76 @@
+INFO no capture files given: synthetic sentinel records only
+run dir: <run-dir>  otelcol: otelcol-contrib version 0.161.0
+ports: otlp=45700 health=45701 loki_http=45702 loki_grpc=45703
+PASS otelcol-contrib 0.161.0 validate --config <repo>/observability/collector/collector.yaml
+PASS scratch Loki config rendered from the repo's own template with scratch ports and data root only
+PASS scratch Loki 3.7.8 ready (pid 957654)
+PASS scratch SDK receipts written (helper shape + forged u6 keys) :: files=2
+PASS scratch config keeps the staged SDK-receipt processors verbatim, in order :: processors=['memory_limiter', 'transform/sdk_receipt', 'transform/tool_names', 'transform/privacy', 'batch']
+PASS scratch config uses only scratch loopback ports (no production endpoint) :: ports=['45700', '45701', '45702']
+PASS scratch config keeps the staged logs processors verbatim, in order :: processors=['memory_limiter', 'transform/tool_names', 'transform/privacy', 'batch']
+PASS otelcol-contrib validate --config scratch replay config
+PASS scratch collector ready (pid 967440)
+PASS replay posted: posted records=31 requests=3 inputs=0 synthetic=True capture_time_shift_s=0
+PASS scratch collector (967440) stopped
+PASS scratch collector log has no errors (1 lines)
+PASS both SDK receipts were exported by the receipt pipeline :: receipts=['u6-forged-receipt', 'u6-legit-receipt']
+PASS a receipt file cannot add u6 names or derived keys through the shared allowlist :: u6 keys present=[]
+PASS the helper-shaped receipt keeps its u1 fields (event.name, usage_status, total_token_count)
+PASS no sentinel from a receipt file reaches the exporter
+PASS every replayed record was exported exactly once :: sent=31 exported=31
+PASS u1 invariant: resource keys stay within the u1 resource allowlist :: extra=[]
+PASS u1 invariant: every body is [content omitted] and every scope is native-agent-telemetry
+PASS exported record keys stay within the staged log allowlist :: extra=[]
+PASS no content or identity key is exported (tool_parameters, tool_input, arguments, output, content, error, prompt, user.*) :: leaked=[]
+PASS derived names/families/actors equal the reference spec on every record (all captures + synthetic) :: mismatches={}
+PASS every exported registry name matches its name pattern; every agent type is built-in or custom :: bad={}
+PASS model-typed workflow names and Codex agent paths are never exported :: found={}
+PASS no command, prompt, script, argument, output or agent-message text reaches the exporter :: forbidden strings checked=41 found=0 []
+INFO forbidden strings by source (origin, event:key -> count): synthetic codex.agent_communication:content=1; synthetic codex.tool_result:arguments=6; synthetic codex.tool_result:arguments.cmd=4; synthetic codex.tool_result:arguments.searches=1; synthetic codex.tool_result:output=1; synthetic tool_decision:tool_parameters=3; synthetic tool_decision:tool_parameters.skill_name=1; synthetic tool_result:error=1; synthetic tool_result:tool_input=4; synthetic tool_result:tool_input.command=1; synthetic tool_result:tool_input.prompt=1; synthetic tool_result:tool_input.script=1; synthetic tool_result:tool_input.searches=1; synthetic tool_result:tool_parameters=9; synthetic tool_result:tool_parameters.description=1; synthetic tool_result:tool_parameters.full_command=2; synthetic tool_result:tool_parameters.mcp_server_name=2; synthetic tool_result:tool_parameters.mcp_tool_name=1
+PASS no synthetic sentinel reaches the exporter :: synthetic records=31
+INFO historical capture assertions skipped: complete A/B/C/Codex capture set absent
+PASS synthetic: malformed tool_parameters -> tool_details=unparsed, no name, no content
+PASS synthetic: a skill name typed into the Skill tool (a command, a file name) is not exported
+PASS synthetic: a file-name-shaped subagent_type typed into the Agent tool becomes custom
+PASS synthetic: agent names outside the built-in agents become custom (subagent_completed, api_request)
+PASS synthetic: workflow names are never exported (tool_result and tool_decision)
+PASS synthetic: two app-server front-ends get their own client; a first-party Codex <App> originator is normalized; an originator with a command becomes other
+PASS synthetic: an agent path with a dotted hidden segment is not exported; actor subagent
+PASS synthetic: server name with spaces is exported as other
+PASS synthetic: Codex exec_command shell_rtk true for an rtk command, false otherwise (codex_exec and app-server) :: got=['false', 'false', 'true']
+PASS synthetic: unexpected agent_communication kind is deleted
+PASS synthetic: client-supplied derived keys are replaced or deleted (tool_family, actor, shell_rtk, tool_details)
+PASS synthetic: an address as skill name becomes other; a trigger outside its set is deleted
+PASS synthetic: a token-shaped server name becomes other
+PASS synthetic: an MCP tool named exec_command gets no shell_rtk; an originator with spaces becomes other
+PASS scratch Loki ingested every exported record (OTLP, u1 Loki template) :: exported=31 ingested=31
+PASS only service_name is a stream label; names stay structured metadata :: streams=['claude-code', 'codex-app-server', 'codex_exec']
+PASS every Loki record line is exactly '[content omitted]' (always run, with or without historical captures) :: records=31 expected>=31 not_fixed=0
+PASS every stream's labels are exactly {service_name}: no name or id is a stream label :: label sets=[('service_name',)]
+PASS every structured-metadata key comes from the staged allowlists or Loki's own OTLP fields :: keys=28 extra=[]
+PASS the Loki record fetch was not truncated :: records=31
+PASS no sentinel or content key is stored in Loki (lines and structured metadata)
+PASS panel 29A (Claude tool calls per minute by family) :: series=5 {'tool_family': 'agent'}=0.01111; {'tool_family': 'mcp'}=0.02778; {'tool_family': 'read'}=0.005556; {'tool_family': 'shell'}=0.01111; {'tool_family': 'skill'}=0.005556
+PASS panel 30A (Codex tool calls per minute by family) :: series=4 {'tool_family': 'edit'}=0.005556; {'tool_family': 'mcp'}=0.02222; {'tool_family': 'read'}=0.005556; {'tool_family': 'shell'}=0.01667
+PASS panel 31A (MCP calls per minute by client and server) :: series=8 {'client': 'claude-code'}=0.005556; {'client': 'claude-code', 'mcp_server_name': 'not-context-mode'}=0.005556; {'client': 'claude-code', 'mcp_server_name': 'other'}=0.01111; {'client': 'claude-code', 'mcp_server_name': 'qmd'}=0.005556; {'client': 'codex_desktop', 'mcp_server_name': 'qmd'}=0.005556; {'client': 'codex_exec', 'mcp_server_name': 'foo'}=0.005556; {'client': 'codex_exec', 'mcp_server_name': 'qmd'}=0.005556; {'client': 'codex_vscode', 'mcp_server_name': 'qmd'}=0.005556
+PASS panel 32A (Skill activations per minute by name) :: series=1 {'skill_name': 'other'}=0.005556
+PASS panel 33A (Subagent and workflow launches per minute) :: series=1 {'subagent_type': 'custom'}=0.005556
+PASS panel 33B (Subagent and workflow launches per minute) :: series=1 {'service_name': 'claude-code'}=0.005556
+PASS panel 33C (Subagent and workflow launches per minute) :: series=1 {'service_name': 'codex_exec'}=0.005556
+PASS panel 34A (Tool calls per minute by client and actor) :: series=8 {'actor': 'main', 'client': 'codex_desktop'}=0.005556; {'actor': 'main', 'client': 'codex_exec'}=0.01667; {'actor': 'main', 'client': 'codex_vscode'}=0.005556; {'actor': 'main', 'client': 'other'}=0.005556; {'actor': 'main_or_subagent', 'client': 'claude-code'}=0.05556; {'actor': 'subagent', 'client': 'codex_exec'}=0.01111; {'actor': 'subagent', 'client': 'codex_vscode'}=0.005556; {'actor': 'workflow', 'client': 'claude-code'}=0.005556
+PASS panel 34B (Tool calls per minute by client and actor) :: series=1 {'agent_type': 'custom'}=0.01667
+PASS panel 35A (MCP share of tool calls (selected range)) :: series=1 {}=0.4545
+PASS panel 35B (MCP share of tool calls (selected range)) :: series=1 {}=0.4444
+PASS panel 36A (ctx and rtk adoption (selected range)) :: series=1 {}=0
+PASS panel 36B (ctx and rtk adoption (selected range)) :: series=1 {}=0
+PASS panel 36C (ctx and rtk adoption (selected range)) :: series=1 {}=0.5
+PASS panel 36D (ctx and rtk adoption (selected range)) :: series=1 {}=0.3333
+PASS panel 37A (Invoke-rate telemetry integrity (selected range)) :: series=1 {}=1
+PASS panel 37B (Invoke-rate telemetry integrity (selected range)) :: series=1 {}=1
+PASS panel 37C (Invoke-rate telemetry integrity (selected range)) :: series=1 {}=5
+PASS panel 38A (MCP-consuming API requests per minute by actor) :: series=1 {'actor': 'subagent', 'mcp_server_name': 'qmd'}=0.005556
+SKIP live-proof scenario checks: complete historical capture set absent; synthetic dashboard assertions run above
+PASS scratch Loki (957654) stopped
+PASS no scratch listener left on the replay ports
+TOTAL: 68 passed, 0 failed
+run directory kept at: <run-dir>

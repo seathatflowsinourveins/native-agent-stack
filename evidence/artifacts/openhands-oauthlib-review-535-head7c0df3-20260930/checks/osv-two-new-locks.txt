@@ -1,0 +1,8 @@
+observed_utc=2026-09-30T19:28:57Z
+what makes the ordinary scan filter 9 vulnerabilities at the head where it filtered 7 on main: the two new runtime-worker locks under the ordinary config and under an empty config
+two new locks, the head's ordinary config: scan exit 0
+two new locks, EMPTY config (control): scan exit 1
+osv-two-new-locks-ci-config.raw -> no findings
+osv-two-new-locks-empty-config.raw -> {"nltk==3.10.3": ["GHSA-8mgp-746c-j5xp"]}
+ordinary config: Filtered 2 vulnerabilities from output
+allowed rows for these two locks in the head's tests: 2

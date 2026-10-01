@@ -1,0 +1,154 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "one-off reader of the sweep run's private job directories (not retained as a tool)",
+  "command": "read, per job directory and archived attempt under <work-dir>/gpt6: exit, started, finished, codex_version, model, and the error and turn.failed events of events.jsonl; request ids replaced by <request-id>",
+  "measured_at_utc": "2026-09-29T16:13:13Z",
+  "evidence_class": "local_integration",
+  "note": "Observation of native Codex runs whose full output stays in the private work directory. returns.json keeps each job's status but not its error text; this record keeps the outcome table and the one distinct error text."
+ },
+ "codex": {
+  "version": [
+   "codex-cli 0.157.1"
+  ],
+  "model": [
+   "cx/gpt-6-astra"
+  ],
+  "route": "OmniRoute pooled gateway (build_args.py --gpt6-provider omniroute)"
+ },
+ "scanned": {
+  "job_directories": 54,
+  "sweep_jobs": 52,
+  "probes": 2
+ },
+ "outcomes": {
+  "ok_with_completed_turn": 44,
+  "failed_exit_1": 10,
+  "failed_with_completed_turn": 0
+ },
+ "followup_round": {
+  "gpt6_jobs": 12,
+  "ok": 3,
+  "failed": 9
+ },
+ "failed": [
+  {
+   "job": "gpt6-discover-recovery-portability-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:27:18Z",
+   "finished_utc": "2026-09-29T13:27:19Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-discover-web-research-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:28:58Z",
+   "finished_utc": "2026-09-29T13:28:59Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-discover-token-efficiency-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:30:26Z",
+   "finished_utc": "2026-09-29T13:30:28Z",
+   "seconds": 2,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-document-retrieval-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:33:19Z",
+   "finished_utc": "2026-09-29T13:33:20Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-recovery-portability-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:34:39Z",
+   "finished_utc": "2026-09-29T13:34:40Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-observation-inference-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:42:34Z",
+   "finished_utc": "2026-09-29T13:42:35Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-ci-supply-chain-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:44:59Z",
+   "finished_utc": "2026-09-29T13:45:01Z",
+   "seconds": 2,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-token-efficiency-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:47:08Z",
+   "finished_utc": "2026-09-29T13:47:10Z",
+   "seconds": 2,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-fit-web-research-followup",
+   "phase": "follow-up round",
+   "started_utc": "2026-09-29T13:51:49Z",
+   "finished_utc": "2026-09-29T13:51:51Z",
+   "seconds": 2,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  },
+  {
+   "job": "gpt6-probe3",
+   "phase": "probe after the run",
+   "started_utc": "2026-09-29T15:46:12Z",
+   "finished_utc": "2026-09-29T15:46:13Z",
+   "seconds": 1,
+   "exit": 1,
+   "turn_completed": false,
+   "error_kind": "http_429"
+  }
+ ],
+ "error_events": {
+  "types": [
+   "error",
+   "turn.failed"
+  ],
+  "distinct_texts": [
+   {
+    "text": "exceeded retry limit, last status: 429 Too Many Requests, request id: <request-id>",
+    "jobs": 10
+   }
+  ]
+ },
+ "ok_job_seconds": {
+  "min": 65,
+  "median": 677,
+  "max": 977,
+  "population": "the 44 jobs with a completed turn: 43 of the 52 sweep jobs and the one probe (gpt6-probe) that passed"
+ }
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Verifier's guard environment (same variable set as the implementer's steps/G).
+# Usage: VG <workspace-dir> <command> [args...]
+set -eu
+ws="$1"; shift
+exec /usr/bin/env -i HOME="$HOME" PATH=/usr/bin:/bin HEADROOM_WORKSPACE_DIR="$ws" HEADROOM_OFFLINE=1 HEADROOM_BEACON=off DO_NOT_TRACK=1 HEADROOM_TELEMETRY=off HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 LITELLM_LOCAL_MODEL_COST_MAP=True "$@"

@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--poppler--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "7783682fe6c9f10675d930b021f125028f21d8f1",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "poppler",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v pdftotext) && v=$(timeout 10 pdftotext -v 2>&1 | head -1) && echo \"resolves: $p ($v)\" && SRC=\"blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf\" && test -f \"$SRC\" && I=$(timeout 10 pdfinfo \"$SRC\") && echo \"$I\" | grep -Eq \"^Pages:[[:space:]]+1$\" && echo \"$I\" | grep -q \"595 x 842 pts (A4)\" && P=$(timeout 10 pdftotext -f 1 -l 1 -enc UTF-8 -layout \"$SRC\" -) && echo \"$P\" | grep -qx \"Dummy PDF file\" && B=$(timeout 10 pdftotext -bbox-layout -f 1 -l 1 -enc UTF-8 \"$SRC\" -) && echo \"$B\" | grep -q '<page width=\"595.000000\" height=\"842.000000\">' && echo \"$B\" | grep -q '<word[^>]*>Dummy</word>' && echo \"$B\" | grep -q '<word[^>]*>PDF</word>' && echo \"$B\" | grep -q '<word[^>]*>file</word>' && echo \"$B\" | grep -Eq 'xMin=\"[0-9]+\\.[0-9]+\" yMin=\"[0-9]+\\.[0-9]+\" xMax=\"[0-9]+\\.[0-9]+\" yMax=\"[0-9]+\\.[0-9]+\"' && echo \"PASS: real external W3C PDF corpus/w3c-dummy.pdf (see corpus/NOTICE.md; unmodified since 2026-09-20) extracted with -f/-l page selection, plain -layout text and -bbox-layout page/word coordinates; phrase+geometry checks matched; $v\"",
+      "exit": 0,
+      "duration_s": 0.034,
+      "output_sha256": "c3ae14041013b14e4dbb232c60dae28383717ca86780cdb905b1110460619908",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/pdftotext (pdftotext version 26.09.0)\nPASS: real external W3C PDF corpus/w3c-dummy.pdf (see corpus/NOTICE.md; unmodified since 2026-09-20) extracted with -f/-l page selection, plain -layout text and -bbox-layout page/word coordinates; phrase+geometry checks matched; pdftotext version 26.09.0\n"
+    },
+    {
+      "cmd": "SRC=\"blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf\" && BEFORE=$(sha256sum \"$SRC\" | cut -d' ' -f1) && D=$(mktemp -d) && trap 'rm -rf \"$D\"' EXIT && cp \"$SRC\" \"$D/corrupt.pdf\" && timeout 10 python3 -c \"data=bytearray(open('$D/corrupt.pdf','rb').read()); data[0:8]=b'NOTAPDF!'; data=data[:-200]; open('$D/corrupt.pdf','wb').write(bytes(data))\" && (timeout 10 pdftotext -bbox-layout -enc UTF-8 \"$D/corrupt.pdf\" \"$D/out.xml\" >\"$D/out.log\" 2>\"$D/err.log\"; echo $? > \"$D/rc\") && RC=$(cat \"$D/rc\") && AFTER=$(sha256sum \"$SRC\" | cut -d' ' -f1) && test \"$BEFORE\" = \"$AFTER\" && test \"$RC\" -ne 0 && grep -qi error \"$D/err.log\" && echo \"positive control confirmed: pdftotext exit=$RC on a header+trailer-corrupted copy in mktemp scratch (native refusal), stderr shows a parse error, original $SRC sha256 unchanged ($BEFORE)\"",
+      "exit": 0,
+      "duration_s": 0.028,
+      "output_sha256": "b16d208bf8bfe47f7ea0032e5dfb3fb0750ba8fd4d9c8dcdb342f7929bb19519",
+      "output_excerpt": "positive control confirmed: pdftotext exit=1 on a header+trailer-corrupted copy in mktemp scratch (native refusal), stderr shows a parse error, original blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf sha256 unchanged (3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4)\n"
+    }
+  ],
+  "tool_versions": {
+    "poppler": "26.09.0"
+  },
+  "observed_at_utc": "2026-09-25T19:35:21Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Poppler 26.09.0 extracts retrieval-ready text from a real PDF. pdftotext 26.09.0 extracts the repository's retained external W3C PDF (blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf; provenance in corpus/NOTICE.md) with page selection, plain -layout text and -bbox-layout word coordinates, and the expected phrases and geometry are matched. A copy with a corrupted header and trailer makes pdftotext exit 1 with a parse error while the original's sha256 3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4 stays unchanged (positive control). Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Supersedes the earlier local_integration use receipt of the same day with a native_proven one that includes a positive control.",
+    "A single small public PDF is used; OCR, large filings and non-Latin scripts are not exercised.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:35:21Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd0 and cmd1 from the repo root; output identical. Adequacy-checked: (1) layer role document-retrieval: pdftotext extracts the retained real W3C PDF with page selection, -layout text and -bbox-layout coordinates; corpus/NOTICE.md and a matching sha256 confirm it is the unmodified W3C copy; (2) positive control: a header- and trailer-corrupted copy makes pdftotext exit 1 with a parse error and the original hash is unchanged; (3) backed: pdftotext version 26.09.0 is in retained output, each claim sentence has a retained command plus output; (4) bound: component_id poppler is the winner, tool_versions 26.09.0, pin_matches True. Residual (disclosed): one small PDF; the geometry check is page size plus presence of coordinate attributes, not exact word positions.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:44:44Z",
+      "reviewer": {
+        "identity_sha256": "739ff768866f471b76d2597625e6fdcdc20a33829e1c3b6df3b3c8aa754cc057",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--poppler--use--20260925"
+}

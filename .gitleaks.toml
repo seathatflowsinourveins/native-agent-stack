@@ -226,6 +226,32 @@ regexes = [
   '''^\s*"(?:[A-Za-z0-9_$][A-Za-z0-9_\-./$]*[./][A-Za-z0-9_\-.$]*|\.[A-Za-z0-9_\-./$]+|Dockerfile|LICENSE|Makefile|SHA256SUMS)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
 ]
 
+# 2026-09-24 (round-7 tightening, Codex "not ready" on the shared allowlist above):
+# blueprints/us-equities/adaptive-paper/source-hashes.json maps engine/test file paths
+# under this module (several path-shaped keys contain "credential", e.g.
+# credential_guard.py) to their sha256, which the shared filename-shaped-key allowlist
+# above would also have suppressed for a real hex secret under a credential-shaped key
+# such as "credential.key" in this same file (that allowlist's key alternative accepts
+# any filename-shaped key, not only a real repo path). This dedicated, rule-scoped
+# allowlist instead requires the ENTIRE key to be a repo path specifically under
+# blueprints/us-equities/adaptive-paper/ or tests/ (no path segment may start with ".",
+# so "." and ".." segments are refused), ending in .py, .json, .sh, or .txt, mapped to
+# exactly 64 lowercase hex. tests/test_adaptive_paper_source_hashes_manifest.py (stdlib
+# only, run by CI's validate job) enforces that every entry in this exact file really is
+# that path's own sha256 and that no other key shape exists, so a secret cannot sit in
+# this manifest without failing that test regardless of this allowlist.
+# scripts/validate.py only pins this file's own hash, not each entry. A credential-shaped key (api_key, credential.key, ...)
+# in this same file, a non-hex value, a second secret on the same line, or this same
+# path-keyed shape in any other file, is still detected (tests/test_gitleaks_config.py).
+[[rules.allowlists]]
+description = "Content digests (64-hex) under adaptive-paper/tests repo-path keys in the pinned source-hashes manifest"
+condition = "AND"
+paths = ['''^blueprints/us-equities/adaptive-paper/source-hashes\.json$''']
+regexTarget = "line"
+regexes = [
+  '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/(?:[A-Za-z0-9_\-][A-Za-z0-9_\-.]*/)*[A-Za-z0-9_\-][A-Za-z0-9_\-.]*\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',
+]
+
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
 # to the WHOLE line and keyed on the literal "next_page_token" field name (not just
 # the cursor's base64-with-padding shape): an earlier revision used
@@ -290,6 +316,24 @@ regexes = [
   '''^\s*"key":\s*"(?:ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db|ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0|125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1|683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9)",?\s*$''',
 ]
 
+# 2026-09-28: PR #400 retained the full upstream ai-memory report in a separate
+# returned-results file. Its seven reviewed "key" values are SHA-256 rejection
+# fingerprints, not credentials: ai-memory source 62e73148, auto_improve.rs
+# rejection_fingerprint, reader.rs auto_improve_report aggregation. Keep the old
+# four-value/September-23 exception above unchanged. This independent AND rule
+# permits only these values on whole "key" lines in this one returned report.
+# tests/test_gitleaks_config.py test_e3/e4/e5 cover the positive and adverse cases.
+[[rules.allowlists]]
+description = "Seven reviewed ai-memory rejection digests in the September 27 returned report"
+condition = "AND"
+paths = [
+  '''^observability/memory-scheduled-results-20260927\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''^\s*"key":\s*"(?:ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db|ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0|125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1|683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9|20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088|a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8|d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555)",?\s*$''',
+]
+
 [[rules]]
 id = "sourcegraph-access-token"
 
@@ -301,15 +345,47 @@ id = "sourcegraph-access-token"
 # this rule only, and only a whole anchored "pin" line whose value is a 40-hex id with an optional
 # "<version> @ " prefix; any other field holding a 40-hex value in the same file is still detected
 # (tests/test_gitleaks_config.py test_d/test_d2).
+# 2026-09-26: the landscape-sweep-20260926 record retains the run's layer input for code-navigation exactly
+# as read (inputs/SHA256SUMS). It names Sourcegraph (the SCIP index) and holds the same catalog "pin" lines,
+# so the same anchored pin-line exemption covers that one file too (test_d5).
 [[rules.allowlists]]
 description = "Git commit ids under the \"pin\" field of the dated SOTA manifest"
 condition = "AND"
 paths = [
   '''^catalogs/sota-convergence/manifest-20260923\.json$''',
+  '''^evidence/artifacts/landscape-sweep-20260926/inputs/code-navigation\.json$''',
 ]
 regexTarget = "line"
 regexes = [
   '''^\s*"pin":\s*"(?:[0-9A-Za-z.+_-]+ @ )?[0-9a-f]{40}",?\s*$''',
+]
+
+# 2026-09-26 (landscape-sweep-20260926): catalogs/sota-convergence/manifest-20260926.json names the rule
+# id "sourcegraph-access-token" once, in a secrets-credentials refuter's reasoning, so the rule's keyword
+# makes every 40-hex value in the file a candidate. The lane's own free-text commit ids were shortened to
+# 12 characters before the manifest was built. The only 40-hex values left are the 39 distinct git commit
+# ids of the 60 "pin" values that the generator copies from the catalog layer files, in free-form shapes
+# ("v0.44.0; source <id>", "<id> (blueprints/...)", "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source <id>").
+# Exempted: that exact file, this rule only, and only a finding whose secret is exactly one of those
+# reviewed ids, pinned by value like the ai-memory fingerprints above. Any other 40-hex value in the file
+# stays detected, on a pin line or elsewhere: an unreviewed id, an uppercase variant, or a legacy
+# Sourcegraph token. So does an sgp_-prefixed token, and so do the same ids in any other file
+# (tests/test_gitleaks_config.py test_d3/test_d4).
+# 2026-09-29 (landscape-sweep-20260929): the same shape. The rule id is named again in the secrets-credentials
+# refuters' reasoning, the lane's free-text commit ids were again shortened to 12 characters before the manifest
+# was built (the retained returns hold no bare 40-hex value), and the 60 "pin" values the generator copies from
+# the catalog layer files are the same 39 distinct commit ids, checked value by value against the list below
+# (no id added, none removed). Only the exact path of that manifest joins the allowlist.
+[[rules.allowlists]]
+description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 and 2026-09-29 SOTA manifests"
+condition = "AND"
+paths = [
+  '''^catalogs/sota-convergence/manifest-20260926\.json$''',
+  '''^catalogs/sota-convergence/manifest-20260929\.json$''',
+]
+regexTarget = "secret"
+regexes = [
+  '''^(?:15969ed2471a177d938c889255d2f23f07e4742a|1973f6165bee212acf656ed2f9cb0af86d4f2a18|1b0a49d2792a9432a3aca3fcb617ce7a630d905e|1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335|264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc|26b251a451ce941d3d7a55e6487bcb7f16b5ad48|32792afe5b0183fce10532d3a023f5cfa8612d09|356dfa03278058b02df42124f243c2c345329dae|3c247d78c603fc13d274fda1aa26749e7c8c3710|42334f26d7025d905678f9075b079fc65f9beaf9|62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6|64285b9dd6c606804753235fe992bcf25b9856ee|6976e020b894f6a6777704df2b8c4458cb291ae9|6aa24fdef7e3c3f48b19482535693f5796f2b598|702f4814fe54fabff350d43cb753ae3e47c0c276|7a391566ac827e0d8c269b91f2415c16b0a32a84|7e7eefe28315f3de3aa4dc75cc8b6524f70829cb|8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe|918fa838d99eb3703fe9bc963891619608aa35b4|985ef30ad3ac774218c5ac516b4cb0aa2655730f|a2f4a21e22e5c266278271b6591c70dbc485aea8|abe44344c56cf4bfb5443e0debca7e39342f6e7a|be5f129326efe4864d666d263d249214bd9b4ed2|beccec0d0c451b7aa3e4530416ac431b3c035c69|bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d|c6fbd1c5932df2494ffa0020af5a9fbe80b82143|c840d6f626be7ba418da60aeb0f2080413562451|c99fcf71349e2df4a7a1033ee85ca2e9ced9abee|cc4cb3b7ba50ae250e621983c2779047fb16bb28|d8cdaa33fda8df955cc76ef58a280f68f4cd43fa|db52e28f4d9ded852ab3942cea316258ae4ef346|dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a|dd6ee538aee0f548d4a6b520118f875431fd749e|e620d8572a1e62c9ec07df8cbc8f5c432cd84325|e675ef30369f5ee9f68b04606080c519adf3be69|ec4dfc6953784dc45b79de3147530c89868c6e26|efa08fda9ec485d80292d0487a77939c087dedcc|f29d27def7ee0adb10e7e2fff080ba204054dd4b|f2e500144b0a6090d63723f94453b32717e5fd23)$''',
 ]
 
 # Same named-field allowlist as generic-api-key above (source_head_pin and friends

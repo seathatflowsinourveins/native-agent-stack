@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "status": "prerequisites_present",
+  "platform": {
+    "os": "linux",
+    "architecture": "x86_64",
+    "python": "3.13.15",
+    "supported": true
+  },
+  "manifest": {
+    "status": "valid",
+    "schema_version": 1
+  },
+  "profiles": [
+    {
+      "id": "token-efficiency",
+      "commands": [
+        {
+          "name": "codex",
+          "present": true
+        },
+        {
+          "name": "claude",
+          "present": true
+        },
+        {
+          "name": "rtk",
+          "present": true
+        },
+        {
+          "name": "repomix",
+          "present": true
+        },
+        {
+          "name": "headroom",
+          "present": true
+        },
+        {
+          "name": "toon",
+          "present": true
+        },
+        {
+          "name": "ccusage",
+          "present": true
+        },
+        {
+          "name": "qmd",
+          "present": true
+        },
+        {
+          "name": "markitdown",
+          "present": true
+        },
+        {
+          "name": "serena",
+          "present": true
+        },
+        {
+          "name": "socraticode",
+          "present": true
+        },
+        {
+          "name": "ai-memory",
+          "present": true
+        },
+        {
+          "name": "mcporter",
+          "present": true
+        }
+      ],
+      "recipes": [
+        {
+          "path": "docs/token-efficiency-stack.md",
+          "present": true
+        },
+        {
+          "path": "docs/token-session-handbook.md",
+          "present": true
+        },
+        {
+          "path": "recipes/README.md",
+          "present": true
+        },
+        {
+          "path": "recipes/native-upgrades-20260921.md",
+          "present": true
+        }
+      ],
+      "status": "prerequisites_present",
+      "pinned_versions": [
+        {
+          "id": "codex",
+          "pinned_version": "0.155.1",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "claude-code",
+          "pinned_version": "2.1.281",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "rtk",
+          "pinned_version": "0.50.0",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "context-mode",
+          "pinned_version": "1.0.169",
+          "checked": false,
+          "matches_pin": null
+        },
+        {
+          "id": "repomix",
+          "pinned_version": "1.18.1",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "headroom",
+          "pinned_version": "0.37.0",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "toon",
+          "pinned_version": "4.1.1",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "ccusage",
+          "pinned_version": "20.0.24",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "qmd",
+          "pinned_version": "2.8.3",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "markitdown",
+          "pinned_version": "0.1.8",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "serena",
+          "pinned_version": "2.0.0.dev0",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "socraticode",
+          "pinned_version": "1.14.0",
+          "checked": false,
+          "matches_pin": null
+        },
+        {
+          "id": "ai-memory",
+          "pinned_version": "2.4.1",
+          "checked": true,
+          "matches_pin": true
+        },
+        {
+          "id": "mcporter",
+          "pinned_version": "0.14.1",
+          "checked": true,
+          "matches_pin": true
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "runtime_acceptance_verified": false,
+  "limitations": [
+    "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+    "Git comparison reports source identity only; changed worktree files are not inspected.",
+    "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json and AGENTS.md, and this checkout's .claude/settings.json and .codex/config.toml whole and in-process, and emits no value from them: fixed booleans and hook-event counts only. It opens no credential store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; environment variables only locate the client homes, and two opt-ins are checked by name.",
+    "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project config.toml features and command-line overrides, can override the user scope read here; plugin revisions, hook and project trust, Claude MCP registrations, MCP server startup and a useful native call remain the clients' own checks (/mcp, /hooks, the plugin doctor).",
+    "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this platform's pins file (adoption/pins-<os>-<arch>.json): the declared command, located on PATH only, run with stdin from /dev/null in its own process group. That group is killed once the probe exits, on interruption (SIGINT, SIGTERM or SIGHUP; a signal this check started with ignored, as under nohup, stays ignored), and after its pin's timeout_seconds or 30s (TERM, then KILL 2s later); a descendant that leaves the group, for example by starting its own session, is not reached. Only a probe that exits 0 has its stdout and stderr text compared against the pinned version; a nonzero exit is reported as not matching. A component with no pins entry for this platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe whose declared method is not \"exec\"."
+  ],
+  "client_wiring": {
+    "claude": {
+      "rtk_hook": true,
+      "ai_memory_hook_events": 8,
+      "context_mode_plugin_enabled": true,
+      "subagent_spawn_depth_1": true,
+      "workflow_concurrency_set": true,
+      "effort_level_env_unset": true,
+      "agent_teams_off": true
+    },
+    "project": {
+      "settings_depth_and_concurrency": true,
+      "codex_mcp_servers_present": {
+        "serena": false,
+        "socraticode": false,
+        "ai-memory": false
+      }
+    },
+    "codex": {
+      "rtk_instructions": true,
+      "context_mode_plugin_enabled": true,
+      "mcp_servers_present": {
+        "serena": true,
+        "socraticode": true,
+        "ai-memory": true
+      },
+      "hooks_feature_enabled": true,
+      "ai_memory_hook_events": 7
+    },
+    "complete": true
+  },
+  "git": {
+    "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+    "current_commit": "5c1961e49b89dd56ef5626950a5448735caabe4c",
+    "comparison": "baseline_differs"
+  }
+}

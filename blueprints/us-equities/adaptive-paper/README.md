@@ -110,10 +110,27 @@ this account's observed entitlement or a1000-trades guarantee.
 ## Lifecycle and native boundaries
 
 The SQLite ledger fsyncs intent and request reservations before sending. Stable
-IDs, cumulative fill accounting and an account-specific exclusive lock prevent
-blind retries and competing writers. Shared STOP blocks new entries; confirmed
-owned exits remain available. Fresh startup requires a flat account with no open
-orders. Periodic and final snapshots compare positions and cash to the ledger.
+IDs, per-execution fill accounting (cumulative averages only where an execution is
+missing) and an account-specific exclusive lock prevent blind retries and competing
+writers. Shared STOP blocks new entries; confirmed owned exits remain available. Fresh
+startup requires a flat account with no open orders. Periodic and final snapshots
+compare positions and cash to the ledger.
+
+Engine release of 2026-09-24 (items 2-4 of the data and execution convergence
+record): each broker execution is booked at its own quantity and price, with fill gaps
+closed from the order's FILL activities (README-native.md, README-safety.md); every
+strategy order and position callback is guarded, because rc5 discards an exception
+raised there (README-native.md); and on SIP the engine tracks per-symbol trading halts,
+LULD pauses and quotation-only periods from the status stream plus a startup seed, and
+while a symbol is halted neither lane sends it an entry or a new exit (stop, trailing,
+gap-risk and forced exits wait for the resume) nor re-prices its resting exit
+(README-native.md, README-transport.md, README-mover.md). The quote's own condition
+flag blocks entries only, and a halt only the startup seed asserts expires (at its
+resumption time, or 12 minutes after a LULD pause began). The evidence is synthetic
+fixtures and local integration against the real rc5 `LiveNode`; no paper session has
+run this release yet. It changes engine files
+that a forward protocol pins, so such a protocol needs a new version before it counts
+sessions run on this release.
 
 Stream authentication/subscription acknowledgement, queue integrity, per-symbol
 freshness and connection generations are observed explicitly. Models never own
@@ -145,6 +162,19 @@ python runner.py paper --trial dated-unique-trial --env-file "$PAPER_ENV_FILE" -
 python runner.py recover --env-file "$PAPER_ENV_FILE" --output "$PRIVATE_OUTPUT/recovery.json"
 python benchmark.py --output "$PRIVATE_OUTPUT/synthetic-capacity.json"
 ```
+
+On macOS the key pair can live in the login Keychain instead (store it once with
+`secret set APCA_API_KEY_ID` and `secret set APCA_API_SECRET_KEY`). `secret run`
+hands it to that one command, which removes it from its own environment as it reads it:
+
+```sh
+secret run APCA_API_KEY_ID APCA_API_SECRET_KEY -- python runner.py preflight --credentials keychain-env --output "$PRIVATE_OUTPUT/preflight.json"
+```
+
+`market_research.py` takes the same `--credentials keychain-env`. Both sources are
+paper-only: an `APCA_API_BASE_URL` in the environment or env file that is not
+`https://paper-api.alpaca.markets` is refused before any request. See the
+2026-09-25 addendum to `docs/decisions/2026-09-22-broker-credential-handling.md`.
 
 `paper` is bounded and fails closed when the regular session, account, data,
 frozen configuration or durable state is not ready. No live endpoint is exposed.
@@ -184,10 +214,14 @@ writes), never reads an env file or broker credentials, and never talks to
 Alpaca. It binds loopback-only and serves `/metrics`:
 
 ```sh
-python metrics.py --ledger "$STATE_ROOT/<account-fingerprint>/adaptive/ledger.sqlite3"
+python metrics.py --ledger "$STATE_ROOT/<account-fingerprint>/adaptive/ledger.sqlite3" \
+  --file-sd "$CONFIG_ROOT/adaptive-paper-targets.json"
 ```
 
-`--port` overrides the default `18890`; the host is always `127.0.0.1`.
+`--file-sd` is required to serve: the backend scrapes only registered
+exporters. `--no-file-sd` serves without registering, which means the exporter
+is never scraped or alerted on, so use it only for local inspection. `--port`
+overrides the default `18890`; the host is always `127.0.0.1`.
 `--trial-json` overrides the default sibling `trial.json` path if state is
 laid out differently. See the module docstring for the exact source of every
 metric and the two gaps documented below.
@@ -206,16 +240,31 @@ absent on a bad `--ledger` path or a permissions problem). **Not exported**
 `paper_reconciliation_last_success_timestamp_seconds` and
 `paper_request_budget_wait_exceeded_total`.
 
-The observability backend profile's Prometheus scrapes `127.0.0.1:18890` as
-job `adaptive-paper`, and its rules add the `equities-broker-path` alert
-group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
+The observability backend profile's Prometheus scrapes job `adaptive-paper`
+only at exporters registered in its `file_sd` list,
+`<config-root>/adaptive-paper-targets.json`. `configure.py` ships that list
+as `[]`.
+
+Start the exporter with `--file-sd` pointing at that list:
+
+- It registers its own `127.0.0.1:<port>` target once it serves.
+- It removes that target only on a clean stop (SIGTERM or SIGINT) of a trial
+  that finished with a passing status: phase `finished` with `passed` or
+  `completed_no_signals`.
+- Any other state stays registered, so `EquitiesPaperMetricsMissing` fires:
+  a crashed or killed exporter, an unfinished trial, or a finished trial with
+  any other, missing or unknown status. After recovering that
+  trial, remove the target with `metrics.py --deregister --port <port>
+  --file-sd <list>`.
+
+With nothing registered, the alert is silent. The profile's rules add the
+`equities-broker-path` alert group (`EquitiesOrderStateDivergence`, `EquitiesReconciliationFailed`,
 `EquitiesRequestBudgetExhausted`, `EquitiesLedgerFrozen`,
 `EquitiesPaperMetricsMissing`, `EquitiesLedgerUnreadable`), routed to the
 existing local ntfy receiver by `scope: equities-broker`. It also excludes
-this job from the pre-existing `EcosystemServiceUnavailable` rule, since this
-exporter is a separate process not started by `install.py`/`configure.py`
-and would otherwise leave that generic rule firing permanently whenever no
-paper trial is running. See
+this job from the generic `EcosystemServiceUnavailable` rule. A registered
+exporter that is down therefore alerts once, as `EquitiesPaperMetricsMissing`,
+with wording matched to the trial lifecycle. See
 [`observability/backends/README.md`](../../../observability/backends/README.md#adaptive-paper-broker-path-alerts)
 and the templates under `observability/backends/templates/`. Run `metrics.py`
 as its own process alongside a trial; it is not started by `runner.py` and

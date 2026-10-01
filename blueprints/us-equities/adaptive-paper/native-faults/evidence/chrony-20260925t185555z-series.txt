@@ -1,0 +1,90 @@
+2026-09-25T18:55:55.634639698Z
+Reference ID    : B97DBE39 (185.125.190.57)
+System time     : 0.000000001 seconds fast of NTP time
+Last offset     : +0.271597475 seconds
+RMS offset      : 0.255186796 seconds
+Frequency       : 8104.009 ppm fast
+Residual freq   : +3783.916 ppm
+Skew            : 89.622 ppm
+#* PHC0                          0   3   377     4  -1316ns[-4060ns] +/- 4953us
+
+2026-09-25T18:56:05.390788780Z
+Reference ID    : A7F83EC9 (167.248.62.201)
+System time     : 0.000000000 seconds fast of NTP time
+Last offset     : +0.259173214 seconds
+RMS offset      : 0.255588233 seconds
+Frequency       : 8104.009 ppm fast
+Residual freq   : +3822.716 ppm
+Skew            : 89.622 ppm
+#* PHC0                          0   3   377     6  -1379ns[-3736ns] +/- 4028us
+
+2026-09-25T18:56:15.409086519Z
+Reference ID    : 50484330 (PHC0)
+System time     : 0.000029005 seconds fast of NTP time
+Last offset     : -0.216363743 seconds
+RMS offset      : 0.096656151 seconds
+Frequency       : 12.148 ppm slow
+Residual freq   : -7978.868 ppm
+Skew            : 0.806 ppm
+#* PHC0                          0   3   377     8    -54ms[ -271ms] +/- 3571us
+
+2026-09-25T18:56:25.420680555Z
+Reference ID    : A7F83EC9 (167.248.62.201)
+System time     : 0.000000000 seconds fast of NTP time
+Last offset     : +0.259173214 seconds
+RMS offset      : 0.255588233 seconds
+Frequency       : 8104.009 ppm fast
+Residual freq   : +3822.716 ppm
+Skew            : 89.622 ppm
+^* 167.248.62.201                3   6   273    26    +24ms[ +283ms] +/-   30ms
+
+2026-09-25T18:56:35.437194331Z
+Reference ID    : 50484330 (PHC0)
+System time     : 0.008250407 seconds slow of NTP time
+Last offset     : +0.007162482 seconds
+RMS offset      : 0.086920060 seconds
+Frequency       : 12.148 ppm slow
+Residual freq   : -6404.042 ppm
+Skew            : 0.806 ppm
+^* 167.248.62.201                3   6   273    36    +24ms[ +283ms] +/-   30ms
+
+2026-09-25T18:56:45.453799933Z
+Reference ID    : 50484330 (PHC0)
+System time     : 0.013851796 seconds fast of NTP time
+Last offset     : +0.022350369 seconds
+RMS offset      : 0.082761958 seconds
+Frequency       : 12.148 ppm slow
+Residual freq   : -3599.419 ppm
+Skew            : 0.806 ppm
+#* PHC0                          0   3   377     6    +38ms[  +61ms] +/- 2050us
+
+2026-09-25T18:56:55.469166220Z
+Reference ID    : 50484330 (PHC0)
+System time     : 0.000000224 seconds fast of NTP time
+Last offset     : +0.038390875 seconds
+RMS offset      : 0.079447925 seconds
+Frequency       : 12.042 ppm slow
+Residual freq   : +0.062 ppm
+Skew            : 1.051 ppm
+^* 167.248.62.201                3   6   273    56    +24ms[ +283ms] +/-   30ms
+
+2026-09-25T18:57:05.242586570Z
+Reference ID    : 50484330 (PHC0)
+System time     : 0.000000456 seconds fast of NTP time
+Last offset     : +0.000000325 seconds
+RMS offset      : 0.075370923 seconds
+Frequency       : 11.989 ppm slow
+Residual freq   : +0.007 ppm
+Skew            : 0.732 ppm
+^* 167.248.62.201                3   6   167     1    +42ms[ +286ms] +/-   30ms
+
+2026-09-25T18:57:15.258572489Z
+Reference ID    : A7F83EC9 (167.248.62.201)
+System time     : 0.000000000 seconds slow of NTP time
+Last offset     : +0.243213281 seconds
+RMS offset      : 0.254377842 seconds
+Frequency       : 10885.896 ppm fast
+Residual freq   : +1027.941 ppm
+Skew            : 1790.742 ppm
+#* PHC0                          0   3   377     4   -260ms[ -273ms] +/- 9036us
+

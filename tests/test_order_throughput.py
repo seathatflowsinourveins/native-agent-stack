@@ -1092,6 +1092,23 @@ class EvidenceFileTests(unittest.TestCase):
         self.assertEqual(rows[200]["submit_cancel_pairs_per_minute_max"], 100)
         self.assertEqual(rows[1000]["round_trips_per_minute_two_submits"], 500)
 
+    def test_a_later_trial_receipt_does_not_change_the_dated_evidence(self):
+        # The 2026-09-24 record counts only the trial files it was built from; a trial committed later
+        # (for example ext-20260928) must not move its totals.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for relative in evidence.DATED_TRIAL_FILES + evidence.UNATTRIBUTED:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((evidence.ROOT / relative).read_bytes())
+            later = root / evidence.TRIALS / "later-trial" / "mover-paper.json"
+            later.parent.mkdir(parents=True)
+            later.write_text(json.dumps({"http": [{"kind": "read", "headers": {"x-ratelimit-limit": "200",
+                                                                               "x-ratelimit-remaining": "1"}}]}))
+            files, totals, _ = evidence.observations(root)
+        self.assertEqual(totals, {"data:10000": 14, "trading:200": 705})
+        self.assertNotIn(later.relative_to(root).as_posix(), [f["path"] for f in files])
+
 
 class PullRequestReviewTests(unittest.TestCase):
     """Regressions for the PR #165 review threads."""

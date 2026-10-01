@@ -1,0 +1,422 @@
+{
+ "gpt6-AB": [
+  {
+   "command": "/bin/bash -lc 'rtk cat CLAUDE.md AGENTS.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp.md"
+   }
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -e '\"'^'\"' CLAUDE.md -e 'Carry authorized' -e 'loaded' -e 'Workflow' AGENTS.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -C 3 -e 'Upstream verification' -e 'headless' -e 'plugin' -e 'MCP' -e 'license' -e 'incumben' -e 'unconfirmed' -e 'unattended' docs/harness-defaults.md docs/token-practice.md examples/claude-native/workflows/README.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp"
+   }
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -A 11 '\"'^## Upstream verification'\"' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -e 'Carry authorized' -e 'Keep historical' -e 'native loaded' -e 'claiming a plugin' AGENTS.md CLAUDE.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+   }
+  },
+  {
+   "web_search": "'discovery cache' in https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "action": {
+    "type": "find_in_page",
+    "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+    "pattern": "discovery cache"
+   }
+  },
+  {
+   "web_search": "https://raw.githubusercontent.com/anthropics/claude-code/v2.1.283/CHANGELOG.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://raw.githubusercontent.com/anthropics/claude-code/v2.1.283/CHANGELOG.md"
+   }
+  }
+ ],
+ "gpt6-BA": [
+  {
+   "command": "/bin/bash -lc 'rtk proxy nl -ba CLAUDE.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc 'rtk proxy nl -ba AGENTS.md'",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -C 4 'Upstream verification|incumb|licens|headless|unconfirmed|plugin|MCP|active|clarif|ask' docs/harness-defaults.md docs/acceptance-evidence-policy.md examples/claude-native/workflows/README.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp.md"
+   }
+  },
+  {
+   "command": "/bin/bash -lc \"rtk rg -n -A 24 '\"'^## Upstream verification'\"' docs/harness-defaults.md\"",
+   "exit": 0,
+   "outside_paths": []
+  },
+  {
+   "web_search": "https://code.claude.com/docs/en/mcp",
+   "action": {
+    "type": "open_page",
+    "url": "https://code.claude.com/docs/en/mcp"
+   }
+  },
+  {
+   "web_search": "'directory of skills'",
+   "action": {
+    "type": "find_in_page",
+    "pattern": "directory of skills"
+   }
+  },
+  {
+   "web_search": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "action": {
+    "type": "open_page",
+    "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+   }
+  },
+  {
+   "web_search": "'is a command you type'",
+   "action": {
+    "type": "find_in_page",
+    "pattern": "is a command you type"
+   }
+  }
+ ],
+ "claude-AB": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/adjudication-inputs/x9.AB.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/packets/x9.AB.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/packets/x9.AB.json",
+    "offset": 410,
+    "limit": 530
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "gpt-|\\bo3\\b|\\bo4\\b|astra|opus|sonnet|haiku|fable|mythos|codex|claude's|lane|provenance|refutation|\"model\"|/home|/Users|/tmp|/root",
+    "path": "<attempt2>/adjudication-inputs/x9.AB.json",
+    "-i": true,
+    "output_mode": "content"
+   },
+   "outside_paths": [
+    "/Users",
+    "/home",
+    "/root",
+    "/tmp"
+   ]
+  },
+  {
+   "tool": "Glob",
+   "input": {
+    "pattern": "*",
+    "path": "<root>"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/AGENTS.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Upstream verification and compounding learning",
+    "path": "<root>/docs/harness-defaults.md",
+    "output_mode": "content",
+    "-A": 30
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "`/(mcp|context|plugin)`|/reload-plugins|unconfirmed",
+    "path": "<root>",
+    "glob": "*.md",
+    "output_mode": "content",
+    "head_limit": 60
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/recipes/claude-native-profile.md",
+    "offset": 262,
+    "limit": 22
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/token-session-handbook.md",
+    "offset": 55,
+    "limit": 20
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "[Ww]ord budget|CLAUDE\\.md|headless|workflow child|children",
+    "path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "output_mode": "content",
+    "head_limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "budget|words",
+    "path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/foundation-closure-20260921.md",
+    "offset": 104,
+    "limit": 12
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  }
+ ],
+ "claude-BA": [
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/adjudication-inputs/x9.BA.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/packets/x9.BA.json"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<attempt2>/packets/x9.BA.json",
+    "offset": 410,
+    "limit": 523
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/CLAUDE.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Glob",
+   "input": {
+    "pattern": "*",
+    "path": "<root>"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/AGENTS.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "Upstream verification and compounding learning",
+    "path": "<root>/docs/harness-defaults.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "`/(mcp|context|plugin)`|/plugin\\b|ListPlugins|user-typed|report it as unconfirmed",
+    "path": "<root>",
+    "output_mode": "files_with_matches",
+    "glob": "*.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/harness-defaults.md",
+    "offset": 50,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "`/(mcp|context|plugin)`|/plugin\\b|ListPlugins",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "*.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/recipes/claude-native-profile.md",
+    "offset": 262,
+    "limit": 80
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)word budget|headless|workflow child|children|CLAUDE\\.md",
+    "path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)plugin is active|claiming a plugin|before claiming|unconfirmed",
+    "path": "<root>",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/docs/decisions/2026-09-27-claude-harness-settings.md",
+    "offset": 1,
+    "limit": 40
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)ask the user|ask for|could not (verify|confirm)|cannot (verify|confirm|settle)|not verified|say so|report (it|what)|unverified",
+    "path": "<root>/examples/claude-native",
+    "output_mode": "content",
+    "-n": true,
+    "glob": "*.md"
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Grep",
+   "input": {
+    "pattern": "(?i)headless|no user|workflow child|children load|loads? (in|at) (every|launch)",
+    "path": "<root>/examples/claude-native/workflows/README.md",
+    "output_mode": "content",
+    "-n": true
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "Read",
+   "input": {
+    "file_path": "<root>/examples/claude-native/workflows/README.md",
+    "offset": 40,
+    "limit": 30
+   },
+   "outside_paths": []
+  },
+  {
+   "tool": "advisor",
+   "input": {},
+   "outside_paths": []
+  }
+ ]
+}

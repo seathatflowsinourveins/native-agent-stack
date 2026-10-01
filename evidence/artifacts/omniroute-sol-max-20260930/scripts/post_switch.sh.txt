@@ -1,0 +1,39 @@
+#!/bin/bash
+# post_switch.sh SWITCH_DIR -- the read-backs and probes that follow the 20128 restart (all read-only except the probe requests, which are tiny model calls):
+# the full owner record (gateway_record.py, schema omniroute-gateway-record/2, both ports), the units' states, the unit file before and after, the probe
+# gate (with the framework-lane request, sent only if the bare id answers 200 on 20128), and the call_logs effort counts since the restart.
+set -u
+SWITCH_DIR="$1"
+NS=<NS>
+S=<SCRATCHPAD>
+UNITS=<HOME>/.config/systemd/user
+TOOLS=<TOOLS>
+stamp() { date -u +%FT%TZ; }
+cd /tmp || exit 1
+python3 "$S/gateway_record_main.py" > "$NS/owner-record-after-switch.json" 2> "$NS/owner-record-after-switch.err"; echo "owner record rc=$?"
+{
+  echo "observed_utc=$(stamp)"
+  for u in omniroute omniroute-fw hindsight-live; do
+    echo "--- $u.service"
+    systemctl --user show "$u.service" -p ActiveState -p SubState -p MainPID -p NRestarts -p ExecMainStartTimestamp
+  done
+  echo "--- unit file sha256 (values-free files)"
+  ( cd "$UNITS" && sha256sum omniroute.service omniroute-fw.service )
+  echo "--- rollback copies in the switch directory"
+  ( cd "$SWITCH_DIR" && sha256sum omniroute.service && ls -la | awk '{print $1, $5, $9}' | tail -n +2 )
+  echo "--- BUILD_SHA and shim of each prefix"
+  for p in omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 omniroute-3.8.51-2f42a9ac-pr13788-affinity2 omniroute-3.8.51-2f42a9ac-pr13788; do
+    echo "$p BUILD_SHA=$(cat $TOOLS/$p/lib/node_modules/omniroute/dist/BUILD_SHA) shim/lsof sha256=$(sha256sum $TOOLS/$p/shim/lsof | cut -c1-64)"
+  done
+  echo "--- health"
+  for port in 20128 20129; do echo "$port: $(curl -s -m 5 http://127.0.0.1:$port/api/health)"; done
+  echo "--- serve process arguments per unit (prefix names only)"
+  for u in omniroute omniroute-fw; do
+    pid=$(systemctl --user show "$u.service" -p MainPID --value); echo "$u: $(ps -o args= -p "$pid" | grep -o 'omniroute-[A-Za-z0-9._-]*' | head -1)"
+  done
+} > "$NS/readback-after-switch.txt" 2>&1
+diff -u "$SWITCH_DIR/omniroute.service" "$UNITS/omniroute.service" > "$NS/unit-before-after.diff"; echo "unit diff lines: $(wc -l < "$NS/unit-before-after.diff")"
+python3 "$NS/sol61-harness/probe_gate.py" after-B3 --lane > "$NS/probe-gate-after-switch.json" 2> "$NS/probe-gate-after-switch.err"; echo "probe gate rc=$?"
+since=$(head -1 "$NS/readback-after-switch.txt" | cut -d= -f2)
+python3 "$NS/sol61-harness/calllog_effort_read.py" omniroute counts "$(python3 -c "import datetime; print((datetime.datetime.strptime('$since','%Y-%m-%dT%H:%M:%SZ') - datetime.timedelta(minutes=3)).strftime('%Y-%m-%dT%H:%M:%SZ'))")" gpt-6 > "$NS/calllog-counts-after-switch.json" 2>&1; echo "counts rc=$?"
+echo "[$(stamp)] post_switch done"

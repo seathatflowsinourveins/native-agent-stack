@@ -1,0 +1,13 @@
+host ByteRover paths before the run (UTC 2026-09-26T04:54:32Z):
+absent ~/.config/brv
+absent ~/.local/share/brv
+absent ~/.local/state/brv
+absent ~/.cache/brv
+absent ~/.config/configstore
+host ByteRover paths after the run (UTC 2026-09-26T04:56:43Z):
+absent ~/.config/brv
+absent ~/.local/share/brv
+absent ~/.local/state/brv
+absent ~/.cache/brv
+absent ~/.config/configstore
+ByteRover processes after the run: 0

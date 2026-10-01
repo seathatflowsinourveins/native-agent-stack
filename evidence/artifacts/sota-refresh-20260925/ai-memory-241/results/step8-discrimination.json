@@ -1,0 +1,1 @@
+{"discrimination": {"claude-settings.json": {"real_path_only": true, "real_lines_changed": 8, "flag_change_detected": true, "leftover_old_path_detected": true}, "codex-hooks.json": {"real_path_only": true, "real_lines_changed": 7, "flag_change_detected": true, "leftover_old_path_detected": true}}, "pass": true}

@@ -1,0 +1,763 @@
+{
+ "schema_version": 1,
+ "id": "sota-refresh-20260925-ai-memory",
+ "unit": "ai-memory",
+ "host": "nativestack-5975wx-20260925",
+ "date_utc": "2026-09-25",
+ "baseline_version": "2.3.2",
+ "candidate_version": "2.4.0",
+ "upstream": {
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "release": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.0",
+  "tag_commit": "b1b25219b507cf56cb7334ac1a408dc9b09eaa50",
+  "tag_object": "5c4350e318942680db1a67f9babd34fabf13bd28",
+  "published_at": "2026-09-21T23:45:13Z",
+  "asset": "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.0/ai-memory-linux-x86_64.tar.gz",
+  "asset_sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "asset_bytes": 15969555,
+  "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+  "attestation": "none (attestations API HTTP 404)",
+  "immutable_release": false
+ },
+ "roles": {
+  "implementer": "Qualification unit of the 2026-09-25 SOTA-refresh workflow: installed the candidate into a new prefix and ran every step below for both arms without touching production.",
+  "verifier": "A separate agent that re-ran the implementer's steps with its own probe code, checked integrity independently and returned the verdict and defects below.",
+  "coordinator": "The coordinating session that performed the production switch and the post-switch checks (coordinator observations, exported as the aggregate facts in cutover.json).",
+  "writing_worker": "The session that assembled this directory; it performed only the read-only production read-back in out/readback.out."
+ },
+ "sanitization": "Session scratch paths are replaced by $IMPL (the unit's scratch directory) and <scratchpad>; the home directory by ~ and the account name by <user>; the GitHub-hosted runner's build path in upstream npm metadata by <github-runner-home>; UUID-shaped identifiers by <uuid:first-8-hex>. Session identifiers, tokens, probe nonces, page text and config values are not present. Files marked byte_identical_to_run_copy are the exact bytes that ran or were written; for the others run_copy_sha256 is the digest of the unsanitized run copy, which stays in session scratch.",
+ "files": [
+  {
+   "path": "aimem_accept.py",
+   "sha256": "20c88e7f5601fee499e219afed12c46f8e832c2c6f008b64ad90f7953fea8ec5",
+   "bytes": 52527,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/aimem_accept.py"
+  },
+  {
+   "path": "fetch_src.py",
+   "sha256": "00682bdf556636ce4c140026199b225133480c0c8f271eef7eac7a20a23c77aa",
+   "bytes": 1668,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/fetch_src.py"
+  },
+  {
+   "path": "out/attest.err",
+   "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+   "bytes": 25,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/attest.err"
+  },
+  {
+   "path": "results/prod-compare-before-after.json",
+   "sha256": "9f4fd4de3017b8d68f64e22820163950200fb45f9dbcdc41621cfc45e626227a",
+   "bytes": 1086,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/prod-compare-before-after.json"
+  },
+  {
+   "path": "results/prod-snapshot-after.json",
+   "sha256": "b40b6f75ab887c7b2fe916a9775aeaf9d4121e6ecefdb1edac10b7ac98234f09",
+   "bytes": 1267,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/prod-snapshot-after.json"
+  },
+  {
+   "path": "results/prod-snapshot-before.json",
+   "sha256": "fed7a70bf9f1e4292cb206c0a028a7b8bb27908063b02bf6aebbb02d74f37920",
+   "bytes": 1269,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/prod-snapshot-before.json"
+  },
+  {
+   "path": "results/step0-install.json",
+   "sha256": "b195bc8be63515c30be6c42cc9438d4efa62288dc5daaa6ad577504b1dfc3e02",
+   "bytes": 1508,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step0-install.json"
+  },
+  {
+   "path": "results/step1-preflight.json",
+   "sha256": "77eaffe5d6dd95fe26a66828c843458c68cbd00feeb75ef4f4f715f1e35385c8",
+   "bytes": 731,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step1-preflight.json"
+  },
+  {
+   "path": "results/step2-backup.json",
+   "sha256": "58980896a62d6b5138355bd3f49041c0bef96514d02f0d0f56fbf22f84f8e6fd",
+   "bytes": 566,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step2-backup.json"
+  },
+  {
+   "path": "results/step3-baseline-attempt1.json",
+   "sha256": "f02198f80a498fbf6adf1ac76acc6bace8a596ca08250a84832d848e04967a0d",
+   "bytes": 5221,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline-attempt1.json"
+  },
+  {
+   "path": "results/step3-baseline-attempt1.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline-attempt1.stderr"
+  },
+  {
+   "path": "results/step3-baseline-attempt1.stdout",
+   "sha256": "f3b410fa8291af4667ab65d9a1a39542e7cf747ab6d08bc89e70da1e7cd5a3ad",
+   "bytes": 4578,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline-attempt1.stdout"
+  },
+  {
+   "path": "results/step3-baseline.json",
+   "sha256": "17628877993779332062f8a3eb2b46c931e6d2f5ca6c267326c74a09eca82ec8",
+   "bytes": 6215,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline.json"
+  },
+  {
+   "path": "results/step3-baseline.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline.stderr"
+  },
+  {
+   "path": "results/step3-baseline.stdout",
+   "sha256": "3f8622be0bdc5d4cceca5fb6b4aa42c0d353ca8f0b97e98fe6fb72f61ee9d0a4",
+   "bytes": 5438,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step3-baseline.stdout"
+  },
+  {
+   "path": "results/step4-rehearsal.json",
+   "sha256": "9dc40ad1ad470653c70a578f2d9bf27dfee489b79b8489547ac7c257eca38bf3",
+   "bytes": 7518,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rehearsal.json"
+  },
+  {
+   "path": "results/step4-rehearsal.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rehearsal.stderr"
+  },
+  {
+   "path": "results/step4-rehearsal.stdout",
+   "sha256": "33c6a3b4fa6a38690c07b50cc2b1309f0605fde4200d6172f6704e5ef9ab5d39",
+   "bytes": 6594,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rehearsal.stdout"
+  },
+  {
+   "path": "results/step4-rollback-check.json",
+   "sha256": "718a475cbade2fabb5d6afbb90517d73d71794d5f7b9c6548e38ee9ee4abe8c4",
+   "bytes": 1710,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rollback-check.json"
+  },
+  {
+   "path": "results/step4-rollback-check.stderr",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rollback-check.stderr"
+  },
+  {
+   "path": "results/step4-rollback-check.stdout",
+   "sha256": "68928b45983da3ef3783a4b1f6fa08886a85c0b99b728a21510c4de91463e666",
+   "bytes": 1528,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/results/step4-rollback-check.stdout"
+  },
+  {
+   "path": "verify/integrity.py",
+   "sha256": "a0dff6a3b174d7bddc02d74b8c5395838bbba70cb55c7c9d4ea32edfd1125ba2",
+   "bytes": 6337,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/integrity.py"
+  },
+  {
+   "path": "verify/integrity.json",
+   "sha256": "1c6a380b0c278024b6767c1c25abc77e97e4111ff2876e7f93edb0a0f0d2cd24",
+   "bytes": 1415,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/integrity.json"
+  },
+  {
+   "path": "verify/prod_check.py",
+   "sha256": "f9e5537d35893e52ef0267f7612ab403b8f3504c7cbdaf2b413bf18415a77a54",
+   "bytes": 4777,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/prod_check.py"
+  },
+  {
+   "path": "verify/prod-check-before-verify.json",
+   "sha256": "d1845283c89d8c0f5b6da406f7c4d0fb67160c7426c4c6523415b3f3024aa8ee",
+   "bytes": 940,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/prod-check-before-verify.json"
+  },
+  {
+   "path": "verify/prod-check-after-verify.json",
+   "sha256": "91598269e537b6ee734ace22db22e439fe216a1805010b578b04ad375f7728a0",
+   "bytes": 939,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/prod-check-after-verify.json"
+  },
+  {
+   "path": "verify/rerun.py",
+   "sha256": "0ac1a3364e31a9542fcc4060978aaeeadcfbfec26cc4042105f1aff82b7e1947",
+   "bytes": 32452,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/rerun.py"
+  },
+  {
+   "path": "verify/rerun.json",
+   "sha256": "da99a610d55b3679b7a55904492fbf9326cc5aeb47f9ee40c75c8823a1c66436",
+   "bytes": 6414,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/rerun.json"
+  },
+  {
+   "path": "verify/rerun.err",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "$IMPL/verify/rerun.err"
+  },
+  {
+   "path": "out/readback.out",
+   "sha256": "390daa56b88e4f69a899ee72891cb1a67839307181603d6905d7250ef7b324df",
+   "bytes": 912,
+   "byte_identical_to_run_copy": true,
+   "run_copy": "<writing-worker-scratch>/aimem-readback.out"
+  }
+ ],
+ "not_published": [
+  {
+   "run_copy": "$IMPL/dl/ai-memory-2.4.0-linux-x86_64.tar.gz",
+   "sha256": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+   "bytes": 15969555,
+   "reason": "Upstream release asset ai-memory-linux-x86_64.tar.gz v2.4.0 (sha256 matches the pin); fetch it from the release."
+  },
+  {
+   "run_copy": "$IMPL/verify/rerun.out",
+   "sha256": "da99a610d55b3679b7a55904492fbf9326cc5aeb47f9ee40c75c8823a1c66436",
+   "bytes": 6414,
+   "reason": "Byte-identical to verify/rerun.json, which is published."
+  },
+  {
+   "run_copy": "$IMPL/src/fetched_at.txt",
+   "sha256": "b974ffa7fb5ea05c633f46e6b06853321bac7704f43cc8c8277f1837b8378c01",
+   "bytes": 21,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/tree_v2.3.2.json",
+   "sha256": "e3338d1f9f7ccabd48417a7c5586fd9ae345397f95248d1f94b53bc4cba1262e",
+   "bytes": 61648,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/tree_v2.4.0.json",
+   "sha256": "99ec3cb8c16550afabb242e8f7ca419676edd34d2cef71389212234620e83573",
+   "bytes": 66821,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.3.2__crates_ai-memory-cli_src_commands_serve.rs",
+   "sha256": "db2a0ee2f74acf107efbc16dce43cc65beee568389a9ef001bf958e9522a4aeb",
+   "bytes": 178687,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.3.2__crates_ai-memory-cli_src_config.rs",
+   "sha256": "7befb32d2ad1cf593546c7538bab87e624964eec5cf585caaaf4139d8280241a",
+   "bytes": 156259,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.3.2__crates_ai-memory-mcp_src_server.rs",
+   "sha256": "b9cbe00cebae965a1769d0de3aab44cd9e7519527dbc2a90628bbf3fb76cfc1d",
+   "bytes": 525440,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_cli.rs",
+   "sha256": "9adac107ff35b9a7591164d3e43a16d0d5a4764875577d4027a23aa51bb31b99",
+   "bytes": 143557,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_backup.rs",
+   "sha256": "4b096e5456005c41b7b4733f143e9e5806bbaa4edce46576f6fba7e69f2ed6e8",
+   "bytes": 1708,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_commit.rs",
+   "sha256": "6180a4f42c631e6dec7e535cedb64349e145e75c080d4c9e45a5f2b5c95f3c86",
+   "bytes": 1350,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_hook.rs",
+   "sha256": "7590d417ffac43b9289fa4670a7d64d7003c50f7b6cd8a1a6f8d6109eba93980",
+   "bytes": 112507,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_hook_capture.rs",
+   "sha256": "ac6b401fee2ffe8fceeb5a953afc21557317ed11e74874f8bb8b39f4dd9c2322",
+   "bytes": 48636,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_hook_drain_process.rs",
+   "sha256": "61a119f954f045a5f5042e008343215a4d0457aa27c30fa34da2bfbe18df84ed",
+   "bytes": 14366,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_hook_spool.rs",
+   "sha256": "03ca24746bf66e969b001bf625d4f581811f0ac89e0bcbd31228eaa15a39d8a1",
+   "bytes": 118745,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_restore.rs",
+   "sha256": "d113ab0c0305c7703fcf1c274a91bf06866c0dc47f09444b064dd31630ea08fe",
+   "bytes": 14497,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_serve.rs",
+   "sha256": "a31fd918407ea6e38759ead8a642508727fba3ef28523882ad36837ea683ff6f",
+   "bytes": 187632,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_commands_status.rs",
+   "sha256": "095cfff585a0ff16d61a9feaa5615a3096a47a14b98666123a37268ba6073f3d",
+   "bytes": 25250,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_config.rs",
+   "sha256": "e57e6b1557bbde4d7a8551a956ab099e74485a9f29e14f553d2cb470b4fffdc5",
+   "bytes": 173742,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_http_client.rs",
+   "sha256": "ee63405958abc1a27d4648e3aba91e762687a09b10f06c483b7285ffa649a487",
+   "bytes": 29552,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_lib.rs",
+   "sha256": "0281bdc1a6e67cd0b8eaa1f345b02d5bb63a93fd039daf8f3de9b203c78d2ff6",
+   "bytes": 8957,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_logging.rs",
+   "sha256": "8d5a9394316170a79833055e756edf95b9f23511b2f6086160e00501da787a76",
+   "bytes": 8161,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_marker.rs",
+   "sha256": "75dc9f454d0a31f7d7d0a26c5762185d2d27d9ee491cccbeeb3e380763d51720",
+   "bytes": 26618,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-cli_src_process_guard.rs",
+   "sha256": "f02e758f1a4311077767de52cb81268b1a794fb28e3144dbf96ee955f31bb2e9",
+   "bytes": 2588,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-llm_src_local.rs",
+   "sha256": "f4ec01f93b382c859e404618629d5f8f3de06c4ceab31b0d040674d9d0654a17",
+   "bytes": 15441,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-mcp_src_server.rs",
+   "sha256": "175f953a192acc0b881fbf55cbae5dfed50978d993357be6321473e1232ca185",
+   "bytes": 558204,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/src/v2.4.0__crates_ai-memory-wiki_src_git.rs",
+   "sha256": "cb694ef25f68d2598ea09e98e0ebd205d2e02db21aefc98466283a0091a7c769",
+   "bytes": 54680,
+   "reason": "Upstream source copies fetched by fetch_src.py from the v2.3.2 and v2.4.0 tags; reproducible from the tags."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/base-marker/.ai-memory.toml",
+   "sha256": "bf72d5b58e017e46ee6cb72701834a639ff6eeb62c3ae40af13d508f43f8393c",
+   "bytes": 62,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/base-marker/transcript.jsonl",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/base-nomarker/transcript.jsonl",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/rehearsal-marker/.ai-memory.toml",
+   "sha256": "bf72d5b58e017e46ee6cb72701834a639ff6eeb62c3ae40af13d508f43f8393c",
+   "bytes": 62,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/rehearsal-marker/transcript.jsonl",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/rehearsal-nomarker/transcript.jsonl",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/rehearsal-oldhook-marker/.ai-memory.toml",
+   "sha256": "2188dc4429ef65373a22cc4d68d4d30eb06011a46c7661f7887cf51d314e2490",
+   "bytes": 65,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/probe-dirs/rehearsal-oldhook-marker/transcript.jsonl",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0,
+   "reason": "Probe-scope inputs: three .ai-memory.toml capture markers (workspace nsr-probe; projects ai-memory-acceptance-hook, ai-memory-acceptance-oldhook) and empty transcript.jsonl files. A committed marker would opt any session started under that directory into allowlisted capture, so they are described, not published."
+  },
+  {
+   "run_copy": "$IMPL/review.txt",
+   "sha256": "e97747e8b41f6b937dff7d86200c63eda410b88fc2e337ce31176dcfd8419b25",
+   "bytes": 37570,
+   "reason": "Private research inputs (the research review and refutation); their facts are cited in docs/decisions/2026-09-25-workstation-sota-refresh.md."
+  },
+  {
+   "run_copy": "$IMPL/refute.txt",
+   "sha256": "3f895bbea196e1eadfa385c008779388c88e1148e5f54599f3bfad175518366f",
+   "bytes": 19002,
+   "reason": "Private research inputs (the research review and refutation); their facts are cited in docs/decisions/2026-09-25-workstation-sota-refresh.md."
+  },
+  {
+   "run_copy": "$IMPL/verify/reviews.json",
+   "sha256": "999340bd98e68d36f9da23c29a640b51ebbc397065b2a585f5a61935d6ede43a",
+   "bytes": 37521,
+   "reason": "Private research inputs (the research review and refutation); their facts are cited in docs/decisions/2026-09-25-workstation-sota-refresh.md."
+  },
+  {
+   "run_copy": "$IMPL/verify/refutes.json",
+   "sha256": "c04ba6ae5db85d3ede775dbf5b9efce17cf5c9b10ac12824a2a12609e1ed7d47",
+   "bytes": 18906,
+   "reason": "Private research inputs (the research review and refutation); their facts are cited in docs/decisions/2026-09-25-workstation-sota-refresh.md."
+  }
+ ],
+ "integrity": {
+  "artifact": "ai-memory-linux-x86_64.tar.gz from akitaonrails/ai-memory release v2.4.0 (15,969,555 bytes); installed binary sha256 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+  "expected": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "actual": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+  "source": "Checked before extraction at 2026-09-25T18:57Z. Three upstream sources agree with the pinned value: the release .sha256 sidecar (gh release download v2.4.0 --pattern ai-memory-linux-x86_64.tar.gz.sha256), the GitHub API asset digest (sha256:590f75dd..., size 15969555, and browser_download_url matches), and the checksum list in the release body. The downloaded file hashed to the same value, and its size matches the API. There is no artifact attestation: the attestations API returned HTTP 404 at 19:08:41Z. The release is immutable=false, so re-verify at cutover time.",
+  "verified": true
+ },
+ "steps": [
+  {
+   "name": "prod-snapshot-before (read-only production state)",
+   "arm": "production-readonly",
+   "command": "python3 <scratchpad>/sota-refresh/impl/ai-memory/aimem_accept.py prod-snapshot before",
+   "exit": 0,
+   "output_excerpt": "18:57:01Z. Service: MainPID 465, NRestarts 0, active/running since Thu 2026-09-24 00:23:13 EDT. bin/ai-memory -> tools/ai-memory-2.3.2/ai-memory; 2.3.2 binary sha256 93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0. Hook commands: 8 Claude + 7 Codex on 2.3.2. Live DB opened mode=ro: schema V64 (64 rows), quick_check=ok, pages=35, observations=71265; 0 nsr-probe rows. /healthz 404; GET /mcp 405 with allow: POST. 2.4.0 prefix absent.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/prod-snapshot-before.json"
+  },
+  {
+   "name": "step0-install",
+   "arm": "candidate-2.4.0",
+   "command": "python3 aimem_accept.py install (gh api releases/tags/v2.4.0; gh release download sidecar; curl --proto =https --tlsv1.2 into the scratch dl/; sha256 and size check; tar member safety check; tar -xzf --no-same-owner into the new prefix; NEW --version)",
+   "exit": 0,
+   "output_excerpt": "Sidecar, API digest and release body all give 590f75dd...5076. Download: 15969555 bytes, sha256 590f75dd...5076, integrity_verified true. Tar: 196 members, 0 unsafe; top level LICENSE, README.md, ai-memory, crates, docs, hooks, packaging. new_version_stdout 'ai-memory 2.4.0' (rc 0); hooks/ exists; bin link still tools/ai-memory-2.3.2/ai-memory; new binary sha256 360b9dff...6344.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step0-install.json"
+  },
+  {
+   "name": "step1-preflight (read-only)",
+   "arm": "production-readonly",
+   "command": "python3 aimem_accept.py preflight (GET http://127.0.0.1:49474/healthz and /mcp; parse ~/.local/share/ai-memory/config.toml and print only server_url presence, backfill_on_start and non-secret selectors)",
+   "exit": 0,
+   "output_excerpt": "healthz_code 404; get_mcp_code 405, allow POST. server_url absent at top level and nested; backfill_on_start false. Selectors: embedding_provider local, no llm_provider, no admission webhooks, allowed_hosts [localhost, 127.0.0.1, ::1], auto_improve eval disabled, consolidate_on_session_end false.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step1-preflight.json"
+  },
+  {
+   "name": "step2-backup (online, through the live 2.3.2 service)",
+   "arm": "baseline-2.3.2",
+   "command": "AI_MEMORY_SERVER_URL=http://127.0.0.1:49474 tools/ai-memory-2.3.2/ai-memory --data-dir <private scratch client dir> backup --to ~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory/pre-2.4.0.tar.gz (environment built from scratch)",
+   "exit": 0,
+   "output_excerpt": "'wrote backup to ~/.local/state/.../pre-2.4.0.tar.gz (39.63 MiB)'. 41555491 bytes, sha256 c5b14adbeb0c891a1d0cea481f2f230a27c1e7bcc7e854bb45bce7e85f86dd8e, mode 0600, 512 members; top level config.toml, db, wiki. has_db_memory_sqlite, has_wiki and has_config_toml all true; no unsafe members.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step2-backup.json"
+  },
+  {
+   "name": "step3-baseline attempt 1 (2.3.2 on restored copy W/base)",
+   "arm": "baseline-2.3.2",
+   "command": "python3 aimem_accept.py baseline",
+   "exit": 1,
+   "output_excerpt": "14 top-level checks, 13 true: the only false one was 'status', and its only false sub-check was embedding_ok (the checks status_after_probes_embedding_ok and spool_empty_before_stop did not exist in the attempt-1 driver). A freshly started server reports embedding status 'unknown' until its first embedding call, and the readiness loop waited 120 s for 'ok'. That is a probe fault, not a product fault. Everything else passed, including the fingerprint (V64 -> V64 (64 rows) quick_check=ok ... missing_or_changed=0 ... missing=0 | PASS) and hook nonce_found via session_id. The copy was renamed to base-attempt1, not reused.",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "results/step3-baseline-attempt1.json"
+  },
+  {
+   "name": "step3-baseline attempt 2 (probe fixed: embedding health read after the probes)",
+   "arm": "baseline-2.3.2",
+   "command": "python3 aimem_accept.py baseline (fresh extraction; tools/ai-memory-2.3.2/ai-memory --data-dir W/base serve --transport http --enable-web --bind 127.0.0.1:<free> --workspace local --project native-agent-stack)",
+   "exit": 0,
+   "output_excerpt": "16/16 checks. Status 2.3.2: FTS 35/35 pages and 71334/71334 observations; embedding local all-MiniLM-L6-v2 384 with 0 missing, 'unknown' at start and 'ok' after the probes. info: version 2.3.2, protocol 2024-11-05, 23 tools, no scope field. /healthz 404; GET /mcp 405 with allow: POST. Known-page body sha256 98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356. Roundtrip pass. check-capture: marker allowlist/true/true, no-marker allowlist/false/false, 0 spooled. Hook nonce_found true via session_id (1 DB row, 1 session row). Marker-less probe: 0 spool files and 0 rows. Fingerprint 'V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=36 | observations before=71334 missing=0 after=71337 | PASS'. Server stopped: rc 0, pid gone, port closed. No archive.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step3-baseline.json"
+  },
+  {
+   "name": "step4-rehearsal (2.4.0 on separate restored copy W/rehearsal, migration, then 2.3.2 downgrade refusal)",
+   "arm": "candidate-2.4.0",
+   "command": "python3 aimem_accept.py rehearsal (tools/ai-memory-2.4.0/ai-memory --data-dir W/rehearsal serve --transport http --enable-web --bind 127.0.0.1:<free> ... with AI_MEMORY_BACKUP_DIR private; afterwards tools/ai-memory-2.3.2/ai-memory serve on the V66 copy)",
+   "exit": 0,
+   "output_excerpt": "19/19 checks. Fingerprint 'V64 -> V66 (66 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=37 | observations before=71334 missing=0 after=71340 | PASS'. /healthz 200 {\"status\":\"ok\"}; GET /mcp 405 with allow: POST. Status 2.4.0: FTS 35/35 and 71334/71334; embedding local all-MiniLM-L6-v2 384, 0 missing, 'ok' after the probes. info: 2.4.0, protocol 2024-11-05, 23 tools (names identical to 2.3.2), scope.resolved_by explicit. Known-page sha equals the baseline. Roundtrip pass. check-capture as on 2.3.2. The 2.4.0 hook and the 2.3.2 hook client both had nonce_found true. Marker-less probe: 0 spool files, 0 rows. No pre-migration-backup.json and 0 archives. Downgrade: exit 1, 'memory database schema is newer than this ai-memory build: the store has migration V65 (page_compacted_marker) applied, but this build only ships migrations through V64...'; the store stayed V66 (66 rows) with quick_check=ok.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step4-rehearsal.json"
+  },
+  {
+   "name": "step4-rollback-check (fresh extraction opens under 2.3.2 at V64)",
+   "arm": "baseline-2.3.2",
+   "command": "python3 aimem_accept.py rollback-check",
+   "exit": 0,
+   "output_excerpt": "Status version 2.3.2 with FTS parity. Fingerprint 'V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=35 | observations before=71334 missing=0 after=71334 | PASS'. Server stopped: rc 0, pid gone, port closed. No archive.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "results/step4-rollback-check.json"
+  },
+  {
+   "name": "prod-snapshot-after + prod-compare before/after",
+   "arm": "production-readonly",
+   "command": "python3 aimem_accept.py prod-snapshot after && python3 aimem_accept.py prod-compare before after",
+   "exit": 1,
+   "output_excerpt": "18 of 19 checks true. Service: same MainPID 465, same start time and InvocationID hash, NRestarts 0. bin link and the 2.3.2 binary are unchanged. Codex hooks sha unchanged. Hooks still 8+7 on 2.3.2 and 0 on 2.4.0. Live fingerprint 'V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=35 | observations before=71265 missing=0 after=71812 | PASS'. Live DB and wiki: 0 hits for 10 probe tokens and 0 of 7 probe sessions. No archives, no scratch processes. The failing check is claude_settings_unchanged: ~/.claude/settings.json changed (mtime 19:01:59Z) through another actor, not this run (see production_untouched_proof).",
+   "pass": false,
+   "observed_by": "implementer",
+   "output_file": "results/prod-compare-before-after.json"
+  },
+  {
+   "name": "listener and attestation checks",
+   "arm": "production-readonly",
+   "command": "ss -ltnp | grep ai-memory; gh api repos/akitaonrails/ai-memory/attestations/sha256:590f75dd...5076",
+   "exit": 0,
+   "output_excerpt": "1 ai-memory listener: 127.0.0.1:49474 (production only). Attestation API: 'gh: Not Found (HTTP 404)' (exit 1, as expected) at 19:08:41Z.",
+   "pass": true,
+   "observed_by": "implementer",
+   "output_file": "out/attest.err"
+  },
+  {
+   "name": "verifier re-run (own probe code, fresh extractions)",
+   "arm": "candidate-2.4.0 and baseline-2.3.2",
+   "command": "python3 verify/rerun.py; python3 verify/integrity.py; python3 verify/prod_check.py",
+   "exit": 0,
+   "output_excerpt": "Migration V64(64) -> V66(66), quick_check ok, pages 35 -> 37 with 0 changed or missing, observations 71334 -> 71340 with 0 missing and 0 content-changed; /healthz 200; GET /mcp 405 allow POST; 2.3.2 serve on the migrated copy exited 1 (schema newer than this build); integrity 196 tarball members byte-identical in the prefix.",
+   "pass": true,
+   "observed_by": "verifier",
+   "output_file": "verify/rerun.json"
+  },
+  {
+   "name": "cutover: stop and quiesce",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "systemctl --user stop nativestack-memory.service. Quiesced within 5 s: 0 ai-memory processes and 0 users of the database file.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json",
+   "at_utc": "2026-09-25T20:43:48Z"
+  },
+  {
+   "name": "cutover: quiescent fingerprint",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "Schema V64 (64 refinery rows), quick_check ok, 36 pages, 77,213 observations.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: at-rest cold copy",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "db, wiki, config.toml and capture-mode copied at rest: 336 files, 137M, with a SHA256SUMS manifest whose sha256 begins 0246f4121c4104d1. The fingerprint compare of the cold copy against the quiescent live store printed PASS. The copy holds config.toml (auth.token_pepper) and is private.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: switch the binary",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "bin/ai-memory relinked to tools/ai-memory-2.4.0/ai-memory. A 2.4.0 install-hooks preview (no --apply) left the store at V64.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: hook rewrite through the upstream installer",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "install-hooks --apply for claude-code and for codex with --server-url http://127.0.0.1:49474 --capture-mode allowlist, plus --no-capture-prompts for Claude. Against the installer's own .bak-1790369060 copies, the diffs changed only the binary path, on 8 Claude and 7 Codex commands. Both files are valid JSON with 0 references to 2.3.2.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: start",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "systemctl --user start nativestack-memory.service. The journal shows migrations V65__page_compacted_marker and V66__auto_improve_claim_attempts applied. No pre-migration archive was expected: the research found 2.4.0's snapshot_before_db_migration gated to the 1.x to 2.0 upgrade, and the rehearsal on a restored copy wrote none.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json",
+   "at_utc": "2026-09-25T20:44:37Z"
+  },
+  {
+   "name": "cutover: live verification",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "GET /healthz returned 200 on the first poll; MainPID up with NRestarts 0; GET /mcp returned 405 with allow: POST (stateless transport). Fingerprint compare V64 -> V66 PASS: 66 rows, quick_check ok, 36 pages with 0 missing or changed, 0 observations missing, 77,330 after; the growth is hook spool that drained after the restart. `ai-memory status --json` reports version 2.4.0. MCP memory_status returns its counts plus scope {workspace local, project native-agent-stack, resolved_by explicit} and evidence_rows. memory_read_page on decisions/nativestack-isolation.md returned an identical body before and after (sha256 prefix 98eb1dfb4fc6b0f5).",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json"
+  },
+  {
+   "name": "cutover: real-client capture",
+   "arm": "production (cutover)",
+   "command": "coordinator window; see cutover.json",
+   "exit": null,
+   "output_excerpt": "A fresh headless `claude -p` session produced claude-code observations after the restart: session-start, pre-tool-use, post-tool-use, stop and session-end. The hook spool held 0 files older than 5 minutes.",
+   "pass": true,
+   "observed_by": "coordinator",
+   "output_file": "cutover.json",
+   "at_utc": "2026-09-25T20:45:10Z"
+  },
+  {
+   "name": "read-back of the switched state",
+   "arm": "production",
+   "command": "read-only: readlink, --version, sha256sum, curl GET /healthz and /mcp, systemctl --user show, grep -c on the two hook files, installed-versions.txt record",
+   "exit": 0,
+   "output_excerpt": "bin/ai-memory -> tools/ai-memory-2.4.0/ai-memory; 'ai-memory 2.4.0'; sha256 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344; /healthz 200; GET /mcp 405 allow: POST; active, NRestarts=0; hook commands 8 Claude + 7 Codex on 2.4.0, 0 on 2.3.2; installed-versions.txt ai-memory record still 'ai-memory 2.3.2'.",
+   "pass": true,
+   "observed_by": "writing_worker",
+   "output_file": "out/readback.out"
+  }
+ ],
+ "differences": [
+  "No regression on the probed surface. Every check that passed on the 2.3.2 baseline also passed on 2.4.0, run against the same backup with the same serve flags as production.",
+  "/healthz: 2.4.0 returns 200 {\"status\":\"ok\"}; 2.3.2 returns 404. The route is new, and it is a cheap version discriminator.",
+  "memory_status: 2.4.0 adds a scope object (resolved_by \"explicit\" for an explicit workspace/project call) and counts.evidence_rows (0). 2.3.2 has no scope field.",
+  "Schema: 2.4.0 migrates V64 -> V66 (66 rows) at startup. No pre-migration archive was written: nothing in AI_MEMORY_BACKUP_DIR, the scratch HOME, the real HOME or <data_dir>/backups, and no pre-migration-backup.json. After that, 2.3.2 serve exits 1 with DataSchemaAhead (naming V65 page_compacted_marker) and leaves the store intact at V66 with quick_check=ok.",
+  "Unchanged between versions: 23 MCP tools with identical names, protocol 2024-11-05, stateless transport (GET /mcp 405 with allow: POST), allowlist capture semantics (marker true/true, no marker false/false, nothing spooled by --check-capture), FTS parity, and the embedding identity (local all-MiniLM-L6-v2, 384-d, 0 missing). The known-page body sha256 is identical (98eb1dfb...a356).",
+  "The 2.3.2 hook client posting to a 2.4.0 server was captured: the nonce was found via an explicit session_id. This contradicts the 2026-09-23 claim that stock 2.3.2 hooks abort against a 2.4.0 store.",
+  "Both versions report embedding status 'unknown' after a fresh start, until the first embedding call. The reviewer's startup status expectation of 'embedding ok' would fail on either version, so embedding health must be read after a write or query. This caused baseline attempt 1 to fail.",
+  "One count difference comes from probe design only. The 2.4.0 arm ran one extra marker session (the 2.3.2-client probe), so it ends at 37 pages and 71,340 observations versus 36 and 71,337 on 2.3.2. Each completed hook session added one page in both versions."
+ ],
+ "production_untouched_during_qualification": "Before and after snapshots were taken read-only, at 18:57:01Z and 19:03:42Z, and compared with prod-compare.\n\n**Unchanged:**\n- nativestack-memory.service kept MainPID 465, ExecMainStartTimestamp 'Thu 2026-09-24 00:23:13 EDT', the same InvocationID hash and NRestarts 0. It was never stopped or restarted.\n- ~/.local/share/codex-ecosystem/bin/ai-memory resolved to tools/ai-memory-2.3.2/ai-memory before and after.\n- The 2.3.2 binary sha256 stayed 93eeb299...cfed0.\n- ~/.codex/hooks.json sha256 stayed e705a4b1....\n- Hook commands were 8 Claude plus 7 Codex on 2.3.2, and 0 on 2.4.0, both times.\n- Live DB fingerprint, opened mode=ro: 'V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=35 | observations before=71265 missing=0 after=71812 | PASS'. The growth comes from live sessions' hooks.\n- The live /healthz (404) and GET /mcp (405, allow: POST) responses were identical.\n- There was no pre-migration-backup.json and no ~/ai-memory-backup-* archive, before or after.\n\n**No probe leakage:**\n- 0 hits for all 10 probe tokens in live observations, pages and wiki files.\n- 0 of the 7 probe session ids in live sessions.\n- nsr-probe and ai-memory-acceptance rows: 0 before and 0 after.\n- The tokens were never printed, so the live hooks could not capture them from this session's tool output.\n- After the run, the only ai-memory listener is 127.0.0.1:49474, and no scratch ai-memory process remains.\n\n**How live paths were avoided:**\n- No command ran with --data-dir on the live store. The backup client used a private scratch data dir and reached the live 2.3.2 server by URL. Its online backup is a server-side SQLite snapshot, with no write to the store.\n- Every scratch ai-memory process got an environment built from scratch: HOME set to an empty private scratch home, which was still empty at the end, and AI_MEMORY_SERVER_URL set to the scratch port. This matters because this host exports the live URL into agent shells.\n- Nothing touched the GPU servers, systemd, ~/.codex, MCP configs, git checkouts or ~/.local/share/codex-ecosystem/downloads.\n\n**The one failed check:** ~/.claude/settings.json changed (sha256 ddfcbf6d... -> cc635f9f..., mtime 19:01:59.96Z). This run did not cause it:\n- The change fell between baseline attempt 1 (results written 19:00:24Z) and attempt 2 (started 19:02:35Z), when no scratch ai-memory process existed.\n- install-hooks was never run.\n- No scratch process could see the real HOME.\n- Its ai-memory hook lines are unchanged (8 on 2.3.2).\n- Its bytes were read only to compute its sha256 and mtime and to count the tools/ai-memory-2.3.2 and tools/ai-memory-2.4.0 hook paths (aimem_accept.py cmd_prod_snapshot); nothing from it was printed.\n\nThe live server logged the backup request in its own log, which is normal request logging.",
+ "switch": {
+  "method": "Cold-copy cutover by the coordinator (cutover.json), following the refuter-corrected switch procedure: stop and quiesce, quiescent fingerprint, at-rest copy, relink bin/ai-memory, upstream install-hooks preview then --apply for both clients, start, live verification, real-client capture.",
+  "planned_procedure": "This is not performed here. It is the refuter's corrected steps 5-6 plus the required additions.\n\nNames: ECO=~/.local/share/codex-ecosystem, LIVE=~/.local/share/ai-memory, OLD=$ECO/tools/ai-memory-2.3.2/ai-memory, NEW=$ECO/tools/ai-memory-2.4.0/ai-memory, W=a new private 0700 directory for the window. FP means a mode=ro fingerprint snapshot/compare, as in aimem_accept.py fingerprint/fp_compare or the draft fingerprint.py.\n\n**0. Pre-window gates.**\n- v2.4.0 is still the latest release. There is no 2.4.1 or 2.5 and no new advisory against rmcp 2.2.0 or ai-memory 2.4.0.\n- The v2.4.0 asset checksum still reads 590f75dd...5076 (the release is not immutable).\n- sha256sum $NEW = 360b9dff...6344, and $NEW --version = 'ai-memory 2.4.0'.\n- readlink -f $ECO/bin/ai-memory = $OLD, and the 2.3.2 prefix is intact (93eeb299...cfed0).\n- Record the known page's body sha256 through a live 2.3.2 memory_read_page just before the window.\n\n**1. Announce to live sessions.** Tell every live Claude Code and Codex session on this host, and the orchestrator:\n- the window start and end;\n- that ai-memory MCP calls fail while the service is down;\n- that Claude hooks keep spooling locally and drain after the restart;\n- that the 7 Codex ai-memory hooks will be skipped from the moment ~/.codex/hooks.json changes until the user trusts them in /hooks;\n- that sessions should finish or pause tool-heavy work and run /mcp to reconnect afterwards.\n\nNo re-login.\n\n**2. Stop and quiesce.**\n- Run systemctl --user stop nativestack-memory.service.\n- Require pgrep -a -x ai-memory to print nothing (no serve, hook or hook-drain sibling; drains can live up to 5 minutes, so wait or pause sessions).\n- Require fuser $LIVE/db/memory.sqlite to print nothing.\n\n**3. Quiescent fingerprint.** FP snapshot $LIVE/db/memory.sqlite -> $W/fp-live-before.json. Expect schema V64 (64 rows) and quick_check=ok.\n\n**4. At-rest (cold) backup.**\n- Run mkdir -m 700 $W/cold-v64 && cp -a $LIVE/db $LIVE/wiki $LIVE/config.toml $LIVE/capture-mode $W/cold-v64/.\n- FP snapshot $W/cold-v64/db/memory.sqlite -> $W/fp-cold.json.\n- FP compare fp-live-before fp-cold 64 must print PASS.\n- Treat the copy as secret (config.toml holds auth.token_pepper).\n- Optionally also take an online archive before step 2, as a fallback only.\n\n**5. Switch the binary.** Run ln -sfn $NEW $ECO/bin/ai-memory. The unit's ExecStart runs through this symlink. Do not use adoption/bootstrap-linux.sh: it repoints at once and reuses the unversioned download cache.\n\n**6. Hook rewrite through the upstream installer.** Preview each command without --apply first, then apply:\n- $NEW --data-dir $LIVE install-hooks --apply --agent claude-code --config-file ~/.claude/settings.json --server-url http://127.0.0.1:49474 --capture-mode allowlist --no-capture-prompts\n- $NEW --data-dir $LIVE install-hooks --apply --agent codex --config-file ~/.codex/hooks.json --server-url http://127.0.0.1:49474 --capture-mode allowlist\n\nExpect each file's diff against the .bak-<ts> the installer just wrote to change only tools/ai-memory-2.3.2 -> tools/ai-memory-2.4.0: 8 Claude and 7 Codex commands. Diff against that .bak, not an older hash, because ~/.claude/settings.json is also edited by other actors (it changed at 19:01:59Z during this run).\n\n**7. Start.** Run systemctl --user start nativestack-memory.service. V65 and V66 apply at startup, and no pre-migration archive is expected.\n\n**8. Live verification.** Expect all of the following:\n- readlink equals $NEW, and ai-memory --version prints 2.4.0.\n- Exactly 8 Claude and 7 Codex commands on tools/ai-memory-2.4.0, and no 2.3.2 mention.\n- /healthz returns 200 {\"status\":\"ok\"}, and GET /mcp returns 405 with allow: POST.\n- status --json shows version 2.4.0, FTS parity, embedding local all-MiniLM-L6-v2 384 with 0 missing, and embedding status 'ok' only after the first write or query ('unknown' right after start is normal).\n- FP compare fp-live-before against a live snapshot at 66 prints 'V64 -> V66 (66 rows) quick_check=ok ... missing_or_changed=0 ... missing=0 | PASS'.\n- MCP info shows 2.4.0, 23 tools, and scope.resolved_by explicit.\n- The known page's body sha256 is unchanged.\n- Optionally, the MCP roundtrip passes and a $NEW hook probe with an explicit session_id is found. This leaves probe residue in the live store.\n\n**9. Codex hook-trust gate (the user must do this).** In Codex, open /hooks, review the 7 changed ai-memory commands (now tools/ai-memory-2.4.0/...) and trust them. Expect the listing to show every hook trusted and enabled (13/13 is the recorded precedent), with no errors and no startup warning to open /hooks. Codex captures nothing until this is done.\n\n**10. Real-client capture.**\n- Start one new Claude Code session and one new Codex session in ~/code/native-agent-stack, and have each make one tool call.\n- Expect new observations with agent claude-code and agent codex in local/native-agent-stack, created after the restart.\n- Expect $LIVE/hook-spool to hold no *.json older than 5 minutes.\n- Existing Claude sessions run /mcp to reconnect. Their hooks keep working even before the file watcher reloads, because the rehearsal showed a 2.3.2 hook client captured into a 2.4.0 server.\n\n**11. After acceptance only.**\n- Move the repo pins: manifests/stack.json to 2.4.0 with source_pin b1b25219...; adoption/pins-linux-x86_64.json URL and sha 590f75dd...; the landscape and grand-list winner pins; the hook template paths; the recipes row; the stale v2.3.1 in foundation-memory.json.\n- Correct the same-day decision doc.\n- Record the host receipt.\n- Keep the 2.3.2 prefix and $W/cold-v64 until the rollback window closes.",
+  "rollback": "This follows the refuter's cold-copy rollback, which replaces a restore-first approach.\n\n1. Announce to live sessions, then run systemctl --user stop nativestack-memory.service. Require pgrep -a -x ai-memory to print nothing and fuser ~/.local/share/ai-memory/db/memory.sqlite to print nothing.\n2. Keep the failed state for salvage: mv $LIVE/db $LIVE/db.v66-failed && mv $LIVE/wiki $LIVE/wiki.v66-failed.\n3. Copy back the cold V64 copy: cp -a $W/cold-v64/db $W/cold-v64/wiki $W/cold-v64/config.toml $W/cold-v64/capture-mode $LIVE/.\n4. Relink: ln -sfn $ECO/tools/ai-memory-2.3.2/ai-memory $ECO/bin/ai-memory.\n5. Restore ~/.claude/settings.json and ~/.codex/hooks.json from the installer's .bak-<ts> files, or re-run the two install-hooks commands with the 2.3.2 binary. Then the user re-trusts the 7 reverted Codex commands in /hooks.\n6. Run systemctl --user start nativestack-memory.service.\n7. Verify all of the following:\n   - ai-memory --version prints 2.3.2.\n   - The refinery max version is 64 (64 rows).\n   - FP compare fp-live-before against a snapshot of the restored DB at 64 prints PASS.\n   - MCP info shows 2.3.2 (exit 0).\n   - /healthz returns 404 (2.3.2 has no route).\n\n**Fallback only:** $OLD --data-dir $LIVE restore --from <online archive> --force. It refuses while any process named ai-memory is alive, and it loses every write after the archive. This path was not exercised here. The rollback-artifact proof used a fresh extraction served by 2.3.2 (V64 PASS).\n\nPages and observations written between the cold copy and the rollback are lost from the live store, but stay in *.v66-failed for manual salvage.\n\nNever start 2.3.2 against the V66 store. The rehearsal showed it exits 1 with 'memory database schema is newer than this ai-memory build' and leaves the store intact, but the service would stay down.\n\nKeep the 2.4.0 prefix for a later retry."
+ },
+ "verifier": {
+  "verdict": "agree",
+  "production_touched": false,
+  "defects": [
+   {
+    "claim": "The step3-baseline attempt-1 excerpt says '15 of 16 checks true. Only status.embedding_ok failed.' The count is wrong.",
+    "evidence": "results/step3-baseline-attempt1.json has 14 top-level checks, 13 true. The only false one is 'status', and its only false sub-check is 'embedding_ok'. The two checks 'status_after_probes_embedding_ok' and 'spool_empty_before_stop' did not exist in the attempt-1 driver. The receipt claim is not affected: it says only that attempt 1 failed its embedding-status probe, which the record supports.",
+    "severity": "minor"
+   },
+   {
+    "claim": "production_untouched_proof says the contents of ~/.claude/settings.json 'were never read'. That is inaccurate: the file's bytes were read, though nothing was printed.",
+    "evidence": "aimem_accept.py cmd_prod_snapshot (L728-735) reads the raw bytes of ~/.claude/settings.json to compute its sha256, its mtime, and counts of 'tools/ai-memory-2.3.2/ai-memory' and 'tools/ai-memory-2.4.0/ai-memory'. Nothing is printed, so this is wording only.",
+    "severity": "minor"
+   },
+   {
+    "claim": "The acceptance fingerprint is weaker than it reads. Pages are compared through the stored body_sha256 column, and observations by id only. A migration that changed a page body without updating body_sha256, or changed an observation's body, would still print PASS.",
+    "evidence": "aimem_accept.py fingerprint()/fp_compare() (L215-247). My content-level fingerprint closes the gap for this run. It hashes the real page body, title and is_latest, and each observation's session_id, title and body. It found 0 pages changed or missing and 0 observations missing or content-changed across V64->V66 (rerun.json R1 'migration'), so the claim holds; only the check's strength is at issue.",
+    "severity": "minor"
+   }
+  ],
+  "reproduced": [
+   "Step-0 integrity, checked independently at 19:17:41Z (verify/integrity.json):\n- The upstream API asset digest, the .sha256 sidecar and the release body all equal 590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076. API size is 15969555. The asset's updated_at is 2026-09-21T23:45:12Z, so it has not been replaced since publication.\n- The annotated tag v2.4.0 dereferences to commit b1b25219b507, and v2.4.0 is still the latest release.\n- The retained tarball's sha256 equals the pin, at 15969555 bytes.\n- All 196 tarball members (172 files, 24 dirs) are byte-identical in ~/.local/share/codex-ecosystem/tools/ai-memory-2.4.0. There are 0 extra entries and 0 group/world-writable, setid or foreign-owned entries. The newest ctime is 18:57:15Z, the install second.\n- The binary's sha256 is 360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344, and --version prints 'ai-memory 2.4.0' (rc 0).\n- Baseline: the 2.3.2 binary sha256 93eeb299...cfed0 equals the binary inside the cached pinned tarball, whose sha256 is 23e8be6c...6fc.\n- The attestations API still returns HTTP 404.",
+   "Backup artifact: sha256 c5b14adb...dd8e, 41555491 bytes, mode 0600, 512 members, top level config.toml/db/wiki.",
+   "Step-4 rehearsal: 2.4.0 on a fresh extraction, with my own probe code (verify/rerun.json, 19:24:22Z-19:24:36Z). The server used the same serve flags as the production unit's ExecStart, apart from data dir and port.\n- Migration: V64(64) -> V66(66). V65 is page_compacted_marker and V66 is auto_improve_claim_attempts; quick_check=ok. Pages 35 -> 37 with 0 changed or missing; observations 71334 -> 71340 with 0 missing and 0 content-changed. The implementer's fp_compare printed the same line as its recorded one.\n- /healthz returned 200 {\"status\":\"ok\"}. GET /mcp returned 405 with allow: POST.\n- MCP: serverInfo 2.4.0, protocol 2024-11-05, 23 tools. The tool-name hash 37f31a143fe85776 is identical to 2.3.2's. scope.resolved_by is explicit.\n- The known-page body sha256 98eb1dfb...a356 equals the implementer's.\n- The MCP roundtrip passed.\n- --check-capture: allowlist/true/true with the marker, allowlist/false/false without it, and 0 spooled.\n- The 2.4.0 hook client and the 2.3.2 hook client into the 2.4.0 server were each found via session_id in 1.0 s, with 1 DB row each.\n- The marker-less probe left 0 spool files, 0 DB rows and 0 session rows.\n- Embedding status was 'unknown' at start and 'ok' after the probes: local all-MiniLM-L6-v2, 384-d, 0 missing.\n- No pre-migration receipt or archive, and the scratch home stayed empty.",
+   "Downgrade: 2.3.2 serve on my migrated V66 copy exited 1 by itself. The log carried 'memory database schema is newer than this ai-memory build', naming V65. The store stayed V66(66) with quick_check=ok, and 0 pages or observations changed during the refusal.",
+   "Baseline A/B and rollback artifact: 2.3.2 on a separate fresh extraction.\n- /healthz 404, GET /mcp 405 with allow: POST.\n- serverInfo 2.3.2, 23 tools with the same name hash, no scope field.\n- The known-page sha256 is equal to the 2.4.0 read.\n- check-capture semantics are identical.\n- The store stayed V64(64) with 0 changes.",
+   "The acceptance discriminates: each of the implementer's own check functions fails on a wrong version, a tampered scratch DB or a doctored record.\n- fp_compare: an untampered copy expected at V66 gives true. The same copy expected at V64 gives false, one page with a changed body_sha256 gives false, and one deleted observation gives false.\n- mcp_info: expecting 2.4.0 passes on 2.4.0 and fails on 2.3.2; expecting 2.3.2 passes on 2.3.2 and fails on 2.4.0.\n- status_check fails on an FTS mismatch off by one, on embedding 'unknown' in strict mode, on one missing embedding, and when expecting 2.4.0 against 2.3.2.\n- arm_pass is all true on the recorded rehearsal. It turns false when the hook nonce is not found, on an allowlist-bypass DB row, when the no-marker probe admits capture, on healthz 404, when an archive is written, and when the fingerprint fails.",
+   "Production untouched, re-checked read-only at 19:16-19:26Z:\n- nativestack-memory: MainPID 465, NRestarts 0, start 'Thu 2026-09-24 00:23:13 EDT', invocation hash 6e1272d6c960. All identical to the implementer's snapshots.\n- No active user service has entered the active state since 18:40Z.\n- The unit file is unchanged since 2026-09-23, and its environment holds only PATH.\n- bin/ai-memory -> tools/ai-memory-2.3.2/ai-memory, and 0 bin entries changed since 18:40Z.\n- Hooks, by structural parse: 8 Claude and 7 Codex ai-memory commands on 2.3.2 with --server-url http://127.0.0.1:49474, and 0 on 2.4.0. The sha256 of ~/.codex/hooks.json is unchanged.\n- The ~/.claude/settings.json change at 19:01:59Z has a matching backup named settings.json.bak-mcp-autoopen-20260925T150159. That is another actor's naming; ai-memory's installer writes .bak-<unix-ts>.\n- Live DB, opened mode=ro: V64 (64 rows), quick_check=ok. The implementer's 35 prior pages have 0 changed. All 71265 (before) and 71812 (after) observations are present; now 73693.\n- 0 hits for 14 probe tokens (10 implementer, 4 verifier) and 0 of 10 probe sessions in the live DB and wiki.\n- No pre-migration receipt and no ~/ai-memory-backup-*.\n- The journal shows exactly one 'snapshotting SQLite for backup', at 18:57:47Z. v2.3.2 admin.rs handle_backup stages the snapshot in tempfile::tempdir()/tempfile() through the reader pool, so no store write.\n- The live log has 0 'backup written' lines and 0 references to the private path. The backfill.log was last written at 17:21Z, before the run.\n- downloads/ has 0 changes, and the git checkout is clean.\n- The only ai-memory listener is 127.0.0.1:49474, and 0 processes reference the ai-memory private dir.",
+   "Receipt claim: all 39 value literals appear in the implementer's results/*.json. The baseline has 16/16 checks true and the rehearsal 19/19."
+  ],
+  "notes": "**Verdict:** I agree with the implementer's result.\n\n- Every material claim reproduced independently:\n  - integrity;\n  - the rehearsal, with migration, healthz, MCP, capture and both hook clients;\n  - the downgrade refusal;\n  - the 2.3.2 baseline and rollback artifact.\n- Each number and statement in receipt_draft.claim is present in the recorded outputs.\n- The only non-measured values in the claim are the host name and date, which are the receipt's identifiers.\n- The three defects above are minor. None changes the claim.\n\n**What was not proven.** The acceptance really discriminates, but steps 0-4 cannot show that real clients capture after cutover. These remain gates for the switch procedure, and are correctly listed as unverified:\n- the Codex /hooks trust behaviour;\n- real Claude and Codex client capture;\n- the install-hooks path-only diff;\n- restore --force.\n\n**Evidence class.** My re-run is our own integration check with probe code I wrote, run against fresh extractions of the implementer's online backup. It is not an upstream test.\n\n**Probe difference.** My observation poll read by session_id without a text query, so it returned all 3 of the session's rows. The implementer passed the token as a query and got 1 row. Both found the nonce.\n\n**Safety of my run:**\n- I sent no request to the live ai-memory service.\n- I read the live DB only with mode=ro.\n- I copied models/ and capture-mode from the live data dir as reads.\n- Every scratch process got an environment built from scratch: private HOME and TMPDIR, and AI_MEMORY_SERVER_URL set to the scratch port.\n- Scratch servers bound 127.0.0.1 on free ports. All stopped with rc 0, pid gone and port closed, and no leftover processes remained.\n- Tokens were never printed.\n\n**Other observations:**\n- A second qdrant process references the shared parent state dir (~/.local/state/native-agent-stack/sota-refresh-20260925). It belongs to another unit, not ai-memory's subdirectory, and I did not touch it.\n- The secret_path_guard hook blocked two of my process-inspection commands. I did not work around it; a cmdline-only scan answered the question.\n- The other new tool prefixes since 18:40Z (mcporter-0.14.1, rtk-0.50.0, socraticode-1.15.0) belong to other units.\n\n**Artifacts:**\n- Sanitized, non-private: <scratchpad>/sota-refresh/impl/ai-memory/verify/\n  - integrity.json\n  - rerun.json\n  - prod-check-before-verify.json\n  - prod-check-after-verify.json\n  - the scripts integrity.py, rerun.py and prod_check.py\n  - v2.3.2 upstream source copies in src/\n- Private: ~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory/verify/ (0700, 531M).\n  - Contents: the base/, rehearsal/ and neg/ copies, logs, and token and session records.\n  - The copies hold private memory and config.toml with auth.token_pepper, so treat them as secret.\n  - The implementer's documented cleanup (rm -rf -- ~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory) removes them too."
+ },
+ "unverified": [
+  "Pending, user-only: the Codex /hooks trust step for the 7 changed ai-memory commands. Codex captures nothing until they are trusted; the expected trusted/enabled count (13/13 on another host) is not observed here.",
+  "Codex-format hook payloads and real Codex client capture through 2.4.0 (blocked on the trust step; Codex is usage-limited until 2026-09-30).",
+  "Whether Claude Code sessions that were already running reload the rewritten hooks (the real-client check used a fresh headless session).",
+  "The `ai-memory restore --force` fallback; the rollback path is the cold copy, which was fingerprinted but not restored.",
+  "Behaviour over time on 2.4.0: decay, access reinforcement, auto-improve scheduler ticks and the unreleased #792 file-descriptor fix (not in 2.4.0).",
+  "Upstream CI state for b1b25219 and advisories published after the 2026-09-25 research fetches; the writing worker re-read only the release, tag and asset digest (v2.4.0 still latest).",
+  "Web UI behaviour under --enable-web beyond /healthz.",
+  "Which actor modified ~/.claude/settings.json at 19:01:59Z during qualification; only that it was not the qualification run is established."
+ ],
+ "corrections": [
+  {
+   "field": "steps[4].output_excerpt",
+   "original": "15 of 16 checks true. Only status.embedding_ok failed. A freshly started server reports embedding status 'unknown' until its first embedding call, and the readiness loop waited 120 s for 'ok'. That is a probe fault, not a product fault. Everything else passed, including the fingerprint (V64 -> V64 (64 rows) quick_check=ok ... missing_or_changed=0 ... missing=0 | PASS) and hook nonce_found via session_id. The copy was renamed to base-attempt1, not reused.",
+   "corrected": "14 top-level checks, 13 true: the only false one was 'status', and its only false sub-check was embedding_ok (the checks status_after_probes_embedding_ok and spool_empty_before_stop did not exist in the attempt-1 driver). A freshly started server reports embedding status 'unknown' until its first embedding call, and the readiness loop waited 120 s for 'ok'. That is a probe fault, not a product fault. Everything else passed, including the fingerprint (V64 -> V64 (64 rows) quick_check=ok ... missing_or_changed=0 ... missing=0 | PASS) and hook nonce_found via session_id. The copy was renamed to base-attempt1, not reused.",
+   "by": "2026-09-25 repair round (independent review, needs_changes)",
+   "reason": "Verifier defect 1: results/step3-baseline-attempt1.json has 14 top-level checks, 13 true."
+  },
+  {
+   "field": "production_untouched_during_qualification",
+   "original": "- Its contents were never read.",
+   "corrected": "- Its bytes were read only to compute its sha256 and mtime and to count the tools/ai-memory-2.3.2 and tools/ai-memory-2.4.0 hook paths (aimem_accept.py cmd_prod_snapshot); nothing from it was printed.",
+   "by": "2026-09-25 repair round (independent review, needs_changes)",
+   "reason": "Verifier defect 2: cmd_prod_snapshot reads the file's raw bytes to hash and count them; nothing is printed."
+  }
+ ]
+}

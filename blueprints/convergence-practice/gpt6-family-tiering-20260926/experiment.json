@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "planned",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Every GPT-6 step on nativestack-5975wx-20260925 runs gpt-6-astra at max effort, and every step draws on one shared weekly Codex allowance. Mechanical stages with a deterministic scorer may not need the largest model at maximum effort. No frozen, paired measurement yet shows which GPT-6 family member and reasoning effort matches the default on such a stage, or at what token cost.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex",
+      "revision": "36650394c5b38c2990ccf2a3457165ca3e9d9726"
+    },
+    {
+      "url": "https://github.com/dgunning/edgartools",
+      "revision": "abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+    }
+  ],
+  "discovery_provenance": [
+    "Coordinator task of 2026-09-26, which reports the user's request to use the GPT-6 family fully and cleanly, with the token-save practice as the base layer. The arms, command, batching bounds and rule are as tasked.",
+    "Offline local reads on 2026-09-26: codex --version (codex-cli 0.157.1), codex exec --help, codex debug --help and codex debug models --bundled. The last prints the catalog shipped inside the binary, without a refresh or provider request, and lists every arm's model and effort.",
+    "evidence/receipts/codex-01571-qualification-20260926.json and its provider-request artifact (evidence/artifacts/sota-refresh-20260926/codex/out/provider-requests.json): the rust-v0.157.1 tag commit, the exec --json event schema, the strict json_schema text format that --output-schema sends, and the usage-limit error and turn.failed events.",
+    "The host's landscape-sweep runner (tools/sota-convergence/landscape-sweep/codex_job.py): its three-slot fcntl.flock pool, empty working directory and RUST_LOG-free environment, and its limit rule that counts only error and turn.failed events.",
+    "li26 (blueprints/convergence-practice/local-inference-latest-20260926): the frozen cohort, labels, inputs and scoring functions, reused unchanged. li26's own verify-inputs confirmed its acquisition (360 eligible filings), and the batch layout was computed on it before any call.",
+    "docs/token-practice.md: Codex total is input plus output; cached input and reasoning are subsets. The qualification receipt's fake-provider usage agrees.",
+    "Review round of 2026-09-26 (claude-opus and gpt-6-astra reviewers) on the first preregistration commit, before any provider call; plan.json amendment lists each finding and change.",
+    "isolation-probe/ (probe.py, fake_tool_calls.py, results.json): codex-cli 0.157.1 run on 2026-09-26 against a loopback fake Responses provider inside a private network namespace, with no credential. It measured the tools the committed command offered (web search, a shell, sub-agents, a sleep tool) and that the frozen overrides leave only code mode's exec (no file system or network), wait and request_user_input for all three models, and that an unreachable provider hangs the committed command but fails the amended one in under a second.",
+    "Upstream source at the pinned commit 36650394, read with gh api: codex-rs/features/src/lib.rs, codex-rs/core/src/config/mod.rs (sub-agent tools gated by agents.enabled and the model catalog before features.multi_agent), codex-rs/core/src/agents_md.rs (AGENTS.md discovery stops at the working directory without a .git ancestor), codex-rs/login/src/auth/storage.rs (the file store writes auth.json in place) and codex-rs/config/src/loader/mod.rs (system layers under /etc/codex)."
+  ],
+  "license_and_compatibility": "The Codex CLI (openai/codex) is Apache-2.0. The GPT-6 models are reached through the host's native Codex sign-in under OpenAI's terms; no API key is added. SEC EDGAR filings are public, so sending them to the provider is permitted, and the replies stay private. li26's scripts, with EdgarTools 5.58.0 (MIT), produced the reused inputs and labels. The bundled catalog of codex-cli 0.157.1 lists every arm's model and effort; ultra is never used.",
+  "baseline_and_candidate": {
+    "baseline": "A0: gpt-6-astra at max effort through the frozen codex exec command (with its isolation overrides), today's default for every GPT-6 step.",
+    "candidate": "A1 (gpt-6-astra, medium), S0 (gpt-6-sol, max), S1 (gpt-6-sol, medium), L0 (gpt-6-luna, max) and L1 (gpt-6-luna, medium). Each arm runs the same 25 batches of the same 360 filings, with the same prompt, schema and command."
+  },
+  "frozen_inputs": {
+    "base_revision": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+    "tasks": [
+      "sec-8k-item-extraction-20200302-batched"
+    ],
+    "roles": [
+      "codex-exec-mechanical-stage"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/eval_arm.py",
+        "sha256": "1af22fd1bd1c99091f8de214d8bd74625717d782905563ad652a77da237e6bdc"
+      },
+      {
+        "path": "blueprints/convergence-practice/local-inference-latest-20260926/analyze.py",
+        "sha256": "cebc1561c0353d0b6c63008b14c05cbf655c7c69cb275d261a4172a24958c3be"
+      },
+      {
+        "path": "scripts/path_safety.py",
+        "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/plan.json",
+        "sha256": "455e38df43e6bcc9e6e89c5e9399657f93a0a8cebcbf779c1d22c28afe370532"
+      },
+      {
+        "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/prompt.txt",
+        "sha256": "1861b55a72932fc9a94eee727f9bba20b84f4f543d2b04125c4778b5ad785ce7"
+      },
+      {
+        "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/response.schema.json",
+        "sha256": "e8aaebf24a89d487e146bce23a66ceb528cc7dd47d77bfaa0330ac372094d301"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py",
+        "sha256": "af411b98af0869a37a5d6225a00d12ea0773ac2d4f6c4a59f8120712dfd372ad"
+      },
+      {
+        "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py",
+        "sha256": "a563b2e53b6891efa92c7eb8d81a722d58ea434581c7c9e3091a4ef6ec3d866e"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "An arm is routable for mechanical 8-K item extraction when (1) the paired bootstrap (10,000 resamples, seed 20260926) 95% lower bound of micro-F1(arm) - micro-F1(A0) is at least -0.02, (2) its JSON-valid rate is at least 0.98, and (3) every one of its batches completed. A candidate is recommended only when it is routable, its usage is complete and its mean billed tokens per filing are strictly below A0's; among such candidates the cheapest wins, ties going to the lower median wall time of ok calls, then to plan order. If A0's usage is incomplete, its reported cost is a lower bound: a candidate below it is still recommended, otherwise the result is inconclusive. Micro-F1 is over per-accession item-code sets against the filer-declared header ITEMS, with li26's scoring functions; macro-F1, exact match, per-filing precision and recall, failures and wall time are reported alongside. No reply produced with a tool is scored.",
+    "usage_rule": "Record Codex turn.completed usage for every call, whatever its outcome: input, cached input, cache-write input, output (which includes reasoning) and reasoning. Billed tokens per filing = (input - cached input + output) / 360 over every call that reported usage. Cached input and reasoning are reported separately, and reasoning is never added to output a second time. A call without a report counts as zero only after a failed launch or a turn refused by the usage limit; any other such call (a timeout, an unavailable, interrupted or abandoned call) makes its arm's usage incomplete: a candidate with incomplete usage is not ranked, and A0's cost becomes a lower bound. Quota percentages are context only. No whole-task savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "nativestack-5975wx-20260925: WSL2 Ubuntu 24.04.5 x86_64. Hosted GPT-6 models are reached through the native Codex sign-in.",
+    "tools": [
+      {
+        "name": "Codex CLI",
+        "version": "codex-cli 0.157.1 (rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726)"
+      },
+      {
+        "name": "Python",
+        "version": "3.11 or newer standard library for run_arm.py and analyze.py"
+      }
+    ],
+    "isolation": "Each call runs codex exec with --ignore-user-config, a read-only sandbox, stdin /dev/null, no --search and the frozen overrides that switch off web search, the shell, sub-agents, the sleep tool, image viewing, goals, hooks, plugins, apps and unbounded reconnects. Each call has its own CODEX_HOME in its private attempt directory, holding only a link to the native auth.json, an empty scratch HOME, TMPDIR and working directory outside the state tree and every repository, and an allowlisted environment without API keys or RUST_LOG. A run refuses while a system Codex configuration file exists. At most three calls run at once, every call holds one of the host's three Codex slot locks, and calls start through a state-wide launch gate that also guards the stop notes. Replies, events, session records and per-call records stay in a private 0700 state directory. This is not an OS sandbox around codex itself; tool use is detected from each call's session record and fails the call."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py verify-frozen",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py layout --acquisition \"$LI26_ACQ\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm A0 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm A1 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm S0 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm S1 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm L0 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/run_arm.py run --arm L1 --acquisition \"$LI26_ACQ\" --lock-dir \"$CODEX_SLOT_LOCKS\"",
+    "python3 blueprints/convergence-practice/gpt6-family-tiering-20260926/analyze.py --acquisition \"$LI26_ACQ\" --out <decision.json>",
+    "uv run --no-project --with jsonschema --with pyyaml python -B -m unittest tests.test_gpt6_family_tiering_20260926 -v"
+  ],
+  "observations": [],
+  "failures_and_skips": [],
+  "limitations": [
+    "Preregistration only: no arm ran and no provider call was made for this record.",
+    "One task on one day: 360 filings of 2020-03-02 in 25 batches. A routing result covers mechanical extraction with a deterministic scorer, not general quality.",
+    "Labels are filer-declared header ITEMS, not hand-checked or frontier-model labels; li26's 16,000-character input cap applies to every arm alike.",
+    "One run per arm. Codex exec exposes no temperature or seed, so the bootstrap covers filing sampling, not run-to-run variation; provider behaviour and models may change after the run.",
+    "Batches of up to 15 filings share one prompt and one reply, so the result holds for this batching, not for single-filing or larger batches.",
+    "Under --ignore-user-config, gpt-6-sol and gpt-6-luna run at their catalog default priority tier and gpt-6-astra at its default. Wall time is a shared-host, shared-account observation and only breaks ties.",
+    "Quota percentages cannot be attributed to one arm, because other sessions share the account; they are context only.",
+    "The six arms spend a few million tokens of the shared allowance, and a usage limit can stop an arm until the reset.",
+    "Each call also carries Codex's own instructions and the definitions of the tools the overrides leave (code mode's exec, wait, request_user_input), which are part of every arm's measured tokens; the prompt asks for no tool, and a call that uses one fails without being scored.",
+    "The isolation evidence is a loopback probe with a fake provider: it shows what Codex offers and how it handles calls, not how the hosted models behave, and the provider could still change its side.",
+    "A call without a usage report (a timeout, an outage, an interruption or a dead runner) may have spent tokens Codex never reported; such calls make an arm's cost a lower bound and are listed by outcome."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Frozen paired comparison of A1, S0, S1, L0 and L1 against A0 (gpt-6-astra at max effort) for batched 8-K item extraction on the 2020-03-02 cohort, through codex-cli 0.157.1 on nativestack-5975wx-20260925. A routing result applies only to mechanical extraction stages with a deterministic scorer.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Nothing changes until an observed decision recommends an arm. A later routing change names the recommended model and effort in each mechanical extraction stage's own command. Rollback restores -m gpt-6-astra -c model_reasoning_effort=\"max\" there. The experiment writes only its private state directory, which can be removed once its aggregates are recorded.",
+  "next_decision_changing_test": "Run the six arms under the frozen command, resuming any limit-stopped arm after the reset, then apply analyze.py. A route_mechanical_extraction outcome qualifies only that model and effort, for mechanical extraction stages with a deterministic scorer. A different task, day, batch size or Codex version needs its own plan.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

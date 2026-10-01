@@ -1,0 +1,118 @@
+{
+  "steps": [
+    {
+      "step": "M1-old",
+      "binary": "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+      "exit": 0,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "migrations_after": {
+        "goals_1.sqlite": [
+          2,
+          2
+        ],
+        "logs_2.sqlite": [
+          2,
+          2
+        ],
+        "memories_1.sqlite": [
+          2,
+          2
+        ],
+        "queue_1.sqlite": [
+          2,
+          2
+        ],
+        "state_5.sqlite": [
+          55,
+          55
+        ],
+        "thread_history_1.sqlite": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "step": "M2-new",
+      "binary": "~/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+      "exit": 0,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "migrations_after": {
+        "goals_1.sqlite": [
+          2,
+          2
+        ],
+        "logs_2.sqlite": [
+          2,
+          2
+        ],
+        "memories_1.sqlite": [
+          2,
+          2
+        ],
+        "queue_1.sqlite": [
+          2,
+          2
+        ],
+        "state_5.sqlite": [
+          57,
+          57
+        ],
+        "thread_history_1.sqlite": [
+          7,
+          7
+        ]
+      }
+    },
+    {
+      "step": "M3-old-on-migrated",
+      "binary": "~/.local/share/codex-ecosystem/tools/codex-0.155.1/bin/codex",
+      "exit": 0,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "stderr_tail": "Reading additional input from stdin...\n",
+      "migrations_after": {
+        "goals_1.sqlite": [
+          2,
+          2
+        ],
+        "logs_2.sqlite": [
+          2,
+          2
+        ],
+        "memories_1.sqlite": [
+          2,
+          2
+        ],
+        "queue_1.sqlite": [
+          2,
+          2
+        ],
+        "state_5.sqlite": [
+          57,
+          57
+        ],
+        "thread_history_1.sqlite": [
+          7,
+          7
+        ]
+      }
+    }
+  ]
+}

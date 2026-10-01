@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--nautilus-trader--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "nautilus-trader",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/retained-checks.py nautilus-trader",
+      "exit": 0,
+      "duration_s": 0.026,
+      "output_sha256": "3f09dd21730a2bd059837481da0730038e121bc322efaaa7e90a9ee57760781e",
+      "output_excerpt": "{\"component\": \"nautilus-trader\", \"metadata_checked\": 3, \"scope\": \"Two isolated synthetic engine runs; no broker/network/order placement.\", \"native_execution_repeated\": false}\n"
+    }
+  ],
+  "tool_versions": {
+    "nautilus-trader": "2.0.0rc5"
+  },
+  "observed_at_utc": "2026-09-24T04:21:57Z",
+  "result": "pass",
+  "claim": "Validated the retained native command metadata for: Two isolated synthetic engine runs; no broker/network/order placement.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:21:57Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

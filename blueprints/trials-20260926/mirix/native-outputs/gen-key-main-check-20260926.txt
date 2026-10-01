@@ -1,0 +1,20 @@
+PASS fixed: exit 0 == 0
+PASS fixed: the generated value is in neither standard output nor standard error
+PASS fixed: key file mode 0o600 == 0o600 under umask 000
+PASS fixed: key file holds exactly the generated value and a newline
+PASS fixed: standard output names the destination
+PASS exists: exit 1 != 0
+PASS exists: failure reported without exception details
+PASS exists: no further key generated or registered
+PASS exists: existing file unchanged
+PASS symlink: exit 1 != 0
+PASS symlink: target unchanged and link kept
+PASS symlink: no further key registered
+PASS missing: exit 2 == 2
+PASS missing: no further key registered
+PASS error: non-zero exit with a value-free diagnostic
+PASS error: the generated value is in neither output stream
+PASS error: incomplete key file removed
+PASS error: no additional key registered
+PASS restrictive umask: exit 0 and mode 0600
+19 of 19 expectations held

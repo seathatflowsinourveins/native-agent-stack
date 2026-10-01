@@ -16,6 +16,7 @@ The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Pyth
 | [Tavily](tavily.md) | Tavily CLI installation, sign-in and returned results |
 | [SOTA convergence practice](sota-convergence-practice.md) | Reproducible dated repository-convergence recipe (`tools/sota-convergence/`): when to rerun, the six commands, evidence classes, the never-promote rule, and the cross-family review/PR/CI step. |
 | [Saturation sweep](saturation-sweep.md) | A person-started landscape sweep scoped to the layers the weekly `saturation-tracking` issue lists as due, with the evidence it must keep and the append to `catalogs/saturation/ledger.json` |
+| [Host request lane](host-request-lane.md) | Other PCs ask the GPU workstation for memory, RAG, model hosting and qualification work through GitHub issues; the workstation lists, polls, claims and reports them with `scripts/host_requests.py`, and a coordinator session runs the work (drafted: unit tests and read-only runs only) |
 
 ## Paths, pins and installation conventions
 
@@ -43,16 +44,16 @@ For an archive entry in the catalog, use its linked release and the following na
 
 ```sh
 REPOSITORY=rtk-ai/rtk
-RELEASE=v0.49.0
+RELEASE=v0.50.0
 ASSET=rtk-x86_64-unknown-linux-musl.tar.gz
-PREFIX="$STACK_HOME/tools/rtk-0.49.0"
+PREFIX="$STACK_HOME/tools/rtk-0.50.0"
 gh release view "$RELEASE" --repo "$REPOSITORY" --json tagName,assets
-mkdir -p "$PREFIX" "$STACK_HOME/downloads/rtk-0.49.0"
-gh release download "$RELEASE" --repo "$REPOSITORY" --pattern "$ASSET" --dir "$STACK_HOME/downloads/rtk-0.49.0"
-gh release download "$RELEASE" --repo "$REPOSITORY" --pattern checksums.txt --dir "$STACK_HOME/downloads/rtk-0.49.0"
+mkdir -p "$PREFIX" "$STACK_HOME/downloads/rtk-0.50.0"
+gh release download "$RELEASE" --repo "$REPOSITORY" --pattern "$ASSET" --dir "$STACK_HOME/downloads/rtk-0.50.0"
+gh release download "$RELEASE" --repo "$REPOSITORY" --pattern checksums.txt --dir "$STACK_HOME/downloads/rtk-0.50.0"
 # In the download directory, check the exact asset against the publisher's checksum.
 # Inspect archive members before extracting into the empty versioned prefix.
-cd "$STACK_HOME/downloads/rtk-0.49.0"
+cd "$STACK_HOME/downloads/rtk-0.50.0"
 sha256sum --check --ignore-missing checksums.txt
 tar -tf "$ASSET"
 tar -xf "$ASSET" -C "$PREFIX"
@@ -63,7 +64,7 @@ Do not treat a checksum file containing no matching asset as success. Archive fi
 
 | Repository / release | Linux x86_64 asset | SHA-256 |
 | --- | --- | --- |
-| openai/codex / rust-v0.155.1 | `codex-package-x86_64-unknown-linux-musl.tar.gz` | `a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2` |
+| openai/codex / rust-v0.159.2 | `codex-package-x86_64-unknown-linux-musl.tar.gz` | `9e2d29a713b94478b240dec2f10e11324cd05fad76dc43e7c639bdf8a1337a6b` |
 | Wilfred/difftastic / 0.71.0 | `difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz` | `61aea5394a53c56f144637cf39b3a0c0dafa27769731745e5851ff276e6478da` |
 | gitleaks/gitleaks / v8.30.1 | `gitleaks_8.30.1_linux_x64.tar.gz` | `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb` |
 | qdrant/qdrant / v1.19.1 | `qdrant-x86_64-unknown-linux-musl.tar.gz` | `70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9` |
@@ -78,75 +79,167 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | --- | --- | --- |
 | `affaan-m/ECC` · `dd6ee538aee0f548d4a6b520118f875431fd749e` | `git clone https://github.com/affaan-m/ECC.git "$STACK_HOME/tools/ECC"`, then `git -C "$STACK_HOME/tools/ECC" checkout --detach dd6ee538aee0f548d4a6b520118f875431fd749e` | Optional reference: read only `skills/search-first/SKILL.md` or `skills/iterative-retrieval/SKILL.md` when useful. `git rev-parse HEAD` verifies the source pin, not a runtime. Do not install the whole catalog. |
 | `agent-browser` · `0.38.1` | `npm install --global --prefix "$STACK_HOME/tools/agent-browser-0.38.1" agent-browser@0.38.1`; upstream `agent-browser install` downloads its browser; `--with-deps` additionally installs OS dependencies | [Browser workflow](#browser-workflow). Official skill content: `agent-browser skills get core`; load on demand. |
-| `agentsview` · `0.43.0` | Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive; select the host asset through `gh release view v0.43.0 --repo kenn-io/agentsview --json assets`, then the archive procedure | [History workflow](#history-and-usage). Explicit authorized archive scope is required; a blank archive is not evidence of zero historical usage. |
-| `ai-memory` · `2.3.2` | Official [akitaonrails/ai-memory v2.3.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2) archive; `gh release view v2.3.2 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files | [Memory setup and workflow](#project-memory). Back up existing data privately before replacing a running version; native status/search and direct MCP passed for this update. Earlier model receipts retain their original scope. |
-| `ast-grep` · `0.45.3` | `npm install --global --prefix "$STACK_HOME/tools/ast-grep-0.45.3" @ast-grep/cli@0.45.3` | `ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt`. `--stdin` is intentional because this JavaScript fixture has a `.txt` suffix. |
-| `ccusage` · `20.0.24` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable | [History and usage](#history-and-usage). Read existing logs; never manufacture provider usage by replaying a receipt. |
+| `agentsview` · `0.43.0` | Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive; select the host asset through `gh release view v0.43.0 --repo kenn-io/agentsview --json assets`, then the archive procedure | [History workflow](#history-and-usage). Explicit authorized archive scope is required; a blank archive is not evidence of zero historical usage. [v0.44.0](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0) (2026-09-21) is not qualified here: qualify it on a selected archive copy with the same project, session and filter checks before moving the pin. |
+| `ai-memory` · `2.4.1` | Official [akitaonrails/ai-memory v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1) archive; `gh release view v2.4.1 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files | [Memory setup and workflow](#project-memory). 2.4.1 migrates an existing store forward-only (a 2.3.2 store V64 to V67, a 2.4.0 store V66 to V67) when `serve` first opens it and writes no automatic archive for a 2.x store, so follow [upgrading an existing store](#upgrading-an-existing-store). On the NativeStack WSL2 host, 2.4.0 replaced 2.3.2 on 2026-09-25 and 2.4.1 replaced 2.4.0 on 2026-09-26, each after a rehearsal on restored copies and a cold-copy cutover (`evidence/receipts/ai-memory-240-qualification-20260925.json`, `evidence/receipts/ai-memory-241-qualification-20260925.json`); 2.4.0 is kept there for rollback. Earlier model receipts retain their original scope. |
+| `ast-grep` · `0.45.3` | `npm install --global --prefix "$STACK_HOME/tools/ast-grep-0.45.3" @ast-grep/cli@0.45.3` | `ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt`. `--stdin` is intentional because this JavaScript fixture has a `.txt` suffix. At 0.45.3 every command, `run` included, first looks for `sgconfig.yml`/`sgconfig.yaml` in the working directory and each parent and registers the native `customLanguages` libraries it names, with no opt-in ([`lib.rs` L107-139](https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/lib.rs#L107-L139), [`config.rs` L98-131 and L280-299](https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/config.rs#L98-L131)): run it from a directory whose ancestors hold no unreviewed config, or pass `-c` with a reviewed one. The `--allow-custom-languages` opt-in ([#2960](https://github.com/ast-grep/ast-grep/pull/2960)) is merged but in no release yet; qualify it once released. A passing call-match check does not establish `outline` hierarchy (open [#2957](https://github.com/ast-grep/ast-grep/issues/2957)) or YAML rule scope (unknown rule keys are ignored, open [#2963](https://github.com/ast-grep/ast-grep/issues/2963)); check other structural tasks against the original source. |
+| `ccusage` · `20.0.26` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable; for this pin, `npm install --global --prefix "$STACK_HOME/tools/ccusage-20.0.26" ccusage@20.0.26` ([receipt](../evidence/receipts/ccusage-20026-qualification-20260927.json)) | [History and usage](#history-and-usage). Read existing logs; never manufacture provider usage by replaying a receipt. Keep reports token-only (`--no-cost`) unless every model is priced: ccusage charges usage with no known price at 0, lists those models in `totals.unpricedModels` and marks each entry `missingPricing: true` ([JSON output](https://github.com/ccusage/ccusage/blob/v20.0.26/docs/guide/json-output.md#unpriced-models)). On 2026-09-27, 20.0.24's offline snapshot left `claude-opus-5-5` and `gpt-6-luna` unpriced in the retained native histories; 20.0.26's snapshot prices both and reports no unpriced model for the same range, with identical token totals. Its prices are upstream snapshot values, not a contract price: a cost figure still needs a separately qualified price for each model, through [`pricingOverrides`](https://github.com/ccusage/ccusage/blob/v20.0.26/docs/guide/config-files.md#pricing-overrides) where they differ. Totals are consumption, never tokens saved. |
 | `claude-code` · `2.1.278` | Download the [official native installer](https://code.claude.com/docs/en/setup) with `curl -fsSL https://claude.ai/install.sh -o "$STACK_HOME/downloads/claude-install.sh"`; inspect it, then `bash "$STACK_HOME/downloads/claude-install.sh" 2.1.278` | `claude --version` verifies installation. A real [native client pass](#native-client-acceptance) requires the user's normal signed-in account. Native auto-update can subsequently change this installed version. |
 | `claude-hud` · `0.8.0` / `ef5f1c8b167572ad1443c70629763ea8780af96b` | `claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json` | Optional: run `/claude-hud:setup` inside a fresh Claude session. Preserve any existing statusline before choosing the documented integration. A representative input render validates formatting only, not live context or savings. |
 | `codebase-memory-mcp` · `0.11.0` | Official [DeusData/codebase-memory-mcp v0.11.0](https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0), asset `codebase-memory-mcp-linux-amd64.tar.gz`; recorded SHA-256 `032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536` | [Static code graph](#static-code-graph). Invoke the binary directly; its all-client auto-installer is unnecessary. |
-| `codex` · `0.155.1` | Official [openai/codex rust-v0.155.1](https://github.com/openai/codex/releases/tag/rust-v0.155.1), complete package and hash above. Supported package-manager alternative: `npm install --global --prefix "$STACK_HOME/tools/codex-0.155.1" @openai/codex@0.155.1` | `codex --version`, then [native client acceptance](#native-client-acceptance). Preserve the existing account, model, approval policy and sandbox settings. |
+| `codex` · `0.159.2` | Changed after `v2026.09.26.2` (0.155.1 at that tag, then 0.157.1 from 2026-09-26 to 2026-09-30). Official [openai/codex rust-v0.159.2](https://github.com/openai/codex/releases/tag/rust-v0.159.2), complete package and hash above. Supported package-manager alternative: `npm install --global --prefix "$STACK_HOME/tools/codex-0.159.2" @openai/codex@0.159.2` | `codex --version`, then [native client acceptance](#native-client-acceptance). Preserve the existing account, model, approval policy and sandbox settings. A top-level `--search` does not reach `codex exec` in 0.155.1 or 0.157.1: `codex --search exec ...` keeps exec's default `web_search = "cached"` mode, so request live search with `codex exec -c web_search="live" ...` (measured 2026-09-26 against a loopback fake provider: the search requests carried `external_web_access` false with `--search` and true with the override; not re-measured at 0.159.2, whose `codex --help` and `codex exec --help` are byte-identical to 0.157.1's). Before the first interactive launch of 0.157.x or later, keep `daemon_auto_start = false` under `[features]` in `~/.codex/config.toml` (the bootstrap's [template](../adoption/templates/codex.config.template.toml) sets it; otherwise run `codex features disable daemon_auto_start`): without it that launch copies the package into `CODEX_HOME/packages/app-server-daemon` and starts a self-updating background app-server outside the pinned prefix (measured at 0.157.1; 0.159.2 still lists `daemon_auto_start` as stable and on, and the disable command still writes the key). The template also sets `check_for_update_on_startup = false` (changed after `v2026.09.26.2`), because upgrades follow this pin rather than Codex's startup prompt ([`config_toml.rs:520-523`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/config_toml.rs#L520-L523): "Set to `false` only if your Codex updates are centrally managed"). The NativeStack WSL2 host switched from 0.155.1 to 0.157.1 on 2026-09-26 and keeps 0.155.1 for rollback; `evidence/receipts/codex-01571-qualification-20260926.json` holds the qualification and the switch and rollback commands. On 2026-09-30 its launcher already ran a 0.159.2 prefix that another session had installed; `evidence/receipts/codex-01592-qualification-20260930.json` qualifies that prefix without a model call and lists the upstream changes between the two releases. `python3 -B scripts/codex_quota.py --json` reads the account's shared usage window through `codex app-server` ([token practice](../docs/token-practice.md#shared-codex-quota-2026-09-26)). |
 | `codex-for-claude` · `1.0.6` / `db52e28f4d9ded852ab3942cea316258ae4ef346` | `claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user`; `claude plugin install codex@openai-codex --scope user --json` | Optional: `/codex:setup` and `/codex:status` inside Claude. [Bridge scope](#optional-codex-for-claude). A status handshake does not consume a Codex model task or prove one completed. |
-| `context-hub` · `0.1.4` | `npm install --global --prefix "$STACK_HOME/tools/context-hub-0.1.4" @aisuite/chub@0.1.4` | `chub search 'python pytest' --json`; choose an actual returned ID, then `chub get "$DOC_ID" --lang py -o "$STACK_HOME/output/api-doc.md"`. Public registry/download access occurs; do not send feedback or annotations automatically. |
-| `context-mode` · `1.0.169` | Native plugin source, reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: a reviewed revision, not an enforced pin. A Claude marketplace source takes a branch or tag but not a commit, and none is set, so an install or update takes the default branch head; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence. | [Retained Context Mode workflow](#retained-context-mode). After installing, compare the installed `gitCommitSha` with this row ([bootstrap step 4a](../adoption/bootstrap.md)). Read `ctx_stats` as a connection-level estimate, never exact provider savings. |
+| `context-hub` · `0.1.4` | `npm install --global --prefix "$STACK_HOME/tools/context-hub-0.1.4" @aisuite/chub@0.1.4` | `chub search 'python pytest' --json`; choose an actual returned ID, then `chub get "$DOC_ID" --lang py -o "$STACK_HOME/output/api-doc.md"`. Public registry/download access occurs; apply the [native opt-out](#context-hub-opt-out) and do not send feedback or annotations automatically. Check the document's `metadata.versions` against the version the task targets before accepting a curated answer: the [FastAPI guide](https://github.com/andrewyng/context-hub/blob/6467ea3691ab44fbf489b3af0126f43153903b7e/content/fastapi/docs/package/python/DOC.md) covers 0.136.3, while FastAPI's latest release on 2026-09-27 was [0.141.1](https://github.com/fastapi/fastapi/releases/tag/0.141.1). A cache refresh re-downloads the registry but cannot add missing coverage, so use the current primary documentation for newer APIs. A retrieved fact answers its own task; it does not establish that the document is current. |
+| `context-mode` · `1.0.169` | Native plugin source, reviewed at `6f0cc6841c687e754059f36714a11233fda1a02b`: use the recommended SHA-pinned plugin source in [client setup](#native-context-mode-and-hooks). The default Claude marketplace-add commands below track the default branch; they alone do not enforce this pin. The npm `context-mode@1.0.169` package and reviewed plugin use the same context-mode source; separately built bundles that differ by one vendored expression. Their distinct installation surfaces still require full plugin evidence; see the [bundle comparison](../evidence/artifacts/context-mode-codex-binding-20260926/README.md#packages). | [Retained Context Mode workflow](#retained-context-mode). After installing, compare the installed `gitCommitSha` with this row; a revision that GitHub's compare API shows ahead of it with `stats.json` as the only changed file passes by content ([bootstrap step 4a](../adoption/bootstrap.md)). Read `ctx_stats` as a connection-level estimate, never exact provider savings. Record the two identities separately: the npm tarball digest in the [pins file](../adoption/pins-linux-x86_64.json), whose `start.mjs` the Codex user-scope server runs, and each client's installed plugin commit (Claude's `gitCommitSha`, the Codex marketplace `--ref`). The shared `1.0.169` label is not a source pin. |
 | `davila7/claude-code-templates` · `c840d6f626be7ba418da60aeb0f2080413562451` | `git clone https://github.com/davila7/claude-code-templates.git "$STACK_HOME/tools/claude-code-templates"`, then `git -C "$STACK_HOME/tools/claude-code-templates" checkout --detach c840d6f626be7ba418da60aeb0f2080413562451` | Optional reference: read `cli-tool/components/skills/productivity/concise-planning/SKILL.md` for a matching task. No all-agent pack installation or runtime E2E is implied. |
 | `difftastic` · `0.71.0` | Official [Wilfred/difftastic 0.71.0](https://github.com/Wilfred/difftastic/releases/tag/0.71.0), archive/hash above | `difft --exit-code --color never fixtures/before.py fixtures/after.py`. Exit **1** means differences with this flag; inspect the diff rather than treating it as a failed installation. |
 | `gitleaks` · `8.30.1` | Official [gitleaks/gitleaks v8.30.1](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1), archive/hash above | `gitleaks git --redact=100 --no-banner --no-color --report-format json --report-path "$STACK_HOME/output/gitleaks.json" "$PROJECT_ROOT"`. Exit 0 means no matches in the scanned scope; distinguish detection from operational errors. On macOS, run it through [`adoption/tools/gitleaks-guarded-macos`](../adoption/tools/README.md#macos-gitleaks-guarded-macos-2026-09-24). In this repository's all-refs history the redacted findings exceed its 6 GiB cap (exit 137), so scan a narrower range there. |
-| `headroom` · `0.37.0` | `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` | [Upstream MCP compression and retrieval](#headroom-native-compression-and-recovery). The earlier local exact-recovery guard remains separate; no automatic agent-traffic interception. |
+| `headroom` · `0.37.0` | `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` | [Upstream MCP compression and retrieval](#headroom-native-compression-and-recovery). The earlier local exact-recovery guard remains separate; no automatic agent-traffic interception. [v0.39.1](https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1) (2026-09-26) changes only the proxy rate limiter ([compare](https://github.com/headroomlabs-ai/headroom/compare/v0.39.0...v0.39.1) touches no log compressor), so the omission-count defect that kept 0.39.0 out ([receipt](../evidence/receipts/headroom-039-qualification-20260925.json)) stands. Qualify a release on omission counts, required facts and exact retrieval before moving the pin. |
 | `huggingface-hub-native` · `1.32.0` | `uv tool install huggingface-hub==1.32.0` | `hf --version`; [revision-pinned model download](#local-semantic-code-search). Authentication, if needed, uses native `hf auth login`; never publish credentials. |
-| `markitdown` · `0.1.7` | `uv tool install markitdown==0.1.7` | `markitdown fixtures/greeting.html -o "$STACK_HOME/output/greeting.md"`; inspect the greeting in the result. This uses the base HTML converter; PDF/Office extras are separate decisions. |
-| `mcp-inspector` · `2.7.0` | `npm install --global --prefix "$STACK_HOME/tools/mcp-inspector-2.7.0" @modelcontextprotocol/inspector@2.7.0` | `mcp-inspector --cli --config "$PROJECT_ROOT/.mcp.json" --server socraticode --method tools/list --format json --stored-auth-only --cwd "$PROJECT_ROOT"`. Handshake/schema discovery only; follow with a selected tool call for functionality. |
-| `mcporter` · `0.13.13` | `npm install --global --prefix "$STACK_HOME/tools/mcporter-0.13.13" mcporter@0.13.13` | `mcporter --config "$MCPORTER_CONFIG" list socraticode --brief --no-oauth`, then [local semantic search](#local-semantic-code-search) or [Context Mode](#retained-context-mode). Node >=24 is required. |
+| `markitdown` · `0.1.8` | `uv tool install markitdown==0.1.8` | `markitdown fixtures/greeting.html -o "$STACK_HOME/output/greeting.md"`; inspect the greeting in the result. This uses the base HTML converter; PDF/Office extras are separate decisions. 0.1.8 replaced 0.1.7 on the NativeStack WSL2 host on 2026-09-25 after a discriminating comparison (`evidence/receipts/markitdown-018-qualification-20260925.json`): fixture, 8-K and committed-HTML outputs are byte-identical, while `<u>` now stays inline HTML and `<strike>`, `%2F` paths and `data-src` images convert differently. The converter follows the file extension: HTML saved as `.txt` exits 0 with its markup passed through unchanged ([E1 receipt](../evidence/artifacts/token-e2e-ultracode-20260925/README.md#retained-failures-and-gaps)). Give the type with `-x html` or `-m text/html` ([`__main__.py`](https://github.com/microsoft/markitdown/blob/v0.1.8/packages/markitdown/src/markitdown/__main__.py#L65-L75)), then check that the output has no raw tags and holds the required facts. Install and qualify only the extras a workload needs ([optional dependencies](https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#optional-dependencies)); one HTML success says nothing about other formats. The host runs the qualification prefix, and the bootstrap's `install_pin` form, which omits `--exclude-newer`, has no fresh-host equivalence check yet (receipt limitations). |
+| `mcp-inspector` · `2.8.0` | `npm install --global --prefix "$STACK_HOME/tools/mcp-inspector-2.8.0" @modelcontextprotocol/inspector@2.8.0` | `mcp-inspector --cli --config "$PROJECT_ROOT/.mcp.json" --server socraticode --method tools/list --format json --stored-auth-only --cwd "$PROJECT_ROOT"`. Handshake/schema discovery only; follow with a selected tool call for functionality. Read the installed version with `npm ls --global --prefix "$STACK_HOME/tools/mcp-inspector-2.8.0" --depth=0`: the launcher has no version flag and forwards unknown arguments to the default web mode, so `mcp-inspector --version` starts the web UI with `--version` as a stdio server command (observed 2026-09-25 on 2.7.0; the 2.8.0 launcher file is byte-identical). Unless `MCP_AUTO_OPEN_ENABLED=false`, that web mode also opens a browser tab (on WSL, the Windows browser), which then shows `spawn --version ENOENT`; both client templates set it to `false` for agent commands (`resolveAutoOpen` in the 2.7.0 and 2.8.0 web builds). 2.8.0's web server turns its API token gate off only for `DANGEROUSLY_OMIT_AUTH` set to `true` or `1`; 2.7.0 turned it off for any non-empty value, including `false` and `0` ([PR #2390](https://github.com/modelcontextprotocol/inspector/pull/2390), measured in the receipt below). npm 11 reports the package's `postinstall` as not allowed; that script exits at once for a package installed under `node_modules`, so nothing is missing. 2.8.0's package license is `SEE LICENSE IN LICENSE`, which describes an MIT-to-Apache-2.0 relicensing transition. 2.8.0 replaced 2.7.0 on the NativeStack WSL2 host on 2026-09-26 after a matched comparison (`evidence/receipts/mcp-inspector-280-qualification-20260926.json`). |
+| `mcporter` · `0.14.1` | `npm install --global --prefix "$STACK_HOME/tools/mcporter-0.14.1" mcporter@0.14.1` | `mcporter --config "$MCPORTER_CONFIG" list socraticode --brief --no-oauth`, then [local semantic search](#local-semantic-code-search) or [Context Mode](#retained-context-mode). Node >=24 is required, and so is `ps` on the PATH of whatever launches the daemon: 0.14.x finds `ps` through PATH, and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Before switching versions, stop a running daemon once `mcporter daemon status --json` shows `activeCalls` 0 on every server; both versions speak daemon protocol 3, so an old daemon keeps serving new clients. 0.14.1 replaced 0.13.13 on the NativeStack WSL2 host on 2026-09-25 after a matched 37-step comparison (`evidence/receipts/mcporter-0141-qualification-20260925.json`). With `--stdio`, `--name` only names the ad-hoc server ([`ephemeral-flags.ts` L97-105](https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/ephemeral-flags.ts#L97-L105)); without `--server` or a `server.tool` selector, 0.14.1 takes the first positional token, such as `content=@file`, as the server ([`call-arguments.ts` L164-192](https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L164-L192)), so the argument never reaches the tool. Pass `--server NAME --tool TOOL` with `--name NAME`. A successful call is transport acceptance, not a token saving. |
 | `openresearch` · `0.2.7` | Official [alphaXiv/OpenResearch v0.2.7](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7), asset `openresearch-cli-x86_64-unknown-linux-musl.tar.xz`; [qualified archive and rollback](native-upgrades-20260921.md) | `orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3`; retrieve only a selected result with `orx --no-telemetry paper "$PAPER_ID" --full`. Public literature access, not a model-quality ranking. |
 | `playwright-cli` · `0.1.21` | `npm install --global --prefix "$STACK_HOME/tools/playwright-cli-0.1.21" @playwright/cli@0.1.21`; bundled Playwright `1.64.0-alpha-1789764292000` | Optional alternative to agent-browser. `playwright-cli --help` checks installation only; consult its native skill for the chosen browser workflow. Historical installation evidence is Windows-scoped, not a claimed Linux browser E2E. |
 | `promptfoo` · `0.123.1` | `npm install --global --prefix "$STACK_HOME/tools/promptfoo-0.123.1" promptfoo@0.123.1` | `PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config "$EVAL_CONFIG" --no-cache --no-table --no-progress-bar --no-share --no-write --output "$EVAL_RESULT"`. The retained native fixture used a local echo provider and passed two exact assertions with zero model tokens. Select the intended provider/data explicitly; no paid default is supplied. |
 | `qdrant` · `1.19.1` | Official [qdrant/qdrant v1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), archive/hash above; retain Apache-2.0 license | `qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry`; [loopback service and RAG](#local-semantic-code-search). Persistent data paths are separate from the versioned binary. |
-| `qmd` · `2.8.3` | `npm install --global --prefix "$STACK_HOME/tools/qmd-2.8.3" @tobilu/qmd@2.8.3` | [Document workflow](#documents-and-selected-artifacts). BM25 `search` uses no model weights; native dependencies can still occupy substantial disk. `query`/`embed` are separate model-enabled choices. |
-| `repomix` · `1.18.1` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable | `repomix "$PROJECT_ROOT" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output "$STACK_HOME/output/selected-code.xml"`. Explicit two-file artifact; compression omits details, so read originals before editing. |
-| `rtk` · `0.49.0` | Official [rtk-ai/rtk v0.49.0](https://github.com/rtk-ai/rtk/releases/tag/v0.49.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above | In this clone, `rtk git log -6`; use `rtk proxy git log -6` for raw recovery. [Native hooks](#native-context-mode-and-hooks) keep Codex explicit at this stable pin. Counters estimate savings. |
+| `qmd` · `2.8.3` | `npm install --global --prefix "$STACK_HOME/tools/qmd-2.8.3" @tobilu/qmd@2.8.3` | [Document workflow](#documents-and-selected-artifacts). BM25 `search` uses no model weights; native dependencies can still occupy substantial disk. `query`/`embed` are separate model-enabled choices; the MCP `query` tool expands plain text and reranks by default, so a lexical call passes typed `lex` searches with `rerank: false` ([document workflow](#documents-and-selected-artifacts)). |
+| `repomix` · `1.18.1` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable | `repomix "$PROJECT_ROOT" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output "$STACK_HOME/output/selected-code.xml"`. Explicit two-file artifact; compression omits details, so read originals before editing. `--compress` keeps a Python definition only when the first physical line of its signature matches one regex, so a multi-line signature drops the whole definition without notice ([`PythonParseStrategy.ts` L81-86 at v1.18.1](https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81-L86); both E2E receipts lost `status_body`). For exact definitions, signatures or inventories, use an uncompressed pack or the original source, compare every required name, and count that recovery read. Before a handoff, check the pack's file list and the command's exit status. |
+| `rtk` · `0.50.0` | Official [rtk-ai/rtk v0.50.0](https://github.com/rtk-ai/rtk/releases/tag/v0.50.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above; for the Claude hook, also the [`exclude_commands` config](#native-context-mode-and-hooks) | In this clone, `rtk git log -6`; use `rtk proxy git log -6` for raw recovery. [Native hooks](#native-context-mode-and-hooks) keep Codex explicit at this stable pin. Counters estimate savings. 0.50.0 replaced 0.49.0 on the NativeStack WSL2 host on 2026-09-25 (`evidence/receipts/rtk-050-qualification-20260925.json`); 0.49.0's hook returned wrong `head` windows and, for failures reported only on stderr, lost the error text while keeping the exit code. |
 | `sandbox-runtime` · `0.0.77` | `npm install --global --prefix "$STACK_HOME/tools/sandbox-runtime-0.0.77" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.77` | [Isolation workflow](#on-demand-isolation). Linux requires bubblewrap, socat and ripgrep. Package metadata establishes the pin; the CLI can report a fallback version. |
-| `serena` · `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` | Native pinned execution: `uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd` | [Client MCP setup](#native-project-mcp). Upstream declares `2.0.0.dev0`; the commit is the identity. Language-server support varies by project; a handshake alone does not prove every language. |
+| `serena` · `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` | Installed command, which the adoption MCP templates name as `${ECO_ROOT}/bin/serena`: `uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143` with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the ecosystem prefix, as in [bootstrap step 4a](../adoption/bootstrap.md). One-off pinned execution without an install: `uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd` | [Client MCP setup](#native-project-mcp). Upstream declares `2.0.0.dev0`; the commit is the identity. Language-server support varies by project; a handshake alone does not prove every language. |
 | `shanraisshan/claude-code-best-practice` · `15969ed2471a177d938c889255d2f23f07e4742a` | `git clone https://github.com/shanraisshan/claude-code-best-practice.git "$STACK_HOME/tools/claude-code-best-practice"`, then `git -C "$STACK_HOME/tools/claude-code-best-practice" checkout --detach 15969ed2471a177d938c889255d2f23f07e4742a` | Optional reference: read selected README guidance; verify advice against current native docs. No runtime or bulk plugin installation. |
 | `shellcheck` · `0.11.0` | Official [koalaman/shellcheck v0.11.0](https://github.com/koalaman/shellcheck/releases/tag/v0.11.0), asset `shellcheck-v0.11.0.linux.x86_64.tar.xz`; archive procedure | `shellcheck --norc --format=json1 fixtures/example.sh`; inspect all diagnostics. Static shell analysis is not a product test suite. |
-| `socraticode` · `1.14.0` | `npm install --global --prefix "$STACK_HOME/tools/socraticode-1.14.0" --ignore-scripts socraticode@1.14.0` | [Local semantic code search](#local-semantic-code-search). Source `2218f25153d0f3f4a76ee240a5643dbc873e80be`; AGPL-3.0-only with upstream commercial alternative. This profile uses external local services, not Docker or a cloud key. |
-| `toon` · `4.1.1` | `npm install --global --prefix "$STACK_HOME/tools/toon-4.1.1" @toon-format/cli@4.1.1` | `toon fixtures/records.json --stats -o "$STACK_HOME/output/records.toon"`; `toon "$STACK_HOME/output/records.toon" --decode --strict -o "$STACK_HOME/output/records.recovered.json"`. Compare decoded JSON values to the original, including numeric precision. Token estimates are not provider billing. |
-| `vllm` · `0.25.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.25.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.25.0/bin/python" vllm==0.25.0` | [Pinned local GPU embedding service](#local-semantic-code-search). Latest observed 0.29.0 resolved and installed but failed GPU startup under WSL with unavailable UVA; 0.25.0 was restored and real search passed. Do not label 0.25.0 latest or 0.29.0 ready. |
+| `socraticode` · `1.15.0` | `npm install --global --prefix "$STACK_HOME/tools/socraticode-1.15.0" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0` | [Local semantic code search](#local-semantic-code-search). Source `f6191f076a42405f0d5508139f3a8b505cfef93a`; AGPL-3.0-only with upstream commercial alternative. This profile uses external local services, not Docker or a cloud key. `--before` reproduces the qualified dependency tree; the package ships no shrinkwrap. The macOS pin stays 1.14.0 until a Mac qualifies 1.15.0. |
+| `toon` · `4.1.1` | `npm install --global --prefix "$STACK_HOME/tools/toon-4.1.1" @toon-format/cli@4.1.1` | `toon fixtures/records.json --stats -o "$STACK_HOME/output/records.toon"`; `toon "$STACK_HOME/output/records.toon" --decode --strict -o "$STACK_HOME/output/records.recovered.json"`. Compare decoded JSON values to the original, including numeric precision. Token estimates are not provider billing. Keep the original JSON unless the strict decode is value-equal: 4.1.1 emits a root string that starts with U+FEFF unquoted, and decoding strips it, which can change the value or its type (open [#339](https://github.com/toon-format/toon/issues/339)). Choose TOON by the exact encoded size and that equality. No record count is an upstream threshold: the tabular encoder takes any number of non-empty objects that share one key set, with columns of primitives or, recursively, of non-empty objects that share one key set; an empty object or an array-valued column falls back to list form ([`tabular.ts` L6-78](https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts#L6-L78)). |
+| `vllm` · `0.30.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.30.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.30.0/bin/python" vllm==0.30.0` | [Pinned local GPU embedding service](#local-semantic-code-search). 0.30.0 carries the WSL pinned-memory fallback and serves the production embeddings on the NativeStack WSL2 host since 2026-09-25, qualified against 0.25.0 first (identical embeddings and code-index results; `evidence/receipts/vllm-030-switch-20260925.json`). 0.29.0 failed GPU startup under WSL with unavailable UVA; keep 0.25.0 installed for rollback until the new pin has run a while. |
 | `worktrunk` · `0.79.0` | Official [max-sixty/worktrunk v0.79.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0); [qualified archive and rollback](native-upgrades-20260921.md) | `wt list --format json`; for an actual owned writing task, `wt switch --create "$BRANCH" --base "$BASE_REF" --no-cd --no-hooks --format json`. The retained disposable lifecycle verified selection and `wt remove "$BRANCH" --foreground --no-hooks --format json`, leaving only the original worktree. |
+
+## Context Hub opt-out
+
+For `@aisuite/chub@0.1.4`, set `telemetry: false` and `feedback: false` in `~/.chub/config.yaml`. These are upstream settings: [`docs/cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229) documents both switches and their environment equivalents; [`SECURITY.md:28`](https://github.com/andrewyng/context-hub/blob/v0.1.4/SECURITY.md#L28) confirms the telemetry config location. Use `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` only for invocations where `HOME` or `CHUB_DIR` is overridden, such as a worker using another home: [`cli/src/lib/config.js:23–40`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js#L23-L40) resolves the config from that location. No wrapper script is needed. The verified npm tarball digest is recorded in both [Linux](../adoption/pins-linux-x86_64.json) and [macOS](../adoption/pins-macos-arm64.json) pins; it is artifact identity, not native acceptance.
+
+**2026-09-27 amendment:** the explicit Codex `stack-worker` profile is the one
+carrier that sets both environment opt-outs unconditionally, whenever
+`-p stack-worker` is selected, whatever `HOME` is. The home-only rule above
+continues to apply to other invocations. See the
+[worker decision addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub)
+and Context Hub `v0.1.4`
+[`telemetry.js`](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js#L5-L14),
+which checks these variables before loading configuration.
 
 ## Native context mode and hooks
 
-The reviewed native plugin revision below declares 1.0.169. Full plugin hooks and the older npm release's MCP-only behavior are distinct. [Codex's marketplace CLI](https://github.com/openai/codex) takes that revision as `--ref` and checks it out. A [Claude marketplace source](https://code.claude.com/docs/en/plugin-marketplaces) takes a branch or tag but not a commit, so the Claude commands install the default branch head and `6f0cc68` stays a reviewed revision, not an enforced pin. Measured 2026-09-24 on Claude Code 2.1.281 and codex-cli 0.155.1, each in an empty scratch configuration ([retained runs](../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json)): on this repository the former `mksglu/context-mode@6f0cc68…` form exited 1 with a failed clone, while the tag form `@v1.0.169` succeeded (it checks out `589d821`, 133 commits before the review); plain `git clone --branch <commit>` also fails, because a commit is not a branch; the Claude form below recorded no ref and installed `5a92b7c`, six commits past the review that change only `stats.json`; and the Codex `--ref` form checked out `6f0cc68`. Check the installed revision with [bootstrap step 4a](../adoption/bootstrap.md) before relying on it:
+The reviewed native plugin revision below declares 1.0.169. Full plugin hooks and the npm CLI's MCP-only installation are distinct; the [bundle comparison](../evidence/artifacts/context-mode-codex-binding-20260926/README.md#packages) records their shared context-mode source. [Codex's marketplace CLI](https://github.com/openai/codex) takes that revision as `--ref` and checks it out. A [Claude marketplace source](https://code.claude.com/docs/en/plugin-marketplaces) takes a branch or tag but not a commit, so the Claude commands install the default branch head and `6f0cc68` stays a reviewed revision, not an enforced pin. Measured 2026-09-24 on Claude Code 2.1.281 and codex-cli 0.155.1, each in an empty scratch configuration ([retained runs](../evidence/artifacts/community-sweep-20260924/plugin-marketplace-refs.json)): on this repository the former `mksglu/context-mode@6f0cc68…` form exited 1 with a failed clone, while the tag form `@v1.0.169` succeeded (it checks out `589d821`, 133 commits before the review); plain `git clone --branch <commit>` also fails, because a commit is not a branch; the Claude form below recorded no ref and installed `5a92b7c`, six commits past the review that change only `stats.json`; and the Codex `--ref` form checked out `6f0cc68`. Check the installed revision with [bootstrap step 4a](../adoption/bootstrap.md) before relying on it:
 
 ```sh
 codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json
 codex plugin add context-mode@context-mode --json
 codex features enable hooks
-codex features enable plugin_hooks
 
 claude plugin marketplace add mksglu/context-mode --scope user   # a marketplace source takes no commit ref: this installs the default branch head
 claude plugin install context-mode@context-mode --scope user --json
 ```
 
+**Recommended Claude pin (CM H5 / B6).** In a scratch `CLAUDE_CONFIG_DIR`, use a hand-authored `.claude-plugin/marketplace.json` whose context-mode entry has `source: {"source":"github","repo":"mksglu/context-mode","sha":"6f0cc6841c687e754059f36714a11233fda1a02b"}`. Register that marketplace and install its context-mode entry through Claude's native marketplace/plugin commands. The remote plugin source's `sha` field pins the reviewed commit, bypassing the marketplace-add branch/tag limitation of the default-head commands above. The supported field is **`sha`**, as specified by the [marketplace reference, shared `ref`/`sha` fields and GitHub source example](https://code.claude.com/docs/en/plugins/marketplace-reference#github-plugin-source) (retained reference lines 148–151 and 181–196). Check the installed `gitCommitSha` before adopting that registration in the intended profile; this paragraph documents the installation path, not a new host acceptance run.
+
 Back up the affected settings privately first; preserve unrelated hooks and plugin entries. In **each actual Codex runtime/home**, open a fresh native session and use `/hooks` to inspect and trust the exact installed definitions. Project trust and hook-definition trust are separate. Do not write trust databases by hand or add bypass flags. Reopen a Desktop task after supported configuration changes: an existing task's tool catalog does not automatically hot-load new servers. Claude's `/context-mode:ctx-doctor` checks its own native integration.
 
 Context Mode's upstream `start.mjs` can maintain its own dependencies/cache-heal hooks and check the npm registry. Native installation is not a promise of offline-only startup. Keep native plugin version/provenance receipts and review changes before upgrading.
 
-RTK 0.49.0 supplies a supported Claude hook and explicit Codex instructions. Install global awareness once in each intended client profile, preserving its existing native home:
+RTK 0.50.0 supplies a supported Claude hook; Codex uses explicit `rtk` commands. Install Claude's global awareness once in each intended client profile, preserving its existing native home:
 
 ```sh
 rtk init --global --auto-patch --no-trust-filters
-rtk init --global --codex
 rtk init --global --show
-rtk init --global --codex --show
 ```
 
-Run the Codex form separately under each intended `CODEX_HOME`; an inherited Desktop home must not be mistaken for the native CLI home. The installer writes `RTK.md` and its global instruction reference. Claude's command installs awareness and preserves an existing matching hook; `--no-trust-filters` avoids expanding trusted project filters during this setup. Fresh sessions consume these instructions. Setup is not a prerequisite to repeat at every startup.
+The installer writes `RTK.md` and its global instruction reference. Claude's command installs awareness and preserves an existing matching hook; `--no-trust-filters` avoids expanding trusted project filters during this setup. Fresh sessions consume these instructions. Setup is not a prerequisite to repeat at every startup. The 2026-09-25 switch to 0.50.0 did not re-run `rtk init`: the hook command it registers, `rtk hook claude`, is unchanged, and the adoption Claude settings template already names it.
 
-The Codex form at this pin writes instructions, not an automatic command-rewriting hook; do not combine `--codex` with `--auto-patch`. The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks. Verify the result with one useful native task and its actual tool output.
+Do not run the Codex form (`rtk init --global --codex`) at this pin. At 0.49.0 it wrote instructions only; at 0.50.0, `rtk init --help` describes `--codex` as "Target Codex CLI (uses PreToolUse hook + AGENTS.md + RTK.md)", and that hook answers `permissionDecision: "allow"` on every rewrite, because Codex applies `updatedInput` only with it ([`src/hooks/hook_cmd.rs:900`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/hook_cmd.rs#L900) and [`hooks/codex/README.md:14`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/hooks/codex/README.md?plain=1#L14) at tag commit `1d87b8e7`). Per that README, Codex's own command approval and sandbox checks still run on the rewritten command, but its safety classifier does not unwrap `rtk`, which can add prompts for known-safe commands or obscure the signal for wrapped mutating commands such as `git push`. That Codex hook is not qualified here. The form's instructions never reached a Codex model either: it writes `RTK.md` and an `@RTK.md` line into the global `AGENTS.md`, and Codex expands no `@` reference (`codex-rs/core/src/agents_md.rs` at `rust-v0.157.1`), so the model gets the path as text (`codex debug prompt-input` shows the line), and a Codex home that ran the form at 0.49.0 has only that pointer. Codex's RTK instructions are the inline block of the [Codex worker lane](#codex-worker-lane), which changed after `v2026.09.26.2`. The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks. Verify the result with one useful native task and its actual tool output.
+
+**Claude hook exclusions at 0.50.0.** Through the hook, 0.50.0 windows a large `git show <rev>:<path>` blob to about 8 KiB and appends a recovery hint, so `git show <rev>:<path> | tail -n 5` returns lines from that window instead of the end of the file. `diff` on a missing file exits 1 instead of 2 (0.49.0 too). The bare `"^git show [^ ]*:"` pattern only matches that exact form: `git -C <dir> show HEAD:README.md` is still rewritten and windowed (8,261 of 22,907 bytes, 117 of 274 lines, ending `+157 lines`), so it needs a pattern that also matches the global options rtk's own discovery strips before dispatch (`GIT_GLOBAL_OPT`, [`src/discover/registry.rs:78`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L78)): `-C`/`-c`/`--git-dir`/`--work-tree` with a value, or another `--flag`. Separately, `git branch -a`'s branch-name compaction (`filter_branch_output`, [`src/cmds/git/git_cmd.rs:3185-3244`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L3185-L3244) at tag commit `1d87b8e7`, unchanged on `develop` at `c75f159`, no upstream issue filed) keeps git's `+ ` prefix on a local branch checked out in a linked worktree unconditionally (see the `git-branch` man page; `git_cmd.rs:3209-3211`); its `local.contains(r)` check then misreports that branch as remote-only, but only when a remote-tracking branch of the same name also exists (`git_cmd.rs:3224-3227`) — 31 reported against 6 real in one fixture. Set the `exclude_commands` key of the `[hooks]` table in `~/.config/rtk/config.toml` (`$XDG_CONFIG_HOME/rtk/config.toml` when that is set to an absolute path; on macOS `~/Library/Application Support/rtk/config.toml`, where rtk ignores `XDG_CONFIG_HOME`, as [the macOS page](../adoption/platforms/macos-arm64.md) explains; `rtk config` prints the file rtk reads on its first line) to the value in this block: inside the existing `[hooks]` table, **replace** the key's whole value, from `exclude_commands =` through its closing `]` (or add the key when the table lacks it), and add the `[hooks]` header line only when the file has no `[hooks]` table, keeping any other keys and tables the file already has — a second `[hooks]` header or `exclude_commands` key is invalid TOML, and rtk then silently falls back to defaults (`Config::load().unwrap_or_default()`, `src/core/config.rs:278-281`) rather than erroring, so a leftover duplicate is a silent no-op, not a merge:
+
+```toml
+[hooks]
+exclude_commands = [
+  "^git show [^ ]*:",
+  "diff",
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:',
+  '^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)',
+  "jq",
+]
+```
+
+The third and fourth entries anchor to the git subcommand position: only global options (`-C`/`-c`/`--git-dir`/`--work-tree` with a value, or another `--flag`) may come before `show`/`branch`, so `git show REV:path` and `git branch` are excluded in a bare form, a `-C`/`-c <dir>` form, a `--git-dir`/`--work-tree` form and a `--flag` form (`git show --stat HEAD`, with no colon-blob argument, still gets rewritten), while a command that merely mentions "show", "branch" or a colon as an ordinary argument — `git commit -m "update branch docs"`, `git push origin branch`, `git diff main branch` — is no longer wrongly excluded. Both are single-quoted TOML literal strings so the backslashes are not doubled. The `show` pattern can still match a `git show` call whose *later* argument contains `:` (for example `--pretty=format:%h`); that stays harmless, since the command then runs natively and the only cost is the lost `rtk` output compression. Retained verification on the pinned rtk 0.50.0 binary with a scratch config holding only this block: [`evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt`](../evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt) (binary sha256 `23433a2a…`, the binary extracted from the upstream `rtk-ai/rtk` v0.50.0 release asset tarball, sha256 `bc2b8902…`); the two gaps were first found in the laptop's separate 2026-09-26 ultracode E2E (`evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json`, sibling PR #316 — cited here for the discovery, not as this fix's verification).
+
+The fifth entry is plain `"jq"`: [`compile_exclude_patterns`, RTK v0.50.0, `src/discover/registry.rs:1540–1569`](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1540-L1569) anchors it as `^jq($|\s)`, excluding only matching command segments. Then `rtk hook check "jq -r .x f.json"` prints `No rewrite for: jq -r .x f.json` on stderr and exits 1, while `rtk hook check "git status && jq ."` prints `rtk git status && jq .` on stdout and exits 0. The git segment still rewrites: F3's compound-command handling applies the exclusion per segment ([`registry.rs:1226–1345`](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1226-L1345)); the check's output streams are defined in [`src/main.rs:2940–2952`](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952).
+
+Then `rtk hook check "git show HEAD:x | tail -n 5"`, `rtk hook check "diff a.txt missing.txt"`, `rtk hook check "git -C repo show HEAD:x"`, `rtk hook check "git --git-dir /r/.git show HEAD:x"` and `rtk hook check "git --work-tree /w branch -a"` print `No rewrite for: ...` and exit 1, while `rtk hook check "git show HEAD~1"`, `rtk hook check "git show --stat HEAD"`, `rtk hook check "git --git-dir /r/.git status"`, `rtk hook check "git push origin branch"` and `rtk hook check 'git commit -m "update branch docs"'` still print their rewrites. [`adoption/bootstrap-linux.sh`](../adoption/bootstrap-linux.sh) installs only the binary. It prints a reminder unless the `exclude_commands` key appears exactly once with all five entries **and** the installed `rtk hook check` answers `No rewrite for: ...` with exit 1 for `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a`, `git -C . branch` and `jq -r .x f.json` in your own environment. The second check exists because a TOML-valid file with the exact text can still be ignored: rtk deserializes the whole file, and a `[tracking]` table without `history_days` fails [`TrackingConfig`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/core/config.rs#L152-L158), so the hook's [`cached_config`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/core/config.rs#L261-L281) falls back to the defaults, with no exclusions and no warning. A second, independent upstream acknowledgment of this silent-fallback defect class is [RTK v0.50.0 `AWARENESS_CONFIG.md:63–67`](https://github.com/rtk-ai/rtk/blob/v0.50.0/AWARENESS_CONFIG.md#L63-L67): malformed `[awareness]` configuration reaches `Config::load().unwrap_or_default()` during init, silently installs defaults, and has no stderr warning; the document proposes adding one. This corroborates the malformed `[tracking]` case above, rather than promising an existing warning. After any edit to this file, check it with `rtk hook check`. No adoption template renders this file, so create it by hand. rtk treats an entry that starts with `^` as a raw Rust regex, tested with `is_match` against each command segment, and turns any other entry into `^<escaped entry>($|\s)`, so `"diff"` excludes `diff a b` but not `git diff` ([`compile_exclude_patterns`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L1540-L1569), [`is_excluded`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L1599-L1604)). The exclusions govern only the hook's rewrite: a command that already starts with `rtk` passes through unchanged ([`registry.rs:1690`](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L1690-L1693)), so an explicit `rtk git show <rev>:<path>` still runs the [blob handler](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/cmds/git/git_cmd.rs#L437) and windows the blob; read a whole blob with native `git show` or `rtk proxy git show`. (2026-09-26: a single-regex alternative, `'^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)'` with `"diff"`, was also tested that day and is retained as evidence only ([re-test](../evidence/artifacts/sota-refresh-20260925/rtk/out/mitigation-20260926.out)); the adopted recipe is the five-entry set above.) Rewrites that stay imperfect in both versions: `find` on a missing relative directory exits 0 without output, plain `git log` stops at 10 commits without a notice and drops merge commits, and `python3 -m pytest` becomes `rtk pytest`, which does not use the named interpreter; use `rtk proxy <command>` or the native command where that matters. Before rolling back to 0.49.0, count `saved_tokens<0` rows read-only in a snapshot of `history.db`: 0.49.0 shows such rows as values near 1.8e19 in `rtk gain --history` and `--all` (including `--all --format json|csv`), while plain `rtk gain --format json` showed none in the qualification test ([receipt](../evidence/receipts/rtk-050-qualification-20260925.json)).
+
+## Codex worker lane
+
+This lane changed after `v2026.09.26.2`: a host checked out at that tag has none of its files. [`tools/adoption/apply_codex_lane.py`](../tools/adoption/apply_codex_lane.py) makes four changes to one Codex home, recorded in [the decision](../docs/decisions/2026-09-26-codex-worker-lane.md):
+
+- **`config.toml`**, written only through Codex's own writer: `codex app-server` `config/batchWrite` with `expectedVersion` taken from a `config/read` in the same session. It sets the [template's](../adoption/templates/codex.config.template.toml) session-bound `[mcp_servers.context-mode]` (upstream `start.mjs` from the npm pin, no `cwd`, `default_tools_approval_mode = "approve"`), turns the context-mode plugin's own server off, and adds headroom's four offline variables. It also sets the template's `startup_timeout_sec` on serena (60) and SocratiCode (120) when they are registered, which changed after `v2026.09.26.2`: `codex mcp add` has no timeout option (`codex mcp add --help` at 0.157.1 and 0.159.2), so a server it registered waits Codex's 30-second default (`codex-rs/codex-mcp/src/rmcp_client.rs` L103 at `rust-v0.157.1`, L105 at `rust-v0.159.2`). The writer keeps comments and every other key. It does not check key names, so the script sends only these keys and reads them back.
+- **`AGENTS.md`** gets the block in [`adoption/templates/codex.AGENTS.template.md`](../adoption/templates/codex.AGENTS.template.md): the top rule, rtk-ai/rtk v0.50.0's `hooks/rtk-awareness-full.md` verbatim, and this catalog's exceptions. The exceptions are the four hook exclusions above, standalone `jq`, a complete `git log`, `find` on a path that may be missing, and no `rtk` before a shell builtin (`rtk cd /tmp && echo REACHED` exits 127 at 0.50.0; upstream issue #3969, fix #4175 not merged). An explicit `rtk` prefix skips `exclude_commands`, so the model needs these exceptions in words. Lines outside the block, such as rtk's own `@RTK.md` line, stay.
+- **`stack-worker.config.toml`**, the profile in [`adoption/templates/codex.stack-worker.config.toml`](../adoption/templates/codex.stack-worker.config.toml): `gpt-6.1-sol` at `max` with live web search; a judgment or escalation worker substitutes `-m gpt-6-astra` on its command line (see the worker command below). It also approves read-only tool lists for ai-memory, SocratiCode and Headroom: their tools carry no MCP annotations, so under `approval_policy = "never"` Codex refuses every call to them. Workers lose `ctx_upgrade` and `ctx_purge`. A registered server is therefore not an available tool. A session without this profile, or a worker under another restricted policy, gets "MCP tool call requires approval, but approval policy is never" ([`codex-rs/core/src/mcp_tool_call.rs:1610-1614`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs#L1610-L1614); the rule for unannotated tools is at [L2436-2466](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs#L2436-L2466)). Claim ai-memory recall or SocratiCode search only in a lane that ran with it; elsewhere use original evidence. SocratiCode also skips dot-directories and dotfiles (`INCLUDE_DOT_FILES = "false"`, its default per the [v1.14.0 README](https://github.com/giancarloerra/SocratiCode/blob/v1.14.0/README.md?plain=1#L1579)), so read `.github/` or `.codex/` files directly.
+- **`agents/stack-researcher.toml` and `agents/stack-verifier.toml`** (changed after `v2026.09.26.2`), the two Codex role carriers of the [token-adoption E2E](../evidence/artifacts/token-adoption-e2e-20260926/README.md), from [`adoption/agents/codex/`](../adoption/agents/codex/): checked against that directory's `SHA256SUMS` and their structural rules before anything is copied, then created only when absent (or already identical) under `$CODEX_HOME/agents/`, mode 0600 in a 0700 folder the run makes. Codex discovers a role from every `*.toml` there, so no `[agents.<name>]` table is written and `config.toml` and the profile do not move. A linked or non-folder `agents` path and a differing role file refuse the run (exit 2); other role files, role tables and the system layer's roles are reported as counts; the dry run reads a scratch copy back through `codex doctor --json`, and a rise in its startup warnings fails the rehearsal. Every Codex launch of that home, with or without the profile, is then predicted (by source reading, not yet run) to list both roles in its `spawn_agent` tool; the [decision addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-29-addendum-codex-stack-role-carriers) has the design and its limits, and `scripts/adoption_status.py --client-wiring` reports how many of the two files match (`stack_roles_matching`).
+- **`omniroute.config.toml`**, only with `--omniroute-profile` (changed after `v2026.09.26.2`): [`adoption/templates/codex.omniroute.config.toml`](../adoption/templates/codex.omniroute.config.toml), created only when absent, for [Codex through OmniRoute](#codex-through-omniroute).
+
+The 2026-09-27 custom-agent and worker-profile update adds `CHUB_TELEMETRY = "0"` and `CHUB_FEEDBACK = "0"` under the worker profile's `[shell_environment_policy.set]`. A worker with another `HOME` or `CHUB_DIR` can miss the user's Context Hub configuration; the explicit worker profile opts out for its shell commands, including when the home is shared. Codex `rust-v0.157.1` loads the separate profile file as a full second user layer ([loader](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs)), and Context Hub `v0.1.4` checks these variables before home-scoped settings ([telemetry](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js), [config](https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/config.js)). The [decision addendum](../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub) verifies profile environment loading with source and a native sandbox test, and covers the [F4 RTK guidance](../docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26) refresh in the [three custom-agent templates](../examples/codex-native/README.md#2026-09-27-custom-agent-instruction-refresh).
+
+Start every worker with the profile **and** the model, effort and web search on its command line, with stdin closed:
+
+```sh
+codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live" -s read-only ... < /dev/null
+```
+
+Primary workers use Sol/Max under the [current routing contract](../docs/decisions/2026-09-30-sol-primary-quality-defaults.md); an Astra judgment worker substitutes `-m gpt-6-astra`. Explicit task model choices and role definitions take precedence. The flags are needed because a project `.codex/config.toml` outranks a profile file and `-c` outranks both ([`config_layer_source.rs` at `rust-v0.159.2`](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/config/src/config_layer_source.rs): profile 21, project 25, session flags 30). The profile alone cannot hold these values in a checkout that sets them; it still carries the tool settings. Each value matters:
+- **Worker effort `max`.** For both selected Codex models, `ultra` sends `xhigh`: the bundled catalog's `multi_agent_reasoning_effort` (`codex debug models --bundled`), applied by `resolve_reasoning_effort` in `codex-rs/protocol/src/openai_models/reasoning_effort.rs`. `ultra` also adds a developer message that tells the model to delegate to sub-agents on its own. At `max`, Codex sends `max` and tells the model not to spawn sub-agents unless asked; `codex debug prompt-input` shows which of the two messages a launch gets.
+- **`live` web search.** A read-only or workspace-write sandbox otherwise searches the cached index. A lane that must not browse passes `-c web_search="disabled"` instead.
+
+```sh
+python3 tools/adoption/apply_codex_lane.py --project-config "$PROJECT_ROOT/.codex/config.toml"
+python3 tools/adoption/apply_codex_lane.py --apply --expect-config-sha256 SHA --expect-agents-sha256 SHA
+python3 tools/adoption/prove_codex_lane.py --checkout "$PROJECT_ROOT"
+python3 tools/adoption/prove_codex_lane.py --checkout "$PROJECT_ROOT" --live
+python3 tools/adoption/apply_codex_lane.py --rollback RUN_DIR
+```
+
+- **Dry run (the default).** It rehearses the write, the block and the profile on copies in a scratch Codex home, then prints Codex's own read-back and the two hashes the apply needs.
+- **Apply.** It runs only when no `codex` process is running (`pgrep -x codex` is empty). It refuses when either file changed since the reviewed dry run, when a non-empty `AGENTS.override.md` would shadow `AGENTS.md`, and while an earlier run is unfinished. It keeps 0600 backups of `config.toml` and `AGENTS.md` and a run record under `~/.local/state/native-agent-stack/codex-lane/`, and prints the rollback command before its first write.
+- **Rollback.** It restores each key, and the block, only where it still holds what the run wrote, and reports whatever changed since.
+- **`--live`.** With an installed skill, it spends six model calls, each started with the pinned flags above:
+  - two concurrent workers must each get their own directory from `ctx_execute pwd`;
+  - `memory_query` must complete with the profile and be refused without it;
+  - a worker must run `git status` through `rtk` and read `git show HEAD:big.txt` natively or through `rtk proxy`, byte for byte;
+  - the skill worker must read an installed `SKILL.md` and return its real first line through `context-mode ctx_execute_file` or the specified `rtk cat` command; the check records which route succeeded.
+
+Install a skill under `~/.agents/skills/*/SKILL.md` with the [Claude native profile recipe](claude-native-profile.md#small-persistent-contract-selected-upstream-skills), or select an installed file with `--skill-file PATH/TO/SKILL.md`. The live worker suite always reports the `skill-worker` check. A missing skill or invalid `--skill-file` fails the run (exit 1) after the other five calls; no sixth call is fabricated. Skill locations follow the [official Codex documentation](https://developers.openai.com/codex/skills/), and the native event verdict follows [openai/codex `rust-v0.157.1` exec events](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec/src/exec_events.rs), which are byte-identical at `rust-v0.159.2` ([qualification receipt](../evidence/receipts/codex-01592-qualification-20260930.json)).
+
+A project `.codex/config.toml` that still pins context-mode to one directory (a `cwd` and `CONTEXT_MODE_PROJECT_DIR`) overrides the user-scope entry in that project. Codex's writer only writes the user config, so it cannot fix this. The dry run lists those tables and their line numbers for each `--project-config`; back the file up privately and delete them by hand. Then read back from that project's root: `codex mcp get context-mode --json` must show `"cwd": null`, and `codex mcp list --json` must list one context-mode. Start main-checkout sessions from the repository root, because the bound directory is the session's cwd.
+
+Blind and sweep lanes are unaffected. They run with a run-scoped `CODEX_HOME`, and `--ignore-user-config` alone would not skip the global `AGENTS.md`. The prove script checks this by rendering the input of an empty Codex home.
+
+### Codex through OmniRoute
+
+Changed after `v2026.09.26.2`. [`adoption/templates/codex.omniroute.config.toml`](../adoption/templates/codex.omniroute.config.toml) is an opt-in profile for GPT-6 through a local [OmniRoute](https://github.com/diegosouzapw/OmniRoute) gateway. It holds `cx/gpt-6-astra` at `max` with live search, the provider block of upstream's [Codex guide](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md?plain=1#L22-L41) on port 20128 with `supports_standalone_web_search`, an environment filter for the key, and shell snapshots off. The base template carries none of it, so `render_config.py --check` keeps comparing a host's base config with the template.
+
+```sh
+python3 tools/adoption/apply_codex_lane.py --omniroute-profile
+python3 tools/adoption/apply_codex_lane.py --apply --omniroute-profile --expect-config-sha256 SHA --expect-agents-sha256 SHA
+```
+
+- **Launch** `codex -p omniroute` only in a shell that exports `OMNIROUTE_API_KEY`: the gateway key stored under inventory id `omniroute` with [`tools/credentials/open_credential_terminal.sh`](../tools/credentials/open_credential_terminal.sh) `omniroute`, or any non-empty value for a keyless loopback gateway ([upstream guide, L65-75](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md?plain=1#L65-L75)). Without it Codex stops before any request and prints the profile's `env_key_instructions`. The profile's `[shell_environment_policy.filters]` keeps the variable out of every command the model runs, and `shell_snapshot = false` keeps it out of `$CODEX_HOME/shell_snapshots`.
+- **Workers** use the [landscape sweep's lane home](../tools/sota-convergence/landscape-sweep/README.md) (`build_args.py --gpt6-provider omniroute`), because a worker's one `--profile` slot holds `stack-worker`. That home writes this profile's model, effort, provider and `[features]` keys, and `tests/test_codex_worker_lane.py` checks each one it writes against the profile. It has no `env_key_instructions`; `web_search = "live"` reaches the lane from the `stack-worker` profile and the runner's `-c` flag. Since #393 the lane config also writes `[shell_environment_policy.filters]` with `OMNIROUTE_API_KEY = "exclude"`: without a filter Codex hands each command its whole environment, because `inherit` defaults to `all` and the default excludes are ignored ([`shell_environment_policy.rs:135-136`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/shell_environment_policy.rs#L135-L136)), and the opt-in `test_the_omniroute_filter_keeps_the_key_out_of_commands` shows a fixture value reaching a command once the profile's filter is removed. The home also carries `AGENTS.md`, the host's Codex user instructions from `adoption/templates/codex.AGENTS.template.md` (the top rule and RTK's instructions), which Codex reads as global instructions; without it the lane's model got neither.
+- **Effort and gateway build.** OmniRoute 3.8.50 caps `gpt-6-astra` at `xhigh` (`clampEffort`, [`open-sse/executors/codex.ts:331-355`](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/open-sse/executors/codex.ts#L331-L355)). Commit `a58000c7` on `release/v3.8.51` caps it at `ultra`, one level above `max` ([`reasoningSuffix.ts:1-31`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex/reasoningSuffix.ts#L1-L31)), so `max` passes with the gateway's Thinking Budget at passthrough. That commit alone does not serve this profile. Upstream [PR #14904](https://github.com/diegosouzapw/OmniRoute/pull/14904) reports HTTP 500 for every `/v1/responses` request on that branch. Search also needs `POST /v1/alpha/search` from [PR #13788](https://github.com/diegosouzapw/OmniRoute/pull/13788): `gpt-6-astra` runs on Responses Lite, which sends no hosted tools ([`spec_plan.rs:598-601`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/spec_plan.rs#L598-L601)), so Codex searches through the provider-relative `alpha/search` ([`endpoint/search.rs:14-15`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-api/src/endpoint/search.rs#L14-L15)). Both PRs were open on 2026-09-27. Max-effort GPT-6 lanes keep the native `openai` provider by default until a preregistered same-task comparison with native Codex passes.
+- **Never `omniroute run codex --model <id>`.** It defines the provider inline and passes the model only as `-c model_providers.omniroute.model=<id>` ([`bin/cli/commands/launch-codex.mjs:173-194`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/commands/launch-codex.mjs#L173-L194), called from `run.mjs:162`), which is not a provider field. With those flags Codex 0.157.1 and 0.159.2 warn that the setting is ignored and run another model; under `--strict-config` they refuse to start with "unknown configuration field `model_providers.omniroute.model` in -c/--config override" (measured in a scratch Codex home on 2026-09-27 at 0.157.1 and on 2026-09-30 at 0.159.2; `NAS_CODEX_INTEGRATION=1` runs it again). Choose the model with the profile or `-m`. Never set `name = "OpenAI"` on the provider: `is_openai()` compares only that display name ([`model-provider-info/src/lib.rs:601-603`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L601-L603)).
+- **`--strict-config`** loads `-p omniroute`, but at 0.157.1 and 0.159.2 it rejects `-p stack-worker` with "invalid transport" on that profile's first `[mcp_servers.*]` table: strict mode validates each configuration file on its own as a whole configuration ([`config/src/loader/mod.rs:594-600`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L594-L600) and [L625-645](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L625-L645)), and the profile's server tables name no command or URL. Start stack-worker lanes without it (measured in a scratch Codex home on 2026-09-27 at 0.157.1 and on 2026-09-30 at 0.159.2; `NAS_CODEX_INTEGRATION=1` runs it again).
+- A `config.toml` that still carries the gateway route is listed by the dry run as a host step: a `[model_providers.omniroute]` table, `model_provider = "omniroute"` or a `cx/` model, the form of upstream's [guide](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md?plain=1#L26-L41). Once the profile is in place, back the file up privately and delete them together, restoring the template's `model`. A `model_provider` left without its table stops every launch without `-p omniroute` with "Model provider `omniroute` not found" (measured 2026-09-27 in a scratch Codex home). Read back with `codex debug prompt-input probe`, with and without `-p omniroute`.
 
 ## Native project MCP
 
-Merge [codex-mcp.toml.example](../examples/codex-mcp.toml.example) into the project's `.codex/config.toml` and [claude-mcp.json.example](../examples/claude-mcp.json.example) into `.mcp.json`. They contain only server entries; there are no model, account, approval or sandbox overrides. Replace paths with installed upstream executables. Serena's context is `codex` for Codex and `claude-code` for Claude. Start clients in the selected project so `--project-from-cwd` resolves correctly.
+Merge [codex-mcp.toml.example](../examples/codex-mcp.toml.example) into the project's `.codex/config.toml` and [claude-mcp.json.example](../examples/claude-mcp.json.example) into `.mcp.json`. They contain only server entries; there are no model, account, approval or sandbox overrides. Replace paths with installed upstream executables. Their SocratiCode path names the linux-x86_64 pin, `socraticode-1.15.0`; on macos-arm64 use `socraticode-1.14.0` until a Mac qualifies 1.15.0. Serena's context is `codex` for Codex and `claude-code` for Claude. Start clients in the selected project so `--project-from-cwd` resolves correctly.
 
 Native CLI registration is also supported. For a server that needs no environment map, these examples add a **separate** named server rather than replacing an existing one:
 
@@ -190,7 +283,7 @@ hf download nvidia/Nemotron-3-Embed-1B-BF16 \
 
 qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 # In a second terminal, or via the reviewed user unit:
-"$STACK_HOME/tools/vllm-0.25.0/bin/vllm" serve "$MODEL_DIRECTORY" \
+"$STACK_HOME/tools/vllm-0.30.0/bin/vllm" serve "$MODEL_DIRECTORY" \
   --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 \
   --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 \
   --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
@@ -198,7 +291,7 @@ qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 
 This is a roughly 2.3 GB pinned model download, not a metadata-only check. vLLM selects its native pooling/embedding implementation without `trust_remote_code`. Queries use `query: ` and documents `passage: `, including the trailing spaces. SocratiCode's supported `lmstudio` provider is the generic OpenAI-compatible local adapter pointing to vLLM here; LM Studio itself is not installed. These settings do not change Claude/Codex generation models.
 
-The [MCPorter example](../examples/mcporter.json.example) pins one project working directory, sets `imports: []`, and retains the SocratiCode connection so its upstream watcher stays alive. Edit only the corresponding absolute paths, then save a local copy at `$MCPORTER_CONFIG`. The MCPorter daemon is shared per OS user; do not restart it without checking for other users' connections/active calls.
+The [MCPorter example](../examples/mcporter.json.example) pins one project working directory, sets `imports: []`, and retains the SocratiCode connection so its upstream watcher stays alive. Edit only the corresponding absolute paths, then save a local copy at `$MCPORTER_CONFIG`; its SocratiCode path names the linux-x86_64 pin, `socraticode-1.15.0`, so on macos-arm64 it becomes `socraticode-1.14.0`. The MCPorter daemon is shared per OS user; do not restart it without checking for other users' connections/active calls.
 
 ```sh
 curl --fail --silent --show-error http://127.0.0.1:16333/healthz
@@ -254,7 +347,56 @@ ai-memory install-hooks --agent codex --server-url http://127.0.0.1:49374 \
   --capture-mode allowlist --apply
 ```
 
-These hook installers are global additions gated by the project marker. They preserve a shared capture mode; back up the affected files and inspect the generated merge. Codex uses its selected `CODEX_HOME/hooks.json`; Claude uses its native settings. Review exact Codex hook definitions via `/hooks` afterward. Upstream can disable Claude prompt capture here; Codex prompt capture has no corresponding disable flag at this pin. Bounded sanitized observations and heuristic handoffs still have storage/prompt overhead. Do not describe this profile as zero capture.
+Replace `http://127.0.0.1:49374` with the URL the host's own ai-memory server binds; a copied port can send hooks to another host's or distro's store (on the NativeStack WSL2 workstation the service binds `127.0.0.1:49474`, and 49374 is another distro's default there). These hook installers are global additions gated by the project marker. They preserve a shared capture mode; back up the affected files and inspect the generated merge. Codex uses its selected `CODEX_HOME/hooks.json`; Claude uses its native settings. Review exact Codex hook definitions via `/hooks` afterward. Upstream can disable Claude prompt capture here; Codex prompt capture has no corresponding disable flag at this pin. Bounded sanitized observations and heuristic handoffs still have storage/prompt overhead. Do not describe this profile as zero capture.
+
+### Worktrees and the capture marker
+
+This section changed after `v2026.09.26.2`, which has no `.worktreeinclude`. The marker
+stays untracked (`/.ai-memory.toml` is in `.gitignore`): it is one host's opt-in, and a
+tracked copy would enroll every clone, CI checkout and blind lane on any host whose
+hooks run in allowlist mode. ai-memory 2.4.1 finds it by walking up from the
+session's cwd toward `$HOME`, and outside `$HOME` the walk stops at the checkout's own
+root ([`docs/marker-file.md`](https://github.com/akitaonrails/ai-memory/blob/v2.4.1/docs/marker-file.md)).
+A worktree below the enrolled checkout, such as Claude Code's default
+`.claude/worktrees/<name>`, is therefore captured through the checkout's marker, and a
+worker worktree a script creates outside `$HOME`, such as a session scratchpad under
+`/tmp`, is not. The tracked [`.worktreeinclude`](../.worktreeinclude) names only the
+marker. Claude Code reads it for every worktree it creates with git, and Worktrunk's
+`wt step copy-ignored` reads it in the source worktree (the primary one by default); both
+copy a listed file only when the source has it and ignores it, so an unenrolled clone
+copies nothing.
+
+Enrolling does more than capture. At SessionStart, ai-memory's hook also fetches the
+project's pending handoff and injects it into the new session's context, and that fetch
+consumes it (ai-memory 2.4.1 `hook.rs`: "the GET is destructive"), so a worker session
+in an enrolled worktree can take a handoff meant for your next session, and it starts
+with shared memory context. Enroll only a lane that should have both, one lane at a
+time. An independent-review lane, like a blind lane, must stay unenrolled: create it with
+plain `git worktree add` outside the enrolled checkout, not through Claude Code (which
+copies the marker into every worktree it creates with git; one under `.claude/worktrees/`
+is enrolled through the walk anyway), and do not run the copy below in it. To enroll a
+worker worktree created with `git worktree add`, run from anywhere:
+
+```sh
+wt -C "$WORKTREE" step copy-ignored --require-include   # copies .ai-memory.toml only; reruns write nothing
+printf '{"cwd":"%s"}' "$WORKTREE" | ai-memory --data-dir "$AI_MEMORY_DATA_DIR" hook \
+  --event pre-tool-use --agent codex --server-url http://127.0.0.1:49374 --check-capture
+# expect "capture_mode":"allowlist","marker_present":true,"admits_capture":true
+```
+
+`$AI_MEMORY_DATA_DIR` is the `--data-dir` in the installed hook commands (`CODEX_HOME/hooks.json`).
+The check reads that directory's `capture-mode` file, and a directory without one answers
+`denylist`, which admits every repository whether or not a marker is found, so all three
+values matter. `--require-include` copies nothing when the primary checkout has no
+`.worktreeinclude`; without that file Worktrunk would copy every ignored file, host-only
+`.codex/` included. `--check-capture` evaluates the capture policy without spooling or
+contacting the server. Blind lanes (`tools/sota-convergence/blind_checkout.py`) use plain
+`git worktree add` and stay unenrolled; keep them outside the enrolled checkout so that no
+walk reaches its marker.
+
+### Upgrading an existing store
+
+Migrations are forward-only: 2.4.0 applies V65 and V66 when `serve` opens a 2.3.2 store, 2.4.1 adds V67 (`managed_run_session_link`), and an older binary then refuses the store with `memory database schema is newer than this ai-memory build`. The automatic pre-migration archive covers only the 1.x to 2.0 upgrade, so a 2.x store gets none. Order matters. Re-running [`adoption/bootstrap-linux.sh`](../adoption/bootstrap-linux.sh) repoints `bin/ai-memory` as soon as it installs the new archive, and the service runs through that link, so on a host with an existing store, stop the service and take the at-rest copy below before any bootstrap re-run, including the one [`adoption/update.md`](../adoption/update.md) step 1 asks for after a pin change. The NativeStack WSL2 cutovers (2.3.2 to 2.4.0 on 2026-09-25, 2.4.0 to 2.4.1 on 2026-09-26) used this order: install the verified archive into a new versioned prefix such as `tools/ai-memory-2.4.1`; announce the window to live sessions; stop the service and wait until `pgrep -a -x ai-memory` (not `pgrep -f`, which can match the waiting shell itself) and `fuser` on `db/memory.sqlite` print nothing; copy `db`, `wiki`, `config.toml` and `capture-mode` to a private 0700 directory (`config.toml` holds `auth.token_pepper`); repoint `bin/ai-memory`; run the two `install-hooks` commands above with the new binary and the host's own server URL (NativeStack used `--server-url http://127.0.0.1:49474 --capture-mode allowlist`, plus `--no-capture-prompts` for Claude Code), first without `--apply` as a preview, and check that each file's diff against the installer's `.bak-<unix-ts>` copy changes only the binary path; start the service. Then check `ai-memory --version` and serverInfo, `/healthz` (200 on 2.4.x, 404 on 2.3.2), `ai-memory status --json`, a known page's body and one real client session's new observations. Codex skips changed hooks until they are trusted, so review them in Codex `/hooks`; it captures nothing before that. Rollback is the cold copy, a relink to the previous prefix and a re-run of `install-hooks` with that binary (or the installer's `.bak` hook files, which also revert any unrelated later edits); never start an older binary on the migrated store. Evidence: [`ai-memory-240-qualification-20260925.json`](../evidence/receipts/ai-memory-240-qualification-20260925.json) and [`ai-memory-241-qualification-20260925.json`](../evidence/receipts/ai-memory-241-qualification-20260925.json).
 
 For native routing, `ai-memory install-instructions --target AGENTS.md` updates the managed block and skills; read its help and preview the intended destinations first. Preserve non-managed content, keep canonical project rules in AGENTS/CLAUDE, and do not duplicate those rules as durable pages.
 
@@ -368,40 +510,97 @@ client telemetry settings.
 
 ## Focused jCodeMunch retrieval
 
-Install the pinned upstream server with `uv tool install jcodemunch-mcp==1.108.319`.
-The retained upstream license is **Dual-Use License 1.1**; the bounded local
-acceptance does not establish eligibility for commercial deployment. Keep its
-default six-tool `counter` surface. The following upstream registration commands
-are for the intended native CLI profile; preserve its existing configuration home:
+Install the pinned upstream server into the ecosystem prefix, the host value
+file's `ECO_ROOT`, where the project template runs `${ECO_ROOT}/bin/jcodemunch-mcp`
+(the uv-tool layout of [bootstrap step 4](../adoption/bootstrap.md)). A plain
+`uv tool install` puts the command in uv's own bin directory instead, and the
+rendered entry would name a missing file (changed after `v2026.09.26.2`):
 
 ```sh
-codex mcp add jcodemunch \
-  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
-  -- jcodemunch-mcp
-claude mcp add jcodemunch --scope local --transport stdio \
-  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
-  -- jcodemunch-mcp
+eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
+  uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
 ```
 
-The tested Codex adoption stored the equivalent server entry in the selected
-project's `.codex/config.toml`; the CLI command above adds it to the chosen native
-CLI configuration. Claude's `local` scope applies to the current project.
+The retained upstream license is **Dual-Use License 1.1**; the bounded local
+acceptance does not establish eligibility for commercial deployment. Keep its
+default six-tool `counter` surface. Register it per project, never at user scope
+([decision 2](../docs/decisions/2026-09-25-codex-mcp-scope.md)): its server
+instructions ("Prefer it over Read/Grep/Glob/Bash") would otherwise reach every
+session. Run these from the checkout, or linked worktree, that opts in. For Codex,
+render the project template and copy only its jCodeMunch tables there, then read
+the entry back (changed after `v2026.09.26.2`); for Claude, use `local` scope:
+
+```sh
+eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
+python3 "$PROJECT_ROOT/tools/adoption/render_config.py" --host <host> --out "$STACK_HOME/output/project-render"
+exclude=$(git rev-parse --git-path info/exclude)
+grep -qxF '/.codex/' "$exclude" || echo '/.codex/' >> "$exclude"
+test -e .codex/config.toml || (umask 077 && mkdir -p .codex && \
+  sed -n '/^\[mcp_servers\.jcodemunch\]/,$p' \
+  "$STACK_HOME/output/project-render/project.codex.config.toml" > .codex/config.toml)
+codex mcp get jcodemunch --json
+claude mcp add jcodemunch --scope local --transport stdio \
+  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
+  -- "$eco/bin/jcodemunch-mcp"
+```
+
+The `sed` range copies the rendered `[mcp_servers.jcodemunch]` tables, the
+template's last ones, and nothing else. The whole project template also sets
+`approval_policy`, `sandbox_mode`, `[agents]` and a shell `PATH`, and a project
+file outranks both the user config and its profiles
+(`codex-rs/config/src/config_layer_source.rs` L33-51 at `rust-v0.157.1`), so
+copying all of it would replace the user's own settings in that directory.
+The file holds this host's paths, so it stays untracked: `/.codex/` goes
+into the repository's private ignore list, which every linked worktree of the
+checkout shares ([gitrepository-layout](https://git-scm.com/docs/gitrepository-layout),
+`info`: `$GIT_COMMON_DIR/info` is used). The repository's `.gitignore` does not
+list `.codex/`. When the directory already has a `.codex/config.toml`, merge the rendered
+`[mcp_servers.jcodemunch]` tables into it by hand instead. Codex loads a project
+file only while that directory is trusted, and a linked worktree takes its main
+checkout's trust (`codex-rs/config/src/loader/mod.rs` L131-133 and L1041-1084,
+`codex-rs/git-utils/src/trust.rs` L9-16 at `rust-v0.157.1`); the user template
+trusts the host's `PROJECT_ROOT` value. From an unrelated directory, `codex mcp list --json` must
+list no jcodemunch. A fresh worktree carries no untracked `.codex/config.toml`, so
+without this step Codex there has no jCodeMunch at all: two native attempts in
+`evidence/artifacts/token-e2e-codex-20260926/receipt.json` found none.
+`codex mcp add jcodemunch ...` is the user-scope form. It writes the user config
+("Added global MCP server"), so every session in every directory would load the
+server and its routing instructions; it is not this recipe's path.
 Register once. Use only explicitly selected code directories, with AI/paid
 summaries, savings sharing, watchers, cross-repository defaults and external
 context providers disabled. Do not index conversations, credentials or every
 project merely because the server is available.
+
+To apply [`.jcodemunch.jsonc`](../.jcodemunch.jsonc), call `order` with the
+following arguments, replacing `path` with this checkout's absolute root:
+
+```json
+{"action":"index_folder","args":{"path":"/absolute/checkout/root","incremental":false,"use_ai_summaries":false},"allow_state_change":true}
+```
+
+At jgravelle/jcodemunch-mcp v1.108.319,
+[`server.py` L1597–1645](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/server.py#L1597-L1645)
+defines the MCP `index_folder` arguments (it has no `context_providers` argument:
+the project file's `context_providers: false` disables providers through
+[`tools/index_folder.py` L796–803](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L796-L803)), and
+[L1528](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/tools/index_folder.py#L1528)
+loads the project file; `order` requires `allow_state_change: true`
+([`counter.py` L129–133](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/counter.py#L129-L133)).
+The loader reads `.jcodemunch.jsonc` only from the requested folder
+([`config.py` L1230](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/config.py#L1230)),
+so indexing a subdirectory does not apply this root file. Supply no per-call
+`extra_ignore_patterns`: upstream appends them to the project list
+([`security.py` L576–577](https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/security.py#L576-L577)).
 
 The upstream default index root is intentional: in this release, source retrieval
 records its estimate there even when a custom index root was requested. Reading
 stats from a different root can therefore show a misleading zero. Keep the
 existing default ledger; the native estimate includes repeated reads.
 
-The six-tool surface exposes actions through `order`. Select actual local scope
-and returned repository/symbol IDs for these tool arguments:
-
-```json
-{"action":"index_folder","args":{"path":"/absolute/selected/project/src","use_ai_summaries":false,"extra_ignore_patterns":["*.json","*.jsonl","*.md","*.html","*.txt","**/__pycache__/**"],"follow_symlinks":false,"context_providers":false},"allow_state_change":true}
-```
+The six-tool surface exposes actions through `order`. Use returned
+repository/symbol IDs for these navigation arguments:
 
 ```json
 {"action":"search_symbols","args":{"repo":"RETURNED_REPOSITORY_ID","query":"requested_function","kind":"function","max_results":1}}
@@ -416,9 +615,11 @@ Read the actual upstream report without importing a historical receipt:
 ```sh
 mcporter call --stdio jcodemunch-mcp \
   --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
-  --name jcodemunch --tool order \
+  --name jcodemunch --server jcodemunch --tool order \
   --args '{"action":"get_session_stats","args":{}}' --output json --no-oauth
 ```
+
+`--server jcodemunch` selects the ad-hoc server that `--name` names. This call passes its arguments through `--args`, so it works without it, but a positional argument would otherwise become the server selector ([MCPorter row](#component-catalog-install-and-check)); keep the complete `--name`/`--server`/`--tool` form in copies.
 
 The [direct receipt](../evidence/receipts/native-jcodemunch-20260920.json) verifies
 exact source fidelity. Complete search-plus-source responses used 861 tokens
@@ -434,8 +635,16 @@ Install once with the upstream MCP extra:
 
 ```sh
 uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'
-headroom mcp serve --proxy-url http://127.0.0.1:1
+HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1
+# native registration (the name comes before -e, which takes several values):
+claude mcp add --scope user headroom -e HEADROOM_OFFLINE=1 -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 -e DO_NOT_TRACK=1 -- "$(command -v headroom)" mcp serve --proxy-url http://127.0.0.1:1
+# Codex, where the rendered user template does not already register it (one --env per variable):
+codex mcp add headroom --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 -- "$(command -v headroom)" mcp serve --proxy-url http://127.0.0.1:1
 ```
+
+The Codex line changed after `v2026.09.26.2`. A Codex registration that predates the two Hugging Face variables gets them from the [Codex worker lane](#codex-worker-lane)'s writer, which sets all four whenever headroom is registered.
+
+Headroom 0.37.0 uploads an anonymous usage beacon by default: `telemetry/beacon.py` sets `BEACON_DEFAULT_ON = True`, and the MCP compress path calls it. `HEADROOM_OFFLINE=1` is its master no-egress switch (`offline.py`), which the beacon, the update check and the license and usage reporter each check. Its Hugging Face half, `apply_offline_env()`, runs only at proxy startup (`proxy/server.py`), never in `headroom mcp serve` (`cli/mcp.py`), so the MCP server also needs the two variables that function would set, `HF_HUB_OFFLINE=1` and `TRANSFORMERS_OFFLINE=1`. With them, huggingface_hub and transformers make no Hub request, so a compress call cannot download a Kompress model on a cold cache. `DO_NOT_TRACK=1` also turns off the beacon if a later version renames that switch. Set `HEADROOM_OFFLINE` and `DO_NOT_TRACK` wherever Headroom runs, including any service that calls `headroom savings`, and all four in each client's MCP registration. On 2026-09-25, with `HEADROOM_OFFLINE` and `DO_NOT_TRACK` set, `headroom_compress` still returned compressed output. That install has no onnxruntime, torch or transformers, so Kompress is unavailable there and nothing on its compress path downloads a model; the Hugging Face variables matter where Headroom is installed with its ML extras. None of the four variables covers tiktoken: the MCP server's compress call counts tokens for a Claude model with tiktoken's `o200k_base` (`tokenizers/registry.py`, `_create_anthropic`), and on a cold cache tiktoken downloads that vocabulary on first use. Headroom bounds the load with `HEADROOM_TIKTOKEN_LOAD_TIMEOUT_SECONDS` (default 10) and then falls back to estimating (`tokenizers/tiktoken_counter.py`), and its warning suggests a pre-populated `TIKTOKEN_CACHE_DIR`. The two Hugging Face variables in these commands, and in the Codex template's headroom entry, changed after `v2026.09.26`; a host registered from that release lacks them.
 
 The tested direct MCP fixture used that unreachable loopback proxy address and
 the server's local compression path. Within one live MCP session, call
@@ -461,11 +670,13 @@ is part of this recipe.
 ## Retained Context Mode
 
 If a Codex plugin's bundled server starts in its cache directory, selected
-project files may be outside that server's root. The tested project-scoped
-repair preserves the enabled plugin and its hooks, disables only that bundled
-server, and registers the installed upstream `context-mode` command with the
-explicit project directory. Replace both absolute paths in the selected
-project's `.codex/config.toml`:
+project files may be outside that server's root. The default fix is the
+user-scope form below, which the bootstrap template renders. Where one project
+needs its own entry instead, this project-scoped repair preserves the enabled
+plugin and its hooks, disables only that bundled server, and registers the
+installed upstream `context-mode` command with the explicit project
+directory. Replace every `/absolute/project` in the selected project's
+`.codex/config.toml`:
 
 ```toml
 [plugins."context-mode@context-mode".mcp_servers.context-mode]
@@ -475,17 +686,51 @@ enabled = false
 command = "context-mode"
 cwd = "/absolute/project"
 startup_timeout_sec = 60
+default_tools_approval_mode = "approve"
 
 [mcp_servers.context-mode.env]
 CONTEXT_MODE_PLATFORM = "codex"
 CONTEXT_MODE_PROJECT_DIR = "/absolute/project"
+CLAUDE_PROJECT_DIR = "/absolute/project"
 ```
+
+The bare `context-mode` command imports the server directly
+(`src/cli.ts:258-261` at the reviewed revision `6f0cc684`), without upstream
+`start.mjs`, which is what sets `CLAUDE_PROJECT_DIR` and
+`CONTEXT_MODE_PROJECT_DIR` from the launch directory (`start.mjs:38-51`), so
+this form sets both. The server reads the
+project's `.claude/settings*.json` `Bash(...)` denies only through
+`CLAUDE_PROJECT_DIR` (`src/server.ts:1111-1120`, `src/security.ts:363-377`),
+and on Codex 0.157.1 the plugin's PreToolUse hook never sees an MCP tool (not
+re-checked at the 0.159.2 pin), so without it those denies do not apply to
+`ctx_*` calls.
+`default_tools_approval_mode = "approve"` is the plugin manifest's own setting
+(`.codex-plugin/mcp.json:10`); without it, a `ctx_*` call that Codex routes to
+approval is refused outright in a session whose approval policy is `never`
+("MCP tool call requires approval, but approval policy is never",
+[`codex-rs/core/src/mcp_tool_call.rs:1610-1614`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs#L1610-L1614)).
+Both keys changed after `v2026.09.26.2`.
 
 This uses the supported [bundled MCP server policy](https://developers.openai.com/plugins/build/plugins#bundled-mcp-servers-and-lifecycle-hooks).
 No plugin-cache edits or broader file allowlist are needed. A fresh native
 session reads the configuration; an existing process retains its loaded server
 connection. Both native clients completed the bounded project-file and symbol
 task in the [new client receipt](../evidence/receipts/native-token-focus-clients-20260920.json).
+
+To bind every worktree at once, `adoption/templates/codex.config.template.toml`
+uses a user-scope form (2026-09-26), the default: the same `enabled = false` override, and a
+`[mcp_servers.context-mode]` entry with no `cwd` that runs the pinned npm
+install's upstream `start.mjs` with `node`. Codex starts a server that has no
+`cwd` in the session's own directory, and `start.mjs` binds
+`CONTEXT_MODE_PROJECT_DIR` to it. The bare `context-mode` command is not enough
+there: that CLI starts the server without `start.mjs`, so, like the plugin's own
+server, it takes the project from the newest Codex session log. See the
+[retained comparison](../evidence/artifacts/context-mode-codex-binding-20260926/README.md).
+This template form changed after `v2026.09.26`, whose template leaves the MCP server
+to the plugin. Like the plugin's own server, `start.mjs` runs upstream's self-heal
+on every start, which can write under the Claude configuration directory
+(`$CLAUDE_CONFIG_DIR`, else `~/.claude`): plugin registry and plugin cache
+repair, and a `SessionStart` cache-heal hook in `settings.json`.
 
 Point the Context Mode entry in the MCPorter example at the actual installed plugin's upstream `start.mjs`, using the intended runtime's configuration home. The path must come from that runtime's plugin inventory. This preserves native startup behavior instead of inserting a replacement server.
 
@@ -514,6 +759,8 @@ mcporter --config "$MCPORTER_CONFIG" call codebase-memory.search_graph \
 
 The explicit project name makes the following search reproducible; verify the index response accepted it before searching. Check that `greeting` resolves to the public Python fixture and that line ranges match source. Fast mode exercises static indexing without optional semantic enrichment. `persistence:false` avoids a repository-local graph snapshot, but the native server still retains its database. For call tracing, choose a returned fully qualified function with real edges and the discovered `trace_path` schema; an empty leaf function does not prove call-graph coverage. Use explicit `index_repository` after changes when freshness matters; native polling does not make every query an atomic view of disk.
 
+A complete caller list needs more than one graph query. At v0.11.0, `trace_path` leaves out tests and resolver evidence by default (`include_tests` and `include_evidence` both `false`), and `search_code` is a graph-ranked text search whose literal hits can be mentions rather than calls (tool schemas in `src/mcp/mcp.c`: [`index_repository` L466-481](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L466-L481), [`trace_path` L532-560](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L532-L560) and [`search_code` L632-659](https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L632-L659)). Index the selected repository explicitly, call `trace_path` with `include_evidence: true` (and `include_tests: true` when tests count), keep edges below confidence 0.5 as candidates rather than dropping them, and check every candidate against the original source or Serena's `find_referencing_symbols` before reporting the set as complete.
+
 ## Documents and selected artifacts
 
 QMD uses a deliberately small Markdown collection. This example indexes public fixture notes, without a model download:
@@ -525,6 +772,10 @@ qmd --index "$QMD_INDEX" search 'local code' -c "$QMD_COLLECTION" -n 2 --json
 # Copy an actual returned qmd:// document ID, optionally with a bounded line range.
 qmd --index "$QMD_INDEX" get "$QMD_DOCUMENT_ID"
 ```
+
+Through MCP, the same lexical lane needs explicit arguments. At v2.8.3 the `query` tool expands plain `query` text into typed searches with a model and reranks results with another model unless `rerank` is `false`; `collections` must be an array (a singular `collection` is ignored), and `get` numbers every line unless `lineNumbers` is `false` ([MCP tool parameters](https://github.com/tobi/qmd/blob/v2.8.3/README.md#mcp-tool-parameters), [`src/mcp/server.ts` L315-339](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L315-L339)). Call `query` with `searches: [{"type": "lex", "query": "..."}]`, the named `collections`, a small `limit` and `rerank: false`, then `get` the returned document with `fromLine`/`maxLines`. Embeddings, expansion and reranking are separate model choices to qualify on their own.
+
+An index answers only for the files it holds. The adopted catalog index holds the two us-equities collections, so a question about adoption or a new machine, such as the release re-pin step in `adoption/update.md`, is outside it ([Codex run correction](../evidence/artifacts/token-e2e-codex-20260926/README.md#correction-to-296)): read that file directly with a bounded read. Before a scheduled `qmd update`, check that every collection root exists, since at 2.8.3 a missing root deactivates the collection's documents ([#989](https://github.com/tobi/qmd/issues/989)) and a file that became empty keeps its old indexed content ([#991](https://github.com/tobi/qmd/issues/991)), both in `reindexCollection` ([`src/store.ts` L1605-1720](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1605-L1720)); after an update, compare one returned passage with the file on disk.
 
 Use ast-grep/Serena/rg for exact code, SocratiCode for conceptual code retrieval, and scoped QMD for Markdown. Select one useful lane for an artifact instead of sending it through every compressor. TOON needs a value-preserving decode; Repomix compression needs original-source recovery. Exact local tokenizer counts require the named tokenizer, identical source bytes and scope; they still do not establish provider savings. Do not silently drop errors or recovery paths in filtered outputs.
 
@@ -551,7 +802,7 @@ Set `AGENTSVIEW_DATA_DIR` to a dedicated archive directory and merge [agentsview
 ```sh
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 AGENTSVIEW_NO_DAEMON=1 agentsview sync
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
-  agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --background
+  agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --require-auth --background
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview projects
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
   agentsview session search 'selected task' --fts --project "$HISTORY_PROJECT_ID" --limit 3 --json
@@ -560,6 +811,10 @@ AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_EN
 # Select one native source home for this invocation; do not export it globally.
 CODEX_HOME="$SELECTED_CODEX_HOME" ccusage codex daily --offline --no-cost --json --timezone UTC --config /dev/null
 ```
+
+At v0.43.0, `session list` and `session search` leave out one-shot, automated and subagent sessions by default, and `--fts` searches message bodies only, not tool calls or results ([session API](https://github.com/kenn-io/agentsview/blob/v0.43.0/docs/session-api.md), [commands](https://github.com/kenn-io/agentsview/blob/v0.43.0/docs/commands.md)). Workflow children are subagent sessions and headless workers can be one-shot or automated, so a question about them adds `--include-children --include-automated --include-one-shot`, names the source roots it covers, and checks that each intended population appears. An archive answer is an observation of retained history, not an efficiency or savings measurement.
+
+`--require-auth` keeps the archive API behind the archive's own token ([token on the archive API](../docs/native-dashboards.md#token-on-the-archive-api-2026-09-27)); its `projects` and `session search` calls find the daemon through `AGENTSVIEW_DATA_DIR` and send that token themselves. The on-demand commands above keep `--no-sync` for a dedicated scoped archive. The persistent user unit runs without it, as the live view of all jobs ([live mode](../docs/native-dashboards.md#live-mode-on-the-workstation-2026-09-27)).
 
 Choose an available loopback port and start/stop only the daemon belonging to this dedicated archive. The query commands require the service; the sync command above runs explicitly without it. Use the project ID returned by the archive. Empty results, unreadable logs and parser failure are distinct outcomes. Native and Desktop roots can overlap or contain copied sessions: deduplicate by stable session identity and retain per-root scope before combining totals. Cached input is a subset of input, reasoning output a subset of output; do not add either subset again to provider totals. Local estimates and model subscription usage remain separate.
 

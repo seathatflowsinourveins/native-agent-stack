@@ -1,0 +1,13 @@
+{
+ "note": "sha256 of each file as the judges received it; the published prompts replace host paths with <judges> and <root>. The inputs, the packet and the schemas are byte for byte.",
+ "files": {
+  "adjudication-inputs/x5.AB.json": "0725cf106343d9a202e4919315c74a1d90d6511dba8440943a30aade7dd5809d",
+  "adjudication-inputs/x5.BA.json": "0d52b18cc0ff5c019c160b1a38305a88fb17389b76567e0a65d4518f2b9f015a",
+  "packets/x5.json": "867501516ec248e95f6206b2f5b23d76dc72563d5ce4f14c2d51d51d0d48d85a",
+  "prompts/claude-task-AB.txt": "1b676d67aa8307a9224f5815fa74c2625371c41e6b385591d35751288eb1d3a3",
+  "prompts/claude-task-BA.txt": "431e7e0ab6316b46249b443730d136beb506a1f7731bc577254cc1df7b8fdb6b",
+  "prompts/judge-AB.txt": "dc221ea396c02d79bdaade82e8a9babb0131eedfb9235395bb19d6b924351d97",
+  "prompts/judge-BA.txt": "ce1bb4eb1c2e318a10df54a41db1afee1fdffcdf63dad8369eed96fb553dcec2",
+  "schemas/adjudicate.json": "091bdfa590a645b59a330b94273754badf67305a40581727ac7f1b4993850ca2"
+ }
+}

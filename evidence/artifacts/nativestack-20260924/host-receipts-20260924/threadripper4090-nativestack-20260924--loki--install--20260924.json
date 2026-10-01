@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--loki--install--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "loki",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py loki --version-only",
+      "exit": 0,
+      "duration_s": 0.097,
+      "output_sha256": "20465feedc9c97d9271f55fd31153296bf800e1b6a1a67d6b94fc14890b01509",
+      "output_excerpt": "loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f)\n  build user:       root@a72310b1e091\n  build date:       2026-09-17T13:46:13Z\n  go version:       go1.26.6\n  platform:         linux/amd64\n  tags:             netgo\n\n"
+    }
+  ],
+  "tool_versions": {
+    "loki": "3.7.8"
+  },
+  "observed_at_utc": "2026-09-24T04:18:43Z",
+  "result": "pass",
+  "claim": "Installed native command executed and reported its version. Functional acceptance is a separate observation.",
+  "limitations": [
+    "This receipt does not imply whole-platform acceptance, comparative quality, provider billing, untested repository coverage, or an off-host recovery guarantee. Historical failures remain in execution-ledger.json."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:18:43Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

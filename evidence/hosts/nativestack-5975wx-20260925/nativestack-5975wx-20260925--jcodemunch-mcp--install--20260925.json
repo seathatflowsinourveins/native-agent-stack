@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--jcodemunch-mcp--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && real=$(readlink -f \"$p\") && echo \"resolves: $p -> $real\" && python3 -c \"import json,glob,sys;c=sys.argv[1];stack=[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c];winners=sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c});adopt_ids=[t.get('id') for t in json.load(open('adoption/pins-linux-x86_64.json')).get('tools',[])];print('stack',stack,'winner_pins',winners,'adoption_bootstrap_pin_tool_present', c in adopt_ids);assert stack==['1.108.319'],stack;assert winners==[],winners;assert c not in adopt_ids;print('OK stack-pin-bound (no landscape winner, no adoption bootstrap pin)')\" jcodemunch-mcp",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "5877b20c488db34ab16f9130dcc22b397ae1508578ebd63307ba53fa4dc01912",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp\nstack ['1.108.319'] winner_pins [] adoption_bootstrap_pin_tool_present False\nOK stack-pin-bound (no landscape winner, no adoption bootstrap pin)\n"
+    },
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && real=$(readlink -f \"$p\") && bin_dir=$(dirname \"$p\") && venv_bin=$(dirname \"$real\") && tool_dir=$(dirname \"$(dirname \"$venv_bin\")\") && out=$(UV_TOOL_DIR=\"$tool_dir\" UV_TOOL_BIN_DIR=\"$bin_dir\" uv tool list 2>&1) && block=$(printf '%s\\n' \"$out\" | grep -A3 '^jcodemunch-mcp v') && echo \"$block\" && printf '%s\\n' \"$block\" | grep -qx 'jcodemunch-mcp v1.108.319' && printf '%s\\n' \"$block\" | grep -qx '\\- jcodemunch-mcp' && echo \"OK uv tool list shows jcodemunch-mcp v1.108.319 with its jcodemunch-mcp entrypoint\"",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "c9027f45679c1bad1bee8a41a2ead7fba164b9b8ea6c39d102be960e105b48ce",
+      "output_excerpt": "jcodemunch-mcp v1.108.319\n- gcm\n- jcodemunch-mcp\n- munch-bench\nOK uv tool list shows jcodemunch-mcp v1.108.319 with its jcodemunch-mcp entrypoint\n"
+    },
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && real=$(readlink -f \"$p\") && py=\"$(dirname \"$real\")/python3\" && test -x \"$py\" && \"$py\" -c \"\nimport importlib.metadata as m, hashlib, base64\nd = m.distribution('jcodemunch-mcp')\nprint('dist-info version', d.version)\nprint('license', d.metadata.get('License-Expression'))\nchecked = 0\nbad = []\nmissing = []\nfor f in (d.files or []):\n    if f.hash is None:\n        continue\n    fp = f.locate()\n    if not fp.exists():\n        missing.append(str(f))\n        continue\n    actual = base64.urlsafe_b64encode(hashlib.sha256(fp.read_bytes()).digest()).rstrip(b'=').decode()\n    checked += 1\n    if actual != f.hash.value:\n        bad.append(str(f))\nprint('RECORD_sha256_entries_checked', checked, 'missing', len(missing), 'mismatched', len(bad))\nassert d.version == '1.108.319', d.version\nassert checked > 250, checked\nassert not missing, missing\nassert not bad, bad\nprint('OK installed files match their wheel RECORD sha256 hashes; dist-info version equals the stack pin')\n\"",
+      "exit": 0,
+      "duration_s": 0.074,
+      "output_sha256": "1d44924b1e250fd912ceeb6047f52e8c7d6ec5e92bd746c1985041ca91efdbfb",
+      "output_excerpt": "dist-info version 1.108.319\nlicense LicenseRef-jCodeMunch-Dual-Use-1\nRECORD_sha256_entries_checked 300 missing 0 mismatched 0\nOK installed files match their wheel RECORD sha256 hashes; dist-info version equals the stack pin\n"
+    },
+    {
+      "cmd": "out=$(jcodemunch-mcp --version) && echo \"$out\" && printf '%s' \"$out\" | grep -qx 'jcodemunch-mcp 1.108.319' && echo \"OK version call matches stack pin 1.108.319\"",
+      "exit": 0,
+      "duration_s": 0.518,
+      "output_sha256": "718b83719db5f7cb9ca7df8f1645bfdf93f950da1341efaee537a68d6d786060",
+      "output_excerpt": "jcodemunch-mcp 1.108.319\nOK version call matches stack pin 1.108.319\n"
+    },
+    {
+      "cmd": "p=$(command -v jcodemunch-mcp) && real=$(readlink -f \"$p\") && py=\"$(dirname \"$real\")/python3\" && scratch=$(mktemp -d) && trap 'rm -rf \"$scratch\"' EXIT && \"$py\" -c \"\nimport importlib.metadata as m, hashlib, base64, shutil, os, sys\nd = m.distribution('jcodemunch-mcp')\ntarget = None\nfor f in (d.files or []):\n    if f.hash is not None and str(f).endswith('.py'):\n        fp = f.locate()\n        if fp.exists():\n            target = (f, fp)\n            break\nassert target is not None, 'no hashed .py file found to test'\nf, fp = target\nscratch = sys.argv[1]\ncopy_path = os.path.join(scratch, 'copy.bin')\nshutil.copyfile(fp, copy_path)\ndef sha(path):\n    return base64.urlsafe_b64encode(hashlib.sha256(open(path,'rb').read()).digest()).rstrip(b'=').decode()\nassert sha(copy_path) == f.hash.value, 'sanity: fresh copy must match RECORD hash before corruption'\nwith open(copy_path, 'ab') as fh:\n    fh.write(b'CORRUPTED')\ncorrupted_hash = sha(copy_path)\nassert corrupted_hash != f.hash.value, 'positive control failed: corruption was not detected by hash comparison'\nprint('positive control OK: file', str(f), 'RECORD hash', f.hash.value[:12] + '...', 'now mismatched after a deliberate 9-byte append (corrupted hash', corrupted_hash[:12] + '...)')\n\" \"$scratch\"",
+      "exit": 0,
+      "duration_s": 0.054,
+      "output_sha256": "c33ea3411d6476f4fab8177ed8da61b24e3bc8c60a72ff651798b1973192eeb2",
+      "output_excerpt": "positive control OK: file jcodemunch_mcp/__init__.py RECORD hash NfS824vtonZK... now mismatched after a deliberate 9-byte append (corrupted hash 2rzTPBYhEMJu...)\n"
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.319"
+  },
+  "observed_at_utc": "2026-09-25T19:02:23Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), jcodemunch-mcp 1.108.319 is installed at its stack pin. The launcher resolves to this host's uv tool environment, and uv tool list shows jcodemunch-mcp v1.108.319 with its entry points. All 300 sha256 entries in the installed wheel RECORD match the files on disk, with 0 missing and 0 mismatched. A deliberate 9-byte append to one installed file in a scratch copy is detected as a hash mismatch (positive control). The version call reports 1.108.319. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "jcodemunch-mcp is not a landscape layer winner, so this binds only to the manifests/stack.json pin; it changes no platform_status.",
+    "The RECORD hashes were written by uv at install time from the wheel's own manifest. The check shows the installed files are unchanged since install, not that the wheel matched an independently pinned artifact hash; jcodemunch-mcp is not in adoption/pins-linux-x86_64.json. The distribution's license is LicenseRef-jCodeMunch-Dual-Use-1.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision), not from a pinned install checkout; the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:23Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran all 5 commands from the worktree root (the --version call under an empty temporary HOME; the scratch-copy corruption control writes only to a mktemp dir); each exited 0 and printed output identical to the retained excerpt, including RECORD_sha256_entries_checked 300 missing 0 mismatched 0. Adequacy-checked (install receipt, points 3 and 4): point 3 every claim sentence maps to a retained command: launcher resolves into the uv tool env and stack pin 1.108.319 with no winner and no adoption pin (cmd 1); uv tool list shows v1.108.319 with its entry points (cmd 2); 300 RECORD sha256 entries match with 0 missing (cmd 3); version call prints jcodemunch-mcp 1.108.319 (cmd 4); the 9-byte scratch-copy corruption is detected by hash comparison (cmd 5, a sanity control of the hashing method, not required for install). Point 4: jcodemunch-mcp is not a layer winner in any landscape catalog (it is an alternative in code-navigation, winner serena, and mcp-surfaces), so it binds to its manifests/stack.json pin: tool_versions 1.108.319 equals the stack version under host_receipts.pin_matches. The stack source_pin 8f7b34ab is not compared by any command; the limitations say the receipt binds the version only and that RECORD hashes show files unchanged since install, not a match to an independent artifact hash. Claim and limitations state readiness only (conditional at most). No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:40Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

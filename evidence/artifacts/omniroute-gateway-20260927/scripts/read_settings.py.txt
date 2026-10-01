@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+"""Read OmniRoute routing/cache/compression/safety settings from the loopback gateway.
+
+Prints only scalar values of keys matching a whitelist pattern; never prints secrets, tokens or ids.
+"""
+import json
+import re
+import urllib.request
+
+BASE = "http://127.0.0.1:20128"
+ALLOW = re.compile(r"(affinity|sticky|strategy|fallback|roundrobin|round_robin|expansion|cache|compress|thinking|"
+                   r"reasoning|background|degrad|mcp|a2a|requirelogin|require_login|hedg|zerolatency|cooldown|"
+                   r"combo|timeout|retry|dedup)", re.I)
+DENY = re.compile(r"(secret|token|password|key(?!s?$)|cookie|auth|email|url|id$)", re.I)
+
+
+def get(path):
+    with urllib.request.urlopen(BASE + path, timeout=30) as response:
+        return json.load(response)
+
+
+def walk(prefix, node, out):
+    if isinstance(node, dict):
+        for key, value in node.items():
+            walk(f"{prefix}.{key}" if prefix else key, value, out)
+    elif not isinstance(node, list):
+        leaf = prefix.rsplit(".", 1)[-1]
+        if ALLOW.search(prefix) and not DENY.search(leaf):
+            out[prefix] = node
+
+
+for path in ("/api/settings", "/api/settings/compression", "/api/settings/thinking-budget"):
+    try:
+        data = get(path)
+    except Exception as error:  # noqa: BLE001
+        print(path, "->", repr(error)[:120])
+        continue
+    found = {}
+    walk("", data, found)
+    print(f"== {path}: {len(found)} keys")
+    for key in sorted(found):
+        print(f"  {key} = {json.dumps(found[key])[:80]}")

@@ -1,0 +1,12 @@
+dagu-equities.service
+dbus.service
+ecosystem-alertmanager.service
+ecosystem-grafana.service
+ecosystem-loki.service
+ecosystem-ntfy.service
+ecosystem-otelcol.service
+ecosystem-prometheus.service
+native-stack-embeddings.service
+native-stack-qdrant.service
+nativestack-generation.service
+nativestack-memory.service

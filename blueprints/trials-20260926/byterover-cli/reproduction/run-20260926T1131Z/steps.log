@@ -1,0 +1,23 @@
+2026-09-26T11:31:21Z start; workspace is a fresh mktemp directory
+2026-09-26T11:31:22Z 01-npm-pack: exit=0: npm pack byterover-cli@3.16.1 --pack-destination <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/pack
+2026-09-26T11:32:37Z 03-npm-install: exit=0: npm install --global --no-audit --no-fund --prefix <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/pack/byterover-cli-3.16.1.tgz
+2026-09-26T11:32:39Z 04-version: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv --version
+2026-09-26T11:32:40Z 05-npm-ls: exit=1: npm ls --global --prefix <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix --all @oclif/core @oclif/plugin-update @campfirein/brv-transport-client
+2026-09-26T11:32:43Z 10-vc-init: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc init
+2026-09-26T11:32:44Z 11-vc-add: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc add .
+2026-09-26T11:32:46Z 12-vc-config-name: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc config user.name trial-check
+2026-09-26T11:32:47Z 13-vc-config-email: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc config user.email trial-check@example.invalid
+2026-09-26T11:32:48Z 14-vc-commit: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc commit -m Add auth and billing notes
+2026-09-26T11:32:50Z 15-vc-log: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv vc log
+2026-09-26T11:32:51Z 16-status: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv status --format json
+2026-09-26T11:32:53Z 20-search-positive: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv search rate limiter --format json
+2026-09-26T11:32:54Z 21-search-second-positive: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv search invoices --format json
+2026-09-26T11:32:55Z 22-search-negative: exit=0: <scratch>/trials-gpt6/tmp-run3/tmp.6umCVqaKUy/prefix/bin/brv search zzznonexistentxyz123 --format json
+2026-09-26T11:32:55Z 30-check-positive: checker exit=0 (intended 0)
+2026-09-26T11:32:55Z 31-check-second-positive: checker exit=0 (intended 0)
+2026-09-26T11:32:55Z 32-check-negative: checker exit=0 (intended 0)
+2026-09-26T11:32:55Z 33-check-wrong-path-must-fail: checker exit=1 (intended 1)
+2026-09-26T11:32:55Z 34-check-wrong-count-must-fail: checker exit=1 (intended 1)
+2026-09-26T11:32:55Z 35-check-autoupdate-hook-idle: no brv/lastrun, brv/autoupdate or brv/autoupdate.log in the workspace cache directory (intended)
+2026-09-26T11:32:55Z done: every check matched its intended outcome: yes
+2026-09-26T11:33:01Z 90-stop: exit=0: signals only to the processes recorded in the ledger

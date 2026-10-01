@@ -1,0 +1,5 @@
+invalid [] missing []
+@openai/codex 0.157.1-linux-x64 subject [('pkg:npm/%40openai/codex@0.157.1-linux-x64', '11a73c5e50b49c25...')]
+  workflow {'ref': 'refs/tags/rust-v0.157.1', 'repository': 'https://github.com/openai/codex', 'path': '.github/workflows/rust-release.yml'} commit [{'gitCommit': '36650394c5b38c2990ccf2a3457165ca3e9d9726'}] run https://github.com/openai/codex/actions/runs/36202003947/attempts/2
+@openai/codex 0.157.1 subject [('pkg:npm/%40openai/codex@0.157.1', 'a89fd46746e660ff...')]
+  workflow {'ref': 'refs/tags/rust-v0.157.1', 'repository': 'https://github.com/openai/codex', 'path': '.github/workflows/rust-release.yml'} commit [{'gitCommit': '36650394c5b38c2990ccf2a3457165ca3e9d9726'}] run https://github.com/openai/codex/actions/runs/36202003947/attempts/2

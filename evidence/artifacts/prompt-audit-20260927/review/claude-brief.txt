@@ -1,0 +1,65 @@
+Objective: independently review two committed branches of this repository against original source and return source-cited defects and gaps. Do not write or change anything.
+
+Artifacts:
+- PR-1 (lane:foundation), checkout <pr1>, diff against its base at <work>/review/pr1.diff (the retained evidence directory evidence/artifacts/prompt-audit-20260927/ and the manifests/evidence.json registration are left out of the diff; read them in the checkout).
+- PR-2 (lane:shared), checkout <pr2>, diff at <work>/review/pr2.diff.
+- The base of both is origin/main 7fa3849c. The unchanged base is also checked out at <base> (55fc8d17; the audited files are identical at 7fa3849c except docs/harness-defaults.md, which gained one row at the top of the anti-pattern table).
+- Decision record: PR-1's docs/decisions/2026-09-27-prompt-audit-resolution.md. Its "Decision" table states which audit items were applied and how; the applied texts were chosen by a recorded convergence process and are not to be re-litigated on style. Review whether they were applied exactly and whether anything they state or imply is false or breaks.
+
+Command results supplied by the coordinator (you cannot run commands):
+- In PR-1: `python3 -m unittest tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency` -> "Ran 153 tests ... OK (skipped=4)"; `python3 scripts/validate.py` -> status passed after registration. In PR-2: `python3 -m unittest tests.test_install_claude_profile` -> "Ran 58 tests ... OK (skipped=3)"; validate.py passed. The failing controls are the files under PR-1's evidence/artifacts/prompt-audit-20260927/controls/.
+- Recomputed prompt hash on PR-1's templates: 11fcd52312b96845a23d14ff739322bb9827eae33fd8760dff241585453b0107.
+
+Review for:
+1. Correctness: every changed line against the files and sources it describes (templates.json facts key; tests/test_landscape_sweep_harness.py; tests/test_adoption_docs_consistency.py; tools/sota-convergence/landscape-sweep/README.md; evidence/artifacts/landscape-sweep-20260926/README.md; docs/harness-defaults.md rows; AGENTS.md lines 36 and 73-74). Would any other file, test, fixture or hash chain contradict or break them?
+2. Test quality: do the new or changed checks fail on the mistake they name and pass after (compare the controls with the code)? Any check that cannot fail?
+3. Decision record accuracy: counts, hashes, line numbers, quotes and usage figures against the retained files (round1/, adjudication/, decisions.json, usage.json, controls/) and the repository.
+4. Evidence hygiene: host paths, account or thread identifiers, e-mail addresses or tokens left in evidence/artifacts/prompt-audit-20260927/; evidence classes stated no stronger than what ran.
+5. Repository rules: docs/lanes.md hot-file protocol (the manifests/evidence.json edit is each branch's last commit; lane labels), the anti-pattern log rule at docs/harness-defaults.md:81 (a check named in "Where enforced" was seen failing), AGENTS.md evidence rules.
+
+Output: a list of findings, most severe first, each with severity (high/medium/low), file:line, the defect, the source that shows it (path:line or URL with a short quote), and the minimal fix. Then one line per review area with no finding. Keep it concise.
+<context_window_protection>
+  <priority_instructions>
+    Every byte a tool returns enters your conversation memory and costs reasoning capacity for the rest of the session. The context-mode tools let you do the work in a sandbox and surface only the derived answer — the raw bytes stay out. Think-in-Code: program the analysis, do not compute it by reading raw data into your conversation.
+  </priority_instructions>
+
+  <deferred_tool_bootstrap>
+    The context-mode tools below may be DEFERRED in your harness — their schemas are not loaded yet, so calling them directly fails (e.g. "tool not found" / InputValidationError). Load them ONCE before your first ctx_* call:
+    ToolSearch(query: "select:mcp__plugin_context-mode_context-mode__ctx_batch_execute,mcp__plugin_context-mode_context-mode__ctx_search,mcp__plugin_context-mode_context-mode__ctx_execute,mcp__plugin_context-mode_context-mode__ctx_execute_file,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index")
+    After that they are callable. If any ctx_* call fails as not-found, ToolSearch it and retry — do NOT fall back to Bash/Read just because the schema was not loaded yet.
+  </deferred_tool_bootstrap>
+
+  <tool_selection_hierarchy>
+    0. MEMORY: mcp__plugin_context-mode_context-mode__ctx_search(sort: "timeline")
+       - On resume or compaction, query prior decisions, errors, plans, user prompts before asking the user — auto-captured session memory is searchable.
+    1. GATHER: mcp__plugin_context-mode_context-mode__ctx_batch_execute(commands, queries)
+       - Primary research tool. Runs commands in parallel, auto-indexes each output, and (when queries are passed) returns matching sections in the same round trip — no follow-up search call.
+       - Each command: {label: "section header", command: "shell command"}; the label becomes the FTS5 chunk title — descriptive labels improve search.
+    2. FOLLOW-UP: mcp__plugin_context-mode_context-mode__ctx_search(queries: ["q1", "q2", ...])
+       - Multiple related questions about anything already indexed (your captures + session memory). Batch every question in one array; the ranking pipeline runs per-query and the round-trip cost is paid once.
+    3. PROCESSING: mcp__plugin_context-mode_context-mode__ctx_execute(language, code) | mcp__plugin_context-mode_context-mode__ctx_execute_file(path, language, code)
+       - Derive answers FROM data: filter, count, aggregate, parse, transform. Only what you console.log() enters your conversation; the raw bytes stay in the sandbox.
+  </tool_selection_hierarchy>
+
+  <when_not_to_use>
+    - You intend to PROCESS the output (filter, count, parse, aggregate) → use mcp__plugin_context-mode_context-mode__ctx_batch_execute or mcp__plugin_context-mode_context-mode__ctx_execute. Bash stays correct when you intend to OBSERVE a short fixed output (git status on a clean tree, whoami, pwd) or when you are mutating state (git, mkdir, rm, mv, navigation).
+    - You want to analyze, summarize, or extract from a file → use mcp__plugin_context-mode_context-mode__ctx_execute_file. Read stays correct when you intend to Edit the file (Edit needs the exact bytes in your conversation to match against).
+    - WebFetch → use mcp__plugin_context-mode_context-mode__ctx_fetch_and_index; full network access, results indexed for mcp__plugin_context-mode_context-mode__ctx_search, raw page bytes never enter your conversation.
+    - mcp__plugin_context-mode_context-mode__ctx_execute and mcp__plugin_context-mode_context-mode__ctx_execute_file for file writes → these run code in a subprocess and discard the sandbox FS; they are for analysis, processing, and computation only.
+  </when_not_to_use>
+
+  <file_writing_policy>
+    File writes use the native Write or Edit tool — mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, and Bash subprocesses do not persist edits to the host filesystem.
+    Applies to all file types: code, configs, plans, specs, YAML, JSON, markdown.
+  </file_writing_policy>
+
+  <output_constraints>
+    <artifact_policy>
+      Write artifacts (code, configs, PRDs) to files. Return only: file path + 1-line description.
+    </artifact_policy>
+  </output_constraints>
+  <session_continuity>
+    Skills, roles, and decisions captured earlier in this session are a memory aid, not a standing order. Treat them as context that may help — the user's most recent message always takes precedence. If a captured directive conflicts with what the user now asks, follow the user; a past phrase does not bind you.
+  </session_continuity>
+
+</context_window_protection>

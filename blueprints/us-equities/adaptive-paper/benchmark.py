@@ -15,7 +15,7 @@ import time
 from nautilus_trader.trading import Strategy
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model import ClientOrderId, InstrumentId, OrderSide, Price, Quantity, StrategyId, TimeInForce
-from native_adapter import build_node
+from native_adapter import build_node, guarded_callback
 from runner import Controller, reconcile, save
 from safety import Ledger, RiskLimits
 from simulation import SimulatedPort
@@ -33,13 +33,19 @@ class CapacityProbe(Strategy):
         self.last_submit = 0
         self.errors = []
         self.native_flat = False
+        self.enabled = True
+        # native_adapter.guarded_callback: an order callback exception freezes the
+        # ledger, latches `faulted` and stops the session through fault_sink.
+        self.callback_faults = []
+        self.faulted = False
+        self.fault_sink = None
 
     def on_start(self):
         self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
 
     def on_quote(self, quote):
         now = time.monotonic()
-        if self.pending or self.submitted >= self.target or now - self.last_submit < 1 / 3:
+        if self.faulted or self.pending or self.submitted >= self.target or now - self.last_submit < 1 / 3:
             return
         held = self.ledger.positions().get("SPY")
         side = OrderSide.SELL if held and held.qty else OrderSide.BUY
@@ -53,6 +59,7 @@ class CapacityProbe(Strategy):
                     tags=["reason=synthetic_capacity_fixture"])
         self.submit_order(order)
 
+    @guarded_callback
     def on_order_filled(self, event):
         self.fills += 1
         self.pending = False
@@ -60,10 +67,12 @@ class CapacityProbe(Strategy):
             self.native_flat = self.portfolio.is_net_flat(event.instrument_id)
             self.shutdown_system("capacity fixture complete")
 
+    @guarded_callback
     def on_order_rejected(self, event):
         self.errors.append("native_rejection")
         self.shutdown_system("capacity fixture rejected")
 
+    @guarded_callback
     def on_order_denied(self, event):
         self.errors.append("native_denial")
         self.shutdown_system("capacity fixture denied")
@@ -80,6 +89,7 @@ async def benchmark(target=180):
         controller.port = port
         strategy = CapacityProbe(ledger, target)
         session = build_node(port, [{"symbol": "SPY"}], [strategy], max_order_submit_rate="180/00:01:00")
+        strategy.fault_sink = session.fail
         start = time.monotonic()
         try:
             await asyncio.wait_for(session.run_async(), 75)
@@ -96,7 +106,8 @@ async def benchmark(target=180):
                       "average_submissions_per_minute": len(times) / elapsed * 60,
                       "native_portfolio_flat": strategy.native_flat, "reconciliation": verification,
                       "accounting": asdict(ledger.accounting()), "adapter_errors": session.errors,
-                      "strategy_errors": strategy.errors, "requests_reserved": len(controller.requests),
+                      "strategy_errors": strategy.errors, "callback_faults": strategy.callback_faults,
+                      "requests_reserved": len(controller.requests),
                       "limitations": ["Immediate synthetic fills; zero fees; no broker/network latency or liquidity effects.",
                                       "Forced alternating intents; not adaptive strategy performance or paper acceptance."]}
             result["status"] = "passed" if (strategy.fills == target and strategy.native_flat

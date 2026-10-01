@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "id": "cross-family-review-terminal-lane-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "omniroute",
+    "claude-code"
+  ],
+  "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 242 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (47 and 47 passes, each with eight end-to-end cases and six in-process latch tests, among them a SIGTERM at every line of the probe's resource lifecycle) and 14 mutants (seven per probe; each unmutated probe passes all six cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun gives the counts recorded in 2026-09-28), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at every line of the resource lifecycle, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock.",
+  "limitations": [
+    "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). No live Windows Terminal or interactive Claude Code session was run: the reviewers and the verifiers read code, upstream sources and ran scripts, synthetic homes and private tmux servers; the bell, the tab icon and focus reports in Windows Terminal remain unobserved.",
+    "One review family (GPT-6: gpt-6.1-sol in all three reads and cx/gpt-6-astra-ultra beside it in the re-check and the final read, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus). The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the graded findings of the three passes (23, 19 and 21) are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
+    "Twelve findings of the first wave and two of the re-check were checked by the coordinator, not by a verifier (of the twelve: eight against the code or upstream source, three concerning the removed second-distro target, one convention). The removed target's code was not run before it was removed.",
+    "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Two further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; each repaired in one round); the last round's repairs were checked by controls, mutants, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
+    "Residuals of the final round: a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor.",
+    "Some claims rest on source reading only and were not run: the remote-workspace branch of the PushNotification tool (installed client 2.1.285, `CLAUDE_CODE_REMOTE` or a thin-client session), Windows Terminal's parent order of profiles.defaults and fragment profiles (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`), and Tab.cpp's two-second indicator timer for a focused tab.",
+    "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave, 11 after it, 22 after the re-check, and 36 before and 52 after the final read; other sessions may have used points in between."
+  ],
+  "evidence_class": "independent observation: a second model family (gpt-6.1-sol through the packaged Codex lane on the local OmniRoute gateway) reviewed merged changes; Claude verifiers and the coordinator graded the findings; the repairs are checked by scripts run on this host",
+  "recorded_at_utc": "2026-09-30T17:26:16Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
+    "identity": "one workstation; the running user's Codex, OmniRoute and Claude Code installs"
+  },
+  "data": {
+    "lane": {
+      "runner": "tools/sota-convergence/landscape-sweep codex_call.sh / codex_job.py (packaged)",
+      "provider": "OmniRoute (loopback :20128)",
+      "model": "cx/gpt-6.1-sol",
+      "effort": "max",
+      "codex_cli": "0.159.2",
+      "sandbox": "read-only",
+      "web_search": "live",
+      "slots": 8,
+      "project_note_mcp_servers": "switched off in the lane home",
+      "gateway_compression": "unchanged (master off for the Codex route)"
+    },
+    "jobs": [
+      {
+        "job": "u484-A",
+        "exit": 0,
+        "minutes": 45,
+        "input_tokens": 2612552,
+        "cached_input_tokens": 2455296,
+        "output_tokens": 52962,
+        "findings": 5,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u484-B",
+        "exit": 0,
+        "minutes": 47,
+        "input_tokens": 3321391,
+        "cached_input_tokens": 3161344,
+        "output_tokens": 49369,
+        "findings": 7,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u498-A",
+        "exit": 0,
+        "minutes": 33,
+        "input_tokens": 1701991,
+        "cached_input_tokens": 1582592,
+        "output_tokens": 38958,
+        "findings": 7,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u498-B",
+        "exit": 0,
+        "minutes": 24,
+        "input_tokens": 2058997,
+        "cached_input_tokens": 1969536,
+        "output_tokens": 25011,
+        "findings": 4,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u510-A",
+        "exit": 0,
+        "minutes": 36,
+        "input_tokens": 3662782,
+        "cached_input_tokens": 3511552,
+        "output_tokens": 38139,
+        "findings": 4,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u510-B",
+        "exit": 0,
+        "minutes": 43,
+        "input_tokens": 4762431,
+        "cached_input_tokens": 4613888,
+        "output_tokens": 45842,
+        "findings": 3,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u519-A1",
+        "exit": 0,
+        "minutes": 22,
+        "input_tokens": 1513586,
+        "cached_input_tokens": 1410816,
+        "output_tokens": 26341,
+        "findings": 3,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u519-A2",
+        "exit": 0,
+        "minutes": 41,
+        "input_tokens": 1947159,
+        "cached_input_tokens": 1804672,
+        "output_tokens": 49014,
+        "findings": 10,
+        "verdict": "changes-needed"
+      },
+      {
+        "job": "u519-B",
+        "exit": 0,
+        "minutes": 31,
+        "input_tokens": 2889413,
+        "cached_input_tokens": 2732928,
+        "output_tokens": 35261,
+        "findings": 3,
+        "verdict": "changes-needed"
+      }
+    ],
+    "totals": {
+      "input_tokens": 24470302,
+      "cached_input_tokens": 23242624,
+      "cache_read_share": 0.95,
+      "output_tokens": 360897,
+      "wall_clock_minutes": 71,
+      "gateway_pool_points_used_before_and_after": [
+        7,
+        11
+      ]
+    },
+    "recheck": {
+      "jobs": [
+        {
+          "job": "R1",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 43,
+          "input_tokens": 3293543,
+          "cached_input_tokens": 3137792,
+          "output_tokens": 48649,
+          "findings": 7,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "R2",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 37,
+          "input_tokens": 4165591,
+          "cached_input_tokens": 3968256,
+          "output_tokens": 41354,
+          "findings": 7,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "R3",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 46,
+          "input_tokens": 5605208,
+          "cached_input_tokens": 5387392,
+          "output_tokens": 49972,
+          "findings": 9,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "U1",
+          "model": "cx/gpt-6-astra-ultra",
+          "exit": 0,
+          "minutes": 26,
+          "input_tokens": 4408642,
+          "cached_input_tokens": 4272896,
+          "output_tokens": 39819,
+          "findings": 10,
+          "verdict": "changes-needed"
+        }
+      ],
+      "totals": {
+        "input_tokens": 17472984,
+        "cached_input_tokens": 16766336,
+        "cache_read_share": 0.96,
+        "output_tokens": 179794,
+        "wall_clock_minutes": 46,
+        "gateway_pool_points_used_before_and_after": [
+          11,
+          22
+        ]
+      },
+      "findings": {
+        "total": 33,
+        "by_reviewer_severity": {
+          "high": 1,
+          "medium": 24,
+          "low": 8
+        },
+        "with_a_reviewer_run_command": 33,
+        "by_disposition": {
+          "repaired": 33
+        },
+        "by_check": {
+          "verifier": 19,
+          "duplicate": 12,
+          "coordinator": 2
+        },
+        "verifier_verdicts": {
+          "partly": 3,
+          "confirmed": 16
+        }
+      },
+      "prompts_sha256": {
+        "R1.txt": "3748f85417784df6cb62f53a35e5757328dda7bac75a3116d7830863fab7d2c9",
+        "R2.txt": "d2a742fad989fb26d28c35fb7e1725743b9800aef7f893ecf6e2fe0db31ac5a5",
+        "R3.txt": "0fdfd3d0877690067fda508c857abb8e71ec6723d6aaeb3d0a7b593a16419366",
+        "U1.txt": "882d93c5ebbe4815ce2b94ab591d76fb84449aa82b94a5d453742af3fa1e914f"
+      }
+    },
+    "final_review": {
+      "jobs": [
+        {
+          "job": "F1",
+          "model": "cx/gpt-6-astra-ultra",
+          "exit": 0,
+          "minutes": 36,
+          "input_tokens": 5375077,
+          "cached_input_tokens": 5198080,
+          "output_tokens": 59231,
+          "findings": 3,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "F2",
+          "model": "cx/gpt-6-astra-ultra",
+          "exit": 0,
+          "minutes": 30,
+          "input_tokens": 3736382,
+          "cached_input_tokens": 3552768,
+          "output_tokens": 51238,
+          "findings": 10,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "F3",
+          "model": "cx/gpt-6-astra-ultra",
+          "exit": 0,
+          "minutes": 39,
+          "input_tokens": 5665599,
+          "cached_input_tokens": 5445504,
+          "output_tokens": 64789,
+          "findings": 7,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "F1",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 48,
+          "input_tokens": 4264633,
+          "cached_input_tokens": 4070272,
+          "output_tokens": 48989,
+          "findings": 5,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "F3",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 47,
+          "input_tokens": 4757587,
+          "cached_input_tokens": 4559872,
+          "output_tokens": 51910,
+          "findings": 5,
+          "verdict": "changes-needed"
+        },
+        {
+          "job": "F2",
+          "model": "cx/gpt-6.1-sol",
+          "exit": 0,
+          "minutes": 49,
+          "input_tokens": 2461529,
+          "cached_input_tokens": 2302848,
+          "output_tokens": 53977,
+          "findings": 7,
+          "verdict": "changes-needed"
+        }
+      ],
+      "totals": {
+        "input_tokens": 26260807,
+        "cached_input_tokens": 25129344,
+        "cache_read_share": 0.957,
+        "output_tokens": 330134,
+        "wall_clock_minutes": 50,
+        "gateway_pool_points_used_before_and_after": [
+          36,
+          52
+        ]
+      },
+      "findings": {
+        "total": 37,
+        "by_reviewer_severity": {
+          "medium": 30,
+          "low": 6,
+          "high": 1
+        },
+        "with_a_reviewer_run_command": 37,
+        "by_disposition": {
+          "repaired": 37
+        },
+        "by_check": {
+          "duplicate": 16,
+          "verifier": 21
+        },
+        "verifier_verdicts": {
+          "confirmed": 17,
+          "partly": 4
+        }
+      },
+      "prompts_sha256": {
+        "F1.txt": "26b56b846923c72d955b6ab0dc3ff095a9012e8c7b0e909aeee6705b91b6e715",
+        "F2.txt": "0155233d4b95b152627fbd1b635fceb5fc7bdf3ad7898ee4e0fe5f44160e851c",
+        "F3.txt": "798ab96f0df9f13df915e7138c5cfa672dfb920215e103fbbd0d8b588417e3a8",
+        "review.json": "174be98b715fb4a5c0229822b51d142bf54fc4d2919455d0aa413ddf2c1a0531"
+      }
+    },
+    "findings": {
+      "total": 46,
+      "by_reviewer_severity": {
+        "medium": 34,
+        "low": 9,
+        "high": 3
+      },
+      "with_a_reviewer_run_command": 41,
+      "by_disposition": {
+        "repaired": 39,
+        "kept": 2,
+        "refuted": 2,
+        "removed": 3
+      },
+      "by_check": {
+        "coordinator": 12,
+        "duplicate": 11,
+        "verifier": 23
+      },
+      "verifier_verdicts": {
+        "confirmed": 17,
+        "partly": 4,
+        "refuted": 2
+      }
+    },
+    "prompts_sha256": {
+      "probe.txt": "32fbccddd6e519141ff92cd87932947034dec46c7a6a592ca938ba306320d544",
+      "u484-A.txt": "4fa67fe0012fa320e3f73adbabfc678dfedc879acaa42f42dbd97da35073048f",
+      "u484-B.txt": "c7c8fd77766c8c6c59da9043cf27c687fee2ee37e0950c18702069c96fb5d6c5",
+      "u498-A.txt": "da2260b7f1144422e0235895a95773097db1dda8cd0b3a797502c6d383d21de2",
+      "u498-B.txt": "c6be64ebc771631bf2e9367c9c770b745c9c270fb882f66df47b7d34bd7a11d3",
+      "u510-A.txt": "6b79645998e195ce9fde5ca90f2e0930bdd24aeb9757bff97e4e3baba683c4f7",
+      "u510-B.txt": "ec6abf4ef2f7b5e2845b5b833d62c300c05e0c7888636a7d13708a2535befacf",
+      "u519-A1.txt": "00ecff05330487bfc19056e4c6ee0bb6bef7a95df75cf25a1067070f7b838f5b",
+      "u519-A2.txt": "2c9e4f9993ad1e8aec0e56d42614c9b924a7a249c05420371798aed8aa5f0e5c",
+      "u519-B.txt": "a04ab6a6c4504e54c128e7527194e253d40ee700861dc26d9f709ceb6931af45",
+      "review.json": "174be98b715fb4a5c0229822b51d142bf54fc4d2919455d0aa413ddf2c1a0531"
+    },
+    "repair_checks": {
+      "all_30_commands_exit_0": true,
+      "unit_tests": {
+        "modules": [
+          "test_adoption_status",
+          "test_windows_terminal_defaults",
+          "test_adoption_docs_consistency",
+          "test_render_config",
+          "test_apply_claude_settings"
+        ],
+        "ran": 242,
+        "result": "OK (skipped=1)"
+      },
+      "notification_type_scan_per_release": {
+        "2.1.283": {
+          "catalog_spread_name_length": 3,
+          "array_assignments_found": 1,
+          "base_size": 15,
+          "matcher_values": 17
+        },
+        "2.1.284": {
+          "catalog_spread_name_length": 3,
+          "array_assignments_found": 1,
+          "base_size": 15,
+          "matcher_values": 17
+        },
+        "2.1.285": {
+          "catalog_spread_name_length": 3,
+          "array_assignments_found": 1,
+          "base_size": 15,
+          "matcher_values": 17
+        }
+      },
+      "scan_reader_mutants": "11 mutants, 0 problems",
+      "replace_bell_group": {
+        "controls": "27 cases, 0 problems",
+        "mutants": "16 runs (the unmutated script and 15 mutants), 0 problems"
+      },
+      "tmux_bell_probe": {
+        "success_requires_all_five_arms": true,
+        "selftest": "9 checks, 0 problems"
+      },
+      "tmux_sync_probe": {
+        "mode_2026_pairs_with_terminal_features_sync": 3,
+        "without": 0,
+        "selftest_shutdown_failure_controls": 2
+      },
+      "pty_probes_selftests": {
+        "push_notification_probe_passes": 47,
+        "alert_probe_passes": 47,
+        "end_to_end_cases_in_each": 8,
+        "in_process_latch_tests_in_each": 6,
+        "sweep_of_a_signal_at_every_line_of_the_resource_lifecycle": {
+          "push": {
+            "lines_swept": 120,
+            "client_running_at": 14
+          },
+          "alert": {
+            "lines_swept": 107,
+            "client_running_at": 15
+          }
+        },
+        "stand_in_clients_with_a_blocked_signal": 0
+      },
+      "pty_probe_mutants": {
+        "alert_probe": "8 runs (the unmutated probe and 7 mutants), 0 problems",
+        "push_notification_probe": "8 runs (the unmutated probe and 7 mutants), 0 problems"
+      },
+      "colour_counter": {
+        "selftest": "28 cases, 0 problems",
+        "native_rerun_matches_the_2026_09_28_counts": true
+      },
+      "login_shell": {
+        "controls": "11 homes as expected",
+        "real_host_passes": true,
+        "digest_selftest": "10 checks",
+        "digest_real_host_entries": 13,
+        "scrub_probe_selftest": "selftest passes (all detected as expected)",
+        "landscape_selftest": "28 checks",
+        "bash_truth": "512 combinations, 0 mismatches, first_read compared"
+      },
+      "scrub_probe_native_rerun": {
+        "real_home_names_checked": 19,
+        "real_home_names_changed": 0,
+        "real_home_names_unmeasured": 0,
+        "compared_by": "lstat mode, size, mtime and inode",
+        "empty_files_created_by_arm": {
+          "no_variable": 0,
+          "variable_stock_home": 27,
+          "variable_real_hand_off_file": 26
+        },
+        "real_tmp_top_level_entries_of_no_counted_kind_new_during_the_run": 2,
+        "client": "2.1.285 (Claude Code)"
+      },
+      "codex_strict_check": {
+        "selftest": "5 checks",
+        "template_loaded": true,
+        "controls_refused": true
+      },
+      "overlay_check_user_settings_carries_the_overlay": true,
+      "practice_repository": {
+        "profile_check": "PASS 5 profiles",
+        "controls": "29 cases, 0 problems",
+        "doctor_login_shell_path": "pass"
+      }
+    }
+  },
+  "provenance": {
+    "artifacts_dir": "evidence/artifacts/terminal-lane-cross-family-review-20260930",
+    "scripts_sha256": {
+      "build_final_prompts.py": "b8a4df7c27dec2a8d0ff771b4cf86433fa09f479d64c51829003aac3a917af1b",
+      "build_final_record.py": "9b51f71fcd2d9463c9fec351958f2cc9d6de8dfec618977dfbde8c5f85fe8046",
+      "build_findings_record.py": "b3652aa81ee934a43556557ba5bfadf380d55809da8caf65145ab6388bb677b8",
+      "build_recheck_prompts.py": "46cc5f3858da3ba57b1009353cfbcf602122547ef37b279014fcb7df4d2610f0",
+      "build_recheck_record.py": "282805e76864c18c5f6e6f1bedf250a1e3ecbbca825fdd425f207562451f8724",
+      "build_review_prompts.py": "b10bd83881d2d58a1cb4b0bf551d8a30da2f9c6526a3a1ba579f1afdca28a5ce",
+      "check_receipt_hashes.py": "4406b561aed203704111ce32e42d407920f2c9debb71568d3d95fd01694a9866",
+      "collect_reviews.py": "ca464631cc1133690ac485fd40b427983160248f28c560264f48d964407f6189",
+      "make_final_briefs.py": "056d1f90226346657cbd4307718c4925d080b390c834938c7bfaa2f23fb55223",
+      "make_verify_briefs.py": "e4dffde4dca7892831218ab761e50ac7b26976d562cc2604e4f1036e99aeafce",
+      "merge_partials.py": "fadeda230050101f04154f0524f007b7716bec22d46cbcbfd8df493e36effd6d",
+      "record_sanitizer.py": "bd1a1556ca56c662257aa24591a78d6c3858f16ea53e2b13f6e330dc014b820d",
+      "sanitize_results.py": "d246468fcdc7cf0e5ff5ef2176285c0bf540b516ef1d750000c492b9bc8c241a",
+      "stage_review_lane.py": "f921b25c18e7ae24004133c8d5b29f8d1979c68543ff2fa3a2a086ef535cd3d9",
+      "tmux_sync_probe.py": "46cd411c71433334d466066db918f8155168045461c86c794ecacdac5a0f9be1"
+    },
+    "record_files_sha256": {
+      "results.json": "2627ad7cf6dd0a60c998e7741b9db45512dd928a6f2a7cd1ae3e6c9658ee5cac",
+      "verification.json": "91d8315dc5f5457b1e6181e7acc0c8031ca0e857c29c29222d0ac1d16c0cf676",
+      "findings.json": "650fd30a66082c4d7c3911a833fc24fe84855153579a87a622e1293a1a09f73e",
+      "prompts_sha256.txt": "884d4fc460afa2b7a6d62db41fb1b773b16f4dc9ea87aff9232447ef39809e0d",
+      "recheck-results.json": "e70d41a44966bc58c156c575983135d5cea817dc241daa076a1858249003d6d3",
+      "recheck-verification.json": "6ca67fad1a1dcdfc57b4d44555aeb15090be710ebae78c01360316a72f78d6be",
+      "recheck-findings.json": "561bb55c6a0dbf27e72e00a3aa7504bfbc21ffebb42fc16de23adc96058a3eae",
+      "recheck_prompts_sha256.txt": "85ff9a12e2fd5fa27f3e7e871535f9aea77b40aa51b021a8907f02c7dc21a18c",
+      "final-results.json": "7220ed117afe0a6e6cf6548813d48e49b59933848ca68eb2856003b562a4bd6a",
+      "final-verification.json": "4cf6d40749df35905338c88ac5a9ff6368fa77e9bd7140c71bf44632e72eb8e9",
+      "final-findings.json": "acbe022b9db62c2901f7584f983eaed51600df2a9b9e4f1dc1881ce3598e970e",
+      "final_prompts_sha256.txt": "9591a7273ff9f2688e8d0e5c1edb145442afd477754169d2a69153b390dd6f1b",
+      "final_dispositions.json": "d1a46e7738ba652a719d49d3530f526f7d27e001342069999141045a5fce6902",
+      "final_units.json": "c511dbe6785857c9699bf12e67e59c89706ad0b1efde866612c8519ea882c160"
+    },
+    "recorded_outputs_sha256": {
+      "alert_probe_selftest.txt": "4508ae6b2e14d6e34c8db7ff5c780fd9877101d281c0961852f4eae1531b5566",
+      "codex_tui_strict_check.txt": "20256f043411a03d93024af671b02c02f9708facd5c9004f09fbb46b2306912c",
+      "codex_tui_strict_check_selftest.txt": "3b6b2c35d2a7aa383fc07cc9a019e52a07e25f39ff5291811f134fab6b585ca4",
+      "color_capture.txt": "c13429c5f467b74f3d5c041600483eda2c07c8459148b903e1095d657fee89d6",
+      "color_capture_selftest.txt": "ccf6e9224a86d18de3cf2d504c0e51c3970f84338a2aafd983da04931fac304b",
+      "exit_codes.txt": "d8d815860fc5b7e9125e1c3e0f64560fdfaf571ed2f3f20215ad0a6dd6aab438",
+      "landscape_refresh_selftest.txt": "fa31bbe14275d77ce308d35d2ce5639ca3b9fba84c48894af03c2935f6b15119",
+      "login_path_digest.txt": "77adba676507e0aa894087002bfc6bdc9a44528340a97644953e70afcf4eafd7",
+      "login_path_digest_selftest.txt": "bde9dd2162074409e52b3021263f8c621f841929ef6cdc60b922aae43add0c0c",
+      "login_shell_bash_truth.txt": "186fb6c8c0c64cd7709027eda1a8f72d98b379f0e468309624b2621a43ba554b",
+      "login_shell_check_controls.json": "a59e65c34ddb5bfc5abab2c30eb0770c661555a7c52eafe19cf5e693a634a50a",
+      "notification_types_scan_2.1.283.json": "c37c559072efa00f89505e46e3858ee4020641c031c40ba5244ba6622652120b",
+      "notification_types_scan_2.1.284.json": "476226619608eb0e586531b2e8b5267e94d627aada106d5d7d6b030fd6a8badc",
+      "notification_types_scan_2.1.285.json": "70da716ac09b5067d39744bbd461851d3c23aa8a222e97f1f046ed579a861835",
+      "overlay_noop_check.txt": "376e04bcb7871f6123c5189ead72210932af975850a96806fa334964d0ae193b",
+      "practice_check_terminal_profiles.txt": "a5d6a4547ccf677f1b65d2b289c80304fad79e3ca7048262cb711c9b74cbbdb0",
+      "practice_check_terminal_profiles_controls.txt": "b2fbc1a686b60621c6724d3974efcc16bba717dea8575367e0b8312fbc9bf806",
+      "practice_doctor_login_shell_path.txt": "d19c1a236ae3a20c35578aee5391594efee1ff00b5099cf0747cf473bc7baeeb",
+      "practice_repository_commits.txt": "b3172446dda54bc54afeca61b0cc8f614de34c681e6403c3a0912c20063a84cd",
+      "pty_probe_mutants_alert.txt": "fb7c6ee520cf0369bd1ddef57d32193736f880aba02d5fed1cecc26f9bcca48a",
+      "pty_probe_mutants_push.txt": "fdb7cdb42ac969970abe688cd10e361b5fb64c2fb831af0c9ff0fff2d577ea80",
+      "push_notification_probe_selftest.txt": "3b919eb1bba64c5966d80dde80f8a7b66e5a47da813f8ab8a789c11c218ad524",
+      "replace_bell_group_controls.txt": "235d3cea35df6ba4679e2406f0ea800d9f954ac9d886478d1bf41fe1347527f1",
+      "replace_bell_group_mutants.txt": "308138d176b7b791da1ef0c82e5802dcccb1cb5c1b833c56f9a21444bd819de8",
+      "scan_reader_mutants.txt": "65326735296d2a723fce6bc0915060fbaaa369c45c3d0f7eeaf8d67bf1fe8ed7",
+      "scrub_placeholder_probe.txt": "f5d5b4e7cb8bf4345ab25b566843145b3aaac3f39e71c8f8363ab8f9e0c9f2d2",
+      "scrub_placeholder_probe_selftest.txt": "9754b24b5328869b9aed58cdcc3253ca022c8ea0872d557a91513554c2c261d8",
+      "tmux_bell_probe.txt": "f66422aef1845a2f80bd0943cf815ace8dec09accd1a0387b6e2236192c122b4",
+      "tmux_bell_probe_selftest.txt": "ac339b9a2e4e06b6a6a74ef6f18f9d9d9446ea32505ef44ed4d309f16807ee78",
+      "tmux_sync_probe.txt": "224e7a72c24285d17b44f7e867adf2f18eb1d475a776b972173d84427f1de654",
+      "tmux_sync_probe_selftest.txt": "f6dfb138e3ba789c3c722657e6a5f13b00226fe87e7a109840ee1d02866d542d",
+      "unit_tests.txt": "42a5c07a92a8cdb98294b07ae070e9ee944e490f83ed90936c7204f584aae7dd"
+    },
+    "commands": [
+      "python3 -B stage_review_lane.py <checkout> <host file> <work dir> cx/gpt-6.1-sol 8 http://127.0.0.1:20128/v1",
+      "python3 -B build_review_prompts.py <checkout> <pull request bodies> <work dir>",
+      "codex_call.sh --work-dir <work dir> start|wait|result <job> (packaged runner, nine jobs plus one probe job, then the re-check: three jobs of the first model and one of cx/gpt-6-astra-ultra)",
+      "python3 -B collect_reviews.py <checkout> <out> <lane>=<work dir> -- <jobs>",
+      "python3 -B build_recheck_prompts.py <checkout at the pull request head> <pull request body> <out> <number> <base>",
+      "python3 -B build_recheck_record.py <consolidated.json> ... --journals <journal.jsonl> ... --out <artifact directory>",
+      "python3 -B build_final_prompts.py <checkout at the merged main> <out> (three lenses, each run on cx/gpt-6.1-sol and on cx/gpt-6-astra-ultra), codex_call.sh start|wait|result, python3 -B merge_partials.py, python3 -B make_final_briefs.py <consolidated.json> <units.json> <out> <checkout>; Workflow (agentType stack-verifier, model opus, effort max) over the briefs; python3 -B build_final_record.py <consolidated.json> --journals <journal.jsonl> --out <artifact directory>; python3 -B check_receipt_hashes.py <checkout> <receipt id>",
+      "python3 -B make_verify_briefs.py; Workflow (agentType stack-verifier, model opus, effort max) over the briefs; python3 -B build_findings_record.py",
+      "the 30 commands of recorded/exit_codes.txt (the two signal-case mutant runs are timing-sensitive: they were run after the others with none of this session's other commands running, the two probes in parallel; other sessions' jobs were on the host)"
+    ],
+    "upstream_sources": "docs/decisions/2026-09-28-terminal-experience.md (Update 2026-09-30)"
+  }
+}

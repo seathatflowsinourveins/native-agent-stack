@@ -1,0 +1,34 @@
+[hooks]
+exclude_commands = ["^git show [^ ]*:", "diff"]
+## 0.49.0 with mitigation config
+  0.49.0 hook_rc=0 [git show HEAD:big.txt | tail -n 5]           -> SILENT(native)
+  0.49.0 hook_rc=0 [git show HEAD:big.txt]                       -> SILENT(native)
+  0.49.0 hook_rc=0 [git show HEAD~2]                             -> rtk git show HEAD~2
+  0.49.0 hook_rc=0 [git show --stat HEAD]                        -> rtk git show --stat HEAD
+  0.49.0 hook_rc=0 [git diff]                                    -> rtk git diff
+  0.49.0 hook_rc=0 [git status]                                  -> rtk git status
+  0.49.0 hook_rc=0 [diff a.txt missing.txt]                      -> SILENT(native)
+  0.49.0 hook_rc=0 [diff a.txt b.txt]                            -> SILENT(native)
+## 0.50.0 with mitigation config
+  0.50.0 hook_rc=0 [git show HEAD:big.txt | tail -n 5]           -> SILENT(native)
+  0.50.0 hook_rc=0 [git show HEAD:big.txt]                       -> SILENT(native)
+  0.50.0 hook_rc=0 [git show HEAD~2]                             -> rtk git show HEAD~2
+  0.50.0 hook_rc=0 [git show --stat HEAD]                        -> rtk git show --stat HEAD
+  0.50.0 hook_rc=0 [git diff]                                    -> rtk git diff
+  0.50.0 hook_rc=0 [git status]                                  -> rtk git status
+  0.50.0 hook_rc=0 [diff a.txt missing.txt]                      -> SILENT(native)
+  0.50.0 hook_rc=0 [diff a.txt b.txt]                            -> SILENT(native)
+## executed under mitigation (0.50.0): git show HEAD:big.txt | tail -n 5
+  0.50.0 hook_rc=0 [git show HEAD:big.txt | tail -n 5]           -> SILENT(native)
+  output == native (sha256 bb93ea3b86e6c08404d176f63449f982dfe130b492463716098fea3d49c7da3d)
+## executed under mitigation (0.50.0): diff a.txt missing.txt
+  0.50.0 hook_rc=0 [diff a.txt missing.txt]                      -> SILENT(native)
+  rc=2 stderr=[diff: missing.txt: No such file or directory ]
+## rtk hook check (0.50.0, scratch config)
+  rc=1 [git show HEAD:big.txt | tail -n 5] :: No rewrite for: git show HEAD:big.txt | tail -n 5
+  rc=0 [git show HEAD~2] :: rtk git show HEAD~2
+  rc=1 [diff a.txt missing.txt] :: No rewrite for: diff a.txt missing.txt
+  rc=0 [git status] :: rtk git status
+## control: 0.50.0 WITHOUT mitigation config
+  [git show HEAD:big.txt | tail -n 5] -> rtk git show HEAD:big.txt | tail -n 5
+  [diff a.txt missing.txt] -> rtk diff a.txt missing.txt

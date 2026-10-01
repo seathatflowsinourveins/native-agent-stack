@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "id": "mcp-inspector-280-qualification-20260926",
+  "unit": "mcp-inspector",
+  "host": "nativestack-5975wx-20260925",
+  "date_utc": "2026-09-26",
+  "baseline_version": "2.7.0",
+  "candidate_version": "2.8.0",
+  "upstream": {
+    "release": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0",
+    "published_at": "2026-09-23T18:16:18Z",
+    "tag_commit": "1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
+    "baseline_tag_commit": "2e90a628e6296c62e4bef942afbb43d3faa4baf4",
+    "security_fix": {
+      "pull_request": "https://github.com/modelcontextprotocol/inspector/pull/2390",
+      "title": "fix(web): only DANGEROUSLY_OMIT_AUTH=true/1 disables /api auth",
+      "closes": "https://github.com/modelcontextprotocol/inspector/issues/2331",
+      "merged_at": "2026-09-16T17:32:37Z",
+      "merge_commit": "bc75602bdc7eddc93bc4df4eb1d9e971cd011b7d",
+      "upstream_statement": "buildWebServerConfigFromEnv read the flag as !!process.env.DANGEROUSLY_OMIT_AUTH, so every non-empty string, including false and 0, turned the /api/* bearer gate off",
+      "shipped_code": "stage/auth-parse-source.txt: 2.7.0 clients/web/build/index.js:1661 `!!process.env.DANGEROUSLY_OMIT_AUTH`; 2.8.0 :1669 `isEnvFlagEnabled(process.env.DANGEROUSLY_OMIT_AUTH)` (trimmed, lower-cased, true or 1 only)"
+    },
+    "other_changes_read": "release body: Mcp-Method stamped on modern-era notification POSTs (#2392), OIDC body release (#2393), local $ref resolution before form widgets (#2391), per-server setting to suppress the standalone GET notification stream (#2394), MCP_INSPECTOR_SECRET_KEY_FILE (#2448), project LICENSE (#2449), docs and skills changes"
+  },
+  "integrity": {
+    "tarball": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.8.0.tgz",
+    "bytes": 1206059,
+    "sha256": "4db39519d276b99fe650f1032a3256cb704648cc611e598a38e178b1ba8a7cbf",
+    "integrity": "sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==",
+    "shasum": "206bdbfd849bbc274c8d45e12a35105035b75356",
+    "checks": [
+      "openssl sha512 of the downloaded tarball equals npm dist.integrity; sha1 equals dist.shasum (stage/integrity.txt, both versions)",
+      "npm audit signatures on a scratch registry install: 190 packages with verified registry signatures, 34 with verified attestations, invalid [] and missing [] (stage/audit-signatures.txt)",
+      "SLSA v1 provenance subject sha512 ce7d00f1...d1e9 equals the tarball integrity; built by .github/workflows/main.yml at refs/tags/2.8.0, commit 1e31c78fbf81a989e8eb47021c6281d7876ad7fd, GitHub-hosted runner, run 35901302524 attempt 1 (stage/provenance-inspector-2.8.0.txt)",
+      "the scratch audit install and the production prefix hold the same 188 installed packages at the same versions",
+      "installed package files are byte-identical to the verified tarball (diff -r)"
+    ],
+    "github_release_assets": "none; npm is the distribution channel"
+  },
+  "install": {
+    "command": "npm install --global --no-audit --no-fund --prefix ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.8.0 <verified inspector-2.8.0.tgz>",
+    "npm": "11.19.0",
+    "node": "v24.21.0",
+    "result": "added 190 packages; npm 11 did not run the package's postinstall (node scripts/install-clients.mjs, not covered by allowScripts). That script exits immediately when the package lives under node_modules and the tarball ships no client package.json (identical in 2.7.0 and 2.8.0), so nothing it would do is missing (stage/install.log)",
+    "dependency_changes_vs_2_7_0_prefix": "stage/dependency-diff.txt: rolldown and its linux-x64-gnu binding 1.2.10 -> 1.2.11, bundle-name 4.1.0 -> 4.1.1, string-width 8.2.2 -> 8.3.0, undici 8.11.0 -> 8.11.2, vite 8.3.0 -> 8.3.1 (resolved at install time; the package ships no shrinkwrap)",
+    "package_changes": "stage/package-diff.txt: the launcher clients/launcher/build/index.js is byte-identical (sha256 21ca6e6e...); the web, cli and tui builds, README and package.json differ; LICENSE is new and package.json license moves from MIT to 'SEE LICENSE IN LICENSE' (an MIT-to-Apache-2.0 relicensing transition, documentation CC-BY-4.0)"
+  },
+  "harness": {
+    "scripts": {
+      "accept_inspector.py": "9dfc48832a2b11b1e70378b10e5e46d917d59abc0ceabb0ef8c9c3c3d9604d48",
+      "sandbox.sh": "d1a07d45ea45951dc3a08ecac561c8422b8a944b10b6771158a9a1a24e3df975",
+      "compare_inspector.py": "6ccd29b29c898a531cf2579ad92a1024811951f189d1d70cdf0a0bc35f2a2dd4",
+      "postswitch.sh": "c923a294fe9a03de9d39982750ccfa5d436704d0164caa12dcf7bf40c586aaa4"
+    },
+    "isolation": "every arm ran through sandbox.sh: bwrap with a private network namespace (loopback only, so no web or HTTP listener was reachable from the host and no host port was used), / read-only, /mnt hidden (no Windows executable or browser can start), HOME and TMPDIR inside the arm directory, MCP_AUTO_OPEN_ENABLED=false",
+    "fixture": "a project-local QMD index (`qmd init`) over one Markdown file holding a random marker; QMD 2.8.3 from the host's bin/qmd",
+    "never_run": "`mcp-inspector --version` or a bare `mcp-inspector`; web mode ran only as the explicit `--web` A8 probe inside the sandbox"
+  },
+  "attempts": [
+    {
+      "attempt": 0,
+      "result": "harness error before any Inspector call: the sandbox hides /tmp, so the harness path outside the arm directory was not visible (python3: can't open file); both arms rerun with the harness copied into the arm"
+    },
+    {
+      "attempt": 1,
+      "result": "2.7.0 and 2.8.0 arms complete (below)"
+    }
+  ],
+  "arms": {
+    "2.7.0": {
+      "gated_steps": 15,
+      "gated_steps_passed": 15,
+      "web_auth_gate": {
+        "unset": "on",
+        "false": "off",
+        "0": "off",
+        "yes": "off",
+        "true": "off"
+      }
+    },
+    "2.8.0": {
+      "gated_steps": 15,
+      "gated_steps_passed": 15,
+      "web_auth_gate": {
+        "unset": "on",
+        "false": "on",
+        "0": "on",
+        "yes": "on",
+        "true": "off"
+      }
+    }
+  },
+  "steps": [
+    "A0 identity from package.json (2.7.0 / 2.8.0) and the launcher sha256",
+    "A1 qmd init, collection add, update (fixture)",
+    "A2 --cli stdio tools/list: [get, multi_get, query, status]",
+    "A3 --cli stdio tools/call query (lex, rerank false): one hit, scratch/note.md",
+    "A4 --cli stdio tools/call of an unknown tool: exit 5, tool_not_found",
+    "A5 --cli stdio resources/list and prompts/list: 0 resources, 0 prompts",
+    "A6 --cli stdio tools/list --strict: exit 0 (no error-severity schema portability finding)",
+    "A7 qmd mcp --http on a namespace-private port; --cli http tools/list and tools/call query, default protocol era and --protocol-era auto",
+    "A8 --web with a scratch API token, DANGEROUSLY_OMIT_AUTH unset/false/0/yes/true: GET /api/config without, with the right and with a wrong x-mcp-remote-auth header"
+  ],
+  "differences": {
+    "gated_steps": "none: identical exit codes and outcomes; every stdout identical once the per-arm directory, marker and QMD docid are normalized (A1, A3 and A7 carry them)",
+    "web_auth_gate": {
+      "2.7.0": "off (no token needed, wrong token accepted) for false, 0 and yes as well as true; banner 'Auth: disabled (DANGEROUSLY_OMIT_AUTH)'",
+      "2.8.0": "on (401 without or with a wrong token, 200 with the right one) for unset, false, 0 and yes; off only for true",
+      "unchanged": "unset: on in both; true: off in both; no 'Opening browser' line in any start"
+    }
+  },
+  "production_untouched_during_qualification": "the qualification used only the new prefix, the retained 2.7.0 prefix and sandboxed scratch directories; bin/mcp-inspector still named 2.7.0 until the switch",
+  "switch": {
+    "preconditions": "no running mcp-inspector process (a /proc scan by executable and argv); no reference to the 2.7.0 prefix path in ~/.claude/settings.json, ~/.codex/config.toml, systemd user units or the crontab, so only the bin link selects the version",
+    "relinked_utc": "2026-09-26T04:51:23Z",
+    "method": "ln -sfn <prefix>/bin/mcp-inspector bin/.mcp-inspector.new && mv -T bin/.mcp-inspector.new bin/mcp-inspector (cutover/relink.txt)",
+    "post_switch": "postswitch.sh through the PATH entry (CLI only): resolves to tools/mcp-inspector-2.8.0, npm ls 2.8.0, qmd 2.8.3, tools/list OK, tools/call query OK, unknown tool exit 5 tool_not_found, ALL CHECKS PASSED (cutover/postswitch.out)",
+    "rollback": "ln -sfn ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/bin/mcp-inspector ~/.local/share/codex-ecosystem/bin/.mcp-inspector.new && mv -T ~/.local/share/codex-ecosystem/bin/.mcp-inspector.new ~/.local/share/codex-ecosystem/bin/mcp-inspector; the Inspector keeps no store that 2.8.0 migrates"
+  },
+  "not_published": [
+    "the two npm tarballs and their extracted trees (public at the registry URLs above)",
+    "the scratch audit project, its package-lock.json and npm cache",
+    "the arm working directories (QMD indexes, HOME and Inspector state files); their outputs are in out/raw-outputs.json",
+    "the random scratch API tokens and QMD markers: the harness already replaced each token with a placeholder in its logs and results, and the published copies read <redacted> for that placeholder (gitleaks' generic-api-key rule reads the harness's own placeholder as a key assignment)"
+  ],
+  "files": [
+    "accept_inspector.py",
+    "compare.json",
+    "compare_inspector.py",
+    "cutover/postswitch.out",
+    "cutover/relink.txt",
+    "out/raw-outputs.json",
+    "postswitch.sh",
+    "results-2.7.0.json",
+    "results-2.8.0.json",
+    "sandbox.sh",
+    "stage/audit-signatures.txt",
+    "stage/auth-parse-source.txt",
+    "stage/cli-help-2.8.0.txt",
+    "stage/dependency-diff.txt",
+    "stage/install.log",
+    "stage/integrity.txt",
+    "stage/launcher-help-2.8.0.txt",
+    "stage/package-diff.txt",
+    "stage/provenance-inspector-2.8.0.txt"
+  ]
+}

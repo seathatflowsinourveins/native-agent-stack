@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--serena--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "dcd6f0cf01ee67417946f70c02c068f1c2f1b654",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "serena",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v serena) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && eco=\"$HOME/.local/share/codex-ecosystem\" && UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" timeout 15 uv tool list | grep -A3 \"^serena-agent \" && python3 -c \"import json,glob,sys;c='serena';print('stack.json version',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'| landscape winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\"",
+      "exit": 0,
+      "duration_s": 0.049,
+      "output_sha256": "20a66e3713421ada1649652669cb5eaeff5704f71b4263176c61d693c2be1811",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/serena -> ~/.local/share/codex-ecosystem/python-tools/serena-agent/bin/serena\nserena-agent v2.0.0.dev0\n- serena\n- serena-agent\n- serena-hooks\nstack.json version ['2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143'] | landscape winner pins ['2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143']\n"
+    },
+    {
+      "cmd": "python3 -c \"import glob,json,os,shutil;p=shutil.which('serena');assert p,'serena not on PATH';b=os.path.dirname(os.path.dirname(os.path.realpath(p)));files=glob.glob(os.path.join(b,'lib','python3*','site-packages','serena_agent-*.dist-info','direct_url.json'));assert len(files)==1,files;d=json.load(open(files[0]));commit=d['vcs_info']['commit_id'];pins=sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')=='serena'});print('direct_url.json:',d['url'],'| commit',commit,'| requested_revision',d['vcs_info'].get('requested_revision'),'| landscape winner pins',pins);assert d['url']=='https://github.com/oraios/serena',d['url'];assert d['vcs_info'].get('requested_revision')==commit;assert len(pins)==1 and commit in pins[0],(commit,pins);print('OK: installed serena_agent dist-info direct_url.json source commit matches the code-navigation winner pin exactly')\"",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "ef4fad7c1acfe6bdb4ec7b567ea0496dde51046b2ca30a7ee9bcf95f6f6db834",
+      "output_excerpt": "direct_url.json: https://github.com/oraios/serena | commit c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | requested_revision c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | landscape winner pins ['2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143']\nOK: installed serena_agent dist-info direct_url.json source commit matches the code-navigation winner pin exactly\n"
+    },
+    {
+      "cmd": "timeout 15 serena --version",
+      "exit": 0,
+      "duration_s": 0.805,
+      "output_sha256": "13abec14b6680dacd84831b99acc41f6c4aaa87b261cd610bb3ad13025a7028b",
+      "output_excerpt": "Serena 2.0.0.dev0\n"
+    }
+  ],
+  "tool_versions": {
+    "serena": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+  },
+  "observed_at_utc": "2026-09-25T19:02:22Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Serena is installed at the code-navigation winner pin, 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143. The serena launcher resolves to this host's uv tool environment serena-agent, and uv tool list reports serena-agent v2.0.0.dev0. The installed distribution's direct_url.json records https://github.com/oraios/serena at commit c6fbd1c5932df2494ffa0020af5a9fbe80b82143, which equals the landscape winner pin and the stack entry. serena --version reports 2.0.0.dev0. Every command exits 0.",
+  "limitations": [
+    "Serena has no entry in adoption/pins-linux-x86_64.json, so there is no pinned archive hash. Integrity here is the installed distribution's recorded VCS source commit, not a hash of a downloaded artifact.",
+    "Install stage: a resolved path, pin records, an integrity check and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision), not from a pinned install checkout; the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:02:22Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session review at catalog_revision dcd6f0cf. Reproduce: re-ran all 3 commands from the worktree root (the serena --version call under an empty temporary HOME); each exited 0 and printed output identical to the retained excerpt. Adequacy-checked (install receipt, points 3 and 4): point 3 every claim sentence maps to a retained command: launcher resolves into the serena-agent uv tool env and uv tool list shows serena-agent v2.0.0.dev0 (cmd 1); direct_url.json records https://github.com/oraios/serena at commit c6fbd1c5 with requested_revision equal to it, asserted equal to the landscape winner pin, and the stack.json entry printed in cmd 1 carries the same commit (cmds 1-2); serena --version prints 2.0.0.dev0 (cmd 3). The limitation that adoption/pins-linux-x86_64.json has no serena entry has no retained command, but it is a limitation not a claim sentence and I confirmed it true in the repo. Point 4: serena is the code-navigation layer winner in catalogs/landscape/foundation.json; tool_versions '2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143' equals the winner pin and the stack version under host_receipts.pin_matches (I ran it). Claim and limitations state readiness only (install stage, conditional at most; integrity is the recorded VCS commit, no archive hash). No missing point.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:10:40Z",
+      "reviewer": {
+        "identity_sha256": "ef0949f46c06221d96e0eed1c788aaffe76a984fc2c39dddbaac68fa3911784a",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

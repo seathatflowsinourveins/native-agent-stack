@@ -2,21 +2,49 @@
 """Read-only adoption prerequisite report. No installation or runtime acceptance.
 
 Checks command presence with shutil.which; it never invokes those commands. The
-only subprocess is a bounded native Git revision query. No credentials, client
-configuration, service/process state, network endpoints, or model APIs are read.
+only subprocess is a bounded native Git revision query. It opens no credential store
+(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) and reads no
+service/process state, network endpoint or model API. Client configuration is read
+only with the opt-in --client-wiring, which parses fixed native client files whole and
+in-process and emits no value from them: fixed booleans and hook-event counts only,
+never a value, command, path or environment value (Codex hook trust is compared as a
+SHA-256 inside this process, as Codex computes it; the two Codex role files under the
+Codex home's agents/ are compared byte for byte with this checkout's adoption/agents/codex
+copies and only how many are equal is reported). The opt-in --pinned-versions execs
+a profile's PATH-resolved commands with their platform pin's declared "exec"
+version_probe only (never one declared "npm-metadata" or another method, since that
+method exists exactly because running the tool starts a server or a UI), each in its
+own process group that is killed once the probe exits, times out or is interrupted,
+and emits booleans, counts, component ids and version strings from the checked-in
+manifest and pins file and the output of a probe that exited 0. The opt-in --login-shell looks at the metadata of the
+three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_login, ~/.profile) without opening or
+executing any of them, and emits a fixed state per file, never a value, path or environment value. The opt-in
+--launcher-resolution is the one check that runs them: a bounded Bash login shell from a fixed environment reports
+where `command -v claude` resolves (claude itself never runs), shown only under $ECO_ROOT, $HOME or a system
+directory, with whether it is the ecosystem launcher and that launcher's sha256. Without that flag, --login-shell
+reports launcher_resolution as {"status": "not_run", "flag": "--launcher-resolution"}.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
+import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import platform
 import re
+import shlex
 import shutil
+import signal
+import stat
 import subprocess
 import sys
+import tempfile
+import threading
 from urllib.parse import urlsplit
+import warnings
 
 
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -24,12 +52,178 @@ NAME = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_.-]*\Z")
 # Grafana's Linux x86-64 archive keeps this basename after extraction:
 # https://grafana.com/docs/loki/latest/setup/install/local/
 COMMAND_ALIASES = {("loki", "linux", "x86_64"): ("loki-linux-amd64",)}
+NO_CLIENT_STATE = ("No credentials, client configuration, environment values, network endpoints, or running "
+                   "processes are inspected.")
+# --pinned-versions replaces this statement with PINNED_VERSION_LIMITATIONS.
+NO_PINNED_VERSION = "Executable presence does not verify its version, installation integrity, activation, or E2E behavior."
 LIMITATIONS = [
-    "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+    NO_PINNED_VERSION,
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
     "Git comparison reports source identity only; changed worktree files are not inspected.",
-    "No credentials, client configuration, environment values, network endpoints, or running processes are inspected.",
+    NO_CLIENT_STATE,
 ]
+# --client-wiring replaces NO_CLIENT_STATE with these two statements.
+CLIENT_WIRING_LIMITATIONS = [
+    "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json, "
+    "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
+    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It also compares the two "
+    "Codex role files under the Codex home's agents/ with this checkout's adoption/agents/codex copies byte for byte "
+    "and reports how many are equal, a count and never a name or text. It opens no credential "
+    "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
+    "environment variables only locate the client homes, and two opt-ins are checked by name.",
+    "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
+    "config.toml features and command-line overrides, can override the user scope read here. Codex hook trust is "
+    "computed for the ai-memory hooks.json entries only, the way Codex rust-v0.155.1 to rust-v0.157.1 computes it "
+    "(a user config.toml [hooks.state] trusted_hash equal to the hook's current hash); a later Codex that hashes "
+    "differently reads as untrusted here until this check follows it. hooks.json is read as Codex's serde parse "
+    "reads it, and both Codex hook counts are null for a file that parse rejects, since Codex then loads none of "
+    "its hooks; the trusted count is also null when a matcher on an ai-memory hook uses regex syntax this check "
+    "cannot evaluate as Rust's regex crate does. Plugin revisions and bundled plugin hooks, project trust, Claude "
+    "MCP registrations, MCP server startup and a useful native call remain the clients' own checks (/mcp, /hooks, "
+    "the app-server hooks/list, the plugin doctor).",
+]
+PINNED_VERSION_TIMEOUT_SECONDS = 30
+# adoption/bootstrap-linux.sh run_version_probe: TERM to the probe's process group when its bound expires, KILL
+# this many seconds later.
+PINNED_VERSION_KILL_GRACE_SECONDS = 2
+# A pin's version_probe.method this script ever execs. "npm-metadata" (context-mode: no version flag, any
+# other argument starts its MCP stdio server) and any future undeclared method are reported unchecked instead;
+# see adoption/bootstrap-linux.sh's write_version_report, which this reuses the pins file's schema from (#251).
+SUPPORTED_VERSION_PROBE_METHODS = ("exec",)
+# --pinned-versions replaces NO_PINNED_VERSION with this statement.
+PINNED_VERSION_LIMITATIONS = [
+    "--pinned-versions execs a selected profile's component_ids that have an \"exec\" version_probe in this "
+    "platform's pins file (adoption/pins-<os>-<arch>.json): the declared command, located on PATH only, run with "
+    "stdin from /dev/null in its own process group. That group is killed once the probe exits, on interruption "
+    "(SIGINT, SIGTERM or SIGHUP; a signal this check started with ignored, as under nohup, stays ignored), "
+    f"and after its pin's timeout_seconds or {PINNED_VERSION_TIMEOUT_SECONDS}s (TERM, then KILL "
+    f"{PINNED_VERSION_KILL_GRACE_SECONDS}s later); a descendant that leaves the group, for example by starting its "
+    "own session, is not reached. Only a probe that exits 0 has its stdout and stderr text compared against the "
+    "pinned version; a nonzero exit is reported as not matching. A component with no pins entry for this "
+    "platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared "
+    "because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe "
+    "whose declared method is not \"exec\".",
+]
+# --login-shell: the personal files a Bash login shell reads, in bash(1) INVOCATION order. GNU bash 5.3 shell.c
+# execute_profile_file (1116-1127) runs ~/.bash_profile and, only while maybe_execute_file returns 0, ~/.bash_login and
+# then ~/.profile; builtins/evalfile.c evalfile_internal returns 0 only for a missing file (FEVAL_ENOENTOK) and nonzero
+# for an empty file (nr == 0), a directory and every other open error, so the first file that exists ends the search
+# even when it reads as nothing; maybe_execute_file does not set FEVAL_REGFILE, so a device is read as empty and a FIFO
+# blocks the shell. Key -> file name under HOME.
+LOGIN_SHELL_FILES = {"bash_profile": ".bash_profile", "bash_login": ".bash_login", "profile": ".profile"}
+LOGIN_FILE_STATES = ("absent", "empty", "content", "unusable")
+LOGIN_SHELL_KEYS = (*LOGIN_SHELL_FILES, "first_read", "profile_read")
+# --login-shell appends this statement.
+LOGIN_SHELL_LIMITATIONS = [
+    "--login-shell looks at the metadata of ~/.bash_profile, ~/.bash_login and ~/.profile under HOME (existence, regular "
+    "file, read permission, size) and never opens, reads or executes one, so it emits a fixed state per file (absent, "
+    "empty, content or unusable), the file a Bash login shell reads first and whether that shell reaches ~/.profile, "
+    "never a value, path or environment value. It mirrors GNU bash 5.3's login search (shell.c execute_profile_file, "
+    "builtins/evalfile.c evalfile_internal): the first of the three that exists ends the search even when it is empty "
+    "or unusable (a directory, an unreadable file or a special file: a device reads as empty and a FIFO blocks the login "
+    "shell), so an empty ~/.bash_profile hides a real ~/.profile. profile_read is true when the search reaches ~/.profile "
+    "and it is usable, false when an earlier file is empty or unusable, when ~/.profile is itself unusable or when it does "
+    "not exist, and null when an earlier file has content, since whether that file sources ~/.profile is not read. HOME "
+    "is the environment's, else the passwd entry's, else \"/\", the way bash falls back (shell.c). It does not run a login shell, so it proves neither a PATH nor a command; "
+    "/etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode and an sh-mode login (which read other files or "
+    "none, bash(1) INVOCATION) are outside it.",
+]
+# --launcher-resolution: one Bash login shell, started as a Windows Terminal profile's `bash -lc` starts one
+# (adoption/platforms/linux-wsl2.md, "Windows Terminal profiles and the login shell"), from a fixed environment, so this
+# process's own PATH cannot answer for it (a probe from a shell that already has PATH passes with broken login files).
+# The PATH is the system directories of adoption/hosts/example.json's HOST_PATH.
+LAUNCHER_LOGIN_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+LAUNCHER_TIMEOUT_SECONDS = 10
+LAUNCHER_MARKER = "native-agent-stack:launcher-resolution:"
+# A resolved path outside $ECO_ROOT and $HOME is shown only under these directories; any other is withheld (on WSL a
+# Windows npm install puts a `claude` script under /mnt/c/Users/<name>/, which names the user).
+LAUNCHER_SYSTEM_PREFIXES = ("/usr/", "/bin/", "/sbin/", "/opt/", "/snap/", "/nix/")
+LAUNCHER_RESOLUTIONS = ("ecosystem_launcher", "other", "not_found", "unavailable")
+LAUNCHER_RESOLUTION_KEYS = ("resolution", "path", "is_ecosystem_launcher", "launcher_sha256")
+# --login-shell without --launcher-resolution: that check executes the login files, which --login-shell never does, so
+# the report says the check was not run and which flag runs it instead of leaving the key out.
+LAUNCHER_NOT_RUN = {"status": "not_run", "flag": "--launcher-resolution"}
+# --launcher-resolution appends this statement.
+LAUNCHER_RESOLUTION_LIMITATIONS = [
+    "--launcher-resolution runs one Bash login shell (`bash -l -c`, stdin from /dev/null, its own process group killed "
+    f"after {LAUNCHER_TIMEOUT_SECONDS}s) from a fixed environment: HOME, USER and LOGNAME from this process and PATH "
+    f"{LAUNCHER_LOGIN_PATH}, as a terminal profile's `bash -lc` starts, so this process's PATH cannot answer for it. That "
+    "shell runs /etc/profile and the first personal startup file bash finds, whatever they do, then `command -v "
+    "claude`; claude itself never runs. It reports where claude resolves only as a path under $ECO_ROOT "
+    "($ECO_INSTALL_ROOT, else ~/.local/share/codex-ecosystem), under $HOME or under a system directory, and withholds "
+    "any other path; whether it is the ecosystem launcher $ECO_ROOT/bin/claude; and that launcher's sha256. WSL's "
+    "appended Windows PATH entries, ~/.bashrc and another login shell are outside it.",
+]
+# The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
+CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
+WIRED_MCP_SERVERS = ("serena", "socraticode", "ai-memory")
+# This catalog's pins-<os>-<arch>.json naming (adoption/pins-macos-arm64.json) vs. platform.system().lower().
+PIN_OS_ALIASES = {"darwin": "macos"}
+DEPTH_VARIABLE = "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH"
+CONCURRENCY_VARIABLE = "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS"
+EFFORT_VARIABLE = "CLAUDE_CODE_EFFORT_LEVEL"  # any value overrides every child's effort
+AGENT_TEAMS_VARIABLE = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"  # the agent-teams opt-in
+# Codex 0.155.1's lifecycle-hook feature keys (codex-rs/features: the legacy alias, then the key), in the sorted
+# order Codex applies them, so "hooks" wins when both are set.
+CODEX_HOOK_FEATURES = ("codex_hooks", "hooks")
+# The global instruction files Codex reads from its home, first non-blank one wins, passed to the model verbatim:
+# no "@path" reference is expanded (codex-rs/codex-home/src/instructions/mod.rs at rust-v0.155.1 and rust-v0.157.1).
+CODEX_INSTRUCTION_FILES = ("AGENTS.override.md", "AGENTS.md")
+# rtk 0.50.0 (src/hooks/init.rs RTK_MD_OWNED_MARKER) heads the RTK.md it writes with this comment line; it is RTK's
+# ownership record, not an instruction, so an inline copy may leave it out.
+RTK_OWNED_MARKER = "<!-- rtk-owned:"
+# Codex hook trust, read from codex-rs/hooks/src/engine/discovery.rs, config_rules.rs, lib.rs, events/common.rs and
+# codex-rs/config/src/hook_config.rs and fingerprint.rs (byte-identical where used at rust-v0.155.1 and
+# rust-v0.157.1). A hooks.json handler runs only when it is enabled and trusted: the user config.toml's
+# [hooks.state."<hooks.json path>:<event key>:<group>:<handler>"] trusted_hash equals the SHA-256 of the handler's
+# normalized identity. Event name -> the key label Codex uses in both.
+CODEX_HOOK_EVENTS = {"PreToolUse": "pre_tool_use", "PermissionRequest": "permission_request",
+                     "PostToolUse": "post_tool_use", "PreCompact": "pre_compact", "PostCompact": "post_compact",
+                     "SessionStart": "session_start", "SessionEnd": "session_end",
+                     "UserPromptSubmit": "user_prompt_submit", "SubagentStart": "subagent_start",
+                     "SubagentStop": "subagent_stop", "Stop": "stop", "Interrupt": "interrupt"}
+CODEX_EVENTS_WITHOUT_MATCHER = frozenset({"UserPromptSubmit", "Stop", "Interrupt"})  # matcher_pattern_for_event
+CODEX_CONTEXT_LIMIT_EVENTS = frozenset({"PreToolUse", "PostToolUse", "SessionStart", "UserPromptSubmit",
+                                        "SubagentStart"})  # the events that may emit additionalContext
+CODEX_DEFAULT_CONTEXT_LIMIT = 2_500  # DEFAULT_HOOK_OUTPUT_TOKEN_LIMIT, dropped from the identity when configured
+# Codex reads hooks.json with serde_json::from_str::<HooksFile> (discovery.rs load_hooks_json) and loads no hook at
+# all from a file that fails it. The fields of each serde struct in hook_config.rs, in declaration order (a JSON
+# array fills them in that order); HookHandlerConfig is internally tagged by "type", with these variants.
+CODEX_HOOKS_FILE_FIELDS = ("description", "hooks")
+CODEX_GROUP_FIELDS = ("matcher", "hooks")
+CODEX_HANDLER_FIELDS = {"command": ("command", "commandWindows", "timeout", "async", "statusMessage",
+                                    "additionalContextLimit"),
+                        "mcp_tool": ("server", "tool", "input", "timeout", "statusMessage"),
+                        "prompt": (), "agent": ()}
+# serde_json 1.0.149 (Codex 0.157.1's Cargo.lock): the 128th array or object nested along a path it parses fails
+# ("recursion limit exceeded"); a skipped unknown field's value is scanned without that limit.
+SERDE_JSON_RECURSION_LIMIT = 128
+U64_MAX = 2 ** 64 - 1
+I64_MAX = 2 ** 63 - 1  # a TOML integer: the widest number Codex's hook hash can hold
+RUST_WHITESPACE = ("\t\n\x0b\x0c\r \x85\xa0           "
+                   "     　")  # char::is_whitespace, which Rust's str::trim strips
+# The regex constructs that Python's re and Rust's regex crate (regex-syntax 0.8.8 in Codex 0.157.1) parse alike;
+# see shared_regex_subset.
+REGEX_META = frozenset("\\.+*?()|[]{}^$#&-~")  # regex-syntax's escapable meta characters; Python escapes them too
+REGEX_CLASS_ESCAPES = frozenset("dDwWsS")
+REGEX_CONTROL_ESCAPES = frozenset("aftnrv")
+REGEX_ASSERTION_ESCAPES = frozenset("bBA")
+REGEX_SUBSET_MAX_LENGTH = 1_000
+REGEX_SUBSET_MAX_CLASSES = 20  # Unicode classes compile large in Rust; a few stay far below its 10 MiB size limit
+REGEX_SUBSET_MAX_DEPTH = 64
+CLIENT_FILE_LIMIT = 1_048_576
+CLIENT_WIRING_KEYS = {
+    "claude": ("rtk_hook", "ai_memory_hook_events", "context_mode_plugin_enabled", "subagent_spawn_depth_1",
+               "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
+    "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
+    "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
+              "ai_memory_hook_events", "ai_memory_hook_events_trusted", "stack_roles_matching"),
+}
+# The two Codex role carriers the worker lane installs under <Codex home>/agents (tools/adoption/apply_codex_lane.py) and
+# this checkout ships in adoption/agents/codex, whose SHA256SUMS names exactly these two files.
+STACK_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "codex"
+ABSENT, NOT_A_FILE = "absent", "not_a_file"
 
 
 class InvalidManifest(ValueError):
@@ -168,7 +362,1028 @@ def command_present(name: str, host: dict) -> bool:
     return any(shutil.which(alias) is not None for alias in aliases)
 
 
-def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None) -> dict:
+def read_client_file(path: Path, kind: str):
+    """A client file parsed as "json", "toml" or "text": {} or "" when absent, None when unreadable,
+    oversized or malformed. Parsed content stays in this module; callers reduce it to booleans and counts."""
+    try:
+        if not os.path.lexists(path):
+            return "" if kind == "text" else {}
+        if not path.is_file() or path.stat().st_size > CLIENT_FILE_LIMIT:
+            return None
+        text = path.read_text(encoding="utf-8")
+        if kind == "text":
+            return text
+        if kind == "json":
+            data = json.loads(text)
+        else:
+            import tomllib  # standard library from Python 3.11; older interpreters report the file unreadable
+            data = tomllib.loads(text)
+    except (ImportError, OSError, UnicodeError, ValueError, RecursionError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def table(value) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
+def hook_argvs(groups, tool: str | None = None):
+    """argv of each command hook in one event's matcher groups; with ``tool``, only groups whose
+    matcher covers it (absent, "" and "*" match every tool, anything else must match the whole name)."""
+    for group in groups if isinstance(groups, list) else []:
+        if not isinstance(group, dict):
+            continue
+        matcher = group.get("matcher")
+        if tool is not None and matcher not in (None, "", "*"):
+            try:
+                if not isinstance(matcher, str) or re.fullmatch(matcher, tool) is None:
+                    continue
+            except re.error:
+                continue
+        hooks = group.get("hooks")
+        for hook in hooks if isinstance(hooks, list) else []:
+            if isinstance(hook, dict) and hook.get("type") == "command" and isinstance(hook.get("command"), str):
+                try:
+                    yield shlex.split(hook["command"])
+                except ValueError:
+                    continue
+
+
+def runs(argv: list[str], program: str) -> bool:
+    return bool(argv) and PurePosixPath(argv[0]).name == program
+
+
+def ai_memory_hook_events(hooks) -> int:
+    """How many hook events run an ``ai-memory ... hook`` command (the command is never returned)."""
+    return sum(any(runs(argv, "ai-memory") and "hook" in argv[1:] for argv in hook_argvs(groups))
+               for groups in table(hooks).values())
+
+
+def settings_env_text(settings: dict, name: str) -> str | None:
+    """A settings ``env`` entry as text, compared inside this module and never returned by it."""
+    value = table(settings.get("env")).get(name)
+    return str(value).strip() if isinstance(value, (str, int)) and not isinstance(value, bool) else None
+
+
+def depth_and_concurrency(settings: dict) -> tuple[bool, bool]:
+    """Subagent spawn depth exactly 1; a workflow concurrency cap within the client's accepted 1-256."""
+    concurrency = settings_env_text(settings, CONCURRENCY_VARIABLE) or ""
+    return (settings_env_text(settings, DEPTH_VARIABLE) == "1",
+            re.fullmatch(r"[0-9]{1,3}", concurrency) is not None and 1 <= int(concurrency) <= 256)
+
+
+def mcp_servers_present(config) -> dict:
+    """Codex ``mcp_servers`` table names only (a table with ``enabled = false`` is not present)."""
+    if config is None:
+        return dict.fromkeys(WIRED_MCP_SERVERS)
+    servers = table(config.get("mcp_servers"))
+    return {name: isinstance(servers.get(name), dict) and servers[name].get("enabled") is not False
+            for name in WIRED_MCP_SERVERS}
+
+
+def claude_wiring(claude_dir: Path, env) -> dict:
+    settings = read_client_file(claude_dir / "settings.json", "json")
+    if settings is None:
+        return dict.fromkeys(CLIENT_WIRING_KEYS["claude"])
+    hooks = {} if settings.get("disableAllHooks") is True else table(settings.get("hooks"))
+    names = table(settings.get("env"))
+    plugin = table(settings.get("enabledPlugins")).get(CONTEXT_MODE_PLUGIN) is True
+    if plugin:  # enabled in settings and recorded in the native plugin registry
+        registry = read_client_file(claude_dir / "plugins" / "installed_plugins.json", "json")
+        installs = None if registry is None else table(registry.get("plugins")).get(CONTEXT_MODE_PLUGIN)
+        plugin = None if registry is None else isinstance(installs, list) and bool(installs)
+    depth, concurrency = depth_and_concurrency(settings)
+    return {
+        "rtk_hook": any(runs(argv, "rtk") and argv[1:3] == ["hook", "claude"]
+                        for argv in hook_argvs(hooks.get("PreToolUse"), "Bash")),
+        "ai_memory_hook_events": ai_memory_hook_events(hooks),
+        "context_mode_plugin_enabled": plugin,
+        "subagent_spawn_depth_1": depth,
+        "workflow_concurrency_set": concurrency,
+        "effort_level_env_unset": EFFORT_VARIABLE not in names and EFFORT_VARIABLE not in env,
+        # Information, not a requirement: agent teams are an allowed dispatch mode for parallel exploration
+        # (user instructions 2026-09-27; https://code.claude.com/docs/en/agent-teams). A 0/1 count, not a bool,
+        # so the all-booleans completeness rule never counts it and the output stays flags and counts only.
+        "agent_teams_opt_in": int(AGENT_TEAMS_VARIABLE in names or AGENT_TEAMS_VARIABLE in env),
+    }
+
+
+def codex_hooks_enabled(config) -> bool | None:
+    """Codex's lifecycle-hook feature, stable and on by default in 0.155.1. False turns off hooks.json and
+    plugin-bundled hooks alike, as disableAllHooks does for Claude; a non-boolean fails Codex's own parse."""
+    if config is None:
+        return None
+    features = config.get("features", {})
+    if not isinstance(features, dict):
+        return False
+    enabled = True
+    for key in CODEX_HOOK_FEATURES:
+        if key in features:
+            if not isinstance(features[key], bool):
+                return False
+            enabled = features[key]
+    return enabled
+
+
+def instruction_text(text: str) -> str:
+    """Instruction text compared by content: whitespace runs collapsed, RTK's ownership comment line dropped."""
+    lines = [line for line in text.splitlines() if not line.lstrip().startswith(RTK_OWNED_MARKER)]
+    return " ".join(" ".join(lines).split())
+
+
+def codex_instructions(codex_dir: Path) -> str | None:
+    """The global instructions Codex gives the model: AGENTS.override.md when it has non-blank text, else AGENTS.md
+    ("" when neither has any). None when either file is unreadable here, since Codex may still read it. Blank is
+    decided as Codex decides it, with Rust's str::trim (codex-home/src/instructions/mod.rs at rust-v0.157.1):
+    U+001C to U+001F, which Python's str.strip() also removes, make an override Codex sends."""
+    for name in CODEX_INSTRUCTION_FILES:
+        text = read_client_file(codex_dir / name, "text")
+        if text is None or text.strip(RUST_WHITESPACE):
+            return text
+    return ""
+
+
+def rtk_instructions_inline(codex_dir: Path) -> bool | None:
+    """RTK.md's text appears inline in the instructions Codex loads. A bare "@RTK.md" reference, which is what
+    `rtk init -g --codex` writes, is not enough: Codex expands no reference, so the model sees only the path."""
+    instructions, rtk = codex_instructions(codex_dir), read_client_file(codex_dir / "RTK.md", "text")
+    if instructions is None or rtk is None:
+        return None
+    body = instruction_text(rtk)
+    return bool(body) and body in instruction_text(instructions)
+
+
+def shared_regex_subset(pattern: str) -> bool:
+    """Whether ``pattern`` uses only constructs that Python's re and Rust's regex crate (regex-syntax 0.8.8, which
+    Codex 0.157.1 locks) accept and reject alike, so that Python's re.compile decides it as Rust would: literals,
+    ".", "^", "$", "|", "(" and "(?:" groups, one "*", "+" or "?" after an atom (then an optional lazy "?"),
+    escaped meta characters, \\d \\D \\w \\W \\s \\S, \\a \\f \\t \\n \\r \\v, \\b \\B \\A outside classes, and
+    classes of literals, ASCII letter and digit ranges and those escapes. Counted repetition, inline flags, named
+    groups, lookaround, backreferences, \\z \\Z \\p \\x \\0, nested classes and a repetition of an assertion or of
+    a repetition are not in it: there the engines differ (evidence/artifacts/adoption-status-truth-20260926)."""
+    if len(pattern) > REGEX_SUBSET_MAX_LENGTH:
+        return False
+    index, depth, classes, previous = 0, 0, 0, "start"  # previous: start, atom, assertion, repeat or lazy
+    while index < len(pattern):
+        char = pattern[index]
+        if char == "\\":
+            if index + 1 == len(pattern):
+                return True  # a trailing backslash: both engines reject the pattern
+            escaped = pattern[index + 1]
+            if escaped in REGEX_ASSERTION_ESCAPES:
+                previous = "assertion"
+            elif escaped in REGEX_META or escaped in REGEX_CONTROL_ESCAPES or escaped in REGEX_CLASS_ESCAPES:
+                classes += escaped in REGEX_CLASS_ESCAPES
+                previous = "atom"
+            else:
+                return False
+            index += 2
+        elif char == "[":
+            index += 1 + pattern.startswith("^", index + 1)
+            start, letter = index, False  # letter: the previous member is an ASCII letter or digit
+            while True:
+                if index == len(pattern):
+                    return True  # an unclosed class: both engines reject the pattern
+                member = pattern[index]
+                if member == "]" and index > start:
+                    break
+                if member in "[]&~" or pattern.startswith("--", index):
+                    return False  # nested classes and Rust's set operators && -- ~~
+                if member == "\\":
+                    escaped = pattern[index + 1:index + 2]
+                    if not escaped:
+                        return True
+                    if not (escaped in REGEX_META or escaped in REGEX_CONTROL_ESCAPES
+                            or escaped in REGEX_CLASS_ESCAPES):
+                        return False
+                    classes += escaped in REGEX_CLASS_ESCAPES
+                    index, letter = index + 2, False
+                elif member == "-" and index > start and pattern[index + 1:index + 2] != "]":
+                    end = pattern[index + 1:index + 2]
+                    if not (letter and end.isascii() and end.isalnum()):
+                        return False
+                    index, letter = index + 2, False  # a range such as a-z
+                else:
+                    index, letter = index + 1, member.isascii() and member.isalnum()
+            index += 1
+            classes += 1
+            previous = "atom"
+        elif char == "(":
+            if pattern.startswith("(?", index) and not pattern.startswith("(?:", index):
+                return False
+            index += 3 if pattern.startswith("(?:", index) else 1
+            depth += 1
+            if depth > REGEX_SUBSET_MAX_DEPTH:
+                return False
+            previous = "start"
+        elif char in "*+?":
+            if char == "?" and previous == "repeat":
+                previous = "lazy"
+            elif previous in ("atom", "start"):
+                previous = "repeat"  # after nothing, both engines reject: "nothing to repeat"
+            else:
+                return False
+            index += 1
+        elif char in "{}]":
+            return False
+        else:
+            previous = ("start" if char == "|" else "assertion" if char in "^$" else "atom")
+            depth -= char == ")"
+            index += 1
+    return classes <= REGEX_SUBSET_MAX_CLASSES
+
+
+def codex_matcher_loads(matcher: str) -> bool | None:
+    """validate_matcher_pattern (codex-rs/hooks/src/events/common.rs): "" and "*" match all, a name or a | list of
+    ASCII letters, digits and "_" is exact, anything else must compile in Rust's regex crate. None when the matcher
+    is outside shared_regex_subset, where Python's re cannot stand in for Rust's."""
+    if matcher in ("", "*") or re.fullmatch(r"[A-Za-z0-9_|]*", matcher):
+        return True
+    if not shared_regex_subset(matcher):
+        return None
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # FutureWarning on a possible nested set
+            re.compile(matcher)
+    except (re.error, RecursionError, OverflowError, ValueError):
+        return False
+    return True
+
+
+class CodexRejects(ValueError):
+    """Codex's own parse of hooks.json fails (or cannot finish), so Codex loads no hook from that file."""
+
+
+class JsonObject(dict):
+    """A JSON object as Codex's serde_json reads it: the dict keeps each key's last value, as serde_json's own maps
+    do, and ``pairs`` keeps every pair in order, repeats included, for serde's field checks."""
+
+    def __init__(self, pairs):
+        super().__init__(pairs)
+        self.pairs = pairs
+
+
+def reject_constant(_name):
+    raise CodexRejects("NaN and Infinity are not JSON")
+
+
+def parsed_text(value) -> str:
+    """A string serde_json parses into Rust text (a field, a key, anything buffered): a lone surrogate fails."""
+    if not isinstance(value, str):
+        raise CodexRejects("expected text")
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        raise CodexRejects("lone surrogate") from None
+    return value
+
+
+def optional_text(value) -> str | None:
+    return None if value is None else parsed_text(value)
+
+
+def unsigned(value) -> int | None:
+    """Option<u64> or Option<usize>: null or a plain JSON integer from 0 to 2^64-1. serde_json's arbitrary_precision
+    feature, enabled in Codex's build, keeps any other number as text, which the field refuses."""
+    if value is None:
+        return None
+    if not isinstance(value, int) or isinstance(value, bool) or not 0 <= value <= U64_MAX:
+        raise CodexRejects("expected u64")
+    return value
+
+
+def buffered(value, depth: int) -> None:
+    """One internally tagged handler, which serde buffers whole before reading its tag: every key and string in it
+    is parsed as text, and each array or object in it counts toward serde_json's recursion limit (numbers stay
+    arbitrary-precision text, so none is out of range)."""
+    if isinstance(value, (list, dict)):
+        if depth >= SERDE_JSON_RECURSION_LIMIT:
+            raise CodexRejects("recursion limit exceeded")
+        for key, item in value.pairs if isinstance(value, JsonObject) else ((None, item) for item in value):
+            if key is not None:
+                parsed_text(key)
+            buffered(item, depth + 1)
+    elif isinstance(value, str):
+        parsed_text(value)
+
+
+def serde_struct(value, fields: tuple, *, deny_unknown: bool = False, aliases: dict | None = None) -> dict:
+    """A serde-derived struct read from a JSON object, where each key is parsed as text, a repeated field fails and
+    an unknown key fails under deny_unknown_fields or is otherwise skipped with its value unparsed; or read from a
+    JSON array, which holds the fields in declaration order and may be shorter, but not longer."""
+    if isinstance(value, list):
+        if len(value) > len(fields):
+            raise CodexRejects("trailing characters")
+        return dict(zip(fields, value))
+    if not isinstance(value, JsonObject):
+        raise CodexRejects("expected a struct")
+    found = {}
+    for key, item in value.pairs:
+        name = (aliases or {}).get(parsed_text(key), key)
+        if name in fields:
+            if name in found:
+                raise CodexRejects(f"duplicate field {name}")
+            found[name] = item
+        elif deny_unknown:
+            raise CodexRejects("unknown field")
+    return found
+
+
+def toml_representable(value) -> bool:
+    """An MCP hook's input must convert to TOML (deserialize_mcp_tool_input): no null anywhere. Numbers always
+    convert, as arbitrary-precision text."""
+    if isinstance(value, dict):
+        return all(toml_representable(item) for item in value.values())
+    if isinstance(value, list):
+        return all(toml_representable(item) for item in value)
+    return value is not None
+
+
+def codex_handler(value) -> dict | None:
+    """One HookHandlerConfig, tagged by "type" (buffered, then read as its variant), as a dict with its "type" and
+    the fields append_matcher_groups uses; None for prompt and agent, which Codex skips."""
+    buffered(value, 6)  # file, "hooks", event array, group, its "hooks" array, then this handler
+    if isinstance(value, list):  # an array: the tag, then the variant's fields in order
+        if not value:
+            raise CodexRejects("missing field type")
+        tag, fields = value[0], value[1:]
+    elif isinstance(value, JsonObject):
+        tags = [item for key, item in value.pairs if key == "type"]
+        if len(tags) != 1:
+            raise CodexRejects("missing or duplicate field type")
+        tag, fields = tags[0], JsonObject([(key, item) for key, item in value.pairs if key != "type"])
+    else:
+        raise CodexRejects("expected a handler")
+    if not isinstance(tag, str) or tag not in CODEX_HANDLER_FIELDS:
+        raise CodexRejects("expected variant identifier")
+    fields = serde_struct(fields, CODEX_HANDLER_FIELDS[tag],
+                          aliases={"command_windows": "commandWindows"} if tag == "command" else None)
+    if tag == "command":
+        handler = {"type": tag, "command": parsed_text(fields.get("command")),
+                   "timeout": unsigned(fields.get("timeout")), "async": fields.get("async", False),
+                   "statusMessage": optional_text(fields.get("statusMessage")),
+                   "additionalContextLimit": unsigned(fields.get("additionalContextLimit"))}
+        optional_text(fields.get("commandWindows"))
+        if not isinstance(handler["async"], bool):
+            raise CodexRejects("expected a boolean")
+        return handler
+    if tag == "mcp_tool":
+        server, tool = parsed_text(fields.get("server")), parsed_text(fields.get("tool"))
+        mcp_input = fields.get("input", JsonObject([]))
+        if not isinstance(mcp_input, dict) or not toml_representable(mcp_input):
+            raise CodexRejects("MCP hook input must be representable as TOML")
+        return {"type": tag, "server": server, "tool": tool, "timeout": unsigned(fields.get("timeout")),
+                "statusMessage": optional_text(fields.get("statusMessage"))}
+    return None
+
+
+def codex_hook_events(data) -> dict:
+    """A hooks.json as Codex parses it (HooksFile, HookEventsToml, MatcherGroup and HookHandlerConfig in
+    codex-rs/config/src/hook_config.rs, read by serde_json::from_str), as {event: [(matcher, [handler])]} with
+    codex_handler's handlers. Raises CodexRejects where that parse fails, and Codex then loads no hook from it."""
+    top = serde_struct(data, CODEX_HOOKS_FILE_FIELDS, deny_unknown=True)
+    optional_text(top.get("description"))
+    events = {}
+    for event, groups in serde_struct(top.get("hooks", JsonObject([])), tuple(CODEX_HOOK_EVENTS)).items():
+        if not isinstance(groups, list):
+            raise CodexRejects("expected a sequence")
+        events[event] = []
+        for group in groups:
+            fields = serde_struct(group, CODEX_GROUP_FIELDS)
+            handlers = fields.get("hooks", [])
+            if not isinstance(handlers, list):
+                raise CodexRejects("expected a sequence")
+            events[event].append((optional_text(fields.get("matcher")), [codex_handler(item) for item in handlers]))
+    return events
+
+
+def codex_hooks_json(text: str) -> dict:
+    """Parse hooks.json text as Codex's serde_json does: codex_hook_events of it, or CodexRejects. JSON objects keep
+    repeated keys, NaN and Infinity fail, and a skipped value keeps any number."""
+    try:
+        return codex_hook_events(json.loads(text, object_pairs_hook=JsonObject, parse_constant=reject_constant))
+    except CodexRejects:
+        raise
+    except (ValueError, RecursionError) as error:  # not JSON, or nested deeper than Python parses
+        raise CodexRejects(str(error)) from None
+
+
+def normalized_timeout(event: str, timeout: int | None) -> int:
+    """normalize_command_hook: SessionEnd and Interrupt default to 1 s and are clamped to 1-3 s, others default to
+    600 s and are at least 1 s."""
+    if event in ("SessionEnd", "Interrupt"):
+        return min(max(1 if timeout is None else timeout, 1), 3)
+    return max(600 if timeout is None else timeout, 1)
+
+
+def runs_ai_memory_hook(command: str) -> bool:
+    try:
+        argv = shlex.split(command)
+    except ValueError:
+        return False
+    return runs(argv, "ai-memory") and "hook" in argv[1:]
+
+
+def codex_hook_hashes(source: str, events: dict) -> dict:
+    """{key: (event, loads, current hash, runs ai-memory's hook)} for each command handler of one hooks.json whose
+    path is ``source``, following discovery.rs append_matcher_groups: a group whose matcher does not compile is
+    skipped (loads False; None when codex_matcher_loads cannot tell), as is a blank command. The hash is hook_hash
+    through fingerprint.rs version_for_toml: SHA-256 of the normalized identity as compact JSON with sorted keys.
+    Raises CodexRejects for a hook Codex cannot hash (a number beyond a TOML integer), on which Codex's hook
+    discovery panics and its app-server stops answering."""
+    result = {}
+    for event, groups in events.items():
+        label = CODEX_HOOK_EVENTS[event]
+        for group_index, (matcher, handlers) in enumerate(groups):
+            matcher = None if event in CODEX_EVENTS_WITHOUT_MATCHER else matcher
+            loads = True if matcher is None else codex_matcher_loads(matcher)
+            if loads is False:
+                continue  # Codex skips the whole group with a warning
+            for handler_index, handler in enumerate(handlers):
+                if handler is None:
+                    continue  # prompt and agent hooks: skipped as unsupported
+                if handler["type"] == "mcp_tool":
+                    if not (event == "SessionEnd" or not handler["server"].strip(RUST_WHITESPACE)
+                            or not handler["tool"].strip(RUST_WHITESPACE)) \
+                            and normalized_timeout(event, handler["timeout"]) > I64_MAX:
+                        raise CodexRejects("hook identity is not TOML")
+                    continue  # an MCP hook runs no command
+                if not handler["command"].strip(RUST_WHITESPACE):
+                    continue  # skipped before it is normalized or hashed
+                timeout = normalized_timeout(event, handler["timeout"])
+                limit = handler["additionalContextLimit"] if event in CODEX_CONTEXT_LIMIT_EVENTS else None
+                if max(timeout, limit or 0) > I64_MAX:
+                    raise CodexRejects("hook identity is not TOML")
+                config = {"type": "command", "command": handler["command"], "timeout": timeout,
+                          "async": handler["async"]}
+                if handler["statusMessage"] is not None:
+                    config["statusMessage"] = handler["statusMessage"]
+                if limit is not None and limit != CODEX_DEFAULT_CONTEXT_LIMIT:
+                    config["additionalContextLimit"] = limit
+                identity = {"event_name": label, "hooks": [config]}
+                if matcher is not None:
+                    identity["matcher"] = matcher
+                canonical = json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                result[f"{source}:{label}:{group_index}:{handler_index}"] = (
+                    event, loads, "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+                    runs_ai_memory_hook(handler["command"]))
+    return result
+
+
+def codex_hook_states(config) -> dict:
+    """The user config.toml's [hooks.state] as config_rules.rs hook_states_from_stack reads it: keys trimmed as
+    Rust's str::trim does, an entry with a wrongly typed field skipped, and "enabled" and "trusted_hash" merged
+    field by field."""
+    states = {}
+    for key, value in table(table(table(config).get("hooks")).get("state")).items():
+        key = key.strip(RUST_WHITESPACE)
+        if not isinstance(value, dict) or not key:
+            continue
+        fields = {"enabled": value.get("enabled"), "trusted_hash": value.get("trusted_hash")}
+        if not (isinstance(fields["enabled"], (bool, type(None)))
+                and isinstance(fields["trusted_hash"], (str, type(None)))):
+            continue
+        states.setdefault(key, {}).update({name: item for name, item in fields.items() if item is not None})
+    return states
+
+
+def codex_ai_memory_hook_counts(events: dict, config, key_root: str) -> tuple[int, int | None]:
+    """(events with an ai-memory hook in hooks.json, events with one Codex runs): enabled, and its [hooks.state]
+    trusted_hash equal to its current hash, exactly as discovery.rs hook_enabled and hook_trust_status decide for a
+    user (not managed) hook. The second is None when a matcher on an ai-memory hook leaves loading undecided.
+    Hashes are compared here and never returned."""
+    configured = sum(any(handler is not None and handler["type"] == "command"
+                         and runs_ai_memory_hook(handler["command"]) for _, handlers in groups for handler in handlers)
+                     for groups in events.values())
+    hooks = codex_hook_hashes(f"{key_root}/hooks.json", events)
+    if any(loads is None for _, loads, _, ai_memory in hooks.values() if ai_memory):
+        return configured, None
+    states = codex_hook_states(config)
+    return configured, len({event for key, (event, loads, digest, ai_memory) in hooks.items()
+                            if ai_memory and loads and states.get(key, {}).get("enabled") is not False
+                            and states.get(key, {}).get("trusted_hash") == digest})
+
+
+def read_regular_bytes(path: Path, limit: int = CLIENT_FILE_LIMIT):
+    """The bytes of a regular file, never read through a link: ABSENT when there is none, NOT_A_FILE for a link, a folder or
+    another kind of file, None when it cannot be read (a folder that cannot be searched, a path through a file, no
+    permission) or is over ``limit``."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return ABSENT
+    except OSError:
+        return None
+    if not stat.S_ISREG(mode):
+        return NOT_A_FILE
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(limit + 1)
+    except OSError:
+        return None
+    return data if len(data) <= limit else None
+
+
+def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
+    """How many of the two Codex role carriers under ``codex_dir``/agents are byte for byte the copies in ``roles_source``
+    (this checkout's adoption/agents/codex): a count, never a file's text or name.
+
+    0 when the agents folder is absent. A carrier that is absent, a link, a folder or another kind of file, or that differs,
+    does not count. None when the comparison cannot be made: a source copy is unreadable (also where the folder is absent),
+    the agents path is a link or not a folder (what Codex would load through it is not known here), or the folder or an
+    installed carrier cannot be read. Codex discovers a role from every *.toml below agents/ (codex-rs/agent-roles/src/
+    discovery.rs at rust-v0.157.1), so an extra file is another role: tools/adoption/apply_codex_lane.py and
+    tools/token-e2e/freeze_snapshot.py count those, and this count does not."""
+    sources = []
+    for name in STACK_ROLE_FILES:
+        data = read_regular_bytes(roles_source / name)
+        if not isinstance(data, bytes):
+            return None
+        sources.append(data)
+    agents = codex_dir / "agents"
+    try:
+        mode = os.lstat(agents).st_mode
+    except FileNotFoundError:
+        return 0
+    except OSError:
+        return None
+    if not stat.S_ISDIR(mode):  # lstat does not follow a link, so a linked folder is not a folder here
+        return None
+    matching = 0
+    for name, expected in zip(STACK_ROLE_FILES, sources):
+        found = read_regular_bytes(agents / name)
+        if found is None:
+            return None
+        matching += isinstance(found, bytes) and found == expected
+    return matching
+
+
+def codex_wiring(codex_dir: Path, key_root: str | None = None, *, roles_source: Path | None = None) -> dict:
+    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it); ``roles_source`` is the
+    directory holding the two role carriers to compare with (client_wiring passes the checkout's, and a caller that passes
+    none gets this repository's own)."""
+    config = read_client_file(codex_dir / "config.toml", "toml")
+    engine = codex_hooks_enabled(config)
+    hooks_path = codex_dir / "hooks.json"
+    text = read_client_file(hooks_path, "text")
+    try:  # hooks off: none runs; an absent hooks.json: no hooks; unreadable, or failing Codex's own parse: unknown
+        counts = ((None, None) if text is None or engine is None else (0, 0) if not engine else
+                  codex_ai_memory_hook_counts(codex_hooks_json(text) if os.path.lexists(hooks_path) else {},
+                                              config, key_root or str(codex_dir)))
+    except CodexRejects:
+        counts = (None, None)
+    entry = {} if config is None else table(table(config.get("plugins")).get(CONTEXT_MODE_PLUGIN))
+    plugin = None if config is None else entry.get("enabled") is True
+    if plugin:  # enabled in config.toml and present in the native plugin cache
+        try:
+            plugin = any(path.is_file() for path in
+                         codex_dir.glob("plugins/cache/context-mode/context-mode/*/.codex-plugin/plugin.json"))
+        except OSError:
+            plugin = None
+    configured, trusted = counts
+    return {
+        "rtk_instructions": rtk_instructions_inline(codex_dir),
+        "context_mode_plugin_enabled": plugin,
+        "mcp_servers_present": mcp_servers_present(config),
+        "hooks_feature_enabled": engine,
+        "ai_memory_hook_events": configured,
+        "ai_memory_hook_events_trusted": trusted,
+        "stack_roles_matching": stack_roles_matching(codex_dir, STACK_ROLES_SOURCE if roles_source is None
+                                                     else roles_source),
+    }
+
+
+def project_wiring(root: Path) -> dict:
+    settings = read_client_file(root / ".claude" / "settings.json", "json")
+    return {"settings_depth_and_concurrency": None if settings is None else all(depth_and_concurrency(settings)),
+            "codex_mcp_servers_present": mcp_servers_present(read_client_file(root / ".codex" / "config.toml", "toml"))}
+
+
+def only_flags(value) -> bool:
+    """Booleans, counts, None (unreadable) and objects of them: never text read from a file."""
+    if value is None or isinstance(value, bool) or (isinstance(value, int) and value >= 0):
+        return True
+    return isinstance(value, dict) and all(isinstance(key, str) and only_flags(item) for key, item in value.items())
+
+
+def fixed_wiring(result) -> bool:
+    """The exact CLIENT_WIRING_KEYS shape, each server map naming WIRED_MCP_SERVERS, and only flags."""
+    if not isinstance(result, dict) or set(result) != set(CLIENT_WIRING_KEYS):
+        return False
+    if any(not isinstance(result[group], dict) or set(result[group]) != set(keys)
+           for group, keys in CLIENT_WIRING_KEYS.items()):
+        return False
+    servers = (result["project"]["codex_mcp_servers_present"], result["codex"]["mcp_servers_present"])
+    return (all(isinstance(item, dict) and set(item) == set(WIRED_MCP_SERVERS) for item in servers)
+            and only_flags(result))
+
+
+def leaves(value) -> list:
+    return [leaf for item in value.values() for leaf in leaves(item)] if isinstance(value, dict) else [value]
+
+
+def wiring_complete(groups: dict) -> bool:
+    """The documented rule (docs/token-efficiency-stack.md, "Coverage check"): every file parsed, every boolean
+    true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
+    every Codex event that runs ai-memory trusted, so Codex actually runs its hook. The count of matching role files
+    (stack_roles_matching) is information: a number, 0 included, never blocks completeness, but its None (a file, the folder
+    or a source copy that cannot be read) does, like every other null."""
+    if None in leaves(groups):
+        return False
+    claude, project, codex = groups["claude"], groups["project"], groups["codex"]
+    servers = all(codex["mcp_servers_present"][name] or project["codex_mcp_servers_present"][name]
+                  for name in WIRED_MCP_SERVERS)
+    flags = all(value for group in groups.values() for value in group.values() if isinstance(value, bool))
+    return (servers and flags and claude["ai_memory_hook_events"] > 0 and codex["ai_memory_hook_events"] > 0
+            and codex["ai_memory_hook_events_trusted"] == codex["ai_memory_hook_events"])
+
+
+def client_wiring(root: Path, env=None) -> dict:
+    """Opt-in check that the selected token practice is wired into the native clients.
+
+    Reads the user Claude and Codex homes (CLAUDE_CONFIG_DIR and CODEX_HOME when set) and this
+    checkout's project files. Fixed keys only; None marks a file that is unreadable or malformed,
+    and "complete" applies the documented rule to the three groups."""
+    env = os.environ if env is None else env
+    home = env.get("HOME") or str(Path.home())
+    codex_home = env.get("CODEX_HOME")
+    # Codex's own spelling of its home in hook keys: a set CODEX_HOME canonicalized, else $HOME/.codex as is
+    # (codex-rs/utils/home-dir find_codex_home).
+    key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
+    groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
+              "project": project_wiring(root),
+              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root,
+                                    roles_source=root / "adoption" / "agents" / "codex")}
+    if not fixed_wiring(groups):
+        raise AssertionError("client wiring must be the fixed keys with boolean or count values")
+    return {**groups, "complete": wiring_complete(groups)}
+
+
+def login_file_state(path: Path) -> str:
+    """How a Bash login shell finds one startup file, from its metadata alone: absent (ENOENT, a dangling symlink
+    included: the search goes on), empty (read as nothing, yet the search ends), content, or unusable (a directory,
+    a special file, no read permission or any other error: the search ends at that file, whatever bash then does with
+    it: it reports a directory, reads a device such as /dev/null as empty, and blocks on a FIFO). Never opens it."""
+    try:
+        info = path.stat()
+    except FileNotFoundError:
+        return "absent"
+    except OSError:
+        return "unusable"
+    if not stat.S_ISREG(info.st_mode) or not os.access(path, os.R_OK):
+        return "unusable"
+    return "content" if info.st_size else "empty"
+
+
+def fixed_login_shell(result) -> bool:
+    """The exact LOGIN_SHELL_KEYS shape over fixed literals only: no text from a file can pass."""
+    return (isinstance(result, dict) and set(result) == set(LOGIN_SHELL_KEYS)
+            and all(result[key] in LOGIN_FILE_STATES for key in LOGIN_SHELL_FILES)
+            and any(result["first_read"] is value for value in (*LOGIN_SHELL_FILES, None))
+            and any(result["profile_read"] is value for value in (True, False, None)))
+
+
+def login_home(env) -> Path:
+    """HOME as bash finds it: the environment's, else the passwd entry's, else "/" (shell.c sets
+    current_user.home_dir to "/" when getpwuid fails)."""
+    try:
+        return Path(env.get("HOME") or Path.home())
+    except (KeyError, RuntimeError, OSError):
+        return Path("/")
+
+
+def login_shell(env=None) -> dict:
+    """Opt-in static check of the files a Bash login shell reads under HOME (see LOGIN_SHELL_FILES). Fixed keys: a
+    state per file, first_read (the first file that exists, None when none does) and profile_read (True when the
+    search reaches ~/.profile and it is usable, False when an empty or unusable file ends the search first, when
+    ~/.profile is itself unusable or when it does not exist, None when an earlier file has content and may or may not
+    source it). HOME comes from the environment, else from the user's passwd entry, else "/" as bash falls back to it
+    (shell.c sets current_user.home_dir to "/" when getpwuid fails)."""
+    env = os.environ if env is None else env
+    home = login_home(env)
+    states = {key: login_file_state(home / name) for key, name in LOGIN_SHELL_FILES.items()}
+    first = next((key for key, state in states.items() if state != "absent"), None)
+    if first is None:
+        profile_read = False
+    elif first == "profile":
+        profile_read = states["profile"] != "unusable"
+    else:
+        profile_read = None if states[first] == "content" else False
+    result = {**states, "first_read": first, "profile_read": profile_read}
+    if not fixed_login_shell(result):
+        raise AssertionError("login shell state must be the fixed keys with fixed values")
+    return result
+
+
+def shown_path(path: str, eco_root: Path, home: Path) -> str | None:
+    """A resolved path as the report may show it: under the ecosystem root as $ECO_ROOT/..., under HOME as
+    $HOME/..., a system directory's path as it is, and None for anything else."""
+    normal = os.path.normpath(path)
+    for anchor, name in ((eco_root, "$ECO_ROOT"), (home, "$HOME")):
+        base = os.path.normpath(str(anchor))
+        if base != "/" and normal.startswith(base + "/"):
+            return f"{name}/{normal[len(base) + 1:]}"
+    return normal if normal.startswith(LAUNCHER_SYSTEM_PREFIXES) else None
+
+
+def fixed_launcher_resolution(result) -> bool:
+    """The exact LAUNCHER_RESOLUTION_KEYS shape: a resolution from the fixed list, a shown path or None, a boolean that
+    agrees with the resolution, and a sha256 or None."""
+    if not isinstance(result, dict) or tuple(result) != LAUNCHER_RESOLUTION_KEYS:
+        return False
+    path, digest = result["path"], result["launcher_sha256"]
+    return (result["resolution"] in LAUNCHER_RESOLUTIONS
+            and (path is None or (isinstance(path, str) and "\n" not in path
+                                  and path.startswith(("$ECO_ROOT/", "$HOME/", *LAUNCHER_SYSTEM_PREFIXES))))
+            and isinstance(result["is_ecosystem_launcher"], bool)
+            and result["is_ecosystem_launcher"] == (result["resolution"] == "ecosystem_launcher")
+            and (digest is None or (isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest) is not None)))
+
+
+def launcher_resolution(env=None, seconds: float = LAUNCHER_TIMEOUT_SECONDS) -> dict:
+    """Opt-in: where `command -v claude` resolves in a Bash login shell started from a fixed environment (see
+    LAUNCHER_RESOLUTION_LIMITATIONS), whether that is the ecosystem launcher ($ECO_INSTALL_ROOT, else
+    ~/.local/share/codex-ecosystem, then bin/claude), and the launcher's sha256. claude is never run. resolution is
+    unavailable when no bash is found, the shell does not finish within ``seconds`` or prints no answer, not_found when
+    no claude resolves, and other for anything but the launcher, whose path is shown only under $ECO_ROOT, $HOME or a
+    system directory (an alias or function is never shown)."""
+    env = os.environ if env is None else env
+    home = login_home(env)
+    eco_root = Path(env.get("ECO_INSTALL_ROOT") or home / ".local/share/codex-ecosystem")
+    launcher = eco_root / "bin" / "claude"
+    try:
+        digest = hashlib.sha256(launcher.read_bytes()).hexdigest() if launcher.is_file() else None
+    except OSError:
+        digest = None
+    result = {"resolution": "unavailable", "path": None, "is_ecosystem_launcher": False, "launcher_sha256": digest}
+    bash = shutil.which("bash", path=LAUNCHER_LOGIN_PATH)
+    if bash is not None:
+        login_env = {"HOME": str(home), "PATH": LAUNCHER_LOGIN_PATH,
+                     **{name: env[name] for name in ("USER", "LOGNAME") if env.get(name)}}
+        script = f'p="$(command -v claude)" || p=; printf "\\n%s%s\\n" "{LAUNCHER_MARKER}" "$p"'
+        probe = run_version_probe([bash, "-l", "-c", script], seconds, env=login_env, cwd="/")
+        answers = [line[len(LAUNCHER_MARKER):] for line in (probe[1] if probe else "").splitlines()
+                   if line.startswith(LAUNCHER_MARKER)]
+        if answers and not answers[-1]:
+            result["resolution"] = "not_found"
+        elif answers:
+            resolved = answers[-1]
+            same = os.path.normpath(resolved) == os.path.normpath(str(launcher))
+            if not same and os.path.isabs(resolved):
+                with contextlib.suppress(OSError):
+                    same = os.path.samefile(resolved, launcher)
+            result["resolution"] = "ecosystem_launcher" if same else "other"
+            result["is_ecosystem_launcher"] = same
+            result["path"] = shown_path(resolved, eco_root, home) if os.path.isabs(resolved) else None
+    if not fixed_launcher_resolution(result):
+        raise AssertionError("launcher resolution must be the fixed keys with fixed values")
+    return result
+
+
+def pins_file_path(root: Path, host: dict) -> Path:
+    """This catalog's platform pins file (adoption/pins-<os>-<arch>.json), matching each pin's own
+    version_probe (#251) against a profile's component_ids. PIN_OS_ALIASES covers a platform.system()
+    name this catalog's own pins files spell differently (only "darwin" -> "macos" today)."""
+    osname = PIN_OS_ALIASES.get(host["os"], host["os"])
+    return root / "adoption" / f"pins-{osname}-{host['architecture']}.json"
+
+
+def read_pins(path: Path) -> dict:
+    """Pin entries by id from a platform pins file; {} when absent, unreadable, oversized or malformed --
+    every component is then reported unchecked, the same as one simply missing from a readable file."""
+    data = read_client_file(path, "json")
+    tools = data.get("tools") if isinstance(data, dict) else None
+    if not isinstance(tools, list):
+        return {}
+    return {entry["id"]: entry for entry in tools
+            if isinstance(entry, dict) and isinstance(entry.get("id"), str) and isinstance(entry.get("version"), str)}
+
+
+def version_at_least(observed: str, floor: str) -> bool:
+    """adoption/bootstrap-linux.sh version_at_least: compare dotted parts numerically, padding the
+    shorter with 0; any non-numeric part (e.g. "dev0") is not a match rather than an error."""
+    observed_parts, floor_parts = observed.split("."), floor.split(".")
+    for index in range(max(len(observed_parts), len(floor_parts))):
+        observed_part = observed_parts[index] if index < len(observed_parts) else "0"
+        floor_part = floor_parts[index] if index < len(floor_parts) else "0"
+        if not (observed_part.isdigit() and floor_part.isdigit()):
+            return False
+        if int(observed_part) != int(floor_part):
+            return int(observed_part) > int(floor_part)
+    return True
+
+
+def version_output_matches(expected: str, match: str, output: str) -> bool:
+    """The bootstrap scripts' own two match rules (adoption/bootstrap-linux.sh version_output_matches):
+    "exact" is the expected text bounded by no adjacent digit or dot (so "2.10" does not match
+    "12.10.0"), "minimum" the first dotted number in the output against a numeric floor (a later
+    version also passes). Any other rule is not a match."""
+    if match == "exact":
+        return re.search(r"(^|[^0-9.])" + re.escape(expected) + r"([^0-9.]|$)", output, re.MULTILINE) is not None
+    if match == "minimum":
+        found = re.search(r"[0-9]+(?:\.[0-9]+)+", output)
+        return found is not None and version_at_least(found.group(), expected)
+    return False
+
+
+def signal_group(group: int, signum: int) -> None:
+    """Signal a probe's whole process group; a group with nothing left in it is not an error."""
+    try:
+        os.killpg(group, signum)
+    except OSError:  # ProcessLookupError: the group is empty; PermissionError: macOS, zombies only
+        pass
+
+
+def run_version_probe(argv: list[str], seconds: float, *, env=None, cwd=None) -> tuple[int, str] | None:
+    """adoption/bootstrap-linux.sh run_version_probe: run ``argv`` with stdin from /dev/null in its own process
+    group (a new session), its output going to temporary files, so a descendant that keeps them open cannot
+    delay the result. When ``seconds`` pass, TERM goes to the whole group and KILL follows
+    PINNED_VERSION_KILL_GRACE_SECONDS later. Whatever is left in the group is killed once the probe exits, and on
+    any interruption before it propagates (main() turns SIGINT, SIGTERM and SIGHUP into one unless they are
+    ignored, as the bootstrap's EXIT trap stops its probe's group when that script is interrupted). Interruptions
+    are held back (held_interrupts) from before the process is created until its group has been killed and
+    reaped, except while the probe is waited for (interrupts_released), inside the block whose cleanup kills the
+    group. One held back, such as one that arrives between the probe's fork and subprocess.Popen returning it, or
+    during the kill, is raised once the group is gone. ``env`` and ``cwd`` (launcher_resolution's fixed login
+    environment) go to the process as given; by default it inherits both. Returns the exit status and the stdout and
+    stderr text, or None on timeout."""
+    with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
+        with held_interrupts():
+            process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                       start_new_session=True, env=env, cwd=cwd)
+            try:
+                with interrupts_released():
+                    try:
+                        status = process.wait(timeout=seconds)
+                    except subprocess.TimeoutExpired:
+                        signal_group(process.pid, signal.SIGTERM)
+                        with contextlib.suppress(subprocess.TimeoutExpired):
+                            process.wait(timeout=PINNED_VERSION_KILL_GRACE_SECONDS)
+                        status = None
+            finally:
+                signal_group(process.pid, signal.SIGKILL)
+                process.wait()
+        if status is None:
+            return None
+        stdout.seek(0)
+        stderr.seek(0)
+        # Joined by a newline, so the two streams are searched as the bootstrap's grep searches two files.
+        return status, "\n".join(stream.read().decode("utf-8", "replace") for stream in (stdout, stderr))
+
+
+# The interrupt held back by held_interrupts: whether a hold is on, and the first signal that arrived during it.
+# Python runs signal handlers in the main thread only, and only the main thread holds, so nothing else reads or
+# changes this.
+HELD_INTERRUPTS: dict = {"holding": False, "pending": None}
+
+
+def raise_interrupt(signum: int) -> None:
+    """A probe interruption: KeyboardInterrupt for SIGINT, as CPython's own handler raises, else SystemExit with
+    status 128 + the signal."""
+    if signum == signal.SIGINT:
+        raise KeyboardInterrupt
+    raise SystemExit(128 + signum)
+
+
+def interrupt_probe(signum: int, _frame) -> None:
+    """The handler signals_interrupt_probes installs: interrupt now, or, during a hold, keep the first signal for
+    the hold's end."""
+    if HELD_INTERRUPTS["holding"]:
+        if HELD_INTERRUPTS["pending"] is None:
+            HELD_INTERRUPTS["pending"] = signum
+        return
+    raise_interrupt(signum)
+
+
+@contextlib.contextmanager
+def held_interrupts():
+    """Hold back the interruptions signals_interrupt_probes turns signals into until the block ends, then raise
+    the first one that arrived. Outside the main thread, or inside another hold, this changes nothing."""
+    if threading.current_thread() is not threading.main_thread() or HELD_INTERRUPTS["holding"]:
+        yield
+        return
+    HELD_INTERRUPTS["pending"] = None  # one left by an earlier hold that was itself interrupted does not carry over
+    HELD_INTERRUPTS["holding"] = True
+    try:
+        yield
+    finally:
+        HELD_INTERRUPTS["holding"] = False
+        signum, HELD_INTERRUPTS["pending"] = HELD_INTERRUPTS["pending"], None
+        if signum is not None:
+            raise_interrupt(signum)
+
+
+@contextlib.contextmanager
+def interrupts_released():
+    """Inside a hold, let interruptions through for the block: one held back so far is raised as the block
+    starts, and the hold resumes when the block ends, however it ends. Outside a hold, or outside the main
+    thread, this changes nothing."""
+    if threading.current_thread() is not threading.main_thread() or not HELD_INTERRUPTS["holding"]:
+        yield
+        return
+    try:
+        HELD_INTERRUPTS["holding"] = False
+        signum, HELD_INTERRUPTS["pending"] = HELD_INTERRUPTS["pending"], None
+        if signum is not None:
+            raise_interrupt(signum)
+        yield
+    finally:
+        HELD_INTERRUPTS["holding"] = True
+
+
+@contextlib.contextmanager
+def signals_interrupt_probes():
+    """While probes run, SIGINT, SIGTERM and SIGHUP interrupt the check through interrupt_probe: SIGINT still
+    raises KeyboardInterrupt, SIGTERM and SIGHUP raise SystemExit (status 128 + the signal), so
+    run_version_probe kills the running probe's group on the way out; it holds an interruption back everywhere
+    but while it waits for the probe, inside the block whose cleanup kills the group. As CPython installs its
+    SIGINT handler only when SIGINT starts at its default action, a signal is changed only while it is at its
+    default action (SIG_DFL, or for SIGINT also CPython's default_int_handler), and put back afterwards: one the
+    check started with ignored (nohup, or a background job) stays ignored, as bash cannot trap a signal ignored
+    on entry, and a handler installed by someone else stays in place. Python accepts signal handlers in the main
+    thread only; elsewhere this changes nothing."""
+    if threading.current_thread() is not threading.main_thread():
+        yield
+        return
+    installed = []
+    for name in ("SIGINT", "SIGTERM", "SIGHUP"):
+        signum = getattr(signal, name, None)
+        if signum is None:
+            continue
+        previous = signal.getsignal(signum)
+        if previous == signal.SIG_DFL or (name == "SIGINT" and previous is signal.default_int_handler):
+            signal.signal(signum, interrupt_probe)
+            installed.append((signum, previous))
+    try:
+        yield
+    finally:
+        for signum, previous in installed:
+            signal.signal(signum, previous)
+
+
+def probe_pinned_version(entry: dict) -> dict:
+    """One component's pinned-version result. Never execs a probe whose declared method is not "exec": a
+    "npm-metadata" method (context-mode) is declared exactly because any other argument starts its MCP
+    stdio server, and any future undeclared method is left unchecked the same way."""
+    pinned = entry.get("version")
+    result = {"pinned_version": pinned if isinstance(pinned, str) else None, "checked": False, "matches_pin": None}
+    probe = table(entry.get("version_probe"))
+    if probe.get("method") not in SUPPORTED_VERSION_PROBE_METHODS:
+        return result
+    command, args = probe.get("command"), probe.get("args")
+    if not isinstance(command, str) or NAME.fullmatch(command) is None or not isinstance(args, list) \
+            or not all(isinstance(item, str) for item in args):
+        return result
+    resolved = shutil.which(command)
+    if resolved is None:
+        return result
+    expect = probe.get("expect")
+    expected = expect if isinstance(expect, str) else pinned
+    match = probe.get("match") if probe.get("match") in ("exact", "minimum") else "exact"
+    declared_seconds = probe.get("timeout_seconds")
+    seconds = declared_seconds if isinstance(declared_seconds, (int, float)) and 0 < declared_seconds <= 300 \
+        else PINNED_VERSION_TIMEOUT_SECONDS
+    try:
+        outcome = run_version_probe([resolved, *args], seconds)
+    except (OSError, ValueError):
+        return result
+    if outcome is None:  # timed out: its process group was killed
+        return result
+    status, output = outcome
+    result["checked"] = True
+    # As the bootstrap's "FAILED (exit N)": a failing probe never matches, even if its diagnostics name the pin.
+    result["matches_pin"] = status == 0 and isinstance(expected, str) and version_output_matches(expected, match,
+                                                                                               output)
+    return result
+
+
+def pinned_versions(component_ids: list[str], pins: dict) -> list[dict]:
+    """Opt-in per-component pinned-version result for one profile's component_ids; {} pins (no platform
+    file for this host) reports every component unchecked, same as one simply absent from it."""
+    return [{"id": identifier, **(probe_pinned_version(pins[identifier]) if identifier in pins else
+             {"pinned_version": None, "checked": False, "matches_pin": None})}
+            for identifier in component_ids]
+
+
+def pinned_versions_summary(results: list[dict]) -> dict:
+    """One profile's component ids by outcome: matched, mismatched (checked, not the pin) and unchecked."""
+    return {"matched": [item["id"] for item in results if item["checked"] and item["matches_pin"]],
+            "mismatched": [item["id"] for item in results if item["checked"] and not item["matches_pin"]],
+            "unchecked": [item["id"] for item in results if not item["checked"]]}
+
+
+def pinned_versions_match(profiles: list[dict]) -> bool | None:
+    """False when any selected profile has a checked component that differs from its pin, True when at least one
+    was checked and none differs, None when nothing could be checked. Unchecked components do not count."""
+    summaries = [profile["pinned_versions_summary"] for profile in profiles]
+    if any(summary["mismatched"] for summary in summaries):
+        return False
+    return True if any(summary["matched"] for summary in summaries) else None
+
+
+def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
+                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False,
+                     with_login_shell: bool = False, with_launcher_resolution: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -176,6 +1391,22 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     result = {"schema_version": 1, "status": "prerequisites_missing", "platform": host,
               "manifest": {"status": "invalid"}, "profiles": [], "errors": [],
               "runtime_acceptance_verified": False, "limitations": LIMITATIONS.copy()}
+    if with_client_wiring:
+        result["client_wiring"] = client_wiring(root, env)
+        result["limitations"] = [item for item in result["limitations"]
+                                 if item != NO_CLIENT_STATE] + CLIENT_WIRING_LIMITATIONS
+    pins = read_pins(pins_file_path(root, host)) if with_pinned_versions else {}
+    if with_pinned_versions:
+        result["limitations"] = [item for item in result["limitations"]
+                                 if item != NO_PINNED_VERSION] + PINNED_VERSION_LIMITATIONS
+    if with_login_shell:
+        result["login_shell"] = login_shell(env)
+        result["limitations"] = result["limitations"] + LOGIN_SHELL_LIMITATIONS
+    if with_launcher_resolution:
+        result["launcher_resolution"] = launcher_resolution(env)
+        result["limitations"] = result["limitations"] + LAUNCHER_RESOLUTION_LIMITATIONS
+    elif with_login_shell:
+        result["launcher_resolution"] = dict(LAUNCHER_NOT_RUN)
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -201,8 +1432,15 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         recipes = [{"path": reference, "present": recipe_path(root, reference).is_file()}
                    for reference in profile["recipe_paths"]]
         ready = all(item["present"] for item in commands + recipes)
-        result["profiles"].append({"id": identifier, "commands": commands, "recipes": recipes,
-            "status": "prerequisites_present" if ready else "prerequisites_missing"})
+        entry = {"id": identifier, "commands": commands, "recipes": recipes,
+                 "status": "prerequisites_present" if ready else "prerequisites_missing"}
+        if with_pinned_versions:
+            entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
+            entry["pinned_versions_summary"] = pinned_versions_summary(entry["pinned_versions"])
+        result["profiles"].append(entry)
+    if with_pinned_versions:
+        # Surfaced at the top: a mismatch leaves the prerequisite status and the exit code unchanged.
+        result["pinned_versions_match"] = pinned_versions_match(result["profiles"])
     revision = git_revision(root)
     baseline = data["source"]["baseline_commit"]
     result["git"] = {"baseline_commit": baseline, "current_commit": revision,
@@ -219,8 +1457,34 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repo-root", type=Path, help="Defaults to the manifest's grandparent directory")
     parser.add_argument("--profile", action="append", help="Profile ID; repeat to check multiple profiles")
     parser.add_argument("--json", action="store_true", help="Emit the bounded report as JSON")
+    parser.add_argument("--client-wiring", action="store_true",
+                        help="Also report whether the selected token practice is wired into the native Claude Code "
+                             "and Codex clients (fixed booleans, hook-event counts and a computed 'complete' only; "
+                             "the exit code is unchanged)")
+    parser.add_argument("--pinned-versions", action="store_true",
+                        help="Also report, per selected profile, whether each component_id's declared platform "
+                             "pin (adoption/pins-<os>-<arch>.json) version_probe observed the pinned version, "
+                             "each profile's matched, mismatched and unchecked ids, and a top-level "
+                             "pinned_versions_match that is false when any checked component differs from its pin "
+                             "(booleans, ids and version strings only; never execs a probe whose declared "
+                             "method is not \"exec\", and the exit code is unchanged)")
+    parser.add_argument("--login-shell", action="store_true",
+                        help="Also report, from file metadata alone (never a read or an exec), which of "
+                             "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
+                             "whether it reaches ~/.profile: a state per file, first_read and profile_read only; "
+                             "without --launcher-resolution, launcher_resolution is "
+                             '{"status": "not_run", "flag": "--launcher-resolution"}; the exit code is unchanged')
+    parser.add_argument("--launcher-resolution", action="store_true",
+                        help="Also run one bounded Bash login shell from a fixed environment and report where "
+                             "`command -v claude` resolves (under $ECO_ROOT, $HOME or a system directory, else "
+                             "withheld), whether it is the ecosystem launcher $ECO_ROOT/bin/claude, and that "
+                             "launcher's sha256; claude is never run, and the exit code is unchanged")
     args = parser.parse_args(argv)
-    report = inspect_adoption(args.manifest, args.repo_root, args.profile)
+    probes = args.pinned_versions or args.launcher_resolution
+    with signals_interrupt_probes() if probes else contextlib.nullcontext():
+        report = inspect_adoption(args.manifest, args.repo_root, args.profile,
+                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions,
+                                  with_login_shell=args.login_shell, with_launcher_resolution=args.launcher_resolution)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -230,6 +1494,21 @@ def main(argv: list[str] | None = None) -> int:
             missing = [item["name"] for item in profile["commands"] if not item["present"]]
             missing += [item["path"] for item in profile["recipes"] if not item["present"]]
             print(f"{profile['id']}: {profile['status']}" + (f" (missing: {', '.join(missing)})" if missing else ""))
+            if "pinned_versions_summary" in profile:
+                summary = profile["pinned_versions_summary"]
+                print(f"  pinned versions: {len(summary['matched'])} matched"
+                      + (f", mismatched: {', '.join(summary['mismatched'])}" if summary["mismatched"] else "")
+                      + (f", unchecked: {', '.join(summary['unchecked'])}" if summary["unchecked"] else ""))
+        if "pinned_versions_match" in report:
+            print(f"Pinned versions match: {json.dumps(report['pinned_versions_match'])}")
+        if "client_wiring" in report:
+            wiring = dict(report["client_wiring"])
+            print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")
+            print("Client wiring: " + json.dumps(wiring, sort_keys=True))
+        if "login_shell" in report:
+            print("Login shell: " + json.dumps(report["login_shell"], sort_keys=True))
+        if "launcher_resolution" in report:
+            print("Launcher resolution: " + json.dumps(report["launcher_resolution"], sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:

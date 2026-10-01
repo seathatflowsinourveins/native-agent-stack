@@ -1,0 +1,12 @@
+2.8.0 url=https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.8.0.tgz bytes=1206059
+  npm dist.integrity=sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==
+  computed          =sha512-zn0A8fIrPDge36vId0XMpj0FL0FChIGQvAvV/+iRTvUYkSzTSIALHjhZyLIgKTzBPnzrxDJnfRbrPcElUcXR6Q==
+  integrity MATCH
+  sha1 npm=206bdbfd849bbc274c8d45e12a35105035b75356 computed=206bdbfd849bbc274c8d45e12a35105035b75356
+  sha256=4db39519d276b99fe650f1032a3256cb704648cc611e598a38e178b1ba8a7cbf
+2.7.0 url=https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.7.0.tgz bytes=1191700
+  npm dist.integrity=sha512-V1SqfR+m3NWMkEe2i3v2GMm00pZtAl/JISAHQzYnOZElEuwuLLkU8vTWBYg5HMCYTgpvuMmzb+MZz98HjdcGuw==
+  computed          =sha512-V1SqfR+m3NWMkEe2i3v2GMm00pZtAl/JISAHQzYnOZElEuwuLLkU8vTWBYg5HMCYTgpvuMmzb+MZz98HjdcGuw==
+  integrity MATCH
+  sha1 npm=e3f210f9d985e6a28b2cb79cae23d9e83bb47358 computed=e3f210f9d985e6a28b2cb79cae23d9e83bb47358
+  sha256=6c47dea0a6b230fbca12c4b10472e5cbae8a72b03eaf5335daf83d017b0fdfcd

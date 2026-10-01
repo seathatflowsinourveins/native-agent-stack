@@ -1,0 +1,23 @@
+"""Independent prediction of the candidate lock: take the previously reviewed lock text (383ccc5b, from the earlier candidate head) and substitute ONLY the urllib3 and
+pyjwt entries with the versions and the sorted sha256 digests of the files PyPI lists for urllib3 2.8.0 and PyJWT 2.15.0. Usage: predict_candidate.py <reviewed lock> <out>
+Prints the digest of the prediction. Read-only network access (PyPI JSON)."""
+import hashlib
+import json
+import re
+import sys
+import urllib.request
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+for name, version in (("urllib3", "2.8.0"), ("PyJWT", "2.15.0")):
+    files = json.load(urllib.request.urlopen(f"https://pypi.org/pypi/{name}/{version}/json", timeout=30))["urls"]
+    hashes = sorted(f["digests"]["sha256"] for f in files)
+    pattern = re.compile(rf"^({name.lower()})==(\S+)( ;[^\\\n]*)? \\\n((?:    --hash=sha256:[0-9a-f]{{64}}(?: \\)?\n?)+)", re.M)
+    matches = list(pattern.finditer(text))
+    assert len(matches) == 1, (name, len(matches))
+    m = matches[0]
+    block = f"{name.lower()}=={version}{m.group(3) or ''} \\\n" + " \\\n".join(f"    --hash=sha256:{h}" for h in hashes) + ("\n" if m.group(4).endswith("\n") else "")
+    print(f"{name.lower()}: {m.group(2)} -> {version}; files on PyPI: {[f['filename'] for f in files]}")
+    text = text[: m.start()] + block + text[m.end():]
+Path(sys.argv[2]).write_text(text, encoding="utf-8")
+print("prediction sha256:", hashlib.sha256(text.encode()).hexdigest(), "| lines", text.count("\n"))

@@ -1,0 +1,687 @@
+{
+  "steps": [
+    {
+      "step": "R0-promtool-3.14.0",
+      "check_config_exit": 0,
+      "check_rules_exit": 0,
+      "check_config": "Checking ~/.config/ecosystem-observability/ecosystem-prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: ~/.config/ecosystem-observability/ecosystem-prometheus.yml is valid prometheus config file syntax\n\nChecking ~/.config/ecosystem-observability/ecosystem-prometheus-rules.yml\n  SUCCESS: 14 rules found",
+      "check_rules": "Checking ~/.config/ecosystem-observability/ecosystem-prometheus-rules.yml\n  SUCCESS: 14 rules found"
+    },
+    {
+      "step": "R0-promtool-3.15.0",
+      "check_config_exit": 0,
+      "check_rules_exit": 0,
+      "check_config": "Checking ~/.config/ecosystem-observability/ecosystem-prometheus.yml\n  SUCCESS: 1 rule files found\n SUCCESS: ~/.config/ecosystem-observability/ecosystem-prometheus.yml is valid prometheus config file syntax\n\nChecking ~/.config/ecosystem-observability/ecosystem-prometheus-rules.yml\n  SUCCESS: 14 rules found",
+      "check_rules": "Checking ~/.config/ecosystem-observability/ecosystem-prometheus-rules.yml\n  SUCCESS: 14 rules found"
+    },
+    {
+      "step": "R1-copy",
+      "copy_started_utc": "2026-09-26T04:53:46Z",
+      "copy_seconds": 0.22,
+      "bytes": 115828843,
+      "blocks": [
+        "01M39H54MX0AFHDVDWMFEZC0F7",
+        "01M3A5RAD5MTB51YMWD391J1DG",
+        "01M3ATBG7MPJ966MR13G7FNDY2",
+        "01M3BEYNWXD48BN2V1SNXMK800",
+        "01M3C3HVQE29XQDCGP6VCBCYMP",
+        "01M3CR51BW3V9JVHJWZ8BPBZGA",
+        "01M3D5WFRQ3BS40BQV5EPE8JZ1",
+        "01M3DCR70PZFFSNDYV08VF99JP",
+        "01M3DCR7CJK8EWSNNN1TG9ZM12",
+        "01M3DKKY8PQRY4YKGGJGJ2YFCC",
+        "01M3DTFNGX7YYWV10VT2CS8TWC"
+      ]
+    },
+    {
+      "step": "R3-start-A-3.14.0",
+      "ready_seconds": 1.04,
+      "port": 29190
+    },
+    {
+      "step": "R3-start-B-3.15.0",
+      "ready_seconds": 1.02,
+      "port": 29191
+    },
+    {
+      "step": "R3-snapshot-A",
+      "version": "3.14.0",
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29190",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": [
+        "ok"
+      ],
+      "rule_count": 14,
+      "historical": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "vllm": [
+        "240"
+      ],
+      "head": {
+        "numSeries": 10023,
+        "numLabelPairs": 2077,
+        "chunkCount": 45334,
+        "minTime": 1790388000000,
+        "maxTime": 1790398504142
+      }
+    },
+    {
+      "step": "R3-snapshot-B",
+      "version": "3.15.0",
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29191",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": [
+        "ok"
+      ],
+      "rule_count": 14,
+      "historical": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "vllm": [
+        "240"
+      ],
+      "head": {
+        "numSeries": 10026,
+        "numLabelPairs": 2084,
+        "chunkCount": 45337,
+        "minTime": 1790388000000,
+        "maxTime": 1790398503947
+      }
+    },
+    {
+      "step": "R3-reload-A",
+      "last_config_before": "2026-09-26T04:53:47Z",
+      "last_config_after": "2026-09-26T04:55:04Z",
+      "reload_success": true
+    },
+    {
+      "step": "R3-reload-B",
+      "last_config_before": "2026-09-26T04:53:48Z",
+      "last_config_after": "2026-09-26T04:55:07Z",
+      "reload_success": true
+    },
+    {
+      "step": "R3-compare",
+      "up_jobs_instances_equal": false,
+      "up_values_equal": false,
+      "rules_equal": true,
+      "targets_equal": true,
+      "historical_equal": true,
+      "vllm_count_equal": true
+    },
+    {
+      "step": "R4-stop",
+      "arm_A_exit": 0,
+      "arm_B_exit": 0
+    },
+    {
+      "step": "R4-rollback-start",
+      "ready_seconds": 1.02,
+      "port": 29192
+    },
+    {
+      "step": "R4-rollback-snapshot",
+      "version": "3.14.0",
+      "historical": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "historical_equal_to_B": true,
+      "self_samples_written_by_3150": [
+        "5"
+      ],
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29191",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29192",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": [
+        "ok"
+      ]
+    },
+    {
+      "step": "R4-rollback-stop",
+      "exit": 0
+    },
+    {
+      "step": "R5-log-A",
+      "lines": 61,
+      "errors": 0,
+      "warnings": 1,
+      "error_samples": [],
+      "warning_samples": [
+        "time=2026-09-26T00:55:10.250-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+      ]
+    },
+    {
+      "step": "R5-log-B",
+      "lines": 61,
+      "errors": 0,
+      "warnings": 1,
+      "error_samples": [],
+      "warning_samples": [
+        "time=2026-09-26T00:55:10.314-04:00 level=WARN source=main.go:1280 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+      ]
+    },
+    {
+      "step": "R5-log-B-rollback",
+      "lines": 60,
+      "errors": 0,
+      "warnings": 1,
+      "error_samples": [],
+      "warning_samples": [
+        "time=2026-09-26T00:55:31.419-04:00 level=WARN source=main.go:1249 msg=\"Received an OS signal, exiting gracefully...\" signal=terminated"
+      ]
+    }
+  ],
+  "arms": {
+    "A": {
+      "buildinfo": {
+        "version": "3.14.0",
+        "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "branch": "HEAD",
+        "buildUser": "root@f423027f4410",
+        "buildDate": "20260817-16:49:19",
+        "goVersion": "go1.26.6"
+      },
+      "runtimeinfo": {
+        "reloadConfigSuccess": true,
+        "storageRetention": "1w or 512MiB",
+        "lastConfigTime": "2026-09-26T04:53:47Z"
+      },
+      "tsdb_head": {
+        "numSeries": 10023,
+        "numLabelPairs": 2077,
+        "chunkCount": 45334,
+        "minTime": 1790388000000,
+        "maxTime": 1790398504142
+      },
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29190",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "names": [
+          "EcosystemAcceptanceTargetDown",
+          "EcosystemCollectorHealthUnexpected",
+          "EcosystemDaguDashboardHealthUnexpected",
+          "EcosystemFreeLLMAPIHealthUnexpected",
+          "EcosystemHostFilesystemMetricsMissing",
+          "EcosystemOmniRouteHealthUnexpected",
+          "EcosystemRootFilesystemLowSpace",
+          "EcosystemServiceUnavailable",
+          "EquitiesLedgerFrozen",
+          "EquitiesLedgerUnreadable",
+          "EquitiesOrderStateDivergence",
+          "EquitiesPaperMetricsMissing",
+          "EquitiesReconciliationFailed",
+          "EquitiesRequestBudgetExhausted"
+        ]
+      },
+      "targets": [
+        [
+          "alertmanager",
+          "up"
+        ],
+        [
+          "collector-health",
+          "up"
+        ],
+        [
+          "collector-native",
+          "up"
+        ],
+        [
+          "loki",
+          "up"
+        ],
+        [
+          "prometheus",
+          "up"
+        ],
+        [
+          "qdrant",
+          "up"
+        ],
+        [
+          "vllm",
+          "up"
+        ]
+      ],
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "vllm_up_samples_1h_before_copy": [
+        "240"
+      ]
+    },
+    "B": {
+      "buildinfo": {
+        "version": "3.15.0",
+        "revision": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+        "branch": "HEAD",
+        "buildUser": "root@4635dd007a60",
+        "buildDate": "20260925-07:33:45",
+        "goVersion": "go1.27.1"
+      },
+      "runtimeinfo": {
+        "reloadConfigSuccess": true,
+        "storageRetention": "1w or 512MiB",
+        "lastConfigTime": "2026-09-26T04:53:48Z"
+      },
+      "tsdb_head": {
+        "numSeries": 10026,
+        "numLabelPairs": 2084,
+        "chunkCount": 45337,
+        "minTime": 1790388000000,
+        "maxTime": 1790398503947
+      },
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29191",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "names": [
+          "EcosystemAcceptanceTargetDown",
+          "EcosystemCollectorHealthUnexpected",
+          "EcosystemDaguDashboardHealthUnexpected",
+          "EcosystemFreeLLMAPIHealthUnexpected",
+          "EcosystemHostFilesystemMetricsMissing",
+          "EcosystemOmniRouteHealthUnexpected",
+          "EcosystemRootFilesystemLowSpace",
+          "EcosystemServiceUnavailable",
+          "EquitiesLedgerFrozen",
+          "EquitiesLedgerUnreadable",
+          "EquitiesOrderStateDivergence",
+          "EquitiesPaperMetricsMissing",
+          "EquitiesReconciliationFailed",
+          "EquitiesRequestBudgetExhausted"
+        ]
+      },
+      "targets": [
+        [
+          "alertmanager",
+          "up"
+        ],
+        [
+          "collector-health",
+          "up"
+        ],
+        [
+          "collector-native",
+          "up"
+        ],
+        [
+          "loki",
+          "up"
+        ],
+        [
+          "prometheus",
+          "up"
+        ],
+        [
+          "qdrant",
+          "up"
+        ],
+        [
+          "vllm",
+          "up"
+        ]
+      ],
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "vllm_up_samples_1h_before_copy": [
+        "240"
+      ]
+    },
+    "B-rollback": {
+      "buildinfo": {
+        "version": "3.14.0",
+        "revision": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+        "branch": "HEAD",
+        "buildUser": "root@f423027f4410",
+        "buildDate": "20260817-16:49:19",
+        "goVersion": "go1.26.6"
+      },
+      "runtimeinfo": {
+        "reloadConfigSuccess": true,
+        "storageRetention": "1w or 512MiB",
+        "lastConfigTime": "2026-09-26T04:55:11Z"
+      },
+      "tsdb_head": {
+        "numSeries": 11111,
+        "numLabelPairs": 2085,
+        "chunkCount": 46422,
+        "minTime": 1790388000000,
+        "maxTime": 1790398530603
+      },
+      "up": [
+        [
+          "alertmanager",
+          "127.0.0.1:19093",
+          "1"
+        ],
+        [
+          "collector-health",
+          "127.0.0.1:28888",
+          "1"
+        ],
+        [
+          "collector-native",
+          "127.0.0.1:28889",
+          "1"
+        ],
+        [
+          "loki",
+          "127.0.0.1:13100",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:19090",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29191",
+          "1"
+        ],
+        [
+          "prometheus",
+          "127.0.0.1:29192",
+          "1"
+        ],
+        [
+          "qdrant",
+          "127.0.0.1:26333",
+          "1"
+        ],
+        [
+          "vllm",
+          "127.0.0.1:18231",
+          "1"
+        ]
+      ],
+      "rules": {
+        "groups": 2,
+        "rules": 14,
+        "health": [
+          "ok"
+        ],
+        "names": [
+          "EcosystemAcceptanceTargetDown",
+          "EcosystemCollectorHealthUnexpected",
+          "EcosystemDaguDashboardHealthUnexpected",
+          "EcosystemFreeLLMAPIHealthUnexpected",
+          "EcosystemHostFilesystemMetricsMissing",
+          "EcosystemOmniRouteHealthUnexpected",
+          "EcosystemRootFilesystemLowSpace",
+          "EcosystemServiceUnavailable",
+          "EquitiesLedgerFrozen",
+          "EquitiesLedgerUnreadable",
+          "EquitiesOrderStateDivergence",
+          "EquitiesPaperMetricsMissing",
+          "EquitiesReconciliationFailed",
+          "EquitiesRequestBudgetExhausted"
+        ]
+      },
+      "targets": [
+        [
+          "alertmanager",
+          "up"
+        ],
+        [
+          "collector-health",
+          "up"
+        ],
+        [
+          "collector-native",
+          "up"
+        ],
+        [
+          "loki",
+          "up"
+        ],
+        [
+          "prometheus",
+          "up"
+        ],
+        [
+          "qdrant",
+          "up"
+        ],
+        [
+          "vllm",
+          "up"
+        ]
+      ],
+      "historical_up_6h": {
+        "series": 7,
+        "samples": 511,
+        "sha256": "22d1cb613b67d5e065f0ad3427a76c23c1ab2a9336b719e8c1d21bade2824298"
+      },
+      "vllm_up_samples_1h_before_copy": [
+        "240"
+      ]
+    }
+  }
+}

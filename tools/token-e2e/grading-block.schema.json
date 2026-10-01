@@ -1,0 +1,536 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "token-e2e-grading/1"
+    },
+    "tool": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "path",
+        "revision",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "registry_sha256": {
+      "type": "string"
+    },
+    "grammar": {
+      "enum": [
+        "g1"
+      ]
+    },
+    "d_extract": {
+      "type": "boolean"
+    },
+    "dropped_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "readings": {
+      "type": "object",
+      "properties": {
+        "R2-01": {
+          "enum": [
+            "root_array",
+            "single_key_wrapper",
+            "wrapper_with_extras"
+          ]
+        },
+        "R2-02": {
+          "enum": [
+            "ordered",
+            "unordered"
+          ]
+        },
+        "R2-03": {
+          "enum": [
+            "full_segment",
+            "def_line_range"
+          ]
+        },
+        "R2-04": {
+          "enum": [
+            "complete_and_precise",
+            "precision_only"
+          ]
+        },
+        "R2-05": {
+          "enum": [
+            "sites_and_functions",
+            "sites_only",
+            "functions_only"
+          ]
+        },
+        "R2-06": {
+          "enum": [
+            "answer_elements",
+            "element_contents"
+          ]
+        },
+        "R2-07": {
+          "enum": [
+            "all_B_with_check",
+            "organic_only"
+          ]
+        },
+        "R2-08": {
+          "enum": [
+            "matched_all_per_family_and_pooled",
+            "matched_organic",
+            "pooled_only"
+          ]
+        },
+        "R2-09": {
+          "enum": [
+            "whole_word",
+            "substring",
+            "alnum_boundary"
+          ]
+        },
+        "R2-10": {
+          "enum": [
+            "completed_attempts",
+            "every_recorded",
+            "last_attempt"
+          ]
+        },
+        "R2-11": {
+          "enum": [
+            "read_tools_only",
+            "mcp_skill_bash_only"
+          ]
+        },
+        "R2-12": {
+          "enum": [
+            "allowlist",
+            "denylist"
+          ]
+        },
+        "R2-13": {
+          "enum": [
+            "packet_roots",
+            "memory_index_roots"
+          ]
+        },
+        "R2-14": {
+          "enum": [
+            "any_row",
+            "first_prompt_and_hook_context"
+          ]
+        },
+        "R2-15": {
+          "enum": [
+            "cli_encode",
+            "any_toon_form"
+          ]
+        },
+        "R2-16": {
+          "enum": [
+            "unknown_in_denominator",
+            "excluded"
+          ]
+        },
+        "R2-17": {
+          "enum": [
+            "fail",
+            "unknown"
+          ]
+        },
+        "R2-18": {
+          "enum": [
+            "exact_url",
+            "host_and_path_suffix"
+          ]
+        },
+        "R2-19": {
+          "enum": [
+            "subset",
+            "equal"
+          ]
+        },
+        "R2-20": {
+          "enum": [
+            "fail",
+            "unknown"
+          ]
+        },
+        "R2-21": {
+          "enum": [
+            "unknown_in_denominator",
+            "excluded"
+          ]
+        }
+      },
+      "required": [
+        "R2-01",
+        "R2-02",
+        "R2-03",
+        "R2-04",
+        "R2-05",
+        "R2-06",
+        "R2-07",
+        "R2-08",
+        "R2-09",
+        "R2-10",
+        "R2-11",
+        "R2-12",
+        "R2-13",
+        "R2-14",
+        "R2-15",
+        "R2-16",
+        "R2-17",
+        "R2-18",
+        "R2-19",
+        "R2-20",
+        "R2-21"
+      ],
+      "additionalProperties": false
+    },
+    "m12": {
+      "type": "object",
+      "properties": {
+        "marker": {
+          "type": "string"
+        },
+        "attachment_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "marker",
+        "attachment_allowlist"
+      ],
+      "additionalProperties": false
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "reuse-296-07": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "reuse-343-01": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "seed-catalog-history-1": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "seed-catalog-history-2": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "seed-catalog-history-3": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "seed-catalog-history-4": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        },
+        "seed-catalog-history-5": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "anchors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "query",
+            "anchors"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "reuse-296-07",
+        "reuse-343-01",
+        "seed-catalog-history-1",
+        "seed-catalog-history-2",
+        "seed-catalog-history-3",
+        "seed-catalog-history-4",
+        "seed-catalog-history-5"
+      ],
+      "additionalProperties": false
+    },
+    "memory_scope": {
+      "type": "object",
+      "properties": {
+        "workspace": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace",
+        "project"
+      ],
+      "additionalProperties": false
+    },
+    "qmd": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "string"
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "index",
+        "collections"
+      ],
+      "additionalProperties": false
+    },
+    "pages": {
+      "type": "object",
+      "properties": {
+        "json": {
+          "type": "string"
+        },
+        "pathlib": {
+          "type": "string"
+        },
+        "stripe": {
+          "type": "string"
+        },
+        "mcp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "json",
+        "pathlib",
+        "stripe",
+        "mcp"
+      ],
+      "additionalProperties": false
+    },
+    "judges": {
+      "type": "object",
+      "properties": {
+        "claude_answers": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "const": "gpt-6-astra"
+            },
+            "effort": {
+              "const": "max"
+            }
+          },
+          "required": [
+            "model",
+            "effort"
+          ],
+          "additionalProperties": false
+        },
+        "codex_answers": {
+          "type": "object",
+          "properties": {
+            "agent_type": {
+              "const": "blind-lane-reviewer"
+            },
+            "model": {
+              "const": "opus"
+            },
+            "effort": {
+              "const": "max"
+            }
+          },
+          "required": [
+            "agent_type",
+            "model",
+            "effort"
+          ],
+          "additionalProperties": false
+        },
+        "refute": {
+          "enum": [
+            "passes_only"
+          ]
+        },
+        "calibration": {
+          "type": "object",
+          "properties": {
+            "correct": {
+              "type": "integer"
+            },
+            "paraphrased": {
+              "type": "integer"
+            },
+            "wrong": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "correct",
+            "paraphrased",
+            "wrong"
+          ],
+          "additionalProperties": false
+        },
+        "retries": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "claude_answers",
+        "codex_answers",
+        "refute",
+        "calibration",
+        "retries"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "tool",
+    "registry_sha256",
+    "grammar",
+    "d_extract",
+    "dropped_tasks",
+    "readings",
+    "m12",
+    "memory",
+    "memory_scope",
+    "qmd",
+    "pages",
+    "judges"
+  ],
+  "additionalProperties": false
+}

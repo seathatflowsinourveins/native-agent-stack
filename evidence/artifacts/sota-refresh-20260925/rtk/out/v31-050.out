@@ -1,0 +1,94 @@
+PASS version
+PASS precondition: live settings have 0 Bash allow rules
+PASS robust: empty payload -> exit 0, silent
+PASS robust: malformed payload -> exit 0, silent
+PASS robust: no-command payload -> exit 0, silent
+PASS head-1 rewrite
+PASS head-1 bytes==native
+PASS head-5 rewrite
+PASS head-5 bytes==native
+PASS cat bytes==native [rtk read <impl>/tmp/tmp.sv8cT2t6hM/f.txt]
+PASS tail-3 bytes==native [rtk read <impl>/tmp/tmp.sv8cT2t6hM/f.txt --tail-lines 3]
+PASS wc rc=1
+PASS wc stderr kept
+PASS grep rc=2
+PASS grep stderr kept
+PASS pytest rc=4
+PASS pytest stderr kept
+NOTE diff unreadable-file rc=1 (native diff: 2; upstream fix bdee7f2 is develop-only) stderr=[rtk: No such file or directory (os error 2)]
+PASS ls missing rc=2 (native 2)
+PASS ls missing error text on stderr
+PASS cat missing rc=1 (native 1)
+PASS cat missing error text on stderr
+PASS find missing rc=1 (native 1)
+PASS find missing error text on stderr
+PASS grep -rn missing-dir rc=2 (native 2)
+PASS grep -rn missing-dir error text on stderr
+PASS rg missing rc=2 (native 2)
+PASS rg missing error text on stderr
+PASS ruff check (stderr-only) rc=2 (native 2)
+PASS ruff check (stderr-only) error text on stderr
+PASS git status outside repo rc=128 (native 128)
+PASS git status outside repo error text on stderr
+PASS gitlog rc=128
+PASS gitlog stderr kept
+PASS git diff bad ref rc=128 (native 128)
+PASS git diff bad ref error text on stderr
+PASS silent: command substitution
+PASS silent: file redirect
+PASS silent: heredoc
+PASS silent: no rtk equivalent
+PASS silent: non-display pipe consumer
+PASS silent: no rtk equivalent (uname)
+PASS proxy==raw
+PASS blob window recovers exactly
+PASS log cap announced
+PASS git log -3 keeps subject big
+PASS git log -3 keeps subject c12
+PASS git log -3 keeps subject c11
+PASS git log --oneline -5 keeps subject big
+PASS git log --oneline -5 keeps subject c12
+PASS git log --oneline -5 keeps subject c11
+PASS git log --oneline -5 keeps subject c10
+PASS git log --oneline -5 keeps subject c9
+NOTE plain git log (13 commits, no -n): 10 distinct subjects shown, cap notice=none [rtk git log]
+PASS git show HEAD~1 keeps subject c12
+PASS git show HEAD~1 names n.txt
+PASS git show HEAD~1 keeps +12
+PASS git status shows n.txt
+PASS git status shows untracked-file.txt
+PASS git status shows staged-file.txt
+PASS git diff names n.txt
+PASS git diff keeps added line
+PASS grep -rn keeps needle one
+PASS grep -rn keeps needle two
+PASS grep -rn keeps y needle three
+PASS grep -rn keeps a.txt
+PASS grep -rn keeps b.txt
+PASS grep -rn keeps c.md
+PASS ls keeps one.txt
+PASS ls keeps two.log
+PASS ls keeps three
+PASS git diff --cached names cached-file.txt
+PASS git diff --cached keeps added line
+PASS rg -n keeps needle one
+PASS rg -n keeps needle two
+PASS rg -n keeps y needle three
+PASS rg -n keeps a.txt
+PASS rg -n keeps b.txt
+PASS rg -n keeps c.md
+PASS find keeps a.txt
+PASS find keeps sub/b.txt
+PASS find excludes c.md
+PASS wc -l keeps count 40
+PASS explicit allow rule -> allow
+PASS partly allowed compound -> no decision
+PASS ask rule -> no decision
+PASS silent: deny rule
+NOTE allow rule Bash(git status) applied to 'git status --short': rc=0 permissionDecision=allow
+PASS legacy colon allow rule -> allow
+PASS silent: leading-wildcard deny rule
+PASS compound with unallowed segment -> no decision
+NOTE hook stderr non-empty in 1 of 45 payload calls; first: git status :: [rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings 
+COUNTS pass=88 fail=0 note=4
+RESULT pass

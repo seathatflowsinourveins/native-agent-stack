@@ -1,0 +1,14 @@
+{
+  "environment_keys": [
+    "HOME",
+    "LANG",
+    "PATH",
+    "PWD"
+  ],
+  "external_network_interfaces": [
+    "lo"
+  ],
+  "home": "/run/home",
+  "network_namespace": "net:[4026532186]",
+  "pid_namespace": "pid:[4026532184]"
+}

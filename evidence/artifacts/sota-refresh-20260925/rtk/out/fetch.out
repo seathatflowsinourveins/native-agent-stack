@@ -1,0 +1,32 @@
+fetch_utc=2026-09-25T18:44:35Z
+## release list (newest 8)
+dev-0.51.0-rc.459 prerelease=true latest=false 2026-09-25T10:14:06Z
+dev-0.50.1-rc.457 prerelease=true latest=false 2026-09-25T09:53:34Z
+dev-0.50.1-rc.456 prerelease=true latest=false 2026-09-24T22:44:26Z
+v0.50.0 prerelease=false latest=true 2026-09-24T10:02:31Z
+dev-0.50.0-rc.453 prerelease=true latest=false 2026-09-24T07:51:31Z
+dev-0.50.0-rc.452 prerelease=true latest=false 2026-09-23T20:15:39Z
+dev-0.50.0-rc.451 prerelease=true latest=false 2026-09-21T15:06:26Z
+dev-0.50.0-rc.450 prerelease=true latest=false 2026-09-21T05:52:52Z
+## tag ref
+refs/tags/v0.50.0 commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec
+## release meta
+tag=v0.50.0 prerelease=false draft=false published=2026-09-24T10:02:31Z target=1d87b8e719ce0a50c223cd93ca64dd16921f9aec
+api digest rtk-x86_64-unknown-linux-musl.tar.gz = sha256:bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 size=4857739
+api digest checksums.txt = sha256:4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048
+-rw-r--r-- 838 checksums.txt
+-rw-r--r-- 4857739 rtk-x86_64-unknown-linux-musl.tar.gz
+sha256(tarball)            = bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89
+checksums.txt line         = bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89
+api asset digest           = bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89
+research expected          = bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89
+refuter earlier download   = bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89
+sha256(checksums.txt)      = 4c7116898ae812960dfa0de3b3acc5406a0da49209f0ad7bed4d4ed8c4785048 (the GitHub releases API reports the same digest for checksums.txt; so does the research record)
+## sha256sum --check --strict (publisher line)
+rtk-x86_64-unknown-linux-musl.tar.gz: OK
+## tar listing
+-rwxr-xr-x runner/runner 11040640 2026-09-24 06:06 rtk
+member sha256: 23433a2a50bdeb12199cadd4b94b639238d6c38529fcba1c30c9295db5fa9517
+## attestation lookup (HTTP status only)
+gh api rc=1 :: gh: Not Found (HTTP 404) 
+INTEGRITY verified

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--poppler--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "a74dd1b60ad5f055cee3e1489a490b7e6e6b056f",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "poppler",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v pdftotext) || { echo \"POPPLER_RESOLVE_FAIL: pdftotext not on PATH\"; exit 1; }\nrp=$(readlink -f \"$p\") || { echo \"POPPLER_RESOLVE_FAIL: unresolvable $p\"; exit 1; }\ncase \"$rp\" in \"$HOME\"/.local/share/codex-ecosystem/poppler-26.09.0/prefix/*) : ;; *) echo \"POPPLER_RESOLVE_FAIL: unexpected path $rp\"; exit 1 ;; esac\npins=$(python3 -c \"import json,glob;c=[x for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='poppler'][0];w=sorted({x['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for x in (l.get('winners') or []) if x.get('component_id')=='poppler'});print('stack version',c['version'],'| winner pins',w);raise SystemExit(0 if c['version']=='26.09.0' and w==['26.09.0'] else 1)\") || { echo \"POPPLER_RESOLVE_FAIL: pin records disagree: $pins\"; exit 1; }\nif dpkg -s poppler-utils > /dev/null 2>&1; then echo \"POPPLER_RESOLVE_FAIL: the apt package poppler-utils is installed\"; exit 1; fi\necho \"POPPLER_RESOLVE_OK | resolves: $p -> $rp (this host's poppler-26.09.0 source-build prefix) | $pins | dpkg -s poppler-utils: not installed\"",
+      "exit": 0,
+      "duration_s": 0.087,
+      "output_sha256": "3d5fab470deade382593137aefbd40d0620869ff25ddc1a4c196635119491791",
+      "output_excerpt": "POPPLER_RESOLVE_OK | resolves: ~/.local/share/codex-ecosystem/bin/pdftotext -> ~/.local/share/codex-ecosystem/poppler-26.09.0/prefix/bin/pdftotext (this host's poppler-26.09.0 source-build prefix) | stack version 26.09.0 | winner pins ['26.09.0'] | dpkg -s poppler-utils: not installed\n"
+    },
+    {
+      "cmd": "B=\"$HOME/.local/share/codex-ecosystem/poppler-26.09.0/downloads\"\nA=\"$B/poppler-26.09.0.tar.xz\"\nSIG=\"$A.sig\"\nKEY=\"$B/poppler-key.asc\"\n[ -f \"$A\" ] && [ -f \"$SIG\" ] && [ -f \"$KEY\" ] || { echo \"POPPLER_SIGNATURE_FAIL: retained archive, signature or key missing\"; exit 1; }\na=$(sha256sum < \"$A\" | cut -d' ' -f1)\nstackpin=$(python3 -c \"import json;print([x['source_pin'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']=='poppler'][0])\") || exit 1\nsrcpin=$(python3 -c \"import json;print(json.load(open('blueprints/convergence-practice/wsl-document-ingestion/sources.json'))['poppler']['archive_sha256'])\") || exit 1\nfpr=$(python3 -c \"import json;print(json.load(open('blueprints/convergence-practice/wsl-document-ingestion/sources.json'))['poppler']['publisher_fingerprint'])\") || exit 1\nD=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$D\"' EXIT\nGNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --import \"$KEY\" > /dev/null 2>&1 || { echo \"POPPLER_SIGNATURE_FAIL: key import failed\"; exit 1; }\nGNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --status-fd 1 --verify \"$SIG\" \"$A\" > \"$D/status.log\" 2> \"$D/err.log\"\ngrc=$?\ngood=$(grep '^\\[GNUPG:\\] GOODSIG ' \"$D/status.log\")\nvalid=$(grep '^\\[GNUPG:\\] VALIDSIG ' \"$D/status.log\")\ntrust=$(grep -o '^\\[GNUPG:\\] TRUST_[A-Z]*' \"$D/status.log\")\nif [ \"$grc\" -eq 0 ] && [ -n \"$good\" ] && printf '%s\\n' \"$valid\" | grep -q \"^\\[GNUPG:\\] VALIDSIG $fpr \" && [ \"$a\" = \"$stackpin\" ] && [ \"$a\" = \"$srcpin\" ]; then\n  echo \"POPPLER_SIGNATURE_OK | gpg --verify exit $grc | VALIDSIG fingerprint == sources.json publisher_fingerprint | archive sha256 == stack source_pin == sources.json archive_sha256\"\nelse\n  echo \"POPPLER_SIGNATURE_FAIL | gpg --verify exit $grc | archive sha256 $a | stack source_pin $stackpin | sources.json $srcpin\"\n  cat \"$D/status.log\"\n  exit 1\nfi\necho \"$good\"\necho \"$valid\"\necho \"$trust (temporary keyring: trust comes from the pinned fingerprint, not the web of trust)\"\necho \"archive sha256 $a\"",
+      "exit": 0,
+      "duration_s": 0.172,
+      "output_sha256": "c88e9b22f8eee98af944d1712f19cb7dd3446caa696770d747cc587b7040b84a",
+      "output_excerpt": "POPPLER_SIGNATURE_OK | gpg --verify exit 0 | VALIDSIG fingerprint == sources.json publisher_fingerprint | archive sha256 == stack source_pin == sources.json archive_sha256\n[GNUPG:] GOODSIG 3A6A4DB839EAA6D7 Albert Astals Cid <aacid@kde.org>\n[GNUPG:] VALIDSIG CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 2026-09-03 1788468521 0 4 0 1 10 00 CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7\n[GNUPG:] TRUST_UNDEFINED"
+    },
+    {
+      "cmd": "B=\"$HOME/.local/share/codex-ecosystem/poppler-26.09.0/downloads\"\nD=$(mktemp -d) || exit 1\ntrap 'rm -rf \"$D\"' EXIT\ncp \"$B/poppler-26.09.0.tar.xz\" \"$D/tampered.tar.xz\" || exit 1\npython3 -c \"import sys;p=sys.argv[1];b=bytearray(open(p,'rb').read());i=len(b)//2;b[i]^=0x01;open(p,'wb').write(b)\" \"$D/tampered.tar.xz\" || exit 1\nGNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --import \"$B/poppler-key.asc\" > /dev/null 2>&1 || { echo \"POPPLER_TAMPER_CONTROL_FAIL: key import failed\"; exit 1; }\nGNUPGHOME=\"$D\" timeout 15 gpg --batch --no-default-keyring --status-fd 1 --verify \"$B/poppler-26.09.0.tar.xz.sig\" \"$D/tampered.tar.xz\" > \"$D/status.log\" 2> \"$D/err.log\"\ngrc=$?\nbad=$(grep '^\\[GNUPG:\\] BADSIG ' \"$D/status.log\")\ngood=$(grep -c '^\\[GNUPG:\\] GOODSIG ' \"$D/status.log\")\nif [ \"$grc\" -eq 1 ] && [ -n \"$bad\" ] && [ \"$good\" -eq 0 ]; then\n  echo \"POPPLER_TAMPER_CONTROL_OK | gpg --verify of a copy with one flipped byte exits $grc | GOODSIG lines: $good\"\n  echo \"$bad\"\nelse\n  echo \"POPPLER_TAMPER_CONTROL_FAIL | gpg --verify exit $grc | GOODSIG lines: $good\"\n  exit 1\nfi",
+      "exit": 0,
+      "duration_s": 0.1,
+      "output_sha256": "958e7d87c86c3b0df3c69c933520df1bb33d723dd19c8d2c959e7e9ab9bb78c5",
+      "output_excerpt": "POPPLER_TAMPER_CONTROL_OK | gpg --verify of a copy with one flipped byte exits 1 | GOODSIG lines: 0\n[GNUPG:] BADSIG 3A6A4DB839EAA6D7 Albert Astals Cid <aacid@kde.org>\n"
+    },
+    {
+      "cmd": "v=$(timeout 10 pdftotext -v 2>&1 | head -1)\nif [ \"$v\" = \"pdftotext version 26.09.0\" ]; then\n  echo \"POPPLER_VERSION_OK | $v\"\nelse\n  echo \"POPPLER_VERSION_FAIL | $v\"\n  exit 1\nfi",
+      "exit": 0,
+      "duration_s": 0.022,
+      "output_sha256": "69043a5c87a09b4b57e497da7c6d743f43b1e820e3ddd2591e64934a1f870a2a",
+      "output_excerpt": "POPPLER_VERSION_OK | pdftotext version 26.09.0\n"
+    }
+  ],
+  "tool_versions": {
+    "poppler": "26.09.0"
+  },
+  "observed_at_utc": "2026-09-26T02:48:28Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), Poppler 26.09.0, the document-retrieval winner, is installed as a local source build, not the apt package (dpkg -s poppler-utils reports it not installed). pdftotext resolves into this host's poppler-26.09.0 build prefix, and the stack version and winner pin read 26.09.0. The retained release archive's sha256 8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e equals the manifests/stack.json source_pin and the sources record. gpg --verify of its detached signature against the retained publisher key exits 0, and the retained status lines show GOODSIG and a VALIDSIG whose fingerprint CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7 is the sources record's publisher_fingerprint. The same verification of a copy with one flipped byte exits 1 with BADSIG (negative control). pdftotext reports version 26.09.0. Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Replaces nativestack-5975wx-20260925--poppler--install--20260925 as this host's latest Poppler install receipt. It is a new dated receipt, not a further generation: record --supersedes links generations only within one date, and the 2026-09-25 receipts stay unchanged. They still count in scripts/platform_status.py, which counts every independently agreed native_proven pass, unless a reviewer records needs_changes on them. The cross-family review of #281 found that its retained excerpt stopped before the claimed GOODSIG and VALIDSIG results; this receipt prints its status line and gpg's own GOODSIG, VALIDSIG and TRUST status lines first, and adds a tampered-copy control.",
+    "gpg reports TRUST_UNDEFINED because the key sits in a temporary keyring; the trust anchor is the fingerprint pinned in blueprints/convergence-practice/wsl-document-ingestion/sources.json, not the web of trust.",
+    "The source_pin is the sha256 of the release tarball, not a git commit. No build stamp ties the installed binaries to that archive beyond pdftotext's reported version; their own hashes are build outputs and are not compared with any other host's.",
+    "Install stage: a resolved path, pin records, signature and integrity checks and pdftotext -v show the pinned build is present and runs. That is readiness evidence, not functional acceptance, and supports conditional at most.",
+    "Install source: a local source build in ~/.local/share/codex-ecosystem/poppler-26.09.0/prefix, the prefix layout of the blueprints/convergence-practice/wsl-document-ingestion/README.md build recipe, from the retained archive verified here (commands 1 and 2). Recorded by the workstation coordinator Claude Code session, through a repair worker that shares its session id, from a git worktree at published origin/main (the catalog_revision).",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T02:48:28Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent session. Reproduce: Re-ran once in a throwaway cp -a copy of the worktree via host_receipts.run_command. cmd1-cmd4 exit 0 with output sha256 identical to the recorded ones; the full cmd2 output shows archive sha256 8059eadb, which equals manifests/stack.json source_pin and sources.json archive_sha256 (I read both). Adequacy (install stage): (1) install-only, disclosed as conditional at most; (2) negative control: a copy with one flipped byte gives BADSIG, exit 1; (3) backed: GOODSIG, VALIDSIG with fingerprint CA262C6C (= sources.json publisher_fingerprint), TRUST_UNDEFINED, dpkg not installed and pdftotext 26.09.0 are in the excerpts; the prefix layout matches the wsl-document-ingestion README recipe; (4) bound: tool_versions 26.09.0 pin_matches the document-retrieval winner. Class native_proven; fail-closed; sanitized; gitleaks clean.",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T06:15:14Z",
+      "reviewer": {
+        "identity_sha256": "f07a9dfbc09d23994b3810ea11bc96fd931f69f88b9e1b02d24261f4b8dcad04",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

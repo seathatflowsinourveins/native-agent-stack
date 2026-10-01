@@ -1,0 +1,21 @@
+readback_utc=2026-09-26T05:17:53Z (read-only)
+bin/prometheus -> ~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/prometheus
+bin/promtool -> ~/.local/share/codex-ecosystem/tools/ecosystem-prometheus-3.15.0/promtool
+NRestarts=0
+ActiveState=active
+SubState=running
+ActiveEnterTimestamp=Sat 2026-09-26 00:56:49 EDT
+buildinfo: 3.15.0 5241a27fe3c6983549fccc32f6e65917408c63cd
+ready: Prometheus Server is Ready.
+up{instance="127.0.0.1:13100", job="loki"} => 1
+up{instance="127.0.0.1:18231", job="vllm"} => 1
+up{instance="127.0.0.1:19090", job="prometheus"} => 1
+up{instance="127.0.0.1:19093", job="alertmanager"} => 1
+up{instance="127.0.0.1:26333", job="qdrant"} => 1
+up{instance="127.0.0.1:28888", job="collector-health"} => 1
+up{instance="127.0.0.1:28889", job="collector-native"} => 1
+2 rule groups, 14 rules; health ['ok']
+firing ['EcosystemFreeLLMAPIHealthUnexpected', 'EcosystemOmniRouteHealthUnexpected'] pending []
+alertmanager: EcosystemFreeLLMAPIHealthUnexpected suppressed startsAt 2026-09-24T04:25:26.119Z
+alertmanager: EcosystemOmniRouteHealthUnexpected suppressed startsAt 2026-09-24T04:25:26.119Z
+ntfy ecosystem-alerts messages since 2026-09-26T04:55Z: 0

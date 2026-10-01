@@ -1,0 +1,50 @@
+# Local trial config: derived from mirix/configs/examples/mirix_openai.yaml,
+# with model_endpoint / embedding_endpoint pointed at this host's local
+# OpenAI-compatible servers instead of api.openai.com. Values only; no
+# upstream code changed.
+
+llm_config:
+  model: "qwen3.8-27b-local"
+  model_endpoint_type: "openai"
+  api_key: "<redacted>"
+  model_endpoint: "http://127.0.0.1:18232/v1"
+  context_window: 8192
+  is_local_model: true
+
+topic_extraction_llm_config:
+  model: "qwen3.8-27b-local"
+  model_endpoint_type: "openai"
+  api_key: "<redacted>"
+  model_endpoint: "http://127.0.0.1:18232/v1"
+  context_window: 8192
+  is_local_model: true
+
+build_embeddings_for_memory: true
+
+embedding_config:
+  embedding_model: "nvidia/Nemotron-3-Embed-1B-BF16"
+  embedding_endpoint: "http://127.0.0.1:18231/v1"
+  api_key: "<redacted>"
+  embedding_endpoint_type: "openai"
+  embedding_dim: 2048
+
+meta_agent_config:
+  system_prompts_folder: mirix/prompts/system/base
+  agents:
+    - core_memory_agent
+    - resource_memory_agent
+    - semantic_memory_agent
+    - episodic_memory_agent
+    - procedural_memory_agent
+    - knowledge_memory_agent
+    - reflexion_agent
+    - background_agent
+  memory:
+    core:
+      - label: "human"
+        value: ""
+      - label: "persona"
+        value: "I am a helpful assistant."
+    decay:
+      fade_after_days: 30
+      expire_after_days: 90

@@ -1,0 +1,371 @@
+# Freeze snapshot for the #381 window W
+
+The #381 protocol freezes the environment before the run and forbids changes while a run window is open
+([README "Procedure", step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84) and
+[RUNBOOK "Freeze and preflight"](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md#freeze-and-preflight--aa-7-81-84-steps-12)).
+[`freeze_snapshot.py`](freeze_snapshot.py) makes that list mechanical: it captures the frozen state as items (hashes,
+versions, counts, booleans, unit states), compares two captures and checks a capture against the sealed expectations that
+Amendment 4 publishes, so any session can test its own change against the frozen set without a run.
+
+It is glue over existing commands and file hashes, not a measurement instrument, and it decides nothing: it reports.
+Standard library only, Linux first; the tests ran on Python 3.12.3 and 3.13.15, and no older version is verified. The tool
+itself writes only the two capture files (and the temporary directory of the usage probe, which it removes), changes no host
+state of its own, opens no credential store, and never prints or stores an environment value, a token, a host name or a user
+name. The commands it runs (`claude mcp list`, which starts each configured MCP server, and one `claude -p` call) are the
+client's own, and whether they update the client's bookkeeping files is not verified here.
+
+## Commands
+
+```sh
+T=tools/token-e2e/freeze_snapshot.py
+python3 -B $T capture --label seal --out "$FREEZE_DIR" [--repo <checkout>] [--config freeze.json] [--no-usage-probe]
+python3 -B $T compare <a.json> <b.json> [--full]
+python3 -B $T check <capture.json> --expected <expected.json> [--quiet]
+python3 -B $T list-frozen [--config freeze.json] [--repo <checkout>] [--all] [--json]
+```
+
+- `capture` writes `freeze-<label>.json` (mode 0600: every item plus the `~/...` or `<repo>/...` path its value was read
+  from) and `freeze-<label>.sanitized.json` (the same items with no path field and no path character in any string). The
+  checkout defaults to the one holding the current directory; the output directory must lie outside it, is created with
+  mode 0700 when new, and an existing capture of the same label is never overwritten. It prints one summary line
+  (`items`, `ok`, `missing`, `error`, `not_applicable`, `frozen_not_ok`).
+- `compare` prints one line for every item that differs: `DRIFT` (a frozen value or status changed), `MISSING` (a frozen
+  item exists in one capture only), `ERROR` (a frozen item is in error on either side, so it attests nothing) and `INFO`
+  (an informational item changed or exists once). Identical items print nothing. Hashes print as twelve characters unless
+  `--full`. Either capture may be the private or the sanitized file.
+- `check` compares the frozen items of a capture with the sealed expectations. A sanitized capture is the expectations
+  format, so the owner captures at the seal and publishes that file. It prints `PASS <id>` or `FAIL <id> <reason>` per
+  frozen id and `check: pass=N fail=M`; `--quiet` drops the PASS lines. A frozen id missing from either side fails, so an
+  added hook or block is a failure, and so is an item that is in error. A sealed absence (`missing`) passes while the
+  capture is absent too.
+- `list-frozen` prints `<id><TAB><how to check>` for every frozen item and family (`--all` adds the informational ones,
+  `--json` prints id, class, family, owner and how). It runs no capture and needs no checkout; without `--repo` it checks
+  the paths of a configuration against the home directory only. It prints no path a configuration names: a configured file
+  is listed by its id with a path-free line, because only the private capture records where it lives.
+
+Exit status: `0` done (compare: no frozen drift; check: all pass), `1` a frozen item drifted or failed, `2` a usage, input
+or configuration error, `3` the privacy guard refused the output (nothing was written).
+
+An item is `{"id", "class": "frozen" | "informational", "status": "ok" | "missing" | "error" | "not_applicable",
+"value", "method"}`, plus a `reason` token when the status is not `ok` and, in the private file only, a `path`. Items
+are sorted by id. A frozen item that is `missing` or `not_applicable` is part of the frozen set: the seal records the
+absence and `check` fails when it changes.
+
+## Use in the #381 protocol
+
+| Moment | Command | What it settles |
+| --- | --- | --- |
+| Seal (the merged Amendment 4 revision, tracked tree clean, nothing installing) | `capture --label seal` | The private file stays with the owner; the sanitized file is the sealed expectations. Record its sha256 in the amendment, because a hash proves byte identity of that file. |
+| Any time, any session | `list-frozen` | The frozen ids and their how-to-check lines, without a capture. |
+| Before changing anything, and after | `capture`, then `check <capture> --expected <seal.sanitized.json>` | Whether the change touches a frozen item, by id. |
+| W open, before the first arm | `check <open capture> --expected <seal.sanitized.json>` | Every frozen item still equals the seal. The owner decides what a failure means. |
+| W start and W end | `capture --label w-start`, `capture --label w-end`, then `compare w-start w-end` | Whether a frozen item moved while the window was open: exit `1` on any drift, missing item or error; informational items are listed and never fail. |
+
+Capture at these boundaries, not inside a window: `claude mcp list` connects to (and starts) every configured MCP server,
+and the usage probe is one model call.
+
+## Catalogue
+
+`list-frozen --all` is the authority; this table groups it. Ids use `.` between parts and `:` where a relative path has
+a slash. `<unit>` is one of `ecosystem-otelcol`, `ecosystem-loki`, `ecosystem-prometheus`, `ecosystem-grafana`,
+`omniroute`, `omniroute-fw`, `hindsight-live`, `cognee-live`, `ai-memory`, plus any unit the configuration adds (frozen unless it says informational).
+
+| Ids | Class | Value and how it is read |
+| --- | --- | --- |
+| `repo.head`, `repo.tree_clean` | frozen | `git rev-parse HEAD`; whether `git status --porcelain --untracked-files=no` is empty (tracked files only). Every git call uses `--no-optional-locks`, so the checkout's index is not rewritten. |
+| `repo.sealed.<file>` (5) | frozen | sha256 of `preregistration.json`, `token-e2e-run.mjs`, `RUNBOOK.md`, `fixtures/table.json` and `fixtures/events.jsonl` under `evidence/artifacts/token-adoption-e2e-20260926/`. |
+| `repo.carrier.*` | frozen | sha256 of each `adoption/hooks/claude/token-lanes-block*.md` and of `token-lanes-subagent-start.py`. |
+| `repo.capability_gate.*` | frozen | sha256 of every file under `tools/capability-gate/` except its `README.md`. |
+| `repo.workflow.<file>` (3), `repo.tool.skill_usage.py` | frozen | sha256 of `child-usage.mjs`, `shell-parser.pin.json`, `SHA256SUMS` under `examples/claude-native/workflows/` and of `tools/skill-usage/skill_usage.py`. |
+| `roles.<role>.{adoption,examples,project,user}`, `roles.<role>.identical_across_copies` | frozen | For `stack-verifier`, `isolated-builder`, `source-scout`, `stack-researcher` and `evidence-reviewer`: sha256 of the body in `adoption/agents/claude`, `examples/claude-native/agents`, the project `.claude/agents` and `~/.claude/agents`; true when all four exist and are byte-identical. |
+| `hooks.installed.*`, `hooks.carriers_match_repo` | frozen | sha256 of each file in `~/.claude/hooks` (names containing `.bak` are skipped) and of each carrier the checkout ships, so a missing installed carrier is a `missing` item; true when every carrier the checkout ships has a byte-identical installed copy. |
+| `claude.version`; `claude.launcher.{sha256,size}`; `claude.binary.{version_name,size,sha256}` | frozen | First line of `claude --version`; the launcher `~/.local/share/codex-ecosystem/bin/claude`; the file `~/.local/bin/claude` resolves to and its `versions/<name>` name. |
+| `claude.user_claude_md.sha256`, `claude.user_rtk_md.sha256` | frozen | sha256 of `~/.claude/CLAUDE.md` and `~/.claude/RTK.md`. |
+| `claude.settings.{user,project,local}.sha256` and `claude.settings.{user,project,local}.{effort_level_env_unset, agent_teams_env, subagent_model_env, has_model_settings, has_effort_level, advisor_model}` | frozen | sha256 of `~/.claude/settings.json`, the checkout's `.claude/settings.json` and `.claude/settings.local.json`, and values derived from the whole parsed file: no `CLAUDE_CODE_EFFORT_LEVEL` key in its `env` block; class of `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` (`1`, `other`, `unset`); `CLAUDE_CODE_SUBAGENT_MODEL` and `advisorModel` as a model alias, `other` or `unset`; `modelSettings` and `effortLevel` present. An unparsable file keeps its hash and reports `error` for the derived items. |
+| `claude.settings.{user,project,local}.{permissions_default_mode, permissions_allow_count, permissions_deny_count, permissions_ask_count, skip_dangerous_mode_permission_prompt, cross_session_inbound, auto_continue_at_usage_limit, auto_updates_channel, ultracode, enable_workflows, workflow_size_guideline, switch_models_on_flag, model, effort_level}` | frozen | The behaviour-affecting keys, read from the same three parsed files ([settings reference](https://code.claude.com/docs/en/settings-reference), fetched 2026-09-29). `permissions.defaultMode` (`default`, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`, `manual`); the number of rules in `permissions.allow`, `permissions.deny` and `permissions.ask` (a count, never a rule; `0` when the key is absent); `crossSessionInbound` (`accept`, `hold`, `refuse`); `autoUpdatesChannel` (`latest`, `stable`); `workflowSizeGuideline` (`unrestricted`, `small`, `medium`, `large`); `effortLevel` (`low`, `medium`, `high`, `xhigh`); the booleans `skipDangerousModePermissionPrompt`, `autoContinueAtUsageLimit`, `ultracode`, `enableWorkflows` and `switchModelsOnFlag`; and the top-level `model` as a model alias (`advisorModel` is the `advisor_model` item above). An absent key is `unset`; a value outside the documented set or of another type is `other`; a rule list that is not a list is `error`. The sealed `claude -p` arms pass no permission flags, so these settings define each arm's permissions (`auto` and `bypassPermissions` take effect only from the user file), and a peer session can message a run's lead unless `crossSessionInbound` says otherwise. |
+| `claude.process.{effort_level_unset, agent_teams_env, subagent_model_env}` | frozen | The same three, read from the environment of the process running the capture. |
+| `claude.mcp.*`, `claude.mcp_count` | frozen | From `claude mcp list` run in the checkout: one item per server name, true when it reports `Connected`, and the number of servers. |
+| `codex.version`; `codex.config.sha256`; `codex.stack_worker_profile.{sha256,present}`; `codex.agents_md.sha256`; `codex.rtk_md.sha256` | frozen | `codex --version`; sha256 of `~/.codex/config.toml`, `~/.codex/stack-worker.config.toml` (present: the file exists), `AGENTS.md` and `RTK.md` in `~/.codex`. |
+| `codex.agents.{stack-researcher,stack-verifier}.sha256`, `codex.agents.toml_set`, `codex.agents.role_tables` | frozen | The Codex role carriers (U13, `adoption/agents/codex`), read in the Codex home the way `scripts/adoption_status.py` locates it (`$CODEX_HOME` when set and not empty, else `~/.codex`; a location that came from the variable must meet the path policy and is not stored, and a refused one is an `error` with reason `refused_path`). The two `sha256` items hash `agents/stack-researcher.toml` and `agents/stack-verifier.toml` (`missing` when absent, `error` when the file or the `agents` folder is a link). `toml_set` is `{"stack-researcher.toml": true, "stack-verifier.toml": true, "other": 0}` when the two carriers are the only `*.toml` files below `agents` (`other` counts nested files and links to files named `*.toml`, by Codex's exact extension rule; a name a host chose is never published). A link to a folder anywhere below `agents` makes `toml_set` an `error` with reason `linked_folder`: Codex follows links (`LocalFileSystem::read_directory` classifies a link by its target, openai/codex `rust-v0.157.1` `codex-rs/exec-server/src/local_file_system.rs` lines 710-735; checked against `codex-cli 0.157.1` by `CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it` in `tests/test_codex_worker_lane.py`, which runs with `NAS_CODEX_INTEGRATION=1`), so it enters a linked folder and loads what it finds there as roles, and a set that skipped it would undercount. `role_tables` is the number of `[agents.<name>]` tables in `config.toml` and `stack-worker.config.toml` (0 when a file is absent, `error` when one does not parse; the scalar keys of `[agents]` are not roles). |
+| `codex.{system,project}.{agents_toml_count,role_tables}` | frozen | The other layers that load a role: the system layer's `/etc/codex/agents` and `/etc/codex/config.toml`, and the project layer of the checkout under freeze, `.codex/agents` and `.codex/config.toml`. Counts of `*.toml` files and of `[agents.<name>]` tables, `0` for an absent folder or file, and an `error` (reason `linked_folder`) for a count with a link to a folder below the agents folder; no path is stored. |
+| `codex.launcher.sha256`, `codex.binary.sha256` | frozen | sha256 of the file the `codex` on `PATH` names (a link is read through), and of the file that launcher executes. When the entry is a launcher script whose last line is exactly `exec '<absolute path>' "$@"` (the identity launcher of `observability/collector`), the binary row hashes the file that path names, one hop and through links, if it meets the path policy (else `error`, `refused_path`); for any other entry it is the file the entry resolves to, so the two rows are equal. That file is the entry point of the codex install, not necessarily the native executable: on the reference host it is the npm package's Node entry (`@openai/codex` `bin/codex.js`), which resolves and starts the native binary, so this row pins the entry point and `codex.version` names the release; the native binary is not hashed. No path is stored. |
+| `codex.mcp.servers.{default,stack_worker}` | frozen | `{"<server>": <enabled>, ...}` in name order, from `codex mcp list --json` and `codex -p stack-worker mcp list --json`, each run in an empty temporary directory so a checkout's project layer adds no server. Only each entry's `name` and `enabled` are read: no transport, environment value, argument or URL. Any other shape of output, or a nonzero exit, is an `error`. |
+| `wiring.complete`, `claude.wiring.*`, `codex.wiring.*` | frozen | Booleans and counts (hook events, trusted events) from `scripts/adoption_status.py --client-wiring --json` in the checkout; strings are never taken. |
+| `tools.pinned.<component>`, `tools.pinned_versions_match` | frozen | Pinned version, checked flag and match flag per component, and the overall flag, from `scripts/adoption_status.py --profile token-efficiency --pinned-versions --json`. |
+| `tools.{rtk,node,python}.version`, `tools.rtk.config.sha256` | frozen | First line of `rtk --version`, `node --version`, `python3 --version`; sha256 of `~/.config/rtk/config.toml`. |
+| `tools.tokenizer.{version, o200k_base.sha256, o200k_bpe_ranks.sha256}` | frozen | `gpt-tokenizer` package version and the sha256 of `cjs/encoding/o200k_base.js` and `cjs/bpeRanks/o200k_base.js` under the tokenizer prefix. |
+| `tools.token_manifest.sha256`, `tools.token_manifest_test.sha256`, `tools.token_manifest_template.sha256`, `tools.token_manifest_full_template.sha256` | frozen | sha256 of `tools/token-report/token_manifest.py`, its test file and its two HTML templates. |
+| `tools.qmd.{documents,vectors,pending,orphaned}` | frozen | Counts from the `Documents` block of `qmd --index native-agent-stack-catalog status`; the Orphaned and Pending lines are absent when zero. |
+| `tools.parser.file.*`, `tools.parser.all_match_pin` | frozen | sha256 of each file `examples/claude-native/workflows/shell-parser.pin.json` names (its `files`, and the lockfile it names at `install.lockfile`, `package-lock.json` by default), read from the installed parser directory in the order `child-usage.mjs` resolves it: the configured `parser_dir`, then the absolute path in `CHILD_USAGE_SHELL_PARSER` (it must meet the path policy, a relative value or `~` is an `error` with reason `refused_path`, and its location is not stored), then the pin's `install.default_directory` under the home directory. `all_match_pin` is true when every file equals its pinned sha256 and the lockfile lists both pinned packages with the pinned version and integrity (compared in process, never stored): the check `child-usage.mjs` makes before it loads the parser. A pin the kernel would refuse (a package, its version or its integrity absent) is an `error` with reason `unrecognized_pin`; without the pin file (it ships with U1) the flag is `missing`. |
+| `services.<unit>.{load_state, active_state, main_pid, n_restarts, config_sha256}` | frozen | One `systemctl --user show <unit> -p LoadState -p ActiveState -p MainPID -p NRestarts -p ExecStart` per unit. A unit that is not loaded reports `load_state` and `missing` for the rest. `config_sha256` is the sha256 of the file named by `--config`, `--config.file` or `-config.file` in `ExecStart` (a `file:` scheme is dropped), `not_applicable` when the unit names none. The unit's environment is never requested. |
+| `gateways.<gateway>.route.<route>`, `gateways.<gateway>.build_id` | frozen | Only with a configured gateway: see below. |
+| `extra.<id>` | frozen or informational | Only with a configured file: its sha256. |
+| `capacity.codex.weekly_{used_percent,resets_at_utc}` | informational | The weekly (10080 minute) window of `scripts/codex_quota.py --json`. |
+| `capacity.claude.{five_hour,seven_day}_{utilization_fraction,resets_at_utc}` | informational | `unifiedWindows` of the `rate_limit_event` returned by one headless Haiku call. A call rejected at the session limit exits nonzero (HTTP 429) and still returns the event, so its numbers are read (a utilization above `1` means the window is over its limit); a failed call without the event is `error`. |
+| `capacity.host.{load_average,memory_available_mib}` | informational | `os.getloadavg()` and `MemAvailable` from `/proc/meminfo` (`not_applicable` off Linux). |
+| `time.{capture_start_utc,capture_end_utc,tool_version,tool_revision,tool_sha256}` | informational | The capture's UTC start and end, the tool's version, the git revision of the checkout holding the tool, and the sha256 of the tool file. |
+
+The usage probe is `claude -p OK --model haiku --output-format json --verbose --no-session-persistence --setting-sources
+project`, run in a temporary directory without `OTEL_RESOURCE_ATTRIBUTES` and `RTK_DB_PATH`. The brief's command reads the
+same event; `--verbose` makes the output the event array whatever the user's settings say, and the other flags keep the
+call from loading the user settings, where the user's hooks, plugins and MCP servers are configured, and from saving a
+session. Observed on 2026-09-29 (claude 2.1.284): the isolated call started none of the MCP servers that a call with the
+user settings reported (seven) and left no transcript directory. The event stream does not name hooks, so that no user
+hook ran is inferred from the settings source, not observed. `--no-usage-probe` skips the call and reports the four items
+as `missing` with reason `skipped`.
+
+## Configuration
+
+`freeze.json` is optional and every key is optional; unknown keys are an error.
+
+```json
+{
+  "files": [
+    {"id": "token-report-config", "path": "~/.local/state/native-token-report/config.json"},
+    {"id": "token-report-timer", "path": "~/.config/systemd/user/token-report-refresh.timer", "class": "informational"},
+    {"id": "socraticode-package", "path": "~/.local/share/codex-ecosystem/tools/socraticode-1.15.0/lib/node_modules/socraticode/package.json"},
+    {"id": "returned-results-script", "path": "tools/token-report/returned_results.js"}
+  ],
+  "units": ["token-report-refresh", {"name": "paper-rth-20260929", "class": "informational"}],
+  "qmd_index": "native-agent-stack-catalog",
+  "parser_dir": "~/.local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1",
+  "tokenizer_prefix": "~/.local/share/native-token-report/tokenizer",
+  "gateways": [{
+    "id": "omniroute",
+    "base_url": "http://127.0.0.1:20128",
+    "routes": [{"id": "models", "path": "/v1/models"},
+               {"id": "health", "path": "/health", "ignore_keys": ["uptime"]}],
+    "build_id": {"route": "health", "field": "build"}
+  }]
+}
+```
+
+- `files`: extra files by id and path (`~/...`, absolute, or relative to the checkout); `class` defaults to `frozen`. Use
+  it for what the catalogue does not hash: the token-report configuration, service and timer, and the installed package of a
+  component that `scripts/adoption_status.py --pinned-versions` reports as unchecked (on the workstation host `context-mode`
+  and `socraticode`, whose probes are not run), and the report renderer's script, which `tools/token-report/token_manifest.py`
+  inlines into the rendered HTML but the catalogue does not hash. `list-frozen` names a configured file by its id only, so
+  give each id a name that says which file it is.
+- `parser_dir` and `tokenizer_prefix`: where the installed shell parser (tree-sitter-bash) and the `gpt-tokenizer` package
+  live when they are not at their defaults. `parser_dir` plays the `--shell-parser` argument of `child-usage.mjs`, which the
+  kernel tries before `CHILD_USAGE_SHELL_PARSER`; without either, the pin's default directory under the home directory is
+  read. The capture reads `CHILD_USAGE_SHELL_PARSER` from its own process, so capture in the environment the run will use.
+- `units`: extra systemd user units, added to the nine defaults. An entry is a unit name (frozen) or
+  `{"name", "class"}`; `informational` records a unit that may run inside a run window, such as a paper-trading unit, without
+  failing `compare`. A default unit is always frozen: naming one as informational is an error.
+- `gateways`: a plain `http` origin on `127.0.0.1`, `localhost` or `[::1]`, and the paths to fetch. Each route is one
+  unauthenticated GET without proxy or redirect; its value is `sha256(json.dumps(body, sort_keys=True))` with the
+  route's `ignore_keys` removed at every depth. `build_id` reads one JSON field (dotted for nested) or one response
+  header of a route. A non-2xx answer, a body that is not JSON or an unreachable gateway is `error` with the token
+  (`http_401`, `not_json`, `timeout`, `unreachable`) as its value; the tool sends and reads no credential, so an
+  authentication failure is an error and never a bypass. The owner supplies the endpoints and the rules.
+- A path outside the checkout and the home directory is refused, symlinks included. The three credential stores
+  (`~/.claude.json`, `~/.claude/.credentials.json`, `~/.codex/auth.json`) are refused by name, by symlink and by inode, in
+  the configuration and in any path read from a unit file. No error message names a path.
+
+## Privacy
+
+- Collectors derive booleans, counts, hashes, versions, model aliases and documented setting values. A model alias prints
+  only when it is a short lower-case token, and a setting with a closed value set prints only a member of that set;
+  anything else is the class `other`. Settings and unit files are read whole and in process; their other values are never
+  copied. A permission rule is counted and never kept, and its text is also on the guard's list below.
+- The private capture stores paths as `~/...` or `<repo>/...`, never as an absolute path. The sanitized capture has no path
+  field, no path character and no user name. A location that came from an environment variable (the parser directory that
+  `CHILD_USAGE_SHELL_PARSER` names) is not stored at all, and `list-frozen` prints no path a configuration names.
+- A last guard refuses the whole capture (exit 3, nothing written) if any string carries an environment value of eight
+  characters or more (except the model alias of `CLAUDE_CODE_SUBAGENT_MODEL`), a permission rule of eight characters or more,
+  the home or checkout path, or the user or host name. A value or name that the tool's own catalogue text already contains
+  (item ids, methods, the documented setting values) is not listed, so a host whose user is called `claude` can still
+  capture, and neither is a model alias that a settings file states and the tool prints, so an environment variable that
+  holds the same alias does not stop the capture. The refusal names the items (a host-derived family member by its family) and the
+  environment variable names involved, never a value.
+- Every scanner is a linear character scan; no regular expression is used.
+
+## Limits
+
+- A hash proves byte identity, not behaviour. `sha256` of a file says the bytes are the sealed bytes, nothing about what a
+  running process loaded earlier or does later.
+- Informational capacity items (time, Codex and Claude windows, load, memory) are not frozen. They describe whichever
+  account the client was signed into when the capture ran, and `check` never reads them.
+- A capture is one instant. A unit that stopped and returned to the same state between two captures shows only through
+  `main_pid` and `n_restarts`; a file changed and changed back shows nothing.
+- `tools.qmd.*` counts move when anything updates the index. On the workstation host the index changed on its own between
+  the amendment notes and this unit's captures (285 files and no pending in the notes, 288 files and 15 pending later), so
+  the seal is only meaningful when no update, embed or cleanup runs, as the freeze already requires.
+- `claude mcp list` starts each configured server to test it, so a `claude.mcp.<name>` flag can flip between W-start and
+  W-end without any file changing (a slow start, a server that needs a network). Read such a drift before treating it as a
+  change of configuration; `claude.mcp_count` and the file hashes tell the two apart.
+- `ai-memory` and `cognee-live` are not systemd user units on the workstation host (`load_state` is `not-found`), so the
+  seal freezes their absence. Name the real unit in `units` if a host runs them as units.
+- A gateway's build identifier is read from its HTTP answer (a JSON field or a header), because the tool never requests a
+  unit's `Environment`; a build id kept only in a unit's environment is not captured.
+- `shell-parser.pin.json` ships with U1, so `tools.parser.*` are `missing` on a checkout that predates it, and the seal
+  then freezes that absence. `tools.parser.*` mirrors `verifiedShellParser` in U1's `child-usage.mjs`, which is not merged at
+  this unit's base (the function is byte-identical on the two U1 branches read); when U1 merges, read it again, because a
+  change to its directory order, its lockfile rule or its pin keys makes the mirror stale. A run started with another
+  `--shell-parser` argument or another `CHILD_USAGE_SHELL_PARSER` than the capture's loads a directory this tool did not
+  hash: name it in `parser_dir` or capture in the run's environment.
+- The report freeze hashes `token_manifest.py`, its test and its two templates. `tools/token-report/returned_results.js`, which
+  `token_manifest.py` inlines into the rendered HTML, and every `gpt-tokenizer` module except the two encoder files are not
+  in the default catalogue; name them under `files` (see Configuration).
+- The tool records hashes and whether the copies of a role body are identical, and `check` compares them with the sealed
+  expectations; it does not know which hashes are right. The RUNBOOK requires each of the five role bodies to equal the
+  SHA256 recorded in the sealed README (the `d022295a` table, and the Amendment 3 row for `isolated-builder`), so the seal
+  owner verifies the seal capture's `roles.<role>.*` values against those before publishing it. The RUNBOOK names three
+  copies (adoption, project, user); the tool hashes a fourth (`examples/claude-native/agents`), which is stricter.
+- `unifiedWindows` in the `rate_limit_event` (the five-hour and seven-day windows) is observed on claude 2.1.284, not
+  documented: a client update may drop it, and the four Claude capacity items then read `missing`. The Agent SDK reference
+  documents only the single-window fields `status`, `resets_at`, `rate_limit_type` and `utilization`.
+- Only the first configuration flag of a unit's `ExecStart` is hashed. A unit that reads its configuration from an
+  environment variable or from arguments the flags above do not name reports `not_applicable`.
+- macOS: `services.*` and the memory item report `not_applicable`; the other items are unverified there because no macOS
+  host ran them. Windows is unsupported.
+- The tests below are integration checks of this glue against a synthetic host, not upstream acceptance and not a
+  statement about any real host; only a `capture` on the host does that.
+
+## Tests
+
+```sh
+TMPDIR=<private dir> python3 -B -m unittest tests.test_freeze_snapshot
+```
+
+The suite builds a temporary host (a git checkout, a home directory, fake `claude`, `codex`, `rtk`, `node`, `python3`,
+`qmd`, `systemctl` and `git` on a private `PATH`, canned repo scripts and a loopback HTTP server) whose canned outputs
+copy the shapes read from the real commands on 2026-09-29. `MutationControlTests` writes a mutant of the tool for each
+property (an environment leak with and without the guard, a variant that prints `os.environ`, a collector blind to each
+item class, informational drift that fails, a check that always passes, credential refusal off, a missing tool that
+raises, a collector blind to `permissions.defaultMode` or to `crossSessionInbound`, permission rules printed with and
+without the guard, `list-frozen` printing the configured path, the parser variable ignored, its location stored or a relative
+or `~` value accepted, the configured parser directory ranked below the variable, the lockfile ignored, and the
+`tokenizer_prefix` override ignored) and requires the test for that property to fail on it; the last eleven also require the
+failing assertion to name the item, the refusal or the value, so a mutant cannot fail for another reason.
+`FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps the mutants and each
+one's exit code and failing assertion.
+
+## Sources
+
+There is no upstream implementation of this glue. The closest maintained tools were checked on 2026-09-29 and not
+adopted: osquery (`specs/linux/systemd_units.table` has no `MainPID` or `NRestarts` column and `specs/hash.table` covers
+files, and it needs the osquery binary), AIDE (a file-integrity hash database) and Ansible or InSpec (frameworks that check
+declared state). None reads `claude`, `codex` or `qmd`, derives values from a settings file, digests a gateway answer or
+carries the redaction rules above. Each rule follows its own source:
+
+- The #381 [README "Procedure"](../../evidence/artifacts/token-adoption-e2e-20260926/README.md) and
+  [RUNBOOK freeze rules](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md) in this repository: the frozen
+  list and the rule that nothing changes while a run window is open.
+- [`systemctl show`](https://www.freedesktop.org/software/systemd/man/255/systemctl.html) (systemd 255: "To select
+  specific properties to show, use `--property=`. This command is intended to be used whenever computer-parsable output
+  is required"), and the configuration flag each default unit's own binary lists in its `--help` (otelcol `--config`,
+  Loki `-config.file`, Prometheus `--config.file`, Grafana `server --config`), read on 2026-09-29.
+- [git](https://git-scm.com/docs/git) `--no-optional-locks` ("Do not perform optional operations that require locks") and
+  [git-status](https://git-scm.com/docs/git-status) `--porcelain --untracked-files=no`.
+- The [Claude Code CLI reference](https://code.claude.com/docs/en/cli-reference) for the probe flags: `--no-session-persistence`
+  ("Disable session persistence so sessions are not saved to disk and cannot be resumed. Print mode only") and
+  `--setting-sources` ("Comma-separated list of setting sources to load (user, project, local)"), with `--output-format`,
+  `--verbose` and `--model`.
+- [proc_meminfo(5)](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html): `MemAvailable` ("An estimate of how much
+  memory is available for starting new applications, without swapping").
+- `examples/claude-native/workflows/child-usage.mjs` `verifiedShellParser` (U1, unmerged at this unit's base; the function is
+  byte-identical on branch `claude/pra-u1d-parser-ci-2d-20260929` at `967561cc`, lines 656, 661 and 663-668, and on
+  `claude/pra-u1-cmdpos-2d-20260928` at `2bad7320`, lines 643-655): the directory order (argument,
+  `CHILD_USAGE_SHELL_PARSER`, the pin's default under the home directory), the pinned files and the lockfile rule that
+  `tools.parser.*` mirrors.
+- Output shapes read on 2026-09-29 and kept as fixtures in `tests/test_freeze_snapshot.py`: `claude mcp list` and
+  `claude -p ... --output-format json` (claude 2.1.284), `qmd status` (qmd 2.8.3, whose `Documents` block prints the
+  Orphaned and Pending lines only above zero), `scripts/adoption_status.py --client-wiring --json`,
+  `--pinned-versions --json` and `scripts/codex_quota.py --json` (this repository), and the tools' `--version` lines.
+  `claude mcp list` has no documented machine-readable form, and the Agent SDK reference documents `RateLimitInfo` without
+  `unifiedWindows`, so both shapes are observed, not specified. A call rejected at the session limit was observed to
+  return the `rate_limit_event` with `status` `rejected` and both windows, then a result with `is_error` true and
+  `api_error_status` 429.
+
+## Frozen-check grader (`grade.py`)
+
+`grade.py` is the independent grader that the #381 protocol names ("graders use the independent frozen checks"). It grades
+what the token E2E retained with checks frozen before the run, and publishes counts that carry no identifier. It is a local
+integration check, not upstream acceptance, and its judge calls are separate model runs. Design and rejected alternatives:
+[the decision record](../../docs/decisions/2026-09-29-frozen-check-grader.md).
+
+- **Spec and inputs.** `spec` builds the grading spec from the newest seal of the sealed preregistration (no override) and
+  its `grading` block (Amendment 4: readings, judges, pages, memory anchors, dropped tasks, tool digests); at the commit
+  before Amendment 4 it refuses with `E_GRADING_BLOCK field=missing`. `bind` records the private launch inputs, `identity`
+  builds and validates the identity table from the recorded launches, `keys` computes every freeze key from pinned Git
+  content at the exec revision (`--memory` and `--qmd` add the historical memory records and the qmd coverage), and `capture`
+  observes pages, trees, builders and the T0 commands around a window or an arm (`w-open`, `pre-arm`, `post-arm`, `w-close`,
+  `post-w`).
+- **Grading.** `grade` reads the identity table, keys, captures, U4's join ledgers and adoption reports, U2's run-mode
+  output and call ledger, and U10's Codex events and driver directory, and grades every attempt. Class A oracles read
+  independent originals and keys, class B re-run or observe a tree, class C read the structure of the answer carrier and class
+  D clauses (a semantic requirement) are settled by the blind judge. An attempt is `completed`, `inadmissible` (a usage limit
+  or a launch fault) or `unresolved` (a run that cannot be mapped to an identity); the attempt rule, the gates (G-Q, M7, M8,
+  M12) and the optional-task block (M9: correctness and the use of the task's lane tool, never gating) follow the
+  preregistration. Every ambiguity of its register takes the harder reading the spec names, and the other readings are
+  published under `alternatives`; production code has no default reading. `regrade --from <private dir>` repeats the grading
+  from a private directory alone, optionally with other judgments.
+  A fact is read from the answer by a closed grammar (g1): integers next to their label word, a fact named by its field name
+  (`latency_ms 17`, `latency_sum: 124`, a quoted JSON key), a level word only when no negation disowns it (`no ERROR among
+  them`) and quoted raw rows by their `event` field. A fact no form matches is `unknown(unparsed)`; the D-extract fallback
+  (a blind judge quotes the words verbatim, and the grader reads the quote again) covers only the T0 test-run words, which
+  are read with an extraction-only reader of number words (`forty-nine`), and the payload of T9 and the web-table tasks.
+  The web-table sum and the blind tasks' facts have no fallback: what the grammar cannot read stays unknown. A quote is
+  used only when it is verbatim in the answer and every value lies inside a quote, whether the judgment came from `judge`
+  or from a `--judgments` file.
+- **Judges.** `judge packets` builds scrubbed packets (values, identifiers, paths and tool names replaced, spans kept so a
+  quote maps back to the answer) and the blind calibration controls of each template and route. Claude answers are judged by
+  gpt-6-astra at `max` effort through the packaged Codex lane (`codex_lane.build_command` with its isolation arguments, an
+  empty home directory, a strict output schema and the packet inline; any tool item voids the call): `judge codex`. Codex
+  answers are judged by Opus at `max` through the saved Workflow `frozen-check-judge.js` with agent type `blind-lane-reviewer`
+  (Read, Glob and Grep over file packets in a scrubbed export root): `judge claude-args`, run the printed request from that
+  root, then `judge collect`. A judgment counts only when every quote is a verbatim substring of the packet, no leak screen
+  fires, a refuter (passes only) does not overturn it, the route's isolation audit passes (the transcript audit and zero
+  `hook_additional_context` rows on the Claude route) and its calibration controls came out right. Otherwise the clause is
+  `unknown` with the reason `judge_quote`, `judge_leak`, `judge_refuted`, `judge_audit`, `judge_hook_rows`,
+  `judge_calibration` or `judge_unavailable`. An infrastructure failure is retried once; a usage limit pauses the run (exit
+  `75`, rerun to resume) and `--accept-unavailable` finishes with the unrun packets as `judge_unavailable`. Both windows
+  must be closed (`E_WINDOW_OPEN window=W_C` or `W_X`). `judge rehearse --route codex|claude` sends two planted controls
+  through a route before Amendment 4 and skips the window check.
+- **Controls.** `controls` runs the planted class A, B and C answers with known verdicts (`calibration/oracle-controls.json`),
+  the E1 answers at their pinned keys and the class D calibration files (`calibration/T*.json`: per template a reference, a
+  paraphrased correct and at least two planted wrong answers, and extraction controls for the payload and unittest
+  templates); `grade --controls FILE` embeds its counts. `differential --inputs <dir>` compares the T0 oracle with the
+  retained `check.py` of two earlier runs on the original baseline and three mutations of it; exit 0 when every verdict
+  agrees, 1 otherwise, counts only.
+- **Publishing.** `export` writes one returned_results record whose attachment is the ID-free aggregate
+  (`token-e2e-grades/1`) into a fresh neutral directory (it refuses an existing one, one inside a work tree and one whose
+  path names a run value, the home directory or the user name). `check-html` is the privacy canary over a generated HTML
+  report, with `--from <private dir>` adding the run's own values. The report producer (U11) must hand
+  `render_reports` only neutral `origin` and `path` values anywhere in its data, capture from a neutral directory, and run
+  `check-html --from` on the result.
+- **Privacy and exit codes.** Private files are 0600, create-only and refused inside any git work tree; the aggregate holds
+  counts and statuses only (no `tool_use_id`, call id, path, host, user name or command text). The canary gathers the run
+  token, the identifier fields of the identity rows (identity, label, ids and locators), the input paths and roots, the home
+  directory and the user name; row vocabulary (actor names) and the instruction-file anchor lines are not identifiers and
+  are not gathered. Flags are taken as written (`--flag value` or `--flag=value`; an abbreviation is `E_ARGS`), the recorded
+  command carries a placeholder for every private path in both spellings, and `export` refuses (`E_EXPORT_INPUT
+  reason=argv`) a recorded command that still holds a path shape. Exit 0 when G-Q, M7, M8 and M12 pass, 1 otherwise, 2 on a
+  refusal with a code and a field, never a value (a crash is a refusal, `E_INTERNAL`).
+
+Limits:
+
+- The real judge routes have not run in this build (its brief allowed read-only document fetches only, so no judge model
+  call was in scope): the suite drives `judge codex` with a scripted `codex` on `PATH` and `judge collect` with a recorded
+  Workflow result. The rehearsal commands above are the acceptance step that needs the real routes and is still open.
+- `spec` and `keys` run against the real preregistration only after Amendment 4 exists; until then the suite uses a fixture
+  repository whose grading block names the decided readings. Calibration keys are self-contained synthetic keys; only the E1
+  group of `controls` uses real receipts.
+- A judged answer is screened for identifiers and the canary, not for hit text it quotes from a retrieval (recorded residual).
+- A historical memory hit is a result that names a frozen record's whole path or its content digest; the bare file name never
+  counts, because another page can share it. The freeze holds a path and a digest per record (the search rows carry no page
+  id), and how the real records for the memory tasks are named in real results is unmeasured until they are frozen.
+- A payload extraction may be requested for a web-table answer whose payload decoded and only whose sum is unparsed; the
+  grader ignores it (it reads a payload extraction only when no payload decoded), so that packet costs one judge call and
+  decides nothing.
+- The suite checks this code against synthetic hosts and fixtures; only a real grade run measures a real run.
+
+Tests: `PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest -v tests.test_token_e2e_grader` (needs `git`, `node` and the `toon`
+CLI 4.1.1; on Linux none is skipped, and two tests skip without `/proc`). The mutant classes (`F19_Mutants`,
+`F19b_Stage2Mutants`, `F19c_Stage3Mutants`) patch the tool once per property and require the named test to fail on the
+mutant. Sources: `tools/sota-convergence/codex_lane.py`, `transcript_audit.py` and `adjudication-lane.js` (used unchanged),
+`scripts/native_token_ci.py` `markdown_elements` (unchanged), the TOON CLI 4.1.1 strict decode, `tools/token-report`
+(`returned_results.js`, `render_reports`) and the
+[preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).

@@ -1,0 +1,21 @@
+{
+  "bodies": {
+    "alpha": "# Alpha routing\nMarigoldpixel is a alpha fixture only.\n",
+    "beta": "# Beta routing\nDriftwoodlantern is a beta fixture only.\n",
+    "delta": "# Delta routing\nThistlebronze is a delta fixture only.\n",
+    "gamma": "# Gamma routing\nCinderfoxglove is a gamma fixture only.\n"
+  },
+  "instant": "2026-09-26T02:18:59.558206+00:00",
+  "instant2": "2026-09-26T02:18:59.776400+00:00",
+  "new2_id": "fixture-id-12",
+  "new_id": "fixture-id-10",
+  "old2_id": "fixture-id-11",
+  "old_id": "fixture-id-9",
+  "status_pre_counts": {
+    "evidence_rows": 0,
+    "observations": 0,
+    "pages_all": 5,
+    "pages_latest": 4,
+    "sessions": 0
+  }
+}

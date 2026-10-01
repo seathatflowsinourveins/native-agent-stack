@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-vshulcz-deja-vu",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/vshulcz/deja-vu",
+ "reviewed_commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of vshulcz/deja-vu at commit bb93e229a5e2c2ccd1fe4444479e7ea98d765600 (license MIT), read from README.md at that commit. Repository description: \"The most accurate, cheapest and fastest memory for coding agents: searchable session history from Claude Code, Codex, Cursor and 32 more agents, already on your disk. No LLM, one Go binary.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1088,
+  "pushed_at": "2026-09-29T10:18:35Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+   "text": "```sh curl -fsSL https://raw.githubusercontent.com/vshulcz/deja-vu/main/install.sh | sh deja install --auto ```"
+  },
+  {
+   "source": "README.md@bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+   "text": "- **Starts full.** Months of history from before you installed it are searchable on day one: `deja \"connection pool exhausted\"` over gigabytes. - **One memory, every agent.** A fix found in Codex comes back in Claude Code, Cursor or opencode; all [thirty-five agents](#supported-harnesses) read the same index. - **Nobody has to ask.** Recall arrives at session start, before a file is edited or a command runs, and after a command fails. - **Survives compaction.** Over 43 measured compactions the s"
+  },
+  {
+   "source": "README.md@bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+   "text": "`deja stats --card` draws it in the terminal; give it a filename and it writes an SVG for a profile README. To post it anywhere else, [turn it into a PNG](https://vshulcz.github.io/deja-vu/card/) — that page converts it in your own browser."
+  }
+ ]
+}

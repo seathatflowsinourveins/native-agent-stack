@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--promptfoo--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "promptfoo",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "python3 -c \"\nimport json, glob\nd = json.load(open('manifests/stack.json'))\nstack_v = [c['version'] for c in d['components'] if c['id']=='promptfoo']\nwinner_pins = sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers', []) for w in (l.get('winners') or []) if w.get('component_id')=='promptfoo'})\nprint('stack', stack_v, '| winner pins', winner_pins)\nassert stack_v == ['0.123.1'] and winner_pins == ['0.123.1'], (stack_v, winner_pins)\nprint('pin cross-check ok: manifests/stack.json and every catalogs/landscape winner pin agree on promptfoo 0.123.1')\n\" \\\n&& DO_NOT_TRACK=1 npm_config_audit=false npm_config_fund=false timeout 30 npm view promptfoo@0.123.1 dist.integrity dist.shasum --json | python3 -c \"\nimport json, sys\nr = json.load(sys.stdin)\nprint('npm registry dist.integrity', r['dist.integrity'], '| dist.shasum', r['dist.shasum'])\nassert r['dist.integrity'] == 'sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg==', r\nassert r['dist.shasum'] == '96a901bcc5c43d0b52b42144a49b3d77b1699e25', r\nprint('promptfoo 0.123.1 dist.integrity and dist.shasum verified against the npm registry')\n\"\n",
+      "exit": 0,
+      "duration_s": 0.422,
+      "output_sha256": "e8d7af08fe95655e9af18d73a3d7c6c6d899359a360b0077cd87eb104399c8df",
+      "output_excerpt": "stack ['0.123.1'] | winner pins ['0.123.1']\npin cross-check ok: manifests/stack.json and every catalogs/landscape winner pin agree on promptfoo 0.123.1\nnpm registry dist.integrity sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg== | dist.shasum 96a901bcc5c43d0b52b42144a49b3d77b1699e25\npromptfoo 0.123.1 dist.integrity and dist.shasum verified against the"
+    },
+    {
+      "cmd": "p=$(command -v promptfoo) && r=$(readlink -f \"$p\") && echo \"promptfoo resolves: $p -> $r\" \\\n&& case \"$r\" in \"$HOME\"/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/*) echo \"under persistent install prefix: yes\" ;; *) echo \"under persistent install prefix: no\"; exit 1 ;; esac \\\n&& PF_VERSION=$(DO_NOT_TRACK=1 PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 timeout 20 promptfoo --version) \\\n&& echo \"promptfoo --version: $PF_VERSION\" \\\n&& test \"$PF_VERSION\" = \"0.123.1\" \\\n&& DO_NOT_TRACK=1 npm_config_audit=false npm_config_fund=false timeout 20 npm ls --global --prefix \"$HOME/.local/share/codex-ecosystem/tools/promptfoo-0.123.1\" --depth=0 promptfoo\n",
+      "exit": 0,
+      "duration_s": 2.085,
+      "output_sha256": "a11cd6b002b4adffef103f4f42ddeb426557e213f8371fc279d3866a23579b2d",
+      "output_excerpt": "promptfoo resolves: ~/.local/share/codex-ecosystem/bin/promptfoo -> ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib/node_modules/promptfoo/dist/src/entrypoint.js\nunder persistent install prefix: yes\npromptfoo --version: 0.123.1\n~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib\n\u2514\u2500\u2500 promptfoo@0.123.1\n\n"
+    }
+  ],
+  "tool_versions": {
+    "promptfoo": "0.123.1"
+  },
+  "observed_at_utc": "2026-09-26T01:31:19Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), promptfoo 0.123.1, the quality-evaluation winner, is installed persistently under ~/.local/share/codex-ecosystem/tools/promptfoo-0.123.1 with npm's own documented global-prefix install (npm install --global --prefix <dir> promptfoo@0.123.1), telemetry, npm's update notifier and npm's own audit/fund network calls disabled (DO_NOT_TRACK=1, PROMPTFOO_DISABLE_TELEMETRY=1, PROMPTFOO_DISABLE_UPDATE=1, --no-audit --no-fund). manifests/stack.json and every catalogs/landscape winner pin agree on 0.123.1, and the npm registry's own dist.integrity/dist.shasum for promptfoo@0.123.1 are read back with npm view and asserted equal to sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg==/96a901bcc5c43d0b52b42144a49b3d77b1699e25. The promptfoo executable on PATH resolves (fully, through every symlink) into this exact install prefix, promptfoo --version reports 0.123.1, and npm ls --global confirms promptfoo@0.123.1 installed there. Readiness only; every command exits 0.",
+  "limitations": [
+    "Install stage: resolved path, pin cross-check, npm registry integrity readback and the version/npm ls calls show the pinned build is present and starts; this is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "Functional use, a live promptfoo eval against this host's local model with a deliberate-failure positive control, is covered by the separate nativestack-5975wx-20260925--promptfoo--use--20260925-2 receipt on this host; not repeated here.",
+    "npm's install-time allowScripts gate skipped postinstall/install scripts for 5 packages (onnxruntime-node, esbuild, @swc/core, protobufjs, @playwright/browser-chromium); the promptfoo CLI and the eval path this repository exercises do not need them, but a promptfoo feature that does (for example a browser-based provider) would need an explicit npm install -g --allow-scripts=... rerun.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision); the install is on the host filesystem under ~/.local/share/codex-ecosystem, outside any repository checkout.",
+    "second_physical_machine is declared, not proven by this file; independent review is what a reader relies on for that, per docs/contributing-evidence.md."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T01:31:19Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Independent reviewer session (claude-opus-5-5), 2026-09-26; reproduce + adequacy-checked (install stage). Re-ran both commands once with /bin/sh (dash) from the worktree root: exit 0; output_excerpt and raw sha256 identical. Fail-closed: holds; each command is one && chain (cmd1's final python parses and asserts the npm view JSON; cmd2's case branch exits 1). Winner binding holds: tool_versions 0.123.1 pin_matches the quality-evaluation winner pin. Install: the prefix exists persistently (ext4, on the login PATH). DEFECT (backed claims): (1) The claim asserts the installer invocation 'npm install --global --prefix <dir> promptfoo@0.123.1' and install-time settings (DO_NOT_TRACK=1, PROMPTFOO_DISABLE_TELEMETRY=1, PROMPTFOO_DISABLE_UPDATE=1, --no-audit --no-fund) with no retained installer command or output; the retained commands set those variables only for the readback calls. (2) The limitation that npm's allowScripts gate skipped five packages' install scripts has no retained output. (3) The limitation that functional use is 'covered by' the use-2 receipt is misleading: that receipt's retained output reads 'promptfoo source: ephemeral npm install (no stable install found)', so it did not exercise this install. Superseded by -2, which narrows these claims.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-26T02:50:59Z",
+      "reviewer": {
+        "identity_sha256": "7d53892bea622f647629485d3080436dc714f62922f65349e05947ad40e7863f",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

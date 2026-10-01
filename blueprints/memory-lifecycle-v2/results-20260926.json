@@ -1,0 +1,995 @@
+{
+  "schema_version": 1,
+  "claim_id": "memory-lifecycle-v2-20260926",
+  "evidence_class": "local_integration",
+  "acceptance_policy_class": "local integration check (docs/acceptance-evidence-policy.md): a locally authored fixture driving the official binaries over native stdio MCP; not an upstream test",
+  "observed_at_utc": {
+    "first_phase_started": "2026-09-26T02:18:43.673871+00:00",
+    "last_phase_finished": "2026-09-26T02:19:08.891292+00:00",
+    "source": "the retained execution receipts phase-*/command.json"
+  },
+  "status": "passed",
+  "scope": "Disposable stores only, one per binary: a TTL crossing in real wall-clock time, scoped routing across 4 projects in 2 workspaces (scopes[] and global=true), restart durability with a second native process on the same store, direct reads of swept and deleted pages, and v1 regressions.",
+  "not_established": [
+    "The memory-lifecycle gate in catalogs/us-equities/convergence-review.json stays open: live-store policy, scoped retrieval quality and evaluated learning were not exercised.",
+    "Store migration between binaries, concurrent clients, tenant authorization, secure erasure, retrieval ranking, embeddings and LLM features (PREREGISTRATION.md section 8)."
+  ],
+  "supersedes": "results-20260925.json (its analyzer accepted malformed and misattributed responses; its retained responses are under runs-20260925/)",
+  "preregistration": {
+    "path": "blueprints/memory-lifecycle-v2/PREREGISTRATION.md",
+    "sha256": "6804e430dee871cd10a38c097ade0e3f84ce246a00592ad2f038b20c6e6a4321",
+    "frozen_utc": "2026-09-26T02:18:28Z",
+    "sha256_at_freeze": "6804e430dee871cd10a38c097ade0e3f84ce246a00592ad2f038b20c6e6a4321",
+    "freeze_record": "history/preregistration-freeze-20260926.txt",
+    "executed_harness_unchanged_since_freeze": true,
+    "executed_harness_recorded_by_each_run": true,
+    "publish_py_changed_after_freeze": true,
+    "publish_py_change": "After the runs, publish.py also lists protocol.jsonl among the private-only files and records a sha256 over the store's final file listing. It post-processes retained files and does not affect any verdict.",
+    "recorded_before_the_first_fixture_run": true
+  },
+  "errata_against_the_frozen_preregistration": [
+    "Section 7 says no upstream result was read before the freeze. A progress check before the freeze showed two passing v2.3.2 test lines (admin::tests::auto_improve_buckets_an_oidc_operator_by_qualified_identity and admin::tests::merge_workspace_folds_projects_and_deletes_empty_source; the second matches the workspace and delete patterns). The v2.3.2 first-round run finished at 02:17:42Z, 46 s before the freeze, and was read after it.",
+    "The upstream commands were all rerun after the freeze (final round). The first round had put the sandbox HOME under /home, which the repository private-content scanner flags. Its receipts are retained under upstream-20260926/superseded-round-1/ and its results are listed below. The final runner also creates HOME and /tmp fresh per run, records its own sha256 and the in-sandbox toolchain versions, and parses a status line that a spawned process's output separated from its test name.",
+    "Control mutation 2 (the expiry condition always true, placeholder kept) was added after the freeze. The preregistered empty fragment unbinds a positional SQL placeholder, so its failure need not come from the expiry semantics. Both mutations ran and both are reported.",
+    "Section 7 lists four deviations from the CI environment. In addition, the sandbox clears every other variable and sets HOME, USER, LANG, TZ and PATH; each receipt records the full environment.",
+    "Section 7's pass bar did not anticipate a step that selects no test. v2.4.1's cargo test --workspace --doc ran 11 doc-test harnesses containing 0 doc tests, so per docs/acceptance-evidence-policy.md it is recorded as untested (vacuous), not passed.",
+    "Section 6 says the 2026-09-25 attempts are recorded in results-20260925.json. The details are in history/attempts-20260925.json, which results-20260925.json links.",
+    "Section 2 cites release verification run before the freeze (02:05:28Z). The retained upstream-20260926/release-verification.json is a rerun at 02:58:31Z, made after one field was renamed (asset_sha256_github_api to asset_sha256_github_release_record) because gitleaks' generic-api-key rule flagged the public digest. Both runs gave identical digests and verdicts; the first run stays private and upstream-20260926/publication.json lists its sha256.",
+    "Section 7 says rustup-init was checked against its published sha256; no record of that check was retained. The comparison was made from 2026-09-26T04:16:30.686158+00:00 to 2026-09-26T04:16:30.819694+00:00, after the runs, on the private rustup-init that setup.sh ran: upstream-20260926/rustup-init-verification.json."
+  ],
+  "changes_after_the_independent_review": [
+    "upstream_verification.runs holds only the unchanged suites at the release tags. It had also listed the four discriminating-control runs, which ran a filtered command and, twice, a mutated checkout; they now appear only under discriminating_control.",
+    "assemble_results.py reports every retained attempt, passing or failing, in attempts, and names each version's earlier attempts in binaries. An unexpected success, an analysis error, a phase that never ran or a missing native expiry is recorded instead of stopping the assembly.",
+    "upstream-20260926/setup.log had its scratch root replaced without a declaration. publish_upstream.py now publishes it and writes upstream-20260926/publication.json, which binds every retained upstream file to the sha256 of its private source and declares each transformation. setup.log now uses the <scratch> placeholder of the other upstream files instead of <upstream-scratch>.",
+    "status is passed only when every retained attempt passed and its verdicts were reproduced. A later pass of the same version no longer outweighs an earlier failed or stopped attempt.",
+    "history/recheck-20260925.json retains the output of history/recheck_20260925.py.",
+    "tests/test_memory_lifecycle_v2.py adds a discriminating control for each of the 82 phase-pre and 19 phase-post checks, on each retained run: one change to a response, a per-call instant or a handoff value that must turn that check false. The earlier controls covered only the repaired rules.",
+    "history/review_repair_controls_20260926.py re-introduces each reviewed defect in a temporary copy of the files and requires the matching regression tests to fail with it and pass without it. Its output is retained in history/review-repair-controls-20260926.txt.",
+    "The grand-dashboard checkpoint that cites this file (observability/grand-dashboard/state.json recorded_at_utc) is dated after the evidence it cites."
+  ],
+  "changes_after_the_verification_review": [
+    "upstream-20260926/run_upstream_tests.py refuses to start when its log or receipt already exists and creates both exclusively. A rerun, such as the section 7 --no-fail-fast follow-up to a failed run, needs its own --label or --out, so it can no longer truncate an earlier log or replace its receipt. --reparse prints the recomputed receipt instead of rewriting it.",
+    "upstream-20260926/control.py judges each run from the runner exit status and the receipt (a build error, an empty selection or a missing receipt is neither pass nor fail) and refuses existing output. Once the four runs are done it writes its summary, whether or not they were as expected, and exits 1 unless they gave pass, fail, fail, pass and the file was restored byte-for-byte. The retained control run meets that bar.",
+    "The upstream runs, the control and the setup used the earlier run_upstream_tests.py, control.py and setup.sh, retained byte-for-byte under history/upstream-scripts-as-run-20260926/. Every retained upstream and control receipt records the as-run runner's sha256 (runner_matches_as_run_copy). The final round's driver script and its log are retained as history/upstream-final-round-driver-20260926.sh and history/upstream-final-round-driver-20260926.log: the log recorded the sha256 of the runner and of control.py when the round started, and both equal the as-run copies. No hash of setup.sh was recorded when it ran; history/publication.json states the basis for its copy.",
+    "upstream-20260926/setup.sh said in its header that the rustup-init checksum was verified before the script ran. No record of such a check was kept (see the rustup-init erratum), and the header now says so and names the later comparison. Only that comment changed.",
+    "history/preregistration-sha256-20260925.txt had the private scratch root replaced by <scratch> on lines 1 and 6 without a declaration. history/publication.json now binds it (1,009 bytes) to its private source (1,191 bytes, sha256 6428d940b1efae32a166bb43249f6537fc4335e97a0f83202422cf1609c2a858) and declares that substitution. It also binds the retained freeze record, the as-run scripts and the final-round driver files to the files they copy, and says what binds every other file under history/.",
+    "tests/test_memory_lifecycle_v2.py covers each of these changes. history/verification_repair_controls_20260926.py puts each reviewed defect back in a temporary copy and shows the matching tests failing with it and passing without it; its output is retained in history/verification-repair-controls-20260926.txt."
+  ],
+  "binaries": {
+    "2.3.2": {
+      "evidence_dir": "runs-20260926/ai-memory-2.3.2/attempt-1",
+      "binary": "2.3.2",
+      "attempt": "attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+      "official_release": {
+        "tag": "v2.3.2",
+        "asset_sha256_download": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+        "asset_digests_agree": true,
+        "installed_equals_release_binary": true
+      },
+      "negotiated_initialize_protocolVersion": "2024-11-05",
+      "advertised_tool_count": 23,
+      "private_only_sha256": {
+        "phase-pre/tools.json": "58806666b51efc4e3acac23fd606c9367a85d461214dbce1fedeb2e4d083fa72",
+        "phase-pre/protocol.jsonl": "0ce523060d60cd7c53c259b1083ff34cc8ca0033a5f7429fff564332118dc3a9",
+        "phase-post/tools.json": "58806666b51efc4e3acac23fd606c9367a85d461214dbce1fedeb2e4d083fa72",
+        "phase-post/protocol.jsonl": "415d6c7bca8d354067d9b5fcb3f69344e8167e7a3f7405c8736c93db61332990"
+      },
+      "tools_list_stable_across_restart": true,
+      "verdicts_reproduced_from_published_responses": true,
+      "phase_pre": {
+        "started_utc": "2026-09-26T02:18:43.673871+00:00",
+        "finished_utc": "2026-09-26T02:18:51.603367+00:00",
+        "duration_seconds": 7.929,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.3.2",
+        "tool_calls": 71,
+        "checks_total": 82,
+        "checks_passed": 82,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "invalid_combined_scope": {
+            "code": -32603,
+            "message": "global cannot be combined with workspace/project/scopes",
+            "meets_bar": true
+          },
+          "invalid_expiry": {
+            "code": -32603,
+            "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date",
+            "meets_bar": true
+          },
+          "missing_scope": {
+            "code": -32602,
+            "message": "project 'absent' not found in workspace 'lifecycle-v2'",
+            "meets_bar": true
+          },
+          "ttl_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "phase_post": {
+        "started_utc": "2026-09-26T02:18:51.615660+00:00",
+        "finished_utc": "2026-09-26T02:18:52.054129+00:00",
+        "duration_seconds": 0.438,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.3.2",
+        "tool_calls": 18,
+        "checks_total": 19,
+        "checks_passed": 19,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "revision_deleted_direct_read": {
+            "code": -32603,
+            "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "ttl_short_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "ttl_real_time": {
+        "server_expired_at": "2026-09-26T02:18:48Z",
+        "ttl_before_expiry_received_utc": "2026-09-26T02:18:44.486652+00:00",
+        "first_post_expiry_call_sent_utc": "2026-09-26T02:18:50.929805+00:00",
+        "seconds_answered_before_expiry": 3.513,
+        "seconds_sent_after_expiry": 2.93
+      },
+      "sweep": {
+        "preview_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:18:48Z",
+            "deleted": false
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": false
+          }
+        ],
+        "apply_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:18:48Z",
+            "deleted": true
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": true
+          }
+        ],
+        "native_hard_deleted_counter": 0
+      },
+      "status_counts_pre": {
+        "observations": 0,
+        "pages_all": 5,
+        "pages_latest": 4,
+        "sessions": 0
+      },
+      "status_counts_post": {
+        "pages_latest": 4,
+        "pages_all": 5,
+        "sessions": 0,
+        "observations": 0
+      },
+      "passed": true,
+      "earlier_attempts": []
+    },
+    "2.4.0": {
+      "evidence_dir": "runs-20260926/ai-memory-2.4.0/attempt-1",
+      "binary": "2.4.0",
+      "attempt": "attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "binary_sha256": "360b9dff30537cc514876eab0c4df0d57b9c8c8bb1c62d4a9240f0264e246344",
+      "official_release": {
+        "tag": "v2.4.0",
+        "asset_sha256_download": "590f75ddaf0f8f1a07b70ba20900de717b89c3f6c46e6e5e0540ade302795076",
+        "asset_digests_agree": true,
+        "installed_equals_release_binary": true
+      },
+      "negotiated_initialize_protocolVersion": "2025-03-26",
+      "advertised_tool_count": 23,
+      "private_only_sha256": {
+        "phase-pre/tools.json": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "phase-pre/protocol.jsonl": "b6a110082fbdeea04d91ae81024b91f92d333c020d64161166690dd7fd87d349",
+        "phase-post/tools.json": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "phase-post/protocol.jsonl": "abe2bf03ad6a62dfcc9d321eb59967a89acee9784d9f5febbc2db90c14a62690"
+      },
+      "tools_list_stable_across_restart": true,
+      "verdicts_reproduced_from_published_responses": true,
+      "phase_pre": {
+        "started_utc": "2026-09-26T02:18:52.203258+00:00",
+        "finished_utc": "2026-09-26T02:19:00.054735+00:00",
+        "duration_seconds": 7.851,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.4.0",
+        "tool_calls": 71,
+        "checks_total": 82,
+        "checks_passed": 82,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "invalid_combined_scope": {
+            "code": -32603,
+            "message": "global cannot be combined with workspace/project/scopes",
+            "meets_bar": true
+          },
+          "invalid_expiry": {
+            "code": -32603,
+            "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date",
+            "meets_bar": true
+          },
+          "missing_scope": {
+            "code": -32602,
+            "message": "project 'absent' not found in workspace 'lifecycle-v2'",
+            "meets_bar": true
+          },
+          "ttl_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "phase_post": {
+        "started_utc": "2026-09-26T02:19:00.059809+00:00",
+        "finished_utc": "2026-09-26T02:19:00.554189+00:00",
+        "duration_seconds": 0.494,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.4.0",
+        "tool_calls": 18,
+        "checks_total": 19,
+        "checks_passed": 19,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "revision_deleted_direct_read": {
+            "code": -32603,
+            "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "ttl_short_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "ttl_real_time": {
+        "server_expired_at": "2026-09-26T02:18:56Z",
+        "ttl_before_expiry_received_utc": "2026-09-26T02:18:52.889220+00:00",
+        "first_post_expiry_call_sent_utc": "2026-09-26T02:18:59.343335+00:00",
+        "seconds_answered_before_expiry": 3.111,
+        "seconds_sent_after_expiry": 3.343
+      },
+      "sweep": {
+        "preview_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:18:56Z",
+            "deleted": false
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": false
+          }
+        ],
+        "apply_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:18:56Z",
+            "deleted": true
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": true
+          }
+        ],
+        "native_hard_deleted_counter": 0
+      },
+      "status_counts_pre": {
+        "evidence_rows": 0,
+        "observations": 0,
+        "pages_all": 5,
+        "pages_latest": 4,
+        "sessions": 0
+      },
+      "status_counts_post": {
+        "pages_latest": 4,
+        "pages_all": 5,
+        "sessions": 0,
+        "observations": 0,
+        "evidence_rows": 0
+      },
+      "passed": true,
+      "earlier_attempts": []
+    },
+    "2.4.1": {
+      "evidence_dir": "runs-20260926/ai-memory-2.4.1/attempt-1",
+      "binary": "2.4.1",
+      "attempt": "attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "binary_sha256": "dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd",
+      "official_release": {
+        "tag": "v2.4.1",
+        "asset_sha256_download": "15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4",
+        "asset_digests_agree": true,
+        "installed_equals_release_binary": true
+      },
+      "negotiated_initialize_protocolVersion": "2025-03-26",
+      "advertised_tool_count": 23,
+      "private_only_sha256": {
+        "phase-pre/tools.json": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "phase-pre/protocol.jsonl": "832f51e62c8338e2d02da55a6d1655fcfd088741de28c00582504e8311460ff8",
+        "phase-post/tools.json": "30dabd6aecfef89eb3046e84484d69b9e98c6c562ebc1124fba56238ff023bf0",
+        "phase-post/protocol.jsonl": "77372ff304bf6ef03cbb4fc2940f53106db849fcc54091abf0620804d407463a"
+      },
+      "tools_list_stable_across_restart": true,
+      "verdicts_reproduced_from_published_responses": true,
+      "phase_pre": {
+        "started_utc": "2026-09-26T02:19:00.713449+00:00",
+        "finished_utc": "2026-09-26T02:19:08.394338+00:00",
+        "duration_seconds": 7.681,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.4.1",
+        "tool_calls": 71,
+        "checks_total": 82,
+        "checks_passed": 82,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "invalid_combined_scope": {
+            "code": -32603,
+            "message": "global cannot be combined with workspace/project/scopes",
+            "meets_bar": true
+          },
+          "invalid_expiry": {
+            "code": -32603,
+            "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date",
+            "meets_bar": true
+          },
+          "missing_scope": {
+            "code": -32602,
+            "message": "project 'absent' not found in workspace 'lifecycle-v2'",
+            "meets_bar": true
+          },
+          "ttl_after_sweep_direct_read": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "phase_post": {
+        "started_utc": "2026-09-26T02:19:08.400189+00:00",
+        "finished_utc": "2026-09-26T02:19:08.891292+00:00",
+        "duration_seconds": 0.491,
+        "exit_code": 0,
+        "bwrap_version": "bubblewrap 0.9.0",
+        "binary_sha256_unchanged": true,
+        "reported_version": "ai-memory 2.4.1",
+        "tool_calls": 18,
+        "checks_total": 19,
+        "checks_passed": 19,
+        "failed_checks": [],
+        "expected_protocol_rejections": {
+          "expired_past_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/expired.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "revision_deleted_direct_read": {
+            "code": -32603,
+            "message": "page notes/revision.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          },
+          "ttl_short_direct_read_gone": {
+            "code": -32603,
+            "message": "page notes/ttl-short.md not found in resolved scope lifecycle-v2/alpha",
+            "meets_bar": true
+          }
+        }
+      },
+      "ttl_real_time": {
+        "server_expired_at": "2026-09-26T02:19:05Z",
+        "ttl_before_expiry_received_utc": "2026-09-26T02:19:01.362467+00:00",
+        "first_post_expiry_call_sent_utc": "2026-09-26T02:19:07.816888+00:00",
+        "seconds_answered_before_expiry": 3.638,
+        "seconds_sent_after_expiry": 2.817
+      },
+      "sweep": {
+        "preview_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:19:05Z",
+            "deleted": false
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": false
+          }
+        ],
+        "apply_expired": [
+          {
+            "id": "fixture-id-5",
+            "path": "notes/ttl-short.md",
+            "expired_at": "2026-09-26T02:19:05Z",
+            "deleted": true
+          },
+          {
+            "id": "fixture-id-7",
+            "path": "notes/expired.md",
+            "expired_at": "2000-01-01T00:00:00Z",
+            "deleted": true
+          }
+        ],
+        "native_hard_deleted_counter": 0
+      },
+      "status_counts_pre": {
+        "evidence_rows": 0,
+        "observations": 0,
+        "pages_all": 5,
+        "pages_latest": 4,
+        "sessions": 0
+      },
+      "status_counts_post": {
+        "pages_latest": 4,
+        "pages_all": 5,
+        "sessions": 0,
+        "observations": 0,
+        "evidence_rows": 0
+      },
+      "passed": true,
+      "earlier_attempts": []
+    }
+  },
+  "attempts": [
+    {
+      "binary": "2.3.2",
+      "attempt": "attempt-1",
+      "evidence_dir": "runs-20260926/ai-memory-2.3.2/attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "verdicts_reproduced_from_published_responses": true,
+      "passed": true,
+      "failed_checks": {
+        "pre": [],
+        "post": []
+      }
+    },
+    {
+      "binary": "2.4.0",
+      "attempt": "attempt-1",
+      "evidence_dir": "runs-20260926/ai-memory-2.4.0/attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "verdicts_reproduced_from_published_responses": true,
+      "passed": true,
+      "failed_checks": {
+        "pre": [],
+        "post": []
+      }
+    },
+    {
+      "binary": "2.4.1",
+      "attempt": "attempt-1",
+      "evidence_dir": "runs-20260926/ai-memory-2.4.1/attempt-1",
+      "stage_reached": "complete",
+      "stopped_by": null,
+      "analysis_error_at_run_time": null,
+      "analysis_error": null,
+      "verdicts_reproduced_from_published_responses": true,
+      "passed": true,
+      "failed_checks": {
+        "pre": [],
+        "post": []
+      }
+    }
+  ],
+  "upstream_verification": {
+    "evidence_class": "native_proven",
+    "acceptance_policy_class": "upstream test (docs/acceptance-evidence-policy.md): unchanged upstream suites at the release tags, upstream CI command",
+    "runs": {
+      "v2.3.2/workspace-all-targets.receipt.json": {
+        "tag": "v2.3.2",
+        "commit": "353841d91618d20b110b208de284a74d0b960379",
+        "tracked_files_modified": false,
+        "upstream_command": "cargo test --workspace --all-targets",
+        "toolchain_in_sandbox": [
+          "rustc 1.95.0 (59807616e 2026-04-14)",
+          "cargo 1.95.0 (f2d3ce0bd 2026-03-21)"
+        ],
+        "runner_matches_as_run_copy": true,
+        "started_utc": "2026-09-26T02:35:53.060195+00:00",
+        "finished_utc": "2026-09-26T02:40:29.775440+00:00",
+        "duration_seconds": 276.7,
+        "exit_code": 0,
+        "totals": {
+          "passed": 3357,
+          "failed": 0,
+          "ignored": 11,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed",
+        "log": "upstream-20260926/v2.3.2/workspace-all-targets.log",
+        "log_sha256": "e4e005b87b6f0d048a6365c1a70c081b913d719930a64f75ea6d0de09545fe04"
+      },
+      "v2.4.0/workspace-all-targets.receipt.json": {
+        "tag": "v2.4.0",
+        "commit": "b1b25219b507cf56cb7334ac1a408dc9b09eaa50",
+        "tracked_files_modified": false,
+        "upstream_command": "cargo test --workspace --all-targets",
+        "toolchain_in_sandbox": [
+          "rustc 1.95.0 (59807616e 2026-04-14)",
+          "cargo 1.95.0 (f2d3ce0bd 2026-03-21)"
+        ],
+        "runner_matches_as_run_copy": true,
+        "started_utc": "2026-09-26T02:40:30.028826+00:00",
+        "finished_utc": "2026-09-26T02:44:46.886006+00:00",
+        "duration_seconds": 256.9,
+        "exit_code": 0,
+        "totals": {
+          "passed": 3515,
+          "failed": 0,
+          "ignored": 14,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed",
+        "log": "upstream-20260926/v2.4.0/workspace-all-targets.log",
+        "log_sha256": "8b8d0d814a5a383144eb5a737aab27908d0e05662e6c7b8da488905c41735979"
+      },
+      "v2.4.1/workspace-all-targets.receipt.json": {
+        "tag": "v2.4.1",
+        "commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+        "tracked_files_modified": false,
+        "upstream_command": "cargo test --workspace --all-targets",
+        "toolchain_in_sandbox": [
+          "rustc 1.95.0 (59807616e 2026-04-14)",
+          "cargo 1.95.0 (f2d3ce0bd 2026-03-21)"
+        ],
+        "runner_matches_as_run_copy": true,
+        "started_utc": "2026-09-26T02:44:47.201327+00:00",
+        "finished_utc": "2026-09-26T02:50:49.123933+00:00",
+        "duration_seconds": 361.9,
+        "exit_code": 0,
+        "totals": {
+          "passed": 3615,
+          "failed": 0,
+          "ignored": 14,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed",
+        "log": "upstream-20260926/v2.4.1/workspace-all-targets.log",
+        "log_sha256": "8aae8f08634c6f2f1a78d94dea87fbbf88079f222f8ac69f09f467b17efbb1eb"
+      },
+      "v2.4.1/workspace-doc.receipt.json": {
+        "tag": "v2.4.1",
+        "commit": "433a19f3d54dea287571b1423591db2a89965fa9",
+        "tracked_files_modified": false,
+        "upstream_command": "cargo test --workspace --doc",
+        "toolchain_in_sandbox": [
+          "rustc 1.95.0 (59807616e 2026-04-14)",
+          "cargo 1.95.0 (f2d3ce0bd 2026-03-21)"
+        ],
+        "runner_matches_as_run_copy": true,
+        "started_utc": "2026-09-26T02:50:49.333450+00:00",
+        "finished_utc": "2026-09-26T02:50:55.770423+00:00",
+        "duration_seconds": 6.4,
+        "exit_code": 0,
+        "totals": {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "test_binaries": 11
+        },
+        "failed_tests": [],
+        "verdict": "untested: zero tests selected",
+        "log": "upstream-20260926/v2.4.1/workspace-doc.log",
+        "log_sha256": "7fadc1b7903049a49abac67f1c4c743af0808148e7013d379fac41b044ab71c3"
+      }
+    },
+    "superseded_round_1": {
+      "superseded-round-1/v2.3.2/workspace-all-targets.receipt.json": {
+        "upstream_command": "cargo test --workspace --all-targets",
+        "started_utc": "2026-09-26T02:07:03.845622+00:00",
+        "exit_code": 0,
+        "totals": {
+          "passed": 3357,
+          "failed": 0,
+          "ignored": 11,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed"
+      },
+      "superseded-round-1/v2.4.0/workspace-all-targets.receipt.json": {
+        "upstream_command": "cargo test --workspace --all-targets",
+        "started_utc": "2026-09-26T02:17:42.143670+00:00",
+        "exit_code": 0,
+        "totals": {
+          "passed": 3515,
+          "failed": 0,
+          "ignored": 14,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed"
+      },
+      "superseded-round-1/v2.4.1/workspace-all-targets.receipt.json": {
+        "upstream_command": "cargo test --workspace --all-targets",
+        "started_utc": "2026-09-26T02:27:44.693602+00:00",
+        "exit_code": 0,
+        "totals": {
+          "passed": 3615,
+          "failed": 0,
+          "ignored": 14,
+          "test_binaries": 15
+        },
+        "failed_tests": [],
+        "verdict": "passed"
+      },
+      "superseded-round-1/v2.4.1/workspace-doc.receipt.json": {
+        "upstream_command": "cargo test --workspace --doc",
+        "started_utc": "2026-09-26T02:35:44.661193+00:00",
+        "exit_code": 0,
+        "totals": {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "test_binaries": 11
+        },
+        "failed_tests": [],
+        "verdict": "untested: zero tests selected"
+      }
+    },
+    "discriminating_control": {
+      "evidence_class": "local_integration",
+      "note": "A control, not an upstream test: a filtered upstream command on a checkout whose reader.rs was mutated and then restored.",
+      "summary": {
+        "target": "crates/ai-memory-store/src/reader.rs",
+        "original_sha256": "712c9a02a50898ea02b02664de54fde69c150c57ab5f22f08771b97b9c16ace0",
+        "runs": {
+          "control-0-unmodified": 0,
+          "control-1-empty-fragment": 1,
+          "control-2-filter-always-true": 1,
+          "control-3-restored": 0
+        },
+        "restored_sha256_matches": true
+      },
+      "runs": {
+        "control-0-unmodified": {
+          "expected": "passed",
+          "observed": "passed",
+          "as_expected": true,
+          "upstream_command": "cargo test -p ai-memory-consolidate --all-targets ttl_expiry_lifecycle_end_to_end",
+          "runner_matches_as_run_copy": true,
+          "started_utc": "2026-09-26T02:50:56.059471+00:00",
+          "finished_utc": "2026-09-26T02:52:07.417082+00:00",
+          "exit_code": 0,
+          "tests_selected": 1,
+          "tracked_files_modified": false,
+          "failure_message": null,
+          "failed_on_the_expiry_assertion": false
+        },
+        "control-1-empty-fragment": {
+          "expected": "failed",
+          "observed": "failed",
+          "as_expected": true,
+          "upstream_command": "cargo test -p ai-memory-consolidate --all-targets ttl_expiry_lifecycle_end_to_end",
+          "runner_matches_as_run_copy": true,
+          "started_utc": "2026-09-26T02:52:07.590800+00:00",
+          "finished_utc": "2026-09-26T02:52:31.623613+00:00",
+          "exit_code": 101,
+          "tests_selected": 1,
+          "tracked_files_modified": true,
+          "failure_message": [
+            "thread 'integration::lifecycle::ttl_expiry_lifecycle_end_to_end' (102) panicked at crates/ai-memory-consolidate/src/../tests/suite/lifecycle.rs:599:10:",
+            "search: Sqlite(InvalidParameterCount(5, 4))"
+          ],
+          "failed_on_the_expiry_assertion": false
+        },
+        "control-2-filter-always-true": {
+          "expected": "failed",
+          "observed": "failed",
+          "as_expected": true,
+          "upstream_command": "cargo test -p ai-memory-consolidate --all-targets ttl_expiry_lifecycle_end_to_end",
+          "runner_matches_as_run_copy": true,
+          "started_utc": "2026-09-26T02:52:31.903836+00:00",
+          "finished_utc": "2026-09-26T02:52:58.933100+00:00",
+          "exit_code": 101,
+          "tests_selected": 1,
+          "tracked_files_modified": true,
+          "failure_message": [
+            "thread 'integration::lifecycle::ttl_expiry_lifecycle_end_to_end' (102) panicked at crates/ai-memory-consolidate/src/../tests/suite/lifecycle.rs:603:5:",
+            "expired hidden: [\"notes/expired.md\", \"notes/refreshed.md\", \"notes/future.md\", \"notes/forever.md\", \"notes/expired-pinned.md\"]"
+          ],
+          "failed_on_the_expiry_assertion": true
+        },
+        "control-3-restored": {
+          "expected": "passed",
+          "observed": "passed",
+          "as_expected": true,
+          "upstream_command": "cargo test -p ai-memory-consolidate --all-targets ttl_expiry_lifecycle_end_to_end",
+          "runner_matches_as_run_copy": true,
+          "started_utc": "2026-09-26T02:52:59.058031+00:00",
+          "finished_utc": "2026-09-26T02:53:15.516879+00:00",
+          "exit_code": 0,
+          "tests_selected": 1,
+          "tracked_files_modified": false,
+          "failure_message": null,
+          "failed_on_the_expiry_assertion": false
+        }
+      },
+      "mutation_diffs": [
+        "upstream-20260926/control/control-1-empty-fragment.diff",
+        "upstream-20260926/control/control-2-filter-always-true.diff"
+      ]
+    },
+    "property_map_counts": {
+      "v2.3.2/workspace-all-targets": {
+        "ttl_expiry_sweep": {
+          "matched": 56,
+          "passed": 56,
+          "failed": 0,
+          "ignored": 0
+        },
+        "scope_isolation": {
+          "matched": 295,
+          "passed": 295,
+          "failed": 0,
+          "ignored": 0
+        },
+        "persistence_restart": {
+          "matched": 57,
+          "passed": 57,
+          "failed": 0,
+          "ignored": 0
+        },
+        "supersession_as_of": {
+          "matched": 15,
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        "delete": {
+          "matched": 108,
+          "passed": 107,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "v2.4.0/workspace-all-targets": {
+        "ttl_expiry_sweep": {
+          "matched": 67,
+          "passed": 67,
+          "failed": 0,
+          "ignored": 0
+        },
+        "scope_isolation": {
+          "matched": 297,
+          "passed": 297,
+          "failed": 0,
+          "ignored": 0
+        },
+        "persistence_restart": {
+          "matched": 59,
+          "passed": 59,
+          "failed": 0,
+          "ignored": 0
+        },
+        "supersession_as_of": {
+          "matched": 20,
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0
+        },
+        "delete": {
+          "matched": 108,
+          "passed": 107,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "v2.4.1/workspace-all-targets": {
+        "ttl_expiry_sweep": {
+          "matched": 72,
+          "passed": 72,
+          "failed": 0,
+          "ignored": 0
+        },
+        "scope_isolation": {
+          "matched": 300,
+          "passed": 300,
+          "failed": 0,
+          "ignored": 0
+        },
+        "persistence_restart": {
+          "matched": 59,
+          "passed": 59,
+          "failed": 0,
+          "ignored": 0
+        },
+        "supersession_as_of": {
+          "matched": 20,
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0
+        },
+        "delete": {
+          "matched": 114,
+          "passed": 113,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "v2.4.1/workspace-doc": {
+        "ttl_expiry_sweep": {
+          "matched": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "scope_isolation": {
+          "matched": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "persistence_restart": {
+          "matched": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "supersession_as_of": {
+          "matched": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "delete": {
+          "matched": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      }
+    },
+    "property_map": "upstream-20260926/property-map.json",
+    "publication": {
+      "record": "upstream-20260926/publication.json",
+      "published_files": 31,
+      "changed_by_transform": [
+        "control/control-0-unmodified.receipt.json",
+        "control/control-1-empty-fragment.receipt.json",
+        "control/control-2-filter-always-true.receipt.json",
+        "control/control-3-restored.receipt.json",
+        "setup.log",
+        "superseded-round-1/v2.3.2/workspace-all-targets.receipt.json",
+        "superseded-round-1/v2.4.0/workspace-all-targets.receipt.json",
+        "superseded-round-1/v2.4.1/workspace-all-targets.receipt.json",
+        "superseded-round-1/v2.4.1/workspace-doc.receipt.json",
+        "v2.3.2/workspace-all-targets.receipt.json",
+        "v2.4.0/workspace-all-targets.receipt.json",
+        "v2.4.1/workspace-all-targets.receipt.json",
+        "v2.4.1/workspace-doc.receipt.json"
+      ],
+      "private_only_files": [
+        "release-verification-first-run.json"
+      ]
+    },
+    "rustup_init": {
+      "rustup_version": "1.29.1",
+      "started_utc": "2026-09-26T04:16:30.686158+00:00",
+      "finished_utc": "2026-09-26T04:16:30.819694+00:00",
+      "binary_sha256": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71",
+      "binary_matches_sidecar": true,
+      "binary_matches_official_archive": true,
+      "official_url": "https://static.rust-lang.org/rustup/archive/1.29.1/x86_64-unknown-linux-gnu/rustup-init.sha256",
+      "verdict": "passed",
+      "control": {
+        "mutation": "last byte of the binary flipped in memory",
+        "sha256": "ee0152624fbee75b824987634da0b6af17ca7c26c3926878546b6e96eec915a7",
+        "matches_official_archive": false,
+        "failed_as_expected": true
+      }
+    },
+    "scripts_as_run": {
+      "directory": "history/upstream-scripts-as-run-20260926/",
+      "note": "The upstream runs, the control and the setup used these copies; history/publication.json binds each to its private source. The final-round driver logged the sha256 of the runner and of control.py when the round started (sha256_logged_when_run_matches). No hash of setup.sh was logged when it ran; its publication entry states the basis for the copy. The committed scripts listed in committed_script_differs changed afterwards (see changes_after_the_verification_review).",
+      "committed_script_differs": [
+        "control.py",
+        "run_upstream_tests.py",
+        "setup.sh"
+      ],
+      "sha256_logged_when_run_matches": {
+        "control.py": true,
+        "run_upstream_tests.py": true,
+        "setup.sh": null
+      },
+      "final_round_driver": [
+        "history/upstream-final-round-driver-20260926.sh",
+        "history/upstream-final-round-driver-20260926.log"
+      ]
+    }
+  },
+  "isolation": {
+    "mechanism": "bubblewrap --unshare-all --clearenv --die-with-parent --new-session --cap-drop ALL; only the binary, system runtime and driver read-only and a fresh run directory writable",
+    "network_interfaces": [
+      "lo"
+    ],
+    "embedding_provider": "none",
+    "llm": "not configured",
+    "watcher": false,
+    "real_memory_or_authentication_stores_mounted": false
+  }
+}

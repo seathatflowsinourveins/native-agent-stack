@@ -1,0 +1,2 @@
+COLORTERM unset {'bytes': 3097, 'fg_truecolor_38;2': 0, 'bg_truecolor_48;2': 0, 'fg_256_38;5': 37, 'bg_256_48;5': 4, 'basic_16': 0, 'not_applied_groups': 0}
+COLORTERM=truecolor {'bytes': 3459, 'fg_truecolor_38;2': 39, 'bg_truecolor_48;2': 6, 'fg_256_38;5': 0, 'bg_256_48;5': 0, 'basic_16': 0, 'not_applied_groups': 0}

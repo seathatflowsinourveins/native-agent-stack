@@ -1,0 +1,7 @@
+[pb] scratch config equals implementer's x config (path-mapped): True
+[pb] M0-minimal-path-resolution: exit=0 pass=True wall=0.1s
+[pb] M1-keepalive-probe-without-ps-on-PATH: exit=0 pass=True wall=0.9s
+[pb] M2-daemon-ownership: pass=True {"status_pid": 4062579, "status_socket_is_arm_socket": true, "protocolVersion": 3, "metadata_pid": 4062579, "kernel_socket_owner_pids": [4062579], "cmdline_is_arm_prefix_daemon": true, "cwd_is_arm_sna
+[pb] M3-daemon-stop-no-leftovers: exit=0 pass=True wall=0.3s
+[pb] DONE passed=True steps=4 failed=[]
+[pb] cleanup={'final_stop_exit': 0, 'terminated_in_cleanup': [], 'alive_after_cleanup': [], 'arm_daemons_after_cleanup': [], 'listeners_under_daemon_dir_after_cleanup': []}

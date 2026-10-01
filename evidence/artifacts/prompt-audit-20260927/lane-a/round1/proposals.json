@@ -1,0 +1,33 @@
+{
+ "note": "Round 3 proposals for the agree/amend/reject lanes, frozen before either lane runs. Each 'old' is the exact current text at the named file and commit; each 'new' replaces it. S1 is the text native-agent-stack-a9 proposed (2026-09-28T02:51Z). X5a-c carry the user-level top rule's 2026-09-28 wording (edited by native-agent-stack-a9 at the user's direction, 07:34Z) into the repository's three copies, keeping each file's tested obligations.",
+ "items": [
+  {
+   "id": "S1",
+   "file": "AGENTS.md",
+   "at": "46184751 (PR #444 head), line 37",
+   "old": "and requires one `lane:*` label per PR. Hand off to a live session that owns an area instead of editing it.",
+   "new": "and requires one `lane:*` label per PR. Build each PR description from `.github/pull_request_template.md`: the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or `### SOTA sources` section (exact, case-sensitive heading). Hand off to a live session that owns an area instead of editing it."
+  },
+  {
+   "id": "X5a",
+   "file": "examples/claude-native/CLAUDE.md",
+   "at": "f508ffba (main), line 3",
+   "old": "**Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.",
+   "new": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** Never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+  },
+  {
+   "id": "X5b",
+   "file": "AGENTS.md",
+   "at": "46184751 (PR #444 head), line 3",
+   "old": "**Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.",
+   "new": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence."
+  },
+  {
+   "id": "X5c",
+   "file": "adoption/templates/codex.AGENTS.template.md",
+   "at": "f508ffba (main), line 3",
+   "old": "Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.",
+   "new": "Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+  }
+ ]
+}

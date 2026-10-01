@@ -1,0 +1,9 @@
+# tools/adoption/prove_codex_lane.py (static checks), real Codex home, before any apply
+[FAIL] marker: exit 0; grep -c top-rule 0, rtk-exceptions 0, 'Prefix every shell command with' 0
+[FAIL] rtk-inline: scripts/adoption_status.py rtk_instructions_inline: False
+[PASS] blind: empty run-scoped CODEX_HOME: exit 0, top-rule lines 0
+[FAIL] binding from /: context-mode launcher is node ['./start.mjs']; context-mode cwd is ~/.codex/plugins/cache/context-mode/context-mode/1.0.169/., not null; context-mode env keys are ['CONTEXT_MODE_PLATFORM']
+[FAIL] binding from ~/code/native-agent-stack: context-mode launcher is ~/.local/share/codex-ecosystem/bin/node ['~/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs']; context-mode cwd is ~/code/native-agent-stack, not null; context-mode env keys are ['CONTEXT_MODE_PLATFORM', 'CONTEXT_MODE_PROJECT_DIR', 'PATH', 'RTK_TELEMETRY_DISABLED']
+[FAIL] profile: context-mode launcher is node ['./start.mjs']; context-mode cwd is ~/.codex/plugins/cache/context-mode/context-mode/1.0.169/., not null; context-mode env keys are ['CONTEXT_MODE_PLATFORM']; default prompt input: {'top_rule': 0, 'rtk_exceptions': 0, 'prefix_rule': 0, 'no_spawn_unless_asked': False, 'proactive_delegation': True}; -p stack-worker prompt input: {'top_rule': 0, 'rtk_exceptions': 0, 'prefix_rule': 0, 'no_spawn_unless_asked': False, 'proactive_delegation': True}; the profile's effort did not reach the prompt input (max turns proactive delegation off); -p stack-worker ai-memory enabled_tools is None; -p stack-worker socraticode enabled_tools is None; -p stack-worker headroom enabled_tools is None; -p stack-worker context-mode disabled_tools is None
+[PASS] rtk-exactness: rtk git status exit 0; git show HEAD:big.txt 21300 of 21300 bytes, byte-exact True; rtk git show 8248 bytes, byte-exact False
+result: FAIL (2 pass, 5 fail)

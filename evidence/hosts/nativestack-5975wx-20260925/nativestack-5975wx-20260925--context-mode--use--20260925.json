@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--context-mode--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "context-mode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "P=\"$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169\"; rev=$(sed -n 's/.*mksglu\\/context-mode --ref \\([0-9a-f]\\{40\\}\\).*/\\1/p' recipes/README.md | head -1); python3 -c \"import json,os,sys;p,rev=sys.argv[1],sys.argv[2];pj=json.load(open(os.path.join(p,'.claude-plugin','plugin.json')));e=json.load(open(os.path.expanduser('~/.claude/plugins/installed_plugins.json')))['plugins']['context-mode@context-mode'];m=[x for x in e if x.get('installPath')==p];print('plugin.json',pj['name'],pj['version'],'| installed_plugins.json entry for this path: version',m[0]['version'] if m else None,'gitCommitSha',m[0]['gitCommitSha'] if m else None,'| equals the recipes/README.md reviewed --ref:',bool(m) and m[0]['gitCommitSha']==rev);raise SystemExit(0 if pj['version']=='1.0.169' and m and m[0]['version']=='1.0.169' and m[0]['gitCommitSha']==rev else 1)\" \"$P\" \"$rev\" && echo \"server.bundle.mjs sha256 $(sha256sum \"$P/server.bundle.mjs\" | cut -c1-16)... | node $(node --version) | mcporter $(mcporter --version) | $(bwrap --version) | plugin node_modules: $([ -d \"$P/node_modules\" ] && echo present || echo absent)\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" context-mode",
+      "exit": 0,
+      "duration_s": 0.157,
+      "output_sha256": "f923b6772983512e1bcb01f9096de9ab0a3989e54f277f3f91b2f59d34ff8cb1",
+      "output_excerpt": "plugin.json context-mode 1.0.169 | installed_plugins.json entry for this path: version 1.0.169 gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b | equals the recipes/README.md reviewed --ref: True\nserver.bundle.mjs sha256 161a106d8c026fd2... | node v24.21.0 | mcporter 0.13.13 | bubblewrap 0.9.0 | plugin node_modules: absent\nstack ['1.0.169'] winner pins []\n"
+    },
+    {
+      "cmd": "w=$(pwd); d=$(mktemp -d) || exit 1; P=\"$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169\"; exp=$(python3 -c \"import json,hashlib,sys;b=open(sys.argv[1],'rb').read();print(sum(i['count'] for i in json.loads(b)['items']),hashlib.sha256(b).hexdigest())\" fixtures/records.json); bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind \"$w\" \"$w\" --bind \"$d\" \"$d\" --chdir \"$w\" -- mcporter call --stdio node --stdio-arg \"$P/server.bundle.mjs\" --cwd \"$w\" --env \"CONTEXT_MODE_DIR=$d/cm\" --env \"CONTEXT_MODE_DATA_DIR=$d/data\" --env \"CLAUDE_CONFIG_DIR=$d/claude\" --env \"CODEX_HOME=$d/codex\" --env CONTEXT_MODE_PLATFORM=claude-code --env \"CONTEXT_MODE_PROJECT_DIR=$w\" --name context-mode --tool ctx_execute_file --args '{\"path\":\"fixtures/records.json\",\"language\":\"python\",\"code\":\"import json,hashlib; d=json.loads(FILE_CONTENT); print(sum(i[\\\"count\\\"] for i in d[\\\"items\\\"]), hashlib.sha256(FILE_CONTENT.encode()).hexdigest())\"}' --output text --no-oauth --timeout 60000 > \"$d/out\" 2> \"$d/err\"; rc=$?; got=$(sed '/^$/d' \"$d/out\" | tail -1); echo \"mcporter exit $rc; ctx_execute_file printed: $got\"; echo \"host-computed from the checkout: $exp\"; [ \"$rc\" -eq 0 ] || head -3 \"$d/err\"; echo \"files the server left in the writable temp dir: $(cd \"$d\" && find . -type f ! -path ./out ! -path ./err | sed 's/[0-9][0-9]*/N/g' | tr '\\n' ' ')\"; rm -rf \"$d\"; test \"$rc\" -eq 0 && test \"$got\" = \"$exp\" && echo \"asserted: exact match\"",
+      "exit": 0,
+      "duration_s": 0.713,
+      "output_sha256": "08524a548cbc852fee34c74eba781ee8a9c83e74e714de95314773a68411cdbf",
+      "output_excerpt": "mcporter exit 0; ctx_execute_file printed: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nhost-computed from the checkout: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nfiles the server left in the writable temp dir: ./cm/sessions/stats-pid-N.json \nasserted: exact match\n"
+    }
+  ],
+  "tool_versions": {
+    "context-mode": "1.0.169"
+  },
+  "observed_at_utc": "2026-09-25T16:00:54Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the Context Mode Claude plugin in the Claude plugin cache answered one ctx_execute_file call through MCPorter 0.13.13's ad-hoc stdio bridge (mcporter call --stdio). Its plugin.json reads context-mode 1.0.169, and its installed_plugins.json entry reads version 1.0.169 at gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b, equal to the reviewed --ref in recipes/README.md (asserted). The plugin's server.bundle.mjs ran under node v24.21.0 inside a bubblewrap 0.9.0 sandbox: the root filesystem, this checkout included, was mounted read-only, /tmp was a private tmpfs, and only a fresh temporary directory was writable. Context Mode's state directories and the client config homes (CONTEXT_MODE_DIR, CONTEXT_MODE_DATA_DIR, CLAUDE_CONFIG_DIR, CODEX_HOME) pointed into that directory. Python code run over fixtures/records.json printed 5 and the file's sha256 (3e0f391d...), the sum of its count fields and its hash. Both equal the values computed on the host from this checkout (asserted). Apart from the private tmpfs, discarded with the sandbox, the only file the server left in the writable temporary directory was one stats JSON under its sessions directory, which was then removed. All commands exit 0.",
+  "limitations": [
+    "The plugin's server bundle was started directly, not through its declared entry point start.mjs. From reading start.mjs and hooks/ensure-deps.mjs (not executed), that boot wrapper runs self-heal layers that can write the plugin registry, settings.json and a hooks directory under the Claude config directory. Because this plugin cache has no node_modules (the first command shows it absent), it also runs npm install for better-sqlite3 and background npm installs into the plugin cache. Neither the wrapper, the plugin's Claude hooks nor a Claude or Codex session was exercised.",
+    "One sandboxed tool call over a 96-byte fixture: ctx_execute, ctx_batch_execute, ctx_search, large-output indexing, ctx_stats and the savings counters were not exercised. The read-only sandbox is stricter than a native client launch, and the session state, including the stats file, was discarded.",
+    "The version evidence is the plugin's own plugin.json and Claude's installed_plugins.json entry. The npm context-mode@1.0.169 release under ~/.local/share/codex-ecosystem is a different source revision and was not used.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main 3f267b5c (the catalog_revision), not in a pinned install checkout; the plugin is this host's existing Claude plugin cache install, and node, mcporter and bwrap are the host's existing binaries.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:00:54Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-25T17:10:09Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Drafted, not installed: see host-requests-workstation.service in this directory for the
+# deployment notes that also apply here.
+[Unit]
+Description=Poll GitHub host requests for the workstation role every 10 minutes
+
+[Timer]
+# Monotonic triggers, as the grand-dashboard timer uses. The first poll runs 2 minutes after the
+# user manager starts (for a user timer, OnStartupSec= plays the part OnBootSec= plays for a
+# system one; a start already in the past elapses at once), then 10 minutes after each poll
+# finishes, so polls never overlap. No Persistent=: `man systemd.timer` (systemd
+# 255.4-1ubuntu8.17 on this host) says it "only has an effect on timers configured with
+# OnCalendar=", and nothing needs catching up, because every poll reads the full current state.
+OnStartupSec=2min
+OnUnitInactiveSec=10min
+RandomizedDelaySec=1min
+AccuracySec=30s
+Unit=host-requests-workstation.service
+
+[Install]
+WantedBy=timers.target

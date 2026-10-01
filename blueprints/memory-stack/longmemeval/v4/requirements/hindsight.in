@@ -1,0 +1,3 @@
+# K1 (A16): Hindsight 0.10.1 (MIT), the official PyPI release (hindsight-api -> hindsight-api-slim[all], which
+# carries the embedded PostgreSQL pg0 and the local embedder and reranker). Wheel hashes are in pins.json.
+hindsight-api==0.10.1

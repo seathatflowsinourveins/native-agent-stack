@@ -1,0 +1,2 @@
+{"event": "recorded", "pid": 3085765, "starttime": 25524465, "ppid": 2224438, "pgrp": 3085765, "session": 3085765, "role": "daemon", "script": "brv-server.js"}
+{"event": "recorded", "pid": 3087553, "starttime": 25525557, "ppid": 3085765, "pgrp": 3085765, "session": 3085765, "role": "descendant of the daemon", "script": "agent-process.js"}

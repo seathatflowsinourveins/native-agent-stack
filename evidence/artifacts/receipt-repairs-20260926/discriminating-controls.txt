@@ -1,0 +1,47 @@
+01 socraticode install 2026-09-25, command 1, PATH=/usr/bin:/bin (socraticode absent)
+   expected: exit 0: the '|| echo' fail-open the #277 review reported
+   observed: exit 0 in 0.0s at 2026-09-26T05:02:24Z -> as expected
+   output: absent from installed-versions.txt (expected: not part of the automated pins-linux-x86_64.json/bootstrap flow)
+02 socraticode install 2026-09-26-2, command 1, same PATH
+   expected: exit 1 with SOCRATICODE_RESOLVE_FAIL
+   observed: exit 1 in 0.0s at 2026-09-26T05:02:24Z -> as expected
+   output: SOCRATICODE_RESOLVE_FAIL | not on PATH: socraticode (exit 1) | control: not on PATH: socraticode-nsr-absent (exit 1)
+03 lean use 2026-09-25, command 2, primary run --data-folder pointed at a missing directory
+   expected: exit 0: the fail-open the #281 review reported
+   observed: exit 0 in 2.3s at 2026-09-26T05:02:24Z -> as expected
+   output: positive control (empty data folder): exit=1, 
+           LEAN engine commit 985ef30ad3ac774218c5ac516b4cb0aa2655730f (== winner pin) ran the unmodified upstream BasicTemplateFrameworkAlgorithm on bundled data: exit=0, empty stderr, , every ExpectedStatistics field matched (Total Orders 3, 6 order events: 3 submitted/3 filled), and the same launcher on an empty data folder failed with a different result (positive control).
+           grep: <tmp>/control/stdout.txt: No such file or directory
+           grep: <tmp>/control/stdout.txt: No such file or directory
+04 lean use 2026-09-26, command 2, same fault
+   expected: exit 1 with LEAN_BACKTEST_FAIL
+   observed: exit 1 in 2.2s at 2026-09-26T05:02:26Z -> as expected
+   output: LEAN_BACKTEST_FAIL | launcher exit 1 | stderr bytes 7051 | upstream ExpectedStatistics matched 0 of 28 | Total Orders None | End Equity None | OrderListHash d41d8cd98f00b204e9800998ecf8427e | order events 0 {}
+           engine source commit 985ef30ad3ac774218c5ac516b4cb0aa2655730f | data: no data-point line | mismatches {'Total Orders': ('3', None), 'Average Win': ('0%', None), 'Average Loss': ('-1.01%', None), 'Compounding Annual Return': ('261.134%', None), 'Drawdown': ('2.200%', None), 'Expectancy': ('-1', None), 'Start Equity': ('100000', None), 'End Equity': ('101655.30', None), 'Net Profit': ('1.655%', None), 'Sharpe Ratio': ('8.472', None), 'Sortino Ratio': ('0', None), 'Probabilistic Sharpe Ratio': ('66.693%', None), 'Loss Rate': ('100%', None), 'Win Rate': ('0%', None), 'Profit-Loss Ratio': ('0', None), 'Alpha': ('-0.091', None), 'Beta': ('1.006', None), 'Annual Standard Deviation': ('0.224', None), 'Annual Variance': ('0.05', None), 'Information Ratio': ('-33.445', None), 'Tracking Error': ('0.002', None), 'Treynor Ratio': ('1.885', None), 'Total Fees': ('$10.32', None), 'Estimated Strategy Capacity': ('$27000000.00', None), 'Lowest Capacity Asset': ('SPY R735QTJ8XC9X', None), 'Por
+05 mcporter use 2026-09-26-2, command 3, without env -i and without --config on config list
+   expected: exit 1 with MCPORTER_BRIDGE_FAIL: the inherited canary MCPORTER_CONFIG is selected
+   observed: exit 1 in 3.0s at 2026-09-26T05:02:29Z -> as expected
+   output: MCPORTER_BRIDGE_FAIL | list/hit/miss exit 0 0 0 | tools ['get', 'multi_get', 'query', 'status'] status ok | hit -> ['fixture/zqxjv-note.md'] token in snippet: True | miss -> results: 0
+           config isolation in this run: inherited MCPORTER_CONFIG = <tmp>/canary.json (canary, dropped by env -i) | Selected config: <tmp>/canary.json | no servers configured: False
+06 fastapi use 2026-09-26, command 2, early exit 3 injected right after the server starts
+   expected: exit 3, and afterwards no process is left in the server's process group
+   observed: exit 3 in 2.5s at 2026-09-26T05:02:32Z -> as expected
+   output: [harness, after exit] processes left in group 2262440: none
+           simulated early exit with server group 2262440 running
+07 /bin/sh builtin kill versus /bin/kill on a throwaway process group (setsid sleep)
+   expected: the builtin 'kill -TERM -- -PGID' fails and leaves the group running; /bin/kill stops it
+   observed: exit 0 in 1.0s at 2026-09-26T05:02:34Z -> as expected
+   output: builtin kill exit 2 (/bin/sh: 7: kill: Illegal number: -) -> group running | /bin/kill exit 0 -> group gone
+08 promptfoo use 2026-09-26-2, command 2, re-run unchanged with results-2.json present
+   expected: exit 0, results-2.json left unchanged (sha256 before == after), a fresh report with its own sha256
+   observed: exit 0 in 7.5s at 2026-09-26T05:02:35Z -> as expected
+   output: [harness] tracked promptfoo/results-2.json sha256 before 9759d082ab4e82a45b6deb7d120c9fcd0a1b87f1692e0849a971a73b09549cfa after 9759d082ab4e82a45b6deb7d120c9fcd0a1b87f1692e0849a971a73b09549cfa: unchanged
+           PROMPTFOO_EVAL_OK | eval exit 100 | successes 4 failures 1 errors 0 | live requests 5 | outputs ['4', 'Paris', 'yes', 'PONG', 'PONG'] | control row failed: True | key absent True | private/email findings 0 0 | sanitized report sha256 5a722761ee88ec7d96f266e3ff71217a4e29295d1315b7ffe6fc18512bf51f11 | results-2.json: exists, left unchanged, sha256 differs (a re-run has its own evalId and timestamps)
+           per-row pass [True, True, True, True, False] | providers ['openai:chat:qwen3.8-27b-local'] | promptfoo 0.123.1 | retained path evidence/artifacts/eval-native-reports-20260926/promptfoo/results-2.json
+09 inspect-ai use 2026-09-26-2, command 2, re-run unchanged with eval-log-2.json present
+   expected: exit 0, eval-log-2.json left unchanged (sha256 before == after), a fresh log with its own sha256
+   observed: exit 0 in 40.0s at 2026-09-26T05:02:43Z -> as expected
+   output: [harness] tracked inspect-ai/eval-log-2.json sha256 before b0083054c54851e935fd9bde5cddeac8bce752339207c57e3e4016026ed642b9 after b0083054c54851e935fd9bde5cddeac8bce752339207c57e3e4016026ed642b9: unchanged
+           INSPECT_EVAL_OK | exit 0 | status success | acc 0.75 | add=C capital=C reverse=C wrong_target_control=I | inspect_ai 0.3.266 from tool env: True | Py 3.13.15 | overlay: openai 3.19.2, 5 added, 0 version changes | tool env unchanged (79): True | key absent True | private/email 0 0 | sha256 68d3702bf0cb601f79cbe96747cf8ffb776254f7608a4e68f455bf90fd9908e5 | eval-log-2.json: exists, left unchanged, sha256 differs (a re-run has its own eval_id and timestamps)
+           overlay packages not in the tool env: httpcore2 httpx2 jiter openai truststore | overlay packages at a different version: [] | tool env packages: 79 | native log file 2026-09-26T05-02-46-00-00_tiny-local-eval_Jyz8Z5fKv2hG9V6uVuDPcE.json | inspect_ai module ~/.local/share/codex-ecosystem/python-tools/inspect-ai/lib/python3.13/site-packages/inspect_ai/__init__.py
+9 controls, 0 not as expected

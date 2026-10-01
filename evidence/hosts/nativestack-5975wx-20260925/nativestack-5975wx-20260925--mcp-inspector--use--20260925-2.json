@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--mcp-inspector--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "5b6014eb6239751cc2bc23ec9a3cca5b05d413dd",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "mcp-inspector",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "bash -c 'export MCP_AUTO_OPEN_ENABLED=false\nset -euo pipefail\nINSPECTOR=$(command -v mcp-inspector) || { echo \"mcp-inspector not on PATH\" >&2; exit 1; }\nRESOLVED=$(readlink -f \"$INSPECTOR\")\necho \"mcp-inspector resolves: $INSPECTOR -> $RESOLVED\"\nPREFIX=\"${RESOLVED%%/lib/node_modules/*}\"\nNPM_LS=$(npm ls --global --prefix \"$PREFIX\" --depth=0 --json)\necho \"npm ls --depth=0: $NPM_LS\"\nINSTALLED_VERSION=$(printf '\"'\"'%s'\"'\"' \"$NPM_LS\" | python3 -c \"import json,sys; print(json.load(sys.stdin)['\"'\"'dependencies'\"'\"']['\"'\"'@modelcontextprotocol/inspector'\"'\"']['\"'\"'version'\"'\"'])\")\necho \"installed version (npm ls, not --version): $INSTALLED_VERSION\"\npython3 -c \"\nimport json, glob\nstack_versions = [c['\"'\"'version'\"'\"'] for c in json.load(open('\"'\"'manifests/stack.json'\"'\"'))['\"'\"'components'\"'\"'] if c['\"'\"'id'\"'\"'] == '\"'\"'mcp-inspector'\"'\"']\nwinner_pins = sorted({w['\"'\"'pin'\"'\"'] for f in glob.glob('\"'\"'catalogs/landscape/*.json'\"'\"') for l in json.load(open(f)).get('\"'\"'layers'\"'\"', []) for w in (l.get('\"'\"'winners'\"'\"') or []) if w.get('\"'\"'component_id'\"'\"') == '\"'\"'mcp-inspector'\"'\"'})\nprint('\"'\"'manifests/stack.json version(s):'\"'\"', stack_versions)\nprint('\"'\"'landscape winner pin(s):'\"'\"', winner_pins)\nassert stack_versions == ['\"'\"'2.7.0'\"'\"'], stack_versions\nassert winner_pins == ['\"'\"'2.7.0'\"'\"'], winner_pins\n\"\ntest \"$INSTALLED_VERSION\" = \"2.7.0\"\necho \"PASS: installed 2.7.0 matches manifests/stack.json and the mcp-surfaces landscape winner pin\"'",
+      "exit": 0,
+      "duration_s": 0.404,
+      "output_sha256": "46198919e62ea94ad94dafd156b15cbb50d716d056c398875c331f1839369e64",
+      "output_excerpt": "mcp-inspector resolves: ~/.local/share/codex-ecosystem/bin/mcp-inspector -> ~/.local/share/codex-ecosystem/tools/mcp-inspector-2.7.0/lib/node_modules/@modelcontextprotocol/inspector/clients/launcher/build/index.js\nnpm ls --depth=0: {\n  \"name\": \"lib\",\n  \"dependencies\": {\n    \"@modelcontextprotocol/inspector\": {\n      \"version\": \"2.7.0\",\n      \"overridden\": false\n    }\n  }\n}\ninstalled version (npm l"
+    },
+    {
+      "cmd": "v=$(qmd --version) && echo \"qmd: $v\" && printf '%s' \"$v\" | grep -q '2\\.8\\.3'",
+      "exit": 0,
+      "duration_s": 0.137,
+      "output_sha256": "98da09c61e7bd8fa08f3e18ffa8210e1301bd38002bfd8cd434fed2a139d703e",
+      "output_excerpt": "qmd: qmd 2.8.3 (facd35e)\n"
+    },
+    {
+      "cmd": "bash -c 'export MCP_AUTO_OPEN_ENABLED=false\nset -euo pipefail\nexport MCP_AUTO_OPEN_ENABLED=false\nINSPECTOR=$(command -v mcp-inspector) || { echo \"mcp-inspector not on PATH\" >&2; exit 1; }\nQMD=$(command -v qmd) || { echo \"qmd not on PATH\" >&2; exit 1; }\nT=$(mktemp -d)\ntrap '\"'\"'rm -rf \"$T\"'\"'\"' EXIT\nmkdir -p \"$T/docs\"\nMARK=\"mcpi-check-$$-$RANDOM\"\nprintf '\"'\"'# Scratch fixture\\n\\n%s appears exactly once in this fresh fixture file.\\n'\"'\"' \"$MARK\" > \"$T/docs/note.md\"\n( cd \"$T\" && \"$QMD\" init >/dev/null && \"$QMD\" collection add \"$T/docs\" --name scratch >/dev/null && \"$QMD\" update >/dev/null )\nprintf '\"'\"'{\"mcpServers\":{\"qmd\":{\"type\":\"stdio\",\"command\":\"%s\",\"args\":[\"mcp\"]}}}'\"'\"' \"$QMD\" > \"$T/mcp.json\"\nLIST_JSON=$(timeout 60 \"$INSPECTOR\" --cli --config \"$T/mcp.json\" --server qmd --method tools/list --format json --stored-auth-only --cwd \"$T\")\npython3 -c \"\nimport json, sys\nd = json.loads(sys.argv[1])\nnames = sorted(t['\"'\"'name'\"'\"'] for t in d['\"'\"'result'\"'\"']['\"'\"'tools'\"'\"'])\nexpected = ['\"'\"'get'\"'\"', '\"'\"'multi_get'\"'\"', '\"'\"'query'\"'\"', '\"'\"'status'\"'\"']\nassert names == expected, (names, expected)\nprint('\"'\"'tools/list OK, tool names:'\"'\"', names)\n\" \"$LIST_JSON\"\nCALL_ARGS=$(printf '\"'\"'{\"searches\":[{\"type\":\"lex\",\"query\":\"%s\"}],\"limit\":5,\"collections\":[\"scratch\"],\"rerank\":false}'\"'\"' \"$MARK\")\nCALL_JSON=$(timeout 60 \"$INSPECTOR\" --cli --config \"$T/mcp.json\" --server qmd --method tools/call --tool-name query --tool-args-json \"$CALL_ARGS\" --format json --stored-auth-only --cwd \"$T\")\npython3 -c \"\nimport json, sys\nd = json.loads(sys.argv[1])\nmark = sys.argv[2]\ntext = d['\"'\"'result'\"'\"']['\"'\"'content'\"'\"'][0]['\"'\"'text'\"'\"']\nhits = d['\"'\"'result'\"'\"']['\"'\"'structuredContent'\"'\"']['\"'\"'results'\"'\"']\nassert '\"'\"'Found 1 result'\"'\"' in text and mark in text, text\nassert len(hits) == 1 and hits[0]['\"'\"'file'\"'\"'] == '\"'\"'scratch/note.md'\"'\"' and hits[0]['\"'\"'score'\"'\"'] == 1, hits\nprint('\"'\"'tools/call query OK, hit:'\"'\"', hits[0]['\"'\"'file'\"'\"'], hits[0]['\"'\"'docid'\"'\"'])\n\" \"$CALL_JSON\" \"$MARK\"\nERR_FILE=\"$T/err.json\"\nset +e\ntimeout 60 \"$INSPECTOR\" --cli --config \"$T/mcp.json\" --server qmd --method tools/call --tool-name does_not_exist_probe --tool-args-json '\"'\"'{}'\"'\"' --format json --stored-auth-only --cwd \"$T\" >/dev/null 2>\"$ERR_FILE\"\nRC=$?\nset -e\necho \"positive-control exit code: $RC\"\ntest \"$RC\" -eq 5\nERR_JSON=$(tail -n 1 \"$ERR_FILE\")\npython3 -c \"\nimport json, sys\nd = json.loads(sys.argv[1])\nassert d['\"'\"'error'\"'\"']['\"'\"'code'\"'\"'] == '\"'\"'tool_not_found'\"'\"', d\nassert '\"'\"'does_not_exist_probe'\"'\"' in d['\"'\"'error'\"'\"']['\"'\"'message'\"'\"'], d\nprint('\"'\"'positive control OK: exit 5,'\"'\"', d['\"'\"'error'\"'\"'])\n\" \"$ERR_JSON\"\necho \"ALL CHECKS PASSED\"'",
+      "exit": 0,
+      "duration_s": 2.261,
+      "output_sha256": "ddc5a3f52ba25479cf15c16fdeec89986576622f88be6bfa5e060939825330ef",
+      "output_excerpt": "tools/list OK, tool names: ['get', 'multi_get', 'query', 'status']\ntools/call query OK, hit: scratch/note.md #2541a3\npositive-control exit code: 5\npositive control OK: exit 5, {'code': 'tool_not_found', 'message': \"Tool 'does_not_exist_probe' not found on server.\"}\nALL CHECKS PASSED\nShutting down (stdin closed)...\nShutting down (stdin closed)...\n"
+    }
+  ],
+  "tool_versions": {
+    "mcp-inspector": "2.7.0"
+  },
+  "observed_at_utc": "2026-09-25T19:48:13Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64), MCP Inspector 2.7.0, an mcp-surfaces winner, inspects a real MCP server in CLI mode, with MCP_AUTO_OPEN_ENABLED=false and no web UI started. The installed version is read with npm ls as 2.7.0, never with a --version flag, and it equals the stack and winner pin. qmd --version reports 2.8.3. The inspected server is a fresh QMD stdio MCP server over a project-local index created with qmd init in a temporary directory, holding a one-file fixture. tools/list returns get, multi_get, query and status. tools/call query, with rerank disabled, returns the fixture document. Calling a nonexistent tool exits 5 with code tool_not_found (positive control). Every command exits 0 on its own assertions.",
+  "limitations": [
+    "Supersedes the same-day receipt, which the independent review held at needs_changes on point 3 (backed claims): the claim said the server was isolated in a temporary HOME, but isolation comes from a project-local index in a temporary directory, and the QMD version had no retained command. This generation rewords the isolation and adds qmd --version.",
+    "Each command is wrapped in bash -c because it uses set -o pipefail and the recorder runs commands under /bin/sh.",
+    "Recorded by the workstation coordinator Claude Code session from a git worktree of this repository at origin/main (the catalog_revision); the component is this host's existing install under ~/.local/share/codex-ecosystem.",
+    "second_physical_machine is declared, not proven by this file: this host's measured hardware profile (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differs from the catalog's WSL authoring laptop. The receipt carries only the recorder's self review until an independent review is appended.",
+    "HTTP/SSE transports and OAuth are not exercised."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:48:13Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran cmd0 (npm ls readback, does not invoke the inspector) and cmd1 (qmd --version) verbatim with MCP_AUTO_OPEN_ENABLED=false exported; both outputs are hash-identical to the recorded output_sha256 (installed 2.7.0; qmd 2.8.3 facd35e). Did not re-run cmd2 (starts a stdio MCP server and calls tools); its excerpt is the full output (sha256 equal) and shows tools/list, the query hit, exit 5 tool_not_found and ALL CHECKS PASSED. Adequacy-checked: (1) layer role passes: mcp-surfaces requires inspecting MCP servers; the Inspector in --cli mode lists the tools of a real QMD stdio server and calls query, using the same mcp-inspector binary that cmd0 read with npm ls. (2) positive control passes: a nonexistent tool exits 5 with tool_not_found, and the unique-marker query returns exactly one hit. (3) the gap named in the superseded receipt's review is fixed: the claim now says a project-local index created with qmd init in a temporary directory (qmd help: 'qmd init - Create a project-local .qmd index'; qmd collection list on this host shows no scratch collection) instead of a temporary HOME, and cmd1 retains qmd --version 2.8.3, which I reproduced. No command runs mcp-inspector with --version or --help. (4) passes: component_id mcp-inspector is the mcp-surfaces winner, tool_versions 2.7.0, pin_matches True.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T19:54:37Z",
+      "reviewer": {
+        "identity_sha256": "a90718ea66d62d8044adb44ee9593c75a88ff91c19671770f1f96bc1a8be7a73",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--mcp-inspector--use--20260925"
+}

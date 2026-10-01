@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Read-only observation of the running OmniRoute gateway: its listening sockets and its search call-log rows.
+
+Prints values-free facts only:
+- the unit's state, restart count and start time (`systemctl --user show`, UTC timestamps);
+- every listening TCP or UDP socket whose owning process is in the unit's cgroup, as address:port only. `ss -Hltunp`
+  (iproute2) names the owning pid, and the unit's processes are the pids in `cgroup.procs` under its `ControlGroup`
+  (cgroup v2, including child cgroups);
+- any socket of another process on the gateway's ports;
+- call_logs rows of the duckduckgo-free search provider in a UTC window, whitelisted fields only, from the gateway's
+  own list API (`GET /api/usage/call-logs?provider=...`, the API scripts/probe_lane.py reads).
+Never prints pids, command lines, cgroup paths, accounts, connection ids or request bodies.
+Usage: observe_gateway.py <since_iso> <until_iso>
+"""
+import datetime
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.request
+
+UNIT = "omniroute.service"
+PORTS = {"20128", "20131", "20132"}
+LOOPBACK = re.compile(r"^(127\.\d+\.\d+\.\d+|\[::1\]|::1)$")
+since, until = sys.argv[1], sys.argv[2]
+
+
+def run(*args):
+    return subprocess.run(args, capture_output=True, text=True, check=True).stdout
+
+
+print(f"# observed {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}, read-only")
+show = dict(line.split("=", 1) for line in run(
+    "systemctl", "--user", "show", UNIT, "--timestamp=utc", "-p", "ActiveState", "-p", "SubState", "-p", "NRestarts",
+    "-p", "ExecMainStartTimestamp", "-p", "ControlGroup").splitlines() if "=" in line)
+for key in ("ActiveState", "SubState", "NRestarts", "ExecMainStartTimestamp"):
+    print(f"{key}={show[key]}")
+
+pids = set()
+for directory, _, files in os.walk("/sys/fs/cgroup" + show["ControlGroup"]):
+    if "cgroup.procs" in files:
+        with open(os.path.join(directory, "cgroup.procs"), encoding="utf-8") as procs:
+            pids.update(line.strip() for line in procs if line.strip())
+print(f"processes in the unit's cgroup: {len(pids)}")
+
+owned, others = [], []
+for line in run("ss", "-Hltunp").splitlines():
+    fields = line.split()
+    netid, local = fields[0], fields[4]
+    address, port = local.rsplit(":", 1)
+    socket_pids = set(re.findall(r"pid=(\d+)", line))
+    if socket_pids & pids:
+        owned.append((netid, address, port))
+    elif port in PORTS:
+        others.append((netid, address, port))
+print("listening sockets of the unit's processes (netid address:port):")
+for netid, address, port in sorted(set(owned), key=lambda s: (int(s[2]), s[1])):
+    print(f"  {netid} {address}:{port}")
+print(f"all of them on loopback: {all(LOOPBACK.match(address) for _, address, _ in owned) and bool(owned)}")
+print(f"gateway ports among them: {sorted(PORTS & {port for _, _, port in owned})}")
+print(f"sockets of other processes on {sorted(PORTS)}: {len(others)}")
+
+with urllib.request.urlopen("http://127.0.0.1:20128/api/usage/call-logs?provider=duckduckgo-free&limit=200",
+                            timeout=30) as response:
+    rows = json.load(response)
+rows = rows if isinstance(rows, list) else rows.get("logs") or rows.get("data") or rows.get("items") or []
+window = [row for row in rows if isinstance(row, dict) and since <= str(row.get("timestamp") or "") < until]
+print(f"call_logs rows of provider duckduckgo-free with {since} <= timestamp < {until}: {len(window)}")
+for row in sorted(window, key=lambda r: str(r.get("timestamp"))):
+    print("  " + json.dumps({key: row.get(key) for key in ("timestamp", "path", "status", "model", "requestType",
+                                                            "duration")}))

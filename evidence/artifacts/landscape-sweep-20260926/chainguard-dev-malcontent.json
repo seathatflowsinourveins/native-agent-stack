@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-chainguard-dev-malcontent",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/chainguard-dev/malcontent",
+ "reviewed_commit": "2047cf7397491bda2cc86ee65b61271b8264ba7a",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "security-supply-chain"
+ ],
+ "claim": "Source and documentation review of chainguard-dev/malcontent at commit 2047cf7397491bda2cc86ee65b61271b8264ba7a (license Apache-2.0), read from README.md at that commit. Repository description: \"#supply #chain #attack #detection\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 678,
+  "pushed_at": "2026-09-26T01:26:25Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2047cf7397491bda2cc86ee65b61271b8264ba7a",
+   "text": "```bash # # 8 o o # 8 8 8 # ooYoYo. .oPYo. 8 .oPYo. .oPYo. odYo. o8P .oPYo. odYo. o8P # 8' 8 8 .oooo8 8 8 ' 8 8 8' `8 8 8oooo8 8' `8 8 # 8 8 8 8 8 8 8 . 8 8 8 8 8 8. 8 8 8 # 8 8 8 `YooP8 8 `YooP' `YooP' 8 8 8 `Yooo' 8 8 8 # ..:..:..:.....:..:.....::.....:..::..::..::.....:..::..::..: # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: # # subtle malware discovery tool ```"
+  },
+  {
+   "source": "README.md@2047cf7397491bda2cc86ee65b61271b8264ba7a",
+   "text": "malcontent discovers supply-chain compromises through the magic of context, differential analysis, and YARA."
+  },
+  {
+   "source": "README.md@2047cf7397491bda2cc86ee65b61271b8264ba7a",
+   "text": "- [analyze](#analyze): unfiltered analysis of a program's capabilities - [diff](#diff): risk-weighted differential analysis between two sources - [scan](#scan): threshold-based scan of a program's capabilities"
+  }
+ ]
+}

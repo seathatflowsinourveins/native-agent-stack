@@ -1,0 +1,10 @@
+[vs] scratch config equals implementer's x config (path-mapped): True
+[vs] R-socraticode-use-0: exit=0 pass=True wall=1.1s
+[vs] S3-ctx_doctor: exit=0 pass=True wall=0.6s
+[vs] S6a-daemon-status-check: exit=0 pass=True wall=0.2s
+[vs] S6b-repeat-socraticode-health: exit=0 pass=True wall=0.4s
+[vs] S6c-daemon-status-recheck: exit=0 pass=True wall=0.2s
+[vs] S6d-daemon-ownership: pass=True {"status_pid": 4016347, "status_socket_is_arm_socket": true, "protocolVersion": 3, "metadata_pid": 4016347, "kernel_socket_owner_pids": [4016347], "cmdline_is_arm_prefix_daemon": true, "cwd_is_arm_sna
+[vs] F-daemon-stop-no-leftovers: exit=0 pass=True wall=0.5s
+[vs] DONE passed=True steps=7 failed=[]
+[vs] cleanup={'final_stop_exit': 0, 'terminated_in_cleanup': [], 'alive_after_cleanup': [], 'arm_daemons_after_cleanup': [], 'listeners_under_daemon_dir_after_cleanup': []}

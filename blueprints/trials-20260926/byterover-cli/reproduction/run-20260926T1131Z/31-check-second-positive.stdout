@@ -1,0 +1,1 @@
+{"output": "<scratch>/trials-gpt6/runs/run-20260926T1131Z/21-search-second-positive.stdout", "expected": {"total": 1, "path": "billing/notes.md", "text": "Monthly invoices"}, "observed": {"success": true, "status": "completed", "totalFound": 1, "paths": ["billing/notes.md"]}, "pass": true, "failures": []}

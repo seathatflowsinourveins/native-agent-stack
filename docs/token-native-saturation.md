@@ -24,8 +24,8 @@ matrix now joins that accepted use scope while retaining every earlier failed
 attempt. Every HUD statistic, automatic compaction and new-host activation remain
 unqualified. The bridge backend passed but outer plugin integration remains
 separate. AgentsView has scoped explicit-endpoint acceptance; automatic archive
-discovery remains unestablished. vLLM 0.25.0 remains the working WSL pin after
-0.29.0 failed initialization. These results do not establish full lifecycle
+discovery remains unestablished. vLLM 0.30.0 is the working WSL pin since 2026-09-25 (0.29.0 failed
+initialization; 0.30.0 was qualified against 0.25.0 before the switch). These results do not establish full lifecycle
 acceptance for the research inventory. The subsequent
 [landscape ledger](../catalogs/landscape/README.md) carries current counts and
 selection comparisons; the original audit above retains its dated counts.

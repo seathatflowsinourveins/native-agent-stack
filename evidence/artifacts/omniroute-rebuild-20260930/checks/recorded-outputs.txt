@@ -1,0 +1,84 @@
+# The applier's checks for the 2026-09-30 OmniRoute settings
+#
+# Sections A-D are the returned results of four command lines that the coordinator ran during the apply, transcribed from the
+# coordinator session's record of them: the command text is as typed (<tokensave> is the private directory that held the applier and
+# its plan, <tmp> a scratch TMPDIR), and the output is the text the session received, with nothing added; the commands' own 'tail',
+# 'cut' and 'head' shortened it, and no file of these outputs was written at the time. The scripts that produced them were the versions
+# that stood then (decision record, 'Provenance of the operation scripts'). Times in sections A-D are UTC as recorded by the session,
+# except the 'ls' columns of section D, which the host printed in its local time (EDT, UTC-4: 20:43:19 is 00:43:19Z). Sections E and F
+# are fresh read-only runs made while this record was reviewed; their commands are as run. Nothing here contains a credential value
+# or a host path.
+
+## A. 2026-09-30T00:05:47Z: the pre-apply checks on the switched builds
+$ cd <tokensave> && python3 post_apply_checks.py --phase pre 2>&1 | tail -12 | cut -c1-220
+PASS [20129] flag UNIVERSAL_CONTEXT_HANDOFF_ENABLED off: ["false", "db"]
+PASS [20129] codexServiceTier absent or disabled: "<absent>"
+PASS [20129] memoryEnabled absent or false: "<absent>"
+PASS [20129] customSystemPromptEnabled absent or false: "<absent>"
+PASS [20128] CX lane compression unchanged (master off, codex/* excluded): {"enabled": false, "exclusions": ["codex/*"]}
+PASS [20128] flag OMNIROUTE_CODEX_APP_SERVER_ENABLED: ["true", "default"]
+PASS [20128] providerStrategies unchanged: {"codex": {"fallbackStrategy": "round-robin", "stickyRoundRobinLimit": 1}}
+PASS [20128] sessionAffinityTtlMs 4 h: 14400000
+PASS [20128] codex connections: no requestDefaults.serviceTier: [[6, 6]]
+PASS [20128] GC6/GC7 blockedProviders present (report only; applied outside plan.json): {"blockedProviders": "absent", "noAuthFallbackDisabledProviders": "absent"}
+PASS [20129] GC6/GC7 blockedProviders present (report only; applied outside plan.json): {"blockedProviders": "absent", "noAuthFallbackDisabledProviders": "absent"}
+phase=pre checks=36 failed=0
+
+## B. 2026-09-30T00:06:17Z: every read-back and the post-apply checks after T01-T09
+$ cd <tokensave> && export TOKENSAVE_STATE_DIR=$HOME/.local/state/native-agent-stack/omniroute-tokensave-apply-20260930 && python3 gateway_apply.py plan.json --verify 2>&1 | cut -c1-200 | tail -14; echo "verify exit=${PIPESTATUS[0]}"; python3 post_apply_checks.py --phase post 2>&1 | grep -v '^PASS' | cut -c1-260 | head -20; echo "post-checks exit=${PIPESTATUS[0]}"
+T01 OK []
+T02 OK []
+T03 OK []
+T04 OK []
+T05 OK []
+T06 OK []
+T07 OK []
+T08 OK []
+T09 OK []
+verify exit=0
+phase=post checks=36 failed=0
+post-checks exit=0
+
+## C. 2026-09-30T00:44:04Z: the delta's read-back, and the post-apply checks after the delta
+##    (after the delta, T09's compression settings are superseded and T10-T15 of that script are drafts that were never applied:
+##     eight of its 40 checks fail for those reasons, which is why it no longer reproduces sections A and B; no exit line was printed for it)
+$ cd <tokensave> && export TOKENSAVE_STATE_DIR=$HOME/.local/state/native-agent-stack/omniroute-tokensave-apply-delta-20260930 && python3 gateway_apply.py plan-delta.json --verify 2>&1 | tail -3 | cut -c1-200; echo "verify exit=${PIPESTATUS[0]}"; python3 post_apply_checks.py --phase post 2>&1 | grep -v '^PASS' | cut -c1-330 | head -20
+T10 OK [] | status applied at 2026-09-30T00:43:52Z
+verify exit=0
+FAIL [20129] engines map [T09]: ["aggressive", "caveman", "ccr", "codex-responses", "lite", "llmlingua", "relevance", "rtk", "session-dedup", "ultra"]
+FAIL [20129] output styles [T09]: []
+FAIL [20129] legacy output mode, Auto-Clarity bypass [T10]: {"enabled": false, "intensity": "lite", "autoClarity": true}
+FAIL [20129] liveZone + languageConfig [T09]: {"liveZone": {"enabled": false}, "languageConfig": {"enabled": false, "defaultLanguage": "en", "autoDetect": true, "enabledPacks": ["en"]}}
+FAIL [20129] safest globals (rtk, caveman, session-dedup, headroom) [T09]: {"rtk.disabledFilters": 0, "rtk.maxCharsPerResult": 12000, "caveman.compressRoles": ["user"], "sessionDedup": {"minBlockChars": 512, "fuzzy": false}, "headroom": {"minRows": 8}}
+FAIL [20128] CX lane master switch and codex/* exclusion [T15]: {"enabled": false, "exclusions": ["codex/*"]}
+FAIL [20128] CX lane engines map and safest globals [T11]: {"rtk.disabledFilters": 0, "rtk.maxCharsPerResult": 12000, "caveman.compressRoles": ["user"], "sessionDedup": {"minBlockChars": 80, "fuzzy": false}, "headroom": {"minRows": 8}, "enginesExplicit": false, "engines_on": ["caveman", "lite", "session-dedup"], "lite": {"compre
+FAIL [20128] CX lane context combos [T12-T14]: {"ids": ["default-caveman"], "defaults": ["default-caveman"]}
+phase=post applied=T01,T02,T03,T04,T05,T06,T07,T08,T09,T10,T11,T12,T13,T14,T15 checks=40 failed=8
+
+## D. 2026-09-30T00:46:17Z: the applier's offline tests, the delta plan's check and verify, and the file times of the applier and the plan
+$ cd <tokensave> && TMPDIR=<tmp> python3 -B -m unittest test_gateway_apply 2>&1 | tail -6; export TOKENSAVE_STATE_DIR=$HOME/.local/state/native-agent-stack/omniroute-tokensave-apply-delta-20260930; python3 gateway_apply.py plan-delta.json --check 2>&1 | tail -2 | cut -c1-160; python3 gateway_apply.py plan-delta.json --verify 2>&1 | tail -2 | cut -c1-160; ls -la --time-style=+%H:%M:%S gateway_apply.py plan.json | awk '{print $6,$7}'
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+----------------------------------------------------------------------
+Ran 20 tests in 12.030s
+
+OK
+steps: ['T10'] | problems: 0
+T10 OK [] | status applied at 2026-09-30T00:43:52Z
+20:43:19 gateway_apply.py
+20:45:44 plan.json
+
+## E. Fresh read-only run against the live gateways
+$ cd <tokensave> && export TOKENSAVE_STATE_DIR=$HOME/.local/state/native-agent-stack/omniroute-tokensave-apply-delta-20260930 && python3 gateway_apply.py plan-delta.json --verify 2>&1 | tail -3 | cut -c1-200; echo "verify exit=${PIPESTATUS[0]}"
+observed_utc: 2026-09-30T04:15:11Z
+T10 OK [] | status applied at 2026-09-30T00:43:52Z
+verify exit=0
+
+## F. Fresh read-only run: the owner record against the record published in host-readback-20260930.json (after_delta)
+$ python3 tools/omniroute/gateway_record.py > record-now.json; echo "gateway_record.py exit: $?"
+gateway_record.py exit: 0
+$ python3 compare_record.py record-now.json host-readback-20260930.json     # scripts/compare_record.py.txt of this artifact
+paths in the fresh record: 32; in the published after_delta record: 32; shared: 32
+equal: 31; different: ['/taken_utc']  (exec_main_start compared after converting the host's local EDT string to UTC; digests compared in full)
+only in the fresh record: [] | only in the published record: []
+schema: omniroute-gateway-record/2 | fresh taken_utc: 2026-09-30T04:15:11Z | published taken_utc: 2026-09-30T00:48:58Z

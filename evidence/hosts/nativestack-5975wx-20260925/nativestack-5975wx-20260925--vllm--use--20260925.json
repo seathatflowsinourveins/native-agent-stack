@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--vllm--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "vllm",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "curl -fsS http://127.0.0.1:18231/version && echo && systemctl --user show -p ActiveState -p SubState -p NRestarts -p ExecStart native-stack-embeddings.service | grep -o 'ActiveState=[a-z]*\\|SubState=[a-z]*\\|NRestarts=[0-9]*\\|tools/vllm-[0-9.]*/bin/vllm' | awk '!seen[$0]++' | tr '\\n' ' ' && echo && nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" vllm",
+      "exit": 0,
+      "duration_s": 0.084,
+      "output_sha256": "27ee049d1e293c256b7b841f445089b86e0f91673b84620a1b2668e78ac2f604",
+      "output_excerpt": "{\"version\":\"0.25.0\"}\nNRestarts=0 tools/vllm-0.25.0/bin/vllm ActiveState=active SubState=running \nNVIDIA GeForce RTX 4090, 24564 MiB, 616.64\nstack ['0.25.0'] winner pins ['0.25.0']\n"
+    },
+    {
+      "cmd": "curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;m=json.load(sys.stdin)['data'][0];print(m['id'],'max_model_len',m['max_model_len'],'root',m['root'])\" ",
+      "exit": 0,
+      "duration_s": 0.018,
+      "output_sha256": "ab46ba7b0e0cb6fcf7ceeb1f6cda96f234d51fa864986a869850b26e675b9bb1",
+      "output_excerpt": "nvidia/Nemotron-3-Embed-1B-BF16 max_model_len 4096 root ~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,math,urllib.request as u\ndocs=['passage: restic restore latest --target DIR restores the newest backup snapshot into DIR','passage: Prometheus scrapes metrics from HTTP targets at a fixed interval','passage: Loki indexes log streams by label and stores chunks on the filesystem']\nq='query: how do I recover files from my latest backup?'\nr=u.Request('http://127.0.0.1:18231/v1/embeddings',data=json.dumps({'model':'nvidia/Nemotron-3-Embed-1B-BF16','input':[q]+docs}).encode(),headers={'Content-Type':'application/json'})\nd=sorted(json.load(u.urlopen(r,timeout=60))['data'],key=lambda x:x['index']);v=[x['embedding'] for x in d]\ncos=lambda a,b:sum(x*y for x,y in zip(a,b))/math.sqrt(sum(x*x for x in a)*sum(y*y for y in b))\ns=[round(cos(v[0],e),4) for e in v[1:]]\nprint('dims',len(v[0]),'inputs',len(v),'cosine(query, [backup, prometheus, loki] passages)',s,'best',s.index(max(s)))\nraise SystemExit(0 if s.index(max(s))==0 else 1)\" ",
+      "exit": 0,
+      "duration_s": 0.132,
+      "output_sha256": "db00793e48ea1323378d898fc58dc708bd9407a9b3eef92281c67284b149775d",
+      "output_excerpt": "dims 2048 inputs 4 cosine(query, [backup, prometheus, loki] passages) [0.5844, 0.0588, 0.2269] best 0\n"
+    }
+  ],
+  "tool_versions": {
+    "vllm": "0.25.0"
+  },
+  "observed_at_utc": "2026-09-25T05:37:56Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), the running vLLM embedding server (GET /version 0.25.0, the catalog pin; unit native-stack-embeddings active and running from tools/vllm-0.25.0) on an NVIDIA GeForce RTX 4090 (24564 MiB, driver 616.64) served nvidia/Nemotron-3-Embed-1B-BF16 (max_model_len 4096) from a model directory named for revision c0c9fea, and answered one /v1/embeddings request for a query and three passages with 2048-dimensional vectors whose cosine similarities ranked the backup passage first for a backup question. That command exits 0 only when the backup passage ranks first. All commands exit 0.",
+  "limitations": [
+    "One request with four short inputs: no throughput, latency, batching, long-context or retrieval-quality measurement. This is not the frozen model-qualification protocol, so no qualified_models entry is recorded and the model is not requalified on this GPU generation by this receipt. GPU memory used by the server was not measured.",
+    "The service was already running under its systemd user unit on this host (ActiveState, SubState and NRestarts are in the first command's output); this receipt did not start, stop or reconfigure it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:56Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (server answered /v1/models and a /v1/embeddings request whose cosines rank the backup passage first, asserted; /version 0.25.0, unit, GPU and model directory are backed; bound to the semantic-rag winner) and re-ran /version, /v1/models, unit state, nvidia-smi and the same embeddings request on this host: 0.25.0, the same model, 2048 dimensions and the same ranking with cosines within 0.0004.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:51Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

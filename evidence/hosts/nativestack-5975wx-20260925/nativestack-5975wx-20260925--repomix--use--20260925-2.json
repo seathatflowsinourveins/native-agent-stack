@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--repomix--use--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "repomix",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v repomix) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && repomix --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" repomix",
+      "exit": 0,
+      "duration_s": 0.086,
+      "output_sha256": "5aad2472652324b051f39fe0c10d56380fe03e34da1e098230d107affa20a505",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/repomix -> ~/.local/share/codex-ecosystem/tools/repomix-1.18.1/lib/node_modules/repomix/bin/repomix.cjs\n1.18.1\nstack ['1.18.1'] winner pins []\n"
+    },
+    {
+      "cmd": "d=$(mktemp -d) || exit 1; repomix --include \"fixtures/before.py,fixtures/after.py,fixtures/example.sh\" --style xml --parsable-style --compress --token-count-encoding o200k_base --output \"$d/pack.xml\" --quiet; rc=$?; if [ \"$rc\" -eq 0 ]; then python3 -c \"import sys,xml.etree.ElementTree as E;r=E.parse(sys.argv[1]).getroot();f={e.get('path'):(e.text or '') for e in r.iter('file')};src={p:open(p).read() for p in f};py=[p for p in f if p.endswith('.py')];sig=all(f[p].strip()=='def greeting(name)' for p in py);body=all('return' in src[p] and 'return' not in f[p] for p in py);sh=f.get('fixtures/example.sh','').strip()==src.get('fixtures/example.sh','').strip();print('XML parsed; packed files',len(f),sorted(f),'| each .py packed as signature def greeting(name):',sig,'| return bodies in sources, absent from pack:',body,'| example.sh kept verbatim:',sh,'| fixtures/records.json packed:','fixtures/records.json' in f);raise SystemExit(0 if sorted(f)==['fixtures/after.py','fixtures/before.py','fixtures/example.sh'] and py and sig and body and sh else 1)\" \"$d/pack.xml\"; rc=$?; else echo \"repomix exit $rc\"; fi; rm -rf \"$d\"; exit $rc",
+      "exit": 0,
+      "duration_s": 0.496,
+      "output_sha256": "4c0c8d0577a7e6b1a30b9b5b4f10015c50c5c3d7b72451c86c03d5dcdcbb37b2",
+      "output_excerpt": "XML parsed; packed files 3 ['fixtures/after.py', 'fixtures/before.py', 'fixtures/example.sh'] | each .py packed as signature def greeting(name): True | return bodies in sources, absent from pack: True | example.sh kept verbatim: True | fixtures/records.json packed: False\n"
+    }
+  ],
+  "tool_versions": {
+    "repomix": "1.18.1"
+  },
+  "observed_at_utc": "2026-09-25T16:35:08Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), repomix 1.18.1 (the manifests/stack.json pin, resolved and version-checked by the first command) packed three explicitly included fixture files with the documented flags --style xml --parsable-style --compress --token-count-encoding o200k_base into a temporary output, which a Python check parsed as XML. Exactly fixtures/after.py, fixtures/before.py and fixtures/example.sh were packed; fixtures/records.json, in the same folder, was not. --compress reduced each Python file to its signature def greeting(name): the return body present in each source is absent from the pack. example.sh was kept verbatim. That command exits 0 only when all of these hold, and the temporary output is removed. All commands exit 0.",
+  "limitations": [
+    "Three small fixture files: no repository-scale pack, remote packing, token-count summary (suppressed by --quiet) or security-check finding was examined. --compress is lossy by design, so an original implementation must be read before editing it.",
+    "Supersedes nativestack-5975wx-20260925--repomix--use--20260925. That receipt ran the same two commands but was recorded as native_proven, although its workload is this repository's fixtures, which docs/contributing-evidence.md Section 2 classes as local_integration. That file stays byte-identical. scripts/platform_status.py and scripts/component_matrix.py do not read supersedes, so an independent agree on it would still count it as a native_proven use pass (for an alternative, host_verified). It needs needs_changes, not agree.",
+    "Recorded from a Claude Code session in a git worktree of this repository whose HEAD was detached at 3f267b5c (the catalog_revision; origin/main when this branch started), with this branch's earlier 2026-09-25 receipts present in the working tree, not in a pinned install checkout. Those receipts are the only difference from 3f267b5c. The tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:35:08Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:10:09Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--repomix--use--20260925"
+}

@@ -2079,16 +2079,18 @@ class NewWavePlatformStatusTests(NewWaveFixture):
 
     def test_every_platform_goes_through_the_shared_function(self):
         # scripts/platform_status.py (catalog PR #117) is the one rule: load_context(root) once per
-        # run, platform_status(platform_id, winner, context) for every platform.
+        # run, platform_status(platform_id, winner, context, layer="<catalog>/<layer_id>") for every
+        # platform, the layer being the row a host receipt with layer_refs must name.
         from scripts import platform_status as shared
         self.assertIs(record_verdicts.platform_status, shared.platform_status)
         self.assertIs(record_verdicts.load_context, shared.load_context)
-        calls, contexts = [], []
+        calls, contexts, layers = [], [], []
         original, original_load = record_verdicts.platform_status, record_verdicts.load_context
 
-        def spy(platform_id, winner, context):
+        def spy(platform_id, winner, context, *, layer=None):
             calls.append((platform_id, dict(winner), context))
-            return original(platform_id, winner, context)
+            layers.append(layer)
+            return original(platform_id, winner, context, layer=layer)
 
         def load_spy(root):
             contexts.append(root)
@@ -2105,6 +2107,7 @@ class NewWavePlatformStatusTests(NewWaveFixture):
         self.assertEqual(len(contexts), 1, "load_context is called once per run")
         winner = self.load_row(catalog, "wave-registered-layer")["winners"][0]
         self.assertEqual({platform for platform, _, _ in calls}, set(shared.PLATFORMS))
+        self.assertEqual(set(layers), {f"{catalog}/wave-registered-layer", f"{catalog}/wave-unregistered-layer"})
         self.assertEqual(len({id(context) for _, _, context in calls}), 1)
         for _, seen, _ in calls:
             self.assertEqual(set(seen), {"component_id", "pin", "evidence_class", "evidence_refs"})

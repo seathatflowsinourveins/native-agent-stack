@@ -1,0 +1,33 @@
+{
+ "wheel_vs_installed": {
+  "members": 46,
+  "compared": 45,
+  "identical": 45,
+  "differ": 0,
+  "missing": 0
+ },
+ "installed_record_check": {
+  "dists": 20,
+  "entries_ok": 1680,
+  "entries_bad": 0,
+  "bad_dists": []
+ },
+ "site_packages_files_not_in_any_RECORD": [
+  "_virtualenv.pth",
+  "_virtualenv.py"
+ ],
+ "site_packages_pyc": 0,
+ "prefix_pyc_total": 0,
+ "transitive_vs_baseline": {
+  "candidate_dists": 19,
+  "baseline_dists": 19,
+  "same_names": true,
+  "record_equal": 19,
+  "unequal": [],
+  "site_packages_files": 1624
+ },
+ "entry_point_script": "#!~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/bin/python\n# -*- coding: utf-8 -*-\nimport sys\nfrom markitdown.__main__ import main\nif __name__ == \"__main__\":\n    if sys.argv[0].endswith(\"-script.pyw\"):\n        sys.argv[0] = sys.argv[0][:-11]\n    elif sys.argv[0].endswith(\".exe\"):\n        sys.argv[0] = sys.argv[0][:-4]\n    sys.exit(main())\n",
+ "bin_link": "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/bin/markitdown",
+ "python_link": "~/.local/share/uv/python/cpython-3.13-linux-x86_64-gnu/bin/python3.13",
+ "python_link_resolved": "~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13"
+}

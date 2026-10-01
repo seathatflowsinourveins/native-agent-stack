@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--zizmor--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "74886724093bc69b5a3427485dab1ac6dbca4424",
+  "recorded_by": {
+    "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+  },
+  "component_id": "zizmor",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v zizmor) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && zizmor --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" zizmor",
+      "exit": 0,
+      "duration_s": 0.048,
+      "output_sha256": "580e1e1755954d73e600135731d7cf40f59df3a7d0514cc24e3d54de58715506",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/zizmor -> ~/.local/share/codex-ecosystem/tools/zizmor-1.30.1/bin/zizmor\nzizmor 1.30.1\nstack ['1.30.1'] winner pins ['1.30.1']\n"
+    },
+    {
+      "cmd": "Z=\"${RR:?}/zizmor-use\"; mkdir \"$Z\" && zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$Z/cache\" .github/workflows .github/dependabot.yml > \"$Z/repo.json\" 2> \"$Z/repo.err\"; rc=$?; python3 -c \"import json,sys;d=json.load(open(sys.argv[1]));print('this repository .github/workflows and dependabot.yml: zizmor exit',sys.argv[2],'| findings',len(d),sorted({(f['ident'],f['determinations']['severity']) for f in d}))\" \"$Z/repo.json\" \"$rc\"; echo \"inputs audited: $(grep -c 'completed' \"$Z/repo.err\")\"; test \"$rc\" -eq 0",
+      "exit": 0,
+      "duration_s": 0.114,
+      "output_sha256": "e5312236e6f8f38439f6b4482510935a7d63f95f77835f2d22363dcf9ffe843f",
+      "output_excerpt": "this repository .github/workflows and dependabot.yml: zizmor exit 0 | findings 0 []\ninputs audited: 19\n"
+    },
+    {
+      "cmd": "Z=\"${RR:?}/zizmor-use\"; mkdir -p \"$Z/fixture/.github/workflows\" && printf '%s\\n' '# Deliberately unsafe input for static analysis only. Never run this workflow.' 'name: Unsafe analysis fixture' 'on: pull_request_target' 'permissions: write-all' 'jobs:' '  unsafe:' '    runs-on: ubuntu-24.04' '    steps:' '      - uses: actions/checkout@main' '        with:' '          ref: ${{ github.event.pull_request.head.sha }}' '      - run: echo \"${{ github.event.pull_request.title }}\"' > \"$Z/fixture/.github/workflows/unsafe.yml\" && zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$Z/cache\" \"$Z/fixture/.github/workflows/unsafe.yml\" > \"$Z/fixture.json\" 2> /dev/null; rc=$?; python3 -c \"\nimport json,sys\nd=json.load(open(sys.argv[1]));got={(f['ident'],f['determinations']['severity']) for f in d}\nneed={('template-injection','High'),('unpinned-uses','High'),('dangerous-triggers','High')}\nprint('deliberately unsafe fixture: zizmor exit',sys.argv[2],'(expected 14: high-severity findings) | findings',sorted(got),'| required high findings present:',need<=got)\nraise SystemExit(0 if sys.argv[2]=='14' and need<=got else 1)\n\" \"$Z/fixture.json\" \"$rc\"",
+      "exit": 0,
+      "duration_s": 0.077,
+      "output_sha256": "bf5647dbc89434b01316c9303eb5f2c2b23e7d4658a4edf4139e04160e100294",
+      "output_excerpt": "deliberately unsafe fixture: zizmor exit 14 (expected 14: high-severity findings) | findings [('artipacked', 'Medium'), ('dangerous-triggers', 'High'), ('template-injection', 'High'), ('unpinned-uses', 'High')] | required high findings present: True\n"
+    },
+    {
+      "cmd": "rm -rf \"${RR:?}/zizmor-use\" && test ! -e \"${RR:?}/zizmor-use\" && echo \"cache and fixture removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "42ee6c5d963cb64365dc6cbc110edff91615360277e01a3bcd6381e8cedfa7c7",
+      "output_excerpt": "cache and fixture removed\n"
+    }
+  ],
+  "tool_versions": {
+    "zizmor": "1.30.1"
+  },
+  "observed_at_utc": "2026-09-25T15:35:36Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), zizmor 1.30.1 (the catalog pin) audited GitHub Actions workflows offline with no config or ignores (--persona regular --strict-collection). This repository's .github/workflows and dependabot.yml produced no findings (exit 0). Positive control: a deliberately unsafe workflow written at run time (pull_request_target, write-all permissions, actions/checkout@main with the PR head ref, and the PR title interpolated into a run step) made zizmor exit 14 with high-severity template-injection, unpinned-uses and dangerous-triggers findings. Each check exits 0 only when its expected result holds; all commands exit 0.",
+  "limitations": [
+    "Offline audits only: online audits (impostor commits, known-vulnerable actions, ref confusion) did not run, and no GitHub token was used. A clean result is not proof that no workflow risk exists.",
+    "The fixture is never executed; it exists only in the owned scratch directory.",
+    "Scratch state lived in an owned directory under this session's scratchpad, referenced as $RR in the commands (the worker exported RR before recording); the last command removes it.",
+    "The same commands were rehearsed while planning. This receipt changes no platform_status.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main (the catalog_revision), not in a pinned install checkout; the tool is this host's existing install under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T15:35:36Z",
+      "reviewer": {
+        "identity_sha256": "fd125af99ec605cd6d05e7fe22787cf60383732ab975747abbae4309028c5e73"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Reproduce: re-ran with scripts/host_receipts.py run_command (sh, repository root, owned mktemp RR under /tmp) on this host at HEAD 6b2f71fa, offline with an owned cache directory. All 4 commands exit 0 with byte-identical raw output (same output_sha256). The repository workflows and dependabot.yml gave exit 0 with 0 findings over 19 inputs; I counted 18 workflow files plus dependabot.yml. The unsafe fixture gave exit 14 with High dangerous-triggers, template-injection and unpinned-uses findings and a Medium artipacked finding. Adequacy, all four points hold. Point 1, layer role: zizmor audited real workflows with no config and no ignores, and its verdict is read. Point 2, positive control: the deliberately unsafe fixture was flagged with the required high-severity findings. Point 3: zizmor 1.30.1 from the resolved path and the winner pin are retained. Point 4: zizmor is the ci-supply-chain winner, and 1.30.1 pin_matches. Note: the fixture write-all permissions drew no excessive-permissions finding, and the claim does not assert one.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:25:18Z",
+      "reviewer": {
+        "identity_sha256": "53ca4cf7516bb9521922405268b5aae1293b989d5cb11a5b26d64222e0f8c1f7"
+      }
+    }
+  ]
+}

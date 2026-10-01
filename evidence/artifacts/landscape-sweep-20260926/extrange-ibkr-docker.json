@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-extrange-ibkr-docker",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/extrange/ibkr-docker",
+ "reviewed_commit": "917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of extrange/ibkr-docker at commit 917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c (license NOASSERTION), read from README.md at that commit. Repository description: \"Run IBKR Gateway/TWS in a Docker container\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 386,
+  "pushed_at": "2026-09-24T06:23:37Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c",
+   "text": "- [Interactive Brokers in Docker](#interactive-brokers-in-docker) - [Features](#features) - [Getting Started](#getting-started) - [Using `docker run`](#using-docker-run) - [Using `docker compose` (recommended)](#using-docker-compose-recommended) - [Environment Variables](#environment-variables) - [Docker Images](#docker-images) - [FAQ](#faq) - [How do I save TWS settings locally?](#how-do-i-save-tws-settings-locally) - [Cannot connect to API when using TWS](#cannot-connect-to-api-when-using-tws)"
+  },
+  {
+   "source": "README.md@917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c",
+   "text": "- **Fully containerized** TWS/IB Gateway, no external dependencies - [**TWS API access**][tws-api] automatically configured and forwarded - **Viewable in a browser** (via noVNC) - **Auto-restart, auto-login** TWS/IB Gateway automatically via [IBC Alpha](https://github.com/IbcAlpha)"
+  },
+  {
+   "source": "README.md@917c4de1d3b024dbea2eb7afcb8a30c8e3ae738c",
+   "text": "```bash docker run -d \\ -p \"127.0.0.1:6080:6080\" \\ -p \"127.0.0.1:8888:8888\" \\ --ulimit nofile=10000 \\ -e USERNAME=your_username \\ -e PASSWORD=your_password \\ ghcr.io/extrange/ibkr:latest ```"
+  }
+ ]
+}

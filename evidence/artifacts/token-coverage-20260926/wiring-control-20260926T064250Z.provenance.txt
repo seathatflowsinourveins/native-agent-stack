@@ -1,0 +1,18 @@
+command (working directory: the checkout): python scripts/adoption_status.py --profile token-efficiency --client-wiring --pinned-versions --json
+== control: CODEX_HOME set to a new empty directory
+exit status: 0; stderr: 0 bytes; UTC: 2026-09-26T06:42:50Z to 2026-09-26T06:42:52Z
+project .codex/config.toml present before the run: False
+report: coverage-20260926T064250Z-codex-home-empty.json, sha256 bdbb2db7f1a6e5a529da8f47d46c2726e9dbab12715a67102c040d8fbe2e38ba, 7014 bytes
+client_wiring.complete: false
+client_wiring.codex.mcp_servers_present: serena=false, socraticode=false, ai-memory=false
+client_wiring.project.codex_mcp_servers_present: serena=false, socraticode=false, ai-memory=false
+== the environment this driver was started with
+exit status: 0; stderr: 0 bytes; UTC: 2026-09-26T06:42:52Z to 2026-09-26T06:42:56Z
+project .codex/config.toml present before the run: False
+report: coverage-20260926T064252Z.json, sha256 494f9cf91c84eda06dc790c207bb0fe8878720da9e7d14913097c022cf3f79f5, 7008 bytes
+client_wiring.complete: true
+client_wiring.codex.mcp_servers_present: serena=true, socraticode=true, ai-memory=true
+client_wiring.project.codex_mcp_servers_present: serena=false, socraticode=false, ai-memory=false
+interpreter: Python 3.13.15; virtual environment: False
+checkout HEAD: 5c1961e49b89dd56ef5626950a5448735caabe4c; paths changed from HEAD (git status --porcelain): 33
+scripts/adoption_status.py sha256: cd1229719768632b045e53e5dc7ee0d4c24ea2c36084589d28f8886329c349a6

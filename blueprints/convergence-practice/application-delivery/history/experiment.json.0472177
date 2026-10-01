@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Turn selected application frameworks into an actually working typed ledger with API validation, transactional persistence, migration and a production browser workflow. Resolve incompatible generator and local container startup without substituting a different database.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/vercel/next.js/tree/ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "revision": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9"
+    },
+    {
+      "url": "https://github.com/react/react/tree/1d34f91dfde6bba84d08b683aaba164c7194dacb",
+      "revision": "1d34f91dfde6bba84d08b683aaba164c7194dacb"
+    },
+    {
+      "url": "https://github.com/fastapi/fastapi/tree/95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+      "revision": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f"
+    },
+    {
+      "url": "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2",
+      "revision": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing selected engineering application catalog gap; official registry/releases/docs verified before local installation."
+  ],
+  "license_and_compatibility": "Next/React/FastAPI MIT; PostgreSQL License. Dependency licenses and compatible TypeScript5.9.3 generator pin are retained in source review and native locks. No global upgrade.",
+  "baseline_and_candidate": {
+    "baseline": "Framework metadata and catalog selection without application execution; not a matched benchmark.",
+    "candidate": "Locked, typed local application with native PostgreSQL and observed browser/transaction/restart acceptance."
+  },
+  "frozen_inputs": {
+    "base_revision": "9b7b5d94cb082b78706c59e203250a4f4c8f4061",
+    "tasks": [
+      "run-ledger"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/backend/app.py",
+        "sha256": "0dbd2f601405cb670b7f2d3bb944aef362333d44b07374e9b00e698c87ee1ff4"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/app/page.tsx",
+        "sha256": "690e4b1f75242a41101d391c66bd96ead09aa2ba30ea541533fb51bffac4ef15"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/migrations/versions/0001_run_ledger.py",
+        "sha256": "ee4bc7d75e19f704d333f9cae23886456ad0bf265f3a526472a28224a6bc3d03"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/uv.lock",
+        "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+        "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
+        "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/freeze.json",
+        "sha256": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/application-delivery/backend/test_api.py",
+        "sha256": "404cef6a7ba380a331ee15dc7a9414756d84f12456f67c34982d5d8968ea813e"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/browser/ledger.spec.ts",
+        "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6"
+      },
+      {
+        "path": "blueprints/convergence-practice/application-delivery/verify_schema.py",
+        "sha256": "d1e8a5df945bc207fd5d1707f59eba12b9c5e22dde7cfc2b7d340ee109130c1b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Invalid requests and stale writes rejected; audit failure rolls back state; migration idempotent; typed production UI creates/updates; exact saved row survives PostgreSQL and app restart.",
+    "usage_rule": "No model invocation by qualification commands. Whole-task coordinator/worker usage unknown; no efficiency claim."
+  },
+  "runtime_and_platform": {
+    "platform": "macOS arm64 Darwin25.5.0",
+    "tools": [
+      {
+        "name": "python",
+        "version": "3.14.7"
+      },
+      {
+        "name": "node",
+        "version": "24.21.0"
+      },
+      {
+        "name": "pnpm",
+        "version": "12.4.2"
+      },
+      {
+        "name": "uv",
+        "version": "0.12.17"
+      },
+      {
+        "name": "next",
+        "version": "16.3.5"
+      },
+      {
+        "name": "react",
+        "version": "19.3.0"
+      },
+      {
+        "name": "fastapi",
+        "version": "0.141.1"
+      },
+      {
+        "name": "postgresql",
+        "version": "18.6"
+      },
+      {
+        "name": "typescript",
+        "version": "5.9.3"
+      },
+      {
+        "name": "playwright_test",
+        "version": "1.63.0"
+      },
+      {
+        "name": "playwright_cli",
+        "version": "0.1.21"
+      },
+      {
+        "name": "chrome",
+        "version": "153.0.8010.53"
+      }
+    ],
+    "isolation": "New Git worktree; project-local locks/environments/native PostgreSQL; dedicated ledger_test database; loopback-only owned processes; separate disposable test browsers."
+  },
+  "commands": [
+    "Reviewed native setup/migration/test/build/browser/restart commands enumerated in receipt.json; make verify supplies the repeatable final application checks."
+  ],
+  "observations": [
+    {
+      "id": "type-generator-attempt",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json",
+          "sha256": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "container-attempt",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json",
+          "sha256": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "native-application-qualified",
+      "task": "run-ledger",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json",
+          "sha256": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "type-generator-attempt",
+      "reason": "TypeScript7.0.2 does not satisfy openapi-typescript7.13.0 peer ^5.x and lacks the JS ts.factory API used by that generator."
+    },
+    {
+      "run_id": "container-attempt",
+      "reason": "Owned container with Documents-directory bind stalled before guest boot. Pending CLI exited after coordinator service intervention with interrupted XPC connection. Image pull succeeded; database was never ready through this path."
+    }
+  ],
+  "limitations": [
+    "Mac arm64 local synthetic vertical slice only. No WSL/cloud/application production, authenticated users, broker or trading qualification.",
+    "The native PostgreSQL source build omits ICU, readline, zlib and TLS; uses UTF-8/C locale, loopback TCP, no Unix socket and local trust authentication. Not a production database profile.",
+    "PostgreSQL named-volume container storage was separately tested by the coordinator. This application receipt uses native PostgreSQL; it does not claim the failed bind-mounted container passed.",
+    "Initial HTTPX tests passed with upstream deprecation; final tests use verified Pydantic httpx2. One upstream Starlette/AnyIO alias deprecation remains.",
+    "Initial CLI browser observation logged missing favicon404; the application icon was added. Final CLI observation has zero console errors or warnings.",
+    "The original oracle freeze is retained. Dedicated test-database guarding and unique synthetic browser titles were added before the final freeze without weakening quality assertions.",
+    "No model/provider calls were made by the application or qualification commands. Whole coordinator/worker usage is unknown; no token-saving claim.",
+    "No production load test, external ingestion, pagination beyond100 rows, independent-host restore or deployment was qualified."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Mac arm64 local typed run-ledger application with native PostgreSQL18.6",
+    "qualification_run_ids": [
+      "native-application-qualified"
+    ]
+  },
+  "rollback": "Stop owned application and native PostgreSQL first; preserve needed synthetic state/evidence, then retire only the task-owned runtime installation after review. No global settings rollback is necessary.",
+  "next_decision_changing_test": "Choose the intended real application and user/security/deployment requirements; separately qualify production packaging, access control and independent-host state recovery.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

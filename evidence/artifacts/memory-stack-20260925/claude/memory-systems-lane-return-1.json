@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "claude",
+  "packet": "memory-systems",
+  "run_label": "claude-memory-systems-lane",
+  "attempt": 1,
+  "packet_sha256": "31318b2121b387e4a478456a5b794e6bf1119d100f9cb3aeeb96c17f19e6e807",
+  "model": {
+    "name": "claude-opus-5-5",
+    "effort": null,
+    "family": "anthropic"
+  },
+  "model_note": "Opus 5.5 research subagent as the coordinator's header line names it; the effort and a resolved model were not recorded.",
+  "client": "Claude Code research subagent with web tools",
+  "source_file": "memory-systems-claude.md",
+  "original_sha256": "fe609037bee332a597c554c09f03f15b3c3637108ab033e130fe35adbdf43d9d",
+  "original_bytes": 8439,
+  "recorder_header": "<!-- Claude lane (Opus 5.5 subagent), 2026-09-25; 129 tool uses, 303,563 subagent tokens; answer verbatim below. -->",
+  "recorder_header_note": "Line 1 of the original is the coordinator's HTML comment (lane, model, tool uses and tokens), not part of the lane's answer; the judges saw the answer without it (blinded_sha256).",
+  "blinded_sha256": "1762ac4ede804bfaa3dddb5b5d90b5f5c7a64260af7e1aad06aa38327a00a69c",
+  "return_text": "<!-- Claude lane (Opus 5.5 subagent), 2026-09-25; 129 tool uses, 303,563 subagent tokens; answer verbatim below. -->\n\n## Verdict (2026-09-25)\n\nNone of the systems below publishes recall_all@5. MemPalace and agentmemory publish recall_any over 500 questions. QA figures are vendor-run with varying answer and judge models. Vendor QA leaders (90–95%, unverified): Hindsight, Mem0, Honcho and Zep. Published-retrieval leaders: verbatim hybrids. V = vendor-reported.\n\nI re-scored MemPalace's committed per-question logs ([raw](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_raw_session_20260414_1629.jsonl), [hybrid](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl)) with your metric:\n\n- Raw MiniLM over **user-turns-only** session text: recall_all@5 **0.857** on 470 questions.\n- Hybrid v4 without an LLM: **0.887** on the 424 held-out non-abstention questions.\n\nBoth beat agentmemory's 0.821. If your BM25 and Qwen3 baselines index whole sessions, re-index user turns first.\n\n## Ranked shortlist\n\n1. **MemPalace**: cheapest to run, likely beats 0.821. [repo](https://github.com/MemPalace/mempalace), MIT, v3.10.0 (2026-09-16).\n   - V, April 2026 ([bench](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/BENCHMARKS.md)): LongMemEval-S cleaned recall_any@5 96.6% raw, 98.4% hybrid on held-out questions, no LLM.\n   - Raw mode bypasses the palace code; palace modes score 89.4% and 84.2% ([#214](https://github.com/MemPalace/mempalace/issues/214); [critique](https://arxiv.org/abs/2604.21284), 2026-04).\n   - Local ChromaDB with ONNX embeddings, no services. Hook plugins for Claude Code and Codex, plus MCP.\n2. **Hindsight**: strongest vendor claims, MIT, local models, hooks for both agents. [repo](https://github.com/vectorize-io/hindsight), MIT, v0.10.1 (2026-09-21).\n   - V; reproduced by Virginia Tech collaborators. LongMemEval-S QA, 500 questions: 91.4% with Gemini-3, 83.6% with gpt-oss-20b ([paper](https://arxiv.org/abs/2512.12818), 2025-12).\n   - BEAM-10M 64.1% ([blog](https://hindsight.vectorize.io/blog/2026/04/02/beam-sota), 2026-04). [Live page](https://benchmarks.hindsight.vectorize.io/) shows 94.6% on AMB, where Gemini answers and judges. Retrieval recall is not published.\n   - Local LLMs through Ollama or llama.cpp. One plugin shares a bank between Claude Code and Codex. Embedded Postgres; an LLM extracts facts on every retain.\n3. **QMD**: local reranking control you already run. [repo](https://github.com/tobi/qmd), MIT, v2.8.3 (2026-08-16).\n   - Published results: none found.\n   - BM25 plus local GGUF embeddinggemma, Qwen3-Reranker-0.6B and query expansion. MCP and a Claude Code plugin, but no session-capture hooks. SQLite only.\n4. **Mem0 OSS**: new hybrid retrieval; measure the platform-to-OSS gap. [repo](https://github.com/mem0ai/mem0), Apache-2.0, v2.2.0 (2026-09-23).\n   - V ([bench](https://github.com/mem0ai/memory-benchmarks)): platform LongMemEval 94.4% (answer model unstated), LoCoMo 92.5%.\n   - Open source: 88.6% with Gemma 4 31B extraction, GPT-5 answering and judging. The README says some optimizations are platform-only.\n   - Competitor re-run: 73.8% with GPT-5 answering ([Maximem](https://www.maximem.ai/blog/state-of-ai-memory-2026-claimed-vs-observed), 2026-05-27).\n   - Ollama config, embedded Qdrant; the Claude Code plugin needs a Platform key ([docs](https://docs.mem0.ai/integrations/claude-code)).\n5. **Honcho**: sessions are first-class, with hybrid message search. [repo](https://github.com/plastic-labs/honcho), AGPL-3.0, v3.2.1 (2026-09-24).\n   - V ([blog](https://plasticlabs.ai/blog/research/Benchmarking-Honcho), 2025-12-19): LongMemEval-S 90.4% (Haiku 4.5 answering, GPT-4o judging), BEAM-10M 0.406.\n   - Claude Code plugin, Codex hooks, MCP.\n   - Needs Postgres, Redis and a deriver worker. Cloud models by default; local via OpenAI-compatible endpoints, though the embedder can silently fall back to OpenAI ([#915](https://github.com/plastic-labs/honcho/issues/915)).\n\n## Adapters\n\n- **MemPalace**: run `longmemeval_bench.py` raw and hybrid-v4 (no LLM rerank), scoring recall_all from `ranked_items`. Also test the production path: mine dated transcripts, then query MCP search.\n- **Hindsight**: one bank per question. Call `retain(transcript, timestamp, document_id=session_id)`, then `recall(query_timestamp=question_date)`. Rank sessions by first-seen `document_id`.\n- **QMD**: write `<qid>/<session_id>.md` with the date in front matter, one collection per question. Run `qmd query --json -n 50` and compare runs with the reranker off.\n- **Mem0**: add turn pairs with `metadata.session_id`, which the vendor harness omits. Rank sessions by their best `search(limit=200)` hit.\n- **Honcho**: one workspace per question, one Honcho session per haystack session. Rank sessions by `session_id` in workspace search results.\n\n## Not shortlisted\n\n- **Graphiti/Zep**: [repo](https://github.com/getzep/graphiti), Apache-2.0, v0.30.2 (2026-09-08).\n  - LongMemEval-S 71.2% with gpt-4o, V ([paper](https://arxiv.org/abs/2501.13956), 2025-01).\n  - 90.2% with gpt-5.4, product unstated ([research](https://www.getzep.com/research/), 2026-08).\n  - Needs Neo4j or FalkorDB and LLM extraction per episode.\n  - Adapter: one episode per session; map edges to episodes.\n- **Supermemory**: [repo](https://github.com/supermemoryai/supermemory) is MIT; the server ships as binaries only (v0.0.8, 2026-08-17), engine source not found.\n  - V: 97% \"Recall@20\" ([research](https://supermemory.ai/research), 2026-05).\n  - Adapter: one container per question, customId = session.\n- **Letta**: the [server](https://github.com/letta-ai/letta) is retired (last release 0.16.8, 2026-05-14). Code now lives in [letta-code](https://github.com/letta-ai/letta-code) (Apache-2.0, v0.33.1, 2026-09-24), a separate agent defaulting to Letta Cloud.\n  - LoCoMo 74.0% with gpt-4o-mini, V ([blog](https://www.letta.com/blog/benchmarking-ai-agent-memory/), 2025-08). LongMemEval: not found.\n  - Adapter: one conversation per session, then message search.\n- **Cognee**: [repo](https://github.com/topoteretes/cognee), Apache-2.0, v1.6.1 (2026-09-24).\n  - BEAM-10M 0.67, V ([guide](https://www.cognee.ai/ai-memory-benchmarks), 2026-09). LongMemEval: not found.\n  - Adapter: one document per session; rank by chunk hits.\n- **Basic Memory**: [repo](https://github.com/basicmachines-co/basic-memory), AGPL-3.0, v0.23.2 (2026-08-25).\n  - LoCoMo R@5 76.4%, V ([page](https://basicmemory.com/compare/mem0), 2026-06). LongMemEval: not found.\n  - Adapter: one note per session.\n- **OpenViking**: [repo](https://github.com/volcengine/OpenViking), AGPL-3.0, v0.4.21 (2026-09-20).\n  - LoCoMo 80–83% with Doubao models, V (README, v0.3.22). LongMemEval: not found.\n  - Adapter: sessions as resources; map `find` URIs to sessions.\n- **claude-mem**: [repo](https://github.com/thedotmack/claude-mem), Apache-2.0, v13.25.3 (2026-09-21).\n  - Benchmarks: not found.\n  - Adapter: replay sessions as observations.\n- **MemOS**: [repo](https://github.com/MemTensor/MemOS), Apache-2.0, v2.0.34 (2026-09-23).\n  - V: LongMemEval 89.20 (2026-07, models unstated).\n  - Needs Neo4j and Qdrant; its local plugin skips Claude Code and Codex.\n  - Adapter: add sessions with a session ID.\n\n## Risks\n\n- **Comparability**:\n  - agentmemory ([repo](https://github.com/rohitg00/agentmemory), Apache-2.0, v0.9.29, 2026-08-16) publishes [95.2% recall_any](https://github.com/rohitg00/agentmemory/blob/main/benchmark/LONGMEMEVAL.md) but scored 0.821 recall_all in your harness.\n  - Maximem found Mem0's QA prompts tuned to the benchmark.\n  - MemPalace hybrid v4 was tuned on LongMemEval; report held-out only.\n- **Realism**: 50-session haystacks are easy; pooling all 19,195 sessions dropped BM25 R@5 to 30% (#214). Add a pooled-store run.\n- **Cost**: 470 questions mean about 22,100 session ingests, about 86 hours at Hindsight's measured gpt-oss-20b rate ([0.071/s](https://github.com/vectorize-io/hindsight-benchmarks/blob/main/results/leaderboard/llm/gcp-gpt-oss-20b-medium.json)). Subsample 100 questions; use one local model everywhere.\n- **Licence and cloud**: Honcho, Basic Memory and OpenViking are AGPL. Supermemory's engine source was not found. Mem0 and Honcho default to cloud services.\n- **Fit**: LongMemEval-S tests chat recall; [LongMemEval-V2](https://arxiv.org/abs/2605.12493) (2026-05) tests agent trajectories.\n",
+  "output_contract_check": {
+    "shortlist_counts": {
+      "Ranked shortlist": 5
+    },
+    "shortlist_limit_per_role": 5,
+    "within_shortlist_limit": true,
+    "words_whitespace_split": 892,
+    "word_scope": "the answer without the coordinator's header line",
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "sections": [
+    {
+      "heading": "Verdict (2026-09-25)",
+      "text": "None of the systems below publishes recall_all@5. MemPalace and agentmemory publish recall_any over 500 questions. QA figures are vendor-run with varying answer and judge models. Vendor QA leaders (90–95%, unverified): Hindsight, Mem0, Honcho and Zep. Published-retrieval leaders: verbatim hybrids. V = vendor-reported.\n\nI re-scored MemPalace's committed per-question logs ([raw](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_raw_session_20260414_1629.jsonl), [hybrid](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl)) with your metric:\n\n- Raw MiniLM over **user-turns-only** session text: recall_all@5 **0.857** on 470 questions.\n- Hybrid v4 without an LLM: **0.887** on the 424 held-out non-abstention questions.\n\nBoth beat agentmemory's 0.821. If your BM25 and Qwen3 baselines index whole sessions, re-index user turns first."
+    },
+    {
+      "heading": "Ranked shortlist",
+      "text": "1. **MemPalace**: cheapest to run, likely beats 0.821. [repo](https://github.com/MemPalace/mempalace), MIT, v3.10.0 (2026-09-16).\n   - V, April 2026 ([bench](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/BENCHMARKS.md)): LongMemEval-S cleaned recall_any@5 96.6% raw, 98.4% hybrid on held-out questions, no LLM.\n   - Raw mode bypasses the palace code; palace modes score 89.4% and 84.2% ([#214](https://github.com/MemPalace/mempalace/issues/214); [critique](https://arxiv.org/abs/2604.21284), 2026-04).\n   - Local ChromaDB with ONNX embeddings, no services. Hook plugins for Claude Code and Codex, plus MCP.\n2. **Hindsight**: strongest vendor claims, MIT, local models, hooks for both agents. [repo](https://github.com/vectorize-io/hindsight), MIT, v0.10.1 (2026-09-21).\n   - V; reproduced by Virginia Tech collaborators. LongMemEval-S QA, 500 questions: 91.4% with Gemini-3, 83.6% with gpt-oss-20b ([paper](https://arxiv.org/abs/2512.12818), 2025-12).\n   - BEAM-10M 64.1% ([blog](https://hindsight.vectorize.io/blog/2026/04/02/beam-sota), 2026-04). [Live page](https://benchmarks.hindsight.vectorize.io/) shows 94.6% on AMB, where Gemini answers and judges. Retrieval recall is not published.\n   - Local LLMs through Ollama or llama.cpp. One plugin shares a bank between Claude Code and Codex. Embedded Postgres; an LLM extracts facts on every retain.\n3. **QMD**: local reranking control you already run. [repo](https://github.com/tobi/qmd), MIT, v2.8.3 (2026-08-16).\n   - Published results: none found.\n   - BM25 plus local GGUF embeddinggemma, Qwen3-Reranker-0.6B and query expansion. MCP and a Claude Code plugin, but no session-capture hooks. SQLite only.\n4. **Mem0 OSS**: new hybrid retrieval; measure the platform-to-OSS gap. [repo](https://github.com/mem0ai/mem0), Apache-2.0, v2.2.0 (2026-09-23).\n   - V ([bench](https://github.com/mem0ai/memory-benchmarks)): platform LongMemEval 94.4% (answer model unstated), LoCoMo 92.5%.\n   - Open source: 88.6% with Gemma 4 31B extraction, GPT-5 answering and judging. The README says some optimizations are platform-only.\n   - Competitor re-run: 73.8% with GPT-5 answering ([Maximem](https://www.maximem.ai/blog/state-of-ai-memory-2026-claimed-vs-observed), 2026-05-27).\n   - Ollama config, embedded Qdrant; the Claude Code plugin needs a Platform key ([docs](https://docs.mem0.ai/integrations/claude-code)).\n5. **Honcho**: sessions are first-class, with hybrid message search. [repo](https://github.com/plastic-labs/honcho), AGPL-3.0, v3.2.1 (2026-09-24).\n   - V ([blog](https://plasticlabs.ai/blog/research/Benchmarking-Honcho), 2025-12-19): LongMemEval-S 90.4% (Haiku 4.5 answering, GPT-4o judging), BEAM-10M 0.406.\n   - Claude Code plugin, Codex hooks, MCP.\n   - Needs Postgres, Redis and a deriver worker. Cloud models by default; local via OpenAI-compatible endpoints, though the embedder can silently fall back to OpenAI ([#915](https://github.com/plastic-labs/honcho/issues/915))."
+    },
+    {
+      "heading": "Adapters",
+      "text": "- **MemPalace**: run `longmemeval_bench.py` raw and hybrid-v4 (no LLM rerank), scoring recall_all from `ranked_items`. Also test the production path: mine dated transcripts, then query MCP search.\n- **Hindsight**: one bank per question. Call `retain(transcript, timestamp, document_id=session_id)`, then `recall(query_timestamp=question_date)`. Rank sessions by first-seen `document_id`.\n- **QMD**: write `<qid>/<session_id>.md` with the date in front matter, one collection per question. Run `qmd query --json -n 50` and compare runs with the reranker off.\n- **Mem0**: add turn pairs with `metadata.session_id`, which the vendor harness omits. Rank sessions by their best `search(limit=200)` hit.\n- **Honcho**: one workspace per question, one Honcho session per haystack session. Rank sessions by `session_id` in workspace search results."
+    },
+    {
+      "heading": "Not shortlisted",
+      "text": "- **Graphiti/Zep**: [repo](https://github.com/getzep/graphiti), Apache-2.0, v0.30.2 (2026-09-08).\n  - LongMemEval-S 71.2% with gpt-4o, V ([paper](https://arxiv.org/abs/2501.13956), 2025-01).\n  - 90.2% with gpt-5.4, product unstated ([research](https://www.getzep.com/research/), 2026-08).\n  - Needs Neo4j or FalkorDB and LLM extraction per episode.\n  - Adapter: one episode per session; map edges to episodes.\n- **Supermemory**: [repo](https://github.com/supermemoryai/supermemory) is MIT; the server ships as binaries only (v0.0.8, 2026-08-17), engine source not found.\n  - V: 97% \"Recall@20\" ([research](https://supermemory.ai/research), 2026-05).\n  - Adapter: one container per question, customId = session.\n- **Letta**: the [server](https://github.com/letta-ai/letta) is retired (last release 0.16.8, 2026-05-14). Code now lives in [letta-code](https://github.com/letta-ai/letta-code) (Apache-2.0, v0.33.1, 2026-09-24), a separate agent defaulting to Letta Cloud.\n  - LoCoMo 74.0% with gpt-4o-mini, V ([blog](https://www.letta.com/blog/benchmarking-ai-agent-memory/), 2025-08). LongMemEval: not found.\n  - Adapter: one conversation per session, then message search.\n- **Cognee**: [repo](https://github.com/topoteretes/cognee), Apache-2.0, v1.6.1 (2026-09-24).\n  - BEAM-10M 0.67, V ([guide](https://www.cognee.ai/ai-memory-benchmarks), 2026-09). LongMemEval: not found.\n  - Adapter: one document per session; rank by chunk hits.\n- **Basic Memory**: [repo](https://github.com/basicmachines-co/basic-memory), AGPL-3.0, v0.23.2 (2026-08-25).\n  - LoCoMo R@5 76.4%, V ([page](https://basicmemory.com/compare/mem0), 2026-06). LongMemEval: not found.\n  - Adapter: one note per session.\n- **OpenViking**: [repo](https://github.com/volcengine/OpenViking), AGPL-3.0, v0.4.21 (2026-09-20).\n  - LoCoMo 80–83% with Doubao models, V (README, v0.3.22). LongMemEval: not found.\n  - Adapter: sessions as resources; map `find` URIs to sessions.\n- **claude-mem**: [repo](https://github.com/thedotmack/claude-mem), Apache-2.0, v13.25.3 (2026-09-21).\n  - Benchmarks: not found.\n  - Adapter: replay sessions as observations.\n- **MemOS**: [repo](https://github.com/MemTensor/MemOS), Apache-2.0, v2.0.34 (2026-09-23).\n  - V: LongMemEval 89.20 (2026-07, models unstated).\n  - Needs Neo4j and Qdrant; its local plugin skips Claude Code and Codex.\n  - Adapter: add sessions with a session ID."
+    },
+    {
+      "heading": "Risks",
+      "text": "- **Comparability**:\n  - agentmemory ([repo](https://github.com/rohitg00/agentmemory), Apache-2.0, v0.9.29, 2026-08-16) publishes [95.2% recall_any](https://github.com/rohitg00/agentmemory/blob/main/benchmark/LONGMEMEVAL.md) but scored 0.821 recall_all in your harness.\n  - Maximem found Mem0's QA prompts tuned to the benchmark.\n  - MemPalace hybrid v4 was tuned on LongMemEval; report held-out only.\n- **Realism**: 50-session haystacks are easy; pooling all 19,195 sessions dropped BM25 R@5 to 30% (#214). Add a pooled-store run.\n- **Cost**: 470 questions mean about 22,100 session ingests, about 86 hours at Hindsight's measured gpt-oss-20b rate ([0.071/s](https://github.com/vectorize-io/hindsight-benchmarks/blob/main/results/leaderboard/llm/gcp-gpt-oss-20b-medium.json)). Subsample 100 questions; use one local model everywhere.\n- **Licence and cloud**: Honcho, Basic Memory and OpenViking are AGPL. Supermemory's engine source was not found. Mem0 and Honcho default to cloud services.\n- **Fit**: LongMemEval-S tests chat recall; [LongMemEval-V2](https://arxiv.org/abs/2605.12493) (2026-05) tests agent trajectories."
+    }
+  ],
+  "items": [
+    {
+      "section": "Verdict (2026-09-25)",
+      "marker": "-",
+      "name": null,
+      "text": "- Raw MiniLM over **user-turns-only** session text: recall_all@5 **0.857** on 470 questions."
+    },
+    {
+      "section": "Verdict (2026-09-25)",
+      "marker": "-",
+      "name": null,
+      "text": "- Hybrid v4 without an LLM: **0.887** on the 424 held-out non-abstention questions."
+    },
+    {
+      "section": "Ranked shortlist",
+      "marker": "1.",
+      "name": "MemPalace",
+      "text": "1. **MemPalace**: cheapest to run, likely beats 0.821. [repo](https://github.com/MemPalace/mempalace), MIT, v3.10.0 (2026-09-16).\n   - V, April 2026 ([bench](https://github.com/MemPalace/mempalace/blob/develop/benchmarks/BENCHMARKS.md)): LongMemEval-S cleaned recall_any@5 96.6% raw, 98.4% hybrid on held-out questions, no LLM.\n   - Raw mode bypasses the palace code; palace modes score 89.4% and 84.2% ([#214](https://github.com/MemPalace/mempalace/issues/214); [critique](https://arxiv.org/abs/2604.21284), 2026-04).\n   - Local ChromaDB with ONNX embeddings, no services. Hook plugins for Claude Code and Codex, plus MCP."
+    },
+    {
+      "section": "Ranked shortlist",
+      "marker": "2.",
+      "name": "Hindsight",
+      "text": "2. **Hindsight**: strongest vendor claims, MIT, local models, hooks for both agents. [repo](https://github.com/vectorize-io/hindsight), MIT, v0.10.1 (2026-09-21).\n   - V; reproduced by Virginia Tech collaborators. LongMemEval-S QA, 500 questions: 91.4% with Gemini-3, 83.6% with gpt-oss-20b ([paper](https://arxiv.org/abs/2512.12818), 2025-12).\n   - BEAM-10M 64.1% ([blog](https://hindsight.vectorize.io/blog/2026/04/02/beam-sota), 2026-04). [Live page](https://benchmarks.hindsight.vectorize.io/) shows 94.6% on AMB, where Gemini answers and judges. Retrieval recall is not published.\n   - Local LLMs through Ollama or llama.cpp. One plugin shares a bank between Claude Code and Codex. Embedded Postgres; an LLM extracts facts on every retain."
+    },
+    {
+      "section": "Ranked shortlist",
+      "marker": "3.",
+      "name": "QMD",
+      "text": "3. **QMD**: local reranking control you already run. [repo](https://github.com/tobi/qmd), MIT, v2.8.3 (2026-08-16).\n   - Published results: none found.\n   - BM25 plus local GGUF embeddinggemma, Qwen3-Reranker-0.6B and query expansion. MCP and a Claude Code plugin, but no session-capture hooks. SQLite only."
+    },
+    {
+      "section": "Ranked shortlist",
+      "marker": "4.",
+      "name": "Mem0 OSS",
+      "text": "4. **Mem0 OSS**: new hybrid retrieval; measure the platform-to-OSS gap. [repo](https://github.com/mem0ai/mem0), Apache-2.0, v2.2.0 (2026-09-23).\n   - V ([bench](https://github.com/mem0ai/memory-benchmarks)): platform LongMemEval 94.4% (answer model unstated), LoCoMo 92.5%.\n   - Open source: 88.6% with Gemma 4 31B extraction, GPT-5 answering and judging. The README says some optimizations are platform-only.\n   - Competitor re-run: 73.8% with GPT-5 answering ([Maximem](https://www.maximem.ai/blog/state-of-ai-memory-2026-claimed-vs-observed), 2026-05-27).\n   - Ollama config, embedded Qdrant; the Claude Code plugin needs a Platform key ([docs](https://docs.mem0.ai/integrations/claude-code))."
+    },
+    {
+      "section": "Ranked shortlist",
+      "marker": "5.",
+      "name": "Honcho",
+      "text": "5. **Honcho**: sessions are first-class, with hybrid message search. [repo](https://github.com/plastic-labs/honcho), AGPL-3.0, v3.2.1 (2026-09-24).\n   - V ([blog](https://plasticlabs.ai/blog/research/Benchmarking-Honcho), 2025-12-19): LongMemEval-S 90.4% (Haiku 4.5 answering, GPT-4o judging), BEAM-10M 0.406.\n   - Claude Code plugin, Codex hooks, MCP.\n   - Needs Postgres, Redis and a deriver worker. Cloud models by default; local via OpenAI-compatible endpoints, though the embedder can silently fall back to OpenAI ([#915](https://github.com/plastic-labs/honcho/issues/915))."
+    },
+    {
+      "section": "Adapters",
+      "marker": "-",
+      "name": "MemPalace",
+      "text": "- **MemPalace**: run `longmemeval_bench.py` raw and hybrid-v4 (no LLM rerank), scoring recall_all from `ranked_items`. Also test the production path: mine dated transcripts, then query MCP search."
+    },
+    {
+      "section": "Adapters",
+      "marker": "-",
+      "name": "Hindsight",
+      "text": "- **Hindsight**: one bank per question. Call `retain(transcript, timestamp, document_id=session_id)`, then `recall(query_timestamp=question_date)`. Rank sessions by first-seen `document_id`."
+    },
+    {
+      "section": "Adapters",
+      "marker": "-",
+      "name": "QMD",
+      "text": "- **QMD**: write `<qid>/<session_id>.md` with the date in front matter, one collection per question. Run `qmd query --json -n 50` and compare runs with the reranker off."
+    },
+    {
+      "section": "Adapters",
+      "marker": "-",
+      "name": "Mem0",
+      "text": "- **Mem0**: add turn pairs with `metadata.session_id`, which the vendor harness omits. Rank sessions by their best `search(limit=200)` hit."
+    },
+    {
+      "section": "Adapters",
+      "marker": "-",
+      "name": "Honcho",
+      "text": "- **Honcho**: one workspace per question, one Honcho session per haystack session. Rank sessions by `session_id` in workspace search results."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "Graphiti/Zep",
+      "text": "- **Graphiti/Zep**: [repo](https://github.com/getzep/graphiti), Apache-2.0, v0.30.2 (2026-09-08).\n  - LongMemEval-S 71.2% with gpt-4o, V ([paper](https://arxiv.org/abs/2501.13956), 2025-01).\n  - 90.2% with gpt-5.4, product unstated ([research](https://www.getzep.com/research/), 2026-08).\n  - Needs Neo4j or FalkorDB and LLM extraction per episode.\n  - Adapter: one episode per session; map edges to episodes."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "Supermemory",
+      "text": "- **Supermemory**: [repo](https://github.com/supermemoryai/supermemory) is MIT; the server ships as binaries only (v0.0.8, 2026-08-17), engine source not found.\n  - V: 97% \"Recall@20\" ([research](https://supermemory.ai/research), 2026-05).\n  - Adapter: one container per question, customId = session."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "Letta",
+      "text": "- **Letta**: the [server](https://github.com/letta-ai/letta) is retired (last release 0.16.8, 2026-05-14). Code now lives in [letta-code](https://github.com/letta-ai/letta-code) (Apache-2.0, v0.33.1, 2026-09-24), a separate agent defaulting to Letta Cloud.\n  - LoCoMo 74.0% with gpt-4o-mini, V ([blog](https://www.letta.com/blog/benchmarking-ai-agent-memory/), 2025-08). LongMemEval: not found.\n  - Adapter: one conversation per session, then message search."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "Cognee",
+      "text": "- **Cognee**: [repo](https://github.com/topoteretes/cognee), Apache-2.0, v1.6.1 (2026-09-24).\n  - BEAM-10M 0.67, V ([guide](https://www.cognee.ai/ai-memory-benchmarks), 2026-09). LongMemEval: not found.\n  - Adapter: one document per session; rank by chunk hits."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "Basic Memory",
+      "text": "- **Basic Memory**: [repo](https://github.com/basicmachines-co/basic-memory), AGPL-3.0, v0.23.2 (2026-08-25).\n  - LoCoMo R@5 76.4%, V ([page](https://basicmemory.com/compare/mem0), 2026-06). LongMemEval: not found.\n  - Adapter: one note per session."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "OpenViking",
+      "text": "- **OpenViking**: [repo](https://github.com/volcengine/OpenViking), AGPL-3.0, v0.4.21 (2026-09-20).\n  - LoCoMo 80–83% with Doubao models, V (README, v0.3.22). LongMemEval: not found.\n  - Adapter: sessions as resources; map `find` URIs to sessions."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "claude-mem",
+      "text": "- **claude-mem**: [repo](https://github.com/thedotmack/claude-mem), Apache-2.0, v13.25.3 (2026-09-21).\n  - Benchmarks: not found.\n  - Adapter: replay sessions as observations."
+    },
+    {
+      "section": "Not shortlisted",
+      "marker": "-",
+      "name": "MemOS",
+      "text": "- **MemOS**: [repo](https://github.com/MemTensor/MemOS), Apache-2.0, v2.0.34 (2026-09-23).\n  - V: LongMemEval 89.20 (2026-07, models unstated).\n  - Needs Neo4j and Qdrant; its local plugin skips Claude Code and Codex.\n  - Adapter: add sessions with a session ID."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Comparability",
+      "text": "- **Comparability**:\n  - agentmemory ([repo](https://github.com/rohitg00/agentmemory), Apache-2.0, v0.9.29, 2026-08-16) publishes [95.2% recall_any](https://github.com/rohitg00/agentmemory/blob/main/benchmark/LONGMEMEVAL.md) but scored 0.821 recall_all in your harness.\n  - Maximem found Mem0's QA prompts tuned to the benchmark.\n  - MemPalace hybrid v4 was tuned on LongMemEval; report held-out only."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Realism",
+      "text": "- **Realism**: 50-session haystacks are easy; pooling all 19,195 sessions dropped BM25 R@5 to 30% (#214). Add a pooled-store run."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Cost",
+      "text": "- **Cost**: 470 questions mean about 22,100 session ingests, about 86 hours at Hindsight's measured gpt-oss-20b rate ([0.071/s](https://github.com/vectorize-io/hindsight-benchmarks/blob/main/results/leaderboard/llm/gcp-gpt-oss-20b-medium.json)). Subsample 100 questions; use one local model everywhere."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Licence and cloud",
+      "text": "- **Licence and cloud**: Honcho, Basic Memory and OpenViking are AGPL. Supermemory's engine source was not found. Mem0 and Honcho default to cloud services."
+    },
+    {
+      "section": "Risks",
+      "marker": "-",
+      "name": "Fit",
+      "text": "- **Fit**: LongMemEval-S tests chat recall; [LongMemEval-V2](https://arxiv.org/abs/2605.12493) (2026-05) tests agent trajectories."
+    }
+  ],
+  "tables": [],
+  "sources_read": [
+    "https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_raw_session_20260414_1629.jsonl",
+    "https://github.com/MemPalace/mempalace/blob/develop/benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl",
+    "https://github.com/MemPalace/mempalace",
+    "https://github.com/MemPalace/mempalace/blob/develop/benchmarks/BENCHMARKS.md",
+    "https://github.com/MemPalace/mempalace/issues/214",
+    "https://arxiv.org/abs/2604.21284",
+    "https://github.com/vectorize-io/hindsight",
+    "https://arxiv.org/abs/2512.12818",
+    "https://hindsight.vectorize.io/blog/2026/04/02/beam-sota",
+    "https://benchmarks.hindsight.vectorize.io/",
+    "https://github.com/tobi/qmd",
+    "https://github.com/mem0ai/mem0",
+    "https://github.com/mem0ai/memory-benchmarks",
+    "https://www.maximem.ai/blog/state-of-ai-memory-2026-claimed-vs-observed",
+    "https://docs.mem0.ai/integrations/claude-code",
+    "https://github.com/plastic-labs/honcho",
+    "https://plasticlabs.ai/blog/research/Benchmarking-Honcho",
+    "https://github.com/plastic-labs/honcho/issues/915",
+    "https://github.com/getzep/graphiti",
+    "https://arxiv.org/abs/2501.13956",
+    "https://www.getzep.com/research/",
+    "https://github.com/supermemoryai/supermemory",
+    "https://supermemory.ai/research",
+    "https://github.com/letta-ai/letta",
+    "https://github.com/letta-ai/letta-code",
+    "https://www.letta.com/blog/benchmarking-ai-agent-memory/",
+    "https://github.com/topoteretes/cognee",
+    "https://www.cognee.ai/ai-memory-benchmarks",
+    "https://github.com/basicmachines-co/basic-memory",
+    "https://basicmemory.com/compare/mem0",
+    "https://github.com/volcengine/OpenViking",
+    "https://github.com/thedotmack/claude-mem",
+    "https://github.com/MemTensor/MemOS",
+    "https://github.com/rohitg00/agentmemory",
+    "https://github.com/rohitg00/agentmemory/blob/main/benchmark/LONGMEMEVAL.md",
+    "https://github.com/vectorize-io/hindsight-benchmarks/blob/main/results/leaderboard/llm/gcp-gpt-oss-20b-medium.json",
+    "https://arxiv.org/abs/2605.12493"
+  ],
+  "native_report": {
+    "tool_uses": 129,
+    "subagent_tokens": 303563,
+    "source": "the coordinator's header line (recorder_header)"
+  },
+  "limits": [
+    "Discovery only: the lane did web research; nothing was installed, downloaded or executed on the Mac or VelaNext.",
+    "sections, items and tables are the recorder's transcription; every string in them is an exact substring of return_text (the answer part), and return_text is authoritative.",
+    "sources_read lists the URLs the answer cites, in order of first appearance; it is not a record of pages opened.",
+    "The subagent's tool log was not retained, so which pages it opened is not recorded, and its blindness rests on the packet instruction.",
+    "The Codex return for the same packet existed in the lanes directory from 00:28 EDT while this lane ran (it returned at 00:47 EDT)."
+  ]
+}

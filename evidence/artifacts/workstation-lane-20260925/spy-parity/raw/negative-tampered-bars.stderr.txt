@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "~/code/native-agent-stack/.claude/worktrees/workstation-lane-wave-a-20260925/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 1177, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "~/code/native-agent-stack/.claude/worktrees/workstation-lane-wave-a-20260925/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 1159, in main
+    bars = load_bars(args.bars, args.lean_data, receipt, manifest)
+  File "~/code/native-agent-stack/.claude/worktrees/workstation-lane-wave-a-20260925/blueprints/us-equities/engine-nautilus/spy-parity/compare.py", line 202, in load_bars
+    raise ValueError("converted_rows_sha256_mismatch")
+ValueError: converted_rows_sha256_mismatch

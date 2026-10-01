@@ -58,11 +58,18 @@ rollback checks passing in scope. That page's own boundary applies here too:
 fresh Linux userspace on the existing WSL kernel is not a booted new PC, an
 independent kernel, or a full-foundation deployment.
 
-## vLLM pin: 0.25.0, not 0.29.0
+## vLLM pin: 0.30.0 (0.29.0 fails on WSL)
 
-The working WSL vLLM pin is **0.25.0**. Version **0.29.0 failed real startup
-with "UVA is not available"** on this WSL GPU path (unified virtual
-addressing unsupported by the WSL GPU driver surface at that release).
+The working WSL vLLM pin is **0.30.0** since 2026-09-25
+([`evidence/receipts/vllm-030-switch-20260925.json`](../../evidence/receipts/vllm-030-switch-20260925.json)).
+0.30.0 carries the pinned-memory fallback for WSL (vllm-project/vllm PR
+#56908) and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. On the
+NativeStack RTX 4090 host it served the same Nemotron-3-Embed-1B-BF16 files
+with embeddings and code-index results identical to 0.25.0, first on an
+owned instance and then in production; 0.25.0 stays installed for rollback.
+Version **0.29.0 failed real startup with "UVA is not available"** on this
+WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
+surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
 WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
 unavailable UVA support. Preserve the accepted environment and model/vector
@@ -76,13 +83,41 @@ itself evidence the WSL UVA gap closed.
 
 1. Follow [`adoption/bootstrap.md`](../bootstrap.md) steps 1–3 (prerequisites,
    `bootstrap-linux.sh --profile <id>`, native sign-in).
+   `adoption/bootstrap-linux.sh` and its `claude-code` pin
+   changed after `v2026.09.24.1`: at that tag the pin is 2.1.280 and the
+   script reinstalls it even over a newer Claude Code, so a re-run
+   downgrades a native auto-updated install. On main the pin is 2.1.284 and a floor: the script
+   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.284 or newer
+   (logging `Kept installed claude-code <version>`, with nothing downloaded
+   or installed) and runs the checksum-verified install only when that
+   launcher is missing, older or unreadable. The pin also changed after `v2026.09.26.2`,
+   where it is 2.1.281: 2.1.284 is the first Claude Code release whose
+   `sonnet` alias resolves to Sonnet 5.5 (on the Anthropic API; an older client routes it to Sonnet 5; [model-config](https://code.claude.com/docs/en/model-config)),
+   so a launcher reporting 2.1.281 to 2.1.283 now takes the
+   checksum-verified install.
+   Its version report changed after `v2026.09.24.1`: that release, and
+   every earlier one, runs `--version` on every file in
+   `$ECO_INSTALL_ROOT/bin` and blocks on `context-mode`, which serves MCP on
+   stdin instead, so run such a release's script with `</dev/null` (step 2 of
+   [`adoption/bootstrap.md`](../bootstrap.md) has the details and the
+   `mcp-inspector` case).
+   The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all five entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once, and, since #314, unless the installed `rtk hook check` also leaves the recipe's probes unrewritten (rtk can ignore a TOML-valid file, for example one with a `[tracking]` table that lacks `history_days`). The script never writes that file. Its pins file's rtk `install_note` also changed after `v2026.09.26` (`pins-linux-x86_64.json`, text only).
+   The script's socraticode and headroom installs changed after `v2026.09.26` too (as did headroom's `install_note`): it now passes `--ignore-scripts` for socraticode's `ignore_scripts: true` pin, a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree, and it now downloads headroom's pinned wheel, verifies its `sha256` and installs that file, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index without reading the wheel or its hash (step 2 of [`adoption/bootstrap.md`](../bootstrap.md)).
+   Its pins file also changed after `v2026.09.25.2` in a second way:
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1 on 2026-09-26, then to 0.159.2 on 2026-09-30; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch, which the template keeps for 0.159.2, where the feature is still listed as stable and on) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
+   `pins-linux-x86_64.json` now pins `repomix`, `toon`,
+   `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
+   `token-efficiency` profile's Linux coverage (step 2 of
+   [`adoption/bootstrap.md`](../bootstrap.md) has the details).
+   Its `ai-memory` and `mcporter` pins also changed after `v2026.09.25.2` (2.3.2 to 2.4.1 and 0.13.13 to 0.14.1); before an existing ai-memory service restarts on 2.4.1, follow [upgrading an existing store](../../recipes/README.md#upgrading-an-existing-store).
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as
    [`adoption/receipt.json`](../receipt.json).
 3. Render configs with [`tools/adoption/render_config.py`](../../tools/adoption/render_config.py)
    (`adoption/bootstrap.md` step 4) using this host's own
-   `adoption/hosts/<host>.json`.
+   `adoption/hosts/<host>.json`. For tab titles, alerts and the login shell of Windows Terminal profiles, see
+   [Windows Terminal profiles and the login shell](#windows-terminal-profiles-and-the-login-shell) (added after `v2026.09.26.2`).
 4. Start selected `systemd --user` units per
    [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle);
    never stop the shared MCPorter daemon to clean up another component.
@@ -96,6 +131,128 @@ itself evidence the WSL UVA gap closed.
    [`docs/contributing-evidence.md`](../../docs/contributing-evidence.md).
 7. When a newer release is pinned, follow
    [moving a host to a new release](../update.md#moving-a-host-to-a-new-release).
+
+## Windows-side commands from WSL
+
+Lessons from work on the WSL workstation in September 2026; the links give the
+upstream behavior behind each.
+
+- Do not pipe a script to `powershell.exe -Command -`. PowerShell reads
+  standard input one statement at a time, as if typed at the prompt, and does
+  not run a statement that fails to parse
+  ([about_PowerShell_exe](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)),
+  so a multi-line block can be dropped without an error. Write a `.ps1` file
+  and run it with
+  `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w file.ps1)"`.
+- Strip `\r` and `\0` from Windows-side output before comparing or parsing it,
+  for example with `tr -d '\r\0'`. Windows programs end lines with CRLF, and
+  `wsl.exe` writes UTF-16 unless `WSL_UTF8=1` is set
+  ([`WslClient.cpp` at 2.7.14](https://github.com/microsoft/WSL/blob/2.7.14/src/windows/common/WslClient.cpp#L1843-L1852)).
+- `Get-ChildItem -Filter 'name.*'` also matches an extensionless `name`: the
+  filter follows Win32 wildcard rules, in which `.*` also matches no extension
+  ([.NET `FileSystemName`](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/IO/Enumeration/FileSystemName.cs#L139)).
+  Before any `Remove-Item`, select with `-LiteralPath` or an exact list of
+  names and print that list. `Remove-Item` deletes permanently; it does not use
+  the Recycle Bin
+  ([PowerShell#6801](https://github.com/PowerShell/PowerShell/issues/6801)).
+- A long script passed inline, as in `wsl.exe -d <distro> -- bash -lc '...'`,
+  can fail with `Argument list too long`: Linux refuses a single argument of
+  128 KiB or more (measured on the workstation's WSL kernel: 131,071 bytes
+  ran, 131,072 did not), and a Windows command line is limited to 32,767
+  characters
+  ([CreateProcessW](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)).
+  `/dev/stdin` could not be reopened by path across the interop boundary
+  either. Pipe the script to `bash -s` instead:
+  `wsl.exe -d <distro> -- bash -s < script.sh`.
+
+## Windows Terminal profiles and the login shell
+
+Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example
+[`examples/claude-native/windows-terminal.fragment.example.json`](../../examples/claude-native/windows-terminal.fragment.example.json)
+and `scripts/adoption_status.py --login-shell`. `adoption/templates/codex.config.template.toml` changed after
+`v2026.09.26.2` too: it adds a `[tui] notifications` list. A host pinned to that release has none of them until a release
+carries them ([moving a host to a new release](../update.md#moving-a-host-to-a-new-release)). The decision, its evidence and
+its limits are in [the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md).
+
+A Windows Terminal profile that starts a client with `bash -lc "exec claude"` gets its PATH from the Bash login shell, and a
+login shell reads only the first of `~/.bash_profile`, `~/.bash_login` and `~/.profile`
+([Bash startup files](https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files); bash 5.3 `shell.c`
+`execute_profile_file`). A file at one of the first two names, even an empty one, therefore hides `~/.profile` and every PATH
+entry it adds, and the tab ends with `exec: claude: not found` (exit 127). With `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux
+with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves it
+([anthropics/claude-code#76236](https://github.com/anthropics/claude-code/issues/76236)).
+
+1. Keep no empty `~/.bash_profile` or `~/.bash_login`. On a host that sets that variable, make `~/.bash_profile` a real file that
+   hands off:
+   `if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`. Bootstrap writes no shell startup file; this stays the
+   operator's edit.
+2. Check without running anything:
+   `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --login-shell --json`. It stats the three
+   files and reports a state each, the file a login shell reads first and `profile_read` (`false` when an empty or unusable earlier file hides `~/.profile` or `~/.profile` is itself unusable; `null` when an earlier file has content, because whether it hands off is not read). It proves
+   no PATH. Prove that with the profile's own launch shape, from Windows or through WSL interop:
+   `wsl.exe -d <DISTRO> -u <WSL_USER> --exec /bin/bash -lc 'type -P claude codex'` must print both paths (`type -P` finds files, where `command -v` also accepts a shell function, which the profile's `exec` cannot start; `type -P` can still print a stale hashed or a non-executable path, so the doctor's check also requires the printed path to be an executable regular file). A probe from a shell
+   that already has PATH passes even when the login files are broken.
+3. Merge the Claude Code overlay (added after `v2026.09.26.2`) into the live settings: `python3 tools/adoption/apply_claude_settings.py --template
+   adoption/templates/claude.settings.linux-wsl2.overlay.json --dry-run`, then the same without `--dry-run` (it backs the file up
+   first). It sets `preferredNotifChannel` to `notifications_disabled` and adds one `Notification` hook that rings the
+   terminal bell only when Claude Code needs the person (a permission or elicitation dialog, an agent waiting for input, a quota event, or the model's own push notification, which a local session sends only when the client judges you away (a remote workspace skips that check): once the terminal has sent a focus report its last state decides, so a tab last reported focused counts as present however long you are gone, and before any report 60 s without input counts as away; `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses the check); the hook runs `jq`, which the bootstrap already requires. Windows Terminal 1.24 acts on no notification sequence but BEL. The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a `Notification` hook that already runs the same command: if the overlay's matcher changes later, edit or remove that group first and merge again (`evidence/artifacts/notification-types-20260929/replace_bell_group.py <checkout> local [--apply]` does that on a private copy, after a backup, and refuses a group it cannot replace without losing something). `evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py` prints whether exactly one group holds the command and whether its matcher equals the overlay's.
+4. Render the Codex template as usual (`tools/adoption/render_config.py`; step 3 above): its `[tui] notifications` list asks for a notification on an approval, a plan-mode prompt or a question (`request_user_input` questions notify as `plan-mode-prompt`; `async-question` covers the asynchronous questions added after 0.155.1), and not when a turn finishes. Codex loads a misspelled kind
+   without an error and never notifies for it; the comment above the list names the source file that defines the kinds.
+5. Copy the profile example, replace `<DISTRO>`, `<WSL_USER>` and `<PROJECT>`, and save it as UTF-8 to
+   `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\native-agent-stack\<name>.json`
+   ([JSON fragment extensions](https://learn.microsoft.com/en-us/windows/terminal/json-fragment-extensions)). The page says a GUID is "optional, but strongly encouraged"; the example declares none because this repository's publication scan treats any UUID as a session identifier. Windows Terminal then derives a stable one from the folder name and the profile name (the page's UUIDv5 recipe gives the same value if you must reference a profile by it), so keep the folder name and the profile names fixed once installed: renaming either gives the profile a new identity, and a `settings.json` override or a `defaultProfile` keyed to the old GUID stops applying. Windows Terminal merges fragments on every settings load
+   and watches only `settings.json`, so touch that file after adding or editing one. The example sets no `suppressApplicationTitle` on the Claude and Codex profiles, so each tab shows the title its
+   client sends; gives them an explicit `bellStyle` array (never `"all"`) and a quiet `bellSound`; and sets `COLORTERM` through the profile's `environment` key. **Precedence** (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`, source read, not run here): a profile's own value, then `profiles.defaults`, then the fragment's profile. A profile that only a fragment defines therefore loses to `profiles.defaults` for every key `defaults` sets: if your `defaults` set `suppressApplicationTitle`, `bellStyle`, `bellSound` or `environment`, the example's values for those keys do not apply, and so the titles, the quiet bell or `COLORTERM` are not what the example advertises. Remove those keys from `defaults`, or put the values in the `settings.json` entry for the profile's own (derived) GUID, which does beat `defaults`. A profile's own `environment` also completely replaces `profiles.defaults.environment` instead of merging with it ([profile-advanced](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), "Environment variables"), so in such an entry copy the variables the defaults set. The practice repository's host check refuses a `defaults` that suppresses titles or rings `all`; it does not compare `defaults.environment`.
+
+Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
+
+## Listeners and ports
+
+- All WSL 2 distributions share one network namespace
+  ([About WSL](https://learn.microsoft.com/en-us/windows/wsl/about)), so
+  `ss -ltnp` in one distribution lists the other distributions' listeners too,
+  without a process. Attribute a listener to its distribution, unit and
+  upstream documentation before labelling it. On the WSL workstation on
+  2026-09-25, `127.0.0.1:49374`, this repository's default ai-memory port, was
+  held by another distribution, and that host's scoped `nativestack-memory`
+  unit binds `127.0.0.1:49474`. The ai-memory MCP registration and the
+  rendered hook commands (`AI_MEMORY_URL` in the host's
+  `adoption/hosts/<host>.json`) must name the port the host's own ai-memory
+  unit binds. The user-scope template `adoption/mcp/claude-user.json` keeps
+  the default 49374, and its comment gives the remove-then-add sequence for
+  another port. That template changed after `v2026.09.24.1`: serena runs
+  `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and
+  jcodemunch is no longer registered at user scope (a per-project opt-in in
+  `adoption/bootstrap.md` step 4a).
+- With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
+  reached from the local network
+  ([mirrored mode](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking))
+  unless the Hyper-V firewall blocks it. WSL 2.0.9 and later turn that
+  firewall on by default on Windows 11 22H2 and later
+  ([WSL and firewall](https://learn.microsoft.com/en-us/windows/wsl/networking#wsl-and-firewall)),
+  and the mirrored-mode page opens inbound connections only by changing the
+  firewall's settings or adding a firewall rule. Bind services to `127.0.0.1`
+  and check `ss -ltnp` after each start.
+- The observability backend renders fixed loopback ports. When another
+  distribution holds one, run `observability/backends/configure.py` with
+  `--port-overrides` (changed after `v2026.09.25.2`, which lacks the option).
+  The renderer keeps the map, so a later re-render does not reset the moved ports.
+  Its Prometheus unit also changed after `v2026.09.26.2`: it adds
+  `--enable-feature=created-timestamp-zero-ingestion,promql-extended-range-selectors`
+  for per-process token counters, and its `ecosystem-prometheus.yml` drops the
+  per-process Codex histogram buckets at scrape. See
+  [its README](../../observability/backends/README.md).
+- vLLM listens on a wildcard port even with `--host 127.0.0.1`. vLLM 0.25.0
+  initializes `torch.distributed` over TCP on a single GPU too (its
+  `UniProcExecutor` passes a `tcp://` init method), and PyTorch's `TCPStore`
+  listens on all interfaces by default. vLLM documents this as known,
+  intended PyTorch behavior and says to firewall the internal ports
+  ([security guidance at v0.25.0](https://github.com/vllm-project/vllm/blob/v0.25.0/docs/usage/security.md#security-and-firewalls-protecting-exposed-vllm-systems)).
+  On the WSL workstation on 2026-09-25 (vLLM 0.25.0, torch 2.11.0, API server
+  on `127.0.0.1:18231`), `ss -ltnp` showed the engine-core process
+  (`VLLM::EngineCor`) listening on `*:24706`. Treat this as a known upstream
+  limitation that the Hyper-V firewall mitigates only while it blocks inbound
+  connections: keep that firewall on and its inbound default at block.
 
 ## Boundaries
 

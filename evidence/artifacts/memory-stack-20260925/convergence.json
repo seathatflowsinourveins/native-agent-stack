@@ -1,0 +1,1819 @@
+{
+  "schema_version": 1,
+  "kind": "coordinator_convergence_table",
+  "source_file": "adjudication-20260925/convergence-table.md",
+  "original_sha256": "6d00a850f0fd63ea7c85010f701aa47a190ffb7e2ede56a6d16395bebb6c9070",
+  "original_bytes": 34876,
+  "author": "the convergence writer of the coordinator's workflow, after all nine judgments returned (02:06 EDT)",
+  "transformation": "The Markdown is embedded in text with the coordinator's two home-relative checkout paths replaced by the placeholders listed in redactions (local paths are not published); putting the paths back restores bytes whose sha256 is original_sha256 (checked at assembly). Every table is parsed cell by cell from that text without edits.",
+  "redactions": [
+    {
+      "placeholder": "<native-agent-stack checkout>",
+      "stands_for": "the home-relative path of the coordinator's checkout of this repository",
+      "occurrences": 2
+    },
+    {
+      "placeholder": "<agent-ecosystem checkout>",
+      "stands_for": "the home-relative path of the coordinator's checkout of the agent-ecosystem repository",
+      "occurrences": 1
+    }
+  ],
+  "text_sha256": "f45092c29e55cffd7d51e2737fddb2d8c5633573b99beb50df9681338f495c8b",
+  "publication_policy": {
+    "universal_sota_claim": false,
+    "automatic_install_or_promotion": false,
+    "best_means": "best-evidenced for this workload on these hosts on 2026-09-25"
+  },
+  "inputs": [
+    {
+      "Input": "`lanes/memory-systems-{packet,codex,claude,convergence}.md`",
+      "sha256 (first 16)": "`31318b2121b387e4`, `2eb2fa3b78e8aad0`, `fe609037bee332a5`, `2790d873498fda16`"
+    },
+    {
+      "Input": "`lanes/sota-models-{packet,codex,claude,convergence}.md`",
+      "sha256 (first 16)": "`1847b3a1a0508078`, `a3fa6b77be06cb74`, `bd99a4468233d845`, `31723c68e154b9c2`"
+    },
+    {
+      "Input": "`longmemeval/report-interim.md` (complete arms only)",
+      "sha256 (first 16)": "`911f6f1df0a65dc3`"
+    },
+    {
+      "Input": "`longmemeval/PREREGISTRATION.md` (A13–A15.2 used)",
+      "sha256 (first 16)": "`095383ec55dab50b`"
+    },
+    {
+      "Input": "`adjudication-20260925/adjudication-key.json`",
+      "sha256 (first 16)": "`1eed64c0c60abbcd`"
+    },
+    {
+      "Input": "The 9 `q*-*.verdict.md` files",
+      "sha256 (first 16)": "listed in section 1"
+    }
+  ],
+  "judge_outcomes": [
+    {
+      "Question": "q1 memory system",
+      "Order a": "SPLIT. agentmemory > MemPalace > Hindsight > Attemory",
+      "Order b": "A = **Claude**. MemPalace > Hindsight; agentmemory kept as the measured control",
+      "Order c": "SPLIT. MemPalace > agentmemory > Hindsight > Attemory > GBrain",
+      "Lane preference across 3 orders": "**Not stable.** SPLIT 2/3, Claude 1/3, Codex 0/3",
+      "What holds in all 3 orders": "Retain ai-memory. Trial MemPalace, Hindsight and agentmemory. Attemory only after a gate. MemPalace ranks #1 only in b and c, the two orders where the Claude return was listed first."
+    },
+    {
+      "Question": "q2 memory LLM",
+      "Order a": "SPLIT. Qwen3.6-35B-A3B > LFM2.5-2.6B",
+      "Order b": "A = **Claude**. Same ranking",
+      "Order c": "SPLIT. Same ranking",
+      "Lane preference across 3 orders": "SPLIT 2/3, Claude 1/3",
+      "What holds in all 3 orders": "Identical ranking in 3/3. Qwen3.5-9B stays the control. Nemotron 3.5 Lightning deferred. MemReader set aside."
+    },
+    {
+      "Question": "q3 reranker",
+      "Order a": "SPLIT. MemReranker-4B > ettin > KaLM",
+      "Order b": "SPLIT. MemReranker-4B > KaLM > ettin",
+      "Order c": "SPLIT. MemReranker-4B > KaLM > ettin",
+      "Lane preference across 3 orders": "**SPLIT 3/3**",
+      "What holds in all 3 orders": "MemReranker-4B #1. Adopt none. Jina excluded. Qwen3-Reranker-4B lower. KaLM (Claude lane only) ranks #2 only in b and c, where the Claude return was listed first."
+    }
+  ],
+  "verdict_file_hashes": [
+    {
+      "File": "q1-a",
+      "sha256": "`4a8418f9ed808a14`"
+    },
+    {
+      "File": "q1-b",
+      "sha256": "`f4645e81cc6305ed`"
+    },
+    {
+      "File": "q1-c",
+      "sha256": "`a80b541211e09679`"
+    },
+    {
+      "File": "q2-a",
+      "sha256": "`21d2e60533c30400`"
+    },
+    {
+      "File": "q2-b",
+      "sha256": "`53a0e12eea3f9c90`"
+    },
+    {
+      "File": "q2-c",
+      "sha256": "`793b0469c8f519f7`"
+    },
+    {
+      "File": "q3-a",
+      "sha256": "`56d1527ae8d9bc7a`"
+    },
+    {
+      "File": "q3-b",
+      "sha256": "`a128fa1824b69dd5`"
+    },
+    {
+      "File": "q3-c",
+      "sha256": "`26bf571202c665f1`"
+    }
+  ],
+  "rows": [
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**ai-memory 2.5-pre `19b6429`**. A local `cargo build` of `release/2.5`; it reports 2.4.0 and is 110 commits ahead of official v2.4.0",
+      "decision_scope": "**retain**: production control on the Mac coordinator. Scope: explicit decisions, verified project scope, handoffs",
+      "evidence_held": "**NCE:** aimem-minilm 0.496, aimem-fts 0.400. C3 has 139/470 rows; C4 not run. The catalog's acceptance evidence covers official 2.3.2 and does not transfer to this build",
+      "lanes_judges": "Lanes: incumbent, not ranked. Judges: retain 3/3 (\"do not reject before C3/C4 and the +5 pp rule\")",
+      "rationale": "Stays the control until a challenger beats C3 and C4. Its binary provenance conflicts with the official-artifact rule (section 4, gate 1)",
+      "next_decision_changing_test": "VelaNext C3, then C4 (A15, step 2). Re-run the memory-lane acceptance on the build that is actually running. Move to the first official 2.5 release and re-pin the control with a 20-question reproduction",
+      "rollback": "Official v2.4.0 `ai-memory-macos-aarch64.tar.gz` (verify against its `.sha256`). Revert `ProgramArguments` in `local.agent-ecosystem.ai-memory.plist`",
+      "decision": "retain"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**agentmemory 0.9.29**. npm `@agentmemory/agentmemory`, iii 0.11.2",
+      "decision_scope": "**trial**: VelaNext evaluation plus an isolated dual-client trial. No production wiring",
+      "evidence_held": "**NCE:** am-minilm 0.821 (official track 0.814), am-keyless 0.617. Ingested through the REST `remember` path, labelled the benchmark API path (A15.2), not the shipped hooks. **DV:** 95.2% recall_any",
+      "lanes_judges": "Lanes: on neither shortlist; it was the packet's measured leader. Judges: a #1, b \"measured control; check the hook path\", c #2. Trial 3/3; its rank depends on the order",
+      "rationale": "Strongest neutral result: +32.5 pp over ai-memory with MiniLM, descriptively. Its standing against C3/C4 is unknown, and its capture path is unmeasured. Apache-2.0, local. Codex Desktop does not dispatch plugin hooks (openai/codex#16430)",
+      "next_decision_changing_test": "**D2h**: the shipped Claude Code hook path on VelaNext. Then the E-vs-F matched-embedder comparison, and both decision families. Then memory-lane acceptance across both clients",
+      "rollback": "Stop the server, delete the trial data directory, drop the trial profile. Production is never touched",
+      "decision": "trial"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**MemPalace 3.10.0** (MIT)",
+      "decision_scope": "**trial**: VelaNext A16 arms in raw and palace (production) modes, plus an isolated hook trial in both clients",
+      "evidence_held": "**D:** vendor per-question logs, re-scored by the Claude lane; we have not reproduced them. recall_all@5 is 0.857 raw (470 questions, user turns only; raw mode bypasses the palace code) and 0.887 for hybrid v4 (424 held-out questions; tuned on LME). **DV:** recall_any@5 96.6% and 98.4% (BENCHMARKS.md, 2026-04). **D, third party:** palace modes 89.4% and 84.2% recall_any (#214; arXiv 2604.21284). No NCE",
+      "lanes_judges": "Lanes: Claude #1, Codex –. Judges: a #2, b #1 (A = Claude preferred), c #1. Trial 3/3; it ranks #1 only when the Claude return is listed first",
+      "rationale": "Best fit to the constraints: local, no services, hooks for both clients, MCP. Its hooks ask the agent to file memories, so capture is model-driven and the production path differs from raw mode",
+      "next_decision_changing_test": "**A16.** First, its own harness at v3.10.0 reproduces the published numbers. Then the official evaluator runs on identical session text with both roles, in raw and palace modes. Add a pooled-store stress run, then memory-lane acceptance",
+      "rollback": "`uv tool uninstall mempalace`. Delete the trial palace and the trial profile's hooks",
+      "decision": "trial"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**Hindsight 0.10.1** (MIT)",
+      "decision_scope": "**trial**: VelaNext. A 100-question subset first, with one local LLM",
+      "evidence_held": "**DV:** LongMemEval-S QA 91.4% (Gemini-3) and 83.6% (gpt-oss-20b) in arXiv 2512.12818; the reproduction was by co-authors, so it is not independent. Undated manifest: 94.6%. BEAM-10M: 64.1%. No retrieval recall is published. Catalog `pinned_source_review` at v0.10.0 (2026-09-19). No NCE",
+      "lanes_judges": "Lanes: Codex #1, Claude #2. Judges: a #3, b #2, c #3. Trial 3/3",
+      "rationale": "Clearest documented shared capture for Claude and Codex, with local LLM support. It runs LLM extraction on every retain: about 86 h for 470 questions at the measured gpt-oss-20b rate. It adds Postgres and a worker",
+      "next_decision_changing_test": "**A16 subset.** recall_all@5 ranked by first-seen `document_id`, plus ingest time. Then capture in both clients through the official coding-agents package",
+      "rollback": "`docker rm` the container and its pg0 volume. Remove the coding-agents wiring from the trial profile",
+      "decision": "trial"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**Attemory v0.1.3**",
+      "decision_scope": "**defer** until a gate passes",
+      "evidence_held": "**DV:** session recall_all@5 96.38% on cleaned LME-S (470 questions, local Qwen3.5-9B; undated file), 83.62% on the M variant. The core is a prebuilt SDK, so source and licence coverage are unverified. Its MCP support is only planned",
+      "lanes_judges": "Lanes: Codex #2. Judges: a #4, b below the trials, c #4. Later, with a gate, 3/3",
+      "rationale": "Reports the closest published metric, but its core cannot be audited",
+      "next_decision_changing_test": "`pinned_source_review` of the prebuilt core (source and licence), then an A16 retrieval arm",
+      "rollback": "Nothing installed",
+      "decision": "defer"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**GBrain v0.56.2.0**",
+      "decision_scope": "**defer**",
+      "evidence_held": "**DV:** 95.53% \"all sessions within 5 chunks\", using hosted OpenAI and Voyage models. Chunks are not sessions. 86.6% QA. The catalog rejected it (R-DUP)",
+      "lanes_judges": "Lanes: Codex #3. Judges: a –, b \"incomplete\", c #5",
+      "rationale": "Its metric unit differs, it relies on hosted models, and a macOS reindex hang is open",
+      "next_decision_changing_test": "Optional A16 arm with local providers only. Reopen if it beats agentmemory on recall_all@5",
+      "rollback": "Nothing installed",
+      "decision": "defer"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**Mem0 OSS v2.2.0**",
+      "decision_scope": "**defer** (catalog status unchanged)",
+      "evidence_held": "**DV:** OSS 91.0% QA (GPT-5) and 88.6% (Gemma 4 extraction); the managed platform scores 94.4%. **D, competitor re-run:** 73.8% (Maximem, 2026-05-27)",
+      "lanes_judges": "Lanes: Codex #4, Claude #4. Judges: –",
+      "rationale": "Local capture needs glue code. Its Claude Code plugin needs a Platform key, which is not passwordless",
+      "next_decision_changing_test": "A cost-bounded A16 arm with one local model, or a real need for application-level memory",
+      "rollback": "Nothing installed",
+      "decision": "defer"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**QMD 2.8.3**",
+      "decision_scope": "**retain** for selected document collections. Not a session-memory candidate",
+      "evidence_held": "Selected in the catalog. The ledger's runbook smoke test: 6/10 hit@3",
+      "lanes_judges": "Lanes: Claude #3, as a control. Judges: –",
+      "rationale": "Local hybrid search with reranking, already installed. No capture hooks",
+      "next_decision_changing_test": "Optional A16 control arm",
+      "rollback": "n/a",
+      "decision": "retain"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**Honcho v3.2.1, OpenViking v0.4.21, Basic Memory v0.23.2**",
+      "decision_scope": "**reject** for this role, this wave",
+      "evidence_held": "**DV only.** Honcho 90.4% QA; OpenViking LoCoMo 80.32%; Basic Memory LoCoMo R@5 76.4%. None has a LongMemEval retrieval score",
+      "lanes_judges": "Lanes: Claude #5 (Honcho), Codex #5 (OpenViking). Judges: –",
+      "rationale": "AGPL-3.0 conflicts with a trading lane that may become commercial. Honcho needs Postgres, Redis and a worker, and its embedder can silently fall back to OpenAI (#915)",
+      "next_decision_changing_test": "Reopen if the licence need changes or an independent recall_all@5 result appears",
+      "rollback": "n/a",
+      "decision": "reject"
+    },
+    {
+      "section": "2.1 Memory system (one shared Claude Code and Codex memory)",
+      "candidate_pin": "**Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired",
+      "decision_scope": "**defer**. Catalog status stands; Letta is reject",
+      "evidence_held": "DV only, or none",
+      "lanes_judges": "On neither shortlist. Judges: –",
+      "rationale": "Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin",
+      "next_decision_changing_test": "Named gap only",
+      "rollback": "n/a",
+      "decision": "defer"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**Qwen3-Embedding-4B**. Ollama `qwen3-embedding:4b` `df5bd2e3c74c` (Q4_K_M, 2560-d)",
+      "decision_scope": "**retain**: production embedder control",
+      "evidence_held": "**NCE:** dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus). C3 pending. **D:** LMEB LongMemEval nDCG@10 50.21, the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB",
+      "lanes_judges": "Lanes: both lanes challenge it. Judges: not adjudicated, because the lanes agreed",
+      "rationale": "Stays until an F arm beats C4 (A15.2, precedence 2)",
+      "next_decision_changing_test": "F1–F3 against C4. G0 (BF16) separates the effect of quantization and runtime from the effect of model generation",
+      "rollback": "n/a (current)",
+      "decision": "retain"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**Nemotron-3-Embed-8B-BF16**, HF revision `d1f2f257`",
+      "decision_scope": "**trial**: VelaNext arms E1, F1 and G1 only",
+      "evidence_held": "**D:** LMEB 64.36 (#1) and LongMemEval 85.70 (snapshot 2026-09-24). RTEB(beta) rank 2; MTEB maintainers ran its private tasks. **DV:** RTEB-16 78.46, MMTEB retrieval 75.45. No NCE",
+      "lanes_judges": "Lanes: Codex #1, Claude #1. Judges: n/a",
+      "rationale": "Strongest independent evidence on memory retrieval. OpenMDW-1.1: notices must be kept, and rights end on a patent suit. No official GGUF or Ollama build; community GGUFs are unverified for its bidirectional attention. LM Studio has a wrong-dimension bug (#2177)",
+      "next_decision_changing_test": "A15 gates: the card's example similarities to 2 dp, batch invariance ≥ 0.9999, a 4,096-token cap. Then F1 against C4. Then the deployable-artifact gate: cosine ≥ 0.999 on the target host, within 1 pp on 100 questions",
+      "rollback": "Evaluation only. Delete the cached revision",
+      "decision": "trial"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**Nemotron-3-Embed-1B-BF16**, revision `c0c9fea9`",
+      "decision_scope": "**trial**: E2, F2 and G2",
+      "evidence_held": "**D:** LMEB 61.50, LongMemEval 81.58, RTEB rank 14. **DV:** RTEB-16 72.38. A partner reports LongMemEval R@10 80.38%, method unconfirmed. The catalog's trial note concerns a code-RAG service, which is not memory evidence",
+      "lanes_judges": "Lanes: Codex #2, Claude #2. Judges: n/a",
+      "rationale": "At 1.14B, the one more likely to deploy on the Mac through the MPS reference implementation",
+      "next_decision_changing_test": "The same gates, then F2 against C4, then an MPS deployability check on the Mac",
+      "rollback": "Same as above",
+      "decision": "trial"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**harrier-oss-v1-0.6b**, revision `f9b9dc8d` (MIT)",
+      "decision_scope": "**trial**: preregistered A15 arms E3, F3 and G3; low prior",
+      "evidence_held": "**D:** LMEB 58.43, LongMemEval 72.46 (below Qwen3-Embedding-0.6B's 73.08). **DV:** MMTEB v2 69.01",
+      "lanes_judges": "Lanes: Claude #3, Codex –. Judges: n/a",
+      "rationale": "Did not converge across families. It stays only because A15 named it before any run. Its ONNX build (onnx-community, not first-party) suits agentmemory's in-process path",
+      "next_decision_changing_test": "E3 against am-minilm, then F3 against C4",
+      "rollback": "Same as above",
+      "decision": "trial"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**Qwen3-Embedding-8B and 0.6B**. Ollama `64b933495768` / `ac6da0dfba84`",
+      "decision_scope": "**defer**: C6/C5 size diagnostics only",
+      "evidence_held": "**D:** LongMemEval 77.66 / 73.08",
+      "lanes_judges": "Lanes: Codex #3 (8B, as a control)",
+      "rationale": "Measure size with the reranker off. No production path",
+      "next_decision_changing_test": "C5/C6 against C3 (diagnostic)",
+      "rollback": "n/a",
+      "decision": "defer"
+    },
+    {
+      "section": "2.2 Embedder",
+      "candidate_pin": "**all-MiniLM-L6-v2**, agentmemory's default through transformers.js",
+      "decision_scope": "**retain**, inside the agentmemory trial only, as shipped",
+      "evidence_held": "**NCE:** am-minilm 0.821, aimem-minilm 0.496. **D:** LongMemEval 67.94. Its 256-token window truncates 4–8k-token pages",
+      "lanes_judges": "–",
+      "rationale": "The as-shipped control for the agentmemory arms",
+      "next_decision_changing_test": "E1–E3 against am-minilm",
+      "rollback": "n/a",
+      "decision": "retain"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**ai-memory LLM listwise reranking**: `qwen3.5-9b-64k`, reasoning low, 20 s hard timeout",
+      "decision_scope": "**retain**: the production setting (status quo)",
+      "evidence_held": "No harness result; C4 has not run",
+      "lanes_judges": "n/a",
+      "rationale": "Under A14 and A15.2 (precedence 1), it stays unless C3 beats C4. More than 5% fallbacks makes the result inconclusive",
+      "next_decision_changing_test": "C3 against C4 on VelaNext",
+      "rollback": "Unset `AI_MEMORY_RERANKER` (the C3 configuration)",
+      "decision": "retain"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**MemReranker-4B**, revision `22890bb4` (Apache-2.0)",
+      "decision_scope": "**trial**: exploratory stage X (A15) on VelaNext only. Outside Holm; no adoption",
+      "evidence_held": "**DV:** LongMemEval nDCG@10 0.8354 and MAP 0.8043 on a fixed top-50 set (arXiv 2605.06132). No independent result",
+      "lanes_judges": "Lanes: Codex #1. Judges: #1 in 3/3",
+      "rationale": "Its evaluation setup is closest to our workload. 4B parameters. Only a community MLX build exists",
+      "next_decision_changing_test": "Stage X over the best system's top 50, plus complete-request latency. Adoption needs an upstream reranker slot in the chosen memory system; we do not maintain forks",
+      "rollback": "Nothing deployed",
+      "decision": "trial"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**KaLM-Reranker-V1-Small**, revision `8c2141c8` (R2: `68b74f09`)",
+      "decision_scope": "**trial**: stage X, after a code review",
+      "evidence_held": "**DV:** LMEB dialogue LongMemEval 87.58, from its own team, which also runs LMEB. BEIR 60.01. No LMEB result for R2",
+      "lanes_judges": "Lanes: Claude #3. Judges: a #3, b #2, c #2. It ranks #2 only when the Claude return is listed first",
+      "rationale": "A strong result, but self-reported. Needs `trust_remote_code`: the repository ships `kalm_*.py` files and a vLLM plugin",
+      "next_decision_changing_test": "`pinned_source_review` of the remote code at the pinned revision, then stage X",
+      "rollback": "Nothing deployed",
+      "decision": "trial"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**ettin-reranker-400m-v1**, revision `5dca3628` (`onnx/model_qint8_arm64.onnx`, 397.5 MB)",
+      "decision_scope": "**trial**: stage X, plus a transformers.js drop-in check",
+      "evidence_held": "**DV:** MTEB(eng, v2) retrieval after reranking 0.6091, against 0.5082 for ms-marco-MiniLM. NanoBEIR 0.7193. No memory result and no independent result",
+      "lanes_judges": "Lanes: Codex #3, Claude #1. Judges: a #2, b #3, c #3",
+      "rationale": "The only reranker on both lanes. 0.4B, Apache-2.0, official ARM64 ONNX. The cheapest replacement for agentmemory's 2021 cross-encoder",
+      "next_decision_changing_test": "Stage X. Check that its ONNX scoring head works in transformers.js",
+      "rollback": "Nothing deployed",
+      "decision": "trial"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**Qwen3-Reranker-4B**",
+      "decision_scope": "**defer**: runs only as the preregistered stage-X arm",
+      "evidence_held": "**DV:** MTEB-R 69.76. **D (KaLM paper):** LMEB dialogue LongMemEval 53.72. Its GGUF needs the classifier head (llama.cpp #16407)",
+      "lanes_judges": "Lanes: Claude #2. Judges: lower in 3/3",
+      "rationale": "Weaker evidence on memory data",
+      "next_decision_changing_test": "The stage-X result",
+      "rollback": "n/a",
+      "decision": "defer"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**Jina Reranker v3.5**",
+      "decision_scope": "**reject**",
+      "evidence_held": "**DV:** BEIR 63.20. Licence CC-BY-NC-4.0 (HF card). The catalog rejected it",
+      "lanes_judges": "Lanes: Codex #2. Judges: excluded in 3/3",
+      "rationale": "Its non-commercial licence conflicts with a trading lane that may become commercial",
+      "next_decision_changing_test": "A licence change",
+      "rollback": "n/a",
+      "decision": "reject"
+    },
+    {
+      "section": "2.3 Reranker",
+      "candidate_pin": "**ms-marco-MiniLM-L-6-v2**, bundled with agentmemory and off by default",
+      "decision_scope": "**retain**, inside the agentmemory trial only, as the bundled baseline",
+      "evidence_held": "**DV (ettin table):** 0.5082. 512-token window",
+      "lanes_judges": "–",
+      "rationale": "The baseline that ettin has to beat",
+      "next_decision_changing_test": "ettin against ms-marco on the agentmemory path",
+      "rollback": "n/a",
+      "decision": "retain"
+    },
+    {
+      "section": "2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)",
+      "candidate_pin": "**Qwen3.5-9B**: `qwen3.5:9b-mlx` `203e30078279` (NVFP4). The production tag `qwen3.5-9b-64k` (`5efc0dd55d4a`) adds `num_ctx` 65536",
+      "decision_scope": "**retain**: production and control",
+      "evidence_held": "**D:** AA-LCR 46.0 without reasoning, 70.0 with it (Artificial Analysis). **DV:** LongBench v2 55.2. No harness result; C4 is pending",
+      "lanes_judges": "Lanes: Codex keeps it as control (#1); Claude keeps it as control. Judges: control in 3/3",
+      "rationale": "The status quo",
+      "next_decision_changing_test": "C4 with at most 5% fallbacks, then H1–H3 against C4",
+      "rollback": "n/a",
+      "decision": "retain"
+    },
+    {
+      "section": "2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)",
+      "candidate_pin": "**Qwen3.6-35B-A3B**, HF revision `995ad96e`. Ollama `qwen3.6:35b-a3b` `096fdbd02fe6` (GGUF, 22.6 GB) and `qwen3.6:35b-a3b-nvfp4` `e92a3e94bbca` (MLX, 23.6 GB)",
+      "decision_scope": "**trial**: H1 on VelaNext; a Mac latency check afterwards",
+      "evidence_held": "**D:** AA-LCR 64.3 without reasoning, 71.7 with it. No LongMemEval score. Apache-2.0",
+      "lanes_judges": "Lanes: Claude #1. Judges: #1 in 3/3 (order b preferred A = Claude)",
+      "rationale": "Strongest independent proxy: +18.3 over the control in the same mode, with 3B active parameters. Memory headroom and the 20 s limit are unmeasured",
+      "next_decision_changing_test": "H1 against C4, with at most 5% fallbacks at 20 s. Consolidation fidelity, listwise quality and p95 complete-request latency at 4K and 8K. The Mac check runs only with the user's go-ahead, because the Mac is control-only",
+      "rollback": "`ollama rm` the tag. Production `AI_MEMORY_LLM_MODEL` stays unchanged",
+      "decision": "trial"
+    },
+    {
+      "section": "2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)",
+      "candidate_pin": "**LFM2.5-2.6B**. Official GGUF `LiquidAI/LFM2.5-2.6B-GGUF`, revision `e7caca5d` (Q4_K_M). No Ollama library tag (404)",
+      "decision_scope": "**trial**: H3, evaluation only. A licence gate comes before any production use",
+      "evidence_held": "**DV:** IFStruct 85.49 (a proxy only); 220 tokens/s on an M5 Max CPU. No memory score. It always reasons. Custom LFM1.0 licence",
+      "lanes_judges": "Lanes: Codex #2. Judges: #2 in 3/3",
+      "rationale": "A speed candidate with unproven quality",
+      "next_decision_changing_test": "H3. Review the LFM1.0 licence. Check that Ollama 0.34.4 supports the architecture",
+      "rollback": "`ollama rm`",
+      "decision": "trial"
+    },
+    {
+      "section": "2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)",
+      "candidate_pin": "**Nemotron 3.5 Lightning 30B-A3B**. Ollama `nemotron-3.5-lightning:30b-a3b` `e7a64ff15fb1`",
+      "decision_scope": "**defer**: the preregistered H2 arm still runs, but there is no adoption path unless H1 fails",
+      "evidence_held": "**D:** AA-LCR 60.3 with reasoning; no score without reasoning was found. **DV:** AA-LCR 52.00. OpenMDW-1.1",
+      "lanes_judges": "Lanes: Claude #2. Judges: deferred in 3/3",
+      "rationale": "Its score needs reasoning on and still trails the control's reasoning score",
+      "next_decision_changing_test": "The H2 result",
+      "rollback": "n/a",
+      "decision": "defer"
+    },
+    {
+      "section": "2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)",
+      "candidate_pin": "**MemReader-4B-thinking**",
+      "decision_scope": "**reject** for this role",
+      "evidence_held": "**DV:** LongMemEval 83.00%, for a pipeline of four memory tools",
+      "lanes_judges": "Lanes: Codex #3. Judges: set aside in 3/3",
+      "rationale": "Says nothing about standalone consolidation or listwise ranking",
+      "next_decision_changing_test": "A standalone consolidation benchmark",
+      "rollback": "n/a",
+      "decision": "reject"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**Ollama 0.34.4** (official release, 2026-09-23)",
+      "decision_scope": "**retain**: production serving on the Mac for embeddings and the memory LLM; also serves the H arms on VelaNext",
+      "evidence_held": "**NCE:** served every harness embedding arm. The catalog pin still says 0.34.3 and needs updating",
+      "lanes_judges": "–",
+      "rationale": "Selected. Embedding models run single-slot (A15.1). No native rerank endpoint",
+      "next_decision_changing_test": "–",
+      "rollback": "The official 0.34.3 release asset",
+      "decision": "retain"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**llama.cpp `llama-server`**, an official release build (catalog `b11057`; the freshness check found v0.5.0, which points to b11146)",
+      "decision_scope": "**trial** (catalog status unchanged): the VelaNext GGUF embedding server (A15.1)",
+      "evidence_held": "NCE on VelaNext for a Qwen3.8-27B repair, not for embeddings",
+      "lanes_judges": "–",
+      "rationale": "A batching server for evaluation throughput",
+      "next_decision_changing_test": "The A15.1 batch-invariance gate",
+      "rollback": "Stop the server; remove the extracted release",
+      "decision": "trial"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**vLLM official container**: `vllm/vllm-openai:v0.24.0` (`sha256:251eba5c…`) or `v0.25.0` (`sha256:fc56161e…`)",
+      "decision_scope": "**defer**. Proposed by this writer; not converged",
+      "evidence_held": "**DV:** NVIDIA's model cards validate Nemotron-3-Embed with vllm-openai v0.20–v0.24 (1B) and v0.21/v0.24 (8B), and with vllm 0.25.0 for `/v2/embed`. The MemReranker card documents a vLLM OpenAI-compatible server",
+      "lanes_judges": "No lane, no judge",
+      "rationale": "The upstream end-to-end server the user asked for, in place of the lane package's own OpenAI-compatible wrapper around sentence-transformers",
+      "next_decision_changing_test": "Add it through an amendment written before any VelaNext run. It must pass the same reference-output and batch-invariance gates",
+      "rollback": "Keep the wrapper",
+      "decision": "defer"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**MLX v0.32.2 and mlx-lm**",
+      "decision_scope": "**trial** (catalog status unchanged)",
+      "evidence_held": "The production LLM already runs through Ollama's MLX engine",
+      "lanes_judges": "–",
+      "rationale": "Kill switch: close mlx-lm as a duplicate if Ollama's MLX path is within 10% of its throughput",
+      "next_decision_changing_test": "As in the catalog",
+      "rollback": "n/a",
+      "decision": "trial"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**transformers.js / ONNX in Node** (agentmemory, in-process)",
+      "decision_scope": "**retain**, inside the agentmemory trial",
+      "evidence_held": "**NCE** through am-minilm",
+      "lanes_judges": "–",
+      "rationale": "As shipped",
+      "next_decision_changing_test": "The ettin and harrier ONNX drop-in checks",
+      "rollback": "n/a",
+      "decision": "retain"
+    },
+    {
+      "section": "2.5 Local serving",
+      "candidate_pin": "**LM Studio**",
+      "decision_scope": "**defer**",
+      "evidence_held": "A bug report shows wrong output dimensions for Nemotron (#2177; Codex lane)",
+      "lanes_judges": "–",
+      "rationale": "Ollama already covers this role",
+      "next_decision_changing_test": "–",
+      "rollback": "n/a",
+      "decision": "defer"
+    }
+  ],
+  "adoption_plan": [
+    {
+      "Trial": "**agentmemory 0.9.29**",
+      "Official install path and pin": "`npm install --prefix <trial> @agentmemory/agentmemory@0.9.29` (npm integrity `sha512-NGHEi563…`). The iii engine 0.11.2 comes pinned by the package and is checksum-verified; the freshness check found iii 0.24 incompatible. Wire the clients from the pinned package with `agentmemory connect claude-code --with-hooks` and `agentmemory connect codex --with-hooks`, the upstream workaround for openai/codex#16430",
+      "Isolation scope": "VelaNext trial profile. `AGENTMEMORY_DATA_DIR` in the trial directory. Ports 3111–3113 and 49134 on loopback. Keyless or local embeddings, so no provider key",
+      "Acceptance test": "(1) D2h against C3 and C4 under the rule. (2) A durable decision written from Claude Code in project P1 comes back to Codex in P1 and does not appear in P2. (3) After a restart, recovery works from the trial directory alone",
+      "Rollback": "`agentmemory stop`, then delete the trial directory and profile"
+    },
+    {
+      "Trial": "**MemPalace 3.10.0**",
+      "Official install path and pin": "`uv tool install mempalace==3.10.0` (PyPI wheel `sha256:9f656452…`), or `ghcr.io/mempalace/mempalace:3.10.0@sha256:db576131…`. Take hooks and plugins only from tag v3.10.0 (`.claude-plugin/`, `.codex-plugin/`, `hooks/mempal_save_hook.sh`, `hooks/mempal_precompact_hook.sh`). Reproduce with the vendor's `benchmarks/longmemeval_bench.py` at v3.10.0",
+      "Isolation scope": "VelaNext trial profile, with `XDG_CONFIG_HOME` in the trial directory",
+      "Acceptance test": "(1) The vendor harness reproduces its published recall_any within 1 pp. (2) Our evaluator gives recall_all@5 on session text with both roles, in raw and palace modes, under the A16 rule. (3) A pooled-store run. (4) Hooks save in both clients. (5) The memory-lane acceptance: scoped decision plus cross-scope negative",
+      "Rollback": "`uv tool uninstall mempalace`, or remove the container. Delete the trial palace"
+    },
+    {
+      "Trial": "**Hindsight 0.10.1**",
+      "Official install path and pin": "`ghcr.io/vectorize-io/hindsight:0.10.1@sha256:b4d3b76f…` with the embedded pg0 volume, or `hindsight-all==0.10.1` (wheel `sha256:250e3118…`, with PyPI publish attestations in the release). LLM provider: local Ollama, keyless. Clients: `@vectorize-io/hindsight-coding-agents`, pinned. Version 0.7.0 is inside the 7-day cooldown until 2026-10-01; otherwise use 0.6.1. Record its compatibility with server 0.10.1",
+      "Isolation scope": "VelaNext. One bank per question for the benchmark; a trial profile for the clients",
+      "Acceptance test": "(1) A16 on 100 questions: recall_all@5 ranked by first-seen `document_id`, plus ingest time and cost. (2) Only if it is competitive: the full 470 under the rule. (3) Capture in both clients, plus the memory-lane acceptance",
+      "Rollback": "`docker rm`, then `docker volume rm`. Remove the coding-agents wiring from the trial profile"
+    },
+    {
+      "Trial": "**Nemotron-3-Embed-8B and 1B**",
+      "Official install path and pin": "Official HF weights at revisions `d1f2f257` and `c0c9fea9` (not gated, so no token). Load them with sentence-transformers as the model card shows (transformers ≥ 5.2.0, sentence-transformers ≥ 5.4.1, uv-locked). This is A15's reference path. The upstream server alternative, `vllm/vllm-openai:v0.24.0` by digest, comes in only through an amendment. No community GGUF or MLX builds",
+      "Isolation scope": "VelaNext GPU, one workload at a time (A13), behind the A13 byte-exact cache",
+      "Acceptance test": "The card's example similarities to 2 dp. Batch invariance ≥ 0.9999. F1 or F2 beats C4 under A15.2. A Mac deployment additionally needs the deployable-artifact gate",
+      "Rollback": "Delete the cached revisions. The production embedder is unchanged"
+    },
+    {
+      "Trial": "**harrier-oss-v1-0.6b**",
+      "Official install path and pin": "Official HF weights at revision `f9b9dc8d` through sentence-transformers. The ONNX check uses `onnx-community/harrier-oss-v1-0.6b-ONNX` at `e4daffa0`; that build is not first-party and has to reproduce the reference outputs",
+      "Isolation scope": "As above",
+      "Acceptance test": "E3 against am-minilm, then F3 against C4",
+      "Rollback": "As above"
+    },
+    {
+      "Trial": "**Qwen3.6-35B-A3B**",
+      "Official install path and pin": "`ollama pull qwen3.6:35b-a3b` and verify manifest `096fdbd02fe6` (VelaNext, H1). On the Mac: `qwen3.6:35b-a3b-nvfp4`, manifest `e92a3e94bbca`. Use the production Modelfile parameters (`num_ctx` 65536, the same sampling) with thinking off",
+      "Isolation scope": "A benchmark Ollama instance on its own port, never the production 11434",
+      "Acceptance test": "(1) H1 against C4 with at most 5% fallbacks at 20 s. (2) Consolidation fidelity, listwise quality, and p95 complete-request latency at 4K and 8K. (3) Memory headroom on the Mac with the embedder resident (`OLLAMA_MAX_LOADED_MODELS=2`)",
+      "Rollback": "`ollama rm` the tag"
+    },
+    {
+      "Trial": "**LFM2.5-2.6B**",
+      "Official install path and pin": "`ollama pull hf.co/LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M`: the developer's official GGUF, repository revision `e7caca5d`. Record the blob digest",
+      "Isolation scope": "As above",
+      "Acceptance test": "H3 against C4. The LFM1.0 licence review passes before any production use",
+      "Rollback": "`ollama rm`"
+    },
+    {
+      "Trial": "**MemReranker-4B, KaLM-Reranker-V1-Small, ettin-reranker-400m-v1**",
+      "Official install path and pin": "Official HF weights at revisions `22890bb4`, `8c2141c8` and `5dca3628`, loaded through the `CrossEncoder` each card recommends. KaLM's `trust_remote_code` files are executed only after a pinned source review. For ettin, also `onnx/model_qint8_arm64.onnx` for the transformers.js check",
+      "Isolation scope": "VelaNext stage X only, outside Holm",
+      "Acceptance test": "Ranking quality over the best system's top 50, plus complete-request latency. Adoption needs the chosen memory system to accept a reranker upstream; no fork, no private adapter in production",
+      "Rollback": "Delete the cached revisions"
+    },
+    {
+      "Trial": "**llama.cpp**",
+      "Official install path and pin": "The official release's Linux CUDA asset, verified by sha256 (A15.1)",
+      "Isolation scope": "VelaNext evaluation only",
+      "Acceptance test": "The batch-invariance gate on the Qwen3 GGUF embedders",
+      "Rollback": "Remove the extracted release"
+    }
+  ],
+  "usage_as_recorded": [
+    {
+      "Work": "Model-screen lanes",
+      "Usage": "Codex: 3,179,978 input (3,044,352 cached), 10,544 output. Claude: 414,369 subagent tokens"
+    },
+    {
+      "Work": "Memory-system lanes",
+      "Usage": "Codex: 2,511,644 input (2,394,880 cached), 10,597 output. Claude: 303,563 subagent tokens"
+    },
+    {
+      "Work": "9 judge runs (from the events files)",
+      "Usage": "357,225 input (192,640 cached), 16,848 output, of which 13,348 reasoning"
+    },
+    {
+      "Work": "This writer",
+      "Usage": "Unknown; not measured here"
+    }
+  ],
+  "required_experiment_fields": [
+    {
+      "Field": "task_and_failure",
+      "Where it is": "The two packets and the three question specs"
+    },
+    {
+      "Field": "primary_sources_and_pins",
+      "Where it is": "Sections 2 and 3"
+    },
+    {
+      "Field": "discovery_provenance",
+      "Where it is": "Blind lanes plus blind judges, mapped through the key"
+    },
+    {
+      "Field": "license_and_compatibility",
+      "Where it is": "Each row"
+    },
+    {
+      "Field": "baseline_and_candidate",
+      "Where it is": "C3 and C4, with the as-shipped controls"
+    },
+    {
+      "Field": "frozen_inputs",
+      "Where it is": "Dataset sha256 `d6f21ea9…`, `eligible-manifest.json`, SHA256SUMS"
+    },
+    {
+      "Field": "predeclared_metrics",
+      "Where it is": "recall_all@5 and the secondary metrics (A2)"
+    },
+    {
+      "Field": "runtime_and_platform",
+      "Where it is": "Mac results descriptive, VelaNext confirmatory (A15.2)"
+    },
+    {
+      "Field": "commands",
+      "Where it is": "Section 3"
+    },
+    {
+      "Field": "observations",
+      "Where it is": "`report-interim.md`, complete arms only"
+    },
+    {
+      "Field": "failures_and_skips",
+      "Where it is": "C3 incomplete; C4 never ran on the Mac; D3's Mac rows excluded; no MemoryAgentBench results found"
+    },
+    {
+      "Field": "limitations",
+      "Where it is": "LongMemEval-S is chat recall, not coding-agent memory (LongMemEval-V2, VibeMemBench); 50-session haystacks are easy"
+    },
+    {
+      "Field": "decision_and_scope",
+      "Where it is": "Section 2"
+    },
+    {
+      "Field": "rollback",
+      "Where it is": "Section 2 and section 3"
+    },
+    {
+      "Field": "next_decision_changing_test",
+      "Where it is": "Section 2"
+    }
+  ],
+  "stage_one_notes": [
+    {
+      "source_file": "sota-models-convergence.md",
+      "original_sha256": "31723c68e154b9c28c7bdfcfeaa2be6f1a1749415707476ce047805c4c129831",
+      "original_bytes": 3104,
+      "author": "coordinator, written after both lanes of this packet returned",
+      "text": "# Convergence: current local models for the memory and retrieval stack (2026-09-25)\n\nTrigger: the user asked why the stack still runs stale models. The retrieval layer used the defaults\nthat came with the two systems:\n- ai-memory: Qwen3-Embedding-4B (2025-06-05);\n- agentmemory: all-MiniLM-L6-v2 (2021) and the ms-marco-MiniLM cross-encoder (2021).\n\nThese were never re-screened against current leaderboards.\n\nLanes. Both were blind, and each saw only `sota-models-packet.md`:\n\n| Lane | Output | Tool use | Usage |\n|---|---|---|---|\n| Codex GPT-6 Astra | `sota-models-codex.md` | 30 web searches | 3,179,978 input tokens (3,044,352 cached); 10,544 output tokens |\n| Claude Opus 5.5 | `sota-models-claude.md` | 130 tool uses | 414,369 subagent tokens |\n\n## Agreement\n\n- **Embedding.** Both lanes rank NVIDIA **Nemotron-3-Embed-8B** first and **Nemotron-3-Embed-1B**\n  second. Both were released 2026-07-16 under OpenMDW-1.1, with 32,768-token inputs.\n- **Reranking.** **ettin-reranker-400m-v1** (Sentence Transformers, 2026-05-19, Apache-2.0)\n  is on both lists.\n- **Memory LLM.** Both keep Qwen3.5-9B as the control.\n- **Risks both lanes flag.**\n  - Nemotron-3-Embed is bidirectional, so the llama.cpp and GGUF conversions are unofficial.\n    An LM Studio bug report also shows wrong output dimensions.\n  - Quantized accuracy and local speed are unverified.\n  - The specialised rerankers need adapters: neither memory system accepts an arbitrary\n    cross-encoder.\n\n## Independent evidence (Claude lane)\n\nThis is LMEB, the Long-horizon Memory Embedding Benchmark (MTEB leaderboard API, snapshot\n2026-09-24), run by its authors in results PRs #600 and #617. Scores for its LongMemEval task\n(nDCG@10):\n\n| Model | Score |\n|---|---|\n| Nemotron-3-Embed-8B | 85.70 |\n| Nemotron-3-Embed-1B | 81.58 |\n| Qwen3-Embedding-8B | 77.66 |\n| Qwen3-Embedding-0.6B | 73.08 |\n| harrier-oss-v1-0.6b | 72.46 |\n| all-MiniLM-L6-v2 | 67.94 |\n| **Qwen3-Embedding-4B (production)** | **50.21** |\n\nThe production embedder is the weakest model listed on that task.\n\n## Divergence\n\n| Role | Codex only | Claude only |\n|---|---|---|\n| Embedding, third place | Qwen3-Embedding-8B, as control | harrier-oss-v1-0.6b (Microsoft, MIT) |\n| Reranking | MemReranker-4B (memory-trained, 2026-04-27); Jina Reranker v3.5 (CC-BY-NC-4.0) | Qwen3-Reranker-4B (2025-06); KaLM-Reranker-V1-Small (2026-06/08) |\n| Memory LLM | LFM2.5-2.6B (Liquid, 2026-08-04, LFM1.0 licence); MemReader-4B-thinking (consolidation only) | Qwen3.6-35B-A3B (2026-04-16); Nemotron 3.5 Lightning 30B-A3B (2026-08-11) |\n\n## Resolution\n\nNo adjudication is needed, because the question is which models to measure, not which one wins.\nThe union goes to measurement under amendment A15, and the measured results decide, with these\nexceptions:\n- **Excluded: Jina Reranker v3.5.** Its non-commercial licence conflicts with the trading lane.\n- **Measured but not deployable yet: LFM2.5-2.6B.** Its custom LFM1.0 licence needs review\n  before any production use.\n- **Out of scope: MemReader-4B-thinking.** It is a consolidation model, and a retrieval\n  benchmark cannot measure it.\n",
+      "tables": [
+        {
+          "section": "Convergence: current local models for the memory and retrieval stack (2026-09-25)",
+          "header": [
+            "Lane",
+            "Output",
+            "Tool use",
+            "Usage"
+          ],
+          "rows": [
+            [
+              "Codex GPT-6 Astra",
+              "`sota-models-codex.md`",
+              "30 web searches",
+              "3,179,978 input tokens (3,044,352 cached); 10,544 output tokens"
+            ],
+            [
+              "Claude Opus 5.5",
+              "`sota-models-claude.md`",
+              "130 tool uses",
+              "414,369 subagent tokens"
+            ]
+          ]
+        },
+        {
+          "section": "Independent evidence (Claude lane)",
+          "header": [
+            "Model",
+            "Score"
+          ],
+          "rows": [
+            [
+              "Nemotron-3-Embed-8B",
+              "85.70"
+            ],
+            [
+              "Nemotron-3-Embed-1B",
+              "81.58"
+            ],
+            [
+              "Qwen3-Embedding-8B",
+              "77.66"
+            ],
+            [
+              "Qwen3-Embedding-0.6B",
+              "73.08"
+            ],
+            [
+              "harrier-oss-v1-0.6b",
+              "72.46"
+            ],
+            [
+              "all-MiniLM-L6-v2",
+              "67.94"
+            ],
+            [
+              "**Qwen3-Embedding-4B (production)**",
+              "**50.21**"
+            ]
+          ]
+        },
+        {
+          "section": "Divergence",
+          "header": [
+            "Role",
+            "Codex only",
+            "Claude only"
+          ],
+          "rows": [
+            [
+              "Embedding, third place",
+              "Qwen3-Embedding-8B, as control",
+              "harrier-oss-v1-0.6b (Microsoft, MIT)"
+            ],
+            [
+              "Reranking",
+              "MemReranker-4B (memory-trained, 2026-04-27); Jina Reranker v3.5 (CC-BY-NC-4.0)",
+              "Qwen3-Reranker-4B (2025-06); KaLM-Reranker-V1-Small (2026-06/08)"
+            ],
+            [
+              "Memory LLM",
+              "LFM2.5-2.6B (Liquid, 2026-08-04, LFM1.0 licence); MemReader-4B-thinking (consolidation only)",
+              "Qwen3.6-35B-A3B (2026-04-16); Nemotron 3.5 Lightning 30B-A3B (2026-08-11)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "source_file": "memory-systems-convergence.md",
+      "original_sha256": "2790d873498fda163be5f2015dcfab868b97e873169721b8dd1b3937d31ae511",
+      "original_bytes": 3599,
+      "author": "coordinator, written after both lanes of this packet returned",
+      "text": "# Convergence: memory systems to benchmark against ai-memory (2026-09-25)\n\n**Trigger.** The user asked why ai-memory is \"the best\". It never was. The catalog verdict for the\nmemory layer is `keep_but_compare`, and nine alternatives were reviewed from source only. Measured\nrecall_all@5 on the full track:\n\n| System | recall_all@5 |\n|---|---|\n| agentmemory with MiniLM | 0.821 |\n| Dense retrieval | 0.753 |\n| BM25 | 0.747 |\n| ai-memory with MiniLM | 0.496 |\n| ai-memory, FTS only | 0.400 |\n\n**Lanes.** Both were blind and saw only `memory-systems-packet.md`:\n\n| Lane | Output | Work | Tokens |\n|---|---|---|---|\n| Codex GPT-6 Astra | `memory-systems-codex.md` | 16 web_search calls | 2,511,644 input (2,394,880 cached), 10,597 output |\n| Claude Opus 5.5 | `memory-systems-claude.md` | 129 tool uses | 303,563 |\n\n## Agreement\n\n- **Hindsight** (vectorize-io, MIT, v0.10.1, 2026-09-21) is ranked 1st by Codex and 2nd by Claude.\n  - It has the strongest vendor QA claims: LongMemEval-S 91.4% with Gemini-3 (paper 2025-12), and\n    83.6% with gpt-oss-20b.\n  - It has hooks for Claude Code and Codex, and runs local models.\n  - Cost: an LLM extracts facts on every retain.\n- **Mem0 OSS** (Apache-2.0, v2.2.0, 2026-09-23) is ranked 4th by both lanes.\n  - Its platform and OSS scores differ, and some of its optimizations are platform-only.\n  - Local capture needs glue code.\n- **Both lanes warn** that vendor QA numbers use different answer and judge models, so they cannot\n  be compared with each other or with our retrieval metric. Only measurement on the same protocol\n  settles the question.\n\n## Evidence that uses our exact metric (recall_all@5, LongMemEval-S cleaned)\n\n| System | Score | Source | Caveats |\n|---|---|---|---|\n| Attemory | 96.38% on 470 questions, with local Qwen3.5-9B | Codex lane; vendor benchmark file, undated | The core ships as a prebuilt SDK, so full source and licence coverage are unverified. |\n| MemPalace, raw mode | 0.857 on 470 questions | Claude lane re-scored the vendor's committed per-question logs | MiniLM over user-turn text only; this mode bypasses the palace code. |\n| MemPalace, hybrid v4 | 0.887 on 424 held-out questions | Same | This mode was tuned on LongMemEval. |\n| GBrain | 95.53% \"all sessions within five chunks\" | Codex lane | Different unit: five chunks is not five sessions. It uses hosted OpenAI and Voyage models. |\n\n## Divergence\n\n| Codex only | Claude only |\n|---|---|\n| Attemory (#2); GBrain (#3); OpenViking (#5, AGPL) | MemPalace (#1); QMD (#3, already installed); Honcho (#5, AGPL, Postgres + Redis + worker) |\n\n## Resolution: measure the union, subject to feasibility gates (amendment A16)\n\n- **Measure, cheap and local:**\n  - MemPalace, in raw and palace (production) modes. Hybrid v4 is reported as tuned and makes no\n    decision.\n  - QMD.\n  - GBrain, with local providers only.\n- **Measure, with LLM extraction and subject to cost:** Hindsight and Mem0 OSS, each with one local\n  model.\n- **Measure only after a gate:** Attemory, once its prebuilt core's source and licence are\n  verified.\n- **Not measured:**\n  - Honcho: AGPL, heavy, and its embedder can silently fall back to OpenAI.\n  - OpenViking: AGPL, and no LongMemEval score was found.\n  - Graphiti/Zep, Supermemory (engine source not found), Letta (server retired), Cognee, Basic\n    Memory, claude-mem and MemOS: none was on either shortlist.\n- **Realism check (Claude lane):** 50-session haystacks are easy. A pooled-store run is recommended\n  as a secondary stress test.\n- **Fit caveat:** LongMemEval-S tests chat recall. LongMemEval-V2 (2026-05) tests agent\n  trajectories.\n",
+      "tables": [
+        {
+          "section": "Convergence: memory systems to benchmark against ai-memory (2026-09-25)",
+          "header": [
+            "System",
+            "recall_all@5"
+          ],
+          "rows": [
+            [
+              "agentmemory with MiniLM",
+              "0.821"
+            ],
+            [
+              "Dense retrieval",
+              "0.753"
+            ],
+            [
+              "BM25",
+              "0.747"
+            ],
+            [
+              "ai-memory with MiniLM",
+              "0.496"
+            ],
+            [
+              "ai-memory, FTS only",
+              "0.400"
+            ]
+          ]
+        },
+        {
+          "section": "Convergence: memory systems to benchmark against ai-memory (2026-09-25)",
+          "header": [
+            "Lane",
+            "Output",
+            "Work",
+            "Tokens"
+          ],
+          "rows": [
+            [
+              "Codex GPT-6 Astra",
+              "`memory-systems-codex.md`",
+              "16 web_search calls",
+              "2,511,644 input (2,394,880 cached), 10,597 output"
+            ],
+            [
+              "Claude Opus 5.5",
+              "`memory-systems-claude.md`",
+              "129 tool uses",
+              "303,563"
+            ]
+          ]
+        },
+        {
+          "section": "Evidence that uses our exact metric (recall_all@5, LongMemEval-S cleaned)",
+          "header": [
+            "System",
+            "Score",
+            "Source",
+            "Caveats"
+          ],
+          "rows": [
+            [
+              "Attemory",
+              "96.38% on 470 questions, with local Qwen3.5-9B",
+              "Codex lane; vendor benchmark file, undated",
+              "The core ships as a prebuilt SDK, so full source and licence coverage are unverified."
+            ],
+            [
+              "MemPalace, raw mode",
+              "0.857 on 470 questions",
+              "Claude lane re-scored the vendor's committed per-question logs",
+              "MiniLM over user-turn text only; this mode bypasses the palace code."
+            ],
+            [
+              "MemPalace, hybrid v4",
+              "0.887 on 424 held-out questions",
+              "Same",
+              "This mode was tuned on LongMemEval."
+            ],
+            [
+              "GBrain",
+              "95.53% \"all sessions within five chunks\"",
+              "Codex lane",
+              "Different unit: five chunks is not five sessions. It uses hosted OpenAI and Voyage models."
+            ]
+          ]
+        },
+        {
+          "section": "Divergence",
+          "header": [
+            "Codex only",
+            "Claude only"
+          ],
+          "rows": [
+            [
+              "Attemory (#2); GBrain (#3); OpenViking (#5, AGPL)",
+              "MemPalace (#1); QMD (#3, already installed); Honcho (#5, AGPL, Postgres + Redis + worker)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "neutral_measurements": {
+    "source_file": "longmemeval/report-mac-descriptive.md",
+    "original_sha256": "62c0079136d575f21f5c96c5606bb2d84407ec94b13b7c525c3ebcb5cac3f120",
+    "supersedes": {
+      "file": "longmemeval/report-interim.md",
+      "original_sha256": "911f6f1df0a65dc35bd421dec77685a211b0d9fa646ce367ecb316e4de001038",
+      "note": "The convergence table used the interim report (23:35 EDT), where C3 had 139/470 rows. C3 finished at 02:32 EDT; this report (02:41 EDT) adds it and the paired comparisons against it. Every other complete arm's figures are unchanged between the two reports."
+    },
+    "generated": "2026-09-25 02:41 EDT by the harness summarizer (A14 logic); not committed",
+    "evidence_class": "native_cli_execution",
+    "platform": "Mac coordinator (MacBook Pro 16-inch, Apple M5 Pro, 64 GB), macOS 26.5 at the report time; the reboot into macOS 27.0 came at about 01:19 on 2026-09-25 (A15.2)",
+    "status": "Mac platform, descriptive under amendment A15.2: the Mac results are a cross-platform replication and confirmatory decisions come only from the VelaNext rerun. Every layer decision in the report is still pending on C4, production with the LLM reranker (A14), which did not run on the Mac.",
+    "protocol": "PREREGISTRATION.md with amendments A1–A14 as of the report: LongMemEval-S cleaned (dataset sha256 d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442), official LongMemEval code 9e0b455f4ef0e2ab8f2e582289761153549043fc, session-level retrieval, a fresh store per question, eligible-manifest.json sha256 871f5da108b2901204aa01315b87d91cdee8d4e61dea96f4499916cbc19a05b7; full-session track n = 470 and official track n = 419",
+    "primary_metric": "recall_all@5: every evidence session in the top 5",
+    "complete_arm_rule": "An arm is complete when the report's Coverage table shows 0 missing rows, 0 errors and 0 env errors.",
+    "complete_arms": [
+      {
+        "arm": "A1b-full-oracle",
+        "preregistered_id": "A1b (A6 full-session oracle)",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.994,
+            "ndcg_any@5": 1.0,
+            "recall_all@10": 1.0,
+            "ndcg_any@10": 1.0,
+            "recall_any@5": 1.0,
+            "recall_any@10": 1.0
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 1.0,
+            "multi-session (n=121)": 1.0,
+            "single-session-assistant (n=56)": 1.0,
+            "single-session-preference (n=30)": 1.0,
+            "single-session-user (n=64)": 1.0,
+            "temporal-reasoning (n=127)": 0.976
+          }
+        }
+      },
+      {
+        "arm": "A0-official-bm25",
+        "preregistered_id": "A0",
+        "coverage": {
+          "rows": 500,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.74,
+            "ndcg_any@5": 0.777,
+            "recall_all@10": 0.813,
+            "ndcg_any@10": 0.797,
+            "recall_any@5": 0.891,
+            "recall_any@10": 0.919
+          },
+          "official": {
+            "recall_all@5": 0.742,
+            "ndcg_any@5": 0.772,
+            "recall_all@10": 0.823,
+            "ndcg_any@10": 0.794,
+            "recall_any@5": 0.888,
+            "recall_any@10": 0.926
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.958,
+            "multi-session (n=121)": 0.554,
+            "single-session-assistant (n=56)": 0.804,
+            "single-session-preference (n=30)": 0.7,
+            "single-session-user (n=64)": 0.938,
+            "temporal-reasoning (n=127)": 0.677
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.958,
+            "multi-session (n=121)": 0.562,
+            "single-session-assistant (n=5)": 0.8,
+            "single-session-preference (n=30)": 0.7,
+            "single-session-user (n=64)": 0.938,
+            "temporal-reasoning (n=127)": 0.701
+          }
+        }
+      },
+      {
+        "arm": "A1-official-oracle",
+        "preregistered_id": "A1",
+        "coverage": {
+          "rows": 500,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "official": {
+            "recall_all@5": 0.993,
+            "ndcg_any@5": 1.0,
+            "recall_all@10": 1.0,
+            "ndcg_any@10": 1.0,
+            "recall_any@5": 1.0,
+            "recall_any@10": 1.0
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "official": {
+            "knowledge-update (n=72)": 1.0,
+            "multi-session (n=121)": 1.0,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 1.0,
+            "single-session-user (n=64)": 1.0,
+            "temporal-reasoning (n=127)": 0.976
+          }
+        }
+      },
+      {
+        "arm": "aimem-fts",
+        "preregistered_id": "C1",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.4,
+            "ndcg_any@5": 0.483,
+            "recall_all@10": 0.438,
+            "ndcg_any@10": 0.495,
+            "recall_any@5": 0.664,
+            "recall_any@10": 0.687
+          },
+          "official": {
+            "recall_all@5": 0.368,
+            "ndcg_any@5": 0.454,
+            "recall_all@10": 0.403,
+            "ndcg_any@10": 0.465,
+            "recall_any@5": 0.642,
+            "recall_any@10": 0.663
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.333,
+            "multi-session (n=121)": 0.19,
+            "single-session-assistant (n=56)": 0.768,
+            "single-session-preference (n=30)": 0.567,
+            "single-session-user (n=64)": 0.688,
+            "temporal-reasoning (n=127)": 0.291
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.333,
+            "multi-session (n=121)": 0.19,
+            "single-session-assistant (n=5)": 0.8,
+            "single-session-preference (n=30)": 0.567,
+            "single-session-user (n=64)": 0.688,
+            "temporal-reasoning (n=127)": 0.331
+          }
+        }
+      },
+      {
+        "arm": "aimem-minilm",
+        "preregistered_id": "C2",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.496,
+            "ndcg_any@5": 0.576,
+            "recall_all@10": 0.696,
+            "ndcg_any@10": 0.63,
+            "recall_any@5": 0.785,
+            "recall_any@10": 0.881
+          },
+          "official": {
+            "recall_all@5": 0.473,
+            "ndcg_any@5": 0.548,
+            "recall_all@10": 0.704,
+            "ndcg_any@10": 0.61,
+            "recall_any@5": 0.768,
+            "recall_any@10": 0.883
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.528,
+            "multi-session (n=121)": 0.322,
+            "single-session-assistant (n=56)": 0.804,
+            "single-session-preference (n=30)": 0.733,
+            "single-session-user (n=64)": 0.719,
+            "temporal-reasoning (n=127)": 0.339
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.528,
+            "multi-session (n=121)": 0.331,
+            "single-session-assistant (n=5)": 0.8,
+            "single-session-preference (n=30)": 0.733,
+            "single-session-user (n=64)": 0.719,
+            "temporal-reasoning (n=127)": 0.378
+          }
+        }
+      },
+      {
+        "arm": "aimem-qwen3",
+        "preregistered_id": "C3",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.57,
+            "ndcg_any@5": 0.643,
+            "recall_all@10": 0.815,
+            "ndcg_any@10": 0.704,
+            "recall_any@5": 0.832,
+            "recall_any@10": 0.928
+          },
+          "official": {
+            "recall_all@5": 0.558,
+            "ndcg_any@5": 0.622,
+            "recall_all@10": 0.828,
+            "ndcg_any@10": 0.689,
+            "recall_any@5": 0.826,
+            "recall_any@10": 0.938
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.625,
+            "multi-session (n=121)": 0.413,
+            "single-session-assistant (n=56)": 0.821,
+            "single-session-preference (n=30)": 0.767,
+            "single-session-user (n=64)": 0.812,
+            "temporal-reasoning (n=127)": 0.409
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.625,
+            "multi-session (n=121)": 0.43,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 0.767,
+            "single-session-user (n=64)": 0.812,
+            "temporal-reasoning (n=127)": 0.449
+          }
+        }
+      },
+      {
+        "arm": "am-keyless",
+        "preregistered_id": "D1",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.617,
+            "ndcg_any@5": 0.665,
+            "recall_all@10": 0.789,
+            "ndcg_any@10": 0.715,
+            "recall_any@5": 0.853,
+            "recall_any@10": 0.938
+          },
+          "official": {
+            "recall_all@5": 0.628,
+            "ndcg_any@5": 0.673,
+            "recall_all@10": 0.807,
+            "ndcg_any@10": 0.722,
+            "recall_any@5": 0.866,
+            "recall_any@10": 0.947
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.681,
+            "multi-session (n=121)": 0.38,
+            "single-session-assistant (n=56)": 0.696,
+            "single-session-preference (n=30)": 0.533,
+            "single-session-user (n=64)": 0.906,
+            "temporal-reasoning (n=127)": 0.646
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.681,
+            "multi-session (n=121)": 0.388,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 0.533,
+            "single-session-user (n=64)": 0.906,
+            "temporal-reasoning (n=127)": 0.693
+          }
+        }
+      },
+      {
+        "arm": "am-minilm",
+        "preregistered_id": "D2",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.821,
+            "ndcg_any@5": 0.848,
+            "recall_all@10": 0.938,
+            "ndcg_any@10": 0.872,
+            "recall_any@5": 0.951,
+            "recall_any@10": 0.983
+          },
+          "official": {
+            "recall_all@5": 0.814,
+            "ndcg_any@5": 0.831,
+            "recall_all@10": 0.936,
+            "ndcg_any@10": 0.858,
+            "recall_any@5": 0.936,
+            "recall_any@10": 0.976
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.931,
+            "multi-session (n=121)": 0.727,
+            "single-session-assistant (n=56)": 0.946,
+            "single-session-preference (n=30)": 0.833,
+            "single-session-user (n=64)": 0.922,
+            "temporal-reasoning (n=127)": 0.74
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.931,
+            "multi-session (n=121)": 0.736,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 0.833,
+            "single-session-user (n=64)": 0.922,
+            "temporal-reasoning (n=127)": 0.756
+          }
+        }
+      },
+      {
+        "arm": "bm25-full",
+        "preregistered_id": "B1",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.747,
+            "ndcg_any@5": 0.806,
+            "recall_all@10": 0.847,
+            "ndcg_any@10": 0.831,
+            "recall_any@5": 0.926,
+            "recall_any@10": 0.964
+          },
+          "official": {
+            "recall_all@5": 0.735,
+            "ndcg_any@5": 0.784,
+            "recall_all@10": 0.842,
+            "ndcg_any@10": 0.811,
+            "recall_any@5": 0.914,
+            "recall_any@10": 0.957
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.917,
+            "multi-session (n=121)": 0.554,
+            "single-session-assistant (n=56)": 0.964,
+            "single-session-preference (n=30)": 0.567,
+            "single-session-user (n=64)": 0.953,
+            "temporal-reasoning (n=127)": 0.677
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.917,
+            "multi-session (n=121)": 0.562,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 0.567,
+            "single-session-user (n=64)": 0.953,
+            "temporal-reasoning (n=127)": 0.717
+          }
+        }
+      },
+      {
+        "arm": "dense-qwen3",
+        "preregistered_id": "B2",
+        "coverage": {
+          "rows": 470,
+          "missing": 0,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "tracks": {
+          "full": {
+            "recall_all@5": 0.753,
+            "ndcg_any@5": 0.772,
+            "recall_all@10": 0.896,
+            "ndcg_any@10": 0.806,
+            "recall_any@5": 0.926,
+            "recall_any@10": 0.97
+          },
+          "official": {
+            "recall_all@5": 0.742,
+            "ndcg_any@5": 0.744,
+            "recall_all@10": 0.895,
+            "ndcg_any@10": 0.781,
+            "recall_any@5": 0.907,
+            "recall_any@10": 0.959
+          }
+        },
+        "recall_all_at_5_by_question_type": {
+          "full": {
+            "knowledge-update (n=72)": 0.861,
+            "multi-session (n=121)": 0.645,
+            "single-session-assistant (n=56)": 0.982,
+            "single-session-preference (n=30)": 0.933,
+            "single-session-user (n=64)": 0.844,
+            "temporal-reasoning (n=127)": 0.606
+          },
+          "official": {
+            "knowledge-update (n=72)": 0.861,
+            "multi-session (n=121)": 0.661,
+            "single-session-assistant (n=5)": 1.0,
+            "single-session-preference (n=30)": 0.933,
+            "single-session-user (n=64)": 0.844,
+            "temporal-reasoning (n=127)": 0.646
+          }
+        }
+      }
+    ],
+    "paired_against_c3": {
+      "method": "the report's paired comparison against aimem-qwen3 (C3): cluster bootstrap 95% CI and sign-flip p, Holm within this family (A5); values as printed",
+      "full_track": [
+        {
+          "arm": "am-minilm",
+          "delta_recall_all_at_5": "+0.251",
+          "ci95_recall_all_at_5": "[+0.203, +0.299]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.205",
+          "ci95_ndcg_any_at_5": "[+0.167, +0.242]"
+        },
+        {
+          "arm": "dense-qwen3",
+          "delta_recall_all_at_5": "+0.183",
+          "ci95_recall_all_at_5": "[+0.136, +0.230]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.129",
+          "ci95_ndcg_any_at_5": "[+0.094, +0.164]"
+        },
+        {
+          "arm": "bm25-full",
+          "delta_recall_all_at_5": "+0.177",
+          "ci95_recall_all_at_5": "[+0.127, +0.227]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.163",
+          "ci95_ndcg_any_at_5": "[+0.125, +0.201]"
+        },
+        {
+          "arm": "A0-official-bm25",
+          "delta_recall_all_at_5": "+0.170",
+          "ci95_recall_all_at_5": "[+0.119, +0.219]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.134",
+          "ci95_ndcg_any_at_5": "[+0.094, +0.174]"
+        },
+        {
+          "arm": "am-keyless",
+          "delta_recall_all_at_5": "+0.047",
+          "ci95_recall_all_at_5": "[-0.006, +0.101]",
+          "p_holm": "0.5209",
+          "delta_ndcg_any_at_5": "+0.022",
+          "ci95_ndcg_any_at_5": "[-0.022, +0.066]"
+        },
+        {
+          "arm": "aimem-minilm",
+          "delta_recall_all_at_5": "-0.074",
+          "ci95_recall_all_at_5": "[-0.107, -0.042]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "-0.067",
+          "ci95_ndcg_any_at_5": "[-0.087, -0.048]"
+        },
+        {
+          "arm": "aimem-fts",
+          "delta_recall_all_at_5": "-0.170",
+          "ci95_recall_all_at_5": "[-0.209, -0.131]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "-0.160",
+          "ci95_ndcg_any_at_5": "[-0.187, -0.133]"
+        }
+      ],
+      "official_track": [
+        {
+          "arm": "am-minilm",
+          "delta_recall_all_at_5": "+0.255",
+          "ci95_recall_all_at_5": "[+0.202, +0.308]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.209",
+          "ci95_ndcg_any_at_5": "[+0.171, +0.248]"
+        },
+        {
+          "arm": "A0-official-bm25",
+          "delta_recall_all_at_5": "+0.184",
+          "ci95_recall_all_at_5": "[+0.129, +0.240]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.150",
+          "ci95_ndcg_any_at_5": "[+0.107, +0.193]"
+        },
+        {
+          "arm": "dense-qwen3",
+          "delta_recall_all_at_5": "+0.184",
+          "ci95_recall_all_at_5": "[+0.130, +0.237]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.122",
+          "ci95_ndcg_any_at_5": "[+0.083, +0.161]"
+        },
+        {
+          "arm": "bm25-full",
+          "delta_recall_all_at_5": "+0.177",
+          "ci95_recall_all_at_5": "[+0.120, +0.234]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "+0.162",
+          "ci95_ndcg_any_at_5": "[+0.121, +0.203]"
+        },
+        {
+          "arm": "am-keyless",
+          "delta_recall_all_at_5": "+0.069",
+          "ci95_recall_all_at_5": "[+0.012, +0.128]",
+          "p_holm": "0.1376",
+          "delta_ndcg_any_at_5": "+0.051",
+          "ci95_ndcg_any_at_5": "[+0.006, +0.097]"
+        },
+        {
+          "arm": "aimem-minilm",
+          "delta_recall_all_at_5": "-0.086",
+          "ci95_recall_all_at_5": "[-0.124, -0.049]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "-0.074",
+          "ci95_ndcg_any_at_5": "[-0.096, -0.052]"
+        },
+        {
+          "arm": "aimem-fts",
+          "delta_recall_all_at_5": "-0.191",
+          "ci95_recall_all_at_5": "[-0.235, -0.147]",
+          "p_holm": "0.0001",
+          "delta_ndcg_any_at_5": "-0.167",
+          "ci95_ndcg_any_at_5": "[-0.198, -0.138]"
+        }
+      ]
+    },
+    "report_decision_lines": [
+      "`A0-official-bm25`: pending: production aimem-qwen3-rerank (C4) not finished; against C3 alone it passes (A14)",
+      "`aimem-fts`: provisional: does not beat yet (ai-memory configuration, against C3); final once aimem-qwen3-0.6b, aimem-qwen3-8b, am-qwen3, aimem-qwen3-rerank finish",
+      "`aimem-minilm`: provisional: does not beat yet (ai-memory configuration, against C3); final once aimem-qwen3-0.6b, aimem-qwen3-8b, am-qwen3, aimem-qwen3-rerank finish",
+      "`aimem-qwen3-0.6b`: pending: arm not finished (or has env errors)",
+      "`aimem-qwen3-8b`: pending: arm not finished (or has env errors)",
+      "`aimem-qwen3-rerank`: pending: C4 not finished",
+      "`am-keyless`: pending: production aimem-qwen3-rerank (C4) not finished; against C3 alone it does not pass (A14)",
+      "`am-minilm`: pending: production aimem-qwen3-rerank (C4) not finished; against C3 alone it passes (A14)",
+      "`am-qwen3`: pending: arm not finished (or has env errors)",
+      "`bm25-full`: pending: production aimem-qwen3-rerank (C4) not finished; against C3 alone it passes (A14)",
+      "`dense-qwen3`: pending: production aimem-qwen3-rerank (C4) not finished; against C3 alone it passes (A14)"
+    ],
+    "c3_platform_note": "C3 rows 349 onward were computed on macOS 27.0 with the same Ollama binary and model digest (A15.2). The drift check recomputed 20 completed questions on macOS 27.0 without the cache; the recorder's comparison of those rows with C3's rows gives identical full-track recall_all@5 on 20/20 and ndcg_any@5 on 18/20.",
+    "drift_check": {
+      "questions": 20,
+      "identical_full_track": {
+        "recall_all@5": 20,
+        "ndcg_any@5": 18
+      },
+      "sources": "results-drift-macos27/aimem-qwen3.jsonl against results/aimem-qwen3.jsonl (not committed)"
+    },
+    "oracle_checks": [
+      "`A1b-full-oracle`: recall_all@5 0.99362 vs ceiling 0.99362 — pass",
+      "`A1-official-oracle`: recall_all@5 0.99284 vs ceiling 0.99284 — pass"
+    ],
+    "excluded_incomplete_arms": [
+      {
+        "arm": "am-qwen3",
+        "preregistered_id": "D3",
+        "coverage": {
+          "rows": 12,
+          "missing": 458,
+          "errors": 0,
+          "env_errors": 0
+        },
+        "note": "Stopped under A13; A15.2 excludes its 12 Mac rows from every analysis."
+      }
+    ],
+    "not_run_on_the_mac": "C4 (production, LLM reranker on), C5, C6 and the D2h shipped-hook arm (A15.2: C4, C6, D3, C5, the quant runs and AIPerf never ran on the Mac).",
+    "transcription": "Values are transcribed from the report's full-track, official-track, paired, by-type and coverage tables for the complete arms only (every arm except am-qwen3); the report itself is not committed."
+  },
+  "preregistration": {
+    "source_file": "longmemeval/PREREGISTRATION.md",
+    "original_sha256": "1f3ca9d554cff24dc785c35f275335027a831dd386f460890f8a3082a07c11c2",
+    "note": "Not committed. The convergence table cites this file at sha256 prefix 095383ec55dab50b with A13–A15.2; it was amended at 02:15 EDT, after the table (02:06 EDT), to add A16. The sha256 above is the file with A16.",
+    "amendments_cited": [
+      {
+        "id": "A13",
+        "heading": "2026-09-24 A13: one GPU workload at a time, and a byte-exact embedding cache (before C4, C5 and C6 started)",
+        "summary": "One GPU workload at a time and a byte-exact embedding cache (the queue it set was superseded at 00:00 by the control-only decision). It records that Ollama ran the embedding model single-slot."
+      },
+      {
+        "id": "A14",
+        "heading": "2026-09-24 A14: production is C4, not C3 (a correction written at 23:26 EDT, before any comparison against C3 or C4 existed)",
+        "summary": "Production reranks with its LLM, so production is C4; a layer candidate must beat both C3 and C4 (intersection–union), and the reranker stays unless C3 beats C4."
+      },
+      {
+        "id": "A15",
+        "heading": "2026-09-25 A15: the rerun on VelaNext, plus current-generation models (written before any VelaNext run)",
+        "summary": "The confirmatory rerun moves to VelaNext (one platform per comparison) and adds the E, F, G and H arms for the current-generation embedders and reranker LLMs, G0 as a diagnostic and X as an exploratory reranker stage."
+      },
+      {
+        "id": "A15.1",
+        "heading": "2026-09-25 A15.1: GPU throughput on VelaNext (written before any VelaNext run)",
+        "summary": "Batched embedding servers on VelaNext (llama.cpp llama-server for the GGUF controls, a BF16 reference server), a batch-invariance gate, and Ollama kept for the GGUF chat LLMs."
+      },
+      {
+        "id": "A15.2",
+        "heading": "2026-09-25 A15.2: corrections from the adversarial review (written before any VelaNext run and before C3 finished)",
+        "summary": "Fixed C3 and C4 families with Holm at α = 0.0333 each and α = 0.0167 reserved for A16; precedence reranker, then embedder, then layer; the D2h shipped-hook arm; the deployable-artifact gate; Mac results descriptive; record corrections (the model lanes made 15 Codex web_search calls, not 30)."
+      },
+      {
+        "id": "A16",
+        "heading": "2026-09-25 A16: memory-system trial arms (named before any A16 run; α = 0.0167 as reserved in A15.2)",
+        "summary": "Names the decision-capable A16 arms D2h (agentmemory shipped hooks), M2 (MemPalace palace mode) and K1 (Hindsight with one local LLM on a 100-question stratified subset), the diagnostics (M1 raw mode, vendor harness reproductions, a pooled-store run), defers Attemory, GBrain and Mem0 OSS, rejects Honcho, OpenViking, Basic Memory and the retired Letta server, and keeps ai-memory in production until a candidate passes and then clears the memory-lane acceptance."
+      }
+    ]
+  },
+  "skeptic_review": {
+    "method": "A stage of the coordinator's convergence workflow ran two independent skeptic checks on each of the 34 rows (68 checks). Each check tested (a) that the row's evidence is true to its sources and correctly labelled, (b) the lane and judge mapping through the key, (c) the practice's rules (no adopt_within_scope without NCE plus memory-lane acceptance, no universal SOTA claim) and (d) that the next test can change the decision, and returned refuted true or false, the errors and a corrected row.",
+    "source": "the workflow's structured result, not committed because it holds local paths and session-scoped file names",
+    "source_sha256": "b668e0673eca586956473f303bf622f7281db1288abb1c2f21c02da2bdc601a9",
+    "refuting_checks": 9,
+    "rows_with_a_refuting_check": 7,
+    "decisions_changed": 0,
+    "application": "The recorder applied every refuting check's correction, the LMEB source naming on every row that cites LMEB figures (as the coordinator required), and the harrier next test that the refuting check on the all-MiniLM-L6-v2 row found to repeat the same error. The corrected rows are in catalogs/foundation/memory-stack-20260925.json; the rows above stay as written. Optional wording suggestions from non-refuting checks are not applied; none changes a decision.",
+    "corrections": [
+      {
+        "id": "k1-ollama-embedding-arms",
+        "row": "/rows/28",
+        "candidate_pin": "**Ollama 0.34.4** (official release, 2026-09-23)",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "decision_scope",
+            "as_written": "**retain**: production serving on the Mac for embeddings and the memory LLM; also serves the H arms on VelaNext",
+            "corrected": "production serving on the Mac for the Qwen3 embedder and the memory LLM. On VelaNext it serves only the GGUF chat LLMs (C4 and the H arms, preregistered and not yet run); the VelaNext embedders go to llama-server and the BF16 reference server (A15.1)"
+          },
+          {
+            "field": "evidence_held",
+            "as_written": "**NCE:** served every harness embedding arm. The catalog pin still says 0.34.3 and needs updating",
+            "corrected": "**NCE** (Mac only, descriptive under A15.2): Ollama served the Qwen3-Embedding GGUF arms: B2 dense-qwen3 (complete, n = 470, recall_all@5 0.753), C3 aimem-qwen3 (139/470 in the interim report) and D3 am-qwen3 (12/470, excluded from every analysis by A15.2). The MiniLM arms C2 and D2 ran in-process on CPU, not on Ollama. Embedding models run single-slot (OLLAMA_NUM_PARALLEL is ignored for them; A13, A15.1). No native rerank endpoint. The agent-ecosystem catalog's selected pin still says 0.34.3 and needs updating; its manifest already records 0.34.4"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "–",
+            "corrected": "None pending for retain. Recheck the VelaNext serving of C4 and the H arms when those runs happen"
+          }
+        ],
+        "basis": "Both skeptic checks on this row refuted check (a): the claim that Ollama 'served every harness embedding arm' is false. The MiniLM arms ran in-process (A15.1 calls C2 and D2 CPU-only), and under A15.1 Ollama serves no VelaNext embedder.",
+        "refuting_checks": 2
+      },
+      {
+        "id": "k2-qmd-next-test",
+        "row": "/rows/7",
+        "candidate_pin": "**QMD 2.8.3**",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "Selected in the catalog. The ledger's runbook smoke test: 6/10 hit@3",
+            "corrected": "Selected in the agent-ecosystem catalog at pin 2.8.3. Our operational runbook retrieval smoke test: 6/10 hit@3 with `qmd search` (the keyword path), against 3/10 on the old Mac and 9/10 for SocratiCode on the same questions. Not a LongMemEval result"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "Optional A16 control arm",
+            "corrected": "Rerun the runbook retrieval smoke test after each index rebuild or version change, on both `qmd search` and `qmd query` (the reranking path), and compare it with SocratiCode on the same 10 questions. A drop below the old-Mac baseline (3/10 hit@3), or a consistent loss to SocratiCode on the document collections, moves QMD to defer for those collections. A QMD LongMemEval arm would bear only on the separate session-memory question, and A16 as written names none"
+          }
+        ],
+        "basis": "One skeptic check refuted check (d): an optional A16 LongMemEval arm cannot change a retain decision scoped to selected document collections; the runbook smoke test is what bears on it. The other check agreed that the A16 arm bears only on the session-memory scope.",
+        "refuting_checks": 1
+      },
+      {
+        "id": "k3-minilm-next-test",
+        "row": "/rows/15",
+        "candidate_pin": "**all-MiniLM-L6-v2**, agentmemory's default through transformers.js",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**NCE:** am-minilm 0.821, aimem-minilm 0.496. **D:** LongMemEval 67.94. Its 256-token window truncates 4–8k-token pages",
+            "corrected": "**NCE** (Mac, descriptive under A15.2): am-minilm 0.821 on the REST benchmark API path; aimem-minilm 0.496, which measures ai-memory with this embedder rather than the embedder alone. **D:** LMEB LongMemEval task, nDCG@10 67.94 (MTEB leaderboard API snapshot 2026-09-24; LMEB results PRs #600/#617). Its 256-token window truncates 4–8k-token pages"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "E1–E3 against am-minilm",
+            "corrected": "E1–E3 (agentmemory with each new embedder, on VelaNext, benchmark API path) decided against C3 and against C4, passing both Holm families (A14, A15.2, α = 0.0333). D2 (am-minilm), rerun on VelaNext, is reported alongside as the paired, descriptive as-shipped reference, not as the decision comparator. A production switch also needs the A15.2 deployable-artifact gate and D2h, the shipped hook path"
+          }
+        ],
+        "basis": "One skeptic check refuted check (d): 'E1–E3 against am-minilm' is not a preregistered decision comparison (A15 and A15.2 decide E1–E3 against C3 and C4, and one platform per comparison forbids pairing VelaNext arms with the Mac 0.821). The other check flagged the same as a weakness.",
+        "refuting_checks": 1
+      },
+      {
+        "id": "k4-qwen3-embedding-8b-0.6b",
+        "row": "/rows/14",
+        "candidate_pin": "**Qwen3-Embedding-8B and 0.6B**. Ollama `64b933495768` / `ac6da0dfba84`",
+        "decision_unchanged": "defer",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**D:** LongMemEval 77.66 / 73.08",
+            "corrected": "**D** (independent): LMEB (Long-horizon Memory Embedding Benchmark) LongMemEval task, nDCG@10: 77.66 (8B) and 73.08 (0.6B), MTEB leaderboard API snapshot 2026-09-24, run by the LMEB (KaLM) authors in results PRs #600/#617. Not QA accuracy and not our recall_all@5. No NCE: C5 and C6 never ran on the Mac"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "C5/C6 against C3 (diagnostic)",
+            "corrected": "An amendment written before its first run names an F-style arm: ai-memory with Qwen3-Embedding-8B (`64b933495768`) and the reranker on, decided against C4 under the A14/A15.2 rule, then the deployable-artifact gate. A16 as written names no such arm. Until one exists, C5/C6 against C3 on VelaNext are descriptive size diagnostics with the reranker off and cannot change this row (A15.2, precedence 2)"
+          }
+        ],
+        "basis": "One skeptic check refuted checks (a) and (d): the row did not name its independent source, and under A15.2 precedence 2 'C5/C6 against C3' cannot change the decision. The other check proposed the same evidence wording.",
+        "refuting_checks": 1
+      },
+      {
+        "id": "k5-lmeb-source-qwen3-embedding-4b",
+        "row": "/rows/10",
+        "candidate_pin": "**Qwen3-Embedding-4B**. Ollama `qwen3-embedding:4b` `df5bd2e3c74c` (Q4_K_M, 2560-d)",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**NCE:** dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus). C3 pending. **D:** LMEB LongMemEval nDCG@10 50.21, the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB",
+            "corrected": "**NCE:** dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus). C3 pending. **D:** LMEB LongMemEval task, nDCG@10 50.21 (MTEB leaderboard API snapshot 2026-09-24), the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB"
+          }
+        ],
+        "basis": "Names the LMEB source (LongMemEval task, nDCG@10, snapshot) as the coordinator required for every row citing LMEB figures.",
+        "refuting_checks": 0
+      },
+      {
+        "id": "k5-lmeb-source-nemotron-8b",
+        "row": "/rows/11",
+        "candidate_pin": "**Nemotron-3-Embed-8B-BF16**, HF revision `d1f2f257`",
+        "decision_unchanged": "trial",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**D:** LMEB 64.36 (#1) and LongMemEval 85.70 (snapshot 2026-09-24). RTEB(beta) rank 2; MTEB maintainers ran its private tasks. **DV:** RTEB-16 78.46, MMTEB retrieval 75.45. No NCE",
+            "corrected": "**D:** LMEB average nDCG@10 64.36 (#1) and LMEB LongMemEval task nDCG@10 85.70 (MTEB leaderboard API snapshot 2026-09-24; LMEB PRs #600/#617). RTEB(beta) rank 2; the vendor submitted its public tasks and the MTEB maintainers ran its private tasks. **DV:** RTEB-16 78.46, MMTEB retrieval 75.45. No NCE"
+          }
+        ],
+        "basis": "Names the LMEB source as required; both skeptic checks on this row proposed this wording, including the RTEB public/private note.",
+        "refuting_checks": 0
+      },
+      {
+        "id": "k5-lmeb-source-nemotron-1b",
+        "row": "/rows/12",
+        "candidate_pin": "**Nemotron-3-Embed-1B-BF16**, revision `c0c9fea9`",
+        "decision_unchanged": "trial",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**D:** LMEB 61.50, LongMemEval 81.58, RTEB rank 14. **DV:** RTEB-16 72.38. A partner reports LongMemEval R@10 80.38%, method unconfirmed. The catalog's trial note concerns a code-RAG service, which is not memory evidence",
+            "corrected": "**D:** LMEB average nDCG@10 61.50 and LMEB LongMemEval task nDCG@10 81.58 (MTEB leaderboard API snapshot 2026-09-24), RTEB rank 14. **DV:** RTEB-16 72.38. A partner reports LongMemEval R@10 80.38%, method unconfirmed. The catalog's trial note concerns a code-RAG service, which is not memory evidence"
+          }
+        ],
+        "basis": "Names the LMEB source as required.",
+        "refuting_checks": 0
+      },
+      {
+        "id": "k5-lmeb-source-harrier",
+        "row": "/rows/13",
+        "candidate_pin": "**harrier-oss-v1-0.6b**, revision `f9b9dc8d` (MIT)",
+        "decision_unchanged": "trial",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**D:** LMEB 58.43, LongMemEval 72.46 (below Qwen3-Embedding-0.6B's 73.08). **DV:** MMTEB v2 69.01",
+            "corrected": "**D:** LMEB average nDCG@10 58.43 and LMEB LongMemEval task nDCG@10 72.46, below Qwen3-Embedding-0.6B's 73.08 (MTEB leaderboard API snapshot 2026-09-24). **DV:** MMTEB v2 69.01"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "E3 against am-minilm, then F3 against C4",
+            "corrected": "F3 against C4 (A15.2, embedder precedence), and E3 and G3 against both C3 and C4 (A14 intersection–union). E3 against a VelaNext rerun of am-minilm is descriptive only. The onnx-community ONNX build must reproduce the reference embeddings (cosine ≥ 0.999) before any in-process use"
+          }
+        ],
+        "basis": "Names the LMEB source as required. The refuting check on the all-MiniLM-L6-v2 row found that this row's 'E3 against am-minilm' repeats the same non-preregistered comparison; a skeptic check on this row proposed the replacement wording.",
+        "refuting_checks": 0
+      },
+      {
+        "id": "k6-nemotron-lightning-scope",
+        "row": "/rows/26",
+        "candidate_pin": "**Nemotron 3.5 Lightning 30B-A3B**. Ollama `nemotron-3.5-lightning:30b-a3b` `e7a64ff15fb1`",
+        "decision_unchanged": "defer",
+        "changes": [
+          {
+            "field": "decision_scope",
+            "as_written": "**defer**: the preregistered H2 arm still runs, but there is no adoption path unless H1 fails",
+            "corrected": "the preregistered H2 arm runs on VelaNext in the C4 family (reasoning off where supported, official GGUF on Ollama 0.34.4, production Modelfile parameters). It is compared only if C3 against C4 keeps the reranker on, and under A15.2 it is eligible for selection whether or not H1 passes: it must beat C4 under Holm at α = 0.0333 with a significant gain of at least +5 pp and at most 5% fallbacks at 20 s, and have the best point estimate among the passing H arms. Even then it reaches at most trial until the memory-lane acceptance passes"
+          },
+          {
+            "field": "lanes_judges",
+            "as_written": "Lanes: Claude #2. Judges: deferred in 3/3",
+            "corrected": "Lanes: Claude #2. Judges: not ranked in 3/3; orders a and b defer it and order c deprioritizes it"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "The H2 result",
+            "corrected": "H2 against C4 on VelaNext under the C4-family Holm test (α = 0.0333, +5 pp, at most 5% fallbacks at 20 s), decided only if the reranker stays on; then H2 against H1 by point estimate, with their paired CI"
+          }
+        ],
+        "basis": "Both skeptic checks refuted checks (c) and (d): 'no adoption path unless H1 fails' adds a gate A15 and A15.2 never preregistered (H1–H3 are all C4-family members, and among passing candidates the choice is by point estimate). Order c's verdict says 'Deprioritize', not 'defer'.",
+        "refuting_checks": 2
+      },
+      {
+        "id": "k7-llama-cpp-evidence-and-gate",
+        "row": "/rows/29",
+        "candidate_pin": "**llama.cpp `llama-server`**, an official release build (catalog `b11057`; the freshness check found v0.5.0, which points to b11146)",
+        "decision_unchanged": "trial",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "NCE on VelaNext for a Qwen3.8-27B repair, not for embeddings",
+            "corrected": "model_task_execution on VelaNext at b11057: a Qwen3.8-27B chat-model code repair that passed 12 tests (catalog host record 2026-09-20). Not NCE in this table's sense (not our LongMemEval harness), and no embedding evidence"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "The A15.1 batch-invariance gate",
+            "corrected": "Before C3 and C4 run on VelaNext, on the same GGUF digests (`df5bd2e3c74c`, `ac6da0dfba84`, `64b933495768`) with the same pooling and instruction settings: first a parity gate against Ollama 0.34.4 (cosine ≥ 0.999 on the gate texts, recall within 1 pp on 100 questions), then the A15.1 batch-invariance gate (cosine ≥ 0.9999). If parity fails, llama.cpp moves to defer for this role and single-slot Ollama serves the controls as A15 preregistered; if batch invariance fails, its throughput reason no longer holds, so it moves to defer with Ollama serving the controls. The parity gate is not in the preregistration yet and must be written in before any VelaNext run"
+          }
+        ],
+        "basis": "One skeptic check refuted checks (a) and (d): the evidence is a chat-model repair, not NCE; the build is unpinned; and the batch-invariance gate alone cannot change the decision because a failing model just runs single-sequence. The other check made the same relabel and pin points.",
+        "refuting_checks": 1,
+        "pin_note": "b11057 is an official prerelease tag (commit 59657a613ab0fa4ab327d6c790123dff30bfbd67), the catalog's qualified build; v0.5.0 is a release tag at b11146 (commit 7fe450e19305b828c199d602c23a8337aaa1f03b). A15.1 names neither: fix one, with its asset sha256, before any A15.1 run."
+      },
+      {
+        "id": "k8-transformers-js-next-test",
+        "row": "/rows/32",
+        "candidate_pin": "**transformers.js / ONNX in Node** (agentmemory, in-process)",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "as_written": "**NCE** through am-minilm",
+            "corrected": "**NCE** through am-minilm: recall_all@5 0.821 on the full track (n = 470), on the Mac benchmark API path (REST `remember`), descriptive under A15.2. The trial tree resolves @huggingface/transformers 4.3.0 and onnxruntime-node 1.30.0 from the agentmemory 0.9.29 lockfile (reported by a skeptic check; not re-verified here)"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "as_written": "The ettin and harrier ONNX drop-in checks",
+            "corrected": "The agentmemory trial outcome: D2h on the shipped hook path, and E1–E3 (agentmemory through its OpenAI-compatible /v1/embeddings provider on VelaNext) against C3 and C4, with D2 as the paired descriptive reference. If an endpoint embedder is selected, or agentmemory leaves the trial, this runtime moves to defer or reject for the role. The ettin and harrier ONNX drop-in checks decide scope only; they are not preregistered, must be added by amendment before any run, and the harrier build must reproduce the reference outputs (cosine ≥ 0.999)"
+          }
+        ],
+        "basis": "One skeptic check refuted check (d): the ONNX drop-in checks cannot change a retain decision (they only widen or narrow what the runtime serves), and E3 does not use transformers.js. The other check called the same test weak.",
+        "refuting_checks": 1
+      }
+    ]
+  },
+  "measurement_updates": {
+    "source": "longmemeval/report-mac-descriptive.md (C3 complete at 470/470; paired comparisons against C3)",
+    "note": "Applied by the recorder after the skeptic corrections, because C3 finished after the table was written. Every figure is Mac-platform and descriptive under A15.2; confirmatory decisions come from VelaNext. No update changes a decision; the layer decision still needs C4 (A14).",
+    "updates": [
+      {
+        "id": "u1-ai-memory-c3",
+        "row": "/rows/0",
+        "candidate_pin": "**ai-memory 2.5-pre `19b6429`**. A local `cargo build` of `release/2.5`; it reports 2.4.0 and is 110 commits ahead of official v2.4.0",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "before": "**NCE:** aimem-minilm 0.496, aimem-fts 0.400. C3 has 139/470 rows; C4 not run. The catalog's acceptance evidence covers official 2.3.2 and does not transfer to this build",
+            "updated": "**NCE** (Mac, descriptive under A15.2): C3 aimem-qwen3, the production embedder with the reranker off, 0.570 recall_all@5, complete at 470/470 (rows 349 onward ran on macOS 27.0; a 20-question drift check without cache reproduced recall_all@5 on 20/20 and ndcg_any@5 on 18/20); aimem-minilm 0.496, aimem-fts 0.400. Paired against C3: am-minilm +0.251 [95% CI +0.203, +0.299], dense-qwen3 +0.183, bm25-full +0.177 and A0 +0.170 (Holm p 0.0001 each), am-keyless +0.047 [−0.006, +0.101] (p 0.52). C4 (production, reranker on) did not run on the Mac. The catalog's acceptance evidence covers official 2.3.2 and does not transfer to this build"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "before": "VelaNext C3, then C4 (A15, step 2). Re-run the memory-lane acceptance on the build that is actually running. Move to the first official 2.5 release and re-pin the control with a 20-question reproduction",
+            "updated": "C4, production with the LLM reranker (A14): the layer decision needs it, because a layer candidate must beat both C3 and C4, and C4 did not run on the Mac. On VelaNext: C3, then C4 (A15, step 2) with at most 5% fallbacks. Then re-run the memory-lane acceptance on the build that is actually running, and move to the first official 2.5 release with a 20-question reproduction of the control"
+          }
+        ]
+      },
+      {
+        "id": "u2-agentmemory-against-c3",
+        "row": "/rows/1",
+        "candidate_pin": "**agentmemory 0.9.29**. npm `@agentmemory/agentmemory`, iii 0.11.2",
+        "decision_unchanged": "trial",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "before": "**NCE:** am-minilm 0.821 (official track 0.814), am-keyless 0.617. Ingested through the REST `remember` path, labelled the benchmark API path (A15.2), not the shipped hooks. **DV:** 95.2% recall_any",
+            "updated": "**NCE** (Mac, descriptive under A15.2): am-minilm 0.821 (official track 0.814), am-keyless 0.617; paired against C3 (0.570), am-minilm +0.251 [95% CI +0.203, +0.299], Holm p 0.0001, and am-keyless +0.047 [−0.006, +0.101], p 0.52. Ingested through the REST `remember` path, labelled the benchmark API path (A15.2), not the shipped hooks. **DV:** 95.2% recall_any"
+          },
+          {
+            "field": "rationale",
+            "before": "Strongest neutral result: +32.5 pp over ai-memory with MiniLM, descriptively. Its standing against C3/C4 is unknown, and its capture path is unmeasured. Apache-2.0, local. Codex Desktop does not dispatch plugin hooks (openai/codex#16430)",
+            "updated": "Strongest neutral result: +32.5 pp over ai-memory with MiniLM and +25.1 pp over C3, descriptively on the Mac. Its standing against C4 is unknown, and its capture path is unmeasured. Apache-2.0, local. Codex Desktop does not dispatch plugin hooks (openai/codex#16430)"
+          },
+          {
+            "field": "next_decision_changing_test",
+            "before": "**D2h**: the shipped Claude Code hook path on VelaNext. Then the E-vs-F matched-embedder comparison, and both decision families. Then memory-lane acceptance across both clients",
+            "updated": "C4, production with the reranker, which the layer decision needs (A14), and **D2h**, the shipped Claude Code hook path, both on VelaNext. Then the E-vs-F matched-embedder comparison, and both decision families. Then memory-lane acceptance across both clients"
+          }
+        ]
+      },
+      {
+        "id": "u3-qwen3-embedding-4b-c3",
+        "row": "/rows/10",
+        "candidate_pin": "**Qwen3-Embedding-4B**. Ollama `qwen3-embedding:4b` `df5bd2e3c74c` (Q4_K_M, 2560-d)",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "before": "**NCE:** dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus). C3 pending. **D:** LMEB LongMemEval task, nDCG@10 50.21 (MTEB leaderboard API snapshot 2026-09-24), the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB",
+            "updated": "**NCE** (Mac, descriptive under A15.2): dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus) and C3 aimem-qwen3 0.570 (ai-memory with this embedder, reranker off; complete at 470/470). **D:** LMEB LongMemEval task, nDCG@10 50.21 (MTEB leaderboard API snapshot 2026-09-24), the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB"
+          }
+        ]
+      },
+      {
+        "id": "u4-ollama-c3",
+        "row": "/rows/28",
+        "candidate_pin": "**Ollama 0.34.4** (official release, 2026-09-23)",
+        "decision_unchanged": "retain",
+        "changes": [
+          {
+            "field": "evidence_held",
+            "before": "**NCE** (Mac only, descriptive under A15.2): Ollama served the Qwen3-Embedding GGUF arms: B2 dense-qwen3 (complete, n = 470, recall_all@5 0.753), C3 aimem-qwen3 (139/470 in the interim report) and D3 am-qwen3 (12/470, excluded from every analysis by A15.2). The MiniLM arms C2 and D2 ran in-process on CPU, not on Ollama. Embedding models run single-slot (OLLAMA_NUM_PARALLEL is ignored for them; A13, A15.1). No native rerank endpoint. The agent-ecosystem catalog's selected pin still says 0.34.3 and needs updating; its manifest already records 0.34.4",
+            "updated": "**NCE** (Mac only, descriptive under A15.2): Ollama served the Qwen3-Embedding GGUF arms: B2 dense-qwen3 and C3 aimem-qwen3 are complete (n = 470; recall_all@5 0.753 and 0.570), and D3 am-qwen3 (12/470) is partial and excluded from every analysis by A15.2. The MiniLM arms C2 and D2 ran in-process on CPU, not on Ollama. Embedding models run single-slot (OLLAMA_NUM_PARALLEL is ignored for them; A13, A15.1). No native rerank endpoint. The agent-ecosystem catalog's selected pin still says 0.34.3 and needs updating; its manifest already records 0.34.4"
+          }
+        ]
+      }
+    ]
+  },
+  "recorder_addenda": [
+    {
+      "date": "2026-09-25",
+      "note": "Added after the table was written; the text is unchanged. C3 (aimem-qwen3, the production embedder with the reranker off) finished at 02:32 EDT with 470/470 rows and 0 errors: recall_all@5 0.570 on the full track, which am-minilm (+0.251), dense-qwen3 (+0.183), bm25-full (+0.177) and A0 (+0.170) exceed with Holm p 0.0001 on the Mac, descriptively. The rules section's 'Production is not yet measured' and the ai-memory row's '139/470' predate it; C4, production with the LLM reranker, is still unmeasured, and the layer decision needs it (A14).",
+      "refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "note": "Added after the table was written; the text is unchanged. PREREGISTRATION.md was amended at 02:15 EDT to add A16, which names the A16 arms (D2h, M2 MemPalace palace mode, K1 Hindsight on a 100-question subset) and the diagnostics before any A16 run. Section 4, gate 2 ('A16 is not written') predates it; A16 names no QMD arm and no Qwen3-Embedding-8B F-style arm.",
+      "refs": [
+        "evidence/artifacts/memory-stack-20260925/convergence.json"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "note": "Section 5's search-count disagreement is resolved by the Codex event streams: 15 web_search items for the model-screen lane (A15.2's correction) and 16 for the memory-system lane (the stage-one note's figure; the ledger's 32 is not supported).",
+      "refs": [
+        "evidence/artifacts/memory-stack-20260925/usage.json",
+        "evidence/artifacts/memory-stack-20260925/codex/sota-models-lane-return-1.json",
+        "evidence/artifacts/memory-stack-20260925/codex/memory-systems-lane-return-1.json"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "note": "Section 4, gate 7 names this directory as the source-of-truth path for the record; this commit lands it.",
+      "refs": [
+        "evidence/artifacts/memory-stack-20260925/README.md"
+      ]
+    }
+  ],
+  "text": "# Memory-stack convergence record, 2026-09-25\n\nThis is the convergence writer's record for the coordinator. It records decisions only. Nothing\nwas installed, downloaded, promoted or reconfigured. It follows the protocol's publication policy:\n`automatic_install_or_promotion: false`, `universal_sota_claim: false`. \"Best\" below always means\n\"best-evidenced for this workload on these hosts today\". It never means state of the art in general.\n\n- **Practice:** `<native-agent-stack checkout>/blueprints/convergence-practice/protocol.json` at `aa0812b`.\n- **Catalog repository:** `<agent-ecosystem checkout>` at `af3df3b`.\n\n## Inputs and checks\n\n| Input | sha256 (first 16) |\n|---|---|\n| `lanes/memory-systems-{packet,codex,claude,convergence}.md` | `31318b2121b387e4`, `2eb2fa3b78e8aad0`, `fe609037bee332a5`, `2790d873498fda16` |\n| `lanes/sota-models-{packet,codex,claude,convergence}.md` | `1847b3a1a0508078`, `a3fa6b77be06cb74`, `bd99a4468233d845`, `31723c68e154b9c2` |\n| `longmemeval/report-interim.md` (complete arms only) | `911f6f1df0a65dc3` |\n| `longmemeval/PREREGISTRATION.md` (A13–A15.2 used) | `095383ec55dab50b` |\n| `adjudication-20260925/adjudication-key.json` | `1eed64c0c60abbcd` |\n| The 9 `q*-*.verdict.md` files | listed in section 1 |\n\n- **Blinded judge inputs:** `shasum -c SHA256SUMS` gave 10/10 OK. The lane source hashes match\n  `source_sha256` in the key.\n- **Upstream pins:** re-checked today, read-only, through `gh`, PyPI, npm, GHCR, Docker Hub, the\n  Ollama registry (manifest sha256, method checked against the local IDs `df5bd2e3c74c` and\n  `203e30078279`) and the Hugging Face API.\n- **Production facts:** read from the ai-memory LaunchAgent, from `tools/ai-memory-2.5.0-19b6429/SOURCE`\n  and from `ollama list`.\n\n## Rules applied\n\n- **Evidence classes.**\n  - **NCE** (native_cli_execution): measured in our LongMemEval-S harness. These are Mac runs on\n    the full track (n = 470, recall_all@5). Under A15.2 they are descriptive only; confirmatory\n    decisions come from the VelaNext rerun.\n  - **D** (discovery): a leaderboard or independent source, named in the row.\n  - **DV** (discovery, vendor): a vendor claim.\n- **Ceiling for challengers.** A row can reach `adopt_within_scope` only with two things: NCE in our\n  harness, and a pass of the memory-lane acceptance. That acceptance reads: \"An explicit durable\n  decision is retrievable in its intended scope with cross-scope negatives\". Its next gate reads:\n  \"Recovery without importing unrelated histories or another host's credential store\". No\n  challenger has both, so the most any challenger gets is `trial`.\n- **Replacing production.** A challenger must beat both C3 and C4 (A14 intersection–union). Holm\n  runs within each family at α = 0.0333, and the gain must be significant and at least +5 pp\n  (A2, A15.2).\n- **Production is not yet measured in our harness.**\n  - C3 (production embedder, reranker off) has 139 of 470 rows in `report-interim.md`.\n  - C4 (production, LLM reranker on) never ran on the Mac.\n  - This writer computed and read no C3 aggregate.\n\n## 1. Judge outcomes mapped through the key\n\nAll nine judges were blind GPT-6 Sol runs through `codex exec`, read-only and working from the\nfile alone. All nine exited with code 0.\n\nThe key defines three orders:\n- **a:** A is the Codex lane, listed first.\n- **b:** A is the Claude lane, listed first.\n- **c:** A is the Codex lane, but B (Claude) is listed first.\n\n| Question | Order a | Order b | Order c | Lane preference across 3 orders | What holds in all 3 orders |\n|---|---|---|---|---|---|\n| q1 memory system | SPLIT. agentmemory > MemPalace > Hindsight > Attemory | A = **Claude**. MemPalace > Hindsight; agentmemory kept as the measured control | SPLIT. MemPalace > agentmemory > Hindsight > Attemory > GBrain | **Not stable.** SPLIT 2/3, Claude 1/3, Codex 0/3 | Retain ai-memory. Trial MemPalace, Hindsight and agentmemory. Attemory only after a gate. MemPalace ranks #1 only in b and c, the two orders where the Claude return was listed first. |\n| q2 memory LLM | SPLIT. Qwen3.6-35B-A3B > LFM2.5-2.6B | A = **Claude**. Same ranking | SPLIT. Same ranking | SPLIT 2/3, Claude 1/3 | Identical ranking in 3/3. Qwen3.5-9B stays the control. Nemotron 3.5 Lightning deferred. MemReader set aside. |\n| q3 reranker | SPLIT. MemReranker-4B > ettin > KaLM | SPLIT. MemReranker-4B > KaLM > ettin | SPLIT. MemReranker-4B > KaLM > ettin | **SPLIT 3/3** | MemReranker-4B #1. Adopt none. Jina excluded. Qwen3-Reranker-4B lower. KaLM (Claude lane only) ranks #2 only in b and c, where the Claude return was listed first. |\n\n**Reading.** The judge never preferred the Codex return. Its only non-SPLIT answers came in order\nb, where the Claude return held position A and was listed first. In order a the Codex return held\nthat same position and got SPLIT, so the order b preference could be a position or label effect,\nand this cannot be separated from a real preference. No lane wins.\n\nThe decisions below therefore rest on candidate positions that hold across all three orders. Where\na rank moves with the listing order (MemPalace against agentmemory in q1, KaLM against ettin in\nq3), the order is unresolved, and our own measurement decides it.\n\nVerdict files (sha256, first 16):\n\n| File | sha256 |\n|---|---|\n| q1-a | `4a8418f9ed808a14` |\n| q1-b | `f4645e81cc6305ed` |\n| q1-c | `a80b541211e09679` |\n| q2-a | `21d2e60533c30400` |\n| q2-b | `53a0e12eea3f9c90` |\n| q2-c | `793b0469c8f519f7` |\n| q3-a | `56d1527ae8d9bc7a` |\n| q3-b | `a128fa1824b69dd5` |\n| q3-c | `26bf571202c665f1` |\n\n## 2. Convergence table\n\nNotation:\n- \"Lanes\": the candidate's rank on each lane's shortlist.\n- \"Judges\": the rank in orders a/b/c, with the 3-order consistency.\n- \"–\": not named.\n\n### 2.1 Memory system (one shared Claude Code and Codex memory)\n\n| Candidate · pin | Decision · scope | Evidence held | Lanes · judges | Rationale | Next decision-changing test | Rollback |\n|---|---|---|---|---|---|---|\n| **ai-memory 2.5-pre `19b6429`**. A local `cargo build` of `release/2.5`; it reports 2.4.0 and is 110 commits ahead of official v2.4.0 | **retain**: production control on the Mac coordinator. Scope: explicit decisions, verified project scope, handoffs | **NCE:** aimem-minilm 0.496, aimem-fts 0.400. C3 has 139/470 rows; C4 not run. The catalog's acceptance evidence covers official 2.3.2 and does not transfer to this build | Lanes: incumbent, not ranked. Judges: retain 3/3 (\"do not reject before C3/C4 and the +5 pp rule\") | Stays the control until a challenger beats C3 and C4. Its binary provenance conflicts with the official-artifact rule (section 4, gate 1) | VelaNext C3, then C4 (A15, step 2). Re-run the memory-lane acceptance on the build that is actually running. Move to the first official 2.5 release and re-pin the control with a 20-question reproduction | Official v2.4.0 `ai-memory-macos-aarch64.tar.gz` (verify against its `.sha256`). Revert `ProgramArguments` in `local.agent-ecosystem.ai-memory.plist` |\n| **agentmemory 0.9.29**. npm `@agentmemory/agentmemory`, iii 0.11.2 | **trial**: VelaNext evaluation plus an isolated dual-client trial. No production wiring | **NCE:** am-minilm 0.821 (official track 0.814), am-keyless 0.617. Ingested through the REST `remember` path, labelled the benchmark API path (A15.2), not the shipped hooks. **DV:** 95.2% recall_any | Lanes: on neither shortlist; it was the packet's measured leader. Judges: a #1, b \"measured control; check the hook path\", c #2. Trial 3/3; its rank depends on the order | Strongest neutral result: +32.5 pp over ai-memory with MiniLM, descriptively. Its standing against C3/C4 is unknown, and its capture path is unmeasured. Apache-2.0, local. Codex Desktop does not dispatch plugin hooks (openai/codex#16430) | **D2h**: the shipped Claude Code hook path on VelaNext. Then the E-vs-F matched-embedder comparison, and both decision families. Then memory-lane acceptance across both clients | Stop the server, delete the trial data directory, drop the trial profile. Production is never touched |\n| **MemPalace 3.10.0** (MIT) | **trial**: VelaNext A16 arms in raw and palace (production) modes, plus an isolated hook trial in both clients | **D:** vendor per-question logs, re-scored by the Claude lane; we have not reproduced them. recall_all@5 is 0.857 raw (470 questions, user turns only; raw mode bypasses the palace code) and 0.887 for hybrid v4 (424 held-out questions; tuned on LME). **DV:** recall_any@5 96.6% and 98.4% (BENCHMARKS.md, 2026-04). **D, third party:** palace modes 89.4% and 84.2% recall_any (#214; arXiv 2604.21284). No NCE | Lanes: Claude #1, Codex –. Judges: a #2, b #1 (A = Claude preferred), c #1. Trial 3/3; it ranks #1 only when the Claude return is listed first | Best fit to the constraints: local, no services, hooks for both clients, MCP. Its hooks ask the agent to file memories, so capture is model-driven and the production path differs from raw mode | **A16.** First, its own harness at v3.10.0 reproduces the published numbers. Then the official evaluator runs on identical session text with both roles, in raw and palace modes. Add a pooled-store stress run, then memory-lane acceptance | `uv tool uninstall mempalace`. Delete the trial palace and the trial profile's hooks |\n| **Hindsight 0.10.1** (MIT) | **trial**: VelaNext. A 100-question subset first, with one local LLM | **DV:** LongMemEval-S QA 91.4% (Gemini-3) and 83.6% (gpt-oss-20b) in arXiv 2512.12818; the reproduction was by co-authors, so it is not independent. Undated manifest: 94.6%. BEAM-10M: 64.1%. No retrieval recall is published. Catalog `pinned_source_review` at v0.10.0 (2026-09-19). No NCE | Lanes: Codex #1, Claude #2. Judges: a #3, b #2, c #3. Trial 3/3 | Clearest documented shared capture for Claude and Codex, with local LLM support. It runs LLM extraction on every retain: about 86 h for 470 questions at the measured gpt-oss-20b rate. It adds Postgres and a worker | **A16 subset.** recall_all@5 ranked by first-seen `document_id`, plus ingest time. Then capture in both clients through the official coding-agents package | `docker rm` the container and its pg0 volume. Remove the coding-agents wiring from the trial profile |\n| **Attemory v0.1.3** | **defer** until a gate passes | **DV:** session recall_all@5 96.38% on cleaned LME-S (470 questions, local Qwen3.5-9B; undated file), 83.62% on the M variant. The core is a prebuilt SDK, so source and licence coverage are unverified. Its MCP support is only planned | Lanes: Codex #2. Judges: a #4, b below the trials, c #4. Later, with a gate, 3/3 | Reports the closest published metric, but its core cannot be audited | `pinned_source_review` of the prebuilt core (source and licence), then an A16 retrieval arm | Nothing installed |\n| **GBrain v0.56.2.0** | **defer** | **DV:** 95.53% \"all sessions within 5 chunks\", using hosted OpenAI and Voyage models. Chunks are not sessions. 86.6% QA. The catalog rejected it (R-DUP) | Lanes: Codex #3. Judges: a –, b \"incomplete\", c #5 | Its metric unit differs, it relies on hosted models, and a macOS reindex hang is open | Optional A16 arm with local providers only. Reopen if it beats agentmemory on recall_all@5 | Nothing installed |\n| **Mem0 OSS v2.2.0** | **defer** (catalog status unchanged) | **DV:** OSS 91.0% QA (GPT-5) and 88.6% (Gemma 4 extraction); the managed platform scores 94.4%. **D, competitor re-run:** 73.8% (Maximem, 2026-05-27) | Lanes: Codex #4, Claude #4. Judges: – | Local capture needs glue code. Its Claude Code plugin needs a Platform key, which is not passwordless | A cost-bounded A16 arm with one local model, or a real need for application-level memory | Nothing installed |\n| **QMD 2.8.3** | **retain** for selected document collections. Not a session-memory candidate | Selected in the catalog. The ledger's runbook smoke test: 6/10 hit@3 | Lanes: Claude #3, as a control. Judges: – | Local hybrid search with reranking, already installed. No capture hooks | Optional A16 control arm | n/a |\n| **Honcho v3.2.1, OpenViking v0.4.21, Basic Memory v0.23.2** | **reject** for this role, this wave | **DV only.** Honcho 90.4% QA; OpenViking LoCoMo 80.32%; Basic Memory LoCoMo R@5 76.4%. None has a LongMemEval retrieval score | Lanes: Claude #5 (Honcho), Codex #5 (OpenViking). Judges: – | AGPL-3.0 conflicts with a trading lane that may become commercial. Honcho needs Postgres, Redis and a worker, and its embedder can silently fall back to OpenAI (#915) | Reopen if the licence need changes or an independent recall_all@5 result appears | n/a |\n| **Graphiti/Zep, Supermemory, Cognee, claude-mem, MemOS**. **Letta:** its server is retired | **defer**. Catalog status stands; Letta is reject | DV only, or none | On neither shortlist. Judges: – | Each has a disqualifier: Neo4j/extraction weight, a binary-only engine, no LongMemEval result, or no Claude/Codex plugin | Named gap only | n/a |\n\n### 2.2 Embedder\n\n| Candidate · pin | Decision · scope | Evidence held | Lanes · judges | Rationale | Next decision-changing test | Rollback |\n|---|---|---|---|---|---|---|\n| **Qwen3-Embedding-4B**. Ollama `qwen3-embedding:4b` `df5bd2e3c74c` (Q4_K_M, 2560-d) | **retain**: production embedder control | **NCE:** dense-qwen3 0.753 (the B2 dense baseline, user-turn corpus). C3 pending. **D:** LMEB LongMemEval nDCG@10 50.21, the weakest model listed. LMEB PRs #600/#617; the KaLM team runs LMEB | Lanes: both lanes challenge it. Judges: not adjudicated, because the lanes agreed | Stays until an F arm beats C4 (A15.2, precedence 2) | F1–F3 against C4. G0 (BF16) separates the effect of quantization and runtime from the effect of model generation | n/a (current) |\n| **Nemotron-3-Embed-8B-BF16**, HF revision `d1f2f257` | **trial**: VelaNext arms E1, F1 and G1 only | **D:** LMEB 64.36 (#1) and LongMemEval 85.70 (snapshot 2026-09-24). RTEB(beta) rank 2; MTEB maintainers ran its private tasks. **DV:** RTEB-16 78.46, MMTEB retrieval 75.45. No NCE | Lanes: Codex #1, Claude #1. Judges: n/a | Strongest independent evidence on memory retrieval. OpenMDW-1.1: notices must be kept, and rights end on a patent suit. No official GGUF or Ollama build; community GGUFs are unverified for its bidirectional attention. LM Studio has a wrong-dimension bug (#2177) | A15 gates: the card's example similarities to 2 dp, batch invariance ≥ 0.9999, a 4,096-token cap. Then F1 against C4. Then the deployable-artifact gate: cosine ≥ 0.999 on the target host, within 1 pp on 100 questions | Evaluation only. Delete the cached revision |\n| **Nemotron-3-Embed-1B-BF16**, revision `c0c9fea9` | **trial**: E2, F2 and G2 | **D:** LMEB 61.50, LongMemEval 81.58, RTEB rank 14. **DV:** RTEB-16 72.38. A partner reports LongMemEval R@10 80.38%, method unconfirmed. The catalog's trial note concerns a code-RAG service, which is not memory evidence | Lanes: Codex #2, Claude #2. Judges: n/a | At 1.14B, the one more likely to deploy on the Mac through the MPS reference implementation | The same gates, then F2 against C4, then an MPS deployability check on the Mac | Same as above |\n| **harrier-oss-v1-0.6b**, revision `f9b9dc8d` (MIT) | **trial**: preregistered A15 arms E3, F3 and G3; low prior | **D:** LMEB 58.43, LongMemEval 72.46 (below Qwen3-Embedding-0.6B's 73.08). **DV:** MMTEB v2 69.01 | Lanes: Claude #3, Codex –. Judges: n/a | Did not converge across families. It stays only because A15 named it before any run. Its ONNX build (onnx-community, not first-party) suits agentmemory's in-process path | E3 against am-minilm, then F3 against C4 | Same as above |\n| **Qwen3-Embedding-8B and 0.6B**. Ollama `64b933495768` / `ac6da0dfba84` | **defer**: C6/C5 size diagnostics only | **D:** LongMemEval 77.66 / 73.08 | Lanes: Codex #3 (8B, as a control) | Measure size with the reranker off. No production path | C5/C6 against C3 (diagnostic) | n/a |\n| **all-MiniLM-L6-v2**, agentmemory's default through transformers.js | **retain**, inside the agentmemory trial only, as shipped | **NCE:** am-minilm 0.821, aimem-minilm 0.496. **D:** LongMemEval 67.94. Its 256-token window truncates 4–8k-token pages | – | The as-shipped control for the agentmemory arms | E1–E3 against am-minilm | n/a |\n\n### 2.3 Reranker\n\n| Candidate · pin | Decision · scope | Evidence held | Lanes · judges | Rationale | Next decision-changing test | Rollback |\n|---|---|---|---|---|---|---|\n| **ai-memory LLM listwise reranking**: `qwen3.5-9b-64k`, reasoning low, 20 s hard timeout | **retain**: the production setting (status quo) | No harness result; C4 has not run | n/a | Under A14 and A15.2 (precedence 1), it stays unless C3 beats C4. More than 5% fallbacks makes the result inconclusive | C3 against C4 on VelaNext | Unset `AI_MEMORY_RERANKER` (the C3 configuration) |\n| **MemReranker-4B**, revision `22890bb4` (Apache-2.0) | **trial**: exploratory stage X (A15) on VelaNext only. Outside Holm; no adoption | **DV:** LongMemEval nDCG@10 0.8354 and MAP 0.8043 on a fixed top-50 set (arXiv 2605.06132). No independent result | Lanes: Codex #1. Judges: #1 in 3/3 | Its evaluation setup is closest to our workload. 4B parameters. Only a community MLX build exists | Stage X over the best system's top 50, plus complete-request latency. Adoption needs an upstream reranker slot in the chosen memory system; we do not maintain forks | Nothing deployed |\n| **KaLM-Reranker-V1-Small**, revision `8c2141c8` (R2: `68b74f09`) | **trial**: stage X, after a code review | **DV:** LMEB dialogue LongMemEval 87.58, from its own team, which also runs LMEB. BEIR 60.01. No LMEB result for R2 | Lanes: Claude #3. Judges: a #3, b #2, c #2. It ranks #2 only when the Claude return is listed first | A strong result, but self-reported. Needs `trust_remote_code`: the repository ships `kalm_*.py` files and a vLLM plugin | `pinned_source_review` of the remote code at the pinned revision, then stage X | Nothing deployed |\n| **ettin-reranker-400m-v1**, revision `5dca3628` (`onnx/model_qint8_arm64.onnx`, 397.5 MB) | **trial**: stage X, plus a transformers.js drop-in check | **DV:** MTEB(eng, v2) retrieval after reranking 0.6091, against 0.5082 for ms-marco-MiniLM. NanoBEIR 0.7193. No memory result and no independent result | Lanes: Codex #3, Claude #1. Judges: a #2, b #3, c #3 | The only reranker on both lanes. 0.4B, Apache-2.0, official ARM64 ONNX. The cheapest replacement for agentmemory's 2021 cross-encoder | Stage X. Check that its ONNX scoring head works in transformers.js | Nothing deployed |\n| **Qwen3-Reranker-4B** | **defer**: runs only as the preregistered stage-X arm | **DV:** MTEB-R 69.76. **D (KaLM paper):** LMEB dialogue LongMemEval 53.72. Its GGUF needs the classifier head (llama.cpp #16407) | Lanes: Claude #2. Judges: lower in 3/3 | Weaker evidence on memory data | The stage-X result | n/a |\n| **Jina Reranker v3.5** | **reject** | **DV:** BEIR 63.20. Licence CC-BY-NC-4.0 (HF card). The catalog rejected it | Lanes: Codex #2. Judges: excluded in 3/3 | Its non-commercial licence conflicts with a trading lane that may become commercial | A licence change | n/a |\n| **ms-marco-MiniLM-L-6-v2**, bundled with agentmemory and off by default | **retain**, inside the agentmemory trial only, as the bundled baseline | **DV (ettin table):** 0.5082. 512-token window | – | The baseline that ettin has to beat | ettin against ms-marco on the agentmemory path | n/a |\n\n### 2.4 Memory LLM (consolidation and listwise reranking, 20 s budget)\n\n| Candidate · pin | Decision · scope | Evidence held | Lanes · judges | Rationale | Next decision-changing test | Rollback |\n|---|---|---|---|---|---|---|\n| **Qwen3.5-9B**: `qwen3.5:9b-mlx` `203e30078279` (NVFP4). The production tag `qwen3.5-9b-64k` (`5efc0dd55d4a`) adds `num_ctx` 65536 | **retain**: production and control | **D:** AA-LCR 46.0 without reasoning, 70.0 with it (Artificial Analysis). **DV:** LongBench v2 55.2. No harness result; C4 is pending | Lanes: Codex keeps it as control (#1); Claude keeps it as control. Judges: control in 3/3 | The status quo | C4 with at most 5% fallbacks, then H1–H3 against C4 | n/a |\n| **Qwen3.6-35B-A3B**, HF revision `995ad96e`. Ollama `qwen3.6:35b-a3b` `096fdbd02fe6` (GGUF, 22.6 GB) and `qwen3.6:35b-a3b-nvfp4` `e92a3e94bbca` (MLX, 23.6 GB) | **trial**: H1 on VelaNext; a Mac latency check afterwards | **D:** AA-LCR 64.3 without reasoning, 71.7 with it. No LongMemEval score. Apache-2.0 | Lanes: Claude #1. Judges: #1 in 3/3 (order b preferred A = Claude) | Strongest independent proxy: +18.3 over the control in the same mode, with 3B active parameters. Memory headroom and the 20 s limit are unmeasured | H1 against C4, with at most 5% fallbacks at 20 s. Consolidation fidelity, listwise quality and p95 complete-request latency at 4K and 8K. The Mac check runs only with the user's go-ahead, because the Mac is control-only | `ollama rm` the tag. Production `AI_MEMORY_LLM_MODEL` stays unchanged |\n| **LFM2.5-2.6B**. Official GGUF `LiquidAI/LFM2.5-2.6B-GGUF`, revision `e7caca5d` (Q4_K_M). No Ollama library tag (404) | **trial**: H3, evaluation only. A licence gate comes before any production use | **DV:** IFStruct 85.49 (a proxy only); 220 tokens/s on an M5 Max CPU. No memory score. It always reasons. Custom LFM1.0 licence | Lanes: Codex #2. Judges: #2 in 3/3 | A speed candidate with unproven quality | H3. Review the LFM1.0 licence. Check that Ollama 0.34.4 supports the architecture | `ollama rm` |\n| **Nemotron 3.5 Lightning 30B-A3B**. Ollama `nemotron-3.5-lightning:30b-a3b` `e7a64ff15fb1` | **defer**: the preregistered H2 arm still runs, but there is no adoption path unless H1 fails | **D:** AA-LCR 60.3 with reasoning; no score without reasoning was found. **DV:** AA-LCR 52.00. OpenMDW-1.1 | Lanes: Claude #2. Judges: deferred in 3/3 | Its score needs reasoning on and still trails the control's reasoning score | The H2 result | n/a |\n| **MemReader-4B-thinking** | **reject** for this role | **DV:** LongMemEval 83.00%, for a pipeline of four memory tools | Lanes: Codex #3. Judges: set aside in 3/3 | Says nothing about standalone consolidation or listwise ranking | A standalone consolidation benchmark | n/a |\n\n### 2.5 Local serving\n\n| Candidate · pin | Decision · scope | Evidence held | Lanes · judges | Rationale | Next decision-changing test | Rollback |\n|---|---|---|---|---|---|---|\n| **Ollama 0.34.4** (official release, 2026-09-23) | **retain**: production serving on the Mac for embeddings and the memory LLM; also serves the H arms on VelaNext | **NCE:** served every harness embedding arm. The catalog pin still says 0.34.3 and needs updating | – | Selected. Embedding models run single-slot (A15.1). No native rerank endpoint | – | The official 0.34.3 release asset |\n| **llama.cpp `llama-server`**, an official release build (catalog `b11057`; the freshness check found v0.5.0, which points to b11146) | **trial** (catalog status unchanged): the VelaNext GGUF embedding server (A15.1) | NCE on VelaNext for a Qwen3.8-27B repair, not for embeddings | – | A batching server for evaluation throughput | The A15.1 batch-invariance gate | Stop the server; remove the extracted release |\n| **vLLM official container**: `vllm/vllm-openai:v0.24.0` (`sha256:251eba5c…`) or `v0.25.0` (`sha256:fc56161e…`) | **defer**. Proposed by this writer; not converged | **DV:** NVIDIA's model cards validate Nemotron-3-Embed with vllm-openai v0.20–v0.24 (1B) and v0.21/v0.24 (8B), and with vllm 0.25.0 for `/v2/embed`. The MemReranker card documents a vLLM OpenAI-compatible server | No lane, no judge | The upstream end-to-end server the user asked for, in place of the lane package's own OpenAI-compatible wrapper around sentence-transformers | Add it through an amendment written before any VelaNext run. It must pass the same reference-output and batch-invariance gates | Keep the wrapper |\n| **MLX v0.32.2 and mlx-lm** | **trial** (catalog status unchanged) | The production LLM already runs through Ollama's MLX engine | – | Kill switch: close mlx-lm as a duplicate if Ollama's MLX path is within 10% of its throughput | As in the catalog | n/a |\n| **transformers.js / ONNX in Node** (agentmemory, in-process) | **retain**, inside the agentmemory trial | **NCE** through am-minilm | – | As shipped | The ettin and harrier ONNX drop-in checks | n/a |\n| **LM Studio** | **defer** | A bug report shows wrong output dimensions for Nemotron (#2177; Codex lane) | – | Ollama already covers this role | – | n/a |\n\n**Summary.**\n- **retain:** ai-memory, Qwen3-Embedding-4B, LLM reranking with Qwen3.5-9B, Ollama 0.34.4 and QMD.\n- **trial:** 3 memory systems, 3 embedders, 2 memory LLMs, 3 rerankers, llama.cpp and MLX.\n- **adopt_within_scope:** none.\n\n## 3. Adoption plan (trial items)\n\nThese rules apply to every trial:\n- **Pins.** Use the upstream official artifact, pinned by version and digest. Never use\n  `@latest` or `latest`, and never build from source when an official artifact exists.\n- **Host.** Trials run on VelaNext, where heavy evaluation lives. The coordinator Mac is\n  control-only.\n- **Isolation.** Each trial gets its own trial user or profile: a separate HOME, with\n  `CLAUDE_CONFIG_DIR` and `CODEX_HOME` pointing into the trial directory. Services bind to\n  loopback, and each has its own data directory.\n- **Credentials.** Sign in natively and passwordlessly on that host. Never copy another host's\n  credential store. Production configuration on the Mac is never edited.\n- **Protocol.** A16 must be written and committed in `PREREGISTRATION.md` before any\n  memory-system arm runs. A15.2 reserves α = 0.0167 for it, and its arms must be named before\n  their first run.\n\n| Trial | Official install path and pin | Isolation scope | Acceptance test | Rollback |\n|---|---|---|---|---|\n| **agentmemory 0.9.29** | `npm install --prefix <trial> @agentmemory/agentmemory@0.9.29` (npm integrity `sha512-NGHEi563…`). The iii engine 0.11.2 comes pinned by the package and is checksum-verified; the freshness check found iii 0.24 incompatible. Wire the clients from the pinned package with `agentmemory connect claude-code --with-hooks` and `agentmemory connect codex --with-hooks`, the upstream workaround for openai/codex#16430 | VelaNext trial profile. `AGENTMEMORY_DATA_DIR` in the trial directory. Ports 3111–3113 and 49134 on loopback. Keyless or local embeddings, so no provider key | (1) D2h against C3 and C4 under the rule. (2) A durable decision written from Claude Code in project P1 comes back to Codex in P1 and does not appear in P2. (3) After a restart, recovery works from the trial directory alone | `agentmemory stop`, then delete the trial directory and profile |\n| **MemPalace 3.10.0** | `uv tool install mempalace==3.10.0` (PyPI wheel `sha256:9f656452…`), or `ghcr.io/mempalace/mempalace:3.10.0@sha256:db576131…`. Take hooks and plugins only from tag v3.10.0 (`.claude-plugin/`, `.codex-plugin/`, `hooks/mempal_save_hook.sh`, `hooks/mempal_precompact_hook.sh`). Reproduce with the vendor's `benchmarks/longmemeval_bench.py` at v3.10.0 | VelaNext trial profile, with `XDG_CONFIG_HOME` in the trial directory | (1) The vendor harness reproduces its published recall_any within 1 pp. (2) Our evaluator gives recall_all@5 on session text with both roles, in raw and palace modes, under the A16 rule. (3) A pooled-store run. (4) Hooks save in both clients. (5) The memory-lane acceptance: scoped decision plus cross-scope negative | `uv tool uninstall mempalace`, or remove the container. Delete the trial palace |\n| **Hindsight 0.10.1** | `ghcr.io/vectorize-io/hindsight:0.10.1@sha256:b4d3b76f…` with the embedded pg0 volume, or `hindsight-all==0.10.1` (wheel `sha256:250e3118…`, with PyPI publish attestations in the release). LLM provider: local Ollama, keyless. Clients: `@vectorize-io/hindsight-coding-agents`, pinned. Version 0.7.0 is inside the 7-day cooldown until 2026-10-01; otherwise use 0.6.1. Record its compatibility with server 0.10.1 | VelaNext. One bank per question for the benchmark; a trial profile for the clients | (1) A16 on 100 questions: recall_all@5 ranked by first-seen `document_id`, plus ingest time and cost. (2) Only if it is competitive: the full 470 under the rule. (3) Capture in both clients, plus the memory-lane acceptance | `docker rm`, then `docker volume rm`. Remove the coding-agents wiring from the trial profile |\n| **Nemotron-3-Embed-8B and 1B** | Official HF weights at revisions `d1f2f257` and `c0c9fea9` (not gated, so no token). Load them with sentence-transformers as the model card shows (transformers ≥ 5.2.0, sentence-transformers ≥ 5.4.1, uv-locked). This is A15's reference path. The upstream server alternative, `vllm/vllm-openai:v0.24.0` by digest, comes in only through an amendment. No community GGUF or MLX builds | VelaNext GPU, one workload at a time (A13), behind the A13 byte-exact cache | The card's example similarities to 2 dp. Batch invariance ≥ 0.9999. F1 or F2 beats C4 under A15.2. A Mac deployment additionally needs the deployable-artifact gate | Delete the cached revisions. The production embedder is unchanged |\n| **harrier-oss-v1-0.6b** | Official HF weights at revision `f9b9dc8d` through sentence-transformers. The ONNX check uses `onnx-community/harrier-oss-v1-0.6b-ONNX` at `e4daffa0`; that build is not first-party and has to reproduce the reference outputs | As above | E3 against am-minilm, then F3 against C4 | As above |\n| **Qwen3.6-35B-A3B** | `ollama pull qwen3.6:35b-a3b` and verify manifest `096fdbd02fe6` (VelaNext, H1). On the Mac: `qwen3.6:35b-a3b-nvfp4`, manifest `e92a3e94bbca`. Use the production Modelfile parameters (`num_ctx` 65536, the same sampling) with thinking off | A benchmark Ollama instance on its own port, never the production 11434 | (1) H1 against C4 with at most 5% fallbacks at 20 s. (2) Consolidation fidelity, listwise quality, and p95 complete-request latency at 4K and 8K. (3) Memory headroom on the Mac with the embedder resident (`OLLAMA_MAX_LOADED_MODELS=2`) | `ollama rm` the tag |\n| **LFM2.5-2.6B** | `ollama pull hf.co/LiquidAI/LFM2.5-2.6B-GGUF:Q4_K_M`: the developer's official GGUF, repository revision `e7caca5d`. Record the blob digest | As above | H3 against C4. The LFM1.0 licence review passes before any production use | `ollama rm` |\n| **MemReranker-4B, KaLM-Reranker-V1-Small, ettin-reranker-400m-v1** | Official HF weights at revisions `22890bb4`, `8c2141c8` and `5dca3628`, loaded through the `CrossEncoder` each card recommends. KaLM's `trust_remote_code` files are executed only after a pinned source review. For ettin, also `onnx/model_qint8_arm64.onnx` for the transformers.js check | VelaNext stage X only, outside Holm | Ranking quality over the best system's top 50, plus complete-request latency. Adoption needs the chosen memory system to accept a reranker upstream; no fork, no private adapter in production | Delete the cached revisions |\n| **llama.cpp** | The official release's Linux CUDA asset, verified by sha256 (A15.1) | VelaNext evaluation only | The batch-invariance gate on the Qwen3 GGUF embedders | Remove the extracted release |\n\n## 4. Gates and open decisions for the coordinator\n\n1. **Production ai-memory is a self-build.**\n   - Facts:\n     - `tools/ai-memory-2.5.0-19b6429/SOURCE` reads \"built locally: cargo build --locked --release\".\n     - That commit is 110 commits ahead of official v2.4.0, and no official 2.5 release exists yet.\n     - A15 also plans a Linux self-build of `19b6429`, although an official v2.4.0 linux-x86_64\n       asset exists.\n   - Decision needed: stay on `19b6429` until the first official 2.5 release, then re-pin both\n     production and the benchmark control with a reproduction check. Or re-pin to official v2.4.0\n     now, which first requires confirming that it has the LLM reranker and the hook paths\n     production uses, and which changes the preregistered control.\n2. **A16 is not written.** `PREREGISTRATION.md` only reserves α for it. It must name the MemPalace\n   arms (raw and palace), the Hindsight subset, and the optional QMD, GBrain (local providers) and\n   Mem0 arms before any run. The D2h shipped-hook arm is already required by A15.2.\n3. **Catalog record changes.**\n   - Registry status changes:\n     - agentmemory: rejected (R-DUP) → trial.\n     - MemPalace: deferred → trial.\n     - Hindsight: deferred at v0.10.0 → trial at v0.10.1.\n     - GBrain: rejected → deferred.\n   - Pin updates:\n     - Ollama pin: 0.34.3 → 0.34.4.\n     - The ai-memory selected pin (2.3.2) differs from the running `19b6429`.\n4. **vLLM** enters through an amendment, or it is dropped.\n5. **Latency checks on the Mac** (Qwen3.6 on MLX) need the user's go-ahead, because the Mac is\n   control-only.\n6. **Reviews that block specific trials:**\n   - the LFM1.0 licence (LFM2.5-2.6B);\n   - KaLM's remote code;\n   - Attemory's prebuilt core, for source and licence;\n   - the OpenMDW-1.1 notice obligations, before any Nemotron deployment.\n7. **Source-of-truth path.** The catalog record PR should land this record at\n   `<native-agent-stack checkout>/evidence/artifacts/memory-stack-20260925/`, following #223's\n   layout. The CLAUDE.md manifest points there. Until that PR merges, this file is the record.\n\n## 5. Usage (whole task, as recorded)\n\n| Work | Usage |\n|---|---|\n| Model-screen lanes | Codex: 3,179,978 input (3,044,352 cached), 10,544 output. Claude: 414,369 subagent tokens |\n| Memory-system lanes | Codex: 2,511,644 input (2,394,880 cached), 10,597 output. Claude: 303,563 subagent tokens |\n| 9 judge runs (from the events files) | 357,225 input (192,640 cached), 16,848 output, of which 13,348 reasoning |\n| This writer | Unknown; not measured here |\n\nSearch counts disagree between records. For the memory-systems Codex lane, the convergence note\nsays 16 searches and the ledger says 32. For the model lane, A15.2 corrects 30 to 15. Token counts\nare as recorded.\n\n## 6. Required experiment fields\n\n| Field | Where it is |\n|---|---|\n| task_and_failure | The two packets and the three question specs |\n| primary_sources_and_pins | Sections 2 and 3 |\n| discovery_provenance | Blind lanes plus blind judges, mapped through the key |\n| license_and_compatibility | Each row |\n| baseline_and_candidate | C3 and C4, with the as-shipped controls |\n| frozen_inputs | Dataset sha256 `d6f21ea9…`, `eligible-manifest.json`, SHA256SUMS |\n| predeclared_metrics | recall_all@5 and the secondary metrics (A2) |\n| runtime_and_platform | Mac results descriptive, VelaNext confirmatory (A15.2) |\n| commands | Section 3 |\n| observations | `report-interim.md`, complete arms only |\n| failures_and_skips | C3 incomplete; C4 never ran on the Mac; D3's Mac rows excluded; no MemoryAgentBench results found |\n| limitations | LongMemEval-S is chat recall, not coding-agent memory (LongMemEval-V2, VibeMemBench); 50-session haystacks are easy |\n| decision_and_scope | Section 2 |\n| rollback | Section 2 and section 3 |\n| next_decision_changing_test | Section 2 |\n"
+}

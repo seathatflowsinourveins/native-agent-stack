@@ -1,0 +1,299 @@
+{
+ "schema": "omniroute-lite-whitespace-probe/1",
+ "taken_utc": "2026-09-30T02:59Z to 03:04Z",
+ "class": "our integration check with synthetic fixtures; no model call and no upstream request; not a savings figure",
+ "question": "Does the headerless lane [session-dedup, ccr, lite] on 20129 (and a 20128 candidate with the same engines) change the bytes of code-bearing text: unified diffs, tab-indented code, aligned columns, exact-match edit text, Codex shell outputs?",
+ "source_read": {
+  "file": "open-sse/services/compression/lite.ts:50-53 at the live 20128 build (ae5539a56)",
+  "code": "content.replace(/\\n{3,}/g, \"\\n\\n\").replace(/[ \\t]+$/gm, \"\")",
+  "applies_to": "every message whose content is a string (system messages excepted while preserveSystemPrompt is true)"
+ },
+ "preview_probe_live_20129": {
+  "how": "POST /api/compression/preview on the live 20129 gateway (a dry run of the gateway's own engines: no model call, nothing written), chat-format messages, four synthetic fixtures, two runs: pipeline [session-dedup, ccr, lite] with preview defaults, and mode lite with lite.compressToolResults false (the live setting). Script: scripts/preview_probe.py.txt The preview's chat-format messages are plain strings.",
+  "rows": [
+   {
+    "run": "headerless lane [session-dedup, ccr, lite], preview defaults",
+    "fixture": "F1 unified diff in a user message",
+    "byte_identical": false,
+    "tokens": [
+     76,
+     76
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -7 +7 @@\n",
+     "-     y  = 2   \n",
+     "+     y  = 2\n"
+    ]
+   },
+   {
+    "run": "headerless lane [session-dedup, ccr, lite], preview defaults",
+    "fixture": "F2 fenced code with indentation and aligned columns",
+    "byte_identical": false,
+    "tokens": [
+     70,
+     70
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -10,2 +9,0 @@\n",
+     "-\n",
+     "-\n"
+    ]
+   },
+   {
+    "run": "headerless lane [session-dedup, ccr, lite], preview defaults",
+    "fixture": "F3 exact-match edit arguments (assistant message)",
+    "byte_identical": true,
+    "tokens": [
+     66,
+     66
+    ],
+    "techniques": [],
+    "fallbackApplied": null
+   },
+   {
+    "run": "headerless lane [session-dedup, ccr, lite], preview defaults",
+    "fixture": "F4 git diff as a tool result",
+    "byte_identical": false,
+    "tokens": [
+     76,
+     76
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -8 +8 @@\n",
+     "- line one    \n",
+     "+ line one\n"
+    ]
+   },
+   {
+    "run": "lite alone, compressToolResults false (the live setting)",
+    "fixture": "F1 unified diff in a user message",
+    "byte_identical": false,
+    "tokens": [
+     76,
+     76
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -7 +7 @@\n",
+     "-     y  = 2   \n",
+     "+     y  = 2\n"
+    ]
+   },
+   {
+    "run": "lite alone, compressToolResults false (the live setting)",
+    "fixture": "F2 fenced code with indentation and aligned columns",
+    "byte_identical": false,
+    "tokens": [
+     70,
+     70
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -10,2 +9,0 @@\n",
+     "-\n",
+     "-\n"
+    ]
+   },
+   {
+    "run": "lite alone, compressToolResults false (the live setting)",
+    "fixture": "F3 exact-match edit arguments (assistant message)",
+    "byte_identical": true,
+    "tokens": [
+     66,
+     66
+    ],
+    "techniques": [],
+    "fallbackApplied": null
+   },
+   {
+    "run": "lite alone, compressToolResults false (the live setting)",
+    "fixture": "F4 git diff as a tool result",
+    "byte_identical": false,
+    "tokens": [
+     76,
+     76
+    ],
+    "techniques": [
+     "whitespace"
+    ],
+    "fallbackApplied": null,
+    "diff": [
+     "--- in\n",
+     "+++ out\n",
+     "@@ -8 +8 @@\n",
+     "- line one    \n",
+     "+ line one\n"
+    ]
+   }
+  ],
+  "reading": "Both runs strip trailing spaces at line ends and collapse runs of blank lines (three or more newlines to two) in user, assistant and tool messages, including inside fenced code and a diff's context lines; tabs, in-line double spaces, aligned columns and JSON edit arguments (F3) are untouched. lite.compressToolResults=false does not exempt tool results from this step: it only stops head-only truncation of them."
+ },
+ "offline_codex_shape_probe": {
+  "how": "the gateway's pre-translation compression step run offline against a Codex-shaped Responses body (network blocked, scratch DATA_DIR), with the live 20129 compression settings (read back at 2026-09-30T00:46Z) and the exclusions emptied, provider codex, model gpt-6-astra-max. The compression modules are imported from the live build's source tree (B2, ae5539a56) through the S1 screen's mirror of chatCore's pre-translation block (scripts/gatewayPath.ts.txt, written at c19983a66); the resolved plan matched the live behavior (stacked [session-dedup, ccr, lite], source default). Script: scripts/codex_lane_probe.ts.txt The synthetic body's tool outputs are plain strings (the shape of older models' shell calls); the pi-practice session reports that its real GPT-6 Codex sessions send content-part arrays, so this probe shows what the lane does to the string shape, not to real GPT-6 traffic (not reproduced here).",
+  "plan": {
+   "mode": "stacked",
+   "source": "default",
+   "pipeline": [
+    "session-dedup",
+    "ccr",
+    "lite"
+   ],
+   "meta": "stacked; source=default"
+  },
+  "stats": {
+   "originalTokens": 1089,
+   "compressedTokens": 993,
+   "savingsPercent": 8.82,
+   "techniquesUsed": [
+    "whitespace"
+   ],
+   "validationWarnings": [
+    "session-dedup: skipped (no eligible content)",
+    "ccr: skipped (no eligible content)"
+   ]
+  },
+  "items": [
+   {
+    "i": 0,
+    "type": "message",
+    "name": null,
+    "call_id": null,
+    "changed": false
+   },
+   {
+    "i": 1,
+    "type": "function_call",
+    "name": "shell",
+    "call_id": "call_1",
+    "changed": false
+   },
+   {
+    "i": 2,
+    "type": "function_call_output",
+    "name": null,
+    "call_id": "call_1",
+    "changed": true,
+    "before_chars": 192,
+    "after_chars": 178,
+    "blank_lines_before_after": [
+     9,
+     5
+    ],
+    "trailing_ws_lines_before_after": [
+     2,
+     0
+    ]
+   },
+   {
+    "i": 3,
+    "type": "message",
+    "name": null,
+    "call_id": null,
+    "changed": false
+   },
+   {
+    "i": 4,
+    "type": "function_call",
+    "name": "shell",
+    "call_id": "call_2",
+    "changed": false
+   },
+   {
+    "i": 5,
+    "type": "function_call_output",
+    "name": null,
+    "call_id": "call_2",
+    "changed": true,
+    "before_chars": 192,
+    "after_chars": 178,
+    "blank_lines_before_after": [
+     9,
+     5
+    ],
+    "trailing_ws_lines_before_after": [
+     2,
+     0
+    ]
+   },
+   {
+    "i": 6,
+    "type": "function_call",
+    "name": "shell_command",
+    "call_id": "call_3",
+    "changed": false
+   },
+   {
+    "i": 7,
+    "type": "function_call_output",
+    "name": null,
+    "call_id": "call_3",
+    "changed": true,
+    "before_chars": 1742,
+    "after_chars": 1622,
+    "blank_lines_before_after": [
+     1,
+     1
+    ],
+    "trailing_ws_lines_before_after": [
+     40,
+     0
+    ]
+   },
+   {
+    "i": 8,
+    "type": "custom_tool_call",
+    "name": "apply_patch",
+    "call_id": "call_4",
+    "changed": false
+   },
+   {
+    "i": 9,
+    "type": "custom_tool_call_output",
+    "name": null,
+    "call_id": "call_4",
+    "changed": false
+   },
+   {
+    "i": 10,
+    "type": "message",
+    "name": null,
+    "call_id": null,
+    "changed": false
+   }
+  ],
+  "reading": "The plan is the headerless lane. Items 2, 5 and 7 are function_call_output strings of `shell` and `shell_command` calls: the file dumps lost one blank line per pair of blank lines (9 to 5) and all trailing spaces (2 to 0), the log lines lost trailing spaces (40 to 0). The user and assistant message items (content parts arrays), the apply_patch call and its output, and `instructions` are unchanged. session-dedup found no eligible block (minBlockChars 512 against 192-character fixtures)."
+ },
+ "limits": [
+  "The offline probe is a mirror, not the gateway's request path; only the preview probe touched the live gateway.",
+  "Upstream's Codex eligibility guard (bodyAdapter.ts:154-201) is consumed only by the codex-responses engine (engines/codexResponses/index.ts:251,281), so it does not exempt shell outputs from lite.",
+  "The pi-practice session reported, separately and not reproduced here, that real Codex 0.159.2 sessions on gpt-6.1-sol send tool output as content-part arrays, which lite does not rewrite, and that 9 of 9 apply_patch hunks over two blank context lines applied first time with the lane off and on; string-content shell outputs (older models' shell_command) remain untested through the gateway."
+ ]
+}

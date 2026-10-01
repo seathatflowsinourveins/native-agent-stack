@@ -1,0 +1,32 @@
+{
+ "at": "2026-09-25T23:10:13Z",
+ "backup_sha256_ok": true,
+ "backup_db": {
+  "schema_max": 66,
+  "schema_rows": 66,
+  "last_migration": "auto_improve_claim_attempts",
+  "quick_check": "ok",
+  "pages": 38,
+  "observations": 85011
+ },
+ "live_db": {
+  "schema_max": 66,
+  "schema_rows": 66,
+  "last_migration": "auto_improve_claim_attempts",
+  "quick_check": "ok",
+  "pages": 38,
+  "observations": 85718
+ },
+ "backup_rows_in_live": {
+  "pages_before": 38,
+  "pages_after": 38,
+  "pages_missing": 0,
+  "pages_content_changed": 0,
+  "pages_latest_or_frontmatter_changed": 0,
+  "obs_before": 85011,
+  "obs_after": 85718,
+  "obs_missing": 0,
+  "obs_changed": 0,
+  "rows_intact": true
+ }
+}

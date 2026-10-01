@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--agentsview--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "0074a0c3276952bb1ab23a4a9fa455334ca1b78b",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+  },
+  "component_id": "agentsview",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "AGENTSVIEW_NO_DAEMON=1 agentsview sync && p=$(agentsview projects --json) && echo \"$p\" | grep -q \"\\\"name\\\": \\\"native_agent_stack\\\"\" && echo \"POSITIVE ASSERTION PASS: native_agent_stack project present\" && ! echo \"$p\" | grep -q \"\\\"name\\\": \\\"definitely_fake_project_xyz\\\"\" && echo \"NEGATIVE CONTROL PASS: fabricated project name absent\"; ec=$?; agentsview daemon stop; agentsview daemon status; exit $ec",
+      "exit": 0,
+      "duration_s": 1.569,
+      "output_sha256": "c5a1ee0a3832497ee051fae4fcde8df8ed41c647345b55f940229397590e91cd",
+      "output_excerpt": "Preparing sync...\nRunning initial sync...\nSync complete: 19 sessions synced in 571ms\nParser anomalies (this run):\n  sanitized fields: 9 total\n    control chars stripped: 9\n\nDatabase: 63 sessions, 6179 messages\nPOSITIVE ASSERTION PASS: native_agent_stack project present\nNEGATIVE CONTROL PASS: fabricated project name absent\nStopped agentsview (pid 1198693).\nNo agentsview daemon is running.\nStarting "
+    }
+  ],
+  "tool_versions": {
+    "agentsview": "0.43.0"
+  },
+  "observed_at_utc": "2026-09-25T21:40:56Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), 1 command(s) were run for component 'agentsview' at stage 'use'; overall result pass.",
+  "limitations": [
+    "Recorded receipt covers only the listed commands; it does not establish full component functional acceptance beyond what these commands exercise."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T21:40:56Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #296 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T22:00:23Z",
+      "reviewer": {
+        "identity_sha256": "9c5823e90820f7b48da70f2f984fbeceed028a61e961da16716145d1915abfc7",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

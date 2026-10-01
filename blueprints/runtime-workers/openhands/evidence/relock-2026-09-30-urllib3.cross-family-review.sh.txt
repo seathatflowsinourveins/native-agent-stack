@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# How each cross-family review of PR 546 was started (the command as typed; the review's own output stream records no model or effort, so neither is an observed value):
+#   usage: codex_review.sh <N>  with the rubric in <scratch>/codex-rubric<N>.txt (N=1: codex-rubric.txt), run from the worktree of the change, stdin closed.
+# -s read-only: the reviewer cannot write; no network tool is granted by the rubric, which also tells it to make no network calls.
+# No -p stack-worker profile is passed, so the run uses the Codex defaults of this host; the route (native login or gateway) was not recorded.
+set -u
+n=$1
+rubric=<scratch>/codex-rubric${n}.txt; [ "$n" = 1 ] && rubric=<scratch>/codex-rubric.txt
+out=<scratch>/codex-review${n}; [ "$n" = 1 ] && out=<scratch>/codex-review
+codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort=max --json -o "$out.md" "$(cat "$rubric")" < /dev/null > "$out.jsonl" 2> "$out.err"
+echo "codex exit: $?" > "$out.exit"

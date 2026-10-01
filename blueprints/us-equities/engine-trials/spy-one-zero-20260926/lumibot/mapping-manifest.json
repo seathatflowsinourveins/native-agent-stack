@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "id": "spy-one-zero-engine-trial-lumibot-mappings",
+  "trial": "spy-one-zero-engine-trials-20260926",
+  "arm": "lumibot",
+  "gate_context": "Comparison arm beside gate G-a (blueprints/us-equities/engine-nautilus/spy-parity). It changes no gate status, catalog decision or engine selection.",
+  "drafted_utc_date": "2026-09-26",
+  "case": "one_zero",
+  "frozen_before_execution": true,
+  "preregistration": {
+    "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/preregistration.json",
+    "sha256": "73ea82e9007d92e1b00feb86ba190d5fb8842b7d14962c651b0caf74b8522b38",
+    "commit": "a74ed16d7084a4d84cd31ce3116a95457baa913c",
+    "binding": "arm_manifests.lumibot.binding. The projection rule in arm_manifests.rules.projection over this file must equal it exactly; fixture_port.py refuses to run otherwise."
+  },
+  "status_vocabulary": {
+    "resolved": "A concrete pinned-engine mapping exists, is implemented here and is checked by a test or by the replay itself.",
+    "unsupported": "The pinned engine cannot express the LEAN behaviour. Recorded as a deviation; never defaulted, approximated silently or absorbed by tolerance.",
+    "blocked": "Not decided here. The dependent comparison cannot pass until it is decided."
+  },
+  "evidence_class": "HIST",
+  "case_configuration": {
+    "case": "one_zero",
+    "seed": null,
+    "account_type": "CASH",
+    "use_random_ids": true,
+    "fill_model": {
+      "order_type": "market",
+      "time_in_force": "gtc",
+      "fill_price": "bar_open",
+      "timestep": "hour",
+      "bar_index": "bar_end_instant",
+      "slippage_model": "none"
+    },
+    "fee_model": {
+      "buy_trading_fees": [],
+      "sell_trading_fees": []
+    },
+    "window": {
+      "symbol": "SPY",
+      "start": "2019-12-02",
+      "end": "2020-04-30"
+    },
+    "plan_owned_fields": [
+      "initial_cash_usd",
+      "sizing_buffer",
+      "target",
+      "fee_usd",
+      "slippage"
+    ],
+    "note": "Preregistered in preregistration.json (arm_manifests.lumibot.binding) for the choices the frozen plan does not express. compare.py binds the plan-owned fields to historical-simulation/plan.json and the seven fields above to this block, and refuses a receipt that disagrees with either. seed is null because the configuration has no stochastic fill, fee or latency component. use_random_ids is true as preregistered, because the Order default identifier is a uuid4; the pre-run probes found that in backtests Strategy.create_order assigns sequential bt_<n> identifiers instead (see generated_id_normalization)."
+  },
+  "engine": {
+    "package": "lumibot",
+    "version": "4.6.1",
+    "license": "GPL-3.0 (evaluation only; imported from the isolated environment, never vendored or copied)",
+    "upstream_repository": "https://github.com/Lumiwealth/lumibot",
+    "upstream_tag": "v4.6.1",
+    "upstream_commit": "2dfdda100cdc34e5acb46a7f13e8208a35aede72",
+    "wheel": "lumibot-4.6.1-py3-none-any.whl",
+    "wheel_sha256": "d06b8feb32c8a23026628e9030b9f166a25f4ab3af510d241aaa915516554159",
+    "dependency_built_from_source": {
+      "ibapi": {
+        "version": "9.81.1.post1",
+        "sdist_sha256": "49f6678bf4cced996920f32ad4b48e6897749ac30ba14a661082285f4ec09cd6",
+        "built_wheel_sha256": "664a4d01e9b47da023fde90630aa312d42b88f2f5f31c1adfd5d32f17debdcaf",
+        "license": "IB API Non-Commercial License or the IB API Commercial License; evaluation only, never redistributed"
+      }
+    },
+    "environment": "$ENV = ~/.local/share/codex-ecosystem/engine-trials-20260926/lumibot-4.6.1 (outside every checkout)",
+    "interpreter": "$ENV/bin/python, a uv 0.12.17 venv over /usr/bin/python3.12 (CPython 3.12.3)",
+    "lock": {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "packages": 264
+    },
+    "evidence_basis": "Pinned upstream documentation and tests fetched at the tag commit (sha256 values in preregistration.json upstream_documents) and the hash-verified wheel source; the installed lumibot package files equal the unpacked wheel. Mechanism probes on synthetic bars under the run sandbox are recorded in run.json."
+  },
+  "configuration": {
+    "entry_point": "Strategy.run_backtest(PandasDataBacktesting, backtesting_start, backtesting_end, pandas_data=[Data(...)], ...)",
+    "backtest_window": "naive 2019-12-02 00:00 to 2020-04-30 23:59, localized by Lumibot to America/New_York; it covers every converted row",
+    "arguments": {
+      "budget": 100000.0,
+      "sleeptime": "60M",
+      "minutes_before_opening": 60,
+      "minutes_before_closing": 5,
+      "buy_trading_fees": [],
+      "sell_trading_fees": [],
+      "benchmark_asset": null,
+      "risk_free_rate": 0.0,
+      "analyze_backtest": false,
+      "show_plot": false,
+      "show_tearsheet": false,
+      "save_tearsheet": false,
+      "show_indicators": false,
+      "show_progress_bar": false,
+      "save_stats_file": false,
+      "save_logfile": false,
+      "quiet_logs": true,
+      "name": "one_zero_port"
+    },
+    "reporting_side_effects": "benchmark_asset None (preregistered: the default SPY benchmark asks Yahoo for returns). risk_free_rate 0.0 (added before the first attempt: left unset, the strategy asks Yahoo for ^IRX when it dumps its statistics; probe-01 observed the sandbox refusing those lookups). Both feed statistics only; cash financing stays off. Analysis, plots, tearsheets, indicators, progress bar, stats and log files are off; the engine writes logs/data_provenance.json under its private working directory.",
+    "record": "The backtest arguments and the configuration facts the engine reports after each run go into the receipt and run.json."
+  },
+  "oracle": {
+    "receipt": "blueprints/us-equities/historical-simulation/receipt.json",
+    "receipt_id": "native-historical-leverage-stress-20260919",
+    "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+    "receipt_sha256_source": "acceptance-plan.md section 1 frozen table, row 'Published baseline receipt'",
+    "plan": "blueprints/us-equities/historical-simulation/plan.json",
+    "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  },
+  "inputs": {
+    "data_root": "<LEAN_DATA>/Data (retained bundled sample; located on this host at ~/.local/share/codex-ecosystem/tools/lean-985ef30/Data)",
+    "frozen_sha256": {
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    },
+    "all_five_verified_present_and_matching": true
+  },
+  "inputs_note": "The inputs block is copied unchanged from spy-parity/mapping-manifest.json, as the preregistration requires; its data_root text names the host that block was written on. On nativestack-5975wx-20260925 the data root is ~/.local/share/codex-ecosystem/lean/Lean/Data, where all five inputs were re-hashed on 2026-09-26 and match.",
+  "mappings": [
+    {
+      "id": "instrument_identity",
+      "lean_concept": "SPY US equity, USD, raw normalization, integer shares, resolved through the bundled map file",
+      "engine_concept": "Asset(symbol='SPY', asset_type='stock') with the quote Asset('USD', 'forex'); PandasData keys its store by (asset, quote). Orders are for whole shares. Prices reach the engine as float(Decimal row string) and come back through the preregistered float projection.",
+      "status": "resolved",
+      "decision": "Asset SPY (asset_type stock) with the default USD quote; integer shares; prices reach the engine as floats of the 4-decimal Decimal rows and come back through the float projection rule. SPY is a simulation identifier only.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/data_sources/pandas_data.py lines 58-89 (store keys are (asset, quote))",
+        "lumibot-4.6.1 wheel lumibot/entities/data.py lines 167-203 (Data takes asset, frame, timestep and quote)"
+      ],
+      "validation": "convert.check_map_file refuses a missing or renamed ticker over the window. The port projects every engine-reported price back to the 0.0001 tick, records max_abs_adjustment (a value above 0.000001 is a guard failure) and requires every engine quantity to be an exact integer.",
+      "limitations": [
+        "SPY here is a simulation identifier only. It is not an IBKR contract ID, an Alpaca asset ID or any broker identity."
+      ]
+    },
+    {
+      "id": "raw_data_decoding",
+      "lean_concept": "ZIP member spy.csv, one row per hourly bar, prices as integer deci-cents scaled by 10,000, volume in whole shares, raw (unadjusted) normalization",
+      "engine_concept": "One pandas DataFrame of exactly the 725 converted rows, indexed at each bar END instant (tz-aware), columns open, high, low and close as floats of the 4-decimal Decimal strings and volume as integer shares, wrapped in Data(asset, frame, timestep='hour', quote=USD). No dividend, stock_splits or other column; no padding, forward fill or resampling by the port.",
+      "status": "resolved",
+      "decision": "convert.py, loaded unchanged by path, decodes the frozen inputs; the engine receives one pandas DataFrame of exactly the 725 converted rows with columns open, high, low, close and volume only.",
+      "evidence": [
+        "blueprints/us-equities/engine-nautilus/spy-parity/convert.py sha256 08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65 (pinned by the preregistration; the port refuses any other bytes)",
+        "lumibot-4.6.1 wheel lumibot/entities/data.py lines 340-347 (the index is converted to America/New_York) and 394-406 (repair reindexes over the data source's date index with forward fill)",
+        "lumibot-4.6.1 wheel lumibot/data_sources/pandas_data.py lines 91-158 (load_data; one-minute padding only for a minute timestep)"
+      ],
+      "validation": "The port refuses to construct an engine unless convert.verify_inputs returns the five frozen hashes and the converted rows number 725 and hash to 6c6fcf4ae2b6d26521d0e0218501d94f7fcfa7571e902309f0f83ac2a68845cc. After each run it checks that the engine's Data still holds exactly those 725 end instants with the same OHLCV values (guard engine_rows_equal_converted_rows), so no engine-side padding or fill occurred. compare.py --lean-data re-hashes the inputs and re-derives and re-hashes the rows at comparison time.",
+      "limitations": [
+        "These are bundled upstream sample bytes. Byte identity is not vendor authenticity, point-in-time availability or market-wide coverage."
+      ]
+    },
+    {
+      "id": "sessions_and_time",
+      "lean_concept": "Hourly rows labelled by local New York bar start; a bar is complete at start + 1 hour; XNYS session membership over 2019-12-02 to 2020-04-30",
+      "engine_concept": "Data with timestep 'hour' indexed at each row's bar END instant. A pure PandasData backtest derives its trading calendar from the supplied rows: each date's market open and close are its first and last index values (10:00 and 16:00 New York; 13:00 on 2019-12-24). Lifecycle hooks run on that calendar: before_market_opens at open minus 60 minutes, before_starting_trading at the open, on_trading_iteration every 60 minutes while the session is open, after_market_closes at the close.",
+      "status": "resolved",
+      "decision": "Data with timestep hour, indexed at each row's bar END instant (tz-aware). A pure PandasData backtest derives its trading calendar from the supplied rows (lumibot/strategies/strategy_executor.py 2630-2649), so each session is expected to span its first and last end-indexed rows (10:00 to 16:00 New York; 13:00 on 2019-12-24). No padding, forward fill or resampling. The declared short session is carried from the Nautilus manifest.",
+      "full_session_rows": 7,
+      "known_short_sessions": {
+        "2019-12-24": 4
+      },
+      "known_short_sessions_reason": "2019-12-24 is the XNYS Christmas Eve half day, closing at 13:00 New York, so it yields the 09:00, 10:00, 11:00 and 12:00 rows only. 104 sessions x 7 rows - 3 missing rows = 725.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/data_sources/pandas_data.py lines 160-188 (calendar from the first and last timestamp of each date)",
+        "lumibot-4.6.1 wheel lumibot/strategies/strategy_executor.py lines 2641-2649 (pure PandasData backtests use that calendar) and 2225-2454 (session setup, iteration loop and close lifecycle)",
+        "lumibot-4.6.1 wheel lumibot/backtesting/backtesting_broker.py lines 602-707 (time to close and open on that calendar)"
+      ],
+      "validation": "convert.check_sessions refuses any undeclared short or long session. The port checks that the engine's calendar equals the first and last end instant of each of the 104 converted sessions (guard sessions_from_rows) and that every lifecycle hook ran exactly at the preregistered clocks (guard lifecycle_clock).",
+      "limitations": [
+        "Session membership comes from the retained daily file through convert.py; the engine applies no exchange calendar in this configuration.",
+        "Bundled history carries no original availability attestation, so event time is preserved but observation time is not independently attested."
+      ]
+    },
+    {
+      "id": "decision_visibility",
+      "lean_concept": "A completed 16:00 bar may form an intent; the fill must land on a later session",
+      "engine_concept": "after_market_closes runs at the session-final bar's end (16:00 New York). get_historical_prices(asset, 1, 'hour', timeshift=-1) at that clock returns the bar indexed 16:00, which with END-indexed bars is the completed decision bar; timeshift 0 would return the 15:00 bar. The port sizes from that bar's converted close and the engine-reported portfolio value and submits one GTC market order.",
+      "status": "resolved",
+      "decision": "The decision reads only the completed decision bar (end 16:00 New York) and submits after that instant; the order may fill only at the next session's first bar. check_decision_bar_is_session_final and check_causality apply, and the engine clock at submission is recorded.",
+      "decision_hook": "after_market_closes, the preregistration's example hook, chosen before the first attempt and recorded in the port header and run.json. Post-hoc variants (failure_policy F5) may use before_market_opens or before_starting_trading.",
+      "evidence": [
+        "tests/test_hour_timestep_support.py at 2dfdda100cdc34e5acb46a7f13e8208a35aede72 (sha256 820cd040c146faed010daacb08301b9c787aa7f269721391271b6af6b06bd6ac): a native hour request with timeshift=-1 includes the bar indexed at the requested instant",
+        "lumibot-4.6.1 wheel lumibot/entities/data.py lines 686-757 (last bar at or before the clock) and 1272-1299 (intraday slices end before that bar unless timeshift is negative)",
+        "probes/hook-probe.json (synthetic bars): the reads each hook sees"
+      ],
+      "validation": "fixture_strategy.check_decision_bar_is_session_final at each decision; a guard that the bar the engine returned has the decision bar's end instant and converted close; fixture_strategy.check_causality on the native fills; the engine clock at submission recorded beside each intent and required to be at or after the decision instant and before the fill (guard submission_clock).",
+      "limitations": [
+        "The decision read proves which bar formed the intent. Whether the order then fills on a later session is decided by the engine's fill model; see market_on_open_proxy."
+      ]
+    },
+    {
+      "id": "market_on_open_proxy",
+      "lean_concept": "MarketOnOpenOrder filled by EquityFillModel.MarketOnOpenFill at the next session's first hourly bar OPEN, stamped at that bar's end (10:00 New York)",
+      "engine_concept": "A market order with time_in_force 'gtc' submitted after the decision bar completes, filled by the backtesting broker at the open of the bar it selects and stamped with the broker clock.",
+      "status": "resolved",
+      "decision": "A GTC market order submitted after the decision bar completes is filled by the backtesting broker at the open of the bar it selects, stamped with the broker datetime (lumibot/backtesting/backtesting_broker.py 3091-3092 and the bar selection before it). With end-indexed bars the next session's first bar is indexed 10:00 New York. Code reading only; not documented in the pinned docs.",
+      "pre_run_finding": "Contradicted on synthetic bars before the first attempt (probes/hook-probe.json). The backtesting broker processes pending orders at the current clock whenever the strategy awaits the next open, before the clock advances (backtesting_broker.py lines 665-707, reached from strategy_executor.py lines 1940-1970 right after after_market_closes). There it takes a two-bar window ending at the bar indexed at or before the clock (lines 2660-2691), selects the first bar indexed in [clock, clock + 2 hours] or else the latest bar at or before the clock, within one day (lines 2956-3080), and prices a market order at that bar's open (lines 3091-3092). With END-indexed bars the bar indexed at 16:00 is the decision bar itself, so the order fills at 16:00 at the decision bar's open. Hooks that submit before the next open (before_market_opens) fill at the same stale open whenever the gap is under a day, and only a submission at the next session's 10:00 (before_starting_trading) lands on the first bar's open, at the instant of submission. The status stays resolved because it is binding; the primary attempt runs the preregistered example hook and its verdict stands as scored.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/backtesting/backtesting_broker.py lines 665-707, 2067-2110, 2660-2691, 2956-3080 and 3091-3092",
+        "lumibot-4.6.1 wheel lumibot/strategies/strategy_executor.py lines 1940-1970 and 2318-2454",
+        "lumibot-4.6.1 wheel lumibot/backtesting/backtesting_broker.py lines 3483-3517 (a day time-in-force elapses at the session close or on a date change, so gtc is used)",
+        "probes/hook-probe.json (synthetic bars, three hooks, engine fill clock from the broker's trade-event log)"
+      ],
+      "validation": "The port reads every fill instant and price from the broker's trade-event log and checks placement at the next session's first bar end (guard fill_at_next_session_first_bar), the price against the open of the bar indexed at the fill instant, causality and the submission clock. compare.py compares price and instant against the oracle with zero tolerance.",
+      "limitations": [
+        "Faithful to LEAN's MarketOnOpenFill only if the fill lands on the next session's first bar; the pre-run finding shows the engine does not do that for an order submitted at the decision bar's end.",
+        "PandasData has no opening-auction or at-the-open time-in-force in the pinned wheel; the documented raw timesteps are minute and day."
+      ]
+    },
+    {
+      "id": "distributions_and_cash",
+      "lean_concept": "Raw-normalized cash dividends posted to the account at the ex-date, derived from the bundled factor file; unexpected splits block the fixture",
+      "engine_concept": "Backtest dividends are credited by the strategy from a dividend column of day bars. With hour data only (and no dividend column, as the binding requires) nothing is credited. The receipt carries an external Decimal ledger from fixture_strategy.distribution_ledger over the engine's own fills, engine_posted false, at LEAN's ex-date instants.",
+      "status": "unsupported",
+      "decision": "Unsupported under this configuration: backtest dividends are credited from a dividend column of day bars (lumibot/strategies/_strategy.py 2152 onward; lumibot/data_sources/data_source.py 862-910), and PandasData serves a day request only from day or minute data (lumibot/data_sources/pandas_data.py 392-470) while this arm supplies hour data only; the pinned PandasData docs define no distribution input. Reported as an external Decimal ledger with engine_posted false.",
+      "derivation": "per_share from convert.derive_distributions on the frozen factor file, never the oracle: 1.57 for ex-date 2019-12-20 and 1.41 for ex-date 2020-03-20.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/strategies/_strategy.py lines 2152-2215 (dividends credited from get_yesterday_dividends per held position)",
+        "lumibot-4.6.1 wheel lumibot/data_sources/data_source.py lines 862-944 (dividends cached from a dividend column of day bars)",
+        "lumibot-4.6.1 wheel lumibot/data_sources/pandas_data.py lines 392-501 (a day request is served from day or minute data only)",
+        "probes/hook-probe.json variant dividend_column: hour data with a dividend column credits nothing either"
+      ],
+      "validation": "The port checks the broker's trade-event log for any cash event (guard engine_cash_events) and the engine's own cash snapshots for any change other than fills (guard engine_cash_changes_only_at_fills). An engine dividend posting would replace the external entry for its ex-date with the engine's own amount and instant; the port never records both and never injects cash.",
+      "limitations": [
+        "Bar prices stay raw-normalized. Payable dates, withholding and short-position debits are outside one_zero."
+      ]
+    },
+    {
+      "id": "costs_and_rounding",
+      "lean_concept": "one_zero: zero fees, zero slippage. one_stress and later: 1 USD per order plus 20 bp adverse slippage with an explicit rounding stage",
+      "engine_concept": "buy_trading_fees and sell_trading_fees empty and no slippage list, so the backtesting broker's trade cost is zero; the strategy updates cash in Decimal from the fill price and quantity and stores it as a float.",
+      "status": "resolved",
+      "decision": "Empty buy and sell trading-fee lists and no slippage. The port reads each native fill's cost back and records any nonzero value as a guard failure.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/backtesting/backtesting_broker.py lines 2032-2064 (trade cost is zero with no fee objects)",
+        "lumibot-4.6.1 wheel lumibot/strategies/_strategy.py lines 2120-2150 (cash update in Decimal, stored as float)",
+        "lumibot-4.6.1 wheel lumibot/entities/order.py lines 1094-1096 (Order.avg_fill_price is rounded to cents, so the port reads the fill price from the trade-event log instead)"
+      ],
+      "validation": "The port reads trade_cost back from every fill event and records any nonzero value as a guard failure (guard costs_zero); the backtest configuration guard requires both fee lists to be empty.",
+      "limitations": [
+        "Zero-cost parity says nothing about the stressed cases' quantities or fill schedule."
+      ],
+      "blocked_extension": {
+        "id": "costs_and_rounding_stress",
+        "status": "blocked",
+        "reason": "The 1 USD per order and 20 bp adverse slippage mapping and the rounding stage for the stressed cases are not decided by this trial."
+      }
+    },
+    {
+      "id": "margin_and_adaptive_state",
+      "lean_concept": "SecurityMarginModel(2m) with DefaultMarginCallModel, post-processing marks, hourly peak and a one-way 5% drawdown latch",
+      "engine_concept": "Lumibot backtests track strategy cash from the budget; no margin model is configured, and cash financing stays off (its default).",
+      "status": "blocked",
+      "decision": "Lumibot backtests track strategy cash from the budget; no margin model is configured or claimed. one_zero requests 1x, so no leverage, margin call or latch is exercised or claimed.",
+      "evidence": [
+        "lumibot-4.6.1 wheel lumibot/strategies/_strategy.py line 679 (cash financing disabled by default)"
+      ],
+      "validation": "The backtest configuration guard records cash financing off; one_zero requests 1x, so no leverage, margin call or latch is exercised.",
+      "limitations": [
+        "Equivalence to SecurityMarginModel(2m), DefaultMarginCallModel timing and quantity, the hourly peak and the one-way 5% latch remains undecided and blocks two_zero, two_stress, adaptive_stress and over_limit."
+      ]
+    }
+  ],
+  "dependent_comparison_status": {
+    "one_zero": "market_on_open_proxy is resolved by binding but contradicted by the pre-run probe; distributions_and_cash is unsupported; margin_and_adaptive_state is blocked but not exercised at 1x",
+    "one_stress": "blocked_by:costs_and_rounding_stress",
+    "two_zero": "blocked_by:margin_and_adaptive_state",
+    "two_stress": "blocked_by:margin_and_adaptive_state,costs_and_rounding_stress",
+    "adaptive_stress": "blocked_by:margin_and_adaptive_state",
+    "over_limit": "blocked_by:margin_and_adaptive_state"
+  },
+  "generated_id_normalization": {
+    "declared_before_execution": true,
+    "applied_fields": [
+      "identifier",
+      "parent_identifier",
+      "event_id",
+      "_identifier"
+    ],
+    "rule": "Only random identifiers are normalized: a uuid4 hex identifier (the Order default, lumibot/entities/order.py lines 24-27 and 479 in the wheel) is validated against ^[0-9a-f]{32}$ and replaced by its ordinal of first appearance in the run. The sequential identifiers the pinned Strategy.create_order assigns in backtests (bt_<n>, lumibot/strategies/strategy.py lines 884-890) are deterministic and stay raw, as ml4t's sequential ids do; any other shape is a guard failure. Published files carry order ordinals only.",
+    "pre_run_finding": "The preregistration expected uuid4 order identifiers. The port's mechanism probe on synthetic bars found bt_<n> identifiers for every backtest order, so in practice nothing is normalized.",
+    "never_normalized": [
+      "timing",
+      "prices",
+      "quantities",
+      "fees",
+      "distributions",
+      "position transitions",
+      "decision order"
+    ]
+  }
+}

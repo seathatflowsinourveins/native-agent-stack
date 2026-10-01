@@ -1,0 +1,1318 @@
+#!/usr/bin/env python3
+"""Guarded reaper for orphaned openai-codex Claude Code plugin brokers.
+
+The openai-codex plugin (`app-server-broker.mjs serve --endpoint unix:<sock>`)
+starts one detached broker per workspace and records it in that workspace's
+plugin-data state directory as `broker.json` (endpoint, pidFile, logFile,
+sessionDir, pid) beside `state.json` (jobs[] with status/workspaceRoot/
+sessionId). Only the main session's SessionEnd hook
+(`scripts/session-lifecycle-hook.mjs` -> `scripts/lib/broker-lifecycle.mjs`
+`sendBrokerShutdown`) ever shuts a broker down, so a crashed session or an
+abandoned workflow-child worktree leaves its broker (and the `codex
+app-server` child it owns) running indefinitely. Upstream
+(openai/codex-plugin-cc) tracks this: issues #543, #605, #380, #767, #743
+(pid reuse -> wrong process), open PRs #680 (idle timeout), #660 (reap
+leaked sessions), #490; nothing merged as of 2026-09-25.
+
+This tool never guesses: a broker is stopped only when every one of these
+holds, each checked directly against the live process and the plugin's own
+recorded state rather than assumed --
+  (a) `/proc/<pid>/cmdline` still names `app-server-broker.mjs` and `serve`
+      with the *same* recorded endpoint (guards pid reuse, upstream #743);
+  (b) no job in its `state.json` has a non-terminal status. The plugin's own
+      status vocabulary (`scripts/lib/tracked-jobs.mjs`,
+      `scripts/lib/job-control.mjs`, `scripts/session-lifecycle-hook.mjs` in
+      openai-codex 1.0.6) is exactly {queued, running} (non-terminal) and
+      {completed, failed, cancelled} (terminal); anything else -- missing,
+      null, or a status this tool has never seen -- is treated as
+      non-terminal so an unrecognized future status blocks reaping instead
+      of being reaped by default;
+  (c) the broker's workspace directory no longer exists, or no live
+      `claude`/`codex` process has a cwd equal to or under it -- excluding
+      the broker's own descendants (fix round, 2026-09-25): every live
+      broker owns a non-detached `codex app-server` child for its whole
+      lifetime, spawned with the broker's own cwd (`app-server.mjs`
+      `SpawnedCodexAppServerClient.initialize()`:
+      `spawn("codex", ["app-server"], {cwd: this.cwd})`), so without
+      excluding descendants a live broker's own child would always look
+      like a live *session* under its own workspace, and a live orphan
+      whose workspace directory still exists (the common retained-worktree
+      case) could never become eligible. The workspace root is read from
+      the *broker's own* `/proc/<pid>/cwd` (the OS's live ground truth for
+      the directory `app-server-broker.mjs` was spawned with -- see
+      `spawnBrokerProcess` in `broker-lifecycle.mjs`, which sets the
+      child's OS cwd to the workspace), not reconstructed from
+      `state.json`, which can be empty for a broker that started but never
+      ran a job. Disclosed gap, not guessed at a fix: a *review* command's
+      broker (unlike a task run) is spawned with the raw command cwd
+      (`codex-companion.mjs` `resolveCommandCwd`), which can be a
+      subdirectory of the actual live session's own cwd rather than the
+      git checkout root that session started from; this guard also checks
+      the workspace root's nearest `.git`-bearing ancestor (if any) for a
+      live session, with the same "equal to or under" test this guard
+      already applies to the plain workspace root -- so it finds a live
+      session anywhere in that checkout, including some OTHER subdirectory
+      than the broker's own workspace cwd, not only when the live
+      session's own cwd is the checkout root exactly (corrected here,
+      fourth fix round, 2026-09-25: an earlier version of this docstring
+      understated this coverage). Fixed (major finding, fifth fix round,
+      2026-09-25): the *first* half of guard (c) -- "the broker's workspace
+      directory no longer exists" -- is decided against that same git
+      checkout root (or the raw cwd, when it has no git relationship at
+      all), never against the broker's raw `/proc/<pid>/cwd` alone; an
+      earlier version declared the workspace unused, skipping the
+      live-session scan entirely, the instant the broker's own (possibly
+      review-triggered, possibly-subdirectory) cwd failed to exist on disk,
+      even when the checkout it belongs to -- the directory that actually
+      keys the plugin's state dir, `resolveWorkspaceRoot(cwd)` in
+      `scripts/lib/workspace.mjs` -- was still there and still live. Fixed
+      further (major finding, sixth fix round, 2026-09-25): that checkout
+      root used to be found by walking upward for the nearest ancestor with
+      a currently EXISTING `.git` entry (`find_git_toplevel`), which walks
+      straight past a REMOVED `git worktree` checkout (Claude Code's own
+      `.claude/worktrees/<name>` layout, this project's own workflow-child
+      worktrees) into whichever ENCLOSING checkout still exists on disk --
+      a directory that never keyed this broker's state dir at all, so a
+      live session anywhere under that unrelated enclosing checkout wrongly
+      kept an already-removed, genuinely orphaned worktree broker blocked
+      (it was correctly eligible before this guard's own keying_root gating
+      immediately above was introduced). Fixed: the keying root guard (c)
+      uses (`find_keying_root`) now walks the same ancestor chain but
+      selects by IDENTITY, not existence -- which ancestor's own
+      `sha256(realpath(...))[:16]` (`hash_workspace_root`) matches this
+      broker's own state-dir name suffix (`state_dir_hash_suffix`), the
+      exact hash `state.mjs`'s `resolveStateDir` used to name that
+      directory in the first place -- so a removed worktree whose own path
+      still matches is returned immediately, before any enclosing checkout
+      is ever considered, and only falls back to the previous
+      `.git`-existence walk when no ancestor's hash matches at all. What it
+      does not cover is a live session with no git relationship to the
+      workspace's checkout at all (see
+      docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
+      limitations"). Also checks
+      the *other* checkout a `git worktree` workspace belongs to (fix
+      round, 2026-09-25, `read_worktree_parent_root`): a workflow-child
+      worktree's broker is spawned with the worktree itself as its cwd, but
+      a coordinator that only dispatches into that worktree by prefixing
+      each Bash command with `cd <worktree> &&` -- never changing its own
+      OS process cwd -- has no cwd under the worktree at all; it is
+      findable here only when it was itself launched from the worktree's
+      own main checkout (resolved from the worktree's `.git` pointer
+      file's `gitdir: .../.git/worktrees/<name>` line, pure stdlib, no
+      `git` binary dependency). A coordinator launched from a checkout
+      with no git relationship to the worktree at all (a separate driver
+      repository dispatching across many *other* repos' worktrees by
+      directory rather than by git ancestry -- observed directly against
+      this tool's own live process during this fix round) has no cwd-based
+      signal here whatsoever; guard (e) is this tool's mitigation for that
+      case, and docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
+      limitations" discloses what guard (e) does not itself cover. Also
+      excludes every OTHER live broker's own descendants, not just the
+      evaluated broker's own (fix round, 2026-09-25, `find_live_broker_pids`):
+      once this guard also scans a workspace's git-toplevel and
+      worktree-parent roots (the two checks just above), excluding only the
+      evaluated broker's own descendants left every OTHER live broker's own
+      `codex app-server` child -- the same shape as this broker's, just for
+      a different workspace -- looking like a live session whenever that
+      other workspace's root sat at or under one of the roots this scan
+      checks. Concretely: two orphaned brokers of one repository (the main
+      checkout plus a `git worktree` nested under it, Claude Code's own
+      `.claude/worktrees/<name>/` layout, or two such worktrees) each found
+      the OTHER's app-server child under their shared main checkout, so
+      neither ever became eligible -- permanent mutual blocking, not a
+      one-sided gap; verified against this rollout's own live worktree
+      layout, not only reasoned about. `find_live_broker_pids` identifies
+      every live broker by `/proc/<pid>/cmdline` alone (the same match
+      guard (a) already applies to the evaluated broker, minus the
+      endpoint check tying it to one specific `broker.json`), so it catches
+      every live broker regardless of which workspace it belongs to or
+      whether its own evaluation has run yet in this pass;
+  (d) the broker process is older than `--min-age` (default 1800s), computed
+      from `/proc/<pid>/stat` field 22 (starttime, in clock ticks since
+      boot) plus `/proc/uptime`, not a filesystem mtime;
+  (e) the workspace's most recent recorded job activity is at least
+      `--min-age` in the past too (fix round, 2026-09-25,
+      `most_recent_job_activity`) -- not just the broker *process's* own
+      age (guard (d) above), so a broker that has been running for hours
+      but last did a job a minute ago is still not reaped. Read from
+      `state.json` jobs[]' `updatedAt` (set on every job write by the
+      plugin's own `upsertJob`, scripts/lib/state.mjs), falling back to
+      `completedAt`/`createdAt`/`startedAt` for a job dict written some
+      other way. A workspace with no job carrying any parseable timestamp
+      (never ran a job at all) has no signal here and this guard passes
+      trivially, leaving guard (d) as the sole age signal for that case --
+      exactly guard (d)'s own pre-fix-round behavior. Stated generally
+      (corrected here, fourth fix round, 2026-09-25: an earlier version of
+      this docstring scoped the residual gap only to a broker that has
+      never run a job): once no live claude/codex process has a cwd under
+      guard (c)'s three scanned roots, ANY broker -- not only one that has
+      never run a job -- becomes eligible as soon as `--min-age` has
+      elapsed since its own newest job activity (or since process start,
+      for one that never ran a job); a broker that ran one job and then
+      went quiet for `--min-age` reaches this guard the same way one that
+      never ran a job reaches guard (d) alone (see "Known limitations").
+
+Action on an eligible broker: send the `broker/shutdown` JSON-RPC
+(`{"id":1,"method":"broker/shutdown","params":{}}\n`) over its unix socket
+(5s timeout), then wait up to 15s for the broker pid and the OS children it
+had at that moment (its `codex app-server`) to exit. This tool never sends
+SIGKILL. `--escalate` is opt-in: only after that wait fails, and only after
+re-checking guard (a) (the pid could have been reused in the interim), it
+sends SIGTERM to the broker's own process group (Node's `detached: true`
+spawn makes the broker its own process-group leader) and waits again. Once
+an exit is confirmed, `broker.json` is removed if it still names the exact
+pid/endpoint just stopped (fix round, 2026-09-25,
+`clear_broker_json_if_stopped`): stopping a broker never used to touch its
+`broker.json`, so a workspace's plugin state kept pointing at the dead
+endpoint/pid until that workspace's own next `SessionEnd` ran, which could
+mislead a plugin code path that trusts `broker.json` without itself
+reconnecting first.
+
+`--list` (the default) makes no changes: it reports the same per-broker
+guard evaluation `--apply` would use, so an operator can see what would
+happen. `--receipt PATH` writes the same JSON report to a file as well as
+stdout, in both modes. One broker's own unreadable or malformed state
+(non-UTF-8 bytes, JSON that parses to something other than an object) is
+reported as that broker's own ineligibility reason and never aborts
+evaluation of the rest (fix round, 2026-09-25, `safe_evaluate_broker`).
+Exit 0 normally; 2 if an eligible broker was not confirmed stopped, or for
+invalid command-line usage (argparse's own convention); 3 if this host has
+no `/proc` at all (unsupported platform -- refuses to run rather than
+silently report every broker as "not running"; fix round, 2026-09-25: this
+used to share exit code 2 with "an eligible broker was not confirmed
+stopped", which a monitor following the documented contract could not tell
+apart).
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import signal
+import socket
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+PROG = "codex-broker-reaper"
+DEFAULT_MIN_AGE_SECONDS = 1800.0
+RPC_TIMEOUT_SECONDS = 5.0
+EXIT_WAIT_SECONDS = 15.0
+POLL_INTERVAL_SECONDS = 0.25
+
+# openai-codex 1.0.6 job status vocabulary (scripts/lib/tracked-jobs.mjs,
+# scripts/lib/job-control.mjs, scripts/session-lifecycle-hook.mjs). Anything
+# not in TERMINAL_JOB_STATUSES -- including a status this list has never
+# seen -- is treated as active, never as terminal.
+NON_TERMINAL_JOB_STATUSES = {"queued", "running"}
+TERMINAL_JOB_STATUSES = {"completed", "failed", "cancelled"}
+
+CLAUDE_OR_CODEX_NAMES = {"claude", "codex"}
+
+
+# --------------------------------------------------------------------------
+# /proc helpers. Every one of these returns None (never raises) when the
+# process is gone or the field is unreadable, so callers treat "unknown" as
+# "guard not satisfied" rather than crashing the whole run over one broker.
+# --------------------------------------------------------------------------
+
+def iter_pids() -> list[int]:
+    try:
+        return [int(name) for name in os.listdir("/proc") if name.isdigit()]
+    except OSError:
+        return []
+
+
+def process_exists(pid: int) -> bool:
+    return Path(f"/proc/{pid}").is_dir()
+
+
+def proc_is_available() -> bool:
+    """False on a host with no /proc at all (this tool is Linux-only).
+
+    Every guard here reads /proc/<pid>/{cmdline,comm,cwd,stat}, /proc/uptime
+    and /proc/meminfo directly; without /proc every one of those reads
+    fails the same way a dead pid would (see read_proc_cmdline and
+    process_start_epoch, which both return None on OSError), so a live
+    broker on an unsupported host would be silently misreported as "pid N
+    is not running" -- 0 eligible, nothing wrong -- instead of failing
+    closed with an explicit, honest error. main() checks this once, up
+    front, rather than letting every broker's own evaluation fail the same
+    ambiguous way.
+    """
+    return Path("/proc").is_dir()
+
+
+def read_proc_cmdline(pid: int) -> list[str] | None:
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+    except OSError:
+        return None
+    if not raw:
+        return None
+    parts = raw.split(b"\0")
+    if parts and parts[-1] == b"":
+        parts.pop()
+    if not parts:
+        return None
+    return [part.decode("utf-8", "surrogateescape") for part in parts]
+
+
+def read_proc_comm(pid: int) -> str | None:
+    try:
+        return Path(f"/proc/{pid}/comm").read_text().strip()
+    except (OSError, ValueError):
+        # ValueError also catches UnicodeDecodeError (fix round, 2026-09-25,
+        # minor finding): read_text() raises it, not OSError, for a comm set
+        # to non-UTF-8 bytes (e.g. via prctl(PR_SET_NAME) with a truncated
+        # multibyte name), which used to escape every "never raises" caller
+        # -- including collect_child_pids() -> process_parent_pid() from
+        # stop_broker(), outside safe_evaluate_broker's own exception net --
+        # and crash --apply with a traceback, exit 1, and no receipt even
+        # after earlier brokers had already been stopped. Matches
+        # process_start_epoch's existing (OSError, ValueError, IndexError).
+        return None
+
+
+def read_proc_cwd(pid: int) -> str | None:
+    """The process's live OS working directory, or None if it can't be read.
+
+    A directory removed while a process still holds it open reads back with
+    a trailing " (deleted)" marker; that marker is stripped, and the
+    (now-nonexistent) path is still returned so callers can observe "no
+    longer exists" through the normal `os.path.isdir` check.
+    """
+    try:
+        target = os.readlink(f"/proc/{pid}/cwd")
+    except OSError:
+        return None
+    suffix = " (deleted)"
+    if target.endswith(suffix):
+        target = target[: -len(suffix)]
+    return target or None
+
+
+def process_start_epoch(pid: int, *, reference: float | None = None) -> float | None:
+    """Wall-clock start time of `pid`, from /proc/<pid>/stat's starttime.
+
+    starttime (field 22, in clock ticks since boot) is parsed after the
+    comm field's closing paren, since comm can itself contain spaces or
+    parentheses. /proc/uptime anchors ticks-since-boot to wall clock.
+    """
+    try:
+        uptime_seconds = float(Path("/proc/uptime").read_text().split()[0])
+        stat_raw = Path(f"/proc/{pid}/stat").read_text()
+    except (OSError, ValueError, IndexError):
+        return None
+    close = stat_raw.rfind(")")
+    if close == -1:
+        return None
+    fields = stat_raw[close + 2:].split()
+    if len(fields) < 20:
+        return None
+    try:
+        starttime_ticks = float(fields[19])  # field 22 overall; see docstring
+    except ValueError:
+        return None
+    clk_tck = os.sysconf("SC_CLK_TCK") or 100
+    now = reference if reference is not None else time.time()
+    boot_epoch = now - uptime_seconds
+    return boot_epoch + starttime_ticks / clk_tck
+
+
+def process_parent_pid(pid: int) -> int | None:
+    try:
+        stat_raw = Path(f"/proc/{pid}/stat").read_text()
+    except (OSError, ValueError):
+        # ValueError also catches UnicodeDecodeError (fix round, 2026-09-25,
+        # minor finding): /proc/<pid>/stat embeds the process's raw comm
+        # between its first "(" and last ")", so a non-UTF-8 comm makes
+        # read_text() raise here too -- see read_proc_comm's matching
+        # comment for the uncaught-crash chain this closes (collect_child_pids
+        # -> process_parent_pid, reached from stop_broker outside
+        # safe_evaluate_broker's exception net).
+        return None
+    close = stat_raw.rfind(")")
+    if close == -1:
+        return None
+    fields = stat_raw[close + 2:].split()
+    if len(fields) < 2:
+        return None
+    try:
+        return int(fields[1])  # field 4 (ppid) overall; see process_start_epoch
+    except ValueError:
+        return None
+
+
+def collect_child_pids(pid: int) -> list[int]:
+    return [candidate for candidate in iter_pids() if process_parent_pid(candidate) == pid]
+
+
+def collect_descendant_pids(pid: int) -> list[int]:
+    """Every descendant of `pid` (children, grandchildren, ...), via a live /proc scan.
+
+    Guard (c) must not mistake the broker's own descendants for a live
+    session: every live broker owns a non-detached `codex app-server` child
+    for its whole lifetime (see the module docstring's guard (c) entry),
+    which can itself spawn further children (e.g. an MCP server). Its comm
+    is "codex" and its cwd equals the broker's own workspace root, so
+    excluding only the broker's own pid -- not its descendants -- would
+    make guard (c) treat that child as if it were a live claude/codex
+    *session* under its own workspace.
+    """
+    descendants: list[int] = []
+    frontier = [pid]
+    seen = {pid}
+    while frontier:
+        parent = frontier.pop()
+        for child in collect_child_pids(parent):
+            if child not in seen:
+                seen.add(child)
+                descendants.append(child)
+                frontier.append(child)
+    return descendants
+
+
+def is_claude_or_codex_process(pid: int) -> bool:
+    """True when `pid` looks like a live `claude` or `codex` process.
+
+    Checked on this host: the native Claude Code binary (~/.local/bin/claude,
+    an ELF executable, not a wrapper script) reports comm == "claude" and
+    argv[0]'s basename == "claude"; the packaged codex CLI binary is native
+    too. Corrected (fix round, 2026-09-25): a Python process run as
+    `python3 script.py` -- what this tool's own tests do to spawn a live-
+    session stand-in -- reports comm == "python3", the *interpreter's* own
+    name, simply because `python3` is the binary actually running, not
+    because of any shebang rewriting. (A *direct* shebang, e.g.
+    `#!/usr/bin/python3`, executed as the script's own file, actually
+    reports the *script's* basename as comm, not the interpreter's --
+    checked directly on this host.) So tests simulating a live session set
+    comm directly with prctl(PR_SET_NAME) (see
+    tests/test_codex_broker_reaper.py) rather than relying on any script's
+    filename.
+    """
+    comm = read_proc_comm(pid)
+    if comm in CLAUDE_OR_CODEX_NAMES:
+        return True
+    argv = read_proc_cmdline(pid)
+    if argv:
+        base = os.path.basename(argv[0])
+        if base in CLAUDE_OR_CODEX_NAMES:
+            return True
+    return False
+
+
+def path_is_under(candidate: str, root: str) -> bool:
+    """True when `candidate` is `root` itself or a path inside it.
+
+    Fixed (fix round, 2026-09-25): for a filesystem-root `root` ("/"),
+    `os.path.normpath(root)` is already "/", which *ends with* `os.sep`; the
+    old `root + os.sep` unconditionally appended a separator regardless,
+    producing "//" for root "/" -- and no normal absolute path other than
+    "/" itself ever starts with "//", so `path_is_under(anything, "/")` was
+    always False except for the exact string "/". Guard (c) calls this for
+    a live-session safety check, so "wrong" here must mean "too eager to
+    treat a path as NOT under root", never the reverse -- appending the
+    separator only when `root` does not already end with one avoids the
+    double separator without changing behavior for any non-root `root`.
+    """
+    candidate = os.path.normpath(candidate)
+    root = os.path.normpath(root)
+    if candidate == root:
+        return True
+    prefix = root if root.endswith(os.sep) else root + os.sep
+    return candidate.startswith(prefix)
+
+
+def find_git_toplevel(path: str) -> str | None:
+    """The nearest ancestor of `path` (inclusive) holding a `.git` entry, or None.
+
+    Pure stdlib, no `git` binary dependency (this tool has none): walks
+    upward checking for `.git` as either a directory (a normal checkout) or
+    a file (a `git worktree` checkout, whose `.git` is a `gitdir:` pointer
+    file), matching what the plugin's own `resolveWorkspaceRoot` resolves
+    with `git rev-parse --show-toplevel` (scripts/lib/workspace.mjs,
+    scripts/lib/git.mjs) closely enough for guard (c)'s purposes -- see
+    evaluate_broker's guard (c), which also checks this directory for a
+    live session, since a review-triggered broker's own OS cwd can be a
+    subdirectory of it rather than this same root (docs/decisions/
+    2026-09-25-codex-broker-reaper.md, "Known limitations").
+    """
+    current = os.path.normpath(path)
+    while True:
+        if os.path.exists(os.path.join(current, ".git")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            return None
+        current = parent
+
+
+def read_worktree_parent_root(checkout_root: str) -> str | None:
+    """The main checkout root for `checkout_root`, if it is a `git worktree` checkout, else None.
+
+    A `git worktree add` checkout's own top-level `.git` is a *file* (not a
+    directory) holding a single `gitdir: <main-repo>/.git/worktrees/<name>`
+    line (`git-worktree(1)`); `find_git_toplevel` already treats that file
+    the same as an ordinary `.git` directory for locating `checkout_root`
+    itself, but does not resolve to the *other* checkout the worktree
+    belongs to. Added for guard (c) (fix round, 2026-09-25): see the module
+    docstring's guard (c) entry for why the live coordinating process for a
+    worktree-scoped broker is sometimes only findable at that other
+    checkout. Pure stdlib, no `git` binary dependency, matching
+    `find_git_toplevel`. A relative `gitdir:` line (git 2.48+'s
+    `worktree.useRelativePaths`) is resolved against `checkout_root` before
+    being searched (fix round, 2026-09-25), so the returned parent is
+    always absolute like `checkout_root` itself. Returns None for a normal
+    checkout (including the repository's own main worktree), or if the
+    pointer file is missing or does not parse as expected.
+    """
+    git_path = os.path.join(checkout_root, ".git")
+    if os.path.isdir(git_path):
+        return None  # a normal checkout, not a linked worktree
+    try:
+        raw = Path(git_path).read_text(encoding="utf-8", errors="surrogateescape")
+    except OSError:
+        return None
+    line = raw.strip()
+    prefix = "gitdir:"
+    if not line.startswith(prefix):
+        return None
+    gitdir = line[len(prefix):].strip()
+    # Resolved against checkout_root -- the directory HOLDING the .git file
+    # itself -- before the marker search (fix round, 2026-09-25): git
+    # writes a relative gitdir: line relative to that directory, not to
+    # this process's own cwd (git 2.48+'s worktree.useRelativePaths / `git
+    # worktree add --relative-paths` can write one). os.path.join already
+    # discards checkout_root when gitdir is already absolute (every case
+    # observed on this host, git 2.43.0), so this is safe either way.
+    # Unresolved, a relative gitdir: still passed the marker search below,
+    # but the returned parent stayed relative -- path_is_under() then
+    # compared it against an absolute /proc cwd and never matched, silently
+    # dropping the worktree-parent protection for such a worktree (unsafe
+    # direction for a live-session safety check).
+    gitdir = os.path.normpath(os.path.join(checkout_root, gitdir))
+    marker = f"{os.sep}.git{os.sep}worktrees{os.sep}"
+    index = gitdir.find(marker)
+    if index == -1:
+        return None
+    parent = gitdir[:index]
+    return parent or None
+
+
+def hash_workspace_root(path: str) -> str:
+    """sha256(realpath(path)).hexdigest()[:16], matching state.mjs's own resolveStateDir hash.
+
+    `scripts/lib/state.mjs` `resolveStateDir` (installed openai-codex 1.0.6,
+    checked directly): `hash = createHash("sha256").update(canonicalWorkspaceRoot)
+    .digest("hex").slice(0, 16)`, where `canonicalWorkspaceRoot` is
+    `fs.realpathSync.native(workspaceRoot)` when that succeeds (i.e. when
+    `workspaceRoot` still existed at the moment the plugin computed it),
+    else `workspaceRoot` itself unchanged. `os.path.realpath` (unlike
+    Node's `fs.realpathSync.native`) does not require `path` to exist: it
+    resolves symlinks in whichever leading components still exist and
+    passes the remainder through unresolved, which reproduces the same
+    string the plugin hashed as long as no component of the path is itself
+    a symlink -- true for every workspace root observed on this host (see
+    docs/decisions/2026-09-25-codex-broker-reaper.md, "Known
+    limitations"). `surrogateescape` avoids raising on a non-UTF-8 path
+    component (matching this module's other /proc-derived path handling)
+    rather than crashing guard (c) outright; Node's own `.update()` of a JS
+    string defaults to UTF-8 bytes too.
+    """
+    return hashlib.sha256(os.path.realpath(path).encode("utf-8", "surrogateescape")).hexdigest()[:16]
+
+
+STATE_DIR_HASH_RE = re.compile(r"-([0-9a-f]{16})$")
+
+
+def state_dir_hash_suffix(broker_dir: Path) -> str | None:
+    """The 16-hex-character keying hash from `broker_dir`'s own name, or None.
+
+    The plugin's state directory is named `<slug>-<hash>` (`state.mjs`
+    `resolveStateDir`): `slug` is a sanitized `path.basename(workspaceRoot)`
+    and can itself contain dashes, but `hash` is always exactly 16 lowercase
+    hex characters (a truncated sha256 hex digest) at the very END of the
+    name -- matched here anchored with `$` so a slug that happens to end in
+    hex-looking characters is never mistaken for the real hash. None when
+    `broker_dir`'s name does not end that way at all (not observed from the
+    plugin itself; `find_keying_root` falls back to the pre-hash-matching
+    heuristic in that case).
+    """
+    match = STATE_DIR_HASH_RE.search(broker_dir.name)
+    return match.group(1) if match else None
+
+
+def find_keying_root(workspace_root: str, expected_hash: str | None) -> str:
+    """The ancestor of `workspace_root` (inclusive) that keys the plugin's state dir.
+
+    Fixed (major finding, sixth fix round, 2026-09-25): the previous
+    `find_git_toplevel(workspace_root) or workspace_root` selected a keying
+    root by walking upward for the nearest ancestor with a currently
+    EXISTING `.git` entry -- the wrong test specifically for a REMOVED `git
+    worktree` checkout (Claude Code's own `.claude/worktrees/<name>`
+    layout, this project's own workflow-child worktrees): once the worktree
+    directory itself is gone, `os.path.exists(worktree/".git")` is False,
+    so the walk continued straight into the ENCLOSING main checkout -- a
+    directory the plugin's own `resolveStateDir` never hashed for this
+    broker at all -- and a live session anywhere under that unrelated
+    enclosing checkout then wrongly kept an already-removed, genuinely
+    orphaned worktree broker blocked (it was correctly eligible before this
+    same guard's fifth-fix-round keying_root gating was introduced).
+
+    Fixed by selecting the keying root by IDENTITY instead of existence:
+    `workspace_root` itself, then each successive parent, is hashed with
+    `hash_workspace_root` (mirroring `resolveStateDir`'s own
+    `sha256(realpath(...))[:16]`) and compared against `expected_hash` --
+    already sitting in this broker's own state-dir name
+    (`state_dir_hash_suffix`) -- returning the FIRST (nearest, i.e. most
+    specific) match. `workspace_root` is always checked before any parent,
+    so a removed worktree whose own path already matches the suffix is
+    returned immediately and is never superseded by an enclosing checkout
+    that merely happens to still exist on disk.
+
+    Falls back to the previous `find_git_toplevel(workspace_root) or
+    workspace_root` heuristic when `expected_hash` is None (a `broker_dir`
+    name that does not end in 16 hex characters -- not observed from the
+    plugin itself) or when no ancestor's hash matches it at all (e.g. a
+    `CLAUDE_PLUGIN_DATA`/slug shape this tool does not model), so a
+    hash-matching miss degrades to the prior, already-reviewed behavior
+    rather than to an unbounded or unsafe root. Every pre-sixth-fix-round
+    guard (c) test uses a synthetic state-dir name that does not itself end
+    in 16 hex characters, so `state_dir_hash_suffix` returns None for all
+    of them and they exercise exactly this fallback path unchanged; see
+    `KeyingRootTests` and `LiveCwdGuardTests` in
+    `tests/test_codex_broker_reaper.py` for both paths' own direct
+    coverage.
+    """
+    if expected_hash is not None:
+        current = os.path.normpath(workspace_root)
+        while True:
+            if hash_workspace_root(current) == expected_hash:
+                return current
+            parent = os.path.dirname(current)
+            if parent == current:
+                break
+            current = parent
+    return find_git_toplevel(workspace_root) or workspace_root
+
+
+def find_live_session_under(workspace_root: str, *, exclude_pids: frozenset[int] = frozenset()) -> int | None:
+    """pid of a live claude/codex process whose cwd is under `workspace_root`, or None."""
+    for pid in iter_pids():
+        if pid in exclude_pids:
+            continue
+        if not is_claude_or_codex_process(pid):
+            continue
+        cwd = read_proc_cwd(pid)
+        if cwd and path_is_under(cwd, workspace_root):
+            return pid
+    return None
+
+
+# --------------------------------------------------------------------------
+# Broker discovery and per-broker guard evaluation.
+# --------------------------------------------------------------------------
+
+def discover_state_roots(explicit_roots: list[str] | None) -> list[Path]:
+    """The plugin's per-workspace `state` directories.
+
+    `--state-root` (repeatable) takes each given path literally as a
+    `state` directory (a directory of `<workspace-slug>-<hash>` entries) and
+    replaces discovery entirely. Otherwise this globs
+    `~/.claude/plugins/data/*codex*/state`, matching every installed
+    openai-codex-family plugin data directory (observed on this host as
+    `codex-openai-codex`).
+    """
+    if explicit_roots:
+        return [Path(root) for root in explicit_roots]
+    home = Path(os.environ.get("HOME") or Path.home())
+    base = home / ".claude" / "plugins" / "data"
+    if not base.is_dir():
+        return []
+    roots = []
+    for entry in sorted(base.iterdir()):
+        if entry.is_dir() and "codex" in entry.name:
+            state_dir = entry / "state"
+            if state_dir.is_dir():
+                roots.append(state_dir)
+    return roots
+
+
+def discover_brokers(state_roots: list[Path]) -> list[Path]:
+    """Per-workspace state directories that hold a `broker.json`."""
+    brokers = []
+    for root in state_roots:
+        if not root.is_dir():
+            continue
+        for entry in sorted(root.iterdir()):
+            if entry.is_dir() and (entry / "broker.json").is_file():
+                brokers.append(entry)
+    return brokers
+
+
+def is_broker_serve_cmdline(argv: list[str] | None) -> bool:
+    """True when `argv` still names an `app-server-broker.mjs serve` invocation, any endpoint.
+
+    Factored out of `broker_cmdline_matches` (fix round, 2026-09-25) so
+    `find_live_broker_pids` can identify every live broker on the host by
+    cmdline alone, without the `--endpoint` match that ties
+    `broker_cmdline_matches` to one specific `broker.json` record.
+    """
+    if not argv:
+        return False
+    if not any("app-server-broker.mjs" in part for part in argv):
+        return False
+    return "serve" in argv
+
+
+def broker_cmdline_matches(argv: list[str] | None, endpoint: str) -> bool:
+    """Guard (a): still an app-server-broker.mjs serving this exact endpoint."""
+    if not is_broker_serve_cmdline(argv):
+        return False
+    for index, part in enumerate(argv):
+        if part == "--endpoint":
+            return index + 1 < len(argv) and argv[index + 1] == endpoint
+    return False
+
+
+def find_live_broker_pids() -> list[int]:
+    """pid of every live process whose cmdline still names app-server-broker.mjs serve, any endpoint.
+
+    Fix round, 2026-09-25 (major finding): guard (c) must exclude every
+    live broker's own descendant processes from its live-session scan, not
+    only the one broker currently being evaluated -- otherwise two orphaned
+    brokers of the same repository can each find the OTHER's own `codex
+    app-server` child and permanently block each other. See the module
+    docstring's guard (c) entry for the mutual-blocking shape this closes
+    and how it was verified. Scans by `/proc/<pid>/cmdline` (the same match
+    guard (a) already applies to the evaluated broker, minus the
+    `--endpoint` check), not by parentage, so it finds every live broker
+    regardless of which workspace it belongs to or whether its own
+    evaluation has run yet in this pass.
+    """
+    return [pid for pid in iter_pids() if is_broker_serve_cmdline(read_proc_cmdline(pid))]
+
+
+def blocking_jobs(jobs: list) -> list[dict]:
+    """Guard (b): jobs whose status is missing, unrecognized, or non-terminal."""
+    blocking = []
+    for job in jobs:
+        if not isinstance(job, dict) or job.get("status") not in TERMINAL_JOB_STATUSES:
+            blocking.append(job if isinstance(job, dict) else {})
+    return blocking
+
+
+def parse_iso8601_epoch(value: object) -> float | None:
+    """Parse a `Date.prototype.toISOString()`-style timestamp to a Unix epoch, or None.
+
+    The plugin's own `nowIso()` (scripts/lib/tracked-jobs.mjs) and
+    `state.mjs`'s `upsertJob` always write `new Date().toISOString()`, e.g.
+    "2026-09-25T10:00:00.000Z" -- always UTC, always a trailing "Z", never a
+    numeric offset. `datetime.fromisoformat` only accepts a trailing "Z"
+    directly on Python 3.11+; this tool otherwise supports 3.10 (it already
+    uses 3.10's `X | None` union syntax throughout), so "Z" is rewritten to
+    "+00:00" by hand rather than assuming 3.11. Never raises: any value that
+    is not a non-empty string, or does not parse, returns None.
+    """
+    if not isinstance(value, str) or not value:
+        return None
+    text = value[:-1] + "+00:00" if value.endswith("Z") else value
+    try:
+        return datetime.fromisoformat(text).timestamp()
+    except ValueError:
+        return None
+
+
+def most_recent_job_activity(jobs: list) -> float | None:
+    """The latest epoch across every job's updatedAt/completedAt/createdAt/startedAt, or None.
+
+    Guard (e) (fix round, 2026-09-25): `state.mjs`'s `upsertJob` sets
+    `updatedAt` on every job write, new or existing, so it is checked first;
+    the others are fallbacks for a job dict written some other way (e.g.
+    `tracked-jobs.mjs`'s `runTrackedJob` also sets `completedAt` and the
+    initial `createdAt` via `createJobRecord`). Returns None (not 0) when no
+    job carries any parseable timestamp at all, so callers can tell "no
+    activity signal" from "activity signal says long ago" -- a broker that
+    has never run a single job has an empty `jobs[]` and legitimately has no
+    signal here (see docs/decisions/2026-09-25-codex-broker-reaper.md,
+    "Known limitations").
+    """
+    latest: float | None = None
+    for job in jobs:
+        if not isinstance(job, dict):
+            continue
+        for key in ("updatedAt", "completedAt", "createdAt", "startedAt"):
+            epoch = parse_iso8601_epoch(job.get(key))
+            if epoch is not None and (latest is None or epoch > latest):
+                latest = epoch
+    return latest
+
+
+def blank_broker_record(broker_dir: Path) -> dict:
+    """The fully-shaped record every broker evaluation returns before any guard runs.
+
+    Single-sourced (fix round, 2026-09-25) so `safe_evaluate_broker`'s
+    exception fallback can never drift out of sync with `evaluate_broker`'s
+    own shape -- both now build a record through this one function.
+    """
+    return {
+        "state_dir": str(broker_dir),
+        "broker_json": None,
+        "endpoint": None,
+        "pid": None,
+        "job_count": None,
+        "workspace_root": None,
+        "age_seconds": None,
+        "guards": {
+            "a_pid_cmdline_match": False,
+            "b_no_active_jobs": None,
+            "c_workspace_unused": None,
+            "d_min_age": None,
+            "e_job_idle": None,
+        },
+        "reasons": [],
+        "eligible": False,
+        "action": "none",
+        "rpc_result": None,
+        "exit_observed": None,
+    }
+
+
+def evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
+    """Evaluate one broker directory against guards (a)-(e).
+
+    Always returns a fully-shaped record (same keys whether or not later
+    guards were reachable), so `--list` and `--apply` reports and the
+    receipt schema stay identical regardless of where evaluation stopped.
+    Can still raise on a broker directory whose state is malformed in a way
+    neither guard (a)'s nor guard (b)'s own reads anticipate; callers that
+    must never abort the rest of a run over one broker use
+    `safe_evaluate_broker` instead.
+    """
+    record: dict = blank_broker_record(broker_dir)
+
+    broker_json_path = broker_dir / "broker.json"
+    try:
+        broker = json.loads(broker_json_path.read_text())
+    except (OSError, ValueError) as error:
+        # ValueError (not just json.JSONDecodeError, a ValueError subclass)
+        # also catches UnicodeDecodeError (a UnicodeError -> ValueError
+        # subclass) from a non-UTF-8 broker.json -- fix round, 2026-09-25:
+        # the narrower `except (OSError, json.JSONDecodeError)` let a
+        # non-UTF-8 file's UnicodeDecodeError propagate uncaught, crashing
+        # this whole function (see safe_evaluate_broker for the outer net).
+        record["reasons"].append(f"cannot read broker.json: {error}")
+        return record
+    record["broker_json"] = str(broker_json_path)
+    if not isinstance(broker, dict):
+        # Fix round, 2026-09-25: broker.json that is valid JSON but not an
+        # object (e.g. a list or a bare string) used to crash at the
+        # `broker.get(...)` call just below with an uncaught AttributeError.
+        record["reasons"].append("broker.json does not contain a JSON object")
+        return record
+
+    endpoint, pid = broker.get("endpoint"), broker.get("pid")
+    record["endpoint"], record["pid"] = endpoint, pid
+    if not isinstance(endpoint, str) or not endpoint or not isinstance(pid, int) or isinstance(pid, bool):
+        record["reasons"].append("broker.json is missing a string endpoint or an integer pid")
+        return record
+
+    argv = read_proc_cmdline(pid)
+    if argv is None:
+        record["reasons"].append(f"pid {pid} is not running")
+        return record
+    if not broker_cmdline_matches(argv, endpoint):
+        record["reasons"].append(
+            f"pid {pid} is alive but its cmdline no longer names app-server-broker.mjs serve "
+            f"--endpoint {endpoint} (guard against pid reuse, upstream #743)"
+        )
+        return record
+    record["guards"]["a_pid_cmdline_match"] = True
+    record["reasons"].append("guard a: pid is alive and its cmdline still matches this broker")
+
+    # Guard (b): every recorded job (if any) is in a terminal status.
+    state_path = broker_dir / "state.json"
+    jobs: list | None = []
+    if state_path.is_file():
+        try:
+            state = json.loads(state_path.read_text())
+            jobs = state.get("jobs") if isinstance(state, dict) else None
+            if not isinstance(jobs, list):
+                jobs = []
+        except (OSError, ValueError) as error:
+            # See the matching broker.json comment above: ValueError also
+            # catches UnicodeDecodeError from a non-UTF-8 state.json.
+            record["reasons"].append(f"cannot read state.json ({error}); treating jobs as active")
+            jobs = None
+    record["job_count"] = len(jobs) if isinstance(jobs, list) else None
+    if jobs is None:
+        record["guards"]["b_no_active_jobs"] = False
+    else:
+        blocking = blocking_jobs(jobs)
+        record["guards"]["b_no_active_jobs"] = not blocking
+        if blocking:
+            ids = ", ".join(str(job.get("id", "?")) for job in blocking[:5])
+            record["reasons"].append(f"guard b failed: {len(blocking)} job(s) not in a terminal status ({ids})")
+        else:
+            record["reasons"].append("guard b: no job has a non-terminal status")
+
+    # Guard (c): workspace root, read from the broker's own live cwd.
+    workspace_root = read_proc_cwd(pid)
+    record["workspace_root"] = workspace_root
+    if workspace_root is None:
+        record["guards"]["c_workspace_unused"] = False
+        record["reasons"].append("guard c failed: could not read the broker's /proc/<pid>/cwd")
+    else:
+        # The directory that actually KEYS the plugin's per-workspace state
+        # dir is resolveWorkspaceRoot(cwd) (scripts/lib/workspace.mjs ->
+        # resolveStateDir, state.mjs L29-43): the git toplevel of the
+        # broker's own recorded cwd when it sits inside a git checkout, else
+        # that raw cwd itself (resolveWorkspaceRoot falls back to cwd on any
+        # ensureGitRepository failure -- checked directly against the
+        # plugin's own scripts/lib/workspace.mjs and git.mjs). find_git_toplevel
+        # mirrors that git lookup with pure stdlib. Fixed (major finding,
+        # fifth fix round, 2026-09-25): a review-triggered broker's OS cwd
+        # can be a SUBDIRECTORY of the checkout it was launched from (see
+        # this docstring's guard (c) entry above); deleting only that
+        # subdirectory (rm, git clean, a branch switch) while a live session
+        # stays at the checkout root must never look like "workspace gone"
+        # -- the plugin keys this broker's state dir off the checkout root,
+        # which still exists, not off the now-missing subdirectory. The
+        # previous version of this guard declared the workspace unused --
+        # skipping the live-session scan entirely -- as soon as
+        # `workspace_root` itself failed `os.path.isdir`, without ever
+        # consulting the checkout root; that let --apply stop a live
+        # session's broker whenever only its own incidental subdirectory
+        # cwd, not the workspace the plugin actually tracks, had been
+        # removed. Skipping the scan and declaring the workspace unused
+        # outright is therefore gated on the KEYING root's own existence,
+        # never on the broker's raw /proc/<pid>/cwd alone.
+        #
+        # Fixed further (major finding, sixth fix round, 2026-09-25):
+        # find_git_toplevel's own "nearest .git entry that currently
+        # EXISTS" walk is the wrong test for the KEYING root specifically --
+        # a REMOVED git-worktree checkout (this project's own
+        # .claude/worktrees/<name> layout) no longer satisfies
+        # os.path.exists(worktree/".git"), so the walk continued straight
+        # into the enclosing main checkout, which never keyed this broker's
+        # state dir at all (see find_keying_root's own docstring for the
+        # concrete case this was found against). find_keying_root replaces
+        # the plain find_git_toplevel call here: it walks the same ancestor
+        # chain but selects by IDENTITY -- which ancestor's own
+        # sha256(realpath(...))[:16] matches this broker's own state-dir
+        # name suffix, the same hash state.mjs's resolveStateDir used to
+        # name it -- so a removed worktree whose own path already matches
+        # is returned immediately and is never superseded by an enclosing
+        # checkout that merely happens to still exist on disk.
+        expected_hash = state_dir_hash_suffix(broker_dir)
+        keying_root = find_keying_root(workspace_root, expected_hash)
+        if not os.path.isdir(keying_root):
+            record["guards"]["c_workspace_unused"] = True
+            record["reasons"].append(
+                f"guard c: workspace root {keying_root} (keys the plugin's state dir) no longer exists"
+            )
+        else:
+            # Exclude every live broker's own descendants, not just this
+            # broker's own (fix round, 2026-09-25, find_live_broker_pids; see
+            # the module docstring's guard (c) entry for the mutual-blocking
+            # bug this closes). `pid` itself is seeded directly too: guard (a)
+            # above already confirmed its cmdline matches this broker, so it is
+            # certain to appear in find_live_broker_pids() as well, but seeding
+            # it costs nothing and stays correct even if that pid's cmdline
+            # became unreadable in the instant between the two /proc reads.
+            exclude_pids = {pid}
+            for broker_pid in find_live_broker_pids():
+                exclude_pids.add(broker_pid)
+                exclude_pids.update(collect_descendant_pids(broker_pid))
+            exclude_pids = frozenset(exclude_pids)
+            # Checked even when workspace_root itself no longer exists: a
+            # directory removed while a live process still holds it open
+            # keeps reporting that exact (deleted) path from its own
+            # /proc/<pid>/cwd (see read_proc_cwd's own docstring), so this
+            # can still find a genuinely live session even though
+            # os.path.isdir(workspace_root) is False.
+            blocker_pid = find_live_session_under(workspace_root, exclude_pids=exclude_pids)
+            blocking_root = workspace_root
+            checked_roots = [workspace_root]
+            if blocker_pid is None and keying_root not in checked_roots:
+                # Also check the workspace's own git checkout root -- the
+                # same directory computed as keying_root above, since that is
+                # what keys the plugin's state dir -- when different from
+                # workspace_root: a review-triggered broker's OS cwd can be a
+                # subdirectory of the checkout the live session actually
+                # started from (see the module docstring's guard (c) entry
+                # and docs/decisions/2026-09-25-codex-broker-reaper.md,
+                # "Known limitations").
+                blocker_pid = find_live_session_under(keying_root, exclude_pids=exclude_pids)
+                blocking_root = keying_root
+                checked_roots.append(keying_root)
+            if blocker_pid is None:
+                # Also check the *other* checkout a `git worktree` workspace
+                # belongs to (fix round, 2026-09-25): see the module docstring's
+                # guard (c) entry for why the live coordinating process for a
+                # worktree-scoped broker is sometimes only findable there.
+                worktree_parent = read_worktree_parent_root(keying_root)
+                if worktree_parent and worktree_parent not in checked_roots:
+                    blocker_pid = find_live_session_under(worktree_parent, exclude_pids=exclude_pids)
+                    blocking_root = worktree_parent
+                    checked_roots.append(worktree_parent)
+            if blocker_pid is None:
+                record["guards"]["c_workspace_unused"] = True
+                record["reasons"].append(
+                    "guard c: no live claude/codex process has a cwd under " + " or under ".join(checked_roots)
+                )
+            else:
+                record["guards"]["c_workspace_unused"] = False
+                record["reasons"].append(f"guard c failed: live pid {blocker_pid} has a cwd under {blocking_root}")
+
+    # Guard (d): process age.
+    started = process_start_epoch(pid, reference=now)
+    if started is None:
+        record["guards"]["d_min_age"] = False
+        record["reasons"].append("guard d failed: could not determine the broker's process start time")
+    else:
+        age = now - started
+        record["age_seconds"] = round(age, 3)
+        old_enough = age >= min_age
+        record["guards"]["d_min_age"] = old_enough
+        verdict = "guard d" if old_enough else "guard d failed"
+        record["reasons"].append(f"{verdict}: age {age:.0f}s, --min-age {min_age:.0f}s")
+
+    # Guard (e): time since the most recent recorded job activity, not just
+    # the broker process's own age (fix round, 2026-09-25; see the module
+    # docstring's guard (e) entry). Reuses `jobs` from guard (b) above;
+    # `jobs` is None there only when state.json itself could not be read, in
+    # which case there is no activity signal to read either.
+    last_activity = most_recent_job_activity(jobs) if isinstance(jobs, list) else None
+    if last_activity is None:
+        record["guards"]["e_job_idle"] = True
+        record["reasons"].append("guard e: no job activity timestamp recorded; guard d's process age governs alone")
+    else:
+        idle_for = now - last_activity
+        idle_enough = idle_for >= min_age
+        record["guards"]["e_job_idle"] = idle_enough
+        verdict = "guard e" if idle_enough else "guard e failed"
+        record["reasons"].append(
+            f"{verdict}: {idle_for:.0f}s since the most recent job activity, --min-age {min_age:.0f}s"
+        )
+
+    record["eligible"] = all(record["guards"].values())
+    return record
+
+
+def safe_evaluate_broker(broker_dir: Path, *, min_age: float, now: float) -> dict:
+    """`evaluate_broker`, but never raises: one broker's failure must not abort the whole run.
+
+    `evaluate_broker` already treats a malformed or unreadable broker.json/
+    state.json as reason to return an ineligible record early; this is the
+    outer safety net for anything neither of those handles (fix round,
+    2026-09-25: before those fixes, a broker.json that parsed as valid JSON
+    but not an object raised an uncaught AttributeError at `.get`, and a
+    non-UTF-8 broker.json/state.json raised an uncaught UnicodeDecodeError
+    -- either crashed the whole list comprehension in `run()`, losing every
+    other broker's receipt for that hour). Catches `Exception`, not
+    `BaseException`, so `KeyboardInterrupt`/`SystemExit` still propagate
+    normally; mirrors the /proc helpers' own stated contract (module
+    docstring): "callers treat 'unknown' as 'guard not satisfied' rather
+    than crashing the whole run over one broker."
+    """
+    try:
+        return evaluate_broker(broker_dir, min_age=min_age, now=now)
+    except Exception as error:  # deliberately broad; see docstring
+        record = blank_broker_record(broker_dir)
+        record["reasons"].append(f"unexpected error evaluating this broker, treated as ineligible: {error!r}")
+        return record
+
+
+# --------------------------------------------------------------------------
+# Action: broker/shutdown RPC, wait, optional SIGTERM escalation.
+# --------------------------------------------------------------------------
+
+def send_shutdown_rpc(endpoint: str, *, timeout: float | None = None) -> str:
+    # Resolved at call time (not as a default-argument value) so tests can
+    # shorten RPC_TIMEOUT_SECONDS/EXIT_WAIT_SECONDS by monkeypatching the
+    # module constant without needing every internal caller to thread a
+    # parameter through.
+    if timeout is None:
+        timeout = RPC_TIMEOUT_SECONDS
+    if not isinstance(endpoint, str) or not endpoint.startswith("unix:"):
+        return "unsupported_endpoint"
+    socket_path = endpoint[len("unix:"):]
+    if not socket_path:
+        return "unsupported_endpoint"
+    request = json.dumps({"id": 1, "method": "broker/shutdown", "params": {}}).encode("utf-8") + b"\n"
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(timeout)
+    try:
+        client.connect(socket_path)
+        client.sendall(request)
+        try:
+            data = client.recv(4096)
+            return "ok" if data else "closed"
+        except socket.timeout:
+            return "sent_no_reply"
+    except FileNotFoundError:
+        return "socket_missing"
+    except ConnectionRefusedError:
+        return "connection_refused"
+    except socket.timeout:
+        return "connect_timeout"
+    except OSError as error:
+        return f"error:{error}"
+    finally:
+        client.close()
+
+
+def wait_for_exit(pid: int, extra_pids: list[int], *, timeout: float | None = None) -> bool:
+    """Poll /proc for `pid` and `extra_pids` to disappear.
+
+    This only asks whether /proc/<pid> exists, not whether the process has
+    been reaped by a parent that called wait() on it: a zombie's /proc/<pid>
+    directory still exists until something reaps it. That distinction does
+    not matter for the orphaned brokers this tool targets -- by definition
+    their original parent (the session that spawned them) is already gone,
+    so the kernel already reparented them to init, which reaps its children
+    the instant they exit. A broker that is still a direct child of a live
+    parent would not be "orphaned" and would already fail guard (c).
+    """
+    if timeout is None:
+        timeout = EXIT_WAIT_SECONDS
+    watch = {pid, *extra_pids}
+    deadline = time.monotonic() + timeout
+    while True:
+        watch = {candidate for candidate in watch if process_exists(candidate)}
+        if not watch:
+            return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(POLL_INTERVAL_SECONDS)
+
+
+def clear_broker_json_if_stopped(record: dict) -> None:
+    """Remove `broker.json` after a confirmed stop, if it still names this exact broker.
+
+    Fix round, 2026-09-25: `stop_broker` confirmed the *process* exited but
+    never touched `broker.json` itself, so a workspace's plugin state kept
+    pointing at the dead endpoint/pid until that workspace's own next
+    `SessionEnd` (`session-lifecycle-hook.mjs` -> `clearBrokerSession`) ran.
+    In the meantime, a plugin code path that trusts `broker.json` without
+    itself reconnecting first misreports for that workspace (e.g.
+    `codex.mjs`'s `getSessionRuntimeStatus`). Re-reads `broker.json` just
+    before deleting it and compares pid/endpoint against `record`, rather
+    than trusting the in-memory record alone, since a *new* broker could
+    have been started (and written its own new `broker.json`) for the same
+    workspace in the time this stop spent waiting for the old one to exit.
+    A record without a `broker_json` path (e.g. a caller-built test record
+    that never went through `evaluate_broker`) is a no-op.
+    """
+    broker_json_path = record.get("broker_json")
+    if not broker_json_path:
+        return
+    path = Path(broker_json_path)
+    try:
+        current = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return
+    if not isinstance(current, dict):
+        return
+    if current.get("pid") == record.get("pid") and current.get("endpoint") == record.get("endpoint"):
+        try:
+            path.unlink()
+        except OSError:
+            pass
+
+
+def stop_broker(record: dict, *, escalate: bool) -> None:
+    """Attempt to stop one eligible broker; mutates `record` in place."""
+    pid, endpoint = record["pid"], record["endpoint"]
+    children = collect_child_pids(pid)
+    record["rpc_result"] = send_shutdown_rpc(endpoint)
+    record["action"] = "rpc_shutdown"
+    exited = wait_for_exit(pid, children)
+    record["exit_observed"] = exited
+    if exited:
+        clear_broker_json_if_stopped(record)
+    if exited or not escalate:
+        if not exited:
+            record["reasons"].append(
+                "broker did not exit within the wait window after broker/shutdown; "
+                "--escalate was not given, so no signal was sent"
+            )
+        return
+
+    # Re-check guard (a): the pid must still be *this* broker before signaling it.
+    argv = read_proc_cmdline(pid)
+    if not broker_cmdline_matches(argv, endpoint):
+        record["reasons"].append(
+            "escalation skipped: pid no longer matches this broker on re-check (possible pid reuse)"
+        )
+        return
+
+    try:
+        pgid = os.getpgid(pid)
+    except (ProcessLookupError, OSError) as error:
+        record["reasons"].append(f"escalation SIGTERM failed: {error}")
+        return
+    if pgid != pid:
+        # The docstring's premise (Node's detached:true spawn makes the
+        # broker its own process-group leader) does not hold here -- signal
+        # only a group the broker is confirmed to lead, since SIGTERM to
+        # someone else's group could reach unrelated live processes.
+        record["action"] = "escalation_skipped_not_group_leader"
+        record["reasons"].append(
+            f"escalation skipped: pid {pid} is not its own process-group leader (pgid {pgid}); "
+            "SIGTERM to that group could reach unrelated processes"
+        )
+        return
+
+    record["action"] = "escalated_sigterm"
+    try:
+        os.killpg(pgid, signal.SIGTERM)
+    except (ProcessLookupError, PermissionError, OSError) as error:
+        record["reasons"].append(f"escalation SIGTERM failed: {error}")
+        return
+    exited = wait_for_exit(pid, children)
+    record["exit_observed"] = exited
+    if exited:
+        clear_broker_json_if_stopped(record)
+    else:
+        record["reasons"].append("broker's process group did not exit even after SIGTERM escalation")
+
+
+# --------------------------------------------------------------------------
+# Receipt, CLI.
+# --------------------------------------------------------------------------
+
+def mem_available_kib() -> int | None:
+    try:
+        for line in Path("/proc/meminfo").read_text().splitlines():
+            if line.startswith("MemAvailable:"):
+                return int(line.split()[1])
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog=PROG, description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--list", action="store_true", help="Dry run (default): evaluate and report, change nothing.")
+    mode.add_argument("--apply", action="store_true", help="Stop every eligible broker; still reports the rest.")
+    parser.add_argument("--min-age", type=float, default=DEFAULT_MIN_AGE_SECONDS, metavar="SECONDS",
+                         help=f"Minimum broker process age to be eligible (default {DEFAULT_MIN_AGE_SECONDS:g}).")
+    parser.add_argument("--receipt", type=Path, metavar="PATH",
+                         help="Also write the JSON report to PATH (parent directories are created).")
+    parser.add_argument("--state-root", action="append", dest="state_roots", metavar="PATH",
+                         help="Use this plugin 'state' directory literally instead of discovering "
+                              "~/.claude/plugins/data/*codex*/state (repeatable).")
+    parser.add_argument("--escalate", action="store_true",
+                         help="If broker/shutdown gets no exit within the wait window, re-check guard (a) "
+                              "and send SIGTERM to the broker's process group. Never sends SIGKILL.")
+    return parser
+
+
+def run(args: argparse.Namespace) -> tuple[dict, int]:
+    now = time.time()
+    mem_before = mem_available_kib()
+    state_roots = discover_state_roots(args.state_roots)
+    broker_dirs = discover_brokers(state_roots)
+    records = [safe_evaluate_broker(broker_dir, min_age=args.min_age, now=now) for broker_dir in broker_dirs]
+
+    if args.apply:
+        for broker_dir, record in zip(broker_dirs, records):
+            if not record["eligible"]:
+                continue
+            # Re-check every guard immediately before acting, not once for
+            # the whole batch: `records` above came from a single evaluation
+            # pass, and an earlier broker's own stop (RPC + up to 15s wait,
+            # 35s with --escalate) can take long enough for a new session to
+            # attach to a *later* broker in this same list before its turn
+            # (ensureBrokerSession reuses any broker whose endpoint already
+            # answers, broker-lifecycle.mjs). Never act on a stale verdict.
+            recheck = safe_evaluate_broker(broker_dir, min_age=args.min_age, now=time.time())
+            if not recheck["eligible"]:
+                record["eligible"] = False
+                record["action"] = "skipped_recheck_failed"
+                record["reasons"].append(
+                    "re-checked immediately before stopping and was no longer eligible ("
+                    + "; ".join(recheck["reasons"]) + "); left untouched"
+                )
+                continue
+            stop_broker(record, escalate=args.escalate)
+        # Only meaningful once an action was actually attempted: --list
+        # leaves exit_observed None (not-attempted) on every record, even an
+        # eligible one, and that must never read as a stop failure. A
+        # failed re-check above already flips eligible to False, so it
+        # falls out of both sums too, exactly like any other ineligible
+        # broker (never touched, never a "failed to stop").
+        failed = sum(1 for record in records if record["eligible"] and record["exit_observed"] is not True)
+        stopped = sum(1 for record in records if record["eligible"] and record["exit_observed"] is True)
+    else:
+        failed = 0
+        stopped = 0
+
+    mem_after = mem_available_kib()
+
+    receipt = {
+        "tool": PROG,
+        "generated_at": now_iso(),
+        "mode": "apply" if args.apply else "list",
+        "min_age_seconds": args.min_age,
+        "escalate": bool(args.escalate) and bool(args.apply),
+        "state_roots": [str(root) for root in state_roots],
+        "mem_available_kib_before": mem_before,
+        "mem_available_kib_after": mem_after,
+        "brokers": records,
+        "summary": {
+            "total": len(records),
+            "eligible": sum(1 for record in records if record["eligible"]),
+            "stopped": stopped,
+            "failed_to_stop": failed,
+        },
+    }
+    return receipt, failed
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_arg_parser()
+    args = parser.parse_args(argv)
+    if args.min_age < 0:
+        parser.error("--min-age must be >= 0")  # argparse usage error: exit 2, like any bad flag/value
+    if not proc_is_available():
+        # Exit 3, not 2 (fix round, 2026-09-25): `parser.error()` always
+        # exits 2, which this tool's own documented contract (README,
+        # rollout brief) also assigns to "an eligible broker was not
+        # confirmed stopped" -- a monitor or systemd consumer following that
+        # contract could not tell a platform refusal from a real stop
+        # failure. Printed directly (not via parser.error's "usage: ..."
+        # banner, which would misleadingly frame this as a bad invocation)
+        # and returned rather than raised, matching every other exit path in
+        # this function.
+        print(
+            f"{PROG}: this host has no /proc: codex-broker-reaper reads /proc/<pid>/{{cmdline,comm,cwd,stat}}, "
+            "/proc/uptime and /proc/meminfo directly and only supports Linux (see adoption/tools/README.md); "
+            "refusing to run rather than silently report every broker as 'not running'",
+            file=sys.stderr,
+        )
+        return 3
+
+    receipt, failed = run(args)
+    text = json.dumps(receipt, indent=2, sort_keys=True)
+    print(text)
+    if args.receipt:
+        args.receipt.parent.mkdir(parents=True, exist_ok=True)
+        args.receipt.write_text(text + "\n", encoding="utf-8")
+    return 2 if failed else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

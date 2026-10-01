@@ -12,6 +12,7 @@ import io
 import json
 import tempfile
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -60,6 +61,51 @@ def summary(**buckets):
 class AssessTests(unittest.TestCase):
     def assess(self, data, pins, max_age_days=30):
         return rs.assess(data, lambda _component: pins, NOW_DT, max_age_days)
+
+    def test_a_stack_alias_is_reported_as_such_and_never_bound(self):
+        report = rs.assess(summary(widget={"macos-arm64": [entry("a.json", "1.0.0", "2026-10-20T00:00:00Z")]}),
+                           lambda _component: (["1.0.0"], "stack_manifest"), NOW_DT, 30,
+                           {"widget": ("widget-winner",)})
+        row = report["rows"][0]
+        self.assertEqual((row["pin_source"], row["alias_of"], row["current_pins"]),
+                         ("stack_alias", ["widget-winner"], []))
+        self.assertEqual((row["bound_receipts"], row["flags"], row["pin_moved_hosts"]), (0, ["stack_alias"], []))
+        self.assertEqual(row["unbound"][0]["reason"], "stack_alias")
+        self.assertEqual((row["grandfathered"], row["info"]), (False, []))
+        self.assertEqual((report["status"], report["flag_counts"]["stack_alias"]), ("flagged", 1))
+
+    def test_a_grandfathered_alias_is_informational_and_not_flagged(self):
+        data = summary(widget={"macos-arm64": [entry("a.json", "1.0.0", "2026-10-20T00:00:00Z")]})
+        report = rs.assess(data, lambda _component: (["1.0.0"], "stack_manifest"), NOW_DT, 30,
+                           {"widget": ("widget-winner",)}, {"a.json"})
+        row = report["rows"][0]
+        self.assertEqual((row["alias_of"], row["grandfathered"], row["info"], row["flags"]),
+                         (["widget-winner"], True, ["stack_alias_grandfathered"], []))
+        self.assertEqual((row["bound_receipts"], row["unbound"][0]["reason"]), (0, "stack_alias_grandfathered"))
+        self.assertEqual((report["status"], report["flagged"]), ("current", 0))
+        self.assertEqual(report["info_counts"], {"stack_alias_grandfathered": 1})
+        self.assertIn("ok (info: stack_alias_grandfathered)", rs.render_text(report))
+
+    def test_one_non_grandfathered_alias_receipt_keeps_the_row_flagged(self):
+        data = summary(widget={"macos-arm64": [entry("a.json", "1.0.0", "2026-10-20T00:00:00Z"),
+                                               entry("b.json", "1.0.0", "2026-10-21T00:00:00Z")]})
+        report = rs.assess(data, lambda _component: (["1.0.0"], "stack_manifest"), NOW_DT, 30,
+                           {"widget": ("widget-winner",)}, {"a.json"})
+        row = report["rows"][0]
+        self.assertEqual((row["grandfathered"], row["info"], row["flags"]), (False, [], ["stack_alias"]))
+        self.assertEqual([item["reason"] for item in row["unbound"]], ["stack_alias_grandfathered", "stack_alias"])
+        self.assertEqual(report["status"], "flagged")
+
+    def test_grandfathered_paths_do_not_affect_a_non_alias_row(self):
+        report = rs.assess(summary(widget={"linux-wsl2-x86_64": [entry("a.json", "0.9.0", "2026-10-20T00:00:00Z")]}),
+                           lambda _component: (["1.0.0"], "landscape_winner"), NOW_DT, 30, {}, {"a.json"})
+        row = report["rows"][0]
+        self.assertEqual((row["grandfathered"], row["info"], row["flags"]), (False, [], ["no_bound_receipt", "pin_moved"]))
+
+    def test_a_non_alias_row_has_an_empty_alias_list(self):
+        report = self.assess(summary(widget={"linux-wsl2-x86_64": [
+            entry("a.json", "1.0.0", "2026-10-20T00:00:00Z")]}), (["1.0.0"], "landscape_winner"))
+        self.assertEqual(report["rows"][0]["alias_of"], [])
 
     def test_recent_bound_receipt_is_not_flagged(self):
         report = self.assess(summary(widget={"linux-wsl2-x86_64": [
@@ -275,6 +321,48 @@ class SyntheticTreeTests(unittest.TestCase):
         self.assertIn("linux-wsl2-x86_64  gadget: latest bound 2026-08-01T00:00:00Z (90 days", out.getvalue())
         self.assertIn("; stale", out.getvalue())
 
+    def test_stack_alias_of_a_winner_never_binds_end_to_end(self):
+        # 'gadget-alias' shares its repository with the differently named winner 'gadget-winner'; its
+        # receipt at the stack version must not be reported as bound (platform_status never joins it).
+        (self.root / "manifests" / "stack.json").write_text(json.dumps({"components": [
+            {"id": "gadget-alias", "version": "3.1.0", "repository": "https://github.com/example/gadget"}]}),
+            encoding="utf-8")
+        (self.root / "catalogs" / "landscape" / "foundation.json").write_text(json.dumps({"layers": [
+            {"winners": [{"component_id": "gadget-winner", "pin": "3.1.0",
+                          "repository": "https://github.com/example/gadget/releases/tag/v3.1.0"}]}]}),
+            encoding="utf-8")
+        path = self.write_receipt("gadget-alias", "3.1.0", "2026-10-29T00:00:00Z")
+        code, report = self.run_report()
+        self.assertEqual(code, 0)
+        row = report["rows"][0]
+        self.assertEqual((row["component_id"], row["alias_of"], row["pin_source"], row["current_pins"]),
+                         ("gadget-alias", ["gadget-winner"], "stack_alias", []))
+        self.assertEqual((row["bound_receipts"], row["latest_bound"], row["flags"]), (0, None, ["stack_alias"]))
+        self.assertEqual(row["unbound"][0]["reason"], "stack_alias")
+        self.assertEqual(row["unbound"][0]["path"], path.relative_to(self.root).as_posix())
+        self.assertEqual(report["flag_counts"]["stack_alias"], 1)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(rs.main(["--root", str(self.root), "--now", NOW]), 0)
+        self.assertIn("alias of winner gadget-winner, never bound; 0/1 bound; stack_alias", out.getvalue())
+
+        # Grandfathering that exact recorded claim (path and claim_sha256) turns the row informational end
+        # to end; an altered claim loses the exemption and the flag returns.
+        relative = path.relative_to(self.root).as_posix()
+        entry = {"canonical_component_id": "gadget-winner", "date": "2026-10-29", "reason": "test",
+                 "claim_sha256": hr.receipt_claim_sha256(json.loads(path.read_text(encoding="utf-8")))}
+        with mock.patch.object(hr, "GRANDFATHERED_ALIAS_RECEIPTS", {relative: entry}):
+            code, report = self.run_report()
+            row = report["rows"][0]
+            self.assertEqual((code, row["flags"], row["info"], row["grandfathered"]),
+                             (0, [], ["stack_alias_grandfathered"], True))
+            self.assertEqual((report["status"], report["flag_counts"]["stack_alias"]), ("current", 0))
+            altered = json.loads(path.read_text(encoding="utf-8"))
+            altered["claim"] = f"{altered.get('claim', '')} (edited after recording)"
+            path.write_text(json.dumps(altered, indent=2) + "\n", encoding="utf-8")
+            code, report = self.run_report()
+            self.assertEqual((report["rows"][0]["flags"], report["status"]), (["stack_alias"], "flagged"))
+
     def test_bad_now_is_a_usage_error(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as bad:
             rs.main(["--root", str(self.root), "--now", "yesterday"])
@@ -293,6 +381,19 @@ class RepositoryRunTests(unittest.TestCase):
         after = sorted(p.relative_to(REPO_ROOT).as_posix() for p in (REPO_ROOT / "evidence" / "hosts").rglob("*")) \
             if (REPO_ROOT / "evidence" / "hosts").is_dir() else []
         self.assertEqual(before, after)
+
+    def test_real_grandfathered_alias_receipts_are_informational_not_flagged(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(rs.main(["--json"]), 0)
+        report = json.loads(out.getvalue())
+        alias_paths = {item["path"] for row in report["rows"] if row["alias_of"] for item in row["unbound"]}
+        self.assertEqual(alias_paths, set(hr.GRANDFATHERED_ALIAS_RECEIPTS))
+        self.assertEqual(report["flag_counts"]["stack_alias"], 0)
+        self.assertEqual(report["info_counts"]["stack_alias_grandfathered"], len(hr.GRANDFATHERED_ALIAS_RECEIPTS))
+        for row in report["rows"]:
+            if row["alias_of"]:
+                self.assertEqual((row["grandfathered"], row["flags"]), (True, []))
 
 
 class ReceiptReadingWorkflowsCheckOutFullHistory(unittest.TestCase):

@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown", line 10, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages/markitdown/__main__.py", line 259, in main
+    result = markitdown.convert(
+        args.filename, stream_info=stream_info, keep_data_uris=args.keep_data_uris
+    )
+  File "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages/markitdown/_markitdown.py", line 349, in convert
+    return self.convert_local(source, stream_info=stream_info, **kwargs)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages/markitdown/_markitdown.py", line 403, in convert_local
+    return self._convert(file_stream=fh, stream_info_guesses=guesses, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/uv-tools/markitdown/lib/python3.13/site-packages/markitdown/_markitdown.py", line 694, in _convert
+    raise FileConversionException(attempts=failed_attempts)
+markitdown._exceptions.FileConversionException: File conversion failed after 1 attempts:
+ - PdfConverter threw MissingDependencyException with message: PdfConverter recognized the input as a potential .pdf file, but the dependencies needed to read .pdf files have not been installed. To resolve this error, include the optional dependency [pdf] or [all] when installing MarkItDown. For example:
+
+* pip install 'markitdown[pdf]'
+* pip install 'markitdown[all]'
+* pip install 'markitdown[pdf, ...]'
+* etc.
+

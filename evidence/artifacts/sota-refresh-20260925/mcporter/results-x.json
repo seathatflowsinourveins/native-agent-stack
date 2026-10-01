@@ -1,0 +1,583 @@
+{
+ "arm": "x",
+ "version": "0.14.1",
+ "started_at": "2026-09-25T19:00:49Z",
+ "snapshot_rev": "7783682fe6c9f10675d930b021f125028f21d8f1",
+ "scratch_config_vs_host_config": {
+  "servers_kept": [
+   "ai-memory",
+   "context-mode",
+   "jcodemunch",
+   "socraticode"
+  ],
+  "servers_dropped": [
+   "headroom",
+   "serena"
+  ],
+  "socraticode_env_overrides": {
+   "SOCRATICODE_WATCHER": [
+    "auto",
+    "off"
+   ],
+   "SOCRATICODE_AUTO_RESUME": [
+    null,
+    "off"
+   ],
+   "TMPDIR": "arm-private"
+  },
+  "jcodemunch_env_overrides": {
+   "CODE_INDEX_PATH": "arm-private copy of ~/.code-index (without _processes)"
+  },
+  "context_mode": "host start.mjs replaced by bwrap(ro root, arm-private state rw, die-with-parent) + node server.bundle.mjs; CODEX_HOME/CLAUDE_CONFIG_DIR/CONTEXT_MODE_DIR/CONTEXT_MODE_DATA_DIR arm-private; platform and project dir as host",
+  "ai_memory": "unchanged (baseUrl)"
+ },
+ "namespace_status_before": null,
+ "cleanup": {
+  "final_stop_exit": 0,
+  "terminated_in_cleanup": [],
+  "alive_after_cleanup": [],
+  "arm_daemons_after_cleanup": [],
+  "listeners_under_daemon_dir_after_cleanup": []
+ },
+ "ended_at": "2026-09-25T19:02:48Z",
+ "steps": [
+  {
+   "name": "S1-command-v",
+   "arm": "x (0.14.1)",
+   "cmd": "command -v mcporter",
+   "exit": 0,
+   "output_excerpt": "~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:00:49Z"
+  },
+  {
+   "name": "R-mcporter-install-0",
+   "arm": "x (0.14.1)",
+   "cmd": "p=$(command -v mcporter) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,sys;print('bootstrap pin (adoption/pins-linux-x86_64.json)',[t['version'] for t in json.load(open('adoption/pins-linux-x86_64.json'))['tools'] if t['id']==sys.argv[1]])\" mcporter && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" mcporter && grep -A1 -- \"-- mcporter --\" \"$HOME/.local/share/codex-ecosystem/installed-versions.txt\" | tail -1 | sed 's/^/bootstrap verified-versions record: /' ",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/bin/mcporter -> ~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/cli.js\nbootstrap pin (adoption/pins-linux-x86_64.json) ['0.13.13']\nstack ['0.13.13'] winner pins ['0.13.13']\nbootstrap verified-versions record: 0.13.13",
+   "pass": true,
+   "wall_s": 0.1,
+   "at_utc": "2026-09-25T19:00:49Z",
+   "receipt": "nativestack-5975wx-20260925--mcporter--install--20260925.json",
+   "substitutions": []
+  },
+  {
+   "name": "R-mcporter-install-1",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --version",
+   "exit": 0,
+   "output_excerpt": "0.14.1",
+   "pass": true,
+   "wall_s": 0.1,
+   "at_utc": "2026-09-25T19:00:50Z",
+   "receipt": "nativestack-5975wx-20260925--mcporter--install--20260925.json",
+   "substitutions": []
+  },
+  {
+   "name": "R-socraticode-use-0",
+   "arm": "x (0.14.1)",
+   "cmd": "C=\"$SCRATCH_CFG\" && echo \"mcporter $(mcporter --version)\" && mcporter --config \"$C\" list socraticode --json --no-oauth | python3 -c 'import glob,json,os,sys;d=json.load(sys.stdin);t=d[\"transport\"];e=[x for x in t.split() if x.endswith(\"/dist/index.js\")][0];v=json.load(open(os.path.join(os.path.dirname(os.path.dirname(e)),\"package.json\")))[\"version\"];s=[x[\"version\"] for x in json.load(open(\"manifests/stack.json\"))[\"components\"] if x[\"id\"]==\"socraticode\"];w=sorted({y[\"pin\"] for f in glob.glob(\"catalogs/landscape/*.json\") for l in json.load(open(f)).get(\"layers\",[]) for y in (l.get(\"winners\") or []) if y.get(\"component_id\")==\"socraticode\"});print(\"server\",d[\"name\"],\"status\",d[\"status\"]);print(\"transport\",t);print(\"package.json beside that entry point:\",v,\"| stack\",s,\"| winner pins\",w);sys.exit(0 if d[\"status\"]==\"ok\" and v in w else 1)'",
+   "exit": 0,
+   "output_excerpt": "mcporter 0.14.1\nserver socraticode status ok\ntransport STDIO ~/.local/share/codex-ecosystem/bin/node ~/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\npackage.json beside that entry point: 1.14.0 | stack ['1.14.0'] | winner pins ['1.14.0']",
+   "pass": true,
+   "wall_s": 1.1,
+   "at_utc": "2026-09-25T19:00:51Z",
+   "receipt": "nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
+   "substitutions": [
+    "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\""
+   ]
+  },
+  {
+   "name": "R-socraticode-use-1",
+   "arm": "x (0.14.1)",
+   "cmd": "C=\"$SCRATCH_CFG\" && h=$(mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth) && s=$(mcporter --config \"$C\" call socraticode.codebase_status --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\"}\" --output text --no-oauth) && printf '%s\\n' \"$h\" | grep '^\\[' && printf '%s\\n' \"$s\" | grep -E '^(Project|Collection|Status|Indexed chunks):' && curl -sS --max-time 10 http://127.0.0.1:18231/v1/models | python3 -c 'import json,sys;print(\"embedding endpoint:\",\", \".join(m[\"id\"]+\" owned_by \"+m[\"owned_by\"] for m in json.load(sys.stdin)[\"data\"]))' && test \"$(printf '%s\\n' \"$h\" | grep -c '^\\[OK\\]')\" -ge 3 && ! printf '%s\\n' \"$h\" | grep '^\\[' | grep -vq '^\\[OK\\]' && printf '%s\\n' \"$s\" | grep -q '^Status: green$'",
+   "exit": 0,
+   "output_excerpt": "[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\nProject: ~/code/native-agent-stack-live\nCollection: codebase_9c518b2ee5c8\nStatus: green\nIndexed chunks: 68666\nembedding endpoint: nvidia/Nemotron-3-Embed-1B-BF16 owned_by vllm",
+   "pass": true,
+   "wall_s": 0.8,
+   "at_utc": "2026-09-25T19:00:51Z",
+   "receipt": "nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
+   "substitutions": [
+    "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\""
+   ]
+  },
+  {
+   "name": "R-socraticode-use-2",
+   "arm": "x (0.14.1)",
+   "cmd": "C=\"$SCRATCH_CFG\" && mcporter --config \"$C\" call socraticode.codebase_search --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\",\\\"query\\\":\\\"where is the trading gate ladder checked and which gates can flip\\\",\\\"limit\\\":8}\" --output text --no-oauth | python3 -c 'import re,sys;h=re.findall(r\"^--- (\\S+) \\(lines (\\d+-\\d+)\\) \\[\\w+\\] score: ([0-9.]+) ---$\",sys.stdin.read(),re.M);want=[\"catalogs/us-equities/gates-20260922.json\",\"scripts/trading_gates.py\"];r={w:next((i+1 for i,x in enumerate(h) if x[0]==w),None) for w in want};print(len(h),\"results; oracle ranks\",r);[print(i+1,x[0]+\":\"+x[1],x[2]) for i,x in enumerate(h[:5])];sys.exit(0 if len(h)>0 and all(r.values()) else 1)'",
+   "exit": 0,
+   "output_excerpt": "8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': 1, 'scripts/trading_gates.py': 2}\n1 catalogs/us-equities/gates-20260922.json:1-31 0.6250\n2 scripts/trading_gates.py:1-38 0.6111\n3 docs/grand-catalog-handbook.md:332-361 0.4500\n4 tests/test_trading_gates.py:488-529 0.4500\n5 evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--socraticode--use--20260925.json:55-57 0.3333",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:00:52Z",
+   "receipt": "nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
+   "substitutions": [
+    "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\""
+   ]
+  },
+  {
+   "name": "R-socraticode-use-3",
+   "arm": "x (0.14.1)",
+   "cmd": "C=\"$SCRATCH_CFG\" && mcporter --config \"$C\" call socraticode.codebase_search --args \"{\\\"projectPath\\\":\\\"$HOME/code/native-agent-stack-live\\\",\\\"query\\\":\\\"Grafana anonymous viewer access on loopback\\\",\\\"limit\\\":8}\" --output text --no-oauth | python3 -c 'import re,sys;h=re.findall(r\"^--- (\\S+) \\(lines (\\d+-\\d+)\\) \\[\\w+\\] score: ([0-9.]+) ---$\",sys.stdin.read(),re.M);want=[\"catalogs/us-equities/gates-20260922.json\",\"scripts/trading_gates.py\"];r={w:next((i+1 for i,x in enumerate(h) if x[0]==w),None) for w in want};print(\"control (unrelated query):\",len(h),\"results; oracle ranks\",r,\"(both must be absent)\");[print(i+1,x[0]+\":\"+x[1],x[2]) for i,x in enumerate(h[:3])];sys.exit(0 if len(h)>0 and not any(r.values()) else 1)'",
+   "exit": 0,
+   "output_excerpt": "control (unrelated query): 8 results; oracle ranks {'catalogs/us-equities/gates-20260922.json': None, 'scripts/trading_gates.py': None} (both must be absent)\n1 observability/grand-dashboard/passwordless.md:1-46 0.8333\n2 observability/grand-dashboard/passwordless.json:67-97 0.7500\n3 observability/grand-dashboard/passwordless.json:1-66 0.5000",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:00:52Z",
+   "receipt": "nativestack-5975wx-20260925--socraticode--use--20260925-2.json",
+   "substitutions": [
+    "C=\"$HOME/.local/share/codex-ecosystem/config/mcporter.json\" -> C=\"$SCRATCH_CFG\""
+   ]
+  },
+  {
+   "name": "S3-ctx_doctor",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode doctor\n\n[OK] Runtimes: 4/11 (36%) \u2014 javascript, shell, python, perl\n[WARN] Performance: NORMAL \u2014 install Bun for 3-5x speed boost\n[OK] Storage sessions: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Storage content: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/cm/content (via CONTEXT_MODE_DIR)\n[OK] Storage stats: ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/cm/sessions (via CONTEXT_MODE_DIR)\n[OK] Server test: PASS\n[OK] FTS5 / SQL ... xt-mode upgrade\n[FAIL] Hooks config: No readable ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm/codex/hooks.json found \u2014 fix: Copy configs/codex/hooks.json to hooks.json or run context-mode upgrade\n[OK] Hook scripts: no direct .mjs script paths to verify\n[OK] Version: v1.0.169",
+   "pass": true,
+   "wall_s": 0.6,
+   "at_utc": "2026-09-25T19:00:53Z"
+  },
+  {
+   "name": "S4-list-ai-memory",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" list ai-memory --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{\n  \"mode\": \"server\",\n  \"name\": \"ai-memory\",\n  \"status\": \"ok\",\n  \"durationMs\": 67,\n  \"instructions\": \"Long-term memory for the current project.\\n\\n**Choose project scope from the MCP client's identity support.** Session-aware MCP clients that forward the real lifecycle-hook session id on every request should omit `workspace`, `project`, and `cwd` for the current repository. Static MCP clients, including clients with lifecycle hooks but no bridge connecting that hook session id to MCP requests, must pass `workspace` and `project` together on every project ... from search/recent/briefing and hard-deleted\\nby the next forget sweep. Omit for pages that never expire.\",\n          \"required\": false,\n          \"type\": \"string\",\n          \"placeholder\": \"<expires-at>\",\n          \"exampleValue\": \"null\",\n          \"defaultValue\": null\n        }\n      ]\n    }\n  ]\n}",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:00:53Z",
+   "status": "ok",
+   "tool_count": 23,
+   "tool_names_sha256": "939a4dd79b673477",
+   "tool_names": [
+    "memory_auto_improve",
+    "memory_briefing",
+    "memory_consolidate",
+    "memory_delete_page",
+    "memory_explore",
+    "memory_feedback",
+    "memory_forget_sweep",
+    "memory_handoff_accept",
+    "memory_handoff_begin",
+    "memory_handoff_cancel",
+    "memory_handoff_list",
+    "memory_install_self_routing",
+    "memory_lint",
+    "memory_message_cancel",
+    "memory_message_list",
+    "memory_message_pop",
+    "memory_message_send",
+    "memory_query",
+    "memory_read_page",
+    "memory_read_session_observations",
+    "memory_recent",
+    "memory_status",
+    "memory_write_page"
+   ]
+  },
+  {
+   "name": "S4-list-jcodemunch",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" list jcodemunch --json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{\n  \"mode\": \"server\",\n  \"name\": \"jcodemunch\",\n  \"status\": \"ok\",\n  \"durationMs\": 452,\n  \"instructions\": \"This repo can be indexed by jcodemunch. Its whole tool catalog sits behind a 3-verb front door. Prefer it over Read/Grep/Glob/Bash for code navigation.\\n\\n**If these tools are deferred (names shown, schemas withheld), load them in ONE lookup:** ToolSearch \\\"select:mcp__jcodemunch__route,mcp__jcodemunch__menu,mcp__jcodemunch__order\\\". One round trip for the session, never one at a time.\\n\\n- route: start here: the task in plain words, back an action to  ...  },\n        {\n          \"property\": \"model\",\n          \"cliName\": \"model\",\n          \"description\": \"Optional active model id; piggybacks tier-switch like plan_turn(model=...).\",\n          \"required\": false,\n          \"type\": \"string\",\n          \"placeholder\": \"<model>\"\n        }\n      ]\n    }\n  ]\n}",
+   "pass": true,
+   "wall_s": 1.0,
+   "at_utc": "2026-09-25T19:00:54Z",
+   "status": "ok",
+   "tool_count": 6,
+   "tool_names_sha256": "29e73d84931c972a",
+   "tool_names": [
+    "announce_model",
+    "jcodemunch_guide",
+    "menu",
+    "order",
+    "route",
+    "set_tool_tier"
+   ]
+  },
+  {
+   "name": "S5-token-report-oneoff",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env CODE_INDEX_PATH=$SCRATCH_CODE_INDEX --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 0,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {},\n  \"lifetime_by_tool_since\": null,\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_c ... s the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}",
+   "pass": true,
+   "wall_s": 1.0,
+   "at_utc": "2026-09-25T19:00:55Z",
+   "substitutions": [
+    "CODE_INDEX_PATH=$HOME/.code-index -> $SCRATCH_CODE_INDEX (arm-private copy)"
+   ]
+  },
+  {
+   "name": "R-jcodemunch-use-0",
+   "arm": "x (0.14.1)",
+   "cmd": "p=$(command -v jcodemunch-mcp) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && jcodemunch-mcp --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" jcodemunch-mcp && J() { mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env \"CODE_INDEX_PATH=$SCRATCH_CODE_INDEX\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args \"$1\" --output json --no-oauth --timeout 60000; }; J '{\"action\":\"list_repos\",\"args\":{}}' | python3 -c \"import json,sys;d=json.load(sys.stdin);print('list_repos count',d['count'],[(r['repo'],'files',r['file_count'],'symbols',r['symbol_count'],'indexed',r['indexed_at'][:10],r['status']) for r in d['repos']])\"",
+   "exit": 0,
+   "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/jcodemunch-mcp -> ~/.local/share/codex-ecosystem/python-tools/jcodemunch-mcp/bin/jcodemunch-mcp\njcodemunch-mcp 1.108.319\nstack ['1.108.319'] winner pins []\nlist_repos count 1 [('seathatflowsinourveins/native-agent-stack', 'files', 6, 'symbols', 7, 'indexed', '2026-09-23', 'loadable')]",
+   "pass": true,
+   "wall_s": 1.5,
+   "at_utc": "2026-09-25T19:00:57Z",
+   "receipt": "nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925-2.json",
+   "substitutions": [
+    "CODE_INDEX_PATH=$HOME/.code-index -> CODE_INDEX_PATH=$SCRATCH_CODE_INDEX"
+   ]
+  },
+  {
+   "name": "R-jcodemunch-use-1",
+   "arm": "x (0.14.1)",
+   "cmd": "J() { mcporter call --stdio \"$(command -v jcodemunch-mcp)\" --env \"CODE_INDEX_PATH=$SCRATCH_CODE_INDEX\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args \"$1\" --output json --no-oauth --timeout 60000; }; r=seathatflowsinourveins/native-agent-stack; s=$(J \"{\\\"action\\\":\\\"search_symbols\\\",\\\"args\\\":{\\\"repo\\\":\\\"$r\\\",\\\"query\\\":\\\"greeting\\\",\\\"kind\\\":\\\"function\\\",\\\"max_results\\\":5}}\") || exit 1; ids=$(printf '%s' \"$s\" | python3 -c \"import json,sys;t=json.load(sys.stdin)['content'][0]['text'];print(' '.join(l.split(',')[1] for l in t.splitlines() if l.startswith('s,')))\") || exit 1; echo \"search_symbols greeting -> $ids\"; id=$(printf '%s\\n' $ids | sed -n '/^fixtures\\/after\\.py::/p' | head -1); test -n \"$id\" || exit 1; g=$(J \"{\\\"action\\\":\\\"get_symbol_source\\\",\\\"args\\\":{\\\"repo\\\":\\\"$r\\\",\\\"symbol_id\\\":\\\"$id\\\"}}\") || exit 1; printf '%s' \"$g\" | python3 -c \"import json,sys;g=json.load(sys.stdin);src=open(g['file']).read().splitlines();want='\\n'.join(src[g['line']-1:g['end_line']]);print('get_symbol_source',g['id'],'lines',g['line'],'-',g['end_line'],'freshness',g.get('_freshness'));print(g['source']);ok=g['source']==want;print('equals those lines of fixtures/after.py in this checkout:',ok);raise SystemExit(0 if ok else 1)\"",
+   "exit": 0,
+   "output_excerpt": "search_symbols greeting -> fixtures/after.py::greeting#function fixtures/before.py::greeting#function\nget_symbol_source fixtures/after.py::greeting#function lines 1 - 2 freshness fresh\ndef greeting(name):\n    return \"Hello, \" + name + \"!\"\nequals those lines of fixtures/after.py in this checkout: True",
+   "pass": true,
+   "wall_s": 2.2,
+   "at_utc": "2026-09-25T19:00:59Z",
+   "receipt": "nativestack-5975wx-20260925--jcodemunch-mcp--use--20260925-2.json",
+   "substitutions": [
+    "CODE_INDEX_PATH=$HOME/.code-index -> CODE_INDEX_PATH=$SCRATCH_CODE_INDEX"
+   ]
+  },
+  {
+   "name": "R-context-mode-use-0",
+   "arm": "x (0.14.1)",
+   "cmd": "P=\"$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169\"; rev=$(sed -n 's/.*mksglu\\/context-mode --ref \\([0-9a-f]\\{40\\}\\).*/\\1/p' recipes/README.md | head -1); python3 -c \"import json,os,sys;p,rev=sys.argv[1],sys.argv[2];pj=json.load(open(os.path.join(p,'.claude-plugin','plugin.json')));e=json.load(open(os.path.expanduser('~/.claude/plugins/installed_plugins.json')))['plugins']['context-mode@context-mode'];m=[x for x in e if x.get('installPath')==p];print('plugin.json',pj['name'],pj['version'],'| installed_plugins.json entry for this path: version',m[0]['version'] if m else None,'gitCommitSha',m[0]['gitCommitSha'] if m else None,'| equals the recipes/README.md reviewed --ref:',bool(m) and m[0]['gitCommitSha']==rev);raise SystemExit(0 if pj['version']=='1.0.169' and m and m[0]['version']=='1.0.169' and m[0]['gitCommitSha']==rev else 1)\" \"$P\" \"$rev\" && echo \"server.bundle.mjs sha256 $(sha256sum \"$P/server.bundle.mjs\" | cut -c1-16)... | node $(node --version) | mcporter $(mcporter --version) | $(bwrap --version) | plugin node_modules: $([ -d \"$P/node_modules\" ] && echo present || echo absent)\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" context-mode",
+   "exit": 0,
+   "output_excerpt": "plugin.json context-mode 1.0.169 | installed_plugins.json entry for this path: version 1.0.169 gitCommitSha 6f0cc6841c687e754059f36714a11233fda1a02b | equals the recipes/README.md reviewed --ref: True\nserver.bundle.mjs sha256 161a106d8c026fd2... | node v24.21.0 | mcporter 0.14.1 | bubblewrap 0.9.0 | plugin node_modules: absent\nstack ['1.0.169'] winner pins []",
+   "pass": true,
+   "wall_s": 0.1,
+   "at_utc": "2026-09-25T19:00:59Z",
+   "receipt": "nativestack-5975wx-20260925--context-mode--use--20260925-2.json",
+   "substitutions": [
+    "command verbatim; TMPDIR=<scratchpad>/sota-refresh/impl/mcporter/tmp-<arm> (host mktemp stays in the scratchpad; inside the receipt's own sandbox the path is on its private tmpfs, like TMPDIR-unset /tmp in production)"
+   ]
+  },
+  {
+   "name": "R-context-mode-use-1",
+   "arm": "x (0.14.1)",
+   "cmd": "w=$(pwd); d=$(mktemp -d) || exit 1; P=\"$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169\"; exp=$(python3 -c \"import json,hashlib,sys;b=open(sys.argv[1],'rb').read();print(sum(i['count'] for i in json.loads(b)['items']),hashlib.sha256(b).hexdigest())\" fixtures/records.json); bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind \"$w\" \"$w\" --bind \"$d\" \"$d\" --chdir \"$w\" -- mcporter call --stdio node --stdio-arg \"$P/server.bundle.mjs\" --cwd \"$w\" --env \"CONTEXT_MODE_DIR=$d/cm\" --env \"CONTEXT_MODE_DATA_DIR=$d/data\" --env \"CLAUDE_CONFIG_DIR=$d/claude\" --env \"CODEX_HOME=$d/codex\" --env CONTEXT_MODE_PLATFORM=claude-code --env \"CONTEXT_MODE_PROJECT_DIR=$w\" --name context-mode --tool ctx_execute_file --args '{\"path\":\"fixtures/records.json\",\"language\":\"python\",\"code\":\"import json,hashlib; d=json.loads(FILE_CONTENT); print(sum(i[\\\"count\\\"] for i in d[\\\"items\\\"]), hashlib.sha256(FILE_CONTENT.encode()).hexdigest())\"}' --output text --no-oauth --timeout 60000 > \"$d/out\" 2> \"$d/err\"; rc=$?; got=$(sed '/^$/d' \"$d/out\" | tail -1); echo \"mcporter exit $rc; ctx_execute_file printed: $got\"; echo \"host-computed from the checkout: $exp\"; [ \"$rc\" -eq 0 ] || head -3 \"$d/err\"; echo \"files the server left in the writable temp dir: $(cd \"$d\" && find . -type f ! -path ./out ! -path ./err | sed 's/[0-9][0-9]*/N/g' | tr '\\n' ' ')\"; rm -rf \"$d\"; test \"$rc\" -eq 0 && test \"$got\" = \"$exp\" && echo \"asserted: exact match\"",
+   "exit": 0,
+   "output_excerpt": "mcporter exit 0; ctx_execute_file printed: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nhost-computed from the checkout: 5 3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c\nfiles the server left in the writable temp dir: ./cm/sessions/stats-pid-N.json \nasserted: exact match",
+   "pass": true,
+   "wall_s": 0.7,
+   "at_utc": "2026-09-25T19:01:00Z",
+   "receipt": "nativestack-5975wx-20260925--context-mode--use--20260925-2.json",
+   "substitutions": [
+    "command verbatim; TMPDIR=<scratchpad>/sota-refresh/impl/mcporter/tmp-<arm> (host mktemp stays in the scratchpad; inside the receipt's own sandbox the path is on its private tmpfs, like TMPDIR-unset /tmp in production)"
+   ]
+  },
+  {
+   "name": "R-context-mode-use-tmp-clean",
+   "arm": "x (0.14.1)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"entries_left_in_receipt_tmpdir\": []}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:01:00Z"
+  },
+  {
+   "name": "S6a-daemon-status-check",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcporter-0.14.1/\" in c and len(d[\"servers\"])>=2 and all(s[\"connected\"] and s[\"activeCalls\"]==0 for s in d[\"servers\"]);print(sorted((s[\"connectionId\"],s[\"connectionGeneration\"]) for s in d[\"servers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:7231d6b0>', 1), ('<uuid:b6d8c55e>', 1)]",
+   "pass": true,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:01:00Z"
+  },
+  {
+   "name": "S6b-repeat-socraticode-health",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "SocratiCode \u2014 Infrastructure Health Check:\n\nQdrant mode: external\nQdrant endpoint: http://127.0.0.1:26333\n[OK] External Qdrant (http://127.0.0.1:26333): Reachable\n\nEmbedding provider: lmstudio\n[OK] LM Studio: Reachable at http://127.0.0.1:18231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\n\nExternal Qdrant mode \u2014 Docker is not required for the vector database.",
+   "pass": true,
+   "wall_s": 0.3,
+   "at_utc": "2026-09-25T19:01:00Z"
+  },
+  {
+   "name": "S6c-daemon-status-recheck",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon status --json | python3 -c 'import json,os,sys;d=json.load(sys.stdin);c=open(\"/proc/%d/cmdline\"%d[\"pid\"]).read().replace(chr(0),\" \");ok=d[\"protocolVersion\"]==3 and d[\"socketPath\"].startswith(os.environ[\"MCPORTER_DAEMON_DIR\"]) and \"/tools/mcporter-0.14.1/\" in c and len(d[\"servers\"])>=2 and all(s[\"connected\"] and s[\"activeCalls\"]==0 for s in d[\"servers\"]);print(sorted((s[\"connectionId\"],s[\"connectionGeneration\"]) for s in d[\"servers\"]));sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "output_excerpt": "[('<uuid:7231d6b0>', 1), ('<uuid:b6d8c55e>', 1)]",
+   "pass": true,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:01:00Z",
+   "identical_connection_list": true
+  },
+  {
+   "name": "S6d-daemon-ownership",
+   "arm": "x (0.14.1)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"status_pid\": 3732858, \"status_socket_is_arm_socket\": true, \"protocolVersion\": 3, \"metadata_pid\": 3732858, \"kernel_socket_owner_pids\": [3732858], \"cmdline_is_arm_prefix_daemon\": true, \"cwd_is_arm_snapshot\": true, \"owned\": true}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:01:01Z",
+   "ownership": {
+    "status_pid": 3732858,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 3732858,
+    "kernel_socket_owner_pids": [
+     3732858
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   }
+  },
+  {
+   "name": "A1-ctx_execute_file-project-read",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute_file --args '{\"path\": \"~/code/native-agent-stack/AGENTS.md\", \"language\": \"python\", \"code\": \"import hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256(b).hexdigest()))\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{\n  \"content\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"path=~/code/native-agent-stack/AGENTS.md\\n```python\\nimport hashlib\\nb=FILE_CONTENT.encode()\\nprint(\\\"BYTES=%d SHA256=%s\\\" % (len(b), hashlib.sha256(b).hexdigest()))\\n```\\n\\nBYTES=10844 SHA256=9b56cee5d4b2a98a2bd6b2a84fdbd272b035f006ee5ef5b92b355e1a6d0f5305\\n\"\n    }\n  ]\n}",
+   "pass": true,
+   "wall_s": 0.3,
+   "at_utc": "2026-09-25T19:01:01Z",
+   "expected": "BYTES=10844 SHA256=9b56cee5d4b2a98a2bd6b2a84fdbd272b035f006ee5ef5b92b355e1a6d0f5305"
+  },
+  {
+   "name": "A2-ctx_execute-42",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"javascript\",\"code\":\"console.log(6*7)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(6*7)\n```\n\n42",
+   "pass": true,
+   "wall_s": 0.3,
+   "at_utc": "2026-09-25T19:01:01Z"
+  },
+  {
+   "name": "A3-probe-persistence-and-ppid-chain",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth  (x2)",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3733179\n\n```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3733179",
+   "pass": true,
+   "wall_s": 0.7,
+   "at_utc": "2026-09-25T19:01:02Z",
+   "ppid_first": 3733179,
+   "ppid_second": 3733179,
+   "ppid_chain_to_daemon": [
+    "3733179:MainThread",
+    "3733178:bwrap",
+    "3732858:MainThread"
+   ],
+   "reached_daemon": true,
+   "daemon_pid": 3732858
+  },
+  {
+   "name": "A4-ai-memory-status",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call ai-memory.memory_status --args '{\"workspace\":\"local\",\"project\":\"native-agent-stack\"}' --output json --no-oauth",
+   "exit": 0,
+   "output_excerpt": "{\n  \"counts\": {\n    \"pages_latest\": 31,\n    \"pages_all\": 35,\n    \"sessions\": 32,\n    \"observations\": 71552\n  }\n}",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:01:03Z",
+   "top_level_keys": [
+    "counts"
+   ]
+  },
+  {
+   "name": "B1a-daemon-stop-retires-daemon-and-server",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "wall_s": 0.5,
+   "at_utc": "2026-09-25T19:01:04Z",
+   "daemon_pid": 3732858,
+   "server_pid": 3733179,
+   "both_gone": true,
+   "socket_removed": true,
+   "metadata_removed": true,
+   "ownership_before": {
+    "status_pid": 3732858,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 3732858,
+    "kernel_socket_owner_pids": [
+     3732858
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   }
+  },
+  {
+   "name": "B1b-next-probe-relaunches",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3735598",
+   "pass": true,
+   "wall_s": 0.8,
+   "at_utc": "2026-09-25T19:01:05Z",
+   "new_ppid": 3735598,
+   "new_daemon_pid": 3735435
+  },
+  {
+   "name": "B1c-daemon-restart",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon restart",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).\nSingle-user daemon started.",
+   "pass": true,
+   "wall_s": 0.6,
+   "at_utc": "2026-09-25T19:01:06Z"
+  },
+  {
+   "name": "B1d-probe-after-restart",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3735983",
+   "pass": true,
+   "wall_s": 0.6,
+   "at_utc": "2026-09-25T19:01:06Z",
+   "daemon_pid_before": 3735435,
+   "daemon_pid_after": 3735858
+  },
+  {
+   "name": "B2a-probe-refuses-after-daemon-sigkill",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\nError: Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched.\n    at DaemonClient.ensureDaemon (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:155:19)\n    at async file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:112:17\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "wall_s": 0.2,
+   "at_utc": "2026-09-25T19:01:08Z",
+   "killed_daemon_pid": 3735858,
+   "direct_children": [
+    3735982
+   ],
+   "ownership_before_kill": {
+    "status_pid": 3735858,
+    "status_socket_is_arm_socket": true,
+    "protocolVersion": 3,
+    "metadata_pid": 3735858,
+    "kernel_socket_owner_pids": [
+     3735858
+    ],
+    "cmdline_is_arm_prefix_daemon": true,
+    "cwd_is_arm_snapshot": true,
+    "owned": true
+   },
+   "refusal_printed": true
+  },
+  {
+   "name": "B2b-retire-orphans-and-archive-metadata",
+   "arm": "x (0.14.1)",
+   "cmd": "(harness check)",
+   "exit": 0,
+   "output_excerpt": "{\"descendants_alive_after_kill\": [], \"terminated_with_TERM\": true, \"escalated_to_KILL\": [], \"all_gone\": true, \"metadata_archived\": true}",
+   "pass": true,
+   "wall_s": 0.0,
+   "at_utc": "2026-09-25T19:01:08Z"
+  },
+  {
+   "name": "B2c-deliberate-daemon-start",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" daemon start",
+   "exit": 0,
+   "output_excerpt": "Single-user daemon started.",
+   "pass": true,
+   "wall_s": 0.5,
+   "at_utc": "2026-09-25T19:01:09Z"
+  },
+  {
+   "name": "B2d-list-context-mode-brief",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" list context-mode --brief --no-oauth",
+   "exit": 0,
+   "output_excerpt": "context-mode\n\n  function ctx_execute(language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, background?: boolean, cwd?: string);\n  // optional (1): intent\n\n  function ctx_execute_file(path: string, language: \"javascript\" | \"typescript\" | \"python\" | \"shell\" | \"ruby\" | \"go\" | \"rust\" | \"php\" | \"perl\" | \"r\" | \"elixir\" | \"csharp\", code: string, timeout?: number, intent?: string);\n\n  function ctx_index(content?: string, path?: string, source?: string, inc ... /proc --tmpfs /tmp --bind ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm ~/.local/state/native-agent-stack/sota-refresh-20260925/mcporter/x/cm --die-with-parent --chdir ~/code/native-agent-stack -- node ~/.codex/plugins/cache/context-mode/context-mode/1.0.169/server.bundle.mjs",
+   "pass": true,
+   "wall_s": 0.6,
+   "at_utc": "2026-09-25T19:01:09Z",
+   "brief_tool_names": [
+    "ctx_batch_execute",
+    "ctx_doctor",
+    "ctx_execute",
+    "ctx_execute_file",
+    "ctx_fetch_and_index",
+    "ctx_index",
+    "ctx_insight",
+    "ctx_purge",
+    "ctx_search",
+    "ctx_stats",
+    "ctx_upgrade"
+   ],
+   "brief_output_sha256": "4e267aab57d28ee0"
+  },
+  {
+   "name": "B2e-bridge-recovered",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\":\"python\",\"code\":\"print(\\\"bridge-recovered\\\")\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```python\nprint(\"bridge-recovered\")\n```\n\nbridge-recovered",
+   "pass": true,
+   "wall_s": 0.3,
+   "at_utc": "2026-09-25T19:01:10Z"
+  },
+  {
+   "name": "B3a-stop-and-hold-lock",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon stop; mv user.json* aside; sleep 95 & lock=<holder pid, time>",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:01:10Z",
+   "moved_aside": [
+    "user.json.stale-archived"
+   ],
+   "holder_pid": 3736744
+  },
+  {
+   "name": "B3b-probe-while-lock-held-fails",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 1,
+   "output_excerpt": "\n[stderr] [mcporter] Daemon startup is taking longer than usual; Chrome relay discovery can take up to 30 seconds.\n[mcporter] MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\nError: MCPorter daemon did not become ready within 45 seconds. Run 'mcporter daemon start --foreground --log' to diagnose startup.\n    at daemonStartupTimeoutError (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/startup-readiness.js:40:12)\n    at waitForDaemo ... aemon/client.js:167:9)\n    at async file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:112:17\n    at async DaemonClient.invoke (file://~/.local/share/codex-ecosystem/tools/mcporter-0.14.1/lib/node_modules/mcporter/dist/daemon/client.js:128:26)",
+   "pass": true,
+   "wall_s": 45.3,
+   "at_utc": "2026-09-25T19:01:56Z",
+   "holder_alive_after_probe": true
+  },
+  {
+   "name": "B3c-probe-after-holder-exit-recovers",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter --config \"$C\" call context-mode.ctx_execute --args '{\"language\": \"javascript\", \"code\": \"console.log(\\\"PPID=\\\"+process.ppid)\"}' --output text --no-oauth",
+   "exit": 0,
+   "output_excerpt": "```javascript\nconsole.log(\"PPID=\"+process.ppid)\n```\n\nPPID=3754312",
+   "pass": true,
+   "wall_s": 0.9,
+   "at_utc": "2026-09-25T19:02:47Z",
+   "holder_exit_after_s": 95.0,
+   "holder_returncode": 0
+  },
+  {
+   "name": "F-daemon-stop-no-leftovers",
+   "arm": "x (0.14.1)",
+   "cmd": "mcporter daemon stop",
+   "exit": 0,
+   "output_excerpt": "Daemon stopped (if it was running).",
+   "pass": true,
+   "wall_s": 0.4,
+   "at_utc": "2026-09-25T19:02:48Z",
+   "tracked_processes": 17,
+   "leftover_tracked": [],
+   "arm_daemons_running": [],
+   "listeners_under_daemon_dir": []
+  }
+ ],
+ "passed": true
+}

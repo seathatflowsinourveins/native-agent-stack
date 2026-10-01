@@ -1,0 +1,11 @@
+Usage: mcp-inspector [options]
+
+MCP Inspector – run web UI, CLI, or TUI
+
+Options:
+  --web       Run web UI (default)
+  --cli       Run CLI
+  --tui       Run TUI
+  -h, --help  display help for command
+
+Mode flags (--web, --cli, --tui) must appear before app options. All following arguments are forwarded unchanged.

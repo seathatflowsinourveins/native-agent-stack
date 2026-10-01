@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--repomix--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "repomix",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v repomix) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && npm ls --global --prefix \"$HOME/.local/share/codex-ecosystem/tools/repomix-1.18.1\" --depth=0 && echo \"prefix directory modified (UTC): $(date -u -r \"$HOME/.local/share/codex-ecosystem/tools/repomix-1.18.1\" +%Y-%m-%dT%H:%MZ)\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" repomix",
+      "exit": 0,
+      "duration_s": 0.458,
+      "output_sha256": "904edca96ca0c8a93fbf7ed720e807507f20dd0c35fbf54e6417bf2b2a02494c",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/repomix -> ~/.local/share/codex-ecosystem/tools/repomix-1.18.1/lib/node_modules/repomix/bin/repomix.cjs\n~/.local/share/codex-ecosystem/tools/repomix-1.18.1/lib\n\u2514\u2500\u2500 repomix@1.18.1\n\nprefix directory modified (UTC): 2026-09-25T15:33Z\nstack ['1.18.1'] winner pins []\n"
+    },
+    {
+      "cmd": "repomix --version",
+      "exit": 0,
+      "duration_s": 0.057,
+      "output_sha256": "71fc7bd16b1bc9b3681085fb0be8aea0b3a37d90d1685938dc2e8a31bf8c9b94",
+      "output_excerpt": "1.18.1\n"
+    }
+  ],
+  "tool_versions": {
+    "repomix": "1.18.1"
+  },
+  "observed_at_utc": "2026-09-25T16:00:51Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), repomix is installed at the manifests/stack.json pin 1.18.1 (repomix is not a landscape winner, so there is no winner pin): the command resolves to the repomix-1.18.1 prefix under ~/.local/share/codex-ecosystem, npm ls in that prefix reports repomix@1.18.1, the prefix directory's modification time reads 2026-09-25 UTC, and repomix --version prints 1.18.1. Readiness only; a version call is not functional acceptance. All commands exit 0.",
+  "limitations": [
+    "Install stage: a resolved path, an npm package record and a version call show the pinned package is present and starts. That is readiness evidence, not functional acceptance; the same host's repomix use receipt covers packing. This receipt changes no platform_status.",
+    "The installation itself (npm into the owned prefix earlier on 2026-09-25, with the bin link in ~/.local/share/codex-ecosystem/bin) is not replayed here. The directory modification time is a filesystem timestamp, not an install log, and nothing here shows the npm flags used.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main 3f267b5c (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:00:51Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:10:08Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

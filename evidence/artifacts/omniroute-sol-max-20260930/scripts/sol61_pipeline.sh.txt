@@ -1,0 +1,86 @@
+#!/bin/bash
+# sol61_pipeline.sh -- build and qualify B3 = B2 + upstream PR 15167 (a 20128-only candidate for gpt-6.1-sol at max effort), without touching a
+# running gateway: a new worktree, a new unreferenced prefix, throwaway data and ports (the smoke runs in its own user and network namespace).
+#   B2 = release/v3.8.51 tip 2f42a9ac1 + #13788 (2 commits) + local affinity patch  -> the running 20128 build (ae5539a56)
+#   B3 = B2 + f5d8e150b79e0901fa18241c7f29bff889b87c14 (upstream PR 15167, cherry-picked with -x; its stable patch-id must equal upstream's)
+# Same recipe as retarget_build.sh / retarget_qualify.sh (2d's request: low priority on a capped CPU set). Results in $OM/ns/qual-B3/,
+# times in $OM/ns/sol61.times, marker $OM/ns/sol61.done (content: ok or the failing step).
+set -u
+OM=<OMNI>
+SC=$OM/scope/omniroute
+TOOLS=<TOOLS>
+CPUS=${BUILD_CPUS:-40-47}
+LOW="nice -n 19 ionice -c2 -n7 taskset -c $CPUS"
+G="git -c core.hooksPath=/dev/null -c user.name=scratch -c user.email=scratch@localhost"
+T=$OM/ns/sol61.times
+H=$OM/ns/sol61-harness
+BASE=ae5539a5623457a2e8bb7f5dddd3d0736a2ddeb7
+PRC=f5d8e150b79e0901fa18241c7f29bff889b87c14
+WANT_PATCHID=14ec6648f50fc499d430f28d2af7840cd2d46055
+V=B3
+W=$OM/wt/$V
+R=$W/.tmp/ns-rebuild
+Q=$OM/ns/qual-$V
+PREFIX=$TOOLS/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+stamp() { date -u +%FT%TZ; }
+fail() { echo "[$(stamp)] FAILED at $1" >> "$T"; echo "$1" > "$OM/ns/sol61.done"; exit "${2:-1}"; }
+
+[ -e "$W" ] && { echo "$W exists, stopping" >&2; exit 3; }
+[ -e "$PREFIX" ] && { echo "$PREFIX exists, stopping" >&2; exit 4; }
+[ "$(git -C $OM/wt/B2 rev-parse HEAD)" = "$BASE" ] || { echo "B2 head moved" >&2; exit 5; }
+mkdir -p "$Q"
+echo "[$(stamp)] setup start base=$BASE pr=$PRC cpus=$CPUS" >> "$T"
+git -C "$SC" worktree add --detach "$W" "$BASE" > /dev/null 2>&1 || fail "worktree add" 6
+cd "$W" || fail "cd" 7
+$G cherry-pick -x "$PRC" > "$Q/cherry-pick.out" 2>&1 || fail "cherry-pick" 8
+got=$($G show HEAD | git patch-id --stable | cut -d' ' -f1)
+echo "[$(stamp)] cherry-picked head=$(git rev-parse HEAD) stable-patch-id=$got upstream=$WANT_PATCHID" >> "$T"
+[ "$got" = "$WANT_PATCHID" ] || fail "patch-id differs from upstream's" 9
+cmp -s "$OM/wt/B2/package-lock.json" package-lock.json || fail "package-lock differs from B2's" 10
+cp -a "$OM/wt/B2/node_modules" node_modules || fail "node_modules copy" 11
+mkdir -p .tmp/ns-rebuild/logs
+cp "$OM"/ns/*.sh "$OM"/ns/*.py "$OM"/ns/*.mts .tmp/ns-rebuild/ 2>/dev/null
+echo "[$(stamp)] $V ready head=$(git rev-parse --short HEAD) commits-over-tip=$(git rev-list --count 2f42a9ac19d1a247ec9ce5473b790843724b3061..HEAD)" >> "$T"
+
+# offline effort probe on the source alone (before the build): the wire model and effort the executor builds
+echo "[$(stamp)] effort probe $V start" >> "$T"
+SCRATCH=$OM/ns/sol61-probe-scratch-$V OMNI_B=$W bash $H/run.sh $H/effort_probe.mts "$Q/effort-$V.json" > "$Q/effort-$V.out" 2> "$Q/effort-$V.err"
+echo "rc=$?" > "$Q/effort-$V.rc"; echo "[$(stamp)] effort probe $V end $(cat $Q/effort-$V.rc)" >> "$T"
+
+echo "[$(stamp)] build $V start" >> "$T"
+$LOW bash .tmp/ns-rebuild/isorun.sh netns data "$W" -- bash .tmp/ns-rebuild/build.sh "$V" > .tmp/ns-rebuild/logs/build-$V.out 2>&1
+echo "rc=$?" > .tmp/ns-rebuild/logs/build-$V.rc; echo "[$(stamp)] build $V end $(cat .tmp/ns-rebuild/logs/build-$V.rc)" >> "$T"
+[ "$(cat .tmp/ns-rebuild/logs/build-$V.rc)" = "rc=0" ] || fail "build" 12
+
+cp "$OM"/ns/isorun-pb.sh "$OM"/ns/smoke2.sh "$OM"/ns/smoke-inner.sh "$R"/ 2>/dev/null
+TGZ=$R/pack/$V/omniroute-3.8.51.tgz
+echo "[$(stamp)] $V install start" >> "$T"
+$LOW bash $R/isorun.sh host data "$W" -- bash $R/install.sh "$V" "$PREFIX" "$TGZ" > "$Q/install.out" 2>&1
+echo "rc=$?" > "$Q/install.rc"; echo "[$(stamp)] $V install end $(cat $Q/install.rc)" >> "$T"
+[ "$(cat $Q/install.rc)" = "rc=0" ] || fail "install" 13
+echo "[$(stamp)] $V smoke start" >> "$T"
+$LOW bash $R/smoke2.sh "$V" "$PREFIX" > "$Q/smoke.out" 2>&1
+echo "rc=$?" > "$Q/smoke.rc"; echo "[$(stamp)] $V smoke end $(cat $Q/smoke.rc)" >> "$T"
+echo "[$(stamp)] $V pack-boot start" >> "$T"
+$LOW bash $R/isorun-pb.sh "$W" -- npm run check:pack-boot > "$Q/pack-boot.out" 2>&1
+echo "rc=$?" > "$Q/pack-boot.rc"; echo "[$(stamp)] $V pack-boot end $(cat $Q/pack-boot.rc)" >> "$T"
+git -C "$W" config --unset core.hooksPath 2>/dev/null   # husky's prepare wrote it into the shared config
+
+files=""
+for pat in tests/unit/check-pack-boot.test.ts tests/unit/issue-8674-alpha-search.test.ts 'tests/unit/*idempotency*.test.ts' 'tests/unit/*codex*client*.test.ts' \
+           tests/unit/affinity-outranks-occupancy-8940.test.ts tests/unit/codex-fast-tier.test.ts tests/unit/codex-reasoning-suffix.test.ts \
+           tests/unit/reasoning-routing-codex-extended-effort.test.ts tests/unit/codex-gpt6-sol-luna.test.ts tests/unit/codex-astra.test.ts \
+           tests/unit/provider-models-discovery-split.test.ts tests/unit/model-hidden-modality-scope-12172.test.ts; do
+  for f in $pat; do [ -f "$f" ] && files="$files $f"; done
+done
+echo "[$(stamp)] $V targeted tests start ($(echo $files | wc -w) files)" >> "$T"
+$LOW bash $R/isorun.sh netns nodata "$W" -- bash $R/nodetest.sh "targeted-$V" $files > "$Q/targeted.out" 2>&1
+echo "rc=$?" > "$Q/targeted.rc"; echo "[$(stamp)] $V targeted tests end $(cat $Q/targeted.rc)" >> "$T"
+
+# the same file list on B2 (the running build's source) for a like-for-like baseline
+B2=$OM/wt/B2
+echo "[$(stamp)] B2 baseline tests start" >> "$T"
+( cd "$B2" && $LOW bash .tmp/ns-rebuild/isorun.sh netns nodata "$B2" -- bash .tmp/ns-rebuild/nodetest.sh "sol61-baseline-B2" $files > "$Q/targeted-B2-baseline.out" 2>&1; echo "rc=$?" > "$Q/targeted-B2-baseline.rc" )
+echo "[$(stamp)] B2 baseline tests end $(cat $Q/targeted-B2-baseline.rc)" >> "$T"
+echo ok > "$OM/ns/sol61.done"
+echo "[$(stamp)] DONE" >> "$T"

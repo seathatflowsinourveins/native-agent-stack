@@ -1,0 +1,16 @@
+Commands of the review as typed (transcribed from the session; the scripts named are in scripts/). Times: the reproduced install ran 2026-09-30T08:37:49Z to 08:37:50Z
+(checks/install-log.txt); the first OSV scans, the closure difference and the independent sweep ran in the following minutes; run_review_outputs.sh regenerated the
+identity, closure, advisory-file, pin-source and OSV outputs from the same git objects and the same scratch install at 2026-09-30T08:52:10Z to 08:52:14Z, and the
+independent sweep was rerun once more with its observed time. Every output file carries its own observed time where its script prints one.
+
+ 1. git fetch -q origin refs/pull/535/head:refs/remotes/pr/535 main                 (git protocol; no REST call)
+ 2. git rev-parse refs/remotes/pr/535; git show refs/remotes/pr/535:blueprints/runtime-workers/openhands/requirements.lock | sha256sum      (identity)
+ 3. python3 lock_closure_diff.py <lock at the PR base> <lock at the head>
+ 4. install_candidate.sh: with UV_NO_CONFIG=1: uv venv --python 3.13.15 <venv>; uv pip install --python <venv>/bin/python --require-hashes --no-deps --only-binary :all:
+    --index-url https://pypi.org/simple -r <build-requirements lock at the head>; uv pip install --python <venv>/bin/python --require-hashes --no-deps --no-build-isolation
+    --index-url https://pypi.org/simple -r <candidate lock>; uv pip check --python <venv>/bin/python      (the candidate's own recorded install commands)
+ 5. <venv>/bin/python oauthlib_independent_scan.py <venv>/lib/python3.13/site-packages
+ 6. <osv-scanner 2.6.0> scan source --config <config> --no-resolve --lockfile=requirements.txt:<lock path> --format json     three times: the head's .github/osv-scanner.toml
+    on the candidate lock; an empty config on the candidate lock (the control); an empty config on the PR base's lock
+ 7. <venv>/bin/python constraint_sources.py <venv>/lib/python3.13/site-packages
+ 8. run_review_outputs.sh      (steps 2, 3, 6, 7 and the advisory-file hash comparison, regenerated with observed times)

@@ -1782,5 +1782,147 @@ print(json.dumps({"code": code, "reads": sorted(reads), "modules": modules}))
             self.assertTrue((self.ROOT / path).is_file(), path)
 
 
+class HostReceiptHistoryTests(GateFixture):
+    """PR #321 verification, defect 3: a successor retires what it supersedes and a dissent vetoes, so a pull request
+    that deletes a base-registered receipt (the dissented tip of a supersede chain, a blocking fail) or strips a
+    review from one brought back what it retired and let a same-comparison raise pass. Base host receipts are
+    append-only at the head: kept, registered, the same recorded claim, the base reviews as a prefix."""
+
+    AGREED = "evidence/hosts/wsl-host-20260920/comp-one-use.json"
+    SUCCESSOR = "evidence/hosts/wsl-host-20260920/comp-one-use-2.json"
+
+    @staticmethod
+    def receipt(verdict="agree", *, reviews=1, claim="ran comp-one"):
+        return {"id": "wsl-host-20260920--comp-one--use--20260920", "claim": claim, "result": "pass",
+                "reviews": [{"kind": "independent_session", "verdict": verdict, "ref": f"review {index}"}
+                            for index in range(reviews)]}
+
+    def setUp(self):
+        super().setUp()
+        self.write(self.AGREED, dump(self.receipt()))
+        self.register(self.AGREED)
+        self.write(self.SUCCESSOR, dump(self.receipt("needs_changes", claim="ran comp-one again")))
+        self.register(self.SUCCESSOR)
+        self.rebase()
+
+    def test_unchanged_and_appended_reviews_pass(self):
+        self.assertPasses(self.report())
+        self.write(self.SUCCESSOR, dump(dict(self.receipt("needs_changes", claim="ran comp-one again", reviews=1),
+                                             reviews=self.receipt("needs_changes", reviews=1)["reviews"]
+                                             + [{"kind": "human", "verdict": "agree", "ref": "later"}])))
+        self.assertPasses(self.report())
+
+    def test_deleting_a_base_receipt_fails(self):
+        (self.root / self.SUCCESSOR).unlink()
+        self.registered.discard(self.SUCCESSOR)
+        self.assertFails(self.report(), f"{self.SUCCESSOR}: a host receipt registered at the base is missing")
+
+    def test_unregistering_a_base_receipt_fails(self):
+        self.registered.discard(self.SUCCESSOR)
+        self.assertFails(self.report(), f"{self.SUCCESSOR}: a host receipt registered at the base is unregistered")
+
+    def test_dropping_a_base_review_fails(self):
+        self.write(self.SUCCESSOR, dump(dict(self.receipt(claim="ran comp-one again"), reviews=[])))
+        self.assertFails(self.report(), "drops or rewrites a review the base host receipt carries")
+
+    def test_rewriting_a_base_claim_fails(self):
+        self.write(self.AGREED, dump(self.receipt(claim="ran comp-one twice")))
+        self.assertFails(self.report(), "changes the recorded claim of a base host receipt")
+
+    def test_a_deletion_with_a_same_comparison_raise_fails(self):
+        # The verification's reproduction: the dissented successor retires the agreed receipt, so the row cannot
+        # be accepted; deleting it and raising the row in one comparison passed before this check.
+        real = gate.platform_evidence.load_context
+
+        def load(root):
+            receipts = [{"path": self.AGREED, "shape_ok": True, "platform_identity_ok": True, "component_version": "1.0",
+                         "evidence_class": "native_proven", "stage": "use", "result": "pass",
+                         "second_physical_machine": True, "review_state": "agree", "host_id": "wsl-host-20260920",
+                         "observed_at_utc": "2026-09-20T01:00:00Z", "layer_scope": None, "supersedes_path": None}]
+            if (root / self.SUCCESSOR).exists():
+                receipts.append(dict(receipts[0], path=self.SUCCESSOR, review_state="dissent",
+                                     observed_at_utc="2026-09-20T05:00:00Z", supersedes_path=self.AGREED))
+            summary = {"components": {"comp-one": {"platforms": {"linux-wsl2-x86_64": {"receipts": receipts}}}}}
+            return gate.platform_evidence.StatusContext(summary=summary, registered_paths=real(root).registered_paths)
+
+        with mock.patch.object(gate.platform_evidence, "load_context", load):
+            row = self.record(evidence_class="native_proven", linux="conditional")
+            self.rebase()
+            self.assertPasses(self.report())
+            (self.root / self.SUCCESSOR).unlink()
+            self.registered.discard(self.SUCCESSOR)
+            row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+            self.assertFails(self.report(), f"{self.SUCCESSOR}: a host receipt registered at the base is missing")
+
+
+class AppendedReviewTrustTests(GateFixture):
+    """PR #321 final check, finding 1: BaseTrust trusted a base receipt only while its bytes were unchanged, so a pull
+    request that appended any review to a base failure dropped that failure from the base-trusted derivation, and a
+    raise resting on a new passing receipt (evidence that must land first) then passed. A base receipt now enters
+    that derivation as its base snapshot: the base's reviews, whatever the head appends."""
+
+    AGREED = "evidence/hosts/wsl-host-20260920/comp-one-use.json"
+    FAIL = "evidence/hosts/wsl-host-20260920/comp-one-use-later-fail.json"
+    RERUN = "evidence/hosts/wsl-host-20260920/comp-one-use-rerun.json"
+
+    @staticmethod
+    def receipt(claim, verdicts=("agree",)):
+        return {"id": "wsl-host-20260920--comp-one--use--20260920", "claim": claim,
+                "reviews": [{"kind": "independent_session", "verdict": verdict, "ref": f"review {index}"}
+                            for index, verdict in enumerate(verdicts)]}
+
+    def setUp(self):
+        super().setUp()
+        real = gate.platform_evidence.load_context
+        agreed = {"path": self.AGREED, "shape_ok": True, "platform_identity_ok": True, "component_version": "1.0",
+                  "evidence_class": "native_proven", "stage": "use", "result": "pass", "second_physical_machine": True,
+                  "review_state": "agree", "independently_reviewed_native_proven_pass": True,
+                  "host_id": "wsl-host-20260920", "observed_at_utc": "2026-09-20T01:00:00Z", "layer_scope": None,
+                  "supersedes_path": None, "supersedes_link": None}
+        timeline = [(self.AGREED, agreed),
+                    (self.FAIL, dict(agreed, path=self.FAIL, result="fail", observed_at_utc="2026-09-21T01:00:00Z",
+                                     independently_reviewed_native_proven_pass=False)),
+                    (self.RERUN, dict(agreed, path=self.RERUN, observed_at_utc="2026-09-22T01:00:00Z"))]
+
+        def load(root):
+            receipts = [entry for path, entry in timeline if (root / path).exists()]
+            summary = {"components": {"comp-one": {"platforms": {"linux-wsl2-x86_64": {"receipts": receipts}}}}}
+            return gate.platform_evidence.StatusContext(summary=summary, registered_paths=real(root).registered_paths)
+
+        patcher = mock.patch.object(gate.platform_evidence, "load_context", load)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        for path, claim in ((self.AGREED, "ran comp-one"), (self.FAIL, "comp-one failed")):
+            self.write(path, dump(self.receipt(claim)))
+            self.register(path)
+        self.row = self.record(evidence_class="native_proven", linux="conditional")
+        self.rebase()
+        self.assertPasses(self.report())
+        # The pull request adds a later passing run, which clears the failure at the head, and raises the row.
+        self.write(self.RERUN, dump(self.receipt("ran comp-one again")))
+        self.register(self.RERUN)
+        self.row["winners"][0]["platform_status"]["linux-wsl2-x86_64"] = "accepted"
+
+    def test_a_raise_on_a_new_rerun_is_refused(self):
+        self.assertFails(self.report(), "follows from the evidence refs and host receipts already at the base")
+
+    def test_appending_a_review_to_the_base_failure_does_not_drop_it(self):
+        self.write(self.FAIL, dump(self.receipt("comp-one failed", ("agree", "needs_changes"))))
+        self.assertFails(self.report(), "follows from the evidence refs and host receipts already at the base")
+
+    def test_the_base_snapshot_keeps_the_base_reviews(self):
+        # An agree appended to a base receipt in the same pull request does not count for the base-trusted view.
+        self.write(self.AGREED, dump(self.receipt("ran comp-one", ("needs_changes",))))
+        self.rebase()
+        self.write(self.AGREED, dump(self.receipt("ran comp-one", ("needs_changes", "agree"))))
+        trust = gate.BaseTrust(gate.Side(self.root, self.base), gate.Side(self.root))
+        context = gate.platform_evidence.load_context(self.root)
+        restricted, _untrusted = trust.context(context, [], "comp-one", "linux-wsl2-x86_64")
+        entries = restricted.summary["components"]["comp-one"]["platforms"]["linux-wsl2-x86_64"]["receipts"]
+        agreed = next(entry for entry in entries if entry["path"] == self.AGREED)
+        self.assertEqual(agreed["review_state"], "dissent")
+        self.assertFalse(agreed["independently_reviewed_native_proven_pass"])
+
+
 if __name__ == "__main__":
     unittest.main()

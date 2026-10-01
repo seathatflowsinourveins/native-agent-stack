@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "kind": "native_usage_by_run",
+  "counter_policy": "Native counters exactly as each client reported them, then mapped to the convergence contract's disjoint categories only where the native scope is known. Unknown stays null; nothing is inferred or converted to zero, and no new sum across runs is claimed.",
+  "runs": [
+    {
+      "run_label": "claude-sota-models-lane",
+      "source": "the coordinator's header line on the Claude return (a relayed subagent completion report)",
+      "native": {
+        "subagent_tokens": 414369,
+        "tool_uses": 130
+      },
+      "scope_note": "No categories are given, and whether the figure is cumulative across the tool calls or the final context was not established, so it is not mapped to the contract total.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "codex-sota-models-lane",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 3179978,
+        "cached_input_tokens": 3044352,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10544,
+        "reasoning_output_tokens": 3041
+      },
+      "event_items_completed": {
+        "agent_message": 6,
+        "command_execution": 1,
+        "web_search": 15,
+        "mcp_tool_call": 3
+      },
+      "scope_note": "Codex input includes cached input and output includes reasoning. Uncached input is input minus cached input; the total is input plus output.",
+      "contract_usage": {
+        "uncached_input": 135626,
+        "cache_creation": 0,
+        "cache_read": 3044352,
+        "output": 10544,
+        "reasoning_in_output": 3041,
+        "total": 3190522,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "claude-memory-systems-lane",
+      "source": "the coordinator's header line on the Claude return (a relayed subagent completion report)",
+      "native": {
+        "subagent_tokens": 303563,
+        "tool_uses": 129
+      },
+      "scope_note": "No categories are given, and whether the figure is cumulative across the tool calls or the final context was not established, so it is not mapped to the contract total.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "codex-memory-systems-lane",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 2511644,
+        "cached_input_tokens": 2394880,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10597,
+        "reasoning_output_tokens": 3625
+      },
+      "event_items_completed": {
+        "agent_message": 6,
+        "command_execution": 3,
+        "web_search": 16
+      },
+      "scope_note": "Codex input includes cached input and output includes reasoning. Uncached input is input minus cached input; the total is input plus output.",
+      "contract_usage": {
+        "uncached_input": 116764,
+        "cache_creation": 0,
+        "cache_read": 2394880,
+        "output": 10597,
+        "reasoning_in_output": 3625,
+        "total": 2522241,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-a",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39567,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2273,
+        "reasoning_output_tokens": 1840
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 22415,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2273,
+        "reasoning_in_output": 1840,
+        "total": 41840,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-b",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39557,
+        "cached_input_tokens": 34304,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2498,
+        "reasoning_output_tokens": 2094
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 5253,
+        "cache_creation": 0,
+        "cache_read": 34304,
+        "output": 2498,
+        "reasoning_in_output": 2094,
+        "total": 42055,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q1-memory-system-c",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39542,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2011,
+        "reasoning_output_tokens": 1589
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 22390,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2011,
+        "reasoning_in_output": 1589,
+        "total": 41553,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-a",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39779,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1470,
+        "reasoning_output_tokens": 1098
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 22627,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 1470,
+        "reasoning_in_output": 1098,
+        "total": 41249,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-b",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39756,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1490,
+        "reasoning_output_tokens": 1072
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 15564,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1490,
+        "reasoning_in_output": 1072,
+        "total": 41246,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q2-memory-llm-c",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39764,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2237,
+        "reasoning_output_tokens": 1893
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 22612,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 2237,
+        "reasoning_in_output": 1893,
+        "total": 42001,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-a",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39755,
+        "cached_input_tokens": 17152,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1831,
+        "reasoning_output_tokens": 1454
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 22603,
+        "cache_creation": 0,
+        "cache_read": 17152,
+        "output": 1831,
+        "reasoning_in_output": 1454,
+        "total": 41586,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-b",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39730,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1347,
+        "reasoning_output_tokens": 993
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 15538,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1347,
+        "reasoning_in_output": 993,
+        "total": 41077,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "adjudicator-q3-reranker-c",
+      "source": "codex exec --json event stream, turn.completed usage (one turn)",
+      "native": {
+        "input_tokens": 39775,
+        "cached_input_tokens": 24192,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1691,
+        "reasoning_output_tokens": 1315
+      },
+      "event_items_completed": {
+        "agent_message": 2,
+        "command_execution": 1
+      },
+      "scope_note": "As for the Codex lanes.",
+      "contract_usage": {
+        "uncached_input": 15583,
+        "cache_creation": 0,
+        "cache_read": 24192,
+        "output": 1691,
+        "reasoning_in_output": 1315,
+        "total": 41466,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "coordinator-stage-one",
+      "source": "not measured",
+      "native": {},
+      "scope_note": "The coordinator wrote both packets and both stage-one convergence notes in its own session; its usage is unknown.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "convergence-workflow",
+      "source": "not measured",
+      "native": {},
+      "scope_note": "The workflow's agents built the blinded briefs and key, launched the nine judge runs, wrote the convergence table and the CLAUDE.md manifest, and ran the 68 skeptic checks. Only the judges' own codex usage is known (above); the agents' usage is unknown.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "run_label": "recorder-artifact-check",
+      "source": "not measured",
+      "native": {},
+      "scope_note": "Assembly of this evidence, the catalog decisions file and the offline checks ran in a coordinator-owned worker whose usage is unknown; the checks themselves call no model.",
+      "contract_usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "table_sum_check": {
+    "claim": "The convergence table's section 5 states the nine judge runs as '357,225 input (192,640 cached), 16,848 output, of which 13,348 reasoning'.",
+    "check": "The nine turn.completed lines reproduce those four figures exactly (checked at assembly)."
+  },
+  "web_search_counts": {
+    "codex-sota-models-lane": {
+      "web_search_items": 15,
+      "search_actions": 11,
+      "search_queries": 31,
+      "other_actions": 4,
+      "recorded_elsewhere": "the stage-one note said 30; A15.2 corrects it to 15"
+    },
+    "codex-memory-systems-lane": {
+      "web_search_items": 16,
+      "search_actions": 6,
+      "search_queries": 19,
+      "other_actions": 10,
+      "recorded_elsewhere": "the stage-one note says 16; the bench ledger said 32"
+    },
+    "adjudicators": "0 web_search items in each of the nine judge streams"
+  },
+  "whole_task_usage": null,
+  "whole_task_note": "Unknown: the Claude lanes, the coordinator, the workflow's agents and the recorder lack complete categories."
+}

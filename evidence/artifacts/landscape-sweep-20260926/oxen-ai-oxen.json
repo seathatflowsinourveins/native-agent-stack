@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-oxen-ai-oxen",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Oxen-AI/Oxen",
+ "reviewed_commit": "f9b3ed50c57f9afc8d6eac3268dd6327bda15196",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "identity-provenance"
+ ],
+ "claim": "Source and documentation review of Oxen-AI/Oxen at commit f9b3ed50c57f9afc8d6eac3268dd6327bda15196 (license Apache-2.0), read from README.md at that commit. Repository description: \"Lightning fast data version control system for large repositories of data. Feels like git, pushes and pulls like oxen.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1188,
+  "pushed_at": "2026-09-26T02:17:08Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f9b3ed50c57f9afc8d6eac3268dd6327bda15196",
+   "text": "Oxen is a lightning fast data version control system for large datasets. We aim to make versioning data as easy as versioning code."
+  },
+  {
+   "source": "README.md@f9b3ed50c57f9afc8d6eac3268dd6327bda15196",
+   "text": "The interface mirrors git, but shines where git and git-lfs fall short. Oxen is built from the ground up for any data type, from machine learning training data and model weights to game assets and studio media, and is optimized to handle repositories with millions of files and terabytes of data."
+  },
+  {
+   "source": "README.md@f9b3ed50c57f9afc8d6eac3268dd6327bda15196",
+   "text": "```bash oxen init oxen add images/ oxen add annotations/*.parquet oxen commit \"Adding 200k images and their corresponding annotations\" oxen push origin main ```"
+  }
+ ]
+}

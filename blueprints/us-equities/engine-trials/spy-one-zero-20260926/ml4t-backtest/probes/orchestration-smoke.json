@@ -1,0 +1,331 @@
+{
+  "all_checks_passed": true,
+  "checks": {
+    "compare_bind_accepts_receipt": true,
+    "compare_scores_synthetic_expectations_pass": true,
+    "no_failed_guard": true,
+    "parent_main_exit_zero": true,
+    "real_child_launch_refuses_synthetic_rows": true,
+    "two_run_records_equal": true
+  },
+  "evidence_class": "synthetic fixture under the run sandbox; not parity evidence",
+  "float_projection": {
+    "max_abs_adjustment": "0",
+    "noise_limit": "0.000001",
+    "per_run": {
+      "run-1": {
+        "max_abs_adjustment": "0",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 11
+      },
+      "run-2": {
+        "max_abs_adjustment": "0",
+        "noise_limit": "0.000001",
+        "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+        "values_projected": 11
+      }
+    },
+    "rule": "d = Decimal(repr(x)); value = d.quantize(Decimal('0.0001'), rounding=ROUND_HALF_EVEN); the compared field carries str(value) and a sibling field suffixed _engine_repr carries repr(x). Quantities must equal an integer exactly.",
+    "values_projected": 11
+  },
+  "guards": [
+    {
+      "name": "network_isolation",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "pinned_spy_parity_sources",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "frozen_plan",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "manifest_binding",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "frozen_inputs_and_rows",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "decision_rows_present",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "funding_rows_on_ex_date_first_bars",
+      "outcome": "pass",
+      "scope": "port"
+    },
+    {
+      "name": "engine_version",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "profile_override_only_commission",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "resolved_configuration",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "bars_processed",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "decisions_reached",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "funding_payment_per_event",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "causality",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "final_state",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "orders_filled_none_rejected",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "submission_clock",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "fill_at_next_session_first_bar",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "fill_price_is_fill_bar_open",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "costs_zero",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "engine_cash_path",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "native_end_cash_is_last_portfolio_state",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "float_projection_noise_only",
+      "outcome": "pass",
+      "scope": "run-1"
+    },
+    {
+      "name": "engine_version",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "profile_override_only_commission",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "resolved_configuration",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "bars_processed",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "decision_bar_is_session_final",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "decision_close_matches_converted_row",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "decisions_reached",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "funding_payment_per_event",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "causality",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "final_state",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "orders_filled_none_rejected",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "submission_clock",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "fill_at_next_session_first_bar",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "fill_price_is_fill_bar_open",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "costs_zero",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "engine_cash_path",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "native_end_cash_is_last_portfolio_state",
+      "outcome": "pass",
+      "scope": "run-2"
+    },
+    {
+      "name": "float_projection_noise_only",
+      "outcome": "pass",
+      "scope": "run-2"
+    }
+  ],
+  "port_sha256": "c9ae66ac5b7956e1a9ddf8e5e7bf372a5a21ac14e3e58cea662b34b55b2aff4f",
+  "receipt_keys": [
+    "arm",
+    "attribution_evidence",
+    "case",
+    "case_configuration",
+    "cash_ledger",
+    "classification",
+    "conversion",
+    "declared_deviations",
+    "derived_distributions",
+    "distribution_ledger",
+    "dividend_cash_usd",
+    "engine",
+    "engine_configuration",
+    "engine_configuration_facts",
+    "engine_totals",
+    "evidence_class",
+    "fees_usd",
+    "fills",
+    "final_quantity",
+    "float_projection",
+    "frozen_plan",
+    "funding_input",
+    "gate_context",
+    "guards",
+    "guards_failed",
+    "id",
+    "inputs",
+    "intents",
+    "isolation",
+    "limitations",
+    "local_source_sha256",
+    "mapping_manifest",
+    "native_end_cash_usd",
+    "native_end_cash_usd_engine_repr",
+    "observed_utc",
+    "port_source_sha256",
+    "preregistration",
+    "reconciled_end_cash_usd",
+    "runs",
+    "schema_version",
+    "started_utc",
+    "tolerances",
+    "trial",
+    "two_run_determinism",
+    "two_run_records_equal",
+    "unsupported_mappings"
+  ],
+  "script_sha256": "5df5e9d8c854d51d30044c27d32fbf52acd104d4d081391047016d526ee21eec",
+  "smoke": "ml4t-backtest port orchestration smoke test (synthetic bars, stand-in conversion)",
+  "synthetic_verdict": {
+    "attribution_evidence": "converted bars",
+    "blocking_mappings": [],
+    "complete": true,
+    "failed": 0,
+    "rejected_attributions": [],
+    "skipped": [],
+    "unattributed_failures": [],
+    "verdict": "PASS"
+  },
+  "synthetic_verdict_checks": 29
+}

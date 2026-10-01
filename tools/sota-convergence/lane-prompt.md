@@ -9,6 +9,8 @@ Rules
    Read only the packet and files under the repository root: no memory stores, code indexes, MCP tools, web
    search, git history, or other checkouts or work directories, which can carry the verdict you must reach.
 2. The winner set is 1-3 adopted candidates (adopted == true) that best satisfy the requirement on the evidence.
+   Adoption, incumbency, installation, retained-control status, receipt count, packet position, license, stars and
+   popularity are not evidence of fit; choose among adopted candidates on what their evidence shows was run.
    why_selected must cite at least one evidence path and state what was actually observed (native execution,
    measured comparison, local integration, synthetic fixture or source review), not what the project claims.
 3. Every adopted non-winner candidate appears in alternatives with a why_not_default that states the concrete

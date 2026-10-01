@@ -50,15 +50,46 @@ and treat the projection as superseded guidance rather than looking for it to ha
    if Windows keeps more than 12 GB free. This replaces the 96 GB proposal in the
    [workstation runtime profile](new-workstation-runtime-profile-20260922.md), which under the
    profiles' own arithmetic would just miss the `headroom` tier.
+
+   Note added 2026-09-25: `sparseVhd=true` has no effect on current WSL. WSL 2.7.14 creates every
+   new VHD non-sparse "while data corruption is being debugged" and prints "Sparse VHD support is
+   currently disabled due to potential data corruption"
+   ([`WslCoreFilesystem.cpp`](https://github.com/microsoft/WSL/blob/2.7.14/src/windows/common/WslCoreFilesystem.cpp#L35-L39)).
+   Making an existing distribution sparse needs
+   `wsl --manage <distro> --set-sparse true --allow-unsafe`
+   ([microsoft/WSL#13075](https://github.com/microsoft/WSL/issues/13075)); this page does not
+   recommend it. To reclaim VHD space instead, run `sudo fstrim -v /` in the distribution, then
+   `wsl --shutdown` and compact its `ext4.vhdx`
+   ([location](https://learn.microsoft.com/en-us/windows/wsl/disk-space#how-to-locate-the-vhdx-file-and-disk-path-for-your-linux-distribution))
+   offline from an elevated prompt: `diskpart` with `select vdisk file="<path>"`,
+   `attach vdisk readonly`, `compact vdisk` and `detach vdisk`, or, with the Hyper-V module,
+   `Mount-VHD -Path <path> -ReadOnly`, `Optimize-VHD -Path <path> -Mode Full` and
+   `Dismount-VHD -Path <path>`. `-Mode Full` on a VHDX that is not attached read-only falls back to
+   `Prezeroed` mode. Both tools compact only a detached or read-only disk. WSL's
+   own disk-space page uses `diskpart` only to expand a VHD and warns that Windows tools on WSL's
+   `AppData` files can corrupt a distribution, so export or back up the distribution first.
+
+   The workstation's live `%UserProfile%\.wslconfig`, read on 2026-09-25, differs from the
+   projection above: `memory=104GB`, `processors=48`, `swap=24GB`, `networkingMode=mirrored` and
+   `[experimental] autoMemoryReclaim=dropCache`, with no `sparseVhd` (that file records removing it
+   on 2026-09-08 as inert), plus host-specific swap-file, crash-dump and idle-timeout keys. Inside
+   WSL, `nproc` returned 48 and `free -g` 102 GiB of memory and 24 GiB of swap. The projection and
+   its 2026-09-23 decision are left as recorded.
 2. Pinned clone at the release tag, then `adoption/bootstrap-linux.sh` (bootstrap step 0 onward).
 3. `python3 scripts/hardware_profile.py --record-host <host-id>` (`<host-id>` like
    `wsl-workstation-20261015`); this writes the measured report and adds the entry to the
    hardware profiles for you, replacing the earlier by-hand edit.
 4. Profiles in order: `foundation-cpu`, `research-runtime`, `observability`, `semantic-rag`,
-   `recovery`, `trading-nautilus` (see the grand list's setup order).
+   `recovery`, `trading-nautilus` (see the grand list's setup order). `token-efficiency` is fully
+   pinned on this platform too (`adoption/README.md`'s profile table); follow
+   [`docs/token-session-handbook.md`](token-session-handbook.md#new-pc-either-platform-the-complete-token-efficiency-practice)
+   for its bootstrap, Codex user-scope MCP servers and coverage-check order.
 5. Record each component that ran with `python3 scripts/host_receipts.py record`
    (`--qualified-model` for any local runtime model you qualified there), then
    `python3 scripts/component_matrix.py --write` and `python3 scripts/new_host_grand_list.py --write`.
+   A `--stage use` receipt of a component that several catalog layers list names the layer(s) it
+   exercised with `--layer-ref <catalog>/<layer_id>`
+   ([contributing evidence](contributing-evidence.md), section 3 step 3; changed after `v2026.09.26`).
 6. North star on this host: the engine replay, then IBKR local acceptance and the adaptive paper
    broker trial as the gate ladder
    ([`catalogs/us-equities/gates-20260922.json`](../catalogs/us-equities/gates-20260922.json)) allows.
@@ -69,22 +100,31 @@ and treat the projection as superseded guidance rather than looking for it to ha
 The 24 GB Mac is being replaced (see the upgrade table below). On the replacement:
 
 0. Sign in natively to Claude, Codex and `gh`; never copy another host's credential stores or memory
-   database. The shared foundation services (ai-memory, Ollama, Qdrant, the user-scope MCP servers,
-   the QMD and SocratiCode indexes, mise tools) come from agent-ecosystem through its single writer
-   ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). Where
-   those services exist, skip the launchd agents of `adoption/bootstrap-macos.sh` in step 1: they
-   would start a second Qdrant and a second ai-memory store.
+   database. Since 2026-09-27 this repository is the Mac's single writer, in two stages
+   ([decision](decisions/2026-09-27-mac-single-writer-staged.md)); it supersedes the earlier
+   agent-ecosystem rule ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)).
+   Stage 1 installs the client layer only (#382). Where agent-ecosystem's services (ai-memory,
+   Ollama, Qdrant) still run, keep them and skip the launchd agents of `adoption/bootstrap-macos.sh`
+   in step 1: they would start a second Qdrant and a second ai-memory store. Stage 2 moves those
+   services only after #379's measurements and the memory-layer head-to-head.
 1. Pinned clone, then `adoption/bootstrap-macos.sh`. The pinned release contains #94 (the Homebrew
    prerequisite install, the `socraticode`, darwin-binary and embedding-model pins, the launchd
    agents and the embedding acceptance script), so every step on the
    [macOS page](../adoption/platforms/macos-arm64.md) runs from the pinned checkout.
+   `token-efficiency` is a separate profile, fully pinned on this platform on main
+   (`adoption/README.md`'s profile table); its last eight macOS pins came after the pinned
+   `v2026.09.26`, so at that tag pass them in `--allow-unpinned` and use their recipes. Follow
+   [`docs/token-session-handbook.md`](token-session-handbook.md#new-pc-either-platform-the-complete-token-efficiency-practice)
+   for its own bootstrap, Codex user-scope MCP servers and coverage check.
 2. `python3 scripts/hardware_profile.py --record-host <host-id>` and the MLX smoke; this writes
    and registers the measured profile.
 3. `macos-arm64-foundation` profile; re-qualify any local model on MLX or llama.cpp Metal: a vLLM
    result on CUDA does not transfer. Record a qualified model with
-   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`.
-4. Record receipts as above. The first real macOS run is what moves the `macos-arm64` column of the
-   grand list off `untested`.
+   `python3 scripts/host_receipts.py record ... --qualified-model '{"runtime": "mlx-lm", ...}'`,
+   adding `--layer-ref` at `--stage use` when several layers list the runtime (changed after `v2026.09.26`).
+4. Record receipts as above, with `--layer-ref` where several layers list the component
+   (changed after `v2026.09.26`). The first real macOS run is what moves the `macos-arm64` column of
+   the grand list off `untested`.
 5. Run the RAM-fit matrix and the embedder and reranker comparisons listed as open items in
    [`foundation-alignment.json`](../evidence/artifacts/host-upgrade-20260924/foundation-alignment.json),
    as scratch processes, and hand the numbers to the foundation-lane owner.

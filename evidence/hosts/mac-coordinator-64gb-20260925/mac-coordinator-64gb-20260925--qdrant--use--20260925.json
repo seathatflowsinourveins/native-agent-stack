@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "mac-coordinator-64gb-20260925--qdrant--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "mac-coordinator-64gb-20260925",
+    "platform_id": "macos-arm64",
+    "os": "macos",
+    "architecture": "arm64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "mac-coordinator-64gb-20260925"
+  },
+  "catalog_revision": "720e294b5c10211d8f75a939bc478af734279d74",
+  "recorded_by": {
+    "identity_sha256": "03a62a68a9785fc83dda29f85fab2c687befe8433887f4e705d2443dde35f354",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "qdrant",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "echo \"macOS $(sw_vers -productVersion) ($(sw_vers -buildVersion)) $(uname -m)\" && curl -fsS http://127.0.0.1:6333/ && echo && p=$(command -v qdrant) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && launchctl list | awk '$3==\"local.agent-ecosystem.qdrant\"{print \"launchd\", $3, \"pid\", ($1==\"-\"?\"none\":\"present\"), \"last exit\", $2}' && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}),'macos pin file',[t['version'] for t in json.load(open('adoption/pins-macos-arm64.json'))['tools'] if t['id']==c])\" qdrant",
+      "exit": 0,
+      "duration_s": 0.13,
+      "output_sha256": "ed648481df02cc320d2cd19615f9d9aed803c2a7e5df6e3bd7269aef3ff660d8",
+      "output_excerpt": "macOS 27.0 (26A428) arm64\n{\"title\":\"qdrant - vector search engine\",\"version\":\"1.19.1\",\"commit\":\"6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de\"}\nresolves: ~/.local/bin/qdrant -> ~/.local/share/agent-ecosystem/qdrant/v1.19.1/qdrant\nlaunchd local.agent-ecosystem.qdrant pid present last exit 0\nstack ['1.19.1'] winner pins ['1.19.1'] macos pin file ['1.19.1']\n"
+    },
+    {
+      "cmd": "python3 - <<'PY'\nimport json, time, urllib.request as u\ndef call(m, url, body=None):\n    r = u.Request(url, method=m, data=None if body is None else json.dumps(body).encode(), headers={'Content-Type': 'application/json'})\n    try:\n        return json.load(u.urlopen(r, timeout=120))\n    except u.HTTPError as e:\n        return {'http_error': e.code}\nQ = 'http://127.0.0.1:6333'\ndocs = ['restic restore latest --target DIR restores the newest backup snapshot into DIR',\n        'Prometheus scrapes metrics from HTTP targets at a fixed interval',\n        'Loki indexes log streams by label and stores chunks on the filesystem']\nq = 'Instruct: Given a question, retrieve the passage that answers it\\nQuery: how do I recover files from my latest backup?'\ne = call('POST', 'http://127.0.0.1:11434/api/embed', {'model': 'qwen3-embedding:4b', 'input': [q] + docs})\nv = e['embeddings']\nn0 = len(call('GET', Q + '/collections')['result']['collections'])\nname = 'nas_receipt_probe_%d' % int(time.time())\nc = call('PUT', Q + '/collections/' + name, {'vectors': {'size': len(v[0]), 'distance': 'Cosine'}})\np = call('PUT', Q + '/collections/' + name + '/points?wait=true', {'points': [{'id': i + 1, 'vector': v[i + 1], 'payload': {'doc': i}} for i in range(len(docs))]})\ns = call('POST', Q + '/collections/' + name + '/points/search', {'vector': v[0], 'limit': 3, 'with_payload': True})\nhits = [(h['payload']['doc'], round(h['score'], 4)) for h in s.get('result', [])]\nd = call('DELETE', Q + '/collections/' + name)\ng = call('GET', Q + '/collections/' + name)\nn1 = len(call('GET', Q + '/collections')['result']['collections'])\nprint('embedder', e.get('model'), 'dims', len(v[0]), '| create', c.get('result'), '| upsert', p.get('result', {}).get('status'), '| hits (doc, score)', hits, '| delete', d.get('result'), '| get after delete http', g.get('http_error'), '| collections before/after', n0, n1)\nok = c.get('result') is True and p.get('result', {}).get('status') == 'completed' and hits and hits[0][0] == 0 and d.get('result') is True and g.get('http_error') == 404 and n0 == n1\nraise SystemExit(0 if ok else 1)\nPY",
+      "exit": 0,
+      "duration_s": 2.644,
+      "output_sha256": "d8d14f3cddcdebcdb1696e7becc39d7d16c7f519ad1ccb7f16fdab7ddc7f49ba",
+      "output_excerpt": "embedder qwen3-embedding:4b dims 2560 | create True | upsert completed | hits (doc, score) [(0, 0.815), (1, 0.4788), (2, 0.3597)] | delete True | get after delete http 404 | collections before/after 5 5\n"
+    }
+  ],
+  "tool_versions": {
+    "qdrant": "1.19.1"
+  },
+  "observed_at_utc": "2026-09-25T14:17:20Z",
+  "result": "pass",
+  "claim": "On host mac-coordinator-64gb-20260925 (macOS arm64, Apple M5 Pro, 18 cores, 64 GB unified memory; macOS version in the first command's output), the running Qdrant server (GET / reports version 1.19.1, commit 6ab21ca, the catalog pin; launchd agent local.agent-ecosystem.qdrant running) stored and searched real embeddings. The second command embedded a query and three passages with this host's Ollama (qwen3-embedding:4b, 2560 dimensions), created a temporary cosine collection, upserted the passages, searched with the query vector and got the backup passage first, then deleted the collection, confirmed that GET on it returns 404 and that the number of existing collections was unchanged. That command exits 0 only when all of these hold. All commands exit 0.",
+  "limitations": [
+    "Recorded from a Claude Code 2.1.280 session, outside the Seatbelt sandbox, in a fresh clone of origin/main at 720e294b (the catalog_revision), not in a pinned install checkout. The tools are this host's existing installs under ~/.local/share/agent-ecosystem and mise, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured profile (evidence/artifacts/hw-profiles/mac-coordinator-64gb-20260925/profile.json: Apple M5 Pro, 18 cores, 64 GB unified memory) differs from the catalog's WSL authoring laptop and from the earlier 24 GB Mac (macos-m5pro-20260924). The receipt carries only the recorder's self review; accepted needs an independent review from a separate session.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status.",
+    "A three-point temporary collection, removed in the same command; existing collections were counted but neither listed nor read. Payload indexes, filtering, snapshots, restart persistence, recovery and load were not exercised.",
+    "The service was already running under its launchd agent; this receipt did not start, stop or reconfigure it. Ollama 0.34.4, the embedder, is not a catalog component and has no receipt of its own."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:17:20Z",
+      "reviewer": {
+        "identity_sha256": "03a62a68a9785fc83dda29f85fab2c687befe8433887f4e705d2443dde35f354",
+        "model": "claude-opus-5-5"
+      }
+    }
+  ]
+}

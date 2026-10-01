@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lockedinlabs-ai-agent-console",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/LockedinLabs-AI/agent-console",
+ "reviewed_commit": "d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "token-efficiency"
+ ],
+ "claim": "Source and documentation review of LockedinLabs-AI/agent-console at commit d14755421d4a8b183d43ca227bcf8e2e871b3b27 (license MIT), read from README.md at that commit. Repository description: \"Local-first observability for AI coding agents. Every Claude Code and Codex session's tokens, cache, models and cost, on this machine and every machine you connect through a self-hosted team hub. Presenting mode, policy hooks, Apple-signed and notarized macOS builds, attested releases. MIT.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 690,
+  "pushed_at": "2026-09-28T18:56:04Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+   "text": "*Captured from `--demo`. Every figure in it is generated and stamped DEMO. [The same screen in the light theme.](docs/console-demo-light.png)*"
+  },
+  {
+   "source": "README.md@d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+   "text": "[Get started](#install) · [Documentation](docs/README.md) · [Architecture](docs/ARCHITECTURE.md) · [Security](SECURITY.md) · [Contribute](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)"
+  },
+  {
+   "source": "README.md@d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+   "text": "**Installing with Claude Code or Codex?** Give it this repository's URL and ask it to follow [INSTALL.md](INSTALL.md). The same guide works if you prefer to install it yourself: choose the current source, an npm archive, or a standalone download, then verify the version and open the console."
+  }
+ ]
+}

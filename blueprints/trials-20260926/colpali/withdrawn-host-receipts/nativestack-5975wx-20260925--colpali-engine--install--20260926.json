@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--colpali-engine--install--20260926",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "c09dd6dfc68d2e17ed79aca436f6beaa6927a78d",
+  "recorded_by": {
+    "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+    "model": "claude-sonnet-5"
+  },
+  "component_id": "colpali-engine",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "/tmp/nas-colpali-trial/.venv-combined/bin/python -c \"\nimport importlib.metadata as m\nfrom colpali_engine.models import ColQwen2_5, ColPali\nprint('colpali_engine_version=' + m.version('colpali-engine'))\nprint('POSITIVE_ASSERTION_PASS: real classes ColQwen2_5 and ColPali import successfully')\ntry:\n    from colpali_engine.models import ThisClassDoesNotExistXYZ\n    print('UNEXPECTED_IMPORT_SUCCESS')\nexcept ImportError:\n    print('NEGATIVE_CONTROL_PASS: nonexistent class import correctly fails')\n\"",
+      "exit": 0,
+      "duration_s": 5.896,
+      "output_sha256": "ab21cc2e42b4da681896510945c0a239deb430333e0735a3d28da511a7a9d952",
+      "output_excerpt": "colpali_engine_version=0.3.13\nPOSITIVE_ASSERTION_PASS: real classes ColQwen2_5 and ColPali import successfully\nNEGATIVE_CONTROL_PASS: nonexistent class import correctly fails\n"
+    }
+  ],
+  "tool_versions": {
+    "colpali-engine": "0.3.13"
+  },
+  "observed_at_utc": "2026-09-26T03:03:42Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (linux-wsl2-x86_64), colpali-engine 0.3.13 (installed via vidore-benchmark[colpali-engine]==5.0.0's own documented extras, inside vidore-benchmark's declared colpali-engine<0.4.0,>=0.3.8 range) imports its real ColPali and ColQwen2_5 model classes; a fabricated nonexistent class name correctly fails to import. Command dry-run under /bin/sh from the worktree root, exit 0.",
+  "limitations": [
+    "Import-only: shows the package resolves and its documented classes exist, not that a model runs end to end -- see the paired 'use' receipt for that.",
+    "colpali-engine's own PyPI-latest (0.3.18) could not be installed alongside vidore-benchmark 5.0.0 at all; 0.3.13 is the newest version uv's resolver could pick when installing the two together via vidore-benchmark's own extras."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-26T03:03:42Z",
+      "reviewer": {
+        "identity_sha256": "106d189e37a1c4340e9643009316f671785babfcd746083645867dd71dc840cc",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ]
+}

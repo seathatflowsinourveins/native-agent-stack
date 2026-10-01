@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "record": "osv-oauthlib-pyjwt-reachability-20260929",
+  "purpose": "Non-reachability review behind the 2026-09-29 [[IgnoredVulns]] entries in .github/osv-scanner.toml for GHSA-hj66-6f7g-4r5v, GHSA-xpv3-w29h-x7cv and GHSA-w6j9-cwv2-h6wq, and behind the IGNORE_ALLOWED_LOCKS entries in tests/test_osv_lockfile_coverage.py that bind them to the two lock digests below. Published on 2026-09-29, the three advisories failed the required osv-scanner check: every pull_request run of security-scan.yml after publication failed with the five findings recorded below (osv_scanner.ci_pull_request_runs).",
+  "checked_commit": "ed293987f3eab7e065581f74824c588d16fb8fbe",
+  "observed_utc": "2026-09-29T19:11:30Z",
+  "evidence_class": "Local runs of the security-scan.yml OSV-Scanner command on this host, not CI runs; the CI failures are read from GitHub Actions run logs (gh run view --log-failed). The rest is a static text search of package artifacts whose sha256 each lock lists: it shows which installed code references the vulnerable APIs, not a runtime trace of what a process executed.",
+  "limitations": [
+    "Static text search of .py files: a name assembled at run time (getattr, importlib with a computed string) would not match.",
+    "Code the OpenHands agent itself writes and runs inside its container is out of scope: the recipe venv is first on that container's PATH, and such code can call any installed API.",
+    "The Lumibot lock hashes a locally built ibapi 9.81.1.post1 wheel that PyPI does not serve; the PyPI sdist of the same version was searched instead, and its digest is PyPI's, not the lock's.",
+    "Direct users came from each pinned release's requires_dist on PyPI's JSON API; the full-lock sweep also covers packages that import oauthlib or jwt without declaring it.",
+    "The OSV database is the live API at scan time."
+  ],
+  "advisories": [
+    {
+      "id": "GHSA-hj66-6f7g-4r5v",
+      "aliases": ["CVE-2026-49264"],
+      "package": "oauthlib",
+      "severity": "medium",
+      "cwe": "CWE-79",
+      "affected": ">= 0.6.1, <= 3.3.1",
+      "fixed": "4.0.0",
+      "published": "2026-09-29T17:53:41Z",
+      "summary": "Unsafe JSONP callback injection in RevocationEndpoint allows arbitrary JavaScript response generation",
+      "vulnerable_code": "oauthlib 3.3.1 oauthlib/oauth2/rfc6749/endpoints/revocation.py:31 and 36 (enable_jsonp=False by default), 72-73 and 81-82 (the response body is wrapped in request.callback when enable_jsonp is set). The pre-configured servers in oauthlib/oauth2/rfc6749/endpoints/pre_configured.py:92, 145, 188, 239 and 282 and oauthlib/openid/connect/core/endpoints/pre_configured.py:137 call RevocationEndpoint.__init__ without enable_jsonp.",
+      "sources": ["https://github.com/advisories/GHSA-hj66-6f7g-4r5v", "https://osv.dev/vulnerability/GHSA-hj66-6f7g-4r5v"]
+    },
+    {
+      "id": "GHSA-xpv3-w29h-x7cv",
+      "aliases": ["CVE-2026-49265"],
+      "package": "oauthlib",
+      "severity": "medium",
+      "cwe": "CWE-208",
+      "affected": ">= 3.0.0, < 4.0.0",
+      "fixed": "4.0.0",
+      "published": "2026-09-29T17:56:31Z",
+      "summary": "Timing attack in the PKCE code_verifier comparison",
+      "vulnerable_code": "oauthlib 3.3.1 oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:18 (code_challenge_method_s256) and 52 (code_challenge_method_plain), comparing with == at lines 49 and 61; mapped at 156-157 and dispatched by validate_code_challenge (544-546), which AuthorizationCodeGrant.validate_token_request (434) calls at line 506 when a token endpoint handles a request (create_token_response, 283).",
+      "sources": ["https://github.com/advisories/GHSA-xpv3-w29h-x7cv", "https://osv.dev/vulnerability/GHSA-xpv3-w29h-x7cv"]
+    },
+    {
+      "id": "GHSA-w6j9-cwv2-h6wq",
+      "aliases": ["CVE-2026-102274"],
+      "package": "PyJWT",
+      "severity": "medium",
+      "cwe": "CWE-755",
+      "affected": ">= 2.9.0, <= 2.13.0",
+      "fixed": "2.14.0",
+      "published": "2026-09-29T18:23:01Z",
+      "summary": "Malformed RSA JWK aborts parsing of an entire JWK Set",
+      "vulnerable_code": "PyJWT 2.13.0 jwt/api_jwk.py:19 (PyJWK) and 135 (PyJWKSet, constructed at 162 and 167); jwt/jwks_client.py:17 (PyJWKClient), 137 (get_jwk_set) and 158 (PyJWKSet.from_dict of the fetched JWKS).",
+      "sources": ["https://github.com/advisories/GHSA-w6j9-cwv2-h6wq", "https://osv.dev/vulnerability/GHSA-w6j9-cwv2-h6wq"]
+    }
+  ],
+  "osv_scanner": {
+    "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6)",
+    "binary": "osv-scanner_linux_amd64 of release v2.6.0, sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, checked with sha256sum --check against the value pinned in .github/workflows/security-scan.yml; kept outside every checkout",
+    "command": "the run block of the workflow's scan step (security-scan.yml lines 64-86), extracted verbatim and run from the checkout root with bash --noprofile --norc -eo pipefail (the shell: bash wrapper) and WRITE_SARIF=false, as on pull_request: osv-scanner scan source --config .github/osv-scanner.toml --no-resolve over the 49 lockfiles of .github/osv-scanner-lockfiles.json",
+    "ci_pull_request_runs": {
+      "read_utc": "2026-09-29T19:22:16Z",
+      "source": "gh run list --workflow security-scan.yml --event pull_request (the 12 most recent runs) and gh run view --log-failed for each failure",
+      "failed_after_publication": [
+        {"run_id": 36613233591, "created": "2026-09-29T18:36:16Z", "head": "22217f99"},
+        {"run_id": 36617653508, "created": "2026-09-29T19:13:03Z", "head": "3d4a9510"},
+        {"run_id": 36618373159, "created": "2026-09-29T19:19:05Z", "head": "fe9f511b"}
+      ],
+      "each_log": "the five findings of the base run below and 'Total 3 packages affected by 5 known vulnerabilities (0 Critical, 0 High, 5 Medium, 0 Low, 0 Unknown) from 1 ecosystem.'",
+      "last_success_before": {"run_id": 36598063447, "created": "2026-09-29T16:29:14Z", "note": "before the first advisory was published at 17:53:41Z"}
+    },
+    "runs": [
+      {
+        "config": ".github/osv-scanner.toml at the checked commit",
+        "exit_code": 1,
+        "summary": "Total 3 packages affected by 5 known vulnerabilities (0 Critical, 0 High, 5 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+        "filtered": "Filtered 3 vulnerabilities from output",
+        "findings": [
+          {"id": "GHSA-hj66-6f7g-4r5v", "cvss": 6.1, "package": "oauthlib", "version": "3.3.1", "fixed": "4.0.0", "lock": "blueprints/runtime-workers/openhands/requirements.lock"},
+          {"id": "GHSA-xpv3-w29h-x7cv", "cvss": 6.8, "package": "oauthlib", "version": "3.3.1", "fixed": "4.0.0", "lock": "blueprints/runtime-workers/openhands/requirements.lock"},
+          {"id": "GHSA-w6j9-cwv2-h6wq", "cvss": 5.9, "package": "pyjwt", "version": "2.13.0", "fixed": "2.14.0", "lock": "blueprints/runtime-workers/openhands/requirements.lock"},
+          {"id": "GHSA-hj66-6f7g-4r5v", "cvss": 6.1, "package": "oauthlib", "version": "3.3.1", "fixed": "4.0.0", "lock": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock"},
+          {"id": "GHSA-xpv3-w29h-x7cv", "cvss": 6.8, "package": "oauthlib", "version": "3.3.1", "fixed": "4.0.0", "lock": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock"}
+        ]
+      },
+      {
+        "config": "the checked commit plus this change's three [[IgnoredVulns]] entries",
+        "exit_code": 0,
+        "summary": "No issues found",
+        "filtered": "Filtered 8 vulnerabilities from output (five more than the base run, one per finding above)"
+      }
+    ],
+    "not_flagged": "Two more tracked files pin oauthlib 3.3.1 but are not scanned lockfiles and match no inventory pattern: blueprints/memory-stack/longmemeval/v4/requirements/mempalace.lock.txt.frozen and evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix3/venv-prefect-3.8.6-freeze.txt. In requirement-format lines of tracked files (git grep), every other pyjwt pin is 2.14.0 or 2.15.0."
+  },
+  "locks": [
+    {
+      "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+      "status": "Live recipe lock owned by another session; not relocked here. It builds the recipe venv, which serializes the request, runs mcp_guard.py and comes first on the server container's PATH; the server process is the agent-server image's PyInstaller binary (README.md lines 58-69).",
+      "affected_pins": {"oauthlib": "3.3.1", "pyjwt": "2.13.0"},
+      "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv", "GHSA-w6j9-cwv2-h6wq"],
+      "direct_users": {
+        "oauthlib": "requests-oauthlib 2.0.0 (oauthlib>=3.0.0), required by google-auth-oauthlib 1.2.2, required by browser-use 0.11.9",
+        "pyjwt": "mcp 1.28.1 (pyjwt[crypto]>=2.10.1); only under extras: fastmcp 3.2.0 [azure], google-auth 2.53.0 [pyjwt, testing], litellm 1.93.0 [proxy], oauthlib 3.3.1 [signedtoken], redis 7.2.1 [jwt]"
+      },
+      "downloaded": "pip download --no-deps of the openhands package pair and every direct user above; each artifact's sha256 is one the lock lists: openhands-sdk 1.49.6 3b4701f125925e804929ab02b61fe2fe10b4fb1e7d723a2c4afdea35566328bb, openhands-tools 1.49.6 11e57a6635fd93c9f1fed14f804ab6f24a4873f75a2d35f0d1c3e57df2c51c87, oauthlib 3.3.1 88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1, requests-oauthlib 2.0.0 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36, google-auth-oauthlib 1.2.2 fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2, browser-use 0.11.9 a66accf4dded24d056eb2733e354e159fd7d82cab986d75dc0f14b395467c82c, pyjwt 2.13.0 66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728, mcp 1.28.1 2726bca5e7193f61c5dde8b12500a6de2d9acf6d1a1c0be9e8c2e706437991df, fastmcp 3.2.0 e71aba3df16f86f546a4a9e513261d3233bcc92bef0dfa647bac3fa33623f681, google-auth 2.53.0 6e7449917c599b35126a99ec268ec6880301f2fea41dce198fe8fd83ff642b68, litellm 1.93.0 (cp313 manylinux x86_64) 98c15e84d32e922a821c105308bf9ddae8700de9ed396530bee2cbb1cacf4cbb, redis 7.2.1 49e231fbc8df2001436ae5252b3f0f3dc930430239bfeb6da4c7ee92b16e5d33",
+      "targeted_search": {
+        "openhands-sdk 1.49.6": "295 .py files. RevocationEndpoint, enable_jsonp, oauthlib servers, grants, PKCE comparison functions, oauthlib imports, PyJWKSet, PyJWK, PyJWKClient, from_jwk and jwt imports: 0 each. code_verifier: 6, all in openhands/sdk/llm/auth/openai.py (267, 278, 561, 607, 719, 726), its client login to OpenAI, which generates the challenge with authlib.oauth2.rfc7636.create_s256_code_challenge (line 26) and sends the verifier to the token endpoint.",
+        "openhands-tools 1.49.6": "93 .py files, 0 hits on every pattern. It imports only browser_use.browser.session, browser_use.mcp.server and browser_use.dom.markdown_extractor from browser-use.",
+        "requests-oauthlib 2.0.0": "15 .py files. 14 oauthlib import lines, naming only oauthlib.common helpers, the oauth1 Client and signature constants, and the oauth2 WebApplicationClient, LegacyApplicationClient, TokenExpiredError, InsecureTransportError and is_secure_transport. code_verifier: 2 (requests_oauthlib/oauth2_session.py:188 and 287), creating a client verifier and sending it.",
+        "google-auth-oauthlib 1.2.2": "6 .py files. No oauthlib import (it uses requests-oauthlib). code_verifier: 10 in google_auth_oauthlib/flow.py, the client installed-app flow.",
+        "browser-use 0.11.9": "169 .py files, 0 hits on every pattern. Its only google_auth_oauthlib use is browser_use/integrations/gmail/service.py:16 (InstalledAppFlow, a client flow), and no browser_use module outside integrations/ imports the integration.",
+        "mcp 1.28.1": "110 .py files. One jwt import (mcp/client/auth/extensions/client_credentials.py:17), used only for jwt.encode of client assertions (lines 189 and 382); no PyJWKSet, PyJWK or PyJWKClient. code_verifier: 14, in its client (mcp/client/auth/oauth2.py) and its own server token handler (mcp/server/auth/handlers/token.py), neither of which imports oauthlib.",
+        "fastmcp 3.2.0": "250 .py files. No oauthlib import and no PyJWT JWK API. code_verifier: 7, in fastmcp's own OAuth proxy (fastmcp/server/auth/oauth_proxy/proxy.py).",
+        "google-auth 2.53.0": "78 .py files. google/oauth2/id_token.py:139 imports jwt, and 144-145 build PyJWKClient(certs_url) and call get_signing_key_from_jwt, inside verify_token (line 110) when the certs URL returns a JWK Set. No other artifact of the lock calls verify_token, verify_oauth2_token or verify_firebase_token (0 of the other 335).",
+        "litellm 1.93.0": "2104 .py files. PyJWKSet: 3 (litellm/proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py:419, 420, 423); PyJWK: 2 (litellm/proxy/auth/handle_jwt.py:22 and 941); all 17 jwt import lines are under litellm/proxy/. litellm/__init__.py:1324 imports proxy.proxy_cli.run_server, whose module-level imports are the standard library, click, httpx, dotenv, litellm, litellm.constants and litellm.secret_managers.main; proxy_server is imported only inside functions (proxy_cli.py:895 and 903). The one reference outside litellm/proxy/, litellm/types/guardrails.py:119, is the string 'mcp_jwt_signer'.",
+        "redis 7.2.1": "111 .py files. One jwt import (redis/auth/token.py:83), used for jwt.decode of a token (line 89); no JWK Set parsing.",
+        "recipe code": "blueprints/runtime-workers/openhands, 12 .py files: 0 hits on every oauthlib and PyJWT pattern. litellm appears only in comments (recipe.py:84 and 135, worker.py:40); the recipe starts no LiteLLM proxy, and its model route is the gateway container."
+      },
+      "full_lock_sweep": {
+        "method": "For every requirement block, the artifact whose sha256 the lock lists (a pure wheel first, then a cp313 linux x86_64 wheel), downloaded from its PyPI JSON URL and sha256-checked, then every .py member searched; oauthlib and PyJWT themselves are excluded as definitions.",
+        "requirements": 336,
+        "artifacts_scanned": 336,
+        "py_files": 14479,
+        "hits": {
+          "enable_jsonp": 0,
+          "create_revocation_response": 0,
+          "oauthlib pre-configured servers (WebApplicationServer and the like, oauthlib.oauth2.Server)": 0,
+          "oauthlib server modules (oauthlib.oauth2.rfc6749.endpoints, .grant_types, oauthlib.openid)": 0,
+          "code_challenge_method_plain or code_challenge_method_s256": 0,
+          "RevocationEndpoint": "16, all Authlib 1.6.12's own class (authlib/integrations/django_oauth2, authlib/oauth2/rfc7009)",
+          "AuthorizationCodeGrant": "14, all Authlib 1.6.12",
+          "validate_code_challenge": "2, Authlib 1.6.12 authlib/oauth2/rfc7636/challenge.py:62 and 69",
+          "oauthlib import": "14, all requests-oauthlib 2.0.0 (Authlib does not import oauthlib)",
+          "PyJWKSet": "3, litellm 1.93.0 under litellm/proxy/",
+          "PyJWKClient": "1, google-auth 2.53.0 google/oauth2/id_token.py:144",
+          "PyJWK": "2, litellm 1.93.0 litellm/proxy/auth/handle_jwt.py",
+          "jwt import": "20: google-auth 1, litellm 17 (all under litellm/proxy/), mcp 1, redis 1"
+        }
+      },
+      "verdict": "Not reachable from installed code. Nothing constructs an oauthlib RevocationEndpoint with enable_jsonp or runs an oauthlib authorization server, so neither oauthlib function the advisories name is called. PyJWT's JWK Set parsing is referenced only by LiteLLM proxy-server features and by google-auth ID-token verification, neither of which the recipe runs or any installed package calls."
+    },
+    {
+      "lock": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+      "status": "Frozen record of the evaluation-only Lumibot 4.6.1 environment of the SPY one_zero engine trial, run offline under bwrap; never relocked, because a relock would change the recorded environment.",
+      "affected_pins": {"oauthlib": "3.3.1"},
+      "unaffected_pins": {"pyjwt": "2.15.0 (fixed in 2.14.0), so GHSA-w6j9-cwv2-h6wq does not apply to this lock"},
+      "advisories": ["GHSA-8mgp-746c-j5xp", "GHSA-h35f-9h28-mq5c", "GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
+      "carried_forward": "GHSA-8mgp-746c-j5xp (nltk 3.10.3) and GHSA-h35f-9h28-mq5c (setuptools 80.10.2) keep the 2026-09-26 review in blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json, which covers this same lock sha256. This record adds the two oauthlib advisories and becomes the lock's evidence path in IGNORE_ALLOWED_LOCKS.",
+      "direct_users": {
+        "oauthlib": "requests-oauthlib 2.0.0 (oauthlib>=3.0.0), required by lumibot 4.6.1, kubernetes 36.0.3 and google-auth-oauthlib 1.4.1 (required by toolbox-adk 1.4.0)"
+      },
+      "downloaded": "pip download --no-deps, each sha256 one the lock lists: lumibot 4.6.1 d06b8feb32c8a23026628e9030b9f166a25f4ab3af510d241aaa915516554159, oauthlib 3.3.1 88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1, requests-oauthlib 2.0.0 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36, google-auth-oauthlib 1.4.1 a1be43ec69fe563ac9b2c4d6fc4334b323b21cbdc59a638b5fa34dd4d5a2a348, kubernetes 36.0.3 8fde9241c4b298e6374a069dcf728359b4e72c2fb29489a975ba4e1c047cf10f, toolbox-adk 1.4.0 23a21862c6d83bc2bd84cff7f386b1875490b98f418c23382725ed75f8bdf4f2",
+      "targeted_search": {
+        "lumibot 4.6.1": "227 .py files, 0 hits on every oauthlib pattern. Its one requests_oauthlib use is lumibot/brokers/schwab.py:638 (OAuth2Session, the Schwab broker's client token refresh); no trial file references Schwab or a Lumibot broker.",
+        "requests-oauthlib 2.0.0": "same artifact and result as in the OpenHands lock: client classes, token errors and helpers only.",
+        "google-auth-oauthlib 1.4.1": "6 .py files, no oauthlib import; code_verifier: 11 in google_auth_oauthlib/flow.py, the client installed-app flow.",
+        "kubernetes 36.0.3": "1736 .py files. kubernetes/config/kube_config.py:27 imports oauthlib.oauth2 only for oauthlib.oauth2.rfc6749.errors.InvalidClientIdError (line 434) around a client OIDC token refresh through OAuth2Session (lines 30 and 416).",
+        "toolbox-adk 1.4.0": "6 .py files, 0 hits; its code does not import google_auth_oauthlib.",
+        "trial code": "blueprints/us-equities/engine-trials/spy-one-zero-20260926, 7 .py files: 0 hits on every oauthlib and PyJWT pattern."
+      },
+      "full_lock_sweep": {
+        "method": "as for the OpenHands lock",
+        "requirements": 264,
+        "artifacts_scanned": 263,
+        "not_on_pypi": "ibapi 9.81.1.post1: the lock lists only the sha256 of the locally built wheel (664a4d01e9b47da023fde90630aa312d42b88f2f5f31c1adfd5d32f17debdcaf). Its PyPI sdist ibapi-9.81.1.post1.tar.gz (sha256 49f6678bf4cced996920f32ad4b48e6897749ac30ba14a661082285f4ec09cd6, equal to PyPI's digest) has 28 .py files, no declared dependencies and 0 oauthlib, PyJWT or PKCE hits.",
+        "py_files": 24527,
+        "hits": {
+          "enable_jsonp": 0,
+          "create_revocation_response": 0,
+          "oauthlib pre-configured servers": 0,
+          "oauthlib server modules": 0,
+          "code_challenge_method_plain or code_challenge_method_s256": 0,
+          "RevocationEndpoint": "16, all Authlib 1.8.0's own class",
+          "AuthorizationCodeGrant": "13, all Authlib 1.8.0",
+          "validate_code_challenge": "2, Authlib 1.8.0 authlib/oauth2/rfc7636/challenge.py:62 and 69",
+          "oauthlib import": "15: requests-oauthlib 2.0.0 14, kubernetes 36.0.3 1"
+        }
+      },
+      "verdict": "Not reachable: nothing in the environment constructs an oauthlib RevocationEndpoint with enable_jsonp or runs an oauthlib authorization server, and the trial ran offline under bwrap."
+    }
+  ],
+  "failed_attempts": [
+    "The first base-commit scan extracted the workflow step with PyYAML, which the host python3 lacks (ModuleNotFoundError); the following bash call exited 1 because the extracted script did not exist. That exit is not a scan result. A plain block-scalar extractor (workflow lines 64-86) produced the base run recorded above.",
+    "pip download of the ibapi sdist failed: pip prepares sdist metadata and could not import setuptools.build_meta under --no-build-isolation. The sdist was fetched from its PyPI JSON URL instead and checked against PyPI's sha256."
+  ],
+  "registrations": [
+    ".github/osv-scanner.toml: [[IgnoredVulns]] for the three advisories, ignoreUntil 2026-10-13.",
+    "tests/test_osv_lockfile_coverage.py: IGNORE_SCOPES entries (oauthlib fixed 4.0.0 for both oauthlib advisories, pyjwt fixed 2.14.0); an IGNORE_ALLOWED_LOCKS entry for the OpenHands lock; the Lumibot entry lists the two oauthlib advisories and names this record as its evidence.",
+    "docs/decisions/2026-09-22-github-automation-closure.md: each entry with this evidence.",
+    "manifests/evidence.json: sha256 and byte counts of the changed files and of this record."
+  ],
+  "expiry_plan": "The owner of the OpenHands recipe relocks onto oauthlib 4.0.0 and PyJWT 2.14.0 and, in the same change, deletes the OpenHands IGNORE_ALLOWED_LOCKS entry (its sha256 pin fails any change to that lock), the GHSA-w6j9-cwv2-h6wq ignore and its IGNORE_SCOPES entry. The Lumibot lock stays on oauthlib 3.3.1, so on 2026-10-13 the scan and test_allowed_advisories_are_scoped_active_ignores fail again by design: then renew the two oauthlib ignores for that lock alone with a new dated reason, or delete that lock."
+}

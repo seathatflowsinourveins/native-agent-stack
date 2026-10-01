@@ -6,6 +6,8 @@ The 2026-09-22 wave was produced by two ad hoc, host-path-hardcoded scripts;
 these four steps replace them with arguments, resumability and a checked-in
 default reconciliation file. No step here calls a model.
 
+The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its own harness in [`landscape-sweep/`](landscape-sweep/README.md).
+
 ## The five steps
 
 1. **`extract_layers.py`** -- deterministic, no-network. Reads
@@ -16,7 +18,14 @@ default reconciliation file. No step here calls a model.
    `trading-catalog.json`, `trading-by-layer.json` (consolidated onto the
    12-layer taxonomy copied live from
    `catalogs/sota-convergence/manifest-20260922.json#/taxonomy`),
-   `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json`, `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json` holds the trading upstreams that a blueprint or runtime
+   record pins but that no selected (`default`/`conditional`) us-equities card
+   carries: hftbacktest, nautilus-ibapi and rust-ibapi. Each is declared in
+   `TRADING_PIN_SOURCES` as a JSON pointer into its source record, so the pin
+   is read from that record, not copied. A pointer that no longer resolves, a
+   non-taxonomy layer or an id that collides with a card id raises instead of
+   dropping the component.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -24,7 +33,8 @@ default reconciliation file. No step here calls a model.
 
 2. **`github_freshness.py`** -- a real network step (authenticated `gh api`
    calls; `gh auth status` must already pass). Reads the repository URLs out
-   of the three working files above and writes `github-freshness.json` with
+   of the working files above (`foundation-layers.json`, `trading-catalog.json`,
+   `trading-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository, plus every alias URL seen for that
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
@@ -87,6 +97,17 @@ default reconciliation file. No step here calls a model.
    `{"general": []}` when the flag is not given. Refuses to write if a host
    path, a bare session UUID, or a known secret-prefix marker survives
    sanitization.
+   `--trading-freshness-out PATH` also writes a report-only
+   `trading-freshness.json` (schema `trading-freshness/1`), separate from the
+   manifest. It has one row per pinned trading component: each selected card
+   (with every taxonomy layer it sits in) plus each `trading-pins.json` entry
+   (`--trading-pins`, default `<work-dir>/trading-pins.json`). Rows use the
+   manifest's own `compute_upstream`/`classify_pin` fields and add a
+   `dormancy` block from `compute_dormancy`. An upstream is dormant when its
+   newest GitHub release and default-branch head commit are both at least 180
+   days before `--checked-at`. `pushed_at` stands in only when the commit date
+   is unknown. `dormant` is `null`, never `false`, when the run has no data
+   for the repository. The manifest's key layout and rows are unchanged.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \
@@ -707,6 +728,13 @@ lane. With the flag:
   of its entries is left out, even where another list repeats it. The refutation is of the discovery
   proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
   catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
+  A refutation no returned vote made does not count (2026-09-28): when `catalogs/saturation/ledger.json`
+  has a completed sweep whose `manifest_sha256` is this manifest's, a row of that sweep's lane whose ledger
+  entry in that layer `scripts/saturation_ledger.py` `refuted_by_absence` reads as refuted only because a vote
+  did not return (`{missing: true}` in the retained returns) is carried as a newcomer, unless another of its
+  entries in the layer is refuted on merit. The returns are trusted as `saturation_ledger.py --check` binds them. On the 2026-09-26 manifest 27
+  rows are refuted only by absence: 23 are now carried as newcomers in 9 foundation packets, and the other 4
+  are already ledger candidates.
 - **Registered evidence is attached.** A newcomer's `evidence_refs` hold the repository-relative
   `evidence/` path each `evidence[]` entry leads with, when that path is listed in `manifests/evidence.json`
   `files[]` and still has its listed sha256. A locator after the path (`items[3]`, `(lines 1-9)`) is dropped.
@@ -1367,7 +1395,7 @@ exits 2, because the checkout has `.git`):
 python3 tools/sota-convergence/blind_checkout.py \
   --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort high
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort max   # max is the default
 python3 tools/sota-convergence/codex_lane.py \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
 python3 tools/sota-convergence/codex_lane.py \
@@ -1413,7 +1441,14 @@ What remains and how it is handled:
   written (kept only as `<name>.json.audit-flagged`), and a resume re-audits a kept return's events, rerunning it
   when they are missing or flagged (round 7, REG7-1). The audit counts web searches and MCP tool calls, and flags
   commands that do any of the following:
-  - name an absolute path outside the repository and the packets directory. Only `/dev/null` and a
+  - name an absolute path outside the repository and the packets directory. A `/` right after `)` or `]`
+    (Python's `Path.cwd()/ref`) starts no path, and neither does a URL's `//` authority (`https://host`,
+    `ssh://`, `qmd://`, `s3://`), though `file://`, `jar:file://` and `https:///` do. A URL reaches nothing from a
+    blind child without the network or a CLI it cannot resolve. Measured
+    2026-09-24 (codex-cli 0.155.1, `--sandbox read-only`), its Python connection to a local listener the caller
+    had just reached, and to 127.0.0.1:6333 (Qdrant's port), failed with `PermissionError: [Errno 1] Operation
+    not permitted`, and the listener accepted nothing. The root rule skips a quoted `'/'` joined with `+` between
+    two non-literal operands (`p+'/'+k`), but not `'/'+'etc/passwd'` or `''+'/'+x`. Only `/dev/null` and a
     command segment's executable token are exempt, and the token only when it is under `/bin/`, `/sbin/`,
     `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/`. The executable token is the first word at the start,
     after `;`, `&&`, `||`, `|` or a newline, or right after `bash -lc '` (or `sh -c "`). A data path under
@@ -1425,7 +1460,32 @@ What remains and how it is handled:
   - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
     `$OLDPWD` or `"$OLDPWD"`;
   - climb out with `..`;
-  - run git, ai-memory, agentsview, mcporter, qmd, socraticode, jcodemunch, serena, sqlite3, curl or wget;
+  - name git, sqlite3, curl or wget anywhere in the command, or any audited CLI by an absolute path outside the
+    repository and packets (`/usr/local/bin/qmd`, which is otherwise an exempt system executable token).
+  - **PATH enforcement.** A blind child's PATH resolves none of ai-memory, agentsview, mcporter, qmd, socraticode,
+    jcodemunch, serena, codex or claude:
+    - `child_env` sets PATH to the system directories (`/usr/bin:/bin:/usr/sbin:/sbin`);
+    - codex runs by the absolute path the caller's PATH resolves, and an npm `#!/usr/bin/env node` launcher runs with
+      the interpreter the caller's PATH resolves;
+    - `blind_path_issue` refuses a blind run (codex_lane and adjudicate codex, exit 2) when any of them resolves on
+      any PATH a child's command can end up with. That is measured each run after a sentinel: the login shell's
+      (Codex runs commands with `bash -lc`; /etc/profile.d adds `/snap/bin` here, and macOS path_helper adds
+      /etc/paths), the default a shell sets when a command drops PATH (`/usr/local/bin` included), and
+      `os.defpath`.
+
+    **New hosts.** A host that installs one of them where a child's PATH reaches it is refused, and the refusal
+    names each directory. For example, Intel Homebrew or npm globals put them in `/usr/local/bin`, which macOS
+    path_helper and a PATH-less shell both add. On a Mac, zsh started with an empty environment takes HOME from
+    passwd and reads the real `~/.zshenv`, so a Homebrew PATH set there counts too. The refusal is correct, since a
+    child's `zsh -c` would get the same PATH, but zsh, fish, ksh and tcsh are untested here. Install the CLIs
+    elsewhere (`~/.local/bin`) to run blind lanes there. A shell-script codex launcher (pnpm's cmd-shim, which runs
+    node by name) is refused up front, and a failed child's last stderr lines go to the console, not the record.
+    A probe that fails is named in the refusal (`PathUnmeasured`), and non-UTF-8 profile output is read leniently
+    (R2-4). The unit suites pin the measured PATH, so they do not depend on the host's (R2-3).
+
+    So their names alone are not flagged in a blind run, since they are also candidates a lane must search for; a
+    non-blind run still flags them. Measured 2026-09-24 with a real blind child: every one of them, and node, npx
+    and uvx, was missing, while python3, git and Codex's bundled rg resolved.
   - in the text a shell expands (a `sh -c` script with its single-quoted spans removed, so a search for a
     literal backtick is not flagged): a command substitution, `${...}` with an operator, `CODEX_HOME` (the bare
     name too), or an inherited directory variable such as `${TMPDIR}` or `$SSL_CERT_DIR`.
@@ -1768,6 +1828,28 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
     `lost` loses any earlier return and is listed as a failure.
   - **Scrubbing.** A URL ends at `;` or `,`, and a path segment glued to a delimiter ("/home/example,private/y") is
     absorbed with its path.
+- **The first 2026-09-24 re-record attempt (wave 20260924 at catalog 149940af), set aside:**
+  - **The Codex lane voided 15 of 32 layers with no read outside the export.** The reasons:
+    - 15 flags named a retrieval CLI that was only a search term or a Python list item (`rg -i 'qmd|...'`,
+      `for t in ['serena', ...]`);
+    - 8 were a quoted `'/'` joining path parts (`p+'/'+k`);
+    - 2 were `Path.cwd()/ref` and `'https://'` read as absolute paths;
+    - 1 was a backtick in a quoted heredoc (REG7-3, kept).
+  - **The fix is enforcement rather than a name heuristic** (the blind audit above). A blind child's PATH resolves
+    no retrieval CLI, which a real child confirmed, and a host where one would resolve is refused. So those names are
+    no longer flagged. The root and path rules skip the Python forms.
+  - **Replayed over that run's 420 commands, 1 of the 32 layers is still flagged** (the backtick). The same replay
+    over the `test_real_reaches_still_flag` cases still flags each.
+  - **The Claude lane was killed 20 minutes in.** `claude -p` ended its background workflow 600 s after its turn
+    ended. The recipe now sets `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`.
+  - **Review of the fix (#206):** Codex and the independent review found gaps, each fixed with a test that fails without it:
+    - an npm `#!/usr/bin/env node` launcher could not start under the child's PATH;
+    - a CLI named by an absolute system path was exempt;
+    - `file:///` passed as a URL;
+    - a `'/'` joined on one side only built `/etc/passwd`;
+    - a command dropping PATH got the shell's default, with `/usr/local/bin`;
+    - profile output could reach the measured PATH.
+  - **Nothing from the attempt is recorded:** codex_lane.py's hash changed, so both lanes rerun on a new wave.
 - **Independent round-11 review of ca89c0d8 (audit normalization, registry and regressions), and its fixes:**
   - **A padded component inside a pattern (NORM11-1, medium).** Glob takes an absolute pattern's base (the text
     before its first `*?[{`, cut at the last `/`) through the same trimming path helper, so `<export>/.. /*` listed

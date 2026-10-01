@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--gitleaks--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "gitleaks",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v gitleaks) && echo \"resolves: $p -> $(readlink \"$p\")\" && d=$(dirname \"$p\") && for f in \"$d/gitleaks-guarded\" adoption/tools/gitleaks-guarded \"$d/ecosystem-bounded-run\" adoption/tools/ecosystem-bounded-run; do echo \"$(sha256sum < \"$f\" | cut -c1-16) $f\"; done",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_sha256": "c3a7a4257a5e75bae74f50649d8d58ab4a6905989eb6230d1ea9b7e58c93b6ea",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/gitleaks -> ~/.local/share/codex-ecosystem/bin/gitleaks-guarded\n7ead675d3a539b96 ~/.local/share/codex-ecosystem/bin/gitleaks-guarded\n7ead675d3a539b96 adoption/tools/gitleaks-guarded\ncde3374b1a6146d8 ~/.local/share/codex-ecosystem/bin/ecosystem-bounded-run\ncde3374b1a6146d8 adoption/tools/ecosystem-bounded-run\n"
+    },
+    {
+      "cmd": "gitleaks version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" gitleaks",
+      "exit": 0,
+      "duration_s": 0.28,
+      "output_sha256": "a732fc02347813122a9726e336e7935ed03273e83d7f5927cca8e96e1c95ee60",
+      "output_excerpt": "8.30.1\nstack ['8.30.1'] winner pins ['8.30.1', 'v8.30.1']\n"
+    },
+    {
+      "cmd": "gitleaks git --no-banner --no-color --redact --log-opts=-1",
+      "exit": 0,
+      "duration_s": 0.469,
+      "output_sha256": "e626dcffd9ef80ac47cea64d3205a25f5ea2fc186e2311d86952fd9406b72fd5",
+      "output_excerpt": "1:37AM INF 1 commits scanned.\n1:37AM INF scanned ~755 bytes (755 bytes) in 150ms\n1:37AM INF no leaks found\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-gitleaks && git init -q -b main /tmp/nsr-gitleaks/repo && cd /tmp/nsr-gitleaks/repo && printf 'gitleaks probe\\n' > README.md && git add README.md && git -c core.hooksPath=/dev/null -c commit.gpgsign=false -c user.name=gitleaks-probe -c user.email=gitleaks-probe@example.invalid commit -q -m 'probe: clean commit' && gitleaks git --no-banner --no-color --redact --log-opts=-1",
+      "exit": 0,
+      "duration_s": 0.509,
+      "output_sha256": "90a6f1387b750552d21b4484353d832954bc553a57d822771951c39f32002f9b",
+      "output_excerpt": "1:37AM INF 1 commits scanned.\n1:37AM INF scanned ~15 bytes (15 bytes) in 124ms\n1:37AM INF no leaks found\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-gitleaks/repo && k=BUNDLE_ENTERPRISE__CONTRIBSYS__COM && v=cafe\"\"babe:dead\"\"beef && printf '%s=%s\\n' \"$k\" \"$v\" > sidekiq.env && git add sidekiq.env && git -c core.hooksPath=/dev/null -c commit.gpgsign=false -c user.name=gitleaks-probe -c user.email=gitleaks-probe@example.invalid commit -q -m 'probe: add the gitleaks sidekiq-secret test fixture' && echo \"throwaway commits: $(git rev-list --count HEAD)\"",
+      "exit": 0,
+      "duration_s": 0.009,
+      "output_sha256": "10f7fe7c1bb88b9451a4ab8ed6df4868dd6131877bcbfec856b44f32ad782f9d",
+      "output_excerpt": "throwaway commits: 2\n"
+    },
+    {
+      "cmd": "cd /tmp/nsr-gitleaks/repo || exit 2; out=$(gitleaks git --no-banner --no-color --redact --verbose --log-opts=-1 2>&1); rc=$?; printf '%s\\n' \"$out\" | grep -E 'Finding:|Secret:|RuleID:|File:|commits scanned|leaks found'; echo \"gitleaks exit=$rc (expected 1: one finding)\"; test \"$rc\" -eq 1 && printf '%s\\n' \"$out\" | grep -Eq 'leaks found: 1([^0-9]|$)' ",
+      "exit": 0,
+      "duration_s": 0.526,
+      "output_sha256": "1e86d085dc9d558a2f5a886a1f5ec85cde356fb7291923437d16d563fc7b5af4",
+      "output_excerpt": "Finding:     BUNDLE_ENTERPRISE__CONTRIBSYS__COM=REDACTED\nSecret:      REDACTED\nRuleID:      sidekiq-secret\nFile:        sidekiq.env\n1:37AM INF 1 commits scanned.\n1:37AM WRN leaks found: 1\ngitleaks exit=1 (expected 1: one finding)\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-gitleaks && test ! -e /tmp/nsr-gitleaks && echo \"throwaway probe directory removed\"",
+      "exit": 0,
+      "duration_s": 0.003,
+      "output_sha256": "1cb6ed90a8a9c13b1532f0441d3bf2acc3495ef6c14a1766644122bba5a2c271",
+      "output_excerpt": "throwaway probe directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "gitleaks": "8.30.1"
+  },
+  "observed_at_utc": "2026-09-25T05:37:51Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), gitleaks 8.30.1 (the catalog pin) ran through this repository's guarded launcher: gitleaks resolves to ~/.local/share/codex-ecosystem/bin/gitleaks-guarded, whose sha256 and that of its ecosystem-bounded-run runner equal the adoption/tools copies (7ead675d..., cde3374b...), and gitleaks version, which execs the native binary, reports 8.30.1. The same redacted one-commit scan, gitleaks git --no-banner --no-color --redact --log-opts=-1, ran three times. Negative controls: the latest commit of this checkout (the catalog_revision, scanned with this repository's .gitleaks.toml) and the clean first commit of a throwaway repository under /tmp each reported no leaks (exit 0). Positive control: after the throwaway repository committed gitleaks' documented sidekiq-secret test fixture, the same scan with --verbose exited 1 with exactly one finding (RuleID sidekiq-secret, File sidekiq.env, secret REDACTED). That command exits 0 only when gitleaks exits 1 and reports 'leaks found: 1'. All commands exit 0 and the throwaway directory is removed.",
+  "limitations": [
+    "Each scan covers one commit (--log-opts=-1): the checkout's latest commit, then the throwaway repository's clean commit and its fixture commit. None is a full-history or working-tree scan, and a clean result does not prove that no secret exists.",
+    "The throwaway repository has no config, so its scans used gitleaks' default rules. The fixture is the sidekiq-secret example from gitleaks' own README and rule tests (two fixed hex words), not a real credential; the command builds it at run time from split pieces so the value never appears in this receipt, and every scan ran with --redact. Throwaway commits used core.hooksPath=/dev/null, commit.gpgsign=false and a fixed probe identity.",
+    "Scans ran inside ecosystem-bounded-run's transient systemd user scope, the launcher's documented containment; this receipt does not separately observe the scope's cgroup limits, the per-user scan lock, or this repository's pre-commit hook.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:37:51Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (redacted git scans; the planted sidekiq-secret fixture gives exit 1 with one finding as the positive control; launcher hashes and 8.30.1 are backed; bound to both winner pins) and re-ran the launcher and runner hash comparison and gitleaks version on this host (identical), plus the clean-commit and fixture-commit scans in a fresh throwaway repository using the native 8.30.1 binary directly rather than the bounded-run scope (exit 0, then exit 1 with RuleID sidekiq-secret).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

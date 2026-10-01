@@ -1,0 +1,34 @@
+{
+ "files": 5137,
+ "files_with_messages": 4667,
+ "messages": 201152,
+ "complete_files": 4524,
+ "incomplete_files": 143,
+ "advisor_iterations": 2070,
+ "advisor_models": {
+  "claude-opus-5-5": 1320,
+  "claude-fable-5-1": 750
+ },
+ "unread_entries": {
+  "fallback_message": 1
+ },
+ "inconsistent_messages": 1,
+ "advisor_results_without_usage": 105,
+ "advisor_calls_without_result": 48,
+ "files_incomplete_by_iteration_issue": 143,
+ "messages_split_known": 201151,
+ "messages_split_equals_combined": 201150,
+ "messages_split_differs": 1,
+ "speed": {
+  "standard": 194370,
+  "null": 6782
+ },
+ "service_tier": {
+  "standard": 201152
+ },
+ "inference_geo": {
+  "not_available": 201152
+ },
+ "advisor_split_equals_combined": 2070,
+ "advisor_split_differs": 0
+}

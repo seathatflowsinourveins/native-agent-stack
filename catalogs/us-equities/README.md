@@ -28,10 +28,27 @@ the reasons for retaining or comparing the CLI, MCP and simulation alternatives.
 Its bounded operational paper lane uses 120 requests/minute against the observed
 200/minute account limit; Elite's advertised 1,000 is API calls, not fills.
 
+The [September 28 mover research refresh](research-20260928-movers.md) records
+historical extreme-mover data sources, the factor evidence for pre-positioning
+versus post-detection continuation, and the layer changes since the September 26
+convergence. No recorded selection changed. The paper series frozen that day
+waits on a rejected (HTTP 401) paper key.
+
 The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
 catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):
 literature and metadata evidence only, with each record's sweep status. Its
 repository records are registered in the decision index.
+
+The [September 24 local-model workload discovery](local-model-workloads-20260924.json)
+records which local-model workloads beyond memory and RAG are worth measuring on
+the 64 GB M5 Pro, from two blind cross-family lanes and one blind adjudication
+([sealed evidence](../../evidence/artifacts/local-model-workloads-20260924/README.md)).
+Four workloads converged as trials: catalyst extraction, earnings-call
+transcription, image-only exhibit OCR and volatility/volume time-series features.
+Tabular foundation models for mover prediction were adjudicated a skip. The
+record also keeps single-lane leads and the workloads that stay on the cloud
+agents. Discovery evidence only: nothing was installed or executed, and inclusion
+selects nothing. Its repository records are registered in the decision index.
 
 The [current token-practice audit](../../docs/token-practice.md) maps the
 then-selected 52 components to their evidence levels and records ten exact artifact comparisons
@@ -87,7 +104,7 @@ The latest [architecture wave](architecture/README.md) reviews 40 finalist recor
 
 ## Read the layer you need
 
-Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker).
+Gate ladder: [`gates-20260922.json`](gates-20260922.json) records the sim → paper → live gates with owner, evidence class, receipt path and flip condition; `python3 scripts/trading_gates.py --check` verifies them arithmetically (nothing is flipped by the checker). For each gate listed in `SOURCE_BINDINGS` in that script (currently `native-fault-behaviour`), it also lists under `warnings` every source file whose sha256 recorded in the receipt differs from the tree (or is missing there) or from the release manifest (`source-hashes.json`) where that manifest lists the file, and any binding it cannot check; this is report-only and never fails the check.
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |

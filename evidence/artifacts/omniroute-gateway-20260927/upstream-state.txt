@@ -1,0 +1,57 @@
+# Upstream state, read-only live checks by the record's author (2026-09-27T07:58:46Z)
+$ npm view omniroute dist-tags --json
+{
+  "latest": "3.8.50"
+}
+$ git ls-remote https://github.com/diegosouzapw/OmniRoute refs/heads/release/v3.8.51
+a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3	refs/heads/release/v3.8.51
+$ gh api repos/diegosouzapw/OmniRoute/pulls/14904 --jq '[.number,.state,.draft,.merged_at,.head.sha,([.labels[].name]|join(",")),.title]'
+[14904,"open",false,null,"b94e2dba4da4c19792a80c11d63cacb931dfdafb","","fix(sse): rebuild deadline-wrapped request from public accessors"]
+$ gh api repos/diegosouzapw/OmniRoute/pulls/13788 --jq '[.number,.state,.draft,.merged_at,.head.sha,([.labels[].name]|join(",")),.title]'
+[13788,"open",false,null,"6c7990058c4ce9677de79452c8cefb10b4bf1b3d","deferred-v3.8.52","[defer] feat(search): implement /v1/alpha/search endpoint for Codex native web search (fixes #8674)"]
+$ gh api repos/diegosouzapw/OmniRoute/pulls/14872 --jq '[.number,.state,.draft,.merged_at,.head.sha,([.labels[].name]|join(",")),.title]'
+[14872,"open",false,null,"396e1ad25928ca930a10051504529511b95469eb","","fix(sse): avoid Node 26 private-slot errors for proxied requests"]
+$ gh api repos/diegosouzapw/OmniRoute/pulls/14886 --jq '[.number,.state,.draft,.merged_at,.head.sha,([.labels[].name]|join(",")),.title]'
+[14886,"open",false,null,"86b75f7da0f30bc2bf10d0a0c9afba3cdbe1f482","","fix(sse): build deadline wrap field-by-field so it survives Next's request proxy"]
+$ gh api repos/diegosouzapw/OmniRoute/issues/14866 --jq '[.number,.state,.updated_at,.title]'
+[14866,"open","2026-09-26T22:46:19Z","🔴 Release branch not green: release/v3.8.51"]
+$ gh api repos/diegosouzapw/OmniRoute/releases/latest --jq '[.tag_name,.published_at]'
+["v3.8.50","2026-08-26T19:30:30Z"]
+$ gh api repos/diegosouzapw/OmniRoute/commits/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/check-runs --paginate --jq '.check_runs[] | [.name,.status,.conclusion] | @tsv' | sort | uniq -c
+      1 Analyze (actions)	completed	success
+      1 Analyze (c-cpp)	completed	success
+      1 Analyze (javascript-typescript)	completed	success
+      1 Analyze (python)	completed	success
+      1 Bank ratchet shrinks	completed	skipped
+      1 Bank ratchet shrinks	completed	success
+      1 Baseline headroom	completed	skipped
+      1 Baseline headroom	completed	success
+      1 Build Docker (linux/amd64)	in_progress	
+      1 Build Docker (linux/arm64)	completed	success
+      1 CodeQL	completed	success
+      1 Deploy OmniRoute to VPS	completed	skipped
+      1 Mergify Merge Protections	completed	neutral
+      1 Mergify Merge Queue	completed	neutral
+      1 Node 24 Compat Tests (1/4)	completed	failure
+      1 Node 24 Compat Tests (2/4)	completed	failure
+      1 Node 24 Compat Tests (3/4)	completed	failure
+      1 Node 24 Compat Tests (4/4)	completed	failure
+      1 Node 26 Compat Tests (1/4)	completed	cancelled
+      1 Node 26 Compat Tests (2/4)	completed	failure
+      1 Node 26 Compat Tests (3/4)	completed	cancelled
+      1 Node 26 Compat Tests (4/4)	completed	cancelled
+      1 Node 26 Compatibility Build	completed	success
+      1 Open / update tracking issue on failure	completed	success
+      1 Release acceptance	completed	failure
+      1 Resolve Docker release metadata	completed	success
+      1 Resolve active release branch	completed	success
+      1 Scorecard analysis	completed	success
+      2 Validate active release branch	queued	
+      1 Validate main branch	completed	skipped
+      1 Validate main branch	queued	
+      1 garak probes (skip without provider secret)	completed	failure
+      1 guard-no-push-after-release	completed	success
+      1 lock-branch	completed	skipped
+      1 promptfoo — injection guard (block mode, no secret)	completed	failure
+      1 property-random-seed	completed	success
+      1 semgrep-cloud-platform/scan	completed	success

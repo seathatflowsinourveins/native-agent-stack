@@ -1,0 +1,604 @@
+{
+ "tool": "serena",
+ "group": "g3-code-navigation",
+ "repo": "https://github.com/oraios/serena",
+ "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 (uv-tool from git)",
+ "installed_version": "Serena 2.0.0.dev0 (native `serena --version`; the commit is the identity)",
+ "role": "Language-server symbol and reference retrieval that replaces whole-file reads. Lanes: Claude and Codex user-scope MCP with --project-from-cwd (bound to the session project); mcporter or mcp-inspector for scratch projects. Landscape: code-navigation winner.",
+ "lanes": [
+  "Claude user-scope MCP",
+  "Codex user-scope MCP",
+  "mcporter --stdio serena start-mcp-server"
+ ],
+ "upstream": {
+  "latest_release": "v1.7.0",
+  "latest_release_url": "https://api.github.com/repos/oraios/serena/releases/latest",
+  "latest_date": "2026-08-09",
+  "latest_date_url": "https://github.com/oraios/serena/releases/tag/v1.7.0",
+  "our_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "our_pin_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+  "behind_by": "The development pin is 123 commits AHEAD of the latest tagged release v1.7.0 (https://github.com/oraios/serena/compare/v1.7.0...c6fbd1c5932df2494ffa0020af5a9fbe80b82143), while current main 7a2968335f2198b966864de1ce3655c8e485a653 is 30 commits ahead of the pin (https://github.com/oraios/serena/compare/c6fbd1c5932df2494ffa0020af5a9fbe80b82143...7a2968335f2198b966864de1ce3655c8e485a653). Both relationships were rechecked live; installing the latest release would move backward from this pin.",
+  "recommended_install": {
+   "command": "uv tool install -p 3.13 serena-agent\nserena init",
+   "url": "https://oraios.github.io/serena/02-usage/010_installation.html"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Upstream offers `serena setup claude-code`, or `claude mcp add --scope user serena -- serena start-mcp-server --context claude-code --project-from-cwd`; project-only registration is also documented. Its client guide additionally recommends tool-use reminders and a Claude prompt override to counter built-in-tool preference. Those are additional adoption choices, not prerequisites for a manual MCP registration.",
+    "url": "https://oraios.github.io/serena/02-usage/030_clients.html#claude-code"
+   },
+   "codex": {
+    "how": "Use `serena setup codex`, or a user configuration entry with command `serena`, args `[\"start-mcp-server\",\"--project-from-cwd\",\"--context=codex\"]`, and startup_timeout_sec=15. Verify the connection with /mcp; the guide separately warns that Codex App sessions may need explicit project activation because their working directory need not be the project directory. Lifecycle hooks are documented separately from the MCP entry.",
+    "url": "https://oraios.github.io/serena/02-usage/030_clients.html#codex-cli-and-app"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Upstream presents language-aware symbol retrieval and editing as a way to obtain the relevant implementation without repeatedly loading whole files, with particular benefit on larger codebases. This is a capability and workload claim, not a measurement of this stack's provider usage.",
+    "url": "https://github.com/oraios/serena/blob/7a2968335f2198b966864de1ce3655c8e485a653/README.md"
+   },
+   {
+    "claim": "Lazy initial instructions, the REPL interface, and explicit session IDs already exist in the development pin; they must not be credited as improvements introduced by upgrading from that pin to current main.",
+    "url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CHANGELOG.md"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Language intelligence depends on the selected backend and language server; some languages need extra dependencies, and some operations are available only for particular languages. An MCP connection alone does not establish language coverage.",
+    "url": "https://github.com/oraios/serena/blob/7a2968335f2198b966864de1ce3655c8e485a653/README.md"
+   },
+   {
+    "text": "Project activation and tool availability depend on the client context: single-project contexts restrict project switching, while globally configured clients may require explicit activation. The documented Claude tool-preference workarounds also mean successful registration does not ensure agents actually choose Serena.",
+    "url": "https://oraios.github.io/serena/02-usage/030_clients.html"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "Unreleased main upgrades the MCP SDK to 2.2.0; qualify client handshakes, schemas and session handling before changing the source pin.",
+    "url": "https://github.com/oraios/serena/commit/c4dc91a7dac4"
+   },
+   {
+    "text": "Unreleased main checks both source and destination memory permissions during rename.",
+    "url": "https://github.com/oraios/serena/commit/37718d3588ee"
+   },
+   {
+    "text": "Unreleased main avoids aborting a tool-context memory rename when reference propagation encounters a read-only memory.",
+    "url": "https://github.com/oraios/serena/commit/24068f7b31b3"
+   },
+   {
+    "text": "Unreleased pattern-search work precomputes line offsets for binary-search line lookup; this is a latency optimization, not new evidence of provider-token savings.",
+    "url": "https://github.com/oraios/serena/pull/2042"
+   },
+   {
+    "text": "Unreleased TypeScript handling waits for in-flight indexing on later cross-file queries.",
+    "url": "https://github.com/oraios/serena/commit/cf54869af8de"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "serena",
+   "repository": "https://github.com/oraios/serena",
+   "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "license": "GPL-3.0-or-later",
+   "profile": "core",
+   "role": "Language-server symbol and reference retrieval",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+   "command_scope": "Native MCP example after configuring this selected project/language; existing historical native acceptance used a Bash symbol in its own project."
+  },
+  "how_we_install": "Reviewed the checkout matching origin/main@34c56340e636ad3d3daeb8482d48d1d8f0b135ae. The token-efficiency profile selects Serena (adoption/manifest.json:382), and both platform pin files use uv-tool-from-git at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 (adoption/pins-linux-x86_64.json:279; adoption/pins-macos-arm64.json:325). The owned-prefix command is `uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143`, with UV_TOOL_DIR=${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR=${ECO_ROOT}/bin (recipes/README.md:109; adoption/bootstrap.md:284). The source commit, rather than the development version string alone, identifies the installation.",
+  "claude_wiring": "adoption/mcp/claude-user.json:8 registers ${ECO_ROOT}/bin/serena at user scope with stdio, --project-from-cwd and --context claude-code; adoption/bootstrap.md:315 describes registration through the profile installer. MCP registration is separate from adoption/templates/claude.settings.template.json, which supplies no Serena-specific hooks. The evidence-reviewer and isolated-builder tool lists explicitly grant Serena symbol/reference operations (examples/claude-native/agents/evidence-reviewer.md:4; examples/claude-native/agents/isolated-builder.md:4).",
+  "codex_wiring": "adoption/templates/codex.config.template.toml:20 supplies the user-scope stdio server, ${ECO_ROOT}/bin/serena, --project-from-cwd, --context codex and startup_timeout_sec=60; the scope decision is docs/decisions/2026-09-25-codex-mcp-scope.md:63. Live read-only `codex mcp list --json` and `codex mcp get serena --json` confirm registration. Comparing the merged list in the main checkout with a neutral directory confirms user-scope availability, while the untracked host-only .codex/config.toml:46 still overrides dashboard visibility in the main checkout. That leftover is not evidence that worktrees lack Serena.",
+  "lane_rule": "Use Serena for code symbols and references; use scoped jCodeMunch where explicitly selected, check freshness, and inspect original implementation before editing. Select one useful context method per artifact (docs/token-session-handbook.md:106; docs/token-session-handbook.md:133; recipes/README.md:611).",
+  "deviations_from_upstream": [
+   {
+    "what": "The stack intentionally installs a development commit ahead of the latest release, rather than the unversioned released-package installation shown in upstream's quick start (recipes/README.md:109; https://oraios.github.io/serena/02-usage/010_installation.html).",
+    "why": "The retained implementation is identified and tested by its source commit; switching to the latest published package would discard already-adopted development functionality.",
+    "fix": "Keep the immutable pin while qualifying current main's MCP and retrieval changes; do not treat installing v1.7.0 as an upgrade.",
+    "pr": null
+   },
+   {
+    "what": "The portable templates provide native MCP and static lane instructions, but do not ship Serena's documented reminder hooks or Claude system-prompt override (adoption/templates/claude.settings.template.json; adoption/mcp/claude-user.json:8; https://oraios.github.io/serena/02-usage/030_clients.html#claude-code).",
+    "why": "The adaptation follows the catalog's task-specific retrieval routing. Mere availability does not reproduce upstream's additional measures for encouraging tool use, and the card's invocation evidence must be assessed separately from retrieval quality.",
+    "fix": "If wider use is intended, qualify scoped reminders against the existing routing and worker tool grants before adopting upstream's broader prompt behavior.",
+    "pr": null
+   },
+   {
+    "what": "Codex uses a longer startup allowance than upstream's example, and the main checkout retains an untracked project entry whose dashboard flag differs from the user template (adoption/templates/codex.config.template.toml:20; .codex/config.toml:46; https://oraios.github.io/serena/02-usage/030_clients.html#codex-cli-and-app).",
+    "why": "These are client configuration choices, not a replacement transport or a loss of user-scope availability; the merged read-only checks distinguish them from a missing registration.",
+    "fix": "Reconcile the stale project entry with the intended user configuration when maintaining that host; preserve the correct client context and working-directory behavior.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Qualify unreleased MCP SDK, memory-permission and cross-file indexing changes before moving the source pin; no installation change was made in this assessment.",
+   "Reconcile the host-only project override with the portable user template, and qualify any tool-use reminders separately from source-retrieval fidelity."
+  ],
+  "assessment": "The native MCP launchers, client-specific contexts and user-scope Codex availability follow upstream's supported integration, although the development pin trails unreleased fixes (adoption/mcp/claude-user.json:8; adoption/templates/codex.config.template.toml:20). The assembled card's exact artifact comparisons support a real reduction for the bounded symbol/reference tasks, while its separate invocation evidence shows that this capability is not routinely used by every worker. The adaptation is therefore working for targeted retrieval, but registration and retrieval savings alone do not establish pervasive adoption or whole-session provider savings."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T18:08:29.347Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " verified (PASS); verifier: agree, 0 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/serena --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json list serena --schema --json --no-oauth --timeout 300000",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.get_current_config --args {} --output text --no-oauth --timeout 300000",
+    "exit": null,
+    "returned": "failed"
+   },
+   {
+    "cmd": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.find_symbol --args {\"name_path_pattern\":\"register_file\",\"relative_path\":\"scripts/host_receipts.py\",\"include_body\":true} --output text --no-oauth --timeout 300000",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.find_referencing_symbols --args {\"name_path\":\"register_file\",\"relative_path\":\"scripts/host_receipts.py\"} --output text --no-oauth --timeout 300000",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json daemon status --json",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 33,
+  "records_shown": [
+   {
+    "id": "serena-01-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/serena --version",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": \"Serena 2.0.0.dev0\", \"install_identity\": {\"direct_url_commit_id\": \"c6fbd1c5932df2494ffa0020af5a9fbe80b82143\", \"uv_receipt_requirement\": \"serena-agent @ git https://github.com/oraios/serena?rev=c6fbd1c5932df2494ffa0020af5a9fbe80b82143\", \"evidence_class\": \"local_integration (read-only cat of the uv tool receipt and dist-info direct_url.json)\"}, \"bridge_",
+    "attachments": 8
+   },
+   {
+    "id": "serena-02-fixture-clone",
+    "status": "passed",
+    "kind": "fixture setup (local integration)",
+    "command": "timeout -k 5 300 git clone --quiet --shared --no-checkout $SCRATCHPAD/wt-rr $SCRATCHPAD/rr/serena/clone",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"local_integration\", \"fixture_head\": \"803bc3514ef05129c57118d8cbad0c61dd4ab141\", \"clone_head\": \"803bc3514ef05129c57118d8cbad0c61dd4ab141\", \"checkout\": {\"argv\": [\"timeout\", \"-k\", \"5\", \"300\", \"git\", \"-C\", \"$SCRATCHPAD/rr/serena/clone\", \"checkout\", \"--quiet\", \"--detach\", \"803bc3514ef05129c57118d8cbad0c61dd4ab141\"], \"exit_code\": 0}, \"fixture_status_before_bytes\": 0, \"fixture_status_afte",
+    "attachments": 7
+   },
+   {
+    "id": "serena-03-baseline-grep",
+    "status": "passed",
+    "kind": "baseline command without the tool (native execution, not the component)",
+    "command": "timeout -k 5 60 grep -rn register_file scripts tests",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution (baseline tool)\", \"stdout_bytes\": 2111, \"streams\": {\"stdout\": {\"bytes\": 2111, \"sha256\": \"9e8e6f59939986d3d0fd3deb6d780b6ad49b743e990db87227ef75c5fd31519a\"}, \"stderr\": {\"bytes\": 0, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}}, \"role\": \"half of the counterfactual_raw baseline (base.txt = grep stdout + cat stdout); run with relative p",
+    "attachments": 2
+   },
+   {
+    "id": "serena-04-baseline-cat",
+    "status": "passed",
+    "kind": "baseline command without the tool (native execution, not the component)",
+    "command": "timeout -k 5 60 cat scripts/host_receipts.py",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution (baseline tool)\", \"stdout_bytes\": 110200, \"streams\": {\"stdout\": {\"bytes\": 110200, \"sha256\": \"87dc207b029aba8497bb08a1ca4fce25b050f4275a59d7e97cb1158100ac43e6\"}, \"stderr\": {\"bytes\": 0, \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"}}, \"role\": \"half of the counterfactual_raw baseline (base.txt = grep stdout + cat stdout); run with relati",
+    "attachments": 2
+   },
+   {
+    "id": "serena-05-mcp-tools-list",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json list serena --schema --json --no-oauth --timeout 300000",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"status\": \"ok\", \"durationMs\": 1250, \"tool_count\": 21, \"tools\": [\"replace_content\", \"replace_in_files\", \"replace_symbol_body\", \"insert_after_symbol\", \"insert_before_symbol\", \"get_symbols_overview\", \"find_symbol\", \"find_referencing_symbols\", \"find_implementations\", \"find_declaration\", \"get_diagnostics_for_file\", \"rename_symbol\", \"safe_delete_symbol\", \"write_memory\"",
+    "attachments": 3
+   },
+   {
+    "id": "serena-06-mcp-get-current-config",
+    "status": "failed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.get_current_config --args {} --output text --no-oauth --timeout 300000",
+    "observation": "{\"exit_code\": 1, \"evidence_class\": \"native execution\", \"returned_stdout\": \"Unknown tool: get_current_config\", \"returned_stderr\": \"[mcporter] Did you mean serena.replace_content?\", \"cause\": \"by upstream design: the claude-code context sets single_project: true, and with --project given SerenaAgent._create_base_toolset adds SingleProjectExclusions [activate_project, get_current_config] (serena/agent.py at c6fbd1c5); mc",
+    "attachments": 2
+   },
+   {
+    "id": "serena-07-mcp-find-symbol",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.find_symbol --args {\"name_path_pattern\":\"register_file\",\"relative_path\":\"scripts/host_receipts.py\"",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"arguments\": {\"name_path_pattern\": \"register_file\", \"relative_path\": \"scripts/host_receipts.py\", \"include_body\": true}, \"returned\": {\"matches\": 1, \"kind\": \"Function\", \"body_location_0based\": [709, 726], \"body_chars\": 1130}, \"check\": {\"by\": \"serena-19 check.py (local_integration)\", \"ast_lines_1based\": [710, 727], \"body_equals_ast_source_segment\": true, \"pass\": tru",
+    "attachments": 2
+   },
+   {
+    "id": "serena-08-mcp-find-referencing-symbols",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena.find_referencing_symbols --args {\"name_path\":\"register_file\",\"relative_path\":\"scripts/host_receipt",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"arguments\": {\"name_path\": \"register_file\", \"relative_path\": \"scripts/host_receipts.py\"}, \"returned\": {\"entries\": 18, \"files\": 6, \"lines_1based\": [\"scripts/component_matrix.py:678\", \"scripts/component_matrix.py:679\", \"scripts/freshness_propose.py:42\", \"scripts/freshness_propose.py:45\", \"scripts/freshness_propose.py:598\", \"scripts/freshness_propose.py:649\", \"scrip",
+    "attachments": 2
+   },
+   {
+    "id": "serena-09-mcporter-daemon-status",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json daemon status --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"servers\": 1, \"connected\": true, \"activeCalls\": 0, \"connectionGeneration\": 1, \"meaning\": \"one keep-alive server connection (generation 1) served tools/list and the three calls, so the language server started once\", \"stop\": {\"argv\": [\"timeout\", \"-k\", \"5\", \"60\", \"$HOME/.local/share/codex-ecosystem/bin/mcporter\", \"--config\", \"$SCRATCHPAD/rr/serena/mcporter.json\", \"d",
+    "attachments": 3
+   },
+   {
+    "id": "serena-10-codex-args-get-current-config",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 400 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $SCRATCHPAD/rr/serena/mcporter.json call serena-codex.get_current_config --args {} --output text --no-oauth --timeout 300000",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"active_project\": \"clone\", \"active_context\": \"codex\", \"active_modes\": \"editing, interactive\", \"language_server_status\": \"ready\", \"available_projects\": \"clone (scratch SERENA_HOME only)\", \"exposed_tools\": 23, \"returned_excerpt\": [\"Current configuration:\", \"Serena version: 2.0.0.dev0\", \"Loglevel: 20, trace_lsp_communication=False\", \"Active project: clone\", \"Agent i",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Locate register_file definition and callers: whole file + grep vs Serena find_symbol/find_referencing_symbols; verified (PASS)",
+    "before_tokens": 17723,
+    "after_tokens": 1752,
+    "change_pct": -90.1,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:15:10.443083+00:00",
+    "last_seen": "2026-09-25T21:15:10.443083+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's serena task; answer verified against the baseline (PASS)",
+    "before_tokens": 22445,
+    "after_tokens": 7810,
+    "change_pct": -65.2,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:52.649759+00:00",
+    "last_seen": "2026-09-26T13:51:52.649759+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 9,
+    "cli_calls": 88,
+    "agents_using": 37,
+    "agents": 1010,
+    "pct_agents_using": 0.0366
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 22,
+    "pct_agents_using": 0.0455
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 9,
+    "cli_calls": 87,
+    "agents_using": 36,
+    "agents": 988,
+    "pct_agents_using": 0.0364
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 4,
+    "agents_using": 4,
+    "agents": 71,
+    "pct_agents_using": 0.0563
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 20,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 90,
+    "cli_calls": 0,
+    "agents_using": 21,
+    "agents": 301,
+    "pct_agents_using": 0.0698
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": [
+    {
+     "client": "codex_exec",
+     "mcp_server_name": "serena",
+     "calls": "4"
+    }
+   ]
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "invoke_rates.live_otel.series",
+    "issue": "Assembler transcription defect: the card reports an empty series, but retained panel 31 contains client=codex_exec, mcp_server_name=serena, value=\"4\" in the same window. assemble.py reads the nonexistent panels_29_to_38 key instead of the source's panels array, silently discarding these four calls. The transcript-derived populations match their source; this defect is confined to the assembler's live_otel extraction.",
+    "fix": "Change the assembler to read panels, select panel_id 31, and retain the Serena series with calls=\"4\". Regenerate the card; this cannot be repaired in serena.upstream.json.",
+    "source": "<scratch>/html-report/scripts/data/live_otel.json"
+   }
+  ],
+  "checked": [
+   ".codex/config.toml (main-checkout MCP fields read through codex mcp list --json)",
+   "<scratch>/html-report/savings.json",
+   "<scratch>/html-report/scripts/data/live_otel.json",
+   "<scratch>/rr/returned-results.json",
+   "<scratch>/rr/serena/build_records.py",
+   "<scratch>/rr/serena/mcporter.json",
+   "<scratch>/rr/serena/out/00a-serena-version.stderr",
+   "<scratch>/rr/serena/out/00a-serena-version.stdout",
+   "<scratch>/rr/serena/out/00b-mcporter-version.stdout",
+   "<scratch>/rr/serena/out/00c-wt-head.stdout",
+   "<scratch>/rr/serena/out/00d-wt-status-before.stdout",
+   "<scratch>/rr/serena/out/00g-clone-head.stdout",
+   "<scratch>/rr/serena/out/00i-serena-direct-url.stdout",
+   "<scratch>/rr/serena/out/00j-serena-uv-receipt.stdout",
+   "<scratch>/rr/serena/out/01-baseline-grep.stderr",
+   "<scratch>/rr/serena/out/01-baseline-grep.stdout",
+   "<scratch>/rr/serena/out/02-baseline-cat.stderr",
+   "<scratch>/rr/serena/out/02-baseline-cat.stdout",
+   "<scratch>/rr/serena/out/10-mcp-list-schema.stderr",
+   "<scratch>/rr/serena/out/10-mcp-list-schema.stdout",
+   "<scratch>/rr/serena/out/11-mcp-get-current-config.stderr",
+   "<scratch>/rr/serena/out/11-mcp-get-current-config.stdout",
+   "<scratch>/rr/serena/out/12-mcp-find-symbol.stderr",
+   "<scratch>/rr/serena/out/12-mcp-find-symbol.stdout",
+   "<scratch>/rr/serena/out/13-mcp-find-referencing-symbols.stderr",
+   "<scratch>/rr/serena/out/13-mcp-find-referencing-symbols.stdout",
+   "<scratch>/rr/serena/out/14-mcp-daemon-status.stderr",
+   "<scratch>/rr/serena/out/14-mcp-daemon-status.stdout",
+   "<scratch>/rr/serena/out/15-mcp-daemon-stop.stdout",
+   "<scratch>/rr/serena/out/20-codex-get-current-config.stderr",
+   "<scratch>/rr/serena/out/20-codex-get-current-config.stdout",
+   "<scratch>/rr/serena/out/60-clone-status-after.stdout",
+   "<scratch>/rr/serena/out/62-clone-serena-files.stdout",
+   "<scratch>/rr/serena/out/64-wt-status-after.stdout",
+   "<scratch>/rr/serena/out/96-wt-status-final.stdout",
+   "<scratch>/rr/serena/out/records.sanitized.jsonl",
+   "<scratch>/rr/serena/out/sanitization.json",
+   "<scratch>/rr/serena/out/scripts/mcporter.json",
+   "<scratch>/rr/serena/out/scripts/run.sh",
+   "<scratch>/rr/serena/records.json",
+   "<scratch>/token-cards/assemble.py",
+   "<scratch>/token-cards/cards/serena.json",
+   "<scratch>/token-cards/groups/g3-code-navigation/serena.upstream.json",
+   "<scratch>/token-cards/invoke_by_tool.json",
+   "<scratch>/token-cards/provenance.py",
+   "AGENTS.md",
+   "adoption/bootstrap.md",
+   "adoption/manifest.json",
+   "adoption/mcp/claude-user.json",
+   "adoption/pins-linux-x86_64.json",
+   "adoption/pins-macos-arm64.json",
+   "adoption/templates/claude.settings.template.json",
+   "adoption/templates/codex.config.template.toml",
+   "adoption/templates/project.codex.config.template.toml",
+   "docs/decisions/2026-09-23-claude-user-profile.md",
+   "docs/decisions/2026-09-25-codex-mcp-scope.md",
+   "docs/token-session-handbook.md",
+   "examples/claude-mcp.json.example",
+   "examples/claude-native/agents/blind-adjudicator.md",
+   "examples/claude-native/agents/blind-lane-reviewer.md",
+   "examples/claude-native/agents/evidence-reviewer.md",
+   "examples/claude-native/agents/isolated-builder.md",
+   "examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "examples/claude-native/agents/source-scout.md",
+   "examples/mcporter.json.example",
+   "https://api.github.com/repos/oraios/serena/commits/main",
+   "https://api.github.com/repos/oraios/serena/compare/c6fbd1c5932df2494ffa0020af5a9fbe80b82143...7a2968335f2198b966864de1ce3655c8e485a653",
+   "https://api.github.com/repos/oraios/serena/compare/v1.7.0...c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "https://api.github.com/repos/oraios/serena/contents/CHANGELOG.md?ref=c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "https://api.github.com/repos/oraios/serena/pulls/2042",
+   "https://api.github.com/repos/oraios/serena/releases/latest",
+   "https://github.com/oraios/serena/blob/7a2968335f2198b966864de1ce3655c8e485a653/README.md",
+   "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CHANGELOG.md",
+   "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+   "https://github.com/oraios/serena/blob/main/CHANGELOG.md",
+   "https://github.com/oraios/serena/commit/24068f7b31b3",
+   "https://github.com/oraios/serena/commit/37718d3588ee",
+   "https://github.com/oraios/serena/commit/c4dc91a7dac4",
+   "https://github.com/oraios/serena/commit/cf54869af8de",
+   "https://github.com/oraios/serena/compare/c6fbd1c5932df2494ffa0020af5a9fbe80b82143...7a2968335f2198b966864de1ce3655c8e485a653",
+   "https://github.com/oraios/serena/compare/v1.7.0...c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+   "https://github.com/oraios/serena/pull/2042",
+   "https://github.com/oraios/serena/releases",
+   "https://github.com/oraios/serena/releases/tag/v1.7.0",
+   "https://oraios.github.io/serena/02-usage/010_installation.html",
+   "https://oraios.github.io/serena/02-usage/030_clients.html",
+   "https://oraios.github.io/serena/02-usage/030_clients.html#claude-code",
+   "https://oraios.github.io/serena/02-usage/030_clients.html#codex-cli-and-app",
+   "manifests/stack.json",
+   "recipes/README.md",
+   "$HOME/.agents/skills/verification-before-completion/SKILL.md",
+   "$HOME/.codex/RTK.md",
+   "$HOME/.codex/config.toml (MCP fields read through codex mcp list --json from the main checkout and review workspace)",
+   "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md",
+   "$HOME/code/native-agent-stack/manifests/stack.json"
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "serena",
+   "verdict": "adapted-with-gaps",
+   "summary": "The immutable 2.0.0.dev0 development pin uses upstream's client-specific contexts and project binding; v1.7.0 remains the latest stable release, so replacing the development pin with it would not be a straightforward upgrade. The newer verified comparison is 25,942→2,168 o200k_base tokens (91.6%), eligible for the retained Python definition-and-reference fixture through MCPorter, with byte-identical Claude-context and Codex-context output and all 16 calls plus two import references preserved (../rr/serena/records.json#serena-20-o200k-compare; #serena-19-quality-check). Historical native-client comparisons remain separate at 17,723→1,752 for Claude (90.1%) and 22,445→7,810 for Codex (65.2%), and none proves provider savings or general language coverage (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The fixed scan found 37/1,010 Ultracode children (3.66%) and 21/301 Codex workers (6.98%) invoking Serena, with 1/22 TOKEN LANES children (4.55%); this pass's initialization and targeted find_symbol both timed out and supply no new successful retrieval (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, investigate that live timeout without assuming its cause, reconcile user-scope startup settings, and qualify upstream's optional Claude and Codex reminder hooks against the existing retrieval lanes.",
+   "gaps": [
+    {
+     "gap": "Current-worker initial_instructions and a targeted find_symbol each timed out after 240 seconds; retained successful fixtures do not verify present responsiveness.",
+     "evidence": "groups/final-verdict-evidence.json#live_probes",
+     "action": "Inspect project binding and server/LSP responsiveness and retain a successful find_symbol in the intended worker before declaring current availability; do not infer that the timeout is caused by configuration drift.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Upstream documents optional reminder/lifecycle hooks for both Claude and Codex, but the Claude template and live Codex hooks contain no Serena hook commands.",
+     "evidence": "adoption/templates/claude.settings.template.json; groups/final-verdict-evidence.json#wiring; https://oraios.github.io/serena/02-usage/030_clients.html",
+     "action": "Qualify scoped reminders with the existing TOKEN LANES rules and verify useful native calls; retain the current client-specific contexts and treat hook adoption as a separate measured change.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The user-scope Serena entry omits the template's 60-second startup allowance, while the project override supplies it.",
+     "evidence": "adoption/templates/codex.config.template.toml; groups/final-verdict-evidence.json#wiring",
+     "action": "Reconcile the user entry with the selected template and verify from a fresh worktree; startup failure attributable to this mismatch remains unverified.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The merged card omits the newer 91.6% bridge comparison; its successful Python fixture does not establish reference completeness for every supported language or excluded path.",
+     "evidence": "cards/serena.json; ../rr/serena/records.json#serena-20-o200k-compare",
+     "action": "Publish the newer bounded comparison alongside historical native results and qualify language/project inclusion on any task requiring broader reference coverage.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest stable release is v1.7.0, published 2026-08-09; the retained installed identity is 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143.",
+     "evidence": "https://api.github.com/repos/oraios/serena/releases/latest; ../rr/serena/records.json#serena-01-version",
+     "result": "holds"
+    },
+    {
+     "claim": "The portable client contexts and --project-from-cwd binding follow upstream's documented wiring.",
+     "evidence": "adoption/mcp/claude-user.json; adoption/templates/codex.config.template.toml; https://oraios.github.io/serena/02-usage/030_clients.html",
+     "result": "holds"
+    },
+    {
+     "claim": "The exact 25,942→2,168 comparison is source-verified for the bounded Python fixture and includes 18 references: 16 calls and two imports, not 18 calls.",
+     "evidence": "../rr/serena/records.json#serena-20-o200k-compare; ../rr/serena/out/70-check-fixture-claude-code-context.stdout; groups/final-verdict-evidence.json#recounts",
+     "result": "holds"
+    },
+    {
+     "claim": "Historical native Claude and Codex reductions of 90.1% and 65.2% hold for their own revisions and task shapes and are not additional savings to sum.",
+     "evidence": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The review's lost live-OTel series is corrected in the merged card: panel 31 contains four Codex Serena calls; these remain separate from the transcript population scan.",
+     "evidence": "groups/g3-code-navigation/serena.review.json; cards/serena.json; ../html-report/scripts/data/live_otel.json",
+     "result": "holds"
+    },
+    {
+     "claim": "All 25 retained command records and 112 attachment references were opened, with matching attachment hashes and sizes.",
+     "evidence": "../rr/serena/records.json; groups/final-verdict-evidence.json#attachments",
+     "result": "holds"
+    },
+    {
+     "claim": "The fixed scan records 9 MCP and 88 CLI invocations across 37/1,010 workflow children and 90 MCP invocations across 21/301 Codex workers; TOKEN LANES children were 1/22.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "result": "holds"
+    },
+    {
+     "claim": "This worker currently completes useful Serena retrieval successfully.",
+     "evidence": "groups/final-verdict-evidence.json#live_probes",
+     "result": "unverified"
+    },
+    {
+     "claim": "Causal provider-token savings and a completed task-matched arm-B experiment are established.",
+     "evidence": "cards/serena.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "serena (initial_instructions and find_symbol attempted; both timed out)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 29
+    },
+    "shell_commands": 3,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-b.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "qmd": 4,
+     "ai-memory": 1,
+     "socraticode": 1,
+     "serena": 2
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 60
+    },
+    "shell_commands": 7,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 17,723->1,752 (90.1%) after binding to the project. #316 FAIL: find_referencing_symbols missed 6/8 .mjs references (no tsconfig include for the dot-directory). #343: 22,445->7,810 (65.2%) PASS.…"
+}

@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "node": "v24.21.0",
+  "packages": {
+    "plugin_clone": {
+      "package_json_version": "1.0.169",
+      "git_head": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "git_status_porcelain_before_launch": [
+        " M .claude-plugin/plugin.json",
+        " M hooks/hooks.json"
+      ],
+      "start_mjs_sha256": "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b",
+      "server_bundle_sha256": "161a106d8c026fd2be84585466c89e645d71bf11ab7963006ee7d4d5d82ce8f4"
+    },
+    "npm_install": {
+      "package_json_version": "1.0.169",
+      "start_mjs_sha256": "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b",
+      "server_bundle_sha256": "c5c36b73505e567034f5dfec0388f3490e8d9bf24d9db79378ebf8c2cc7a45e7",
+      "cli_bundle_sha256": "7f5211b390353bd22d22ada5b8d6f9c3d597ff5fa08b3dda94ea2a08e0208cec"
+    }
+  },
+  "calls": [
+    {
+      "arm": "plugin",
+      "launching_session": "a",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "./start.mjs"
+      ],
+      "cwd": "<home>/.codex/plugins/cache/context-mode/context-mode/1.0.169",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:58Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": false,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "plugin",
+      "launching_session": "b",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "./start.mjs"
+      ],
+      "cwd": "<home>/.codex/plugins/cache/context-mode/context-mode/1.0.169",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:58Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope start.mjs",
+      "launching_session": "a",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"
+      ],
+      "cwd": "<work>/wt-a",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:58Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope start.mjs",
+      "launching_session": "b",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"
+      ],
+      "cwd": "<work>/wt-b",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:59Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope CLI",
+      "launching_session": "a",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/cli.bundle.mjs"
+      ],
+      "cwd": "<work>/wt-a",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:59Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": false,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope CLI",
+      "launching_session": "b",
+      "newest_session_log": "b",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/cli.bundle.mjs"
+      ],
+      "cwd": "<work>/wt-b",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:49:59Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "plugin",
+      "launching_session": "a",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "./start.mjs"
+      ],
+      "cwd": "<home>/.codex/plugins/cache/context-mode/context-mode/1.0.169",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:00Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "plugin",
+      "launching_session": "b",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "./start.mjs"
+      ],
+      "cwd": "<home>/.codex/plugins/cache/context-mode/context-mode/1.0.169",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:00Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": false,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope start.mjs",
+      "launching_session": "a",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"
+      ],
+      "cwd": "<work>/wt-a",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:00Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope start.mjs",
+      "launching_session": "b",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"
+      ],
+      "cwd": "<work>/wt-b",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:01Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-b",
+      "answered_worktree": "b",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope CLI",
+      "launching_session": "a",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/cli.bundle.mjs"
+      ],
+      "cwd": "<work>/wt-a",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:01Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": true,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "arm": "user-scope CLI",
+      "launching_session": "b",
+      "newest_session_log": "a",
+      "argv": [
+        "~/.local/share/codex-ecosystem/bin/node",
+        "<eco>/tools/context-mode-1.0.169/lib/node_modules/context-mode/cli.bundle.mjs"
+      ],
+      "cwd": "<work>/wt-b",
+      "env_names": [
+        "CONTEXT_MODE_PLATFORM",
+        "HOME",
+        "LANG",
+        "LOGNAME",
+        "PATH",
+        "RTK_TELEMETRY_DISABLED",
+        "SHELL",
+        "TERM",
+        "TMPDIR",
+        "USER"
+      ],
+      "started_at_utc": "2026-09-26T06:50:01Z",
+      "server_info": {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      "reply_text": "```shell\npwd\n```\n\n<work>/wt-a",
+      "answered_worktree": "a",
+      "bound_to_its_session": false,
+      "server_exit": 0,
+      "stderr_bytes": 0
+    }
+  ],
+  "summary": {
+    "plugin": {
+      "calls": 4,
+      "bound_to_its_session": 2
+    },
+    "user-scope start.mjs": {
+      "calls": 4,
+      "bound_to_its_session": 4
+    },
+    "user-scope CLI": {
+      "calls": 4,
+      "bound_to_its_session": 2
+    }
+  }
+}

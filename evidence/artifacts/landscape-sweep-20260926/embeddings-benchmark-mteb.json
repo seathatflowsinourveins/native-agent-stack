@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-embeddings-benchmark-mteb",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/embeddings-benchmark/mteb",
+ "reviewed_commit": "94eec4eded2051d41368b26eee9ddac52add26e5",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of embeddings-benchmark/mteb at commit 94eec4eded2051d41368b26eee9ddac52add26e5 (license Apache-2.0), read from README.md at that commit. Repository description: \"MTEB: State-of-the-art evaluation of embeddings across languages and modalities\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 3436,
+  "pushed_at": "2026-09-26T12:02:31Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@94eec4eded2051d41368b26eee9ddac52add26e5",
+   "text": "You can install mteb simply using pip or uv. For more on installation please see the [documentation](https://embeddings-benchmark.github.io/mteb/installation/)."
+  },
+  {
+   "source": "README.md@94eec4eded2051d41368b26eee9ddac52add26e5",
+   "text": "For faster installation, you can also use [uv](https://docs.astral.sh/uv/): ```bash uv add mteb ```"
+  },
+  {
+   "source": "README.md@94eec4eded2051d41368b26eee9ddac52add26e5",
+   "text": "Below we present a simple use-case example. For more information, see the [documentation](https://embeddings-benchmark.github.io/mteb/)."
+  }
+ ]
+}

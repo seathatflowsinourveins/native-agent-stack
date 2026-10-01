@@ -1,0 +1,9 @@
+ok    alert, the unmutated probe passes every case
+ok    alert, mutant, no signal handler is installed: failing 5 of 6 (expected 5)
+ok    alert, mutant, the handler raises (the earlier design): failing 4 of 6 (expected 4)
+ok    alert, mutant, the last signal wins: failing 1 of 6 (expected 1)
+ok    alert, mutant, the observation loop does not poll the latch: failing 5 of 6 (expected 5)
+ok    alert, mutant, the client is not stopped in the cleanup: failing 5 of 6 (expected 5)
+ok    alert, mutant, the private directory is not removed: failing 6 of 6 (expected 6)
+ok    alert, mutant, the measurement ignores exit_status: failing 1 of 6 (expected 1)
+8 runs, 0 problems

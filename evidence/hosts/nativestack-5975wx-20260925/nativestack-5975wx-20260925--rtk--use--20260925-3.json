@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--rtk--use--20260925-3",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "3f267b5c155e9dc7848e9b75fc9202bd810a9ad3",
+  "recorded_by": {
+    "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "rtk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v rtk) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && rtk --version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" rtk",
+      "exit": 0,
+      "duration_s": 0.041,
+      "output_sha256": "184870898f03b5f399916715c1308cb7b0215e719d2742a583fae1db9bee70af",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/rtk -> ~/.local/share/codex-ecosystem/tools/rtk-0.49.0/rtk\nrtk 0.49.0\nstack ['0.49.0'] winner pins ['0.49.0']\n"
+    },
+    {
+      "cmd": "out=$(rtk init --show 2>&1) || exit 1; printf '%s\\n' \"$out\" | sed -n '/^\\[/p' | sed -n '1,5p'; printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] Hook: rtk hook claude' && printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] RTK\\.md: .*\\.claude/RTK\\.md' && printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] Global .*@RTK\\.md reference' && printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] settings\\.json: RTK hook configured' && echo \"asserted: Claude hook command, ~/.claude/RTK.md, global @RTK.md reference and settings.json hook are all [ok]\"",
+      "exit": 0,
+      "duration_s": 0.012,
+      "output_sha256": "79b111ecdb19741b2c8820c536a7841a0410e3710c2e3ddaa9509a0ae257f564",
+      "output_excerpt": "[ok] Hook: rtk hook claude (native binary command)\n[ok] RTK.md: ~/.claude/RTK.md (slim mode)\n[ok] Global (~/.claude/CLAUDE.md): @RTK.md reference\n[--] Local (./CLAUDE.md): exists but rtk not configured\n[ok] settings.json: RTK hook configured\nasserted: Claude hook command, ~/.claude/RTK.md, global @RTK.md reference and settings.json hook are all [ok]\n"
+    },
+    {
+      "cmd": "out=$(rtk init --show --codex 2>&1) || exit 1; printf '%s\\n' \"$out\" | sed -n '/^\\[ok\\] Global/p'; ch=$(rtk init --help | sed -n '/^ *--codex$/{n;s/^ *//;p;}'); echo \"rtk init --help, --codex: $ch\"; procs=$(rtk hook --help | sed -n '/^Commands:/,/^$/p' | awk 'NF && $1 != \"Commands:\" {print $1}' | tr '\\n' ' '); echo \"rtk hook processors: $procs\"; printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] Global RTK\\.md: ' && printf '%s\\n' \"$out\" | grep -q '^\\[ok\\] Global AGENTS\\.md: RTK\\.md reference' && printf '%s\\n' \"$ch\" | grep -q 'no Claude hook patching' && ! printf '%s\\n' $procs | grep -qx codex && printf '%s\\n' $procs | grep -qx claude && echo \"asserted: Codex global RTK.md + AGENTS.md reference [ok]; --codex help says no Claude hook patching; hook processors include claude, not codex\"",
+      "exit": 0,
+      "duration_s": 0.019,
+      "output_sha256": "319ce38fecfb15bc1cd53764241078082ebb6d21949afe2d24824ec2dd830711",
+      "output_excerpt": "[ok] Global RTK.md: ~/.codex/RTK.md\n[ok] Global AGENTS.md: RTK.md reference\nrtk init --help, --codex: Target Codex CLI (uses AGENTS.md + RTK.md, no Claude hook patching)\nrtk hook processors: claude cursor gemini copilot droid vibe check help \nasserted: Codex global RTK.md + AGENTS.md reference [ok]; --codex help says no Claude hook patching; hook processors include claude, not codex\n"
+    },
+    {
+      "cmd": "out=$(printf '{\"session_id\":\"%s\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"%s\",\"description\":\"%s\"},\"cwd\":\".\"}' receipt-fixture 'git status' fixture| rtk hook claude) || exit 1; echo \"rtk hook claude <- PreToolUse Bash 'git status': $out\"; new=$(printf '%s' \"$out\" | python3 -c \"import json,sys;h=json.load(sys.stdin)['hookSpecificOutput'];assert h['hookEventName']=='PreToolUse';assert 'permissionDecision' not in h;assert h.get('permissionDecisionReason')=='RTK auto-rewrite';print(h['updatedInput']['command'])\") && test \"$new\" = \"rtk git status\" && echo \"asserted: updatedInput.command is 'rtk git status', permissionDecisionReason is 'RTK auto-rewrite', no permissionDecision field\"",
+      "exit": 0,
+      "duration_s": 0.054,
+      "output_sha256": "40d8dccdc33feef6193d83797f952526f588c8daa51b422a992a8bcbdd47464d",
+      "output_excerpt": "rtk hook claude <- PreToolUse Bash 'git status': {\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecisionReason\":\"RTK auto-rewrite\",\"updatedInput\":{\"command\":\"rtk git status\",\"description\":\"fixture\"}}}\nasserted: updatedInput.command is 'rtk git status', permissionDecisionReason is 'RTK auto-rewrite', no permissionDecision field\n"
+    },
+    {
+      "cmd": "raw=$(git status | wc -c); filtered=$(rtk git status | wc -c); same=no; [ \"$(git status | sha256sum)\" = \"$(rtk proxy git status | sha256sum)\" ] && same=yes; echo \"git status: $raw bytes; rtk git status (the rewritten command): $filtered bytes; rtk proxy git status byte-identical to raw: $same\"; test \"$filtered\" -lt \"$raw\" && test \"$same\" = yes",
+      "exit": 0,
+      "duration_s": 0.14,
+      "output_sha256": "098ba97b6ca4636b15568e2b8f1464baf3d86fd6cc414dbd957cd2d79df657b6",
+      "output_excerpt": "git status: 1282 bytes; rtk git status (the rewritten command): 1074 bytes; rtk proxy git status byte-identical to raw: yes\n"
+    },
+    {
+      "cmd": "out=$(printf '{\"session_id\":\"%s\",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"%s\",\"description\":\"%s\"},\"cwd\":\".\"}' receipt-fixture 'echo receipt-control' fixture| rtk hook claude); rc=$?; echo \"rtk hook claude <- PreToolUse Bash 'echo receipt-control': exit $rc, stdout bytes ${#out}\"; chk=$(rtk hook check 'echo receipt-control' 2>&1); crc=$?; echo \"rtk hook check: $chk (exit $crc)\"; test \"$rc\" -eq 0 && test -z \"$out\" && test \"$crc\" -ne 0 && printf '%s\\n' \"$chk\" | grep -q '^No rewrite for: echo receipt-control$' && echo \"asserted: no hook output and 'No rewrite for', so the command runs unchanged\"",
+      "exit": 0,
+      "duration_s": 0.01,
+      "output_sha256": "578ffde8a9b7d9516187649d71ebf1e95dab7cb90769509ffd33a7b0244a2ed5",
+      "output_excerpt": "rtk hook claude <- PreToolUse Bash 'echo receipt-control': exit 0, stdout bytes 0\nrtk hook check: No rewrite for: echo receipt-control (exit 1)\nasserted: no hook output and 'No rewrite for', so the command runs unchanged\n"
+    }
+  ],
+  "tool_versions": {
+    "rtk": "0.49.0"
+  },
+  "observed_at_utc": "2026-09-25T16:35:07Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), rtk 0.49.0 (the catalog pin) was exercised on its Claude Code hook path, its Codex instruction path and its CLI without a model session. rtk init --show reported the Claude hook command rtk hook claude, ~/.claude/RTK.md, the global @RTK.md reference and the settings.json RTK hook all [ok] (asserted). rtk init --show --codex reported ~/.codex/RTK.md and the global AGENTS.md RTK.md reference [ok], and rtk init --help describes --codex as 'uses AGENTS.md + RTK.md, no Claude hook patching' (asserted). rtk hook --help printed the processors claude, cursor, gemini, copilot, droid, vibe, check and help; claude is among them and codex is not (asserted), so Codex gets instructions rather than a rewriting hook. A synthetic Claude PreToolUse event for a Bash git status, built with printf and piped into rtk hook claude, returned updatedInput.command 'rtk git status' with permissionDecisionReason 'RTK auto-rewrite' and no permissionDecision field (asserted). The rewritten command printed fewer bytes than raw git status, and rtk proxy git status stayed byte-identical to it (asserted). As a negative control, the same event for echo receipt-control produced no hook output (exit 0), and rtk hook check printed 'No rewrite for: echo receipt-control' and exited 1, so that command runs unchanged (asserted). All commands exit 0.",
+  "limitations": [
+    "No model session ran: the Claude hook was exercised by piping one synthetic PreToolUse event into rtk hook claude, not by Claude Code invoking it, and the Codex path is shown as installed instructions (rtk init --show --codex), not as a Codex session reading them. No rtk gain or tracking report was read; RTK's savings counters are upstream estimates, not provider token measurements, and one command's byte count is not a token measurement.",
+    "rtk init --show and --show --codex are RTK's own read-only report on the global client files, not an independent parse of settings.json, CLAUDE.md or AGENTS.md. The git status byte counts reflect this worktree at recording time.",
+    "Supersedes nativestack-5975wx-20260925--rtk--use--20260925-2, whose claim labelled as asserted some facts that its commands only printed: the ~/.claude/RTK.md line, the hook's permissionDecisionReason and absent permissionDecision, the --codex help text and the 'No rewrite for' text. Commands 2, 3, 4 and 6 now check them; commands 1 and 5 are unchanged. That file stays byte-identical, as does generation 1 (nativestack-5975wx-20260925--rtk--use--20260925, CLI only) with its independent review.",
+    "Recorded from a Claude Code session in a git worktree of this repository whose HEAD was detached at 3f267b5c (the catalog_revision; origin/main when this branch started), with this branch's earlier 2026-09-25 receipts present in the working tree, not in a pinned install checkout. Those receipts are the only difference from 3f267b5c. The tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T16:35:07Z",
+      "reviewer": {
+        "identity_sha256": "883077feaca69bacb1e486b32f0b4cab92ea40d17df96b0555235919f6c20a88",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "PR #263 independent session review",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T17:10:08Z",
+      "reviewer": {
+        "identity_sha256": "53c730e05aac86347b0a1b363719c287b73652f720163a3a3266ce75f317f9fa",
+        "model": "claude-sonnet-5"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--rtk--use--20260925-2"
+}

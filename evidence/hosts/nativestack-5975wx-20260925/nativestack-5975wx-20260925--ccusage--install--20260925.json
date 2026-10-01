@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--ccusage--install--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "ccusage",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "p=$(command -v ccusage) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" ccusage",
+      "exit": 0,
+      "duration_s": 0.034,
+      "output_sha256": "ca1187923b6e048e7f25e3c16444bbf4227985bfd827cfc74f45c3acec6da57e",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/ccusage -> ~/.local/share/codex-ecosystem/tools/ccusage-20.0.24/lib/node_modules/ccusage/src/cli.js\nstack ['20.0.24'] winner pins ['20.0.24']\n"
+    },
+    {
+      "cmd": "ccusage --version",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "72c7c8d6db1e913882d478629eef33e2e3317516342b93c583ed2c10f71a7244",
+      "output_excerpt": "ccusage 20.0.24\n"
+    }
+  ],
+  "tool_versions": {
+    "ccusage": "20.0.24"
+  },
+  "observed_at_utc": "2026-09-25T05:38:17Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), ccusage is installed at the pinned version (the catalog pin): the command resolves to this host's install under ~/.local/share/codex-ecosystem, and its version call reports the pin. Readiness only; a version call is not functional acceptance. All commands exit 0.",
+  "limitations": [
+    "Install stage: a resolved path, a pin record and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "No usage report was generated: this host's client usage logs are private.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:17Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked points 3 and 4 for this install receipt (the resolved path, stack and winner pins and version call each have retained output; component_id is the token-efficiency winner and 20.0.24 pin_matches its pin) and re-ran every command on this host with identical output (ccusage 20.0.24).",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

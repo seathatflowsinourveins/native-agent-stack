@@ -16,6 +16,7 @@ from nautilus_trader.model import ClientOrderId, InstrumentId, OrderSide, Price,
 from nautilus_trader.trading import Strategy
 
 from mover import broker_ref, price_text
+from native_adapter import guarded_callback
 
 
 class MoverStrategy(Strategy):
@@ -29,6 +30,13 @@ class MoverStrategy(Strategy):
         self._clock = clock
         self.started = False
         self.enabled = False
+        # E3: every order callback is wrapped by native_adapter.guarded_callback. An
+        # exception there is recorded here, latches `faulted` (no further submit) and
+        # calls fault_sink (mover_runner binds NativeSession.fail: the node stops and
+        # the residual goes to recovery).
+        self.callback_faults = []
+        self.faulted = False
+        self.fault_sink = None
         # Set by the runner while a reconciliation snapshot is in flight: no order may be
         # sent then, or the snapshot could miss it (AdaptiveStrategy only sends from the
         # runner's own tick, so it never needed this).
@@ -45,7 +53,9 @@ class MoverStrategy(Strategy):
 
     def on_quote(self, quote):
         self.received_quotes += 1
-        if not self.started or self.suspended:
+        if not self.started or self.suspended or self.faulted:
+            # E3: after an order callback raised, the book no longer evaluates: it would
+            # register orders, charge exit budget and log submissions nothing sends.
             return
         symbol = str(quote.instrument_id).rsplit(".", 1)[0]
         leg = self.book.legs.get(symbol)
@@ -60,6 +70,8 @@ class MoverStrategy(Strategy):
         if force_reason:
             self.book.set_force(force_reason, now)
         self._sync_terminal()
+        if self.faulted:
+            return  # E3: a faulted strategy decides nothing more; recovery takes the residual
         self._execute(self.book.evaluate(now, entries_enabled=self.enabled))
 
     @property
@@ -87,6 +99,8 @@ class MoverStrategy(Strategy):
             if action.kind == "cancel":
                 self.cancel_order(ClientOrderId(action.client_id))
                 continue
+            if self.faulted:
+                continue  # an order callback raised: nothing more is sent (recovery cleans up)
             record = action.record
             order = self.order_factory.limit(
                 InstrumentId.from_str(record.symbol + ".ALPACA"),
@@ -98,9 +112,11 @@ class MoverStrategy(Strategy):
             self.submit_order(order)
 
     # -- native order events ------------------------------------------------
+    @guarded_callback
     def on_order_accepted(self, event):
         self.book.on_accepted(str(event.client_order_id), event.ts_event / 1e9, broker_ref(event.venue_order_id))
 
+    @guarded_callback
     def on_order_filled(self, event):
         self.native_fills += 1
         client_id = str(event.client_order_id)
@@ -110,12 +126,15 @@ class MoverStrategy(Strategy):
         if intent is not None and intent.terminal:
             self.book.on_terminal(client_id, intent.status)
 
+    @guarded_callback
     def on_order_canceled(self, event):
         self.book.on_terminal(str(event.client_order_id), "canceled")
 
+    @guarded_callback
     def on_order_expired(self, event):
         self.book.on_terminal(str(event.client_order_id), "expired")
 
+    @guarded_callback
     def on_order_rejected(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
@@ -126,6 +145,7 @@ class MoverStrategy(Strategy):
             self._mark_definitive_refusal(client_id)
         self.book.on_terminal(client_id, "rejected", reason, pre_wire=self._pre_wire(client_id), at=self._clock())
 
+    @guarded_callback
     def on_order_denied(self, event):
         self.native_rejections += 1
         client_id = str(event.client_order_id)
@@ -133,6 +153,7 @@ class MoverStrategy(Strategy):
         self.book.on_terminal(client_id, "denied", str(event.reason), pre_wire=self._pre_wire(client_id),
                               at=self._clock())
 
+    @guarded_callback
     def on_order_cancel_rejected(self, event):
         self.book.on_cancel_rejected(str(event.client_order_id))
 

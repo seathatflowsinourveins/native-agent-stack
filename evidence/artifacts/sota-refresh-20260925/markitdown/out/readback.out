@@ -1,0 +1,8 @@
+readback_utc=2026-09-25T20:12:40Z
+## markitdown
+bin/markitdown -> ~/.local/share/codex-ecosystem/tools/markitdown-0.1.8/bin/markitdown
+markitdown --version: markitdown 0.1.8
+prefix uv-receipt requirement: requirements = [{ name = "markitdown", specifier = "==0.1.8" }]
+prefix uv-receipt exclude-newer lines: 1
+rollback env python-tools/markitdown requirement: requirements = [{ name = "markitdown", specifier = "==0.1.7" }]
+rollback env version: markitdown 0.1.7

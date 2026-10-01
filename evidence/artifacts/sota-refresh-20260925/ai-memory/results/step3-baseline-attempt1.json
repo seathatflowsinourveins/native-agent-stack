@@ -1,0 +1,244 @@
+{
+ "arm": "base",
+ "binary": "~/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+ "expected_version": "2.3.2",
+ "at": "2026-09-25T18:58:20Z",
+ "extract": {
+  "models_copied": true,
+  "capture_mode_file": "allowlist"
+ },
+ "fingerprint_before": "schema V64 (64 rows) quick_check=ok pages=35 observations=71334",
+ "known_page_selected": true,
+ "known_page_same_as_base": true,
+ "ready_seconds": 120.1,
+ "status": {
+  "version": "2.3.2",
+  "counts": {
+   "pages_latest": 31,
+   "pages_all": 35,
+   "sessions": 32,
+   "observations": 71334
+  },
+  "derived": {
+   "pages_rows": 35,
+   "pages_fts_rows": 35,
+   "observations_rows": 71334,
+   "observations_fts_rows": 71334,
+   "latest_pages_missing_embeddings": 0,
+   "embedding_rows": 35
+  },
+  "embedding": {
+   "status": "unknown",
+   "provider": "local",
+   "model": "all-MiniLM-L6-v2",
+   "dim": 384
+  },
+  "embedding_keys": [
+   "dim",
+   "last_call_at",
+   "last_error_at",
+   "last_error_message",
+   "last_error_status",
+   "last_success_at",
+   "model",
+   "provider",
+   "retry_hint",
+   "status"
+  ],
+  "capture_mode": "allowlist",
+  "checks": {
+   "version": true,
+   "pages_fts_match": true,
+   "observations_fts_match": true,
+   "embedding_ok": false,
+   "embedding_identity": true,
+   "latest_pages_missing_embeddings_zero": true
+  },
+  "pass": false
+ },
+ "endpoints": {
+  "healthz_code": 404,
+  "healthz_body": null,
+  "get_mcp_code": 405,
+  "get_mcp_allow": "POST"
+ },
+ "info": {
+  "server": "ai-memory",
+  "version": "2.3.2",
+  "protocol": "2024-11-05",
+  "tools": 23,
+  "tool_names": [
+   "memory_auto_improve",
+   "memory_briefing",
+   "memory_consolidate",
+   "memory_delete_page",
+   "memory_explore",
+   "memory_feedback",
+   "memory_forget_sweep",
+   "memory_handoff_accept",
+   "memory_handoff_begin",
+   "memory_handoff_cancel",
+   "memory_handoff_list",
+   "memory_install_self_routing",
+   "memory_lint",
+   "memory_message_cancel",
+   "memory_message_list",
+   "memory_message_pop",
+   "memory_message_send",
+   "memory_query",
+   "memory_read_page",
+   "memory_read_session_observations",
+   "memory_recent",
+   "memory_status",
+   "memory_write_page"
+  ],
+  "has_probe_tools": true,
+  "status_has_scope": false,
+  "scope_resolved_by": null,
+  "status_counts": {
+   "pages_latest": 31,
+   "pages_all": 35,
+   "sessions": 32,
+   "observations": 71334
+  },
+  "pass": true
+ },
+ "known_page": {
+  "path_matches": true,
+  "body_sha256": "98eb1dfb4fc6b0f5aa496ad78443b0d75cca699c9fa25e2a2fbccea46adba356",
+  "body_chars": 258
+ },
+ "roundtrip": {
+  "write": "ok",
+  "query_hits": 1,
+  "query_path_matches": true,
+  "read_has_token": true,
+  "hits_after_delete": 0,
+  "read_after_delete_failed": true,
+  "pass": true
+ },
+ "check_capture_marker": {
+  "rc": 0,
+  "capture_mode": "allowlist",
+  "marker_present": true,
+  "admits_capture": true,
+  "spooled_files_added": 0
+ },
+ "check_capture_nomarker": {
+  "rc": 0,
+  "capture_mode": "allowlist",
+  "marker_present": false,
+  "admits_capture": false,
+  "spooled_files_added": 0
+ },
+ "hook_probe": {
+  "events": {
+   "session-start": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.03
+   },
+   "post-tool-use": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.01
+   },
+   "session-end": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.01
+   }
+  },
+  "obs": {
+   "nonce_found": true,
+   "via": "session_id",
+   "rows": 1,
+   "total": 1,
+   "seconds": 1.0
+  }
+ },
+ "nomarker_probe": {
+  "events": {
+   "session-start": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.01
+   },
+   "post-tool-use": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.01
+   },
+   "session-end": {
+    "rc": 0,
+    "stdout_is_json_object": true,
+    "stderr_lines": 0,
+    "seconds": 0.01
+   }
+  },
+  "spool": {
+   "spool_files": 1,
+   "files_with_nonce": 0
+  }
+ },
+ "drain_wait": {
+  "seconds": 0.0,
+  "still_running": []
+ },
+ "spool_files_before_stop": 1,
+ "stop": {
+  "rc": 0,
+  "pid_gone": true,
+  "port_closed": true
+ },
+ "killed_leftovers": [],
+ "fingerprint_compare": "V64 -> V64 (64 rows) quick_check=ok | pages before=35 missing_or_changed=0 after=36 | observations before=71334 missing=0 after=71337 | PASS",
+ "fingerprint_pass": true,
+ "db_nonce_counts": {
+  "base-mcp": {
+   "observations": 0,
+   "pages": 0
+  },
+  "base-hook": {
+   "observations": 1,
+   "pages": 0
+  },
+  "base-nomarker": {
+   "observations": 0,
+   "pages": 0
+  }
+ },
+ "db_session_rows": {
+  "base-hook": 1,
+  "base-nomarker": 0
+ },
+ "archives": {
+  "pre_migration_receipt_present": false,
+  "backup_dir_entries": 0,
+  "scratch_home_archives": 0,
+  "real_home_archives": 0,
+  "data_dir_backups_dir_entries": 0
+ },
+ "checks": {
+  "status": false,
+  "info": true,
+  "roundtrip": true,
+  "check_capture_marker": true,
+  "check_capture_nomarker": true,
+  "check_capture_spooled_nothing": true,
+  "hook_nonce_found": true,
+  "nomarker_spool_clean": true,
+  "nomarker_db_zero": true,
+  "hook_db_row": true,
+  "fingerprint": true,
+  "server_stopped": true,
+  "no_pre_migration_archive": true,
+  "known_page_read": true
+ },
+ "pass": false
+}

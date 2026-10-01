@@ -1,0 +1,33 @@
+{
+ "model": "gpt-6-astra",
+ "effort": "max",
+ "sandbox": "read-only",
+ "web_search": "live",
+ "started": "2026-09-28T12:58:47Z",
+ "finished": "2026-09-28T13:08:54Z",
+ "events": 51,
+ "event_types": {
+  "item.completed": 27,
+  "item.started": 21,
+  "thread.started": 1,
+  "turn.completed": 1,
+  "turn.started": 1
+ },
+ "completed_items": {
+  "agent_message": 6,
+  "command_execution": 2,
+  "mcp_tool_call": 18,
+  "web_search": 1
+ },
+ "turn_usage": [
+  {
+   "input_tokens": 1884466,
+   "cached_input_tokens": 1797760,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 15355,
+   "reasoning_output_tokens": 5572
+  }
+ ],
+ "failures": [],
+ "note": "Codex usage fields as reported per turn; cached_input_tokens is a subset of input_tokens and reasoning_output_tokens a subset of output_tokens, so they are never added."
+}

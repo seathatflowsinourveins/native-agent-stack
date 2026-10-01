@@ -1,0 +1,22 @@
+{
+ "S1": {
+  "gpt6": "agree",
+  "claude": "agree",
+  "outcome": "apply the proposed text"
+ },
+ "X5a": {
+  "gpt6": "amend",
+  "claude": "amend",
+  "outcome": "adjudicate (one blind round, both orders, both families; applied only when all four choose it)"
+ },
+ "X5b": {
+  "gpt6": "agree",
+  "claude": "agree",
+  "outcome": "apply the proposed text"
+ },
+ "X5c": {
+  "gpt6": "reject",
+  "claude": "agree",
+  "outcome": "adjudicate (one blind round, both orders, both families; applied only when all four choose it)"
+ }
+}

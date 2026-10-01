@@ -1,0 +1,39 @@
+{
+  "limits": [
+    "Presence/threshold measurement only; no model, service, or GPU workload is actually run.",
+    "nvidia-smi absence yields gpu=null even when a GPU is present but the driver/tool is unavailable.",
+    ".wslconfig detection is a best-effort read of /mnt/<drive>/Users/*/.wslconfig; a non-default Windows user profile path or drive letter is not searched, and on a multi-user Windows PC the alphabetically-first profile with a .wslconfig is used (see wslconfig_other_candidates for the rest).",
+    "WSL effective_ram_gb uses /proc/meminfo (native_proven) rather than .wslconfig's configured ceiling (source_review); wslconfig_memory_gb is still reported for visibility.",
+    "macOS unified-memory VRAM is scaled by a declared, labelled macos_unified_gpu_working_set_fraction (adoption/hardware-profiles.json), not measured Metal working-set behavior on this run.",
+    "The local generation and embedding/semantic-RAG tiers on a unified-memory host are independent, sequential-use budgets; see concurrent_use_warning when both are non-trivial on the same host."
+  ],
+  "measured": {
+    "cores": 24,
+    "cpu_brand": "Intel(R) Core(TM) Ultra 9 275HX",
+    "effective_ram_gb": 47.0,
+    "effective_ram_gb_source": "proc_meminfo",
+    "evidence_class": "native_proven",
+    "gpu": {
+      "evidence_class": "native_proven",
+      "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+      "vram_gb": 23.9
+    },
+    "is_wsl": true,
+    "platform": "wsl",
+    "ram_gb_proc_meminfo": 47.0,
+    "wslconfig_memory_gb": 48.0,
+    "wslconfig_memory_gb_evidence_class": "source_review",
+    "wslconfig_other_candidates": [],
+    "wslconfig_source": "/mnt/c/Users/<user>/.wslconfig"
+  },
+  "profiles_source": "adoption/hardware-profiles.json",
+  "recommended": {
+    "concurrent_use_warning": null,
+    "ecosystem_job_memory_high_gb": 7.9,
+    "ecosystem_job_memory_max_gb": 11.8,
+    "embedding_semantic_rag_tier": "standard",
+    "local_generation_model_tier": "large-32b-q4",
+    "workflow_concurrency_cap": 16
+  },
+  "schema": "hardware-profile-report-v1"
+}

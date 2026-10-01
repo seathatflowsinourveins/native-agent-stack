@@ -22,11 +22,65 @@
       },
       "current_sha256": "bba1f9655cce0b412257fbd0c40680b6b0ccc0ecffb91a2f3605323491655aed",
       "change": "Set SO_REUSEADDR on the preflight bind so TIME_WAIT does not mimic a live listener; keep live listener refusal and never enable SO_REUSEPORT."
+    },
+    {
+      "current_path": "package.json",
+      "original": {
+        "revision": "047217793fdc7c0d9bcefb15d1915ab580bb5eed",
+        "sha256": "dfcda7940e4723c79e5675f55bf713fa1d8c49c2ab0d2b828f061010536238c9",
+        "retained_path": "history/package.0472177.json"
+      },
+      "current_sha256": "adc11906a06213750da8eb351ee5a6289720b2cdb2ffc6723025e1624270c31d",
+      "change": "Security bump next 16.3.5 -> 16.3.6 for GHSA-vcvr-r3jv-pc5j (CVE-2026-94545, critical: remote code execution in next/og ImageResponse; affects >= 16.2.0 < 16.3.6; patched in 16.3.6). rg over the whole repository finds no next/og, ImageResponse or @vercel/og use, and app/ serves a static icon.svg, so this fixture never reached the vulnerable path; the bump removes the vulnerable package from the lock. Only next and its nine @next/* packages change.",
+      "source": {
+        "verified_at": "2026-09-25",
+        "release": "https://github.com/vercel/next.js/releases/tag/v16.3.6",
+        "release_published_at": "2026-09-22T17:15:10Z",
+        "prerelease": false,
+        "tag_commit": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+        "advisory": "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j",
+        "registry": "https://registry.npmjs.org/next/16.3.6",
+        "registry_integrity": "sha512-L+otWM/aQbYTx98aZhgEoMb4bZAXx1YVW4UMA/vuCyCoWG5HJyZUili8QAkqzrcC+5///tsz3s0M+SlyB5bLMw==",
+        "registry_provenance": "SLSA v1 attestation published with the package",
+        "dependency_ranges_unchanged": "next 16.3.6 declares the same dependency and peer ranges as 16.3.5; only @next/env and the eight @next/swc-* pins move to 16.3.6"
+      },
+      "verification": {
+        "host": "Mac arm64, Node 24.21.0, pnpm 12.4.2",
+        "commands": [
+          "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+          "pnpm peers check",
+          "pnpm typecheck",
+          "NEXT_TELEMETRY_DISABLED=1 pnpm build"
+        ],
+        "status": "passed",
+        "scope": "Locked install, peer, type and production-build checks only. The PostgreSQL, API and browser stages of make verify were not rerun, so the 2026-09-20 receipt still qualifies 16.3.5, not 16.3.6."
+      }
+    },
+    {
+      "current_path": "pnpm-lock.yaml",
+      "original": {
+        "revision": "047217793fdc7c0d9bcefb15d1915ab580bb5eed",
+        "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b",
+        "retained_path": "history/pnpm-lock.0472177.yaml"
+      },
+      "current_sha256": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
+      "change": "Regenerated with the fixture's own pnpm 12.4.2 (pnpm install --lockfile-only --ignore-scripts) after the package.json bump. All ten changed resolution integrities (next, @next/env, eight @next/swc-*) equal registry.npmjs.org dist.integrity for 16.3.6; every other entry is byte-identical.",
+      "verification": {
+        "host": "Mac arm64, Node 24.21.0, pnpm 12.4.2",
+        "commands": [
+          "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+          "pnpm peers check",
+          "pnpm typecheck",
+          "NEXT_TELEMETRY_DISABLED=1 pnpm build"
+        ],
+        "status": "passed",
+        "scope": "Locked install, peer, type and production-build checks only. The PostgreSQL, API and browser stages of make verify were not rerun, so the 2026-09-20 receipt still qualifies 16.3.5, not 16.3.6."
+      }
     }
   ],
   "unchanged_historical_evidence": {
     "receipt.json": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7",
-    "experiment.json": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+    "history/experiment.json.0472177": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
     "freeze.json": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
   },
   "qualification": {
@@ -63,5 +117,23 @@
       "status": "passed",
       "retained_baseline_note": "serve.py already had a shebang with non-executable mode at cabbe2c and is invoked explicitly with python3; its mode is unchanged. EXE001 is excluded only from this focused lint invocation."
     }
-  }
+  },
+  "relocated_frozen_inputs": [
+    {
+      "record": "experiment.json",
+      "original": {
+        "revision": "047217793fdc7c0d9bcefb15d1915ab580bb5eed",
+        "sha256": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+        "retained_path": "history/experiment.json.0472177"
+      },
+      "current_sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+      "relocated": {
+        "pointer": "/frozen_inputs/sources/4",
+        "from_path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+        "to_path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
+        "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+      },
+      "change": "The 2026-09-25 Next.js 16.3.6 lock replaced pnpm-lock.yaml. The recorded convergence experiment still binds the exact 16.3.5 lock it ran with, now at its byte-identical retained path; the frozen hash and every other byte of the record are unchanged. The experiment does not qualify the 16.3.6 lock."
+    }
+  ]
 }

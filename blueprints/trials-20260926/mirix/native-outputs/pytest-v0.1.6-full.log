@@ -1,0 +1,583 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0 -- <scratch>/trial-mirix/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <scratch>/trial-mirix/mirix-src
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+testpaths: tests
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 193 items
+
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[episodic] SKIPPED [  0%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[semantic] SKIPPED [  1%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[core] SKIPPED [  1%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[procedural] SKIPPED [  2%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[resource] SKIPPED [  2%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[knowledge] SKIPPED [  3%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[reflexion] SKIPPED [  3%]
+tests/test_agent_prompt_update.py::test_update_agent_system_prompt[meta_memory_agent] SKIPPED [  4%]
+tests/test_agent_prompt_update.py::test_update_all_agents_sequentially SKIPPED [  4%]
+tests/test_agent_prompt_update.py::test_update_same_agent_multiple_times SKIPPED [  5%]
+tests/test_agent_prompt_update.py::test_error_handling_nonexistent_agent SKIPPED [  5%]
+tests/test_auth_provider.py::TestAuthProvider::test_cannot_instantiate_abstract_class PASSED [  6%]
+tests/test_auth_provider.py::TestAuthProvider::test_subclass_must_implement_get_auth_headers PASSED [  6%]
+tests/test_auth_provider.py::TestProviderRegistration::test_register_retrieve_and_use_provider PASSED [  7%]
+tests/test_auth_provider.py::TestProviderRegistration::test_overwrite_existing_provider PASSED [  7%]
+tests/test_auth_provider.py::TestProviderRegistration::test_stateful_provider_with_caching PASSED [  8%]
+tests/test_auth_provider.py::TestTokenRefreshProvider::test_token_refresh_on_expiry PASSED [  8%]
+tests/test_auth_provider.py::TestRegistryManagement::test_list_providers PASSED [  9%]
+tests/test_auth_provider.py::TestRegistryManagement::test_unregister_provider PASSED [  9%]
+tests/test_auth_provider.py::TestRegistryManagement::test_unregister_nonexistent_provider PASSED [ 10%]
+tests/test_auth_provider.py::TestRegistryManagement::test_get_nonexistent_provider PASSED [ 10%]
+tests/test_auth_provider.py::TestLLMConfigIntegration::test_llm_config_with_auth_provider PASSED [ 11%]
+tests/test_auth_provider.py::TestErrorHandling::test_provider_that_raises_exception PASSED [ 11%]
+tests/test_client_agent_isolation.py::test_each_client_has_own_meta_agent SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 12%]
+tests/test_client_agent_isolation.py::test_list_agents_returns_only_client_agents SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 12%]
+tests/test_client_agent_isolation.py::test_get_agent_by_id_enforces_client_ownership SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 13%]
+tests/test_client_agent_isolation.py::test_child_agents_filtered_by_client SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 13%]
+tests/test_client_agent_isolation.py::test_memory_apis_use_correct_client_agents SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 14%]
+tests/test_client_agent_isolation.py::test_redis_cache_respects_client_isolation SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 15%]
+tests/test_client_agent_isolation.py::test_initialization_creates_separate_hierarchies SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d8062302810>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 15%]
+tests/test_credit_system.py::test_deduct_credits_updates_balance PASSED  [ 16%]
+tests/test_credit_system.py::test_credit_deduction_openai_call PASSED    [ 16%]
+tests/test_credit_system.py::test_credit_deduction_gemini_call PASSED    [ 17%]
+tests/test_credit_system.py::test_credit_deduction_other_models_placeholder SKIPPED [ 17%]
+tests/test_deletion_apis.py::test_1_create_client_and_add_memories SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 18%]
+tests/test_deletion_apis.py::test_3_delete_user_memories SKIPPED (Server
+not available at http://localhost:8000:
+HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 18%]
+tests/test_deletion_apis.py::test_4_add_new_memories_after_user_deletion SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 19%]
+tests/test_deletion_apis.py::test_5_delete_client_memories SKIPPED(host='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 19%]
+tests/test_deletion_apis.py::test_6_add_memory_after_client_deletion SKIPPED='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 20%]
+tests/test_deletion_apis.py::test_7_soft_delete_user SKIPPED (Server not
+available at http://localhost:8000: HTTPConnectionPool(host='localhost',
+port=8000): Max retries exceeded with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 20%]
+tests/test_deletion_apis.py::test_8_soft_delete_client SKIPPED (Server
+not available at http://localhost:8000:
+HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded
+with url: /health (Caused by
+ConnectTimeoutError(<HTTPConnection(host='localhost', port=8000) at
+0x7d80623a4c10>, 'Connection to localhost timed out. (connect
+timeout=5)')))                                                           [ 21%]
+tests/test_deletion_apis.py::test_9_summary PASSED                       [ 21%]
+tests/test_memory_decay.py::test_fade_excludes_old_memory PASSED         [ 22%]
+tests/test_memory_decay.py::test_cleanup_deletes_expired PASSED          [ 22%]
+tests/test_memory_integration.py::test_add SKIPPED (GEMINI_API_KEY not
+set)                                                                     [ 23%]
+tests/test_memory_integration.py::test_retrieve_with_conversation SKIPPED [ 23%]
+tests/test_memory_integration.py::test_retrieve_with_topic SKIPPED       [ 24%]
+tests/test_memory_integration.py::test_search SKIPPED (GEMINI_API_KEY
+not set)                                                                 [ 24%]
+tests/test_memory_server.py::TestDirectEpisodicMemory::test_insert_event SKIPPED [ 25%]
+tests/test_memory_server.py::TestDirectEpisodicMemory::test_search_bm25 SKIPPED [ 25%]
+tests/test_memory_server.py::TestDirectEpisodicMemory::test_search_embedding SKIPPED [ 26%]
+tests/test_memory_server.py::TestDirectProceduralMemory::test_insert_procedure SKIPPED [ 26%]
+tests/test_memory_server.py::TestDirectProceduralMemory::test_search_procedures SKIPPED [ 27%]
+tests/test_memory_server.py::TestDirectResourceMemory::test_insert_resource SKIPPED [ 27%]
+tests/test_memory_server.py::TestDirectResourceMemory::test_search_resources_bm25 SKIPPED [ 28%]
+tests/test_memory_server.py::TestDirectResourceMemory::test_search_resources_embedding SKIPPED [ 29%]
+tests/test_memory_server.py::TestDirectKnowledge::test_insert_knowledge SKIPPED [ 29%]
+tests/test_memory_server.py::TestDirectKnowledge::test_search_knowledge SKIPPED [ 30%]
+tests/test_memory_server.py::TestDirectSemanticMemory::test_insert_semantic_item SKIPPED [ 30%]
+tests/test_memory_server.py::TestDirectSemanticMemory::test_search_semantic_embedding SKIPPED [ 31%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_episodic_search_methods_and_fields SKIPPED [ 31%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_procedural_search_methods_and_fields SKIPPED [ 32%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_resource_search_methods_and_fields SKIPPED [ 32%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_knowledge_search_methods_and_fields SKIPPED [ 33%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_semantic_search_methods_and_fields SKIPPED [ 33%]
+tests/test_memory_server.py::TestSearchMethodComparison::test_all_memory_types_search SKIPPED [ 34%]
+tests/test_memory_server.py::TestMetaMemoryParallelism::test_trigger_memory_update_runs_in_parallel SKIPPED [ 34%]
+tests/test_message_handling.py::TestGetMessagesByIds::test_returns_existing_messages_skips_missing PASSED [ 35%]
+tests/test_message_handling.py::TestGetMessagesByIds::test_preserves_order_of_existing_messages PASSED [ 35%]
+tests/test_message_handling.py::TestGetMessagesByIds::test_returns_empty_list_when_all_missing PASSED [ 36%]
+tests/test_message_handling.py::TestGetInContextMessages::test_filters_by_user_id_when_user_provided PASSED [ 36%]
+tests/test_message_handling.py::TestGetInContextMessages::test_no_filtering_when_user_not_provided PASSED [ 37%]
+tests/test_message_handling.py::TestGetInContextMessages::test_returns_empty_when_no_messages PASSED [ 37%]
+tests/test_queue.py::TestMemoryQueue::test_memory_queue_init PASSED      [ 38%]
+tests/test_queue.py::TestMemoryQueue::test_memory_queue_put_get PASSED   [ 38%]
+tests/test_queue.py::TestMemoryQueue::test_memory_queue_timeout PASSED   [ 39%]
+tests/test_queue.py::TestMemoryQueue::test_memory_queue_fifo_order PASSED [ 39%]
+tests/test_queue.py::TestMemoryQueue::test_memory_queue_close PASSED     [ 40%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_partitioned_queue_init PASSED [ 40%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_partitioned_queue_default_partitions PASSED [ 41%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_partitioned_queue_min_partitions PASSED [ 41%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_same_user_routes_to_same_partition PASSED [ 42%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_different_users_can_route_to_different_partitions PASSED [ 43%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_get_from_partition_retrieves_correct_partition PASSED [ 43%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_get_from_partition_invalid_partition PASSED [ 44%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_get_from_partition_timeout PASSED [ 44%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_fallback_to_actor_id_when_no_user_id PASSED [ 45%]
+tests/test_queue.py::TestPartitionedMemoryQueue::test_backward_compatible_get PASSED [ 45%]
+tests/test_queue.py::TestQueueWorker::test_worker_init_without_server PASSED [ 46%]
+tests/test_queue.py::TestQueueWorker::test_worker_init_with_server PASSED [ 46%]
+tests/test_queue.py::TestQueueWorker::test_worker_set_server PASSED      [ 47%]
+tests/test_queue.py::TestQueueWorker::test_worker_start_stop PASSED      [ 47%]
+tests/test_queue.py::TestQueueWorker::test_worker_process_message_without_server PASSED [ 48%]
+tests/test_queue.py::TestQueueWorker::test_worker_process_message_with_server PASSED [ 48%]
+tests/test_queue.py::TestQueueWorker::test_worker_message_processing_integration PASSED [ 49%]
+tests/test_queue.py::TestQueueManager::test_manager_singleton PASSED     [ 49%]
+tests/test_queue.py::TestQueueManager::test_manager_init_without_server PASSED [ 50%]
+tests/test_queue.py::TestQueueManager::test_manager_init_with_server PASSED [ 50%]
+tests/test_queue.py::TestQueueManager::test_manager_idempotent_init PASSED [ 51%]
+tests/test_queue.py::TestQueueManager::test_manager_update_server_after_init PASSED [ 51%]
+tests/test_queue.py::TestQueueManager::test_manager_save_message PASSED  [ 52%]
+tests/test_queue.py::TestQueueManager::test_manager_cleanup PASSED       [ 52%]
+tests/test_queue.py::TestMultiWorkerManager::test_manager_single_worker_default PASSED [ 53%]
+tests/test_queue.py::TestMultiWorkerManager::test_manager_multiple_workers PASSED [ 53%]
+tests/test_queue.py::TestMultiWorkerManager::test_manager_workers_have_unique_partition_ids PASSED [ 54%]
+tests/test_queue.py::TestMultiWorkerManager::test_manager_all_workers_running PASSED [ 54%]
+tests/test_queue.py::TestMultiWorkerManager::test_manager_cleanup_stops_all_workers PASSED [ 55%]
+tests/test_queue.py::TestMultiWorkerManager::test_initialize_queue_with_num_workers PASSED [ 55%]
+tests/test_queue.py::TestMultiWorkerManager::test_num_workers_one_uses_simple_queue PASSED [ 56%]
+tests/test_queue.py::TestWorkerPartitionAssignment::test_worker_with_partition_id_init PASSED [ 56%]
+tests/test_queue.py::TestWorkerPartitionAssignment::test_worker_consumes_from_assigned_partition PASSED [ 57%]
+tests/test_queue.py::TestWorkerPartitionAssignment::test_multiple_workers_partition_isolation PASSED [ 58%]
+tests/test_queue.py::TestWorkerPartitionAssignment::test_partitioned_queue_distributes_by_user_id PASSED [ 58%]
+tests/test_queue.py::TestQueueUtil::test_put_messages_basic PASSED       [ 59%]
+tests/test_queue.py::TestQueueUtil::test_put_messages_with_options PASSED [ 59%]
+tests/test_queue.py::TestQueueUtil::test_put_messages_role_mapping PASSED [ 60%]
+tests/test_queue.py::TestQueueInit::test_initialize_queue PASSED         [ 60%]
+tests/test_queue.py::TestQueueInit::test_save_without_init PASSED        [ 61%]
+tests/test_queue.py::TestQueueInit::test_save_with_init PASSED           [ 61%]
+tests/test_queue.py::TestQueueIntegration::test_end_to_end_message_flow PASSED [ 62%]
+tests/test_queue.py::TestQueueIntegration::test_multiple_messages_processing PASSED [ 62%]
+tests/test_queue.py::TestQueueIntegration::test_worker_handles_processing_errors PASSED [ 63%]
+tests/test_queue.py::TestQueuePerformance::test_enqueue_performance PASSED [ 63%]
+tests/test_queue.py::TestQueuePerformance::test_concurrent_enqueue FAILED [ 64%]
+tests/test_redis_integration.py::TestOrganizationManagerRedis::test_organization_create_with_redis SKIPPED [ 64%]
+tests/test_redis_integration.py::TestOrganizationManagerRedis::test_organization_cache_hit SKIPPED [ 65%]
+tests/test_redis_integration.py::TestOrganizationManagerRedis::test_organization_update_invalidates_cache SKIPPED [ 65%]
+tests/test_redis_integration.py::TestOrganizationManagerRedis::test_organization_delete_removes_cache SKIPPED [ 66%]
+tests/test_redis_integration.py::TestUserManagerRedis::test_user_create_with_redis SKIPPED [ 66%]
+tests/test_redis_integration.py::TestUserManagerRedis::test_user_cache_hit_performance SKIPPED [ 67%]
+tests/test_redis_integration.py::TestUserManagerRedis::test_user_update_status_invalidates_cache SKIPPED [ 67%]
+tests/test_redis_integration.py::TestUserManagerRedis::test_user_update_timezone_invalidates_cache SKIPPED [ 68%]
+tests/test_redis_integration.py::TestUserManagerRedis::test_user_delete_removes_cache SKIPPED [ 68%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_create_with_tools_caches_both SKIPPED [ 69%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_with_tools_denormalizes_tools_agents SKIPPED [ 69%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_retrieval_uses_pipeline_for_tools SKIPPED [ 70%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_update_invalidates_cache SKIPPED [ 70%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_delete_removes_cache SKIPPED [ 71%]
+tests/test_redis_integration.py::TestAgentAndToolManagerRedis::test_agent_cache_hit_performance SKIPPED [ 72%]
+tests/test_redis_integration.py::TestToolsAgentsDenormalization::test_tools_agents_not_cached_separately SKIPPED [ 72%]
+tests/test_redis_integration.py::TestToolsAgentsDenormalization::test_agent_with_tools_single_pipeline_retrieval SKIPPED [ 73%]
+tests/test_redis_integration.py::TestBlockManagerRedis::test_block_create_with_redis SKIPPED [ 73%]
+tests/test_redis_integration.py::TestBlockManagerRedis::test_block_cache_hit SKIPPED [ 74%]
+tests/test_redis_integration.py::TestBlockManagerRedis::test_block_update_invalidates_cache SKIPPED [ 74%]
+tests/test_redis_integration.py::TestBlockManagerRedis::test_block_delete_removes_cache SKIPPED [ 75%]
+tests/test_redis_integration.py::TestMessageManagerRedis::test_message_create_with_redis SKIPPED [ 75%]
+tests/test_redis_integration.py::TestMessageManagerRedis::test_message_cache_hit_performance SKIPPED [ 76%]
+tests/test_redis_integration.py::TestEpisodicMemoryManagerRedis::test_episodic_create_with_redis SKIPPED [ 76%]
+tests/test_redis_integration.py::TestEpisodicMemoryManagerRedis::test_episodic_cache_with_embeddings SKIPPED [ 77%]
+tests/test_redis_integration.py::TestSemanticMemoryManagerRedis::test_semantic_create_with_three_embeddings SKIPPED [ 77%]
+tests/test_redis_integration.py::TestProceduralMemoryManagerRedis::test_procedural_create_with_embeddings SKIPPED [ 78%]
+tests/test_redis_integration.py::TestResourceMemoryManagerRedis::test_resource_create_with_embedding SKIPPED [ 78%]
+tests/test_redis_integration.py::TestKnowledgeMemoryManagerRedis::test_knowledge_create_with_embedding SKIPPED [ 79%]
+tests/test_redis_integration.py::TestRedisFallback::test_block_manager_works_without_redis PASSED [ 79%]
+tests/test_redis_integration.py::TestRedisPerformance::test_block_cache_speedup SKIPPED [ 80%]
+tests/test_redis_integration.py::TestRedisPerformance::test_message_cache_vs_db_comparison SKIPPED [ 80%]
+tests/test_redis_integration.py::TestRedisIntegrationEnd2End::test_full_workflow_with_redis SKIPPED [ 81%]
+tests/test_redis_integration.py::test_redis_integration_summary SKIPPED  [ 81%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users ERROR [ 82%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users_embedding ERROR [ 82%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope ERROR [ 83%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope_embedding ERROR [ 83%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3 ERROR [ 84%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3_embedding ERROR [ 84%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination ERROR [ 85%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination_embedding ERROR [ 86%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_memory_types ERROR [ 86%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type ERROR [ 87%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type_embedding ERROR [ 87%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_additional_filter_tags ERROR [ 88%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_bm25 ERROR [ 88%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_embedding ERROR [ 89%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_response_includes_metadata ERROR [ 89%]
+tests/test_search_all_users.py::TestSearchAllUsers::test_each_result_includes_user_id ERROR [ 90%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_today PASSED [ 90%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_yesterday PASSED [ 91%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_last_week PASSED [ 91%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_this_week PASSED [ 92%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_last_month PASSED [ 92%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_this_month PASSED [ 93%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_last_n_days PASSED [ 93%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_last_n_weeks PASSED [ 94%]
+tests/test_temporal_queries.py::TestTemporalParser::test_parse_last_n_months PASSED [ 94%]
+tests/test_temporal_queries.py::TestTemporalParser::test_no_temporal_expression PASSED [ 95%]
+tests/test_temporal_queries.py::TestTemporalParser::test_case_insensitive PASSED [ 95%]
+tests/test_temporal_queries.py::TestTemporalParser::test_temporal_range_to_dict PASSED [ 96%]
+tests/test_temporal_queries.py::TestTemporalParser::test_temporal_range_none_values PASSED [ 96%]
+tests/test_temporal_queries.py::TestTemporalIntegration::test_retrieve_with_temporal_expression SKIPPED [ 97%]
+tests/test_temporal_queries.py::TestTemporalIntegration::test_retrieve_with_explicit_date_range SKIPPED [ 97%]
+tests/test_temporal_queries.py::TestTemporalIntegration::test_temporal_filtering_episodic_only SKIPPED [ 98%]
+tests/test_user.py::test_explicit_user_creation_then_add_memory SKIPPED  [ 98%]
+tests/test_user.py::test_auto_user_creation_on_add_memory SKIPPED        [ 99%]
+tests/test_user.py::test_idempotent_create_or_get_user SKIPPED           [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of TestSearchAllUsers.test_search_all_users_with_client_id_retrieves_both_users _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_all_users_with_client_id_retrieves_both_users_embedding _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_excludes_user3_without_matching_scope _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_excludes_user3_without_matching_scope_embedding _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_with_client3_retrieves_only_user3 _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_with_client3_retrieves_only_user3_embedding _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_different_org_no_cross_contamination _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_different_org_no_cross_contamination_embedding _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+______ ERROR at setup of TestSearchAllUsers.test_search_all_memory_types _______
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+____ ERROR at setup of TestSearchAllUsers.test_search_specific_memory_type _____
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_specific_memory_type_embedding _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_ ERROR at setup of TestSearchAllUsers.test_search_with_additional_filter_tags _
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+__________ ERROR at setup of TestSearchAllUsers.test_search_with_bm25 __________
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_______ ERROR at setup of TestSearchAllUsers.test_search_with_embedding ________
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+_____ ERROR at setup of TestSearchAllUsers.test_response_includes_metadata _____
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+____ ERROR at setup of TestSearchAllUsers.test_each_result_includes_user_id ____
+tests/test_search_all_users.py:206: in client1
+    client = MirixClient(
+mirix/client/remote_client.py:286: in __init__
+    raise ValueError(
+E   ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+=================================== FAILURES ===================================
+_________________ TestQueuePerformance.test_concurrent_enqueue _________________
+tests/test_queue.py:1123: in test_concurrent_enqueue
+    assert len(processed_messages) == 100  # 5 threads * 20 messages
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 57 == 100
+E    +  where 57 = len(['agent-0-0', 'agent-2-0', 'agent-3-0', 'agent-1-0', 'agent-2-1', 'agent-0-1', 'agent-4-0', 'agent-1-1', 'agent-2-2', 'agent-3-1', 'agent-1-2', 'agent-3-2', 'agent-2-3', 'agent-4-1', 'agent-0-2', 'agent-1-3', 'agent-3-3', 'agent-2-4', 'agent-1-4', 'agent-0-3', 'agent-4-2', 'agent-1-5', 'agent-3-4', 'agent-2-5', 'agent-0-4', 'agent-4-3', 'agent-3-5', 'agent-0-5', 'agent-1-6', 'agent-2-6', 'agent-4-4', 'agent-0-6', 'agent-3-6', 'agent-4-5', 'agent-1-7', 'agent-2-7', 'agent-1-8', 'agent-0-7', 'agent-4-6', 'agent-2-8', 'agent-3-7', 'agent-4-7', 'agent-1-9', 'agent-0-8', 'agent-2-9', 'agent-3-8', 'agent-1-10', 'agent-0-9', 'agent-4-8', 'agent-3-9', 'agent-1-11', 'agent-2-10', 'agent-0-10', 'agent-4-9', 'agent-3-10', 'agent-1-12', 'agent-4-10'])
+----------------------------- Captured stdout call -----------------------------
+2026-09-25 21:46:33 - Mirix - INFO - 🚀 Initializing queue manager: type=memory, num_workers=1, server=provided
+2026-09-25 21:46:33 - Mirix - INFO - 📝 Creating queue instance...
+2026-09-25 21:46:33 - Mirix - INFO - ✅ Queue created: type=MemoryQueue
+2026-09-25 21:46:33 - Mirix - INFO - 👷 Creating single background worker...
+2026-09-25 21:46:33 - Mirix - INFO - ▶️  Starting 1 background worker thread(s)...
+2026-09-25 21:46:33 - Mirix - INFO - 🚀 Starting queue worker thread...
+2026-09-25 21:46:33 - Mirix - INFO - 📝 Creating daemon thread for message consumption...
+2026-09-25 21:46:33 - Mirix - INFO - ✅ Thread created: <Thread(QueueWorker, initial daemon)>
+2026-09-25 21:46:33 - Mirix - INFO - ▶️  Starting thread...
+2026-09-25 21:46:33 - Mirix - INFO - 🎯 Queue worker thread ENTERED _consume_messages()
+2026-09-25 21:46:33 - Mirix - INFO -    _running=True, _server=True
+2026-09-25 21:46:33 - Mirix - INFO - ✅ Thread.start() called, is_alive=True
+2026-09-25 21:46:33 - Mirix - INFO - ✅ Queue worker thread started successfully
+2026-09-25 21:46:33 - Mirix - INFO - 🔍 Worker status: running=1/1, threads_alive=1/1
+2026-09-25 21:46:33 - Mirix - INFO - ✅ All 1 queue worker(s) started successfully!
+2026-09-25 21:46:33 - Mirix - INFO - ✅ Queue manager initialized successfully
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-0-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-2-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-3-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-1-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-2-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-0-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-4-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-1-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-2-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:33 - Mirix - INFO - Processing message via server: agent_id=agent-3-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-2-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-3-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-1-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-4-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+------------------------------ Captured log call -------------------------------
+INFO     Mirix:manager.py:87 🚀 Initializing queue manager: type=memory, num_workers=1, server=provided
+INFO     Mirix:manager.py:97 📝 Creating queue instance...
+INFO     Mirix:manager.py:99 ✅ Queue created: type=MemoryQueue
+INFO     Mirix:manager.py:117 👷 Creating single background worker...
+INFO     Mirix:manager.py:123 ▶️  Starting 1 background worker thread(s)...
+INFO     Mirix:worker.py:343 🚀 Starting queue worker thread...
+INFO     Mirix:worker.py:349 📝 Creating daemon thread for message consumption...
+INFO     Mirix:worker.py:355 ✅ Thread created: <Thread(QueueWorker, initial daemon)>
+INFO     Mirix:worker.py:357 ▶️  Starting thread...
+INFO     Mirix:worker.py:299 🎯 Queue worker thread ENTERED _consume_messages()
+INFO     Mirix:worker.py:300    _running=True, _server=True
+INFO     Mirix:worker.py:359 ✅ Thread.start() called, is_alive=True
+INFO     Mirix:worker.py:361 ✅ Queue worker thread started successfully
+INFO     Mirix:manager.py:135 🔍 Worker status: running=1/1, threads_alive=1/1
+INFO     Mirix:manager.py:144 ✅ All 1 queue worker(s) started successfully!
+INFO     Mirix:manager.py:152 ✅ Queue manager initialized successfully
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-0, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-1, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-2, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-3, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-4, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-5, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-6, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-7, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-8, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-2-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-0-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-9, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-3-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-1-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+INFO     Mirix:worker.py:239 Processing message via server: agent_id=agent-4-10, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+--------------------------- Captured stdout teardown ---------------------------
+2026-09-25 21:46:34 - Mirix - INFO - Processing message via server: agent_id=agent-0-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-2-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-1-13, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-3-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-4-11, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-0-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-2-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-3-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-1-14, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-2-13, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-4-12, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-0-13, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-3-13, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-1-15, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-2-14, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-0-14, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-3-14, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-1-16, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-2-15, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-4-13, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-3-15, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-0-15, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-4-14, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+2026-09-25 21:46:35 - Mirix - INFO - Processing message via server: agent_id=agent-1-17, client_id=client-123 (from actor), user_id=None, input_messages_count=2, use_cache=True, filter_tags=None, occurred_at=None
+=============================== warnings summary ===============================
+mirix/orm/base.py:19
+  <scratch>/trial-mirix/mirix-src/mirix/orm/base.py:19: SADeprecationWarning: The declarative_mixin decorator was used only by the now removed mypy plugin so it has no longer any use and can be safely removed. (deprecated since: 2.1)
+    @declarative_mixin
+
+tests/test_memory_decay.py::test_fade_excludes_old_memory
+  <scratch>/trial-mirix/mirix-src/mirix/orm/sqlalchemy_base.py:431: SADeprecationWarning: The ``noload`` loader strategy is deprecated and will be removed in a future release.  This option produces incorrect results by returning ``None`` for related items. (deprecated since: 2.1) (This warning originated from the `configure_mappers()` process, which was invoked automatically in response to a user-initiated operation.)
+    if found := db_session.execute(query).scalar():
+
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users
+  <scratch>/trial-mirix/venv/lib/python3.11/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_queue.py::TestQueuePerformance::test_concurrent_enqueue - AssertionError: assert 57 == 100
+ +  where 57 = len(['agent-0-0', 'agent-2-0', 'agent-3-0', 'agent-1-0', 'agent-2-1', 'agent-0-1', 'agent-4-0', 'agent-1-1', 'agent-2-2', 'agent-3-1', 'agent-1-2', 'agent-3-2', 'agent-2-3', 'agent-4-1', 'agent-0-2', 'agent-1-3', 'agent-3-3', 'agent-2-4', 'agent-1-4', 'agent-0-3', 'agent-4-2', 'agent-1-5', 'agent-3-4', 'agent-2-5', 'agent-0-4', 'agent-4-3', 'agent-3-5', 'agent-0-5', 'agent-1-6', 'agent-2-6', 'agent-4-4', 'agent-0-6', 'agent-3-6', 'agent-4-5', 'agent-1-7', 'agent-2-7', 'agent-1-8', 'agent-0-7', 'agent-4-6', 'agent-2-8', 'agent-3-7', 'agent-4-7', 'agent-1-9', 'agent-0-8', 'agent-2-9', 'agent-3-8', 'agent-1-10', 'agent-0-9', 'agent-4-8', 'agent-3-9', 'agent-1-11', 'agent-2-10', 'agent-0-10', 'agent-4-9', 'agent-3-10', 'agent-1-12', 'agent-4-10'])
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_users_with_client_id_retrieves_both_users_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_excludes_user3_without_matching_scope_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3 - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_client3_retrieves_only_user3_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_different_org_no_cross_contamination_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_all_memory_types - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_specific_memory_type_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_additional_filter_tags - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_bm25 - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_search_with_embedding - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_response_includes_metadata - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+ERROR tests/test_search_all_users.py::TestSearchAllUsers::test_each_result_includes_user_id - ValueError: api_key is required; set MIRIX_API_KEY or pass api_key to MirixClient.
+======= 1 failed, 88 passed, 88 skipped, 5 warnings, 16 errors in 55.55s =======

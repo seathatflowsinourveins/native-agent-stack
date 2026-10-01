@@ -13,7 +13,18 @@ this lists the latest receipt *bound* to a current pin and its age, and flags:
   clears when the host is done;
 - ``no_bound_receipt``: receipts exist but none matches a current pin;
 - ``no_current_pin``: neither a landscape winner nor ``manifests/stack.json`` gives a
-  version, so binding cannot be judged.
+  version, so binding cannot be judged;
+- ``stack_alias``: the component id is a ``manifests/stack.json`` id sharing its repository with a
+  differently named landscape winner (``host_receipts.winner_stack_aliases``; the row's
+  ``alias_of`` names the winner) and at least one of the row's receipts is not grandfathered.
+  scripts/platform_status.py joins receipts by the winner's own id, so these receipts never bind
+  and are never judged against the stack version; re-record under the winner id.
+
+A row whose receipts are all grandfathered alias receipts (``host_receipts.GRANDFATHERED_ALIAS_RECEIPTS``
+paths whose recorded claim still matches the entry's ``claim_sha256``; ``host_receipts.py validate`` accepts exactly
+those) is informational, not flagged: it keeps ``alias_of``, has ``grandfathered: true`` and
+``info: ["stack_alias_grandfathered"]``, and counts under the report's ``info_counts``, so a
+permanent, validated exemption does not keep the report ``flagged``. Such a receipt still never binds.
 
 "Bound" follows scripts/platform_status.py: a schema-valid receipt whose host os/architecture
 match the platform profile and whose ``tool_versions[component_id]`` matches a current pin
@@ -47,7 +58,8 @@ except ImportError:  # running as a plain script, not a package
 
 
 DEFAULT_MAX_AGE_DAYS = 30
-FLAGS = ("stale", "pin_moved", "no_bound_receipt", "no_current_pin")
+FLAGS = ("stale", "pin_moved", "no_bound_receipt", "no_current_pin", "stack_alias")
+INFO = ("stack_alias_grandfathered",)
 
 
 def parse_now(value: str | None) -> datetime:
@@ -74,12 +86,19 @@ def is_bound(entry: dict, pins: list[str]) -> bool:
                 and any(host_receipts.pin_matches(entry.get("component_version"), pin) for pin in pins))
 
 
-def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
-    """Pure core: ``summary`` is ``host_receipts.build_summary()`` output and ``pins_for`` maps a
-    component id to ``(pins, pin_source)``. Returns the report dict."""
+def assess(summary: dict, pins_for, now: datetime, max_age_days: int,
+           aliases: dict[str, tuple[str, ...]] | None = None, grandfathered_paths=frozenset()) -> dict:
+    """Pure core: ``summary`` is ``host_receipts.build_summary()`` output, ``pins_for`` maps a
+    component id to ``(pins, pin_source)``, ``aliases`` is ``host_receipts.winner_stack_aliases()``
+    (a stack id -> the winner id(s) it aliases; its receipts never bind) and ``grandfathered_paths``
+    is ``host_receipts.grandfathered_alias_paths()`` (alias receipts reported as info, not flagged).
+    Returns the report dict."""
+    aliases = aliases or {}
+    grandfathered_paths = set(grandfathered_paths or ())
     rows = []
     for component_id in sorted(summary.get("components") or {}):
-        pins, pin_source = pins_for(component_id)
+        alias_of = list(aliases.get(component_id) or ())
+        pins, pin_source = ([], "stack_alias") if alias_of else pins_for(component_id)
         platforms = (summary["components"][component_id] or {}).get("platforms") or {}
         for platform_id in sorted(platforms):
             entries = [entry for entry in (platforms[platform_id] or {}).get("receipts") or []
@@ -91,8 +110,13 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
             latest = max(bound, key=lambda entry: (entry.get("observed_at_utc") or "", entry.get("path") or ""),
                          default=None)
             age = host_receipts.receipt_age_days(latest.get("observed_at_utc"), now) if latest else None
-            flags = []
-            if not pins:
+            flags, info = [], []
+            grandfathered = bool(alias_of) and all(entry.get("path") in grandfathered_paths for entry in entries)
+            if grandfathered:
+                info.append("stack_alias_grandfathered")
+            elif alias_of:
+                flags.append("stack_alias")
+            elif not pins:
                 flags.append("no_current_pin")
             else:
                 if latest is None:
@@ -106,6 +130,8 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
                 "component_id": component_id,
                 "current_pins": pins,
                 "pin_source": pin_source,
+                "alias_of": alias_of,
+                "grandfathered": grandfathered,
                 "receipts": len(entries),
                 "bound_receipts": len(bound),
                 "latest_bound": None if latest is None else {
@@ -119,8 +145,11 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
                 "pin_moved_hosts": moved_hosts(entries, pins) if pins else [],
                 "unbound": [{"path": entry.get("path"), "component_version": entry.get("component_version"),
                              "observed_at_utc": entry.get("observed_at_utc"),
-                             "reason": unbound_reason(entry, pins)} for entry in unbound],
+                             "reason": ("stack_alias_grandfathered" if entry.get("path") in grandfathered_paths
+                                        else "stack_alias") if alias_of else unbound_reason(entry, pins)}
+                            for entry in unbound],
                 "flags": flags,
+                "info": info,
             })
     rows.sort(key=lambda row: (row["platform_id"], row["component_id"]))
     counts = {flag: sum(1 for row in rows if flag in row["flags"]) for flag in FLAGS}
@@ -129,6 +158,7 @@ def assess(summary: dict, pins_for, now: datetime, max_age_days: int) -> dict:
         "max_age_days": max_age_days,
         "rows": rows,
         "flag_counts": counts,
+        "info_counts": {item: sum(1 for row in rows if item in row["info"]) for item in INFO},
         "flagged": sum(1 for row in rows if row["flags"]),
         "status": "flagged" if any(row["flags"] for row in rows) else "current",
     }
@@ -169,8 +199,12 @@ def render_text(report: dict) -> str:
                        f"latest bound {latest['observed_at_utc']} ({latest['age_days']} days, {latest['result']}, "
                        f"version {latest['component_version']})")
         flags = ", ".join(row["flags"]) or "ok"
-        lines.append(f"{row['platform_id']}  {row['component_id']}: {latest_text}; pins {row['current_pins']} "
-                     f"({row['pin_source']}); {row['bound_receipts']}/{row['receipts']} bound; {flags}")
+        if row.get("info"):
+            flags += f" (info: {', '.join(row['info'])})"
+        pins_text = (f"alias of winner {', '.join(row['alias_of'])}, never bound" if row.get("alias_of")
+                     else f"pins {row['current_pins']} ({row['pin_source']})")
+        lines.append(f"{row['platform_id']}  {row['component_id']}: {latest_text}; {pins_text}; "
+                     f"{row['bound_receipts']}/{row['receipts']} bound; {flags}")
         if row["pin_moved_hosts"]:
             lines.append(f"    re-record at the current pin: {', '.join(row['pin_moved_hosts'])}")
         for entry in row["unbound"]:
@@ -202,7 +236,8 @@ def main(argv=None) -> int:
     except (OSError, ValueError) as error:
         print(json.dumps({"status": "error", "error": str(error)}))
         return 2
-    report = assess(summary, lambda component_id: current_pins(root, component_id), now, args.max_age_days)
+    report = assess(summary, lambda component_id: current_pins(root, component_id), now, args.max_age_days,
+                    host_receipts.winner_stack_aliases(root), host_receipts.grandfathered_alias_paths(root))
     text = json.dumps(report, indent=1, sort_keys=True) if args.json else render_text(report)
     print(text)
     if out is not None:

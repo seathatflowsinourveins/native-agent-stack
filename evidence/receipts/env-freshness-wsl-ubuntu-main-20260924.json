@@ -1,0 +1,100 @@
+{
+ "artifact": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
+ "artifact_sha256": "45104744c02f09434292e5562689426c76543c8a782cf9e3e491947022094025",
+ "behind": [
+  {
+   "env": "delta-rs-1.6.4-20260922",
+   "installed": "1.6.4",
+   "package": "deltalake",
+   "stable": "1.6.6"
+  },
+  {
+   "env": "equity-worker-sdk",
+   "installed": "0.154.0",
+   "package": "openai-codex",
+   "stable": "0.156.1"
+  },
+  {
+   "env": "sdk-env-baseline-20260922",
+   "installed": "0.154.0",
+   "package": "openai-codex",
+   "stable": "0.156.1"
+  },
+  {
+   "env": "vllm-0.25.0",
+   "installed": "2.4.6",
+   "package": "numpy",
+   "stable": "2.5.3"
+  },
+  {
+   "env": "vllm-0.25.0",
+   "installed": "2.11.0",
+   "package": "torch",
+   "stable": "2.14.0"
+  },
+  {
+   "env": "vllm-0.25.0",
+   "installed": "0.25.0",
+   "package": "vllm",
+   "stable": "0.30.0"
+  },
+  {
+   "env": "vllm-0.29.0",
+   "installed": "2.4.6",
+   "package": "numpy",
+   "stable": "2.5.3"
+  },
+  {
+   "env": "vllm-0.29.0",
+   "installed": "2.13.0",
+   "package": "torch",
+   "stable": "2.14.0"
+  },
+  {
+   "env": "vllm-0.29.0",
+   "installed": "0.29.0",
+   "package": "vllm",
+   "stable": "0.30.0"
+  },
+  {
+   "env": "vllm-0.30.0",
+   "installed": "2.4.6",
+   "package": "numpy",
+   "stable": "2.5.3"
+  },
+  {
+   "env": "vllm-0.30.0",
+   "installed": "2.13.0",
+   "package": "torch",
+   "stable": "2.14.0"
+  }
+ ],
+ "claim": "On one WSL Ubuntu host, 13 isolated tool environments were inventoried with their own interpreters and the watched trading/foundation packages compared with PyPI on 2026-09-24: 34 current, 2 on the newest pre-release (nautilus-trader 2.0.0rc5), 11 behind the latest stable (deltalake 1.6.4 vs 1.6.6, openai-codex 0.154.0 vs 0.156.1, and the numpy/torch/vllm pins inside the vllm 0.25/0.29/0.30 environments).",
+ "command": "python3 scripts/env_freshness.py --tools-dir ~/.local/share/codex-ecosystem/tools --host-label wsl-ubuntu-main --out evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
+ "component_ids": [
+  "nautilus-trader",
+  "alpaca-py",
+  "duckdb",
+  "pandas",
+  "edgartools",
+  "exchange-calendars",
+  "vllm"
+ ],
+ "counts": {
+  "behind_stable": 11,
+  "current": 34,
+  "prerelease_current": 2
+ },
+ "environments": 13,
+ "host_label": "wsl-ubuntu-main",
+ "id": "env-freshness-wsl-ubuntu-main-20260924",
+ "kind": "artifact_measurement",
+ "limitations": [
+  "PyPI index only: git-pinned or other-index installs read as ahead_of_index or unknown.",
+  "CLIs and non-Python tools are covered by the catalog GitHub freshness snapshot, not by this report.",
+  "One host; each PC publishes its own report under the same schema.",
+  "Reports status only; upgrades and adoption stay with the SOTA-convergence lane review."
+ ],
+ "measured_at_utc": "2026-09-24T20:15:27+00:00",
+ "schema_version": 1
+}

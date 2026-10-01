@@ -5,12 +5,68 @@ Codex/Claude integrations. No competing memory daemon or replacement agent
 harness was installed. The [memory landscape review](memory-landscape-maintenance.md)
 records nine repository sources and their selection rationale.
 
-## Installed selection
+The [September 23 scheduled observation](../observability/memory-scheduled-20260923.json)
+now records an actual daily heartbeat and returned native checks. The existing
+hourly learning scheduler applied two pages at 10:04:49 UTC; journal, proposal
+records and scoped MCP reads agree. A later 11:05 response-decoding failure has
+no persisted learning run and remains unresolved. The latest completed native
+session's consolidation finished on attempt 1. No learning run was triggered
+manually for this observation. These outcomes establish lifecycle execution,
+not improved answer quality or token savings.
+
+## September 28 scheduled follow-up
+
+The [September 28 receipt](../observability/memory-scheduled-20260928.json) records
+the next actual wake. Services and existing publications were healthy; the swap
+warning was no longer firing. Learning remains paused, and the upstream report
+still returns 83 runs and 19 approved terminal proposals. Its body matches the
+retained September 27 result apart from the reporting-window timestamps.
+
+Explicit native MCP retrieval confirmed the long Claude session ended at
+01:22:54 UTC, and the scoped store records generation 31,006 completed at
+01:26:43 on attempt 1. This proves recorded completion, not provider success or
+improved answers. The MCP default selects completed sessions by start time;
+it therefore returned the newer-starting September 26 short session. Source
+inspection resolved that difference without restarting a client.
+
+The previous evidence PR's secret scan detected seven upstream rejection
+digests. Source review confirmed their SHA-256 construction. A separate,
+exact-file/seven-value exception preserves unrelated credential detection;
+the original failure, regression checks and bounded native scan are retained.
+
+## September 27 scheduled follow-up
+
+The [September 27 observation](../observability/memory-scheduled-20260927.json)
+and [returned native results](../observability/memory-scheduled-results-20260927.json)
+record the actual daily wake. Current local service/configuration reads confirm
+the previously installed prefix-enabled ai-memory build, Nemotron memory
+embeddings, vLLM 0.30.0 and Codex gpt-6-sol at medium effort. The hourly learning
+scheduler has been intentionally paused since September 25. The table below and
+September 21 configuration are historical; do not restore their older model,
+embedding or scheduler settings over the current qualified setup.
+
+Memory, Qdrant and embedding services were healthy; the existing collector
+published successfully and all 9 Prometheus targets were up. The native report
+returned 83 historical runs and 19 approved terminal proposals. The latest
+captured completed session has no consolidation job. The latest completed job
+is an older observation generation, completed September 24; it does not validate
+the subsequent model change. One semantic excerpt and the QMD pause decision
+matched their source. Exact session/lifetime savings remain unknown.
+
+Stock ai-memory [v2.4.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1)
+still lacks the query/document prefixes required by this deployment. Independent
+tagged-source review confirmed that its query-dispatch fix is already present in
+the installed patch. Retain the current build pending a release containing
+upstream #859 and isolated migration/retrieval qualification; this wake made no
+runtime change. Existing gateway/swap warnings and missing journal output are
+retained in the receipt. No restart persistence or new cross-client E2E is claimed.
+
+## Historical September 21 installed selection
 
 | Layer | Accepted upstream | Current qualification |
 | --- | --- | --- |
 | Shared memory | ai-memory 2.3.2 | Scoped native MCP, allowlisted hooks, local MiniLM embeddings, native Codex consolidation, hourly learning configuration. |
-| Semantic code retrieval | SocratiCode 1.14.0 | Current stable release; both clients registered, direct project watcher active. |
+| Semantic code retrieval | SocratiCode 1.15.0 | Current stable release; both clients registered, direct project watcher active. 1.14.0 until the 2026-09-27 cutover ([receipt](../evidence/receipts/socraticode-1150-qualification-20260927.json)). |
 | Vector store | Qdrant 1.19.1 | Current stable release; existing native loopback service and persistent project collection. |
 | Local embedding inference | vLLM 0.25.0 with pinned NVIDIA Nemotron-3-Embed-1B-BF16 | Retained qualified version. Newer 0.29.0 has an actual host initialization failure; newer is not automatically usable. |
 | Exact source navigation | Serena 2.0.0.dev0 at c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | Current native symbol lookup returned the original scope-selection implementation. |
@@ -58,8 +114,8 @@ outcomes remain separate evidence.
 | --- | --- | --- |
 | Every two minutes | systemd native-data timer; upstream memory/QMD commands and Qdrant API; Loki publication | Fresh inventory and returned metadata. Actual timer invocations and HTTP 204 publication were observed. The oneshot service is normally inactive between successful runs. |
 | Continuous scrape | Existing Prometheus, Collector and Grafana | Configured service/transport alerts and native runtime counters; not retrieval correctness. |
-| Hourly | ai-memory native learning and embedding-backfill configuration | Prior actual scheduler admission is retained. A later hourly tick is still unproved in this receipt; no new learned-write quality claim. |
-| Daily, existing 09:00 schedule | Native Codex task follow-up | Updated to check scoped memory retrieval, real completed-session/learning outcomes, source agreement and selected RAG freshness. Updated configuration is verified; its next scheduler-triggered execution is not claimed. |
+| Hourly | ai-memory native learning and embedding-backfill configuration | September 23 journal and scoped store/MCP readback confirm two applied pages. A later response-decoding failure is retained; write completion does not establish improved learning quality. |
+| Daily, existing 09:00 schedule | Native Codex task follow-up | September 23 heartbeat received at 13:01:02.931 UTC, with bounded current retrieval, source comparison and lifecycle checks. Trigger provenance is the native task envelope; independent scheduler dispatch metadata and restart persistence remain unknown. |
 
 The daily follow-up reuses valid upstream tests and historical add/change/delete,
 client-use and recovery evidence while their inputs match. A changed source,

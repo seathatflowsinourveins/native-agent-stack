@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 from concurrent.futures import TimeoutError as FutureTimeout
+from contextvars import ContextVar
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -18,6 +19,8 @@ import re
 import threading
 import time
 from urllib.parse import urlsplit
+from xml.etree import ElementTree
+from zoneinfo import ZoneInfo
 
 from feeds import DATA_FEEDS, is_qualified_feed
 
@@ -31,6 +34,29 @@ TERMINAL = {"filled", "canceled", "expired", "rejected", "replaced"}
 SYMBOL = re.compile(r"[A-Z][A-Z0-9.\-]{0,14}\Z")
 CLIENT_ID = re.compile(r"[A-Za-z0-9_\-]{1,48}\Z")
 UUID = re.compile(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\Z")
+# GET /v2/account/activities/{activity_type} with activity_type FILL, filtered by the
+# documented order_id query parameter (https://docs.alpaca.markets/us/reference/
+# getaccountactivitiesbyactivitytype-1.md). An activity id is "<timestamp>::<uuid>"
+# (https://docs.alpaca.markets/us/docs/account-activities.md, TradeActivity.id).
+ACTIVITY_FILL_PATH = "/v2/account/activities/FILL"
+ACTIVITY_ID = re.compile(r"[0-9]{1,32}::([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})\Z")
+ACTIVITY_PAGE_SIZE = 100
+# The same endpoint with activity_type FEE ("Fee denominated in USD"), read after one UTC
+# instant: the ledger's cash baseline. Reference (updatedAt 2026-05-27, fetched 2026-09-30):
+# https://docs.alpaca.markets/us/reference/getaccountactivitiesbyactivitytype-1.md. after: "Get
+# activities created after this date. Both formats YYYY-MM-DD and YYYY-MM-DDTHH:MM:SSZ are
+# supported."; direction: "The chronological order of response based on the activity datetime."
+# (default desc, so asc is always sent); page_size: minimum 1, maximum 100; page_token: "Provide
+# the ID of the last activity from the last page to retrieve the next set of results." Its
+# ActivitySubType lists for FEE: REG (Regulatory Fee), TAF (Trading Activity Fee), LCT, ORF, OCC,
+# NRC, NRV, COM (Commission) and CAT (Consolidated Audit Trail Fee).
+ACTIVITY_FEE_PATH = "/v2/account/activities/FEE"
+FEE_SUB_TYPES = frozenset({"REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT"})
+FEE_AFTER = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\Z")
+FEE_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
+# trade_updates events that carry one execution's own qty, price and execution_id.
+EXECUTION_EVENTS = frozenset({"fill", "partial_fill"})
+EXECUTION_FIELDS = ("event", "execution_id", "event_qty", "event_price", "execution_time_ns")
 # The pre-submission boundary (blueprints/us-equities/order-contract). Loaded by
 # path at import, so a missing or broken contract fails transport import closed.
 ORDER_CONTRACT_PATH = Path(__file__).resolve().parent.parent / "order-contract" / "order_contract.py"
@@ -283,6 +309,15 @@ def data_stream_url(feed):
     return "%s/%s" % (DATA_WS_BASE, data_feed(feed))
 
 
+def halt_statuses_supported(feed):
+    """E4: trading statuses and LULD bands ride the quote connection on the SIP feed only
+    (the convergence record's scope; observed natively on v2/sip on 2026-09-24). Their
+    availability on v2/iex is unverified, and a refused channel would keep the stream from
+    becoming ready, so on any other feed the engine subscribes neither and seeds no halt
+    (a seeded halt could only be cleared by a streamed resume)."""
+    return feed == "sip"
+
+
 def decimal_string(value, *, positive=False):
     try:
         number = Decimal(str(value))
@@ -306,11 +341,13 @@ def timestamp_ns(value):
             raise TransportError("timestamp lacks timezone")
         return int(value.timestamp()) * 1_000_000_000 + value.microsecond * 1000
     if isinstance(value, str):
-        match = re.fullmatch(r"(.+?)(?:\.(\d{1,9}))?(Z|[+-]\d\d:\d\d)", value)
+        # RFC 3339 section 5.6 permits lowercase z and arbitrary fractional
+        # precision. Keep the first nine digits for integer nanoseconds.
+        match = re.fullmatch(r"(.+?)(?:\.(\d+))?([Zz]|[+-]\d\d:\d\d)", value)
         if not match:
             raise TransportError("invalid timestamp")
-        base = datetime.fromisoformat(match[1] + match[3].replace("Z", "+00:00"))
-        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "").ljust(9, "0"))
+        base = datetime.fromisoformat(match[1] + match[3].upper().replace("Z", "+00:00"))
+        return int(base.timestamp()) * 1_000_000_000 + int((match[2] or "")[:9].ljust(9, "0"))
     raise TransportError("unsupported timestamp")
 
 
@@ -330,12 +367,160 @@ def normalize_order(raw):
     return result
 
 
+def activity_trade_id(activity_id):
+    """The native TradeId text for one FILL activity: the UUID after "::" (36 characters,
+    NautilusTrader's TradeId limit). The activity id itself (a timestamp, "::" and that
+    UUID) is longer than 36 characters and never used directly."""
+    match = ACTIVITY_ID.fullmatch(str(activity_id))
+    if not match:
+        raise TransportError("invalid activity id")
+    return match[1]
+
+
+def normalize_fill_activity(raw, order_id):
+    """One documented TradeActivity of ``order_id`` (activity_type FILL): one execution,
+    its own qty and price, and the order's cumulative quantity after it. Raises
+    TransportError for any other shape; provider text is never retained."""
+    try:
+        activity_id = str(raw["id"])
+        if (raw.get("activity_type") != "FILL" or str(raw.get("order_id")) != order_id
+                or raw.get("type") not in EXECUTION_EVENTS or raw.get("side") not in ("buy", "sell")):
+            raise TransportError("invalid fill activity")
+        symbol = str(raw["symbol"])
+        result = {"activity_id": activity_id, "trade_id": activity_trade_id(activity_id), "order_id": order_id,
+                  "symbol": symbol, "side": raw["side"], "type": raw["type"],
+                  "qty": decimal_string(raw["qty"], positive=True),
+                  "price": decimal_string(raw["price"], positive=True),
+                  "cum_qty": decimal_string(raw["cum_qty"], positive=True),
+                  "leaves_qty": decimal_string(raw.get("leaves_qty", "0")),
+                  "transaction_time_ns": timestamp_ns(raw.get("transaction_time")), "source": "activity"}
+    except TransportError:
+        raise
+    except (KeyError, TypeError, AttributeError, ValueError):
+        raise TransportError("invalid fill activity") from None
+    if (not SYMBOL.fullmatch(symbol) or result["transaction_time_ns"] <= 0
+            or Decimal(result["qty"]) > Decimal(result["cum_qty"])):
+        raise TransportError("invalid fill activity")
+    return result
+
+
+def tiled_executions(executions):
+    """Executions of one order sorted by cumulative quantity. Each must start where the
+    previous one ended (the first at zero), on one symbol and side, with distinct ids,
+    or the list is not a complete execution record of the order."""
+    ordered = sorted(executions, key=lambda row: Decimal(row["cum_qty"]))
+    previous, ids = Decimal(0), set()
+    for row in ordered:
+        if (Decimal(row["cum_qty"]) - Decimal(row["qty"]) != previous or row["trade_id"] in ids
+                or (row["symbol"], row["side"]) != (ordered[0]["symbol"], ordered[0]["side"])):
+            raise TransportError("fill activities do not tile the order")
+        previous = Decimal(row["cum_qty"])
+        ids.add(row["trade_id"])
+    return ordered
+
+
+def _activity_params(params):
+    """Only the documented FILL filter by one broker order: order_id (UUID), ascending,
+    page_size 1-100 and an activity-id page_token."""
+    if not isinstance(params, dict) or not set(params) <= {"order_id", "direction", "page_size", "page_token"}:
+        return False
+    size, token = params.get("page_size", ACTIVITY_PAGE_SIZE), params.get("page_token")
+    return (isinstance(params.get("order_id"), str) and bool(UUID.fullmatch(params["order_id"]))
+            and params.get("direction", "asc") == "asc" and type(size) is int and 1 <= size <= ACTIVITY_PAGE_SIZE
+            and (token is None or (isinstance(token, str) and bool(ACTIVITY_ID.fullmatch(token)))))
+
+
+def fee_after_text(moment):
+    """The documented UTC ``after`` value (YYYY-MM-DDTHH:MM:SSZ) for a timezone-aware instant,
+    truncated to the second. The checkpoint and every subsequent fee read use this same
+    formatted cutoff. Fees from earlier within that second are booked by the checkpoint
+    before computing the cash baseline, and subsequent reads deduplicate them by id."""
+    if not isinstance(moment, datetime) or moment.tzinfo is None:
+        raise TransportError("timezone-aware fee window required")
+    return moment.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _fee_after(value):
+    if not isinstance(value, str) or not FEE_AFTER.fullmatch(value):
+        return False
+    try:
+        datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return False
+    return True
+
+
+def _fee_activity_params(params):
+    """Only the documented FEE read after one UTC instant: ``after`` (YYYY-MM-DDTHH:MM:SSZ) and
+    direction asc are required, page_size 1-100 and an activity-id page_token are optional. No
+    other filter (order_id, date, until, ...) is ever sent."""
+    if not isinstance(params, dict) or not set(params) <= {"after", "direction", "page_size", "page_token"}:
+        return False
+    size, token = params.get("page_size", ACTIVITY_PAGE_SIZE), params.get("page_token")
+    return (_fee_after(params.get("after")) and params.get("direction") == "asc"
+            and type(size) is int and 1 <= size <= ACTIVITY_PAGE_SIZE
+            and (token is None or (isinstance(token, str) and bool(ACTIVITY_ID.fullmatch(token)))))
+
+
+def normalize_fee_activity(raw):
+    """One documented NonTradeActivity of activity_type FEE: ``{id, date, net_amount, sub_type}``
+    and nothing else. Account Activities (https://docs.alpaca.markets/us/docs/account-activities.md,
+    updatedAt 2026-05-25): id "Can be sent as `page_token`"; date "The date on which the activity
+    occurred or on which the transaction associated with the activity settled."; net_amount "The
+    net amount of money (positive or negative) associated with the activity." (a documented
+    string). An absent or null activity_sub_type is UNSPECIFIED; currency must be absent or USD
+    and status absent or executed (the by-type reference also lists correct and canceled, which
+    this engine does not model). The description field, which carries the account number, is
+    never read. Raises TransportError for any other shape; provider text is never retained."""
+    if not isinstance(raw, dict) or raw.get("activity_type") != "FEE":
+        raise TransportError("invalid fee activity")
+    activity_id, day, amount = raw.get("id"), raw.get("date"), raw.get("net_amount")
+    sub_type = raw.get("activity_sub_type")
+    if (not isinstance(activity_id, str) or not ACTIVITY_ID.fullmatch(activity_id)
+            or not isinstance(day, str) or not FEE_DATE.fullmatch(day) or not isinstance(amount, str)
+            or (sub_type is not None and (not isinstance(sub_type, str) or sub_type not in FEE_SUB_TYPES))
+            or ("currency" in raw and raw["currency"] != "USD")
+            or ("status" in raw and raw["status"] != "executed")):
+        raise TransportError("invalid fee activity")
+    try:
+        datetime.strptime(day, "%Y-%m-%d")
+    except ValueError:
+        raise TransportError("invalid fee activity") from None
+    return {"id": activity_id, "date": day, "net_amount": decimal_string(amount),
+            "sub_type": sub_type or "UNSPECIFIED"}
+
+
+def _collect_fee_pages(client, fee_after, max_pages):
+    """Every FEE activity created after the timezone-aware instant ``fee_after``, oldest first,
+    normalized. Each page repeats the filters and continues from the last activity id, as
+    alpaca-py 0.44.0 BrokerClient._get_account_activities_iterator keeps its request fields and
+    sets page_token to the last result's id. A page bound reached is "completeness unproven",
+    never a partial list; a repeated id means pagination did not advance."""
+    after = fee_after_text(fee_after)
+    fees, seen, token = [], set(), None
+    for _ in range(max_pages):
+        params = {"after": after, "direction": "asc", "page_size": ACTIVITY_PAGE_SIZE}
+        if token is not None:
+            params["page_token"] = token
+        page = client.get("/account/activities/FEE", params)
+        if not isinstance(page, list) or len(page) > ACTIVITY_PAGE_SIZE:
+            raise TransportError("invalid fee activity page")
+        rows = [normalize_fee_activity(row) for row in page]
+        ids = [row["id"] for row in rows]
+        if len(set(ids)) != len(ids) or seen.intersection(ids):
+            raise TransportError("fee activity pagination did not advance")
+        fees.extend(rows)
+        seen.update(ids)
+        if len(page) < ACTIVITY_PAGE_SIZE:
+            return fees
+        token = ids[-1]
+    raise TransportError("fee activity page bound reached; completeness unproven")
+
+
 # Best-effort CTA/UTP quote-condition code that can mark an individual NBBO
-# quote update as halted ("H"). This environment has no network access to
-# verify Alpaca's current live schema, so this is a documented, tested,
-# defensive fallback; Alpaca's primary halt signal is the separate
-# "trading_status" stream message parsed by normalize_trading_status below,
-# not a field on ordinary quote updates (see D3 in the review round).
+# quote update as halted ("H"). Alpaca's primary halt signal is the separate
+# trading status stream message parsed by normalize_trading_status below, not
+# a field on ordinary quote updates; this remains a defensive fallback.
 QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
 
 
@@ -362,24 +547,224 @@ def normalize_quote(raw, symbol=None):
     return result
 
 
-def normalize_trading_status(raw):
-    """Parse an Alpaca "trading_status" market-data stream message
-    (``T: "trading_status"``) into ``{"symbol", "halted", "ts_ns"}``.
+# Trading status messages (T "s": S, sc, sm, rc, rm, t, z), with the status codes
+# Alpaca documents per tape (https://docs.alpaca.markets/us/docs/
+# real-time-stock-pricing-data.md, "Trading Status"). Each code maps to its effect on
+# the symbol's halt state: True halts (no entries, no exit re-pricing), False resumes,
+# None leaves the state unchanged. The two tables share no code. The CTA meanings follow
+# the CTA's own feed specification (CTS Pillar Multicast Output Binary Specification
+# v2.11b, 2026-01-29, glossary and Security Status field): a Price Indication "will be
+# when trading resumes after a Trading Halt" (the symbol is halted until a Resume), while
+# a Trading Range Indication describes "a security that is not Trading Halted" before or
+# after the opening, so it never halts and never resumes a symbol.
+CTA_STATUS_CODES = {
+    "2": ("halted", True),                       # Trading Halt (reason M: LULD trading pause)
+    "3": ("trading", False),                     # Resume
+    "5": ("price_indication", True),             # reopening indication, only while halted
+    "6": ("trading_range_indication", None),     # a symbol that is not halted: no change
+    "7": ("imbalance_buy", None), "8": ("imbalance_sell", None),
+    "9": ("on_close_imbalance_buy", None), "A": ("on_close_imbalance_sell", None),
+    "C": ("no_imbalance", None), "D": ("no_on_close_imbalance", None),
+    "E": ("short_sale_restriction", None),       # never clears a halt
+    "F": ("luld_limit_state", None),             # a LULD limit state is not a halt; never clears one
+}
+UTP_STATUS_CODES = {
+    "H": ("halted", True),                       # Trading Halt
+    "Q": ("quotation_only", True),               # quotes resumed, trading still halted
+    "P": ("volatility_pause", True),             # LULD volatility trading pause
+    "T": ("trading", False),                     # Trading Resumption
+}
+STATUS_CODES = {**CTA_STATUS_CODES, **UTP_STATUS_CODES}
+CTA_TAPES, UTP_TAPES = frozenset({"A", "B"}), frozenset({"C", "O"})
+CTA_LULD_PAUSE_REASON = "M"                      # CTA reason: Limit Up-Limit Down (LULD) Trading Pause
+MARKET_WIDE_REASONS = frozenset({"1", "2", "3", "MWC0", "MWC1", "MWC2", "MWC3"})
 
-    Fields used: ``S`` (symbol), ``sc`` (status code; ``"H"`` == halted,
-    anything else == not halted), ``t`` (timestamp). This mapping documents
-    the exact fields checked but is NOT verified against a live Alpaca
-    payload in this environment (no network access here); it is a SYN-evidence
-    best-effort mapping pending a real trading_status sample, exercised only
-    by a fake-payload test. The websocket subscription that would deliver
-    these messages is not wired into AlpacaPaperTransport in this change (see
-    the task handoff); this function only defines the parsing contract a
-    future subscription can call.
+
+def normalize_trading_status(raw):
+    """Parse one documented trading status message into ``{"symbol", "ts_ns",
+    "status_code", "reason_code", "tape", "state", "halted"}``.
+
+    ``halted`` is True (halt, pause, quotation-only period, or a CTA price indication,
+    which is only sent while a symbol is halted), False (CTA 3, UTP T), or None for a
+    code that must never change the halt state (CTA 6 trading range indication, CTA E
+    short-sale restriction, CTA F LULD limit state, CTA imbalance indicators 7-D). A
+    code outside both documented tables, or a code of the other tape's table, is
+    ``unknown_status`` and halts (fails closed) until a documented resume. A missing or
+    unrecognized tape (anything but A, B, C or O) reads the code from both tables (they
+    share no code), so a documented resume still resumes the symbol. CTA 2 with reason M
+    is a LULD pause. Raises TransportError for a malformed message.
     """
-    symbol = raw.get("S") or raw.get("symbol")
-    status_code = raw.get("sc") or raw.get("status") or raw.get("status_code")
-    return {"symbol": symbol, "halted": status_code in ("H", "halted", "Halted"),
-            "ts_ns": timestamp_ns(raw.get("t", raw.get("timestamp")))}
+    symbol = raw.get("S")
+    status_code = raw.get("sc")
+    if (not isinstance(symbol, str) or not SYMBOL.fullmatch(symbol) or not isinstance(status_code, str)
+            or not status_code):
+        raise TransportError("invalid trading status")
+    try:
+        ts_ns = timestamp_ns(raw.get("t"))
+    except (ValueError, OverflowError):
+        raise TransportError("invalid trading status") from None
+    if ts_ns <= 0:
+        raise TransportError("invalid trading status")
+    tape = raw.get("z")
+    reason = raw.get("rc")
+    reason = reason if isinstance(reason, str) else ""
+    named = tape if isinstance(tape, str) else None
+    table = (CTA_STATUS_CODES if named in CTA_TAPES else UTP_STATUS_CODES if named in UTP_TAPES
+             else STATUS_CODES)
+    state, halted = table.get(status_code, ("unknown_status", True))
+    if halted and status_code == "2" and reason == CTA_LULD_PAUSE_REASON:
+        state = "luld_pause"
+    if halted and reason in MARKET_WIDE_REASONS:
+        state = "market_wide_circuit_breaker"
+    return {"symbol": symbol, "ts_ns": ts_ns, "status_code": status_code, "reason_code": reason,
+            "tape": tape if isinstance(tape, str) else None, "state": state, "halted": halted}
+
+
+def normalize_luld(raw):
+    """One LULD price band message (T "l": S, u limit up, d limit down, i indicator, t,
+    z). Recorded for receipts only; it never changes the halt state (a limit state or a
+    pause arrives as a trading status message). Raises TransportError when malformed."""
+    symbol = raw.get("S")
+    if not isinstance(symbol, str) or not SYMBOL.fullmatch(symbol):
+        raise TransportError("invalid luld band")
+    try:
+        ts_ns = timestamp_ns(raw.get("t"))
+    except (ValueError, OverflowError):
+        raise TransportError("invalid luld band") from None
+    up, down = decimal_string(raw.get("u")), decimal_string(raw.get("d"))
+    if ts_ns <= 0 or min(Decimal(up), Decimal(down)) < 0:
+        raise TransportError("invalid luld band")
+    indicator, tape = raw.get("i"), raw.get("z")
+    return {"symbol": symbol, "ts_ns": ts_ns, "limit_up": up, "limit_down": down,
+            "indicator": indicator if isinstance(indicator, str) else None,
+            "tape": tape if isinstance(tape, str) else None}
+
+
+# E4 startup state: the status stream sends no snapshot at subscribe time, so a symbol
+# already halted when the engine subscribes is seeded from Nasdaq Trader's trade halts
+# RSS (all US listing markets), one request per engine start (the feed's own <ttl> is one
+# minute). Items carry ndaq:IssueSymbol, HaltDate (MM/DD/YYYY), HaltTime (HH:MM:SS[.fff],
+# Eastern), ReasonCode, Market, ResumptionDate and ResumptionTradeTime (empty until a
+# resumption is set); the incentive monitor records the same fields.
+NASDAQ_HALTS_RSS = "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
+HALT_ROW_FIELDS = ("HaltDate", "HaltTime", "IssueSymbol", "Market", "ReasonCode", "ResumptionDate",
+                   "ResumptionQuoteTime", "ResumptionTradeTime")
+HALT_FEED_MAX_BYTES = 4_000_000
+HALT_FEED_SECONDS = 5.0
+HALT_FEED_READ_BYTES = 65536   # the most one read may return; each read is one socket read
+EASTERN = ZoneInfo("America/New_York")
+_HALT_DATE = re.compile(r"(\d{2})/(\d{2})/(\d{4})")
+_HALT_TIME = re.compile(r"(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,6}))?")
+
+
+def parse_nasdaq_halts(payload):
+    """Every item of one trade halts RSS document as a row of HALT_ROW_FIELDS (None for an
+    empty field). Raises TransportError for anything that is not that RSS document."""
+    try:
+        root = ElementTree.fromstring(payload)
+    except (ElementTree.ParseError, TypeError, ValueError):
+        raise TransportError("invalid halts feed") from None
+    if root.tag != "rss" or root.find("channel") is None:
+        raise TransportError("invalid halts feed")
+    rows = []
+    for item in root.iter("item"):
+        row = dict.fromkeys(HALT_ROW_FIELDS)
+        for child in item:
+            tag = child.tag.rsplit("}", 1)[-1]
+            if tag in row:
+                row[tag] = (child.text or "").strip() or None
+        rows.append(row)
+    return rows
+
+
+def eastern_ns(date_text, time_text):
+    """Epoch nanoseconds of a halt feed date (MM/DD/YYYY) and Eastern time."""
+    date, clock = _HALT_DATE.fullmatch(date_text or ""), _HALT_TIME.fullmatch(time_text or "")
+    if not date or not clock:
+        raise TransportError("invalid halt time")
+    try:
+        at = datetime(int(date[3]), int(date[1]), int(date[2]), int(clock[1]), int(clock[2]), int(clock[3]),
+                      int((clock[4] or "").ljust(6, "0")), tzinfo=EASTERN)
+    except ValueError:
+        raise TransportError("invalid halt time") from None
+    return int(at.timestamp()) * 1_000_000_000 + at.microsecond * 1000
+
+
+def active_halts(rows, symbols, now_ns):
+    """The symbols among ``symbols`` halted at ``now_ns`` according to halt rows: each
+    symbol's latest halt (by halt time) counts while its resumption trade time is absent
+    or still ahead. Returns {symbol: {"halted_at_ns", "resumption_trade_ns", "reason_code",
+    "market"}}. Rows of other symbols are ignored; a malformed row of a wanted symbol
+    raises TransportError (the seed is then unavailable, never guessed)."""
+    wanted, latest = set(symbols), {}
+    for row in rows:
+        symbol = row.get("IssueSymbol")
+        if symbol not in wanted:
+            continue
+        halted_at = eastern_ns(row.get("HaltDate"), row.get("HaltTime"))
+        if symbol in latest and latest[symbol]["halted_at_ns"] >= halted_at:
+            continue
+        resumes = row.get("ResumptionTradeTime")
+        latest[symbol] = {"halted_at_ns": halted_at,
+                          "resumption_trade_ns": (eastern_ns(row.get("ResumptionDate") or row.get("HaltDate"), resumes)
+                                                  if resumes else None),
+                          "reason_code": row.get("ReasonCode"), "market": row.get("Market")}
+    return {symbol: halt for symbol, halt in sorted(latest.items())
+            if halt["resumption_trade_ns"] is None or halt["resumption_trade_ns"] > now_ns}
+
+
+def fetch_nasdaq_halts(*, get=None, seconds=HALT_FEED_SECONDS, max_bytes=HALT_FEED_MAX_BYTES):
+    """One GET of the trade halts RSS: that one https URL, no redirects, an uncompressed
+    and bounded body, and a total deadline on the body. requests' timeout bounds each
+    socket read, not the body, and one iter_content chunk may span many reads of a
+    slowly dripping server; so the body is read with urllib3's read1 (at most one socket
+    read per call) and the deadline is checked before every read: reading ends at most
+    one read timeout (``seconds``) after the deadline. Returns the body bytes; raises
+    TransportError otherwise."""
+    if get is None:
+        import requests
+        get = requests.get
+    deadline = time.monotonic() + seconds
+    try:
+        response = get(NASDAQ_HALTS_RSS, timeout=(seconds, seconds), allow_redirects=False, stream=True,
+                       headers={"User-Agent": "Mozilla/5.0 (compatible; adaptive-paper)",
+                                "Accept": "application/rss+xml, application/xml",
+                                "Accept-Encoding": "identity"})
+    except Exception:
+        raise TransportError("halts feed unavailable") from None
+    try:
+        if response.status_code != 200:
+            raise TransportError("halts feed unavailable")
+        if str(response.headers.get("Content-Encoding") or "identity").strip().lower() != "identity":
+            raise TransportError("halts feed unavailable")   # decoding could chain reads past the deadline
+        body = bytearray()
+        while True:
+            if time.monotonic() > deadline:
+                raise TransportError("halts feed unavailable")
+            chunk = response.raw.read1(HALT_FEED_READ_BYTES, decode_content=False)
+            if not chunk:
+                return bytes(body)
+            body += chunk
+            if len(body) > max_bytes:
+                raise TransportError("halts feed too large")
+    except TransportError:
+        raise
+    except Exception:
+        raise TransportError("halts feed unavailable") from None
+    finally:
+        response.close()
+
+
+def nasdaq_halt_seed(symbols, *, now_ns=None, fetch=None):
+    """The startup halt seed for ``symbols``: one trade halts RSS read, its digest and the
+    symbols it shows halted now (active_halts). Blocking; runner.Controller runs it in a
+    worker thread and applies the result on the owner loop."""
+    payload = (fetch or fetch_nasdaq_halts)()
+    rows = parse_nasdaq_halts(payload)
+    now_ns = time.time_ns() if now_ns is None else now_ns
+    return {"source": "nasdaq_trade_halts_rss", "url": NASDAQ_HALTS_RSS, "fetched_at_ns": now_ns,
+            "sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload), "items": len(rows),
+            "halts": active_halts(rows, symbols, now_ns)}
 
 
 def normalize_account(raw, *, include_margin=False):
@@ -455,12 +840,43 @@ class GuardedSession:
         # Every order POST must carry a body equal to an envelope registered by
         # submit_enveloped for that client id (order-contract boundary).
         self._envelopes = {}
+        # (lowercase broker order id, client order id) of the DELETE the owner is about to
+        # send, so the budget hook can record which order a cancel request was for.
+        # asyncio.to_thread copies this context: canceling the awaiting task cannot
+        # clear or overwrite the identity retained by an unfinished HTTP worker.
+        self._cancel_context = ContextVar("cancel_expectation", default=None)
+
+    @property
+    def _cancel_expectation(self):
+        return self._cancel_context.get()
+
+    @_cancel_expectation.setter
+    def _cancel_expectation(self, value):
+        self._cancel_context.set(value)
 
     def expect_submission(self, envelope):
         self._envelopes[envelope["intent"]["client_order_id"]] = envelope
 
     def withdraw_submission(self, client_id):
         self._envelopes.pop(client_id, None)
+
+    def announce_cancel(self, order_id, client_id):
+        try:
+            self._cancel_expectation = (str(order_id).lower(), str(client_id))
+        except Exception:
+            self._cancel_expectation = None
+
+    def withdraw_cancel(self):
+        self._cancel_expectation = None
+
+    def _cancel_client_id(self, path):
+        """The announced client id when `path` is the announced DELETE, else None. Never
+        raises: naming a cancel is metadata and must not stop the DELETE."""
+        try:
+            order_id, client_id = self._cancel_expectation
+            return client_id if path[len("/v2/orders/"):].lower() == order_id else None
+        except Exception:
+            return None
 
     def request(self, method, url, **kwargs):
         method = method.upper()
@@ -477,7 +893,11 @@ class GuardedSession:
                      "/v2/orders:by_client_order_id"}
             asset = path.startswith("/v2/assets/") and SYMBOL.fullmatch(path[len("/v2/assets/"):])
             order_id = path.startswith("/v2/orders/") and UUID.fullmatch(path[len("/v2/orders/"):])
-            allowed = ((method == "GET" and (path in reads or asset or order_id))
+            # FILL activities only filtered by one broker order (fill gap-fill), and FEE
+            # activities only after one UTC instant (the ledger's cash baseline). Both are reads.
+            activities = ((path == ACTIVITY_FILL_PATH and _activity_params(kwargs.get("params")))
+                          or (path == ACTIVITY_FEE_PATH and _fee_activity_params(kwargs.get("params"))))
+            allowed = ((method == "GET" and (path in reads or asset or order_id or activities))
                        or (not self.read_only and method == "POST" and path == "/v2/orders")
                        or (not self.read_only and method == "DELETE" and order_id))
             kind = "submit" if method == "POST" else "cancel" if method == "DELETE" else "read"
@@ -498,6 +918,9 @@ class GuardedSession:
                         self.before_send(kwargs.get("json", {}))
                 except Exception:
                     raise SubmissionNotSent("submission prevented before HTTP request") from None
+            elif kind == "cancel" and (named := self._cancel_client_id(path)):
+                # Only the DELETE for the announced broker order carries its client id.
+                self.before_request(kind, client_id=named)
             else:
                 self.before_request(kind)
             kwargs.update(timeout=(5, 5), allow_redirects=False, verify=True, proxies={})
@@ -587,6 +1010,50 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
         data._session.close()
 
 
+def fee_activities(api_key, secret_key, *, after, before_request, request_observer=None, max_pages=20):
+    """Read-only FEE activities created after the timezone-aware instant ``after``, oldest first,
+    for a caller that records them durably before a cash comparison it makes outside a transport
+    snapshot (runner.main's next-trial check). The snapshot's own allow-listed read, normalization
+    and page bound, on a fresh read-only client; ``before_request`` sees each GET as "read"."""
+    fee_after_text(after)  # a naive instant is refused before any client or request
+    if type(max_pages) is not int or not 1 <= max_pages <= 100:
+        raise TransportError("bounded fee activity pages required")
+    trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True)
+    try:
+        return _collect_fee_pages(trading, after, max_pages)
+    finally:
+        trading._session.close()
+
+
+def fee_checkpoint(api_key, secret_key, *, after, before_request, request_observer=None, max_pages=20):
+    """Read F1, account cash, then F2 on one fresh read-only client; refuse a changed
+    id -> normalized row map. Reuse the Alpaca account-activities endpoint and pagination
+    documented above; before_request synchronously admits each GET as a read.
+
+    Assuming a FEE activity is visible exactly when its amount is in account cash,
+    every fee in F2 is in checkpoint cash and must be booked into ledger cash_delta
+    before computing baseline = cash - cash_delta. Later fees after the fixed formatted
+    L cutoff are booked once by id; fees before that cutoff are in cash and never listed.
+    Thus the per-trial baseline neither double counts nor misses a fee. Truncation can
+    include an earlier fee in L's fractional second; it too is booked before baseline.
+    Fees earlier engines absorbed into baseline are booked at the next checkpoint and
+    baseline is recomputed afterwards, preserving cash reconciliation.
+    """
+    fee_after_text(after)
+    if type(max_pages) is not int or not 1 <= max_pages <= 100:
+        raise TransportError("bounded fee activity pages required")
+    trading = _sdk_client(api_key, secret_key, before_request, request_observer, read_only=True)
+    try:
+        first = _collect_fee_pages(trading, after, max_pages)
+        account = normalize_account(trading.get_account())
+        second = _collect_fee_pages(trading, after, max_pages)
+        if {row["id"]: row for row in first} != {row["id"]: row for row in second}:
+            raise TransportError("fee_activity_posted_during_checkpoint")
+        return {"account": account, "fees": second}
+    finally:
+        trading._session.close()
+
+
 def _symbols(symbols):
     result = tuple(sorted(set(symbols)))
     if not result or len(result) > 30 or any(not isinstance(s, str) or not SYMBOL.fullmatch(s) for s in result):
@@ -652,7 +1119,16 @@ def _stream_classes(data_ws):
 
         async def _dispatch(self, msg):
             if msg.get("T") == "subscription":
-                self.owner._ack("quotes", set(self.owner.symbols).issubset(msg.get("quotes", [])))
+                # On SIP, quotes, trading statuses and LULD bands share this one
+                # connection; every subscribed channel must cover every symbol or the
+                # stream is not ready.
+                symbols = set(self.owner.symbols)
+                quotes = symbols.issubset(msg.get("quotes") or [])
+                halts = not self.owner.halt_statuses or all(
+                    symbols.issubset(msg.get(channel) or []) for channel in ("statuses", "lulds"))
+                if quotes and not halts:
+                    self.owner.freeze_health("halt_status_subscription_rejected")
+                self.owner._ack("quotes", quotes and halts)
             elif msg.get("T") == "error":
                 self.owner.freeze_health("quotes_control_error")
             await super()._dispatch(msg)
@@ -669,7 +1145,11 @@ class AlpacaPaperTransport:
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
-                 extended_hours_allowed=False, include_margin=False):
+                 extended_hours_allowed=False, include_margin=False, sink_status=None,
+                 fee_history_start=None):
+        # sink_status receives every normalized trading status message of a subscribed
+        # symbol (normalize_trading_status) on the owning loop, like sink_observation.
+        self.sink_status = sink_status
         self.extended_hours_allowed = bool(extended_hours_allowed)
         # G-e: forwarded to normalize_account on every snapshot() call.
         # False (every default construction) keeps snapshot()'s account
@@ -677,6 +1157,7 @@ class AlpacaPaperTransport:
         self.include_margin = bool(include_margin)
         self.feed = data_feed(feed)
         self.data_ws = data_stream_url(self.feed)
+        self.halt_statuses = halt_statuses_supported(self.feed)
         self.symbols = _symbols(symbols)
         self.required_quote_symbols = (self.symbols if required_quote_symbols is None
                                        else _symbols(required_quote_symbols))
@@ -693,6 +1174,10 @@ class AlpacaPaperTransport:
         self.history_start = history_start or datetime.now(timezone.utc)
         if self.history_start.tzinfo is None or not 1 <= max_snapshot_pages <= 100:
             raise TransportError("bounded snapshot with timezone-aware history start required")
+        # The caller reuses its checkpoint's fixed lineage window for every snapshot.
+        # Legacy callers keep their recorded baseline window. Defaults to history_start.
+        self.fee_history_start = fee_history_start or self.history_start
+        fee_after_text(self.fee_history_start)
         self.max_snapshot_pages = max_snapshot_pages
         self._events = queue.Queue(maxsize=queue_size)
         self._state_lock = threading.RLock()
@@ -706,6 +1191,10 @@ class AlpacaPaperTransport:
         self._quote_values = {}
         self._pending_stream = {}
         self._stream_seen = set()
+        self._executions = {}      # client order id -> execution ids already forwarded
+        self._status_counts = {}   # trading status messages by resulting state
+        self._luld = {}            # symbol -> latest LULD band (receipts only)
+        self._luld_invalid = 0
         self._intents = {}
         self._not_sent = set()
         self._rejected = {}
@@ -747,7 +1236,11 @@ class AlpacaPaperTransport:
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
                     "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
                     "queue_size": self._events.qsize(), "dropped_quotes": dict(self._dropped_quotes),
-                    "dropped_quotes_by_symbol": dict(self._dropped_by_symbol)}
+                    "dropped_quotes_by_symbol": dict(self._dropped_by_symbol),
+                    "halt_status_channels": ["statuses", "lulds"] if self.halt_statuses else [],
+                    "trading_status_messages": dict(self._status_counts),
+                    "luld_bands": {symbol: dict(band) for symbol, band in self._luld.items()},
+                    "luld_invalid": self._luld_invalid}
 
     @property
     def ready(self):
@@ -773,10 +1266,11 @@ class AlpacaPaperTransport:
             self._reasons.clear()
 
     def _order_events_pending(self):
-        """True while an order event is still queued. Queued quotes do not block a
-        reconciliation acknowledgement: on SIP the quote queue is rarely empty."""
+        """True while an order event is still queued. Queued quotes, trading statuses and
+        LULD bands do not block a reconciliation acknowledgement: on SIP the quote queue
+        is rarely empty."""
         with self._events.mutex:
-            return any(kind != "quote" for kind, _ in self._events.queue)
+            return any(kind == "order" for kind, _ in self._events.queue)
 
     def _connection(self, channel, connected):
         with self._state_lock:
@@ -816,12 +1310,15 @@ class AlpacaPaperTransport:
             raise TransportError("owner callback exceeded bounded deadline") from None
 
     def _budget_sync(self, kind, client_id=None):
-        if client_id is not None:
+        if kind == "submit" and client_id is not None:
             # Never park a submission for an entire rolling window while it
             # holds locks needed by cancels. The supported hook reserves or
             # refuses immediately; this deadline also cancels accidental sleeps.
             return self._on_owner(self.before_request, kind, client_id=client_id,
                                   _owner_timeout=0.25, _freeze_timeout=False)
+        if client_id is not None:
+            # A cancel that names its order keeps the ordinary (waiting) budget path.
+            return self._on_owner(self.before_request, kind, client_id=client_id)
         return self._on_owner(self.before_request, kind)
 
     def _wire_guard(self, order):
@@ -852,24 +1349,41 @@ class AlpacaPaperTransport:
     async def _order_callback(self, raw):
         self._enqueue("order", raw)
 
+    async def _status_callback(self, raw):
+        self._enqueue("status", raw)
+
+    async def _luld_callback(self, raw):
+        self._enqueue("luld", raw)
+
     async def _observe(self, order):
         async with self._observation_lock:
             return await self._observe_locked(order)
 
     async def _observe_locked(self, order):
-        previous = self._observed.get(order["client_order_id"])
+        """Forward one order observation to the sink unless it is stale. A stream fill
+        carrying an execution id not yet forwarded for this order is always forwarded,
+        with its own qty and price, even when a REST read already advanced the cumulative
+        quantity past it; the stored cumulative state never moves backward."""
+        cid = order["client_order_id"]
+        previous = self._observed.get(cid)
+        execution = order.get("execution_id") if order.get("event") in EXECUTION_EVENTS else None
+        new_execution = execution is not None and execution not in self._executions.get(cid, ())
+        stale = False
         if previous:
             if order["id"] != previous["id"]:
                 self.freeze_health("client_id_collision")
                 raise TransportError("client ID resolves to multiple orders")
-            if Decimal(order["filled_qty"]) < Decimal(previous["filled_qty"]):
-                return previous
-            if (Decimal(order["filled_qty"]) == Decimal(previous["filled_qty"])
-                    and (order["updated_at_ns"] < previous["updated_at_ns"]
-                         or (previous["status"] in TERMINAL and order["status"] not in TERMINAL))):
+            stale = (Decimal(order["filled_qty"]) < Decimal(previous["filled_qty"])
+                     or (Decimal(order["filled_qty"]) == Decimal(previous["filled_qty"])
+                         and (order["updated_at_ns"] < previous["updated_at_ns"]
+                              or (previous["status"] in TERMINAL and order["status"] not in TERMINAL))))
+            if stale and not new_execution:
                 return previous
         await self._invoke(self.sink_observation, dict(order))
-        self._observed[order["client_order_id"]] = dict(order)
+        if new_execution:
+            self._executions.setdefault(cid, set()).add(execution)
+        if not stale:
+            self._observed[cid] = {key: value for key, value in order.items() if key not in EXECUTION_FIELDS}
         return order
 
     async def _consume_events(self):
@@ -904,17 +1418,42 @@ class AlpacaPaperTransport:
                     self._quote_seen[quote["symbol"]] = time.monotonic()
                     self._quote_values[quote["symbol"]] = quote
                     await self._invoke(self._on_quote, quote)
-                else:
+                elif kind == "status":
+                    status = normalize_trading_status(raw)
+                    if status["symbol"] not in self.symbols:
+                        raise TransportError("unexpected status symbol")
+                    with self._state_lock:
+                        self._status_counts[status["state"]] = self._status_counts.get(status["state"], 0) + 1
+                    if self.sink_status is not None:
+                        await self._invoke(self.sink_status, status)
+                elif kind == "luld":
+                    try:
+                        band = normalize_luld(raw)
+                    except TransportError:
+                        band = None
+                    with self._state_lock:
+                        if band is None or band["symbol"] not in self.symbols:
+                            self._luld_invalid += 1  # receipts only; never a trading input
+                        elif band["ts_ns"] >= self._luld.get(band["symbol"], {}).get("ts_ns", 0):
+                            self._luld[band["symbol"]] = band
+                elif kind == "order":
                     payload = raw.get("data", raw)
                     order = normalize_order(payload["order"])
                     for key, source in (("event", "event"), ("execution_id", "execution_id"),
                                         ("event_qty", "qty"), ("event_price", "price")):
                         if payload.get(source) is not None:
                             order[key] = str(payload[source])
+                    # https://docs.alpaca.markets/docs/websocket-streaming:
+                    # fill/partial_fill timestamp is when the execution occurred;
+                    # nested order.updated_at is a separate order-state timestamp.
+                    if order.get("event") in EXECUTION_EVENTS and payload.get("timestamp") is not None:
+                        order["execution_time_ns"] = timestamp_ns(payload["timestamp"])
                     self._stream_seen.add(order["client_order_id"])
                     self._pending_stream.pop(order["client_order_id"], None)
                     order = await self._observe(order)
                     await self._invoke(self._on_order, order)
+                else:
+                    raise TransportError("unknown stream event kind")
             except Exception:
                 self.freeze_health("callback_failure")
 
@@ -945,6 +1484,15 @@ class AlpacaPaperTransport:
         self._on_quote, self._on_order = on_quote, on_order
         self._orders_stream.subscribe_trade_updates(self._order_callback)
         self._quotes_stream.subscribe_quotes(self._quote_callback, *self.symbols)
+        if self.halt_statuses:
+            # Halts and LULD bands ride the same data connection as the quotes (one
+            # stream per endpoint). alpaca-py 0.44.0 has subscribe_trading_statuses and a
+            # "lulds" handler slot without a public subscribe method; the SDK sends every
+            # non-empty channel in the one subscribe message of each (re)connect
+            # (DataStream._send_subscribe_msg).
+            self._quotes_stream.subscribe_trading_statuses(self._status_callback, *self.symbols)
+            self._quotes_stream._subscribe(self._luld_callback, self.symbols,
+                                           self._quotes_stream._handlers["lulds"])
         self._started = True
         self._tasks = [asyncio.create_task(self._consume_events()), asyncio.create_task(self._watchdog())]
         for stream, channel in ((self._orders_stream, "orders"), (self._quotes_stream, "quotes")):
@@ -1082,11 +1630,16 @@ class AlpacaPaperTransport:
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
             try:
+                # The worker's copied context retains this DELETE's owned identity
+                # even if task cancellation releases the operation lock early.
+                self._client._session.announce_cancel(order["id"], client_order_id)
                 await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
             except Exception as exc:
                 answer = getattr(exc, "status_code", None)
                 if answer not in (404, 422):
                     self.freeze_health("cancellation_unresolved")
+            finally:
+                self._client._session.withdraw_cancel()
             # A successful DELETE is only an acknowledgement; query cumulative state.
             final = await self._lookup(client_order_id)
             if final is None:
@@ -1116,6 +1669,42 @@ class AlpacaPaperTransport:
             params["after_order_id"] = str(page[-1]["id"])
         raise TransportError("snapshot page bound reached; completeness unproven")
 
+    async def fill_activities(self, order_id):
+        """Every execution of one broker order from its FILL activities (GET
+        /v2/account/activities/FILL, order_id filter, oldest first): each execution's own
+        qty and price and the order's cumulative quantity after it. Read-only, one
+        budgeted GET per 100 executions, bounded by max_snapshot_pages. The executions
+        must tile the order's filled quantity from zero (tiled_executions). Joined to the
+        stream by (order, cumulative quantity): that an activity id's UUID equals the
+        stream's execution_id is not documented, so neither side relies on it."""
+        if self._stopping:
+            raise TransportError("transport stopping")
+        if not isinstance(order_id, str) or not UUID.fullmatch(order_id):
+            raise TransportError("fill activities require a broker order id")
+
+        def collect():
+            rows, token = [], None
+            for _ in range(self.max_snapshot_pages):
+                params = {"order_id": order_id, "direction": "asc", "page_size": ACTIVITY_PAGE_SIZE}
+                if token is not None:
+                    params["page_token"] = token
+                page = self._client.get("/account/activities/FILL", params)
+                if not isinstance(page, list) or len(page) > ACTIVITY_PAGE_SIZE:
+                    raise TransportError("invalid activity page")
+                rows.extend(page)
+                if len(page) < ACTIVITY_PAGE_SIZE:
+                    return rows
+                token = str(page[-1].get("id") if isinstance(page[-1], dict) else "")
+            raise TransportError("activity page bound reached; completeness unproven")
+
+        try:
+            raw = await asyncio.to_thread(collect)
+            return tiled_executions([normalize_fill_activity(row, order_id) for row in raw])
+        except TransportError:
+            raise
+        except Exception:
+            raise TransportError("fill activity lookup failed") from None
+
     async def snapshot(self):
         async with self._operation_lock:
             def collect():
@@ -1124,9 +1713,12 @@ class AlpacaPaperTransport:
                               "avg_entry_price": decimal_string(p["avg_entry_price"])}
                              for p in self._client.get_all_positions()]
                 orders = self._pages("open") + self._pages("all", after=self.history_start)
-                return account, positions, orders
+                # Last, after account cash, through the caller's fixed fee window. A fee
+                # posted between these reads can cause a cash mismatch; fail closed.
+                fees = _collect_fee_pages(self._client, self.fee_history_start, self.max_snapshot_pages)
+                return account, positions, orders, fees
             try:
-                account, positions, raw_orders = await asyncio.to_thread(collect)
+                account, positions, raw_orders, fees = await asyncio.to_thread(collect)
                 orders = {}
                 for raw in raw_orders:
                     order = await self._observe(normalize_order(raw))
@@ -1139,7 +1731,8 @@ class AlpacaPaperTransport:
                             raise TransportError("owned intent absent from complete snapshot")
                         orders[key] = found
                 return {"account": account, "orders": list(orders.values()), "positions": positions,
-                        "complete": True, "history_start": self.history_start.isoformat(),
+                        "fees": fees, "complete": True, "history_start": self.history_start.isoformat(),
+                        "fee_history_start": self.fee_history_start.isoformat(),
                         "scope": "all_open_and_recent_plus_owned", "health": self.health}
             except Exception:
                 self.freeze_health("snapshot_incomplete")

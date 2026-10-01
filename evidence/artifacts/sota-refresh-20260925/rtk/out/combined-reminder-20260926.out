@@ -1,0 +1,29 @@
+## rtk 0.50.0; rtk_config_reminder sha256 2e8841021d5c5f76c6f346c85d0a5f52e52c2aaf8c976bc1ac1003f476838575
+## part 1: rtk hook check on the reminder's probes
+# four-entry
+  rc=1 [git show HEAD:x | tail -n 5] :: No rewrite for: git show HEAD:x | tail -n 5
+  rc=1 [git -C . show --no-color HEAD:x | tail -n 5] :: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5
+  rc=1 [diff a missing] :: No rewrite for: diff a missing
+  rc=1 [git branch -a] :: No rewrite for: git branch -a
+  rc=1 [git -C . branch] :: No rewrite for: git -C . branch
+# four-entry-tracking-without-history-days
+  rc=0 [git show HEAD:x | tail -n 5] :: rtk git show HEAD:x | tail -n 5
+  rc=0 [git -C . show --no-color HEAD:x | tail -n 5] :: rtk git -C . show --no-color HEAD:x | tail -n 5
+  rc=0 [diff a missing] :: rtk diff a missing
+  rc=0 [git branch -a] :: rtk git branch -a
+  rc=0 [git -C . branch] :: rtk git -C . branch
+# four-entry-tracking-with-history-days
+  rc=1 [git show HEAD:x | tail -n 5] :: No rewrite for: git show HEAD:x | tail -n 5
+  rc=1 [git -C . show --no-color HEAD:x | tail -n 5] :: No rewrite for: git -C . show --no-color HEAD:x | tail -n 5
+  rc=1 [diff a missing] :: No rewrite for: diff a missing
+  rc=1 [git branch -a] :: No rewrite for: git branch -a
+  rc=1 [git -C . branch] :: No rewrite for: git -C . branch
+## part 2: rtk_config_reminder on scratch configs (bin_dir holds the installed rtk)
+  four-entry: silent
+  four-entry-tracking-without-history-days: reminder, text passes but rtk fails :: Reminder: for the Claude hook, replace any existing exclude_commands line in <scratch>/four-entry-tracking-without-histo...
+  four-entry-tracking-with-history-days: silent
+  single-regex-alternative: reminder, text check fails :: Reminder: for the Claude hook, replace any existing exclude_commands line in <scratch>/single-regex-alternative/rtk/conf...
+  two-entry-20260925: reminder, text check fails :: Reminder: for the Claude hook, replace any existing exclude_commands line in <scratch>/two-entry-20260925/rtk/config.tom...
+  no-config: reminder, text check fails :: Reminder: for the Claude hook, replace any existing exclude_commands line in <scratch>/no-config/rtk/config.toml with [h...
+## part 3: rtk_config_reminder with this host's environment (read-only)
+  rtk 0.50.0 at bin/rtk: silent (text matches and every probe answered No rewrite for, exit 1)

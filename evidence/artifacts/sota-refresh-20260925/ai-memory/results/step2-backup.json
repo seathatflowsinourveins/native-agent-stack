@@ -1,0 +1,25 @@
+{
+ "at": "2026-09-25T18:57:47Z",
+ "rc": 0,
+ "seconds": 4.4,
+ "stdout": "\u2713 wrote backup to ~/.local/state/native-agent-stack/sota-refresh-20260925/ai-memory/pre-2.4.0.tar.gz (39.63 MiB)",
+ "stderr_lines": 2,
+ "archive": {
+  "bytes": 41555491,
+  "sha256": "c5b14adbeb0c891a1d0cea481f2f230a27c1e7bcc7e854bb45bce7e85f86dd8e",
+  "mode": "0o600",
+  "members": 512,
+  "top_level": [
+   "config.toml",
+   "db",
+   "wiki"
+  ]
+ },
+ "assert": {
+  "has_db_memory_sqlite": true,
+  "has_wiki": true,
+  "has_config_toml": true,
+  "no_unsafe_members": true
+ },
+ "pass": true
+}

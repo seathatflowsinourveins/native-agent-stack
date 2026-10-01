@@ -1,0 +1,3 @@
+{"event": "start", "ts": 1790582877.871, "pid": 314043}
+{"event": "tools/list", "ts": 1790582877.889}
+{"event": "exit", "ts": 1790582878.89, "reason": "timer"}

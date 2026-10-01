@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--poppler--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "poppler",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v pdftotext) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && pdftotext -v 2>&1 | head -1 && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" poppler",
+      "exit": 0,
+      "duration_s": 0.037,
+      "output_sha256": "77ce0ea066bcfe99a222d60387c4f0ca714d79ebead876fc1941b94ebeb7112e",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/pdftotext -> ~/.local/share/codex-ecosystem/poppler-26.09.0/prefix/bin/pdftotext\npdftotext version 26.09.0\nstack ['26.09.0'] winner pins ['26.09.0']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-poppler && TMPDIR=/tmp/nsr-poppler PYTHONDONTWRITEBYTECODE=1 python3.13 blueprints/convergence-practice/document-ingestion/ingest.py --pdftotext \"$(command -v pdftotext)\" --output /tmp/nsr-poppler/attempt-1 --attempt 1 > /tmp/nsr-poppler/run.log 2>&1; rc=$?; tail -c 300 /tmp/nsr-poppler/run.log; echo; echo \"ingest.py exit=$rc\"; exit $rc",
+      "exit": 0,
+      "duration_s": 0.063,
+      "output_sha256": "4351b8eb15c0c95f494aeff2eb51d817eceed3f89e0575d1566af75511754d97",
+      "output_excerpt": "{\"status\": \"passed\", \"checks\": {\"exact_page_text\": true, \"exact_table_cells\": true, \"positive_retrieval\": true, \"negative_retrieval\": true, \"positive_provenance\": true, \"bounded_output\": true, \"invalid_pdf_native_refusal\": true, \"frozen_inputs_unchanged\": true}}\n\ningest.py exit=0\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-poppler && test ! -e /tmp/nsr-poppler && echo \"scratch directory removed\"",
+      "exit": 0,
+      "duration_s": 0.002,
+      "output_sha256": "ab3f4773f1afe69729b08ed4dde8747359ab136c2bcc427e52529c53d9b0ef02",
+      "output_excerpt": "scratch directory removed\n"
+    }
+  ],
+  "tool_versions": {
+    "poppler": "26.09.0"
+  },
+  "observed_at_utc": "2026-09-25T05:38:10Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), Poppler 26.09.0 (the catalog pin; pdftotext resolves to this host's build under ~/.local/share/codex-ecosystem/poppler-26.09.0/prefix) ran the unchanged frozen document-ingestion protocol (blueprints/convergence-practice/document-ingestion/ingest.py) against its retained corpus: status passed, with exact page text, exact table cells, positive and negative retrieval, positive provenance, bounded output, the native invalid-PDF refusal and unchanged frozen inputs all true. All commands exit 0.",
+  "limitations": [
+    "local_integration: the corpus is this repository's designed born-digital Latin-text fixture (blueprints/convergence-practice/wsl-document-ingestion/README.md), not a held-out or real-world PDF set. OCR, scanned pages, multi-column layout, non-Latin CMaps and images were not exercised.",
+    "This receipt does not re-verify that this host's Poppler build matches the source and library hashes in blueprints/convergence-practice/wsl-document-ingestion/sources.json.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "local_integration",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:10Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (the frozen ingestion protocol extracted exact page text and table cells; its invalid-PDF native refusal and negative retrieval are the controls; pdftotext 26.09.0 and its resolved build path are backed; bound to the document-retrieval winner; the local_integration class is declared honestly) and re-ran pdftotext -v and ingest.py into a mktemp output on this host with status passed and all eight checks true.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

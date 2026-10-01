@@ -1,0 +1,28 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+#!/bin/bash
+# Scratch driver: apply the lane to a scratch Codex home (copies of this host's config.toml, AGENTS.md and RTK.md;
+# no auth.json), with a scratch project standing in for the main checkout after the host step, then run the static
+# prove checks against it. No model call. usage: rehearse_static.sh <scratch-dir> <log>
+set -u
+SP=$SCRATCH
+WT=$SP/wt-u4; S=$1; LOG=$2
+rm -rf "$S"; mkdir -p "$S[redacted]"; chmod 700 "$S" "$S/home" "$S[redacted]"
+CH=$S[redacted]
+cp ~/.codex/config.toml ~/.codex/AGENTS.md ~/.codex/RTK.md "$CH/"
+{
+  echo "== host step on a copy of the main checkout's project config"
+  python3 "$SP/pd/host_step_copy.py" ~/code/native-agent-stack/.codex/config.toml "$S/project/.codex/config.toml"
+  printf '\n[projects."%s"]\ntrust_level = "trusted"\n' "$S/project" >> "$CH/config.toml"
+  cd "$WT" || exit 9
+  echo "== prove before apply (scratch home)"
+  timeout 900 python3 tools/adoption/prove_codex_lane.py --codex-home "$CH" --checkout "$S/project"
+  echo "prove rc=$?"
+  echo "== apply"
+  C=$(sha256sum "$CH/config.toml" | cut -d' ' -f1); G=$(sha256sum "$CH/AGENTS.md" | cut -d' ' -f1)
+  timeout 900 python3 tools/adoption/apply_codex_lane.py --apply --codex-home "$CH" --codex-process-name nas-none-xyz \
+    --state-dir "$S/state" --expect-config-sha256 "$C" --expect-agents-sha256 "$G" | sed -n '/^config.toml: written/,$p'
+  echo "apply rc=${PIPESTATUS[0]}"
+  echo "== prove after apply (scratch home)"
+  timeout 900 python3 tools/adoption/prove_codex_lane.py --codex-home "$CH" --checkout "$S/project" --json "$S/prove.json"
+  echo "prove rc=$?"
+} > "$LOG" 2>&1

@@ -1,0 +1,33 @@
+2026-09-25 21:51:29 - Mirix - INFO - Logging to: console (level: INFO)
+INIT_RESULT: "created_by_id='demo-client-id' last_updated_by_id='demo-client-id' created_at=datetime.datetime(2026, 9, 26, 1, 51, 32, 321195, tzinfo=TzInfo(0)) updated_at=datetime.datetime(2026, 9, 26, 1, 51, 32, 388072, tzinfo=TzInfo(0)) id='agent-<uuid>' name='meta_memory_agent' tool_rules=[] message_ids=['message-<uuid>'] system='You are the Meta Memory Manager, as a part of a memory system. In this system, other agents are: Meta Memory Manager, Episodic Memory Manager, Procedural Memory Manager, Resource Memory Manager, Semantic Memory Manager, Core Memory Manager, Knowledge Vault Memory Manager, and Chat Agent. All agents share the same memories.\\nThe system will receive various types of messages from users, including text messages, images, transcripted voice recordings, and other multimedia content. When messages are accumulated to a certain amount, they will be sent to you, along with potential conversations between the user and the Chat Agent during this period. You need to analyze the input messages and conversations, understand what the user is communicating and going through, then save the details into corresponding memories by calling the function `trigger_memory_update` and send the messages to corresponding memory manager so that they will update the memories according to your instructions. When calling `trigger_memory_update`, you can choose one or more memories to update from [\\'core\\', \\'episodic\\', \\'procedural\\', \\'resource\\', \\'knowledge_vault\\', \\'semantic\\'].\\n\\nThe details of all memory components, and how you are supposed to classify content into different memories, are shown below:\\n\\nMEMORY COMPONENTS OVERVIEW:\\n\\n1. Core Memory - Personal User Profile & Interaction Preferences\\nWHO the user is and HOW to interact with them effectively.\\nPurpose: Stores user\\'s personal characteristics and interaction preferences to optimize communication.\\nContains: User identity, person
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/mirix-main-src/mirix/client/remote_client.py", line 426, in _request
+    response.raise_for_status()
+  File "<scratch>/trial-mirix/venv-main/lib/python3.11/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Server error '500 Internal Server Error' for url 'http://127.0.0.1:18533/memory/add'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<scratch>/trial-mirix/quickstart_add_retrieve_async.py", line 54, in <module>
+    asyncio.run(main())
+  File "~/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/quickstart_add_retrieve_async.py", line 34, in main
+    add_result = await client.add(
+                 ^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-main-src/mirix/client/remote_client.py", line 1386, in add
+    return await self._request("POST", endpoint, json=request_data, headers=headers)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<scratch>/trial-mirix/mirix-main-src/mirix/client/remote_client.py", line 432, in _request
+    raise httpx.HTTPStatusError(
+httpx.HTTPStatusError: can only concatenate str (not "dict") to str

@@ -1,0 +1,115 @@
+PASS version
+PASS precondition: live settings have 0 Bash allow rules
+PASS robust: empty payload -> exit 0, silent
+PASS robust: malformed payload -> exit 0, silent
+PASS robust: no-command payload -> exit 0, silent
+FAIL hook protocol for: head -1 <impl>/tmp/tmp.QaJgjYsFRl/f.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL head-1 rewrite: []
+FAIL head-1 bytes differ from native head
+FAIL hook protocol for: head -5 <impl>/tmp/tmp.QaJgjYsFRl/f.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL head-5 rewrite: []
+FAIL head-5 bytes differ from native head
+FAIL hook protocol for: cat <impl>/tmp/tmp.QaJgjYsFRl/f.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL cat bytes differ []
+FAIL hook protocol for: tail -3 <impl>/tmp/tmp.QaJgjYsFRl/f.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL tail-3 bytes differ []
+FAIL hook protocol for: wc -l <impl>/tmp/tmp.QaJgjYsFRl/missing :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL wc: hook did not rewrite
+FAIL hook protocol for: grep -n needle <impl>/tmp/tmp.QaJgjYsFRl/missing :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL grep: hook did not rewrite
+FAIL hook protocol for: pytest -q nosuch_test.py :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL pytest: hook did not rewrite
+FAIL hook protocol for: diff <impl>/tmp/tmp.QaJgjYsFRl/a.txt <impl>/tmp/tmp.QaJgjYsFRl/missing.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL hook protocol for: ls <impl>/tmp/tmp.QaJgjYsFRl/missing :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE ls missing: not rewritten (native path, rc=2)
+FAIL hook protocol for: cat <impl>/tmp/tmp.QaJgjYsFRl/missing :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE cat missing: not rewritten (native path, rc=1)
+FAIL hook protocol for: find <impl>/tmp/tmp.QaJgjYsFRl/missing -name x :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE find missing: not rewritten (native path, rc=1)
+FAIL hook protocol for: grep -rn needle <impl>/tmp/tmp.QaJgjYsFRl/missing-dir :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE grep -rn missing-dir: not rewritten (native path, rc=2)
+FAIL hook protocol for: rg -n needle <impl>/tmp/tmp.QaJgjYsFRl/missing :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE rg missing: not rewritten (native path, rc=2)
+FAIL hook protocol for: ruff check nosuch.py :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE ruff check (stderr-only): not rewritten (native path, rc=2)
+FAIL hook protocol for: git status :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE git status outside repo: not rewritten (native path, rc=128)
+FAIL hook protocol for: git log -1 nsr-no-such-ref :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL gitlog: hook did not rewrite
+FAIL hook protocol for: git diff nsr-no-such-ref :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE git diff bad ref: not rewritten (native path, rc=128)
+PASS silent: command substitution
+PASS silent: file redirect
+PASS silent: heredoc
+PASS silent: no rtk equivalent
+PASS silent: non-display pipe consumer
+PASS silent: no rtk equivalent (uname)
+PASS proxy==raw
+FAIL hook protocol for: git show HEAD:big.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL blob not windowed/announced: []
+FAIL hook protocol for: git log -p :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL log cap silent: []
+FAIL hook protocol for: git log -3 :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git log -3 keeps subject big (missing [big])
+FAIL git log -3 keeps subject c12 (missing [c12])
+FAIL git log -3 keeps subject c11 (missing [c11])
+FAIL hook protocol for: git log --oneline -5 :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git log --oneline -5 keeps subject big (missing [big])
+FAIL git log --oneline -5 keeps subject c12 (missing [c12])
+FAIL git log --oneline -5 keeps subject c11 (missing [c11])
+FAIL git log --oneline -5 keeps subject c10 (missing [c10])
+FAIL git log --oneline -5 keeps subject c9 (missing [c9])
+FAIL hook protocol for: git log :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+NOTE plain git log (13 commits, no -n): 0 distinct subjects shown, cap notice=none []
+FAIL hook protocol for: git show HEAD~1 :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git show HEAD~1 keeps subject c12 (missing [c12])
+FAIL git show HEAD~1 names n.txt (missing [n.txt])
+FAIL git show HEAD~1 keeps +12 (missing [+12])
+FAIL hook protocol for: git status :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git status shows n.txt (missing [n.txt])
+FAIL git status shows untracked-file.txt (missing [untracked-file.txt])
+FAIL git status shows staged-file.txt (missing [staged-file.txt])
+FAIL hook protocol for: git diff :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git diff names n.txt (missing [n.txt])
+FAIL git diff keeps added line (missing [changed-line])
+FAIL hook protocol for: grep -rn needle <impl>/tmp/tmp.QaJgjYsFRl/g :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL grep -rn keeps needle one (missing [needle one])
+FAIL grep -rn keeps needle two (missing [needle two])
+FAIL grep -rn keeps y needle three (missing [y needle three])
+FAIL grep -rn keeps a.txt (missing [a.txt])
+FAIL grep -rn keeps b.txt (missing [b.txt])
+FAIL grep -rn keeps c.md (missing [c.md])
+FAIL hook protocol for: ls <impl>/tmp/tmp.QaJgjYsFRl/l :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL ls keeps one.txt (missing [one.txt])
+FAIL ls keeps two.log (missing [two.log])
+FAIL ls keeps three (missing [three])
+FAIL hook protocol for: git diff --cached :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL git diff --cached names cached-file.txt (missing [cached-file.txt])
+FAIL git diff --cached keeps added line (missing [cached-marker-line])
+FAIL hook protocol for: rg -n needle <impl>/tmp/tmp.QaJgjYsFRl/g :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL rg -n keeps needle one (missing [needle one])
+FAIL rg -n keeps needle two (missing [needle two])
+FAIL rg -n keeps y needle three (missing [y needle three])
+FAIL rg -n keeps a.txt (missing [a.txt])
+FAIL rg -n keeps b.txt (missing [b.txt])
+FAIL rg -n keeps c.md (missing [c.md])
+FAIL hook protocol for: find <impl>/tmp/tmp.QaJgjYsFRl/g -name '*.txt' :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL find keeps a.txt (missing [a.txt])
+FAIL find keeps sub/b.txt (missing [b.txt])
+PASS find excludes c.md
+FAIL hook protocol for: wc -l <impl>/tmp/tmp.QaJgjYsFRl/f.txt :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL wc -l keeps count 40 (missing [40])
+PASS explicit allow rule -> allow
+FAIL hook protocol for: git status && git log -1 :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL compound: []
+FAIL hook protocol for: git diff :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL ask rule: []
+PASS silent: deny rule
+NOTE allow rule Bash(git status) applied to 'git status --short': rc=0 permissionDecision=allow
+PASS legacy colon allow rule -> allow
+PASS silent: leading-wildcard deny rule
+FAIL hook protocol for: git log -2 && git status :: AssertionError: ('permissionDecision', 'allow', 'want', 'none')
+FAIL compound2: []
+NOTE hook stderr non-empty in 1 of 45 payload calls; first: git status :: [rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings 
+COUNTS pass=17 fail=85 note=11
+RESULT fail

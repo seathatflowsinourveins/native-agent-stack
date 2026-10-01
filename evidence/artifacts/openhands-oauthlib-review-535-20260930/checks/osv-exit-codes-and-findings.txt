@@ -1,0 +1,8 @@
+observed_utc=2026-09-30T08:54:08Z
+PR-head lock, the head's own .github/osv-scanner.toml (the CI form): exit 0
+PR-head lock, EMPTY config (the control; must find the two OAuthlib ids): exit 1
+PR-base lock (main's), EMPTY config: exit 1
+osv-head-lock-with-ci-config.json -> no findings
+osv-head-lock-empty-config-control.json -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"]}
+osv-base-lock-empty-config.json -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"]}
+stderr: Scanned <PR535-WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 174 packages

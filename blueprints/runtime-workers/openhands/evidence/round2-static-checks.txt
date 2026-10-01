@@ -1,0 +1,46 @@
+Local structural checks only; no native runtime acceptance.
+
+Command: rtk bash -n blueprints/runtime-workers/openhands/install.sh
+Exit code: 0
+Returned output: (empty)
+
+Command: rtk bash -n blueprints/runtime-workers/openhands/install-container.sh
+Exit code: 0
+Returned output: (empty)
+
+Command: rtk bash -n blueprints/runtime-workers/openhands/install-grader.sh
+Exit code: 0
+Returned output: (empty)
+
+Command: rtk bash -n blueprints/runtime-workers/openhands/run-e2e.sh
+Exit code: 0
+Returned output: (empty)
+
+Command: PYTHONDONTWRITEBYTECODE=1 rtk python3 - (AST/JSON parsing, pinned lock hashes, recipe scratch/cache/bytecode scan)
+Exit code: 0
+Returned output: PASS: Python AST (12 files), JSON (8 files), 2 lock hashes; no recipe scratch/cache/bytecode.
+
+Command: rtk git diff --check
+Exit code: 0
+Returned output: (empty)
+
+Command: PYTHONDONTWRITEBYTECODE=1 rtk python3 - (relative Markdown links, assigned-file boundary and whole-checkout cache sweep)
+Exit code: 1
+Returned output:
+Traceback (most recent call last):
+  File "<stdin>", line 23, in <module>
+AssertionError: ['scripts/__pycache__', 'scripts/__pycache__/catalog_decisions.cpython-313.pyc', 'scripts/__pycache__/validate.cpython-313.pyc', 'scripts/__pycache__/host_receipts.cpython-313.pyc', 'scripts/__pycache__/credential_status.cpython-313.pyc']
+
+The suite wrote no recipe bytecode. The checkout-wide sweep additionally found
+the four ignored scripts bytecode files above; their generating process was not
+observed. Removed only those four files and their empty directory, then reran
+the same sweep. PYTHONDONTWRITEBYTECODE=1 was independently confirmed through
+RTK (sys.dont_write_bytecode returned True).
+
+Command: PYTHONDONTWRITEBYTECODE=1 rtk python3 - (relative Markdown links, assigned-file boundary and whole-checkout cache sweep)
+Exit code: 0
+Returned output: PASS: 39 relative Markdown links; 20 changed/new files within assigned paths; no cache or bytecode directories/files in checkout.
+
+Command: PYTHONDONTWRITEBYTECODE=1 rtk python3 scripts/validate.py --scan-file (each of the 9 round-2 additions listed by git status)
+Exit code: 0
+Returned output: {"scanned_files": 9, "status": "passed"}

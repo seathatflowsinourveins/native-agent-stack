@@ -29,6 +29,10 @@ reports, retained exports and live upstream UIs keep their distinct scopes.
 The [September 20 community review](../../docs/community-native-practice.md)
 explains the selected ECC and Claude practice sources across the sixteen layers of
 that date (the four layers added on 2026-09-22 postdate it).
+The [practice references](practice-references.json) pin the 26 Claude Code practice
+repositories the 2026-09-27 community sweep read (22 community, 4 Anthropic);
+`.github/workflows/practice-references-freshness.yml` reports their drift and
+maintenance weekly and never changes a pin.
 Use the [native Claude profile](../../recipes/claude-native-profile.md) for
 terminal entry, small persistent instructions, selected skills and new-PC checks.
 
@@ -90,6 +94,16 @@ research inventory at its existing path. Discovery lists, candidates and older
 [agent/operations](../us-equities/agents-operations.json) source reviews remain
 available. Their directory placement and reviewed source pins do not supersede
 the currently selected component pin or qualify an entire repository.
+
+The [September 25 memory-stack convergence](memory-stack-20260925.json) records which
+memory systems, embedders, rerankers, memory LLMs and local serving runtimes the shared
+Claude Code and Codex memory retains, trials, defers or rejects. It rests on two blind
+cross-family lane pairs, nine blind judgments in three presentation orders and two
+skeptic checks per row ([sealed evidence](../../evidence/artifacts/memory-stack-20260925/README.md)).
+ai-memory stays the production control; agentmemory, MemPalace and Hindsight, three
+embedders, three rerankers and two memory LLMs are trials on VelaNext; nothing is adopted.
+Its Mac harness figures are descriptive, and the layer decision waits for C4 and the
+VelaNext rerun. Its repository records are registered in the decision index.
 
 The manifest explicitly leaves NautilusTrader, LEAN, Alpaca, skfolio, EdgarTools and the currently
 financial-only DuckDB/pandas claims in the [US-equities domain](../us-equities/README.md).

@@ -1,0 +1,2 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+path=<scratch>/trial-colpali/hf-cache/hub/models--vidore--colpaligemma-3b-pt-448-base/snapshots/30ab955d073de4a91dc5a288e8c97226647e3e5a

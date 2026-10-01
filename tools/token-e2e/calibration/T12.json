@@ -1,0 +1,57 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T12",
+ "clauses": [
+  "Report Idempotency-Key and the canonical page's retention qualification, or a faithful content-gap result",
+  "a curated source lacking either fact cannot establish that capability"
+ ],
+ "sources": [
+  {
+   "label": "canonical page facts (frozen captures)",
+   "text": "idempotency_key_header: True; retention_hours: 24"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The canonical page names the Idempotency-Key header and says keys may be removed from the system automatically after they are at least 24 hours old. The curated documentation lacked the retention rule, so it cannot establish that capability by itself.\n\nSource excerpt: idempotency_key_header: True; retention_hours: 24",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "You send an Idempotency-Key header, and the provider may delete stored keys once they are at least a day old. My curated source did not contain that retention rule, so it does not establish the capability on its own.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The header is called X-Idempotency-Token and keys are kept forever; the curated source and the canonical page agree. The curated source alone cannot establish the capability.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The canonical page names the Idempotency-Key header and a 24 hour retention rule. The curated source lacks the retention rule but is still enough to establish the capability.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

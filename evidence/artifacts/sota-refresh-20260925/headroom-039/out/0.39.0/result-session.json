@@ -1,0 +1,65 @@
+{
+ "A": {
+  "compress_error": null,
+  "compress_s": 5.535,
+  "compressed_mentions_hash": false,
+  "compressed_sha256": "d09c822e7eb7d9a50893a180ec031e8756079a35e8b069d1eba4cc446bd01d86",
+  "compressed_tokens": 257,
+  "content_bytes": 44335,
+  "content_sha256": "de0bd74888ea1c452c3db505b89dc5e8516b54fc1bc377864de9ea124098a9c8",
+  "fidelity": {
+   "compressed_chars": 666,
+   "fixture_rows_verbatim_in_compressed": 7,
+   "nsr_anomaly_present": true,
+   "planted_line_313_verbatim": true,
+   "row_shaped_lines": 7,
+   "row_shaped_lines_not_verbatim_fixture_rows": [],
+   "timestamp_matches": 7,
+   "timestamps_not_verbatim_in_A": []
+  },
+  "hash": "de0bd74888ea1c452c3db505",
+  "hash_equals_sha256_prefix24": true,
+  "original_tokens": 16820,
+  "retrieve_bytes_exact": true,
+  "retrieve_exact": true,
+  "retrieve_s": 0.003,
+  "savings_percent": 98.5,
+  "transforms": [
+   "router:log:0.02"
+  ]
+ },
+ "B": {
+  "compress_error": null,
+  "compress_s": 5.19,
+  "compressed_mentions_hash": false,
+  "compressed_sha256": "52b387c8241cd20cef45c6f2eff836ac35d432238978f0180caf53e771b287d1",
+  "compressed_tokens": 3292,
+  "content_bytes": 183628,
+  "content_sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d",
+  "hash": "2b17eb36da607cc8d2f6f0e2",
+  "hash_equals_sha256_prefix24": true,
+  "original_tokens": 39064,
+  "retrieve_bytes_exact": true,
+  "retrieve_exact": true,
+  "retrieve_s": 0.018,
+  "savings_percent": 91.6,
+  "transforms": [
+   "router:mixed:0.09"
+  ]
+ },
+ "mode": "session",
+ "server_info": {
+  "name": "headroom",
+  "version": "1.30.0"
+ },
+ "session_s": 47.382,
+ "stats_compressions": 2,
+ "stats_retrievals": 2,
+ "tools": [
+  "headroom_compress",
+  "headroom_retrieve",
+  "headroom_stats"
+ ],
+ "unknown_hash_error": "Content not found. It may have expired or the hash may be incorrect.",
+ "workspace": "ws-0.39.0"
+}

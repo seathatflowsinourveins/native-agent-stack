@@ -1,0 +1,440 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "claude",
+  "run_label": "claude-lane",
+  "attempt": 1,
+  "packet_sha256": "38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7",
+  "model": {
+    "name": "claude-opus-5-5",
+    "effort": null,
+    "family": "anthropic"
+  },
+  "model_note": "Requested model claude-opus-5-5; the effort was not recorded and the completion report did not name a resolved model.",
+  "client": "Claude Code general-purpose research subagent with web search",
+  "source_file": "local-uses-claude.md",
+  "original_sha256": "e2c859abce553857ca3acd1e0cc754b9959644ef9c6acc4ff858805724b6f0b4",
+  "original_bytes": 7882,
+  "return_text": "# Local-model workloads beyond memory and RAG (2026-09-24)\n\nGrades: I independent, A academic, S maker, C competitor, P popularity. M = measured elsewhere; E = estimated from this Mac's measured Qwen3.8-27B numbers.\n\n|Workload · why local|Best · runner-up|Evidence|Throughput here|Acceptance test|Verdict|\n|---|---|---|---|---|---|\n|**1. Point-in-time text features** for backtests (8-Ks, news). Local: cloud models cannot be pinned to a cutoff; dated weights are the clean control.|[PIT-4B-FT](https://huggingface.co/Diamegs) dated checkpoints to 2024-12, Apache-2.0 · [ChronoGPT/ChronoBERT](https://huggingface.co/manelalab) v1, 1.55B, yearly cutoffs, MIT|A [Gao et al.](https://arxiv.org/abs/2512.23847) 2026-06-12: lookahead propensity positive in-sample, ~0 after cutoff. A [Zhang & Stadie](https://arxiv.org/abs/2608.02985) 2026-08-04: leakage concentrates on surprising outcomes; needs clean controls. A [He et al.](https://arxiv.org/abs/2502.21206) 2025-07-06: bias modest in one news test. A/S [Kelly et al.](https://arxiv.org/abs/2607.11889) 2026-07-17: PiT news Sharpe 1.0–1.5|E ~1–2K tok/s prefill; embeddings only|Frozen EdgarTools 8-Ks 2015–2024 with acceptance times; prior-month checkpoint embeddings → rolling ridge on next-day abnormal return; baselines Loughran-McDonald tone and Qwen3.8-27B; OOS rank-IC, net Sharpe, HAC t>2|**Trial first**: cleanest route to LLM text signals in backtests|\n|**2. Catalyst tagging/extraction** (event, offering, FDA, contract terms) from 8-Ks and releases; ex-post labels for +200% movers, never backtest signals. Local: backfill volume, pinned labels.|[Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) (installed, 2026-08-14, Apache-2.0) with JSON schema · [GLiNER2](https://github.com/fastino-ai/GLiNER2) (2025) CPU encoder as distilled student|S [Massive](https://arxiv.org/abs/2607.08346) 2026-07-09: 119 event types, 601,088 tags on 292,984 8-Ks; 0.927 precision at score ≥4 (LLM-judged). A [GLiNER2](https://aclanthology.org/2025.emnlp-demos.10/) EMNLP 2025. Local accuracy: unknown|E 15–26 s per 3–5K-token filing: ~260 daily 8-Ks ≈1–2 h; 293K backfill ≈50–90 days (use 9B or student)|1,000 stratified 2025–26 8-Ks from Massive + 300 hand-checked; baselines Opus 5.5 labels and Massive tags; macro-F1, field exact match, filings/hour|**Trial**; adopt for backfill if F1 ≥0.9× Opus|\n|**3. Earnings-call ASR and diarization** (also FDA panels, conferences). Local: season-peak volume at zero marginal cost; offline.|[Cohere Transcribe 03-2026](https://huggingface.co/CohereLabs/cohere-transcribe-03-2026) (2B, Apache-2.0, mlx-audio) · [Parakeet-TDT-0.6B-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) (CC-BY-4.0, 2025-08)|I [Open ASR long-form](https://huggingface.co/datasets/hf-audio/leaderboard_longform) 2026-09-24: Earnings-21/22 WER Cohere 8.7/12.66, Whisper-v3-turbo 9.84/13.1, Parakeet 9.96/14.58; best proprietary 6.48/9.99. [Short-form](https://huggingface.co/datasets/hf-audio/open-asr-leaderboard-results) Earnings22: Qwen3-ASR-1.7B 5.84, Parakeet 5.85|M (S, [FluidAudio](https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md), read 2026-09-24): Parakeet 155.6× real time on M4 Pro (LibriSpeech; 1-h call ≈23 s); diarization 323× on M5 Pro. Cohere: unknown|Earnings-21 (44 calls, entity tags) + Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx, DER|**Trial** (one day): Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice|\n|**4. Image-only exhibits** (slide decks), IR PDFs, legacy scans. Local: bulk backfill at zero marginal cost.|[TeleOCR](https://huggingface.co/StarDoc-AI/TeleOCR) (1.2B, Apache-2.0, 2026-08-17) · [PaddleOCR-VL-1.6](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6) (0.9B, Apache-2.0, 2026-05-28; official MLX-VLM Mac path)|I [OmniDocBench v1.6](https://github.com/opendatalab/OmniDocBench) updated 2026-09-11: 96.91 vs 96.34. A [EDGAR-OCR](https://arxiv.org/abs/2606.18192) 2026-06: 300 SEC tables, Qwen3.6-35B-A3B 75.8% vs Mistral OCR 3 75.3% adjusted recall|Unknown; E ~5–15 s/page (decode-bound)|300 10-Q statement tables rendered to PNG, scored against XBRL facts, + 100 hand-labeled slides; baseline Qwen3.8-27B vision; numeric-cell exact match (pass ≥99%), TEDS, s/page|**Trial**, narrow: XBRL and HTML already cover most filings deterministically|\n|**5. Time-series foundation models** for volatility and volume features. Local: small, CPU-capable, deterministic.|[Chronos-2](https://github.com/amazon-science/chronos-forecasting) (120M, Apache-2.0, 2025-10-20) · [TTM r2.1](https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2) (~1M, Apache-2.0). TimesFM-3 (2026-08-31) scores higher; weights non-commercial, non-production|S [fev-bench](https://huggingface.co/spaces/autogluon/fev-bench) (run by Chronos's maker) 2026-09-24: skill Chronos-2 35.5, TimesFM-3 37.4 (mirror). C [IBM](https://huggingface.co/blog/ibm-research/ibm-releases-sota-granite-time-series) 2026-09-09: TimesFM-3 first on zero-shot GIFT-Eval CRPS. A [Brini](https://arxiv.org/abs/2607.05291) 2026-07-06: of nine zero-shot TSFMs only TTM beats Log-HAR on realized volatility (QLIKE ratio 0.982–0.987)|M (S): Chronos-2 >300 series/s on A10G; Mac unknown; TTM runs on CPU|5-minute realized variance, 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE, Diebold-Mariano p<0.05|**Trial**, low priority; skip for returns|\n|**6. Tool-output injection screening** in agent hooks. Local: per-call latency and cost; outputs may hold code or secrets.|[PIGuard](https://github.com/leolee99/PIGuard) (184M, MIT, ACL 2025) · [Prompt Guard 2 86M](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M) (2025-04)|A [PIArena](https://aclanthology.org/2026.acl-long.1533/) ACL 2026: PIGuard keeps utility (72% vs 74%) but allows over 22% attack success; adaptive attacks unsolved. A [PIDS-Bench](https://arxiv.org/abs/2609.15017) 2026-09-14: an F1-0.98 detector misflags about a third of external benign inputs|M (S): Prompt Guard 2 92 ms per 512 tokens on A100; Mac unknown|2,000 redacted benign outputs from own sessions + PIArena injections; baseline no detector; TPR at FPR ≤1%, p95 latency|**Trial**, flag-only; never a security boundary|\n\n**Not worth running locally**\n\n- Primary agent loop (coding, review, planning, synthesis): on AA v4.3.2 Qwen3.8-27B scores 34 vs Opus 5.5 58 and GPT-6 Astra 53 ([AA](https://artificialanalysis.ai/models/qwen3-8-27b), 2026-09-24; an [Aug-17 report](https://simonwillison.net/2026/Aug/17/qwen-38-27b-scores-52/) said 52, unresolved); its index run emitted 200M tokens, ≈89 days at 26 tok/s.\n- Return forecasting with TSFMs: zero-shot OOS R² −1.37% (Chronos), −2.80% (TimesFM) vs −0.03% (CatBoost) on daily excess returns ([Rahimikia et al.](https://arxiv.org/abs/2511.18578), 2025-11-23, A).\n- Tabular foundation models for mover prediction: trees and deep nets still win on temporal, non-IID, large data ([BeyondArena](https://arxiv.org/abs/2606.30410), 2026-06-29, A); TabPFN-3 weights are non-commercial.\n- Text-to-SQL, filing Q&A and LLM judging: low volume, no privacy driver, and the capability gap above. Numeric, risk and order state stay deterministic.\n\n**Notes**\n\n- Runtimes: row 2 in Ollama; ASR via FluidAudio or mlx-audio; OCR via MLX-VLM; TSFMs via PyTorch (TimesFM-3 ships MLX). PIT-4B needs trust_remote_code: pin a revision and review the code first.\n- Persist outputs with model digests in DuckDB.\n- Conflicts: OmniDocBench's maintainer builds MinerU; NVIDIA, Mistral and OpenAI co-author Open ASR; FluidAudio numbers are the vendor's.\n- If generic TSFMs fail, try finance-pretrained [Kronos](https://github.com/shiyu-coder/Kronos) (AAAI 2026, MIT; S).\n- Unknown: M5 Pro speeds for OCR, PiT, TSFMs and Cohere; Massive data terms; EDGAR-OCR data release.\n",
+  "output_contract_check": {
+    "table_rows": 6,
+    "not_local_items": 4,
+    "words_whitespace_split": 856,
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "items": [
+    {
+      "row": 1,
+      "workload": "Point-in-time text features for backtests (8-Ks, news)",
+      "why_local": "cloud models cannot be pinned to a cutoff; dated weights are the clean control.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "PIT-4B-FT",
+          "urls": [
+            "https://huggingface.co/Diamegs"
+          ],
+          "details": "dated checkpoints to 2024-12, Apache-2.0"
+        },
+        {
+          "role": "runner_up",
+          "name": "ChronoGPT/ChronoBERT",
+          "urls": [
+            "https://huggingface.co/manelalab"
+          ],
+          "details": "v1, 1.55B, yearly cutoffs, MIT"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "A",
+          "source": "Gao et al.",
+          "url": "https://arxiv.org/abs/2512.23847",
+          "date": "2026-06-12",
+          "claim": "lookahead propensity positive in-sample, ~0 after cutoff."
+        },
+        {
+          "grade": "A",
+          "source": "Zhang & Stadie",
+          "url": "https://arxiv.org/abs/2608.02985",
+          "date": "2026-08-04",
+          "claim": "leakage concentrates on surprising outcomes; needs clean controls."
+        },
+        {
+          "grade": "A",
+          "source": "He et al.",
+          "url": "https://arxiv.org/abs/2502.21206",
+          "date": "2025-07-06",
+          "claim": "bias modest in one news test."
+        },
+        {
+          "grade": "A/S",
+          "source": "Kelly et al.",
+          "url": "https://arxiv.org/abs/2607.11889",
+          "date": "2026-07-17",
+          "claim": "PiT news Sharpe 1.0–1.5"
+        }
+      ],
+      "unknowns": [],
+      "throughput": "E ~1–2K tok/s prefill; embeddings only",
+      "throughput_urls": [],
+      "acceptance_test": "Frozen EdgarTools 8-Ks 2015–2024 with acceptance times; prior-month checkpoint embeddings → rolling ridge on next-day abnormal return; baselines Loughran-McDonald tone and Qwen3.8-27B; OOS rank-IC, net Sharpe, HAC t>2",
+      "verdict": "Trial first",
+      "verdict_class": "trial",
+      "verdict_reason": "cleanest route to LLM text signals in backtests"
+    },
+    {
+      "row": 2,
+      "workload": "Catalyst tagging/extraction (event, offering, FDA, contract terms) from 8-Ks and releases; ex-post labels for +200% movers, never backtest signals",
+      "why_local": "backfill volume, pinned labels.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Qwen3.8-27B",
+          "urls": [
+            "https://huggingface.co/Qwen/Qwen3.8-27B"
+          ],
+          "details": "(installed, 2026-08-14, Apache-2.0) with JSON schema"
+        },
+        {
+          "role": "runner_up",
+          "name": "GLiNER2",
+          "urls": [
+            "https://github.com/fastino-ai/GLiNER2"
+          ],
+          "details": "(2025) CPU encoder as distilled student"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "S",
+          "source": "Massive",
+          "url": "https://arxiv.org/abs/2607.08346",
+          "date": "2026-07-09",
+          "claim": "119 event types, 601,088 tags on 292,984 8-Ks; 0.927 precision at score ≥4 (LLM-judged)."
+        },
+        {
+          "grade": "A",
+          "source": "GLiNER2",
+          "url": "https://aclanthology.org/2025.emnlp-demos.10/",
+          "date": "2025",
+          "claim": "EMNLP 2025"
+        }
+      ],
+      "unknowns": [
+        "Local accuracy: unknown"
+      ],
+      "throughput": "E 15–26 s per 3–5K-token filing: ~260 daily 8-Ks ≈1–2 h; 293K backfill ≈50–90 days (use 9B or student)",
+      "throughput_urls": [],
+      "acceptance_test": "1,000 stratified 2025–26 8-Ks from Massive + 300 hand-checked; baselines Opus 5.5 labels and Massive tags; macro-F1, field exact match, filings/hour",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "adopt for backfill if F1 ≥0.9× Opus"
+    },
+    {
+      "row": 3,
+      "workload": "Earnings-call ASR and diarization (also FDA panels, conferences)",
+      "why_local": "season-peak volume at zero marginal cost; offline.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Cohere Transcribe 03-2026",
+          "urls": [
+            "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026"
+          ],
+          "details": "(2B, Apache-2.0, mlx-audio)"
+        },
+        {
+          "role": "runner_up",
+          "name": "Parakeet-TDT-0.6B-v3",
+          "urls": [
+            "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3"
+          ],
+          "details": "(CC-BY-4.0, 2025-08)"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "I",
+          "source": "Open ASR long-form",
+          "url": "https://huggingface.co/datasets/hf-audio/leaderboard_longform",
+          "date": "2026-09-24",
+          "claim": "Earnings-21/22 WER Cohere 8.7/12.66, Whisper-v3-turbo 9.84/13.1, Parakeet 9.96/14.58; best proprietary 6.48/9.99."
+        },
+        {
+          "grade": "I",
+          "source": "Short-form",
+          "url": "https://huggingface.co/datasets/hf-audio/open-asr-leaderboard-results",
+          "date": null,
+          "claim": "Earnings22: Qwen3-ASR-1.7B 5.84, Parakeet 5.85",
+          "grade_note": "no grade letter or date of its own; listed in the same cell after the I-graded long-form entry"
+        }
+      ],
+      "unknowns": [
+        "Cohere: unknown"
+      ],
+      "throughput": "M (S, FluidAudio, read 2026-09-24): Parakeet 155.6× real time on M4 Pro (LibriSpeech; 1-h call ≈23 s); diarization 323× on M5 Pro. Cohere: unknown",
+      "throughput_urls": [
+        "https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md"
+      ],
+      "acceptance_test": "Earnings-21 (44 calls, entity tags) + Earnings-22 (119 h), full calls; baseline Whisper-large-v3-turbo; WER, entity WER, RTFx, DER",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "(one day): Cohere if ≥50× real time here, else Parakeet; skip if vendor transcripts suffice"
+    },
+    {
+      "row": 4,
+      "workload": "Image-only exhibits (slide decks), IR PDFs, legacy scans",
+      "why_local": "bulk backfill at zero marginal cost.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "TeleOCR",
+          "urls": [
+            "https://huggingface.co/StarDoc-AI/TeleOCR"
+          ],
+          "details": "(1.2B, Apache-2.0, 2026-08-17)"
+        },
+        {
+          "role": "runner_up",
+          "name": "PaddleOCR-VL-1.6",
+          "urls": [
+            "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6"
+          ],
+          "details": "(0.9B, Apache-2.0, 2026-05-28; official MLX-VLM Mac path)"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "I",
+          "source": "OmniDocBench v1.6",
+          "url": "https://github.com/opendatalab/OmniDocBench",
+          "date": "2026-09-11",
+          "claim": "updated 2026-09-11: 96.91 vs 96.34."
+        },
+        {
+          "grade": "A",
+          "source": "EDGAR-OCR",
+          "url": "https://arxiv.org/abs/2606.18192",
+          "date": "2026-06",
+          "claim": "300 SEC tables, Qwen3.6-35B-A3B 75.8% vs Mistral OCR 3 75.3% adjusted recall"
+        }
+      ],
+      "unknowns": [],
+      "throughput": "Unknown; E ~5–15 s/page (decode-bound)",
+      "throughput_urls": [],
+      "acceptance_test": "300 10-Q statement tables rendered to PNG, scored against XBRL facts, + 100 hand-labeled slides; baseline Qwen3.8-27B vision; numeric-cell exact match (pass ≥99%), TEDS, s/page",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "narrow: XBRL and HTML already cover most filings deterministically"
+    },
+    {
+      "row": 5,
+      "workload": "Time-series foundation models for volatility and volume features",
+      "why_local": "small, CPU-capable, deterministic.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "Chronos-2",
+          "urls": [
+            "https://github.com/amazon-science/chronos-forecasting"
+          ],
+          "details": "(120M, Apache-2.0, 2025-10-20)"
+        },
+        {
+          "role": "runner_up",
+          "name": "TTM r2.1",
+          "urls": [
+            "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2"
+          ],
+          "details": "(~1M, Apache-2.0)"
+        },
+        {
+          "role": "noted_not_selected",
+          "name": "TimesFM-3",
+          "urls": [],
+          "details": "(2026-08-31) scores higher; weights non-commercial, non-production"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "S",
+          "source": "fev-bench",
+          "url": "https://huggingface.co/spaces/autogluon/fev-bench",
+          "date": "2026-09-24",
+          "claim": "(run by Chronos's maker) 2026-09-24: skill Chronos-2 35.5, TimesFM-3 37.4 (mirror)."
+        },
+        {
+          "grade": "C",
+          "source": "IBM",
+          "url": "https://huggingface.co/blog/ibm-research/ibm-releases-sota-granite-time-series",
+          "date": "2026-09-09",
+          "claim": "TimesFM-3 first on zero-shot GIFT-Eval CRPS."
+        },
+        {
+          "grade": "A",
+          "source": "Brini",
+          "url": "https://arxiv.org/abs/2607.05291",
+          "date": "2026-07-06",
+          "claim": "of nine zero-shot TSFMs only TTM beats Log-HAR on realized volatility (QLIKE ratio 0.982–0.987)"
+        }
+      ],
+      "unknowns": [],
+      "throughput": "M (S): Chronos-2 >300 series/s on A10G; Mac unknown; TTM runs on CPU",
+      "throughput_urls": [],
+      "acceptance_test": "5-minute realized variance, 500 stocks, rolling origin after each model's release; baseline Log-HAR; QLIKE, Diebold-Mariano p<0.05",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "low priority; skip for returns"
+    },
+    {
+      "row": 6,
+      "workload": "Tool-output injection screening in agent hooks",
+      "why_local": "per-call latency and cost; outputs may hold code or secrets.",
+      "candidates": [
+        {
+          "role": "best",
+          "name": "PIGuard",
+          "urls": [
+            "https://github.com/leolee99/PIGuard"
+          ],
+          "details": "(184M, MIT, ACL 2025)"
+        },
+        {
+          "role": "runner_up",
+          "name": "Prompt Guard 2 86M",
+          "urls": [
+            "https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M"
+          ],
+          "details": "(2025-04)"
+        }
+      ],
+      "evidence": [
+        {
+          "grade": "A",
+          "source": "PIArena",
+          "url": "https://aclanthology.org/2026.acl-long.1533/",
+          "date": "ACL 2026",
+          "claim": "PIGuard keeps utility (72% vs 74%) but allows over 22% attack success; adaptive attacks unsolved."
+        },
+        {
+          "grade": "A",
+          "source": "PIDS-Bench",
+          "url": "https://arxiv.org/abs/2609.15017",
+          "date": "2026-09-14",
+          "claim": "an F1-0.98 detector misflags about a third of external benign inputs"
+        }
+      ],
+      "unknowns": [],
+      "throughput": "M (S): Prompt Guard 2 92 ms per 512 tokens on A100; Mac unknown",
+      "throughput_urls": [],
+      "acceptance_test": "2,000 redacted benign outputs from own sessions + PIArena injections; baseline no detector; TPR at FPR ≤1%, p95 latency",
+      "verdict": "Trial",
+      "verdict_class": "trial",
+      "verdict_reason": "flag-only; never a security boundary"
+    }
+  ],
+  "not_local": [
+    {
+      "workload": "Primary agent loop (coding, review, planning, synthesis)",
+      "reason": "on AA v4.3.2 Qwen3.8-27B scores 34 vs Opus 5.5 58 and GPT-6 Astra 53 (AA, 2026-09-24; an Aug-17 report said 52, unresolved); its index run emitted 200M tokens, ≈89 days at 26 tok/s.",
+      "evidence": [
+        {
+          "grade": null,
+          "source": "AA",
+          "url": "https://artificialanalysis.ai/models/qwen3-8-27b",
+          "date": "2026-09-24"
+        },
+        {
+          "grade": null,
+          "source": "Aug-17 report",
+          "url": "https://simonwillison.net/2026/Aug/17/qwen-38-27b-scores-52/",
+          "date": "2026-08-17"
+        }
+      ],
+      "verdict": "skip"
+    },
+    {
+      "workload": "Return forecasting with TSFMs",
+      "reason": "zero-shot OOS R² −1.37% (Chronos), −2.80% (TimesFM) vs −0.03% (CatBoost) on daily excess returns (Rahimikia et al., 2025-11-23, A).",
+      "evidence": [
+        {
+          "grade": "A",
+          "source": "Rahimikia et al.",
+          "url": "https://arxiv.org/abs/2511.18578",
+          "date": "2025-11-23"
+        }
+      ],
+      "verdict": "skip"
+    },
+    {
+      "workload": "Tabular foundation models for mover prediction",
+      "reason": "trees and deep nets still win on temporal, non-IID, large data (BeyondArena, 2026-06-29, A); TabPFN-3 weights are non-commercial.",
+      "evidence": [
+        {
+          "grade": "A",
+          "source": "BeyondArena",
+          "url": "https://arxiv.org/abs/2606.30410",
+          "date": "2026-06-29"
+        }
+      ],
+      "verdict": "skip"
+    },
+    {
+      "workload": "Text-to-SQL, filing Q&A and LLM judging",
+      "reason": "low volume, no privacy driver, and the capability gap above. Numeric, risk and order state stay deterministic.",
+      "evidence": [],
+      "verdict": "skip"
+    }
+  ],
+  "notes": [
+    "Runtimes: row 2 in Ollama; ASR via FluidAudio or mlx-audio; OCR via MLX-VLM; TSFMs via PyTorch (TimesFM-3 ships MLX). PIT-4B needs trust_remote_code: pin a revision and review the code first.",
+    "Persist outputs with model digests in DuckDB.",
+    "Conflicts: OmniDocBench's maintainer builds MinerU; NVIDIA, Mistral and OpenAI co-author Open ASR; FluidAudio numbers are the vendor's.",
+    "If generic TSFMs fail, try finance-pretrained [Kronos](https://github.com/shiyu-coder/Kronos) (AAAI 2026, MIT; S).",
+    "Unknown: M5 Pro speeds for OCR, PiT, TSFMs and Cohere; Massive data terms; EDGAR-OCR data release."
+  ],
+  "sources_read": [
+    "https://huggingface.co/Diamegs",
+    "https://huggingface.co/manelalab",
+    "https://arxiv.org/abs/2512.23847",
+    "https://arxiv.org/abs/2608.02985",
+    "https://arxiv.org/abs/2502.21206",
+    "https://arxiv.org/abs/2607.11889",
+    "https://huggingface.co/Qwen/Qwen3.8-27B",
+    "https://github.com/fastino-ai/GLiNER2",
+    "https://arxiv.org/abs/2607.08346",
+    "https://aclanthology.org/2025.emnlp-demos.10/",
+    "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026",
+    "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+    "https://huggingface.co/datasets/hf-audio/leaderboard_longform",
+    "https://huggingface.co/datasets/hf-audio/open-asr-leaderboard-results",
+    "https://github.com/FluidInference/FluidAudio/blob/main/Documentation/Benchmarks.md",
+    "https://huggingface.co/StarDoc-AI/TeleOCR",
+    "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+    "https://github.com/opendatalab/OmniDocBench",
+    "https://arxiv.org/abs/2606.18192",
+    "https://github.com/amazon-science/chronos-forecasting",
+    "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
+    "https://huggingface.co/spaces/autogluon/fev-bench",
+    "https://huggingface.co/blog/ibm-research/ibm-releases-sota-granite-time-series",
+    "https://arxiv.org/abs/2607.05291",
+    "https://github.com/leolee99/PIGuard",
+    "https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M",
+    "https://aclanthology.org/2026.acl-long.1533/",
+    "https://arxiv.org/abs/2609.15017",
+    "https://artificialanalysis.ai/models/qwen3-8-27b",
+    "https://simonwillison.net/2026/Aug/17/qwen-38-27b-scores-52/",
+    "https://arxiv.org/abs/2511.18578",
+    "https://arxiv.org/abs/2606.30410",
+    "https://github.com/shiyu-coder/Kronos"
+  ],
+  "limits": [
+    "Discovery only: the lane did web research; nothing was installed, downloaded or executed on the Mac. Throughput is measured elsewhere (M) or estimated (E), as the return marks it.",
+    "sources_read lists the URLs the return cites, in order of first appearance. The subagent's tool log was not retained, so which pages it opened is not recorded.",
+    "Blindness rests on the packet instruction and cannot be checked from retained artifacts.",
+    "The return's own unknowns: M5 Pro speeds for OCR, PiT, TSFMs and Cohere; Massive data terms; EDGAR-OCR data release. It leaves one conflict open: Artificial Analysis lists Qwen3.8-27B at 34 while an Aug-17 report said 52.",
+    "items, not_local and notes are the recorder's transcription (every string is a substring of the return with link targets and bold markers removed); return_text is authoritative."
+  ]
+}

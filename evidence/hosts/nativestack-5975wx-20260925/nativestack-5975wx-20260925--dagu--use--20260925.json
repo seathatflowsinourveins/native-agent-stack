@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--dagu--use--20260925",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "aa0812b1d80e09eaca71be7575992b3fbcb74fed",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "dagu",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "p=$(command -v dagu) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && dagu version && python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" dagu",
+      "exit": 0,
+      "duration_s": 0.074,
+      "output_sha256": "5ca603755bde0bd90ae5ff78f7b432b359fad6df08791f2b8ee000d2a79d7069",
+      "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/dagu -> ~/.local/share/codex-ecosystem/dagu/2.16.6/dagu\n2.16.6\nstack ['2.16.6'] winner pins ['2.16.6', 'v2.16.6']\n"
+    },
+    {
+      "cmd": "mkdir /tmp/nsr-dagu && mkdir /tmp/nsr-dagu/dagu-home && python3 -c \"open('/tmp/nsr-dagu/ok.yaml','w').write('steps:\\n  - name: produce\\n    command: echo nsr-probe-value\\n    output: PROBE\\n  - name: consume\\n    command: echo consumed-\\${PROBE}\\n    depends: [produce]\\n');open('/tmp/nsr-dagu/fail.yaml','w').write('steps:\\n  - name: fail-on-purpose\\n    command: sh -c \\'exit 3\\'\\n')\" && dagu validate --dagu-home /tmp/nsr-dagu/dagu-home /tmp/nsr-dagu/ok.yaml && dagu validate --dagu-home /tmp/nsr-dagu/dagu-home /tmp/nsr-dagu/fail.yaml && echo \"ok.yaml and fail.yaml both validate\"",
+      "exit": 0,
+      "duration_s": 0.218,
+      "output_sha256": "247055fbe0fea93b3e2d3e65abbb1bc6f0d871d9977bf037562305fcc2be6ab7",
+      "output_excerpt": "ok.yaml and fail.yaml both validate\ntime=2026-09-25T01:38:08.326-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-09-25T01:38:08.328-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=/tmp/nsr-dagu/dagu-home/dags\ntime=2026-09-25T01:38:08.402-04:00 "
+    },
+    {
+      "cmd": "dagu start --dagu-home /tmp/nsr-dagu/dagu-home --run-id nsr-ok-1 /tmp/nsr-dagu/ok.yaml > /tmp/nsr-dagu/ok.log 2>&1; rc=$?; dagu status --dagu-home /tmp/nsr-dagu/dagu-home --run-id nsr-ok-1 ok > /tmp/nsr-dagu/ok.status 2>/dev/null; echo \"dagu start ok.yaml exit=$rc\"; grep -E '\\[(succeeded|failed|skipped)\\]|^ +consumed-|^Result:' /tmp/nsr-dagu/ok.status; test \"$rc\" -eq 0 && grep -q '^Result: Succeeded' /tmp/nsr-dagu/ok.status && grep -Eq '^ +consumed-nsr-probe-value$' /tmp/nsr-dagu/ok.status",
+      "exit": 0,
+      "duration_s": 0.359,
+      "output_sha256": "e90439d9e3a31649f6d2161527043957206fe9ca17d47d33caaec9884d29abd2",
+      "output_excerpt": "dagu start ok.yaml exit=0\n\u251c\u2500produce (0s) [succeeded]\n\u2514\u2500consume (0s) [succeeded]\n      consumed-nsr-probe-value\nResult: Succeeded\n"
+    },
+    {
+      "cmd": "dagu start --dagu-home /tmp/nsr-dagu/dagu-home --run-id nsr-fail-1 /tmp/nsr-dagu/fail.yaml > /tmp/nsr-dagu/fail.log 2>&1; rc=$?; dagu status --dagu-home /tmp/nsr-dagu/dagu-home --run-id nsr-fail-1 fail > /tmp/nsr-dagu/fail.status 2>/dev/null; echo \"dagu start fail.yaml exit=$rc (expected non-zero)\"; grep -E '\\[(succeeded|failed|skipped)\\]|error:|^Result:' /tmp/nsr-dagu/fail.status; test \"$rc\" -ne 0 && grep -q '^Result: Failed' /tmp/nsr-dagu/fail.status && grep -q 'error: exit status 3' /tmp/nsr-dagu/fail.status",
+      "exit": 0,
+      "duration_s": 0.25,
+      "output_sha256": "bff0800bd499d042f83f34e08bd7402faa2f3c91b63e8cbbf5c63a949089dcc6",
+      "output_excerpt": "dagu start fail.yaml exit=1 (expected non-zero)\n\u2514\u2500fail-on-purpose (0s) [failed]\n  \u2514\u2500error: exit status 3\nResult: Failed\n"
+    },
+    {
+      "cmd": "rm -rf /tmp/nsr-dagu && test ! -e /tmp/nsr-dagu && echo \"scratch DAGU_HOME and DAG files removed\"",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "ab09dcd26ffc52cfea7411f79a34c144cba1c121023ea37c8a1bc0ed75c3674f",
+      "output_excerpt": "scratch DAGU_HOME and DAG files removed\n"
+    }
+  ],
+  "tool_versions": {
+    "dagu": "2.16.6"
+  },
+  "observed_at_utc": "2026-09-25T05:38:08Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), dagu 2.16.6 (the catalog pin in both catalogs) validated and ran two DAGs in a scratch DAGU_HOME under /tmp. A two-step DAG whose second step depends on the first and consumes its captured output ran with dagu start (exit 0), and dagu status reported both steps succeeded, the consumed value nsr-probe-value and Result: Succeeded. A one-step DAG whose step exits 3 made dagu start exit non-zero, and dagu status reported the step failed with exit status 3 and Result: Failed. Each of those commands exits 0 only when its states hold. The scratch directory is removed; all commands exit 0.",
+  "limitations": [
+    "Local one-shot runs only (dagu start in the local context): the scheduler, server and UI, authentication, retries, timeouts, queues and cron schedules were not exercised, and nothing was registered in the host's own DAGU_HOME. dagu warned that no auth.mode was configured for the scratch DAGU_HOME and created its first-run example DAGs there; both were removed with it.",
+    "Recorded from a Claude Code session in a git worktree of this repository at origin/main aa0812b1 (the catalog_revision), not in a pinned install checkout; the tools are this host's existing installs under ~/.local/share/codex-ecosystem, resolved as the first command shows.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt. This receipt changes no platform_status."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T05:38:08Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked all four points (layer role: a two-step DAG with dependency and output passing ran and dagu status was read; positive control: an exit-3 DAG made dagu start exit non-zero with Result: Failed; dagu version 2.16.6 and the pins are backed; bound to the scheduling-supervision and data-quality-orchestration winner pins) and re-ran the ok and fail DAGs in a fresh mktemp DAGU_HOME on this host with identical step states, consumed value and results.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T06:31:50Z",
+      "reviewer": {
+        "identity_sha256": "73beaad02f029b2eb95b7f23de6db95cfabc5c2262d25d9ad9b582df8f7d056e",
+        "model": "claude headless reviewer"
+      }
+    }
+  ]
+}

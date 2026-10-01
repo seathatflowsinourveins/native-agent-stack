@@ -13,62 +13,34 @@ RTK_TELEMETRY_DISABLED = "1"
 enabled = true
 max_concurrent_threads_per_session = 3
 
-# Keep the trusted plugin hooks; start its MCP server in this project's scope.
-[plugins."context-mode@context-mode".mcp_servers.context-mode]
-enabled = false
+# serena, ai-memory and socraticode moved to user scope (codex.config.template.toml), so every Codex
+# worktree worker has them without this project-local file (docs/decisions/2026-09-25-codex-mcp-scope.md).
+# context-mode's MCP server moved there too. Its plugin's own server declares cwd "." in
+# .codex-plugin/mcp.json, which Codex resolves to the plugin root, not the project, so the user-scope
+# template turns that server off and registers context-mode with no cwd: Codex starts it in each
+# session's own directory, which upstream start.mjs binds as CONTEXT_MODE_PROJECT_DIR. That replaces the
+# main-checkout-only binding this file used to carry. recipes/README.md ("Retained Context Mode") keeps
+# the project-scoped form for a project that needs a fixed directory.
 
-[mcp_servers.context-mode]
-command = "${ECO_ROOT}/bin/context-mode"
-cwd = "${PROJECT_ROOT}"
-startup_timeout_sec = 60
-
-[mcp_servers.context-mode.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-CONTEXT_MODE_PLATFORM = "codex"
-CONTEXT_MODE_PROJECT_DIR = "${PROJECT_ROOT}"
-
+# jcodemunch stays project-scoped: its own MCP instructions ("Prefer it over Read/Grep/Glob/Bash for code
+# navigation") would load into every session at user scope, contradicting this catalog's own retrieval
+# routing, the same reasoning docs/decisions/2026-09-23-claude-user-profile.md's 2026-09-25 addendum
+# gives for Claude. A worktree that wants jcodemunch registers it per worktree, exactly as a project that
+# wants it opts in today (adoption/bootstrap.md "jCodeMunch, per project").
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60
+# Approve auto-approves even under approval_policy = "never":
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L98
+# RawMcpServerConfig / McpServerToolConfig: codex-rs/core/config.schema.json at the same tag.
+# Read front door: jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR and server.py:5500-5577:
+# https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/src/jcodemunch_mcp/counter.py
+# `order` defaults allow_state_change=false but accepts true; this list is not a read-only sandbox.
+default_tools_approval_mode = "approve"
+enabled_tools = ["route", "menu", "order"]
 
 [mcp_servers.jcodemunch.env]
 RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CODE_INDEX_PATH = "${CODE_INDEX_PATH}"
 JCODEMUNCH_SHARE_SAVINGS = "0"
-
-[mcp_servers.serena]
-command = "${ECO_ROOT}/bin/serena-context"
-args = ["start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "true", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
-startup_timeout_sec = 60
-
-[mcp_servers.serena.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-
-[mcp_servers.ai-memory]
-url = "http://${AI_MEMORY_URL}/mcp"
-
-[mcp_servers.socraticode]
-command = "${ECO_ROOT}/bin/node"
-args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
-startup_timeout_sec = 120
-
-[mcp_servers.socraticode.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-QDRANT_MODE = "external"
-QDRANT_URL = "http://${QDRANT_URL}"
-EMBEDDING_PROVIDER = "lmstudio"
-LMSTUDIO_URL = "http://${EMBED_URL}/v1"
-EMBEDDING_MODEL = "nvidia/Nemotron-3-Embed-1B-BF16"
-EMBEDDING_DIMENSIONS = "2048"
-EMBEDDING_CONTEXT_LENGTH = "4096"
-EMBEDDING_QUERY_PREFIX = "query: "
-EMBEDDING_DOCUMENT_PREFIX = "passage: "
-EMBEDDING_DOCUMENT_INCLUDE_PATH = "true"
-RESPECT_GITIGNORE = "true"
-INCLUDE_DOT_FILES = "false"
-SOCRATICODE_WATCHER = "auto"
-SEARCH_DEFAULT_LIMIT = "3"

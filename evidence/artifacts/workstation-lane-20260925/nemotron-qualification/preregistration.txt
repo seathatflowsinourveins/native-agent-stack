@@ -1,0 +1,11 @@
+written_utc: 2026-09-25T14:34:49Z
+scope: read-only HTTP to the running vLLM 0.25.0 service on 127.0.0.1:18231 (native-stack-embeddings); nothing started, stopped or reconfigured
+model: nvidia/Nemotron-3-Embed-1B-BF16 revision c0c9fea93ea424587517f2c59e20db9f1d6bf615
+protocol source: docs/hf-memory-model-qualification.md and evidence/receipts/hf-memory-models-20260921.json (the repo's committed, reproducible model-card qualification).
+not rerun: the laptop receipt's ai-memory hybrid-retrieval bar (evidence/artifacts/local-model-alignment-20260923/): its corpus is a sealed snapshot of the laptop's private ai-memory store and its query set is not committed; also its arm B needs max-model-len 8192 while this host serves 4096.
+bars (all must hold for result pass):
+  Q1 revision: served root (from /v1/models) holds README.md sha256 6e811480...; hf cache verify at the revision reports 15 files checked and no mismatch or missing file (extra .cache metadata warnings allowed, as in 2026-09-21).
+  Q2 /v2/embed: NVIDIA's exact Recommended Retrieval Endpoint example (card code sha256 09df5e6a..., only the URL changed to 127.0.0.1:18231) exits 0; 4/4 queries rank their intended document first; max |delta| to the card's printed expected output <= 0.005 (laptop 2026-09-21: 0.0010).
+  Q3 /v1/embeddings with query:/passage: prefixes on the same inputs: 8 vectors of 2048 dims, every L2 norm within 1e-5 of 1; 4/4 intended documents first; max |delta| to the laptop's 2026-09-21 unrounded v1 scores <= 0.005.
+  Q4 discriminating control: the Q3 check with the documents rotated by one must report 0/4 intended-first and fail its ranking assertion.
+kept from the original use receipt: the /version+unit+GPU+pin command, /v1/models, and the backup-ranking assertion.

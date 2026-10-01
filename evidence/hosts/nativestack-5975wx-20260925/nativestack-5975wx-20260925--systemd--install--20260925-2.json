@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--systemd--install--20260925-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "720e294b5c10211d8f75a939bc478af734279d74",
+  "recorded_by": {
+    "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+    "model": "claude-opus-5-5"
+  },
+  "component_id": "systemd",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "command -v systemctl",
+      "exit": 0,
+      "duration_s": 0.001,
+      "output_sha256": "4b7d79eb07b1ba35c68c1ed95cd05f63fba5a5cbc950e7676312ea1261539995",
+      "output_excerpt": "/usr/bin/systemctl\n"
+    },
+    {
+      "cmd": "systemctl --version | head -1",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "1ab41a8b1b3198a4dadabdb1236a1f9aa78a47e68765307902421b6f4426e83e",
+      "output_excerpt": "systemd 255 (255.4-1ubuntu8.17)\n"
+    },
+    {
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' systemd",
+      "exit": 0,
+      "duration_s": 0.007,
+      "output_sha256": "9620cb45e6c3b3572acf974ef13adb2f5294ac64115abe388510e6728deb53ab",
+      "output_excerpt": "systemd 255.4-1ubuntu8.17\n"
+    },
+    {
+      "cmd": "dpkg-query -S /usr/bin/systemctl",
+      "exit": 0,
+      "duration_s": 0.024,
+      "output_sha256": "aeaa09251da452f57f99371a775c6fac65e66e140d7aa4ceac7a11f24fdd5536",
+      "output_excerpt": "systemd: /usr/bin/systemctl\n"
+    },
+    {
+      "cmd": "u=$(id -u); echo \"user manager delegates: $(cat /sys/fs/cgroup/user.slice/user-$u.slice/user@$u.service/cgroup.controllers)\"; echo \"cgroup v2: $(test -e /sys/fs/cgroup/cgroup.controllers && echo yes || echo no)\"",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "193272f3dfabec8e0d4cff15d1fe2f822116ee36d19ae3c5fca816860d104e7a",
+      "output_excerpt": "user manager delegates: cpu memory pids\ncgroup v2: yes\n"
+    },
+    {
+      "cmd": "python3 -c \"import json,glob,sys;c=sys.argv[1];print('stack',[x['version'] for x in json.load(open('manifests/stack.json'))['components'] if x['id']==c],'winner pins',sorted({w['pin'] for f in glob.glob('catalogs/landscape/*.json') for l in json.load(open(f)).get('layers',[]) for w in (l.get('winners') or []) if w.get('component_id')==c}))\" systemd",
+      "exit": 0,
+      "duration_s": 0.034,
+      "output_sha256": "749e6deb02a3ecc52e49df5a85dc06d71a06ee8dcf96e3dca7cceb7dfa01fb8a",
+      "output_excerpt": "stack ['255.4-1ubuntu8.17'] winner pins ['255.4-1ubuntu8.17']\n"
+    }
+  ],
+  "tool_versions": {
+    "systemd": "255.4-1ubuntu8.17"
+  },
+  "observed_at_utc": "2026-09-25T14:22:45Z",
+  "result": "pass",
+  "claim": "On host nativestack-5975wx-20260925 (WSL2 x86_64: AMD Ryzen Threadripper PRO 5975WX, 48 visible CPUs, 102 GiB visible RAM, NVIDIA RTX 4090 24 GB; Ubuntu 24.04.5, WSL 2.7.13), systemctl resolves to /usr/bin/systemctl, which dpkg-query -S reports is owned by the Ubuntu apt package systemd, installed at version 255.4-1ubuntu8.17 (dpkg-query -W; systemctl --version reports systemd 255 (255.4-1ubuntu8.17)), equal to the manifests/stack.json and landscape winner pin. The host runs cgroup v2 and the user manager delegates the cpu, memory and pids controllers. Readiness only; no unit was started for this receipt. All commands exit 0.",
+  "limitations": [
+    "Install stage: a resolved path, a package ownership and version query, a pin record and a version call show the pinned build is present and starts. That is readiness evidence, not functional acceptance, and supports conditional at most. This receipt changes no platform_status.",
+    "No transient unit, timer or service was started or stopped for this receipt, so supervision, restart, RuntimeMaxSec and resource enforcement were not exercised here.",
+    "systemd here is the operating system's Ubuntu apt package 255.4-1ubuntu8.17 at /usr/bin/systemctl, as the first four commands show. This receipt supersedes nativestack-5975wx-20260925--systemd--install--20260925, whose limitation wrongly described the tool as an install under the ecosystem prefix; that receipt's independent review is needs_changes and it is left unchanged. Recorded from a Claude Code session in a git worktree of this repository at origin/main 720e294b (the catalog_revision), not in a pinned install checkout.",
+    "second_physical_machine is declared, not proven by this file: this host's measured CPU and GPU (evidence/artifacts/hw-profiles/nativestack-5975wx-20260925/profile.json) differ from the catalog's WSL authoring laptop (Intel Core Ultra 9 275HX, RTX 5090 Laptop GPU; evidence/artifacts/sota-refresh-20260923/hw-profiles/this-host.json). The receipt carries only the recorder's self review; accepted needs an independent review.",
+    "The same commands were rehearsed once in this session before recording; the rehearsal outputs are not part of this receipt."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:22:45Z",
+      "reviewer": {
+        "identity_sha256": "7d328d4b5d95d83acc9ac0b1cbd120756619360e589f174cc025725664a13f4c",
+        "model": "claude-opus-5-5"
+      }
+    },
+    {
+      "kind": "independent_session",
+      "ref": "Adequacy-checked points 3 and 4 for this install receipt and re-ran all six commands on this host with byte-identical output hashes (command -v systemctl gives /usr/bin/systemctl, dpkg-query -S attributes it to package systemd, systemctl --version and dpkg-query -W give 255.4-1ubuntu8.17, cgroup v2 with cpu memory pids delegated, stack and foundation winner pin 255.4-1ubuntu8.17 with pin_matches true), so every install, version and pin claim is backed, the superseded receipt's contradicted ecosystem-prefix install claim is corrected, and catalog_revision 720e294b is on origin/main.",
+      "verdict": "agree",
+      "at_utc": "2026-09-25T14:51:57Z",
+      "reviewer": {
+        "identity_sha256": "291771731d442d0363957c57ff2c0f33ede168fb7c0d90e5bac12308bf3e592f",
+        "model": "claude headless reviewer"
+      }
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--systemd--install--20260925"
+}

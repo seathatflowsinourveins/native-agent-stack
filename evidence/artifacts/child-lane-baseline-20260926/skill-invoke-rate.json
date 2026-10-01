@@ -1,0 +1,1497 @@
+{
+  "claude": {
+    "format": "json",
+    "measured": true,
+    "num_turns": 0,
+    "origin": "file",
+    "total_cost_usd": 0
+  },
+  "codex": {
+    "files_scanned": 496,
+    "measured": true,
+    "parse_errors": 0,
+    "roots_count": 1,
+    "sessions_user_config_ignored": 118
+  },
+  "generated_at": "2026-09-26T17:07:04+00:00",
+  "kind": "skill_invoke_rate_report",
+  "limits": "Claude 'uses' from /skill-doctor is not windowed by --window (only its '7d tokens' column is): the same lifetime count is reused for every window's zero-usage check, a documented gap, not a measured per-window value. Codex counts are windowed from each rollout line's own timestamp and hold every session's records, the measurement the trial pins; every flag reads them. Two disjoint parts of them are reported beside them, never subtracted: of_which_user_config_ignored (own records of sessions whose catalog lists a codex_enabled=false skill, as under --ignore-user-config: a different listing state) and of_which_copied_from_parent (records a spawned sub-agent's rollout copied from its parent, which the parent's rollout also holds). A skill with no measured, enabled/listed client is excluded from prune_candidates and verdict_recheck, never read as zero usage. The measured listing cost (claude.context_tokens) is its own counter: never mix it into tools/token-report's token-efficiency ledger.",
+  "prune_candidates": [],
+  "schema_version": 1,
+  "skills": [
+    {
+      "age_days": 1.5361959027777778,
+      "claude": {
+        "context_tokens": 20,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "name-only",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Verdict winner (instructions-skills row): typed semantic judgments for evidence review; used by the semantic-evidence-reviewer role.",
+      "installed_at": "2026-09-25T04:14:56.674Z",
+      "name": "typesafe-ai",
+      "prune_eligible": false,
+      "status": "kept",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 1.5361040856481483,
+      "claude": {
+        "context_tokens": 110,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Verdict winner: triage failing GitHub Actions checks on this repo's 18 workflows and 7 required checks.",
+      "installed_at": "2026-09-25T04:15:04.607Z",
+      "name": "gh-fix-ci",
+      "prune_eligible": false,
+      "status": "kept",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 1.5361040625,
+      "claude": {
+        "context_tokens": 140,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 39
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 39
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Verdict winner: language-specific secure-coding review for scripts/ and tools/.",
+      "installed_at": "2026-09-25T04:15:04.609Z",
+      "name": "security-best-practices",
+      "prune_eligible": false,
+      "status": "kept",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7613123379629629,
+      "claude": {
+        "context_tokens": 20,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "name-only",
+        "uses": 37
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 15
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 15
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 15
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 15
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Verdict winner (ECC): staged retrieval for subagent context under the small-context rule.",
+      "installed_at": "2026-09-25T22:50:46.614Z",
+      "name": "iterative-retrieval",
+      "prune_eligible": false,
+      "status": "kept",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7612686226851851,
+      "claude": {
+        "context_tokens": 20,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "name-only",
+        "uses": 36
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 4,
+            "skill_md_reads": 123
+          },
+          "7": {
+            "name_mentions": 4,
+            "skill_md_reads": 123
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 23
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 23
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Verdict winner (ECC): research existing upstream tools before writing code (AGENTS.md research-first rule).",
+      "installed_at": "2026-09-25T22:50:50.391Z",
+      "name": "search-first",
+      "prune_eligible": false,
+      "status": "kept",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7612542592592593,
+      "claude": {
+        "context_tokens": 60,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 22
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 22
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "No debugging procedure is installed; failing tests, CI and paper-engine faults are diagnosed ad hoc.",
+      "installed_at": "2026-09-25T22:50:51.632Z",
+      "name": "diagnosing-bugs",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7612437847222223,
+      "claude": {
+        "context_tokens": 50,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 21
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 21
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "New scripts land with unittest suites (tests/ is the acceptance gate) but no test-first procedure is loaded.",
+      "installed_at": "2026-09-25T22:50:52.537Z",
+      "name": "tdd",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7612330324074074,
+      "claude": {
+        "context_tokens": 100,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Large single-file validators (scripts/validate.py, scripts/landscape.py) lack a shared module/interface vocabulary for refactors.",
+      "installed_at": "2026-09-25T22:50:53.466Z",
+      "name": "codebase-design",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7612225347222221,
+      "claude": {
+        "context_tokens": 30,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Five or more concurrent sessions rebase onto hot files (manifests/evidence.json, docs/lanes.md hot-file protocol) and hit conflicts.",
+      "installed_at": "2026-09-25T22:50:54.373Z",
+      "name": "resolving-merge-conflicts",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7612121412037037,
+      "claude": {
+        "context_tokens": null,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "user-invocable-only",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "User-invoked stress test of a plan before approval; upstream sets disable-model-invocation, so no listing cost.",
+      "installed_at": "2026-09-25T22:50:55.271Z",
+      "name": "grill-me",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7612018287037038,
+      "claude": {
+        "context_tokens": null,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "user-invocable-only",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "User-invoked architecture review of a grown module; upstream sets disable-model-invocation.",
+      "installed_at": "2026-09-25T22:50:56.162Z",
+      "name": "improve-codebase-architecture",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7611891203703705,
+      "claude": {
+        "context_tokens": 90,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 92
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 7,
+            "skill_md_reads": 142
+          },
+          "7": {
+            "name_mentions": 7,
+            "skill_md_reads": 142
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 7,
+            "skill_md_reads": 40
+          },
+          "7": {
+            "name_mentions": 7,
+            "skill_md_reads": 40
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "CLAUDE.md requires supported findings resolved and changed behavior verified before claiming completion; no checklist skill enforces it.",
+      "installed_at": "2026-09-25T22:50:57.260Z",
+      "name": "verification-before-completion",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7611750231481481,
+      "claude": {
+        "context_tokens": 150,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "Paper-lane broker adapters, credential stores and host-request lanes have no written threat model.",
+      "installed_at": "2026-09-25T22:50:58.478Z",
+      "name": "security-threat-model",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7611629282407407,
+      "claude": {
+        "context_tokens": 60,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "The main ruleset requires review-thread resolution; PR review comments are addressed by hand.",
+      "installed_at": "2026-09-25T22:50:59.523Z",
+      "name": "gh-address-comments",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7611341087962962,
+      "claude": {
+        "context_tokens": 240,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 1
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 1
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 1
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 1
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "No custom static rules exist beyond CodeQL default setup; ad hoc pattern audits (e.g. secret-path guards) are grep-based.",
+      "installed_at": "2026-09-25T22:51:02.013Z",
+      "name": "semgrep",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7611058101851852,
+      "claude": {
+        "context_tokens": 250,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "CodeQL default setup gates main via the code_scanning rule, but alert triage and custom queries have no procedure.",
+      "installed_at": "2026-09-25T22:51:04.458Z",
+      "name": "codeql",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7610812847222221,
+      "claude": {
+        "context_tokens": 130,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 73
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 5,
+            "skill_md_reads": 26
+          },
+          "7": {
+            "name_mentions": 5,
+            "skill_md_reads": 26
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 3,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 2,
+            "skill_md_reads": 26
+          },
+          "7": {
+            "name_mentions": 2,
+            "skill_md_reads": 26
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Catalog winners and pinned tools (adoption/pins-*.json) are adopted without a dependency risk checklist.",
+      "installed_at": "2026-09-25T22:51:06.577Z",
+      "name": "supply-chain-risk-auditor",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7610573263888889,
+      "claude": {
+        "context_tokens": 200,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Workflows run agent-adjacent automation (catalog-freshness propose, verdict-review-gate); no audit procedure for agentic Actions risk.",
+      "installed_at": "2026-09-25T22:51:08.647Z",
+      "name": "agentic-actions-auditor",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7610355439814815,
+      "claude": {
+        "context_tokens": 290,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 3
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Parsers and sanitizers (host_receipts.sanitize, receipt validators) have example tests only; Scorecard Fuzzing scores 0.",
+      "installed_at": "2026-09-25T22:51:10.529Z",
+      "name": "property-based-testing",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7610149305555556,
+      "claude": {
+        "context_tokens": 60,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 5
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 5
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "scripts/ and tools/ use uv-run Python without a shared modern-tooling guide (uv, ruff, pyproject).",
+      "installed_at": "2026-09-25T22:51:12.310Z",
+      "name": "modern-python",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7609965046296296,
+      "claude": {
+        "context_tokens": 130,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "zizmor, OSV-Scanner, Scorecard and CodeQL all upload SARIF; reading and diffing those results is manual.",
+      "installed_at": "2026-09-25T22:51:13.902Z",
+      "name": "sarif-parsing",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7609785300925925,
+      "claude": {
+        "context_tokens": 120,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 56
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          },
+          "7": {
+            "name_mentions": 1,
+            "skill_md_reads": 24
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Open Scorecard/zizmor/CodeQL alerts need false-positive triage with retained reasoning.",
+      "installed_at": "2026-09-25T22:51:15.455Z",
+      "name": "fp-check",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7609644444444443,
+      "claude": {
+        "context_tokens": 100,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 1
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "The stack wires many MCP servers (adoption/mcp, 22 files reference MCP servers); building or fixing one has no procedure.",
+      "installed_at": "2026-09-25T22:51:16.672Z",
+      "name": "mcp-builder",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    },
+    {
+      "age_days": 0.7609523263888889,
+      "claude": {
+        "context_tokens": 70,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "The generated ecosystem guide and grand dashboard (19 HTML files) are hand-styled.",
+      "installed_at": "2026-09-25T22:51:17.719Z",
+      "name": "frontend-design",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7609224074074074,
+      "claude": {
+        "context_tokens": 20,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "name-only",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Browser acceptance uses the pinned agent-browser CLI (adoption/pins-*.json); the skill documents its commands. Name-only: 925-char description.",
+      "installed_at": "2026-09-25T22:51:20.304Z",
+      "name": "agent-browser",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.7609099074074074,
+      "claude": {
+        "context_tokens": null,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "user-invocable-only",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 26
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 26
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 4
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 4
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "User-invoked registry search; anything it finds must still be pinned in this manifest before install.",
+      "installed_at": "2026-09-25T22:51:21.384Z",
+      "name": "find-skills",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.3149043865740741,
+      "claude": {
+        "context_tokens": 200,
+        "in_table": true,
+        "last_used": "never",
+        "listing": "on",
+        "uses": 0
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 7
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 7
+          }
+        },
+        "enabled": false,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 7
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 7
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude"
+      ],
+      "gap": "Post-merge review keeps finding siblings of defects already fixed: #314 (2026-09-26) widened #291's rtk blob exclusion and closed a blind-packet leak through sentences the #269 filter did not match. fp-check verifies one finding and says it is not for hunting; no installed procedure searches a fixed bug's variants before merge.",
+      "installed_at": "2026-09-26T09:33:36.261Z",
+      "name": "variant-analysis",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": true
+    },
+    {
+      "age_days": 0.31489082175925925,
+      "claude": {
+        "context_tokens": 40,
+        "in_table": true,
+        "last_used": "today",
+        "listing": "on",
+        "uses": 1
+      },
+      "codex": {
+        "counts": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          }
+        },
+        "enabled": true,
+        "of_which_copied_from_parent": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 0
+          }
+        },
+        "of_which_user_config_ignored": {
+          "30": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          },
+          "7": {
+            "name_mentions": 0,
+            "skill_md_reads": 2
+          }
+        }
+      },
+      "evaluated_clients": [
+        "claude",
+        "codex"
+      ],
+      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md or CLAUDE.md. Skill authoring stays with anthropic-skills:skill-creator and Codex .system/skill-creator; the description also triggers on skill edits, a trial confound, so only AGENTS.md and CLAUDE.md uses count toward this gap.",
+      "installed_at": "2026-09-26T09:33:37.433Z",
+      "name": "writing-for-agents",
+      "prune_eligible": false,
+      "status": "trial",
+      "zero_on_evaluated_clients": false
+    }
+  ],
+  "trial_window_days": 30,
+  "verdict_recheck": [],
+  "windows_days": [
+    7,
+    30
+  ]
+}

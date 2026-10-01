@@ -20,7 +20,7 @@
       "id": "native-clients",
       "title": "Native clients",
       "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
-      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here: an omniroute trial and the catalogs/us-equities/models.json ledger remain notes on this native-clients selection, not an adopted routing layer.",
+      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here, and the catalogs/us-equities/models.json ledger remains a note on this native-clients selection. The user decided on 2026-09-27 to adopt a loopback OmniRoute gateway (component omniroute) for pooled GPT-6 access by gateway-routed Codex lanes such as the landscape sweep. It is a source build of release/v3.8.51 with an upstream fix (#14904) and an upstream feature (#13788); see docs/decisions/2026-09-27-omniroute-account-pool.md. Native Codex stays the max-quality default. The agent-sdks layer default stays pending the preregistered three-arm workers comparison (docs/grand-catalog-handbook.md, agent-sdks row), which remains its only acceptance gate. The terminal surface of these clients (tab titles, bell, colour depth, needed-only alerts) is settled by docs/decisions/2026-09-28-terminal-experience.md: AI-client (Claude, Codex) Windows Terminal profiles must not suppress application titles (static shell profiles may keep fixed titles), BEL is the only bell or notification signal Windows Terminal 1.24 and 1.25 act on (OSC 9;4 only sets progress state), and alerts are limited to pending decisions.",
       "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
       "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
       "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
@@ -248,18 +248,17 @@
       ]
     },
     {
-      "id": "worker-cancellation-crash-resume",
+      "id": "claude-code-sandbox-profile",
       "priority": 2,
-      "status": "accepted_within_scope",
-      "scope": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect. Prior manual-cleanup and permission-refused attempts remain retained; no host/provider/distributed guarantee is implied.",
-      "next_action": "Reuse the accepted role and supervisor for matching tasks. Qualify changed application effects or host boundaries separately; do not rerun this fixture merely to refresh a green status.",
+      "status": "open",
+      "scope": "Claude Code's native sandbox is not enabled as a session profile. docs/decisions/2026-09-24-secret-storage.md (lines 91-95) defers it until a measured profile exists; decision scoped-os-isolation qualifies sandbox-runtime filesystem and HTTP fixtures for owned commands, not a session-wide profile. Registered 2026-09-27; owner: foundation coordinator; re-check 2026-10-11. Pressure evidence: security-audit trial runs (M5) record each missing sandbox capability as a needs_validation blocker, as that skill's execution-safety rule requires; those dated blockers are this gate's pressure evidence.",
+      "next_action": "Measure one trial profile through claude --settings, leaving .claude/settings.json unchanged until it is measured: sandbox.enabled true, sandbox.failIfUnavailable true, allowUnsandboxedCommands false (https://code.claude.com/docs/en/sandboxing, read 2026-09-27); a host check of bubblewrap, socat and kernel.apparmor_restrict_unprivileged_userns; writes outside the owned worktree and launches of /mnt/c Windows binaries must fail. Credentials arm: the deferral's third control, the credentials.files deny for the store (docs/secret-storage.md, section \"Follow-ups not in this change\", lines 1221-1225), is a sandbox.credentials.files entry with mode deny for <store> as docs/secret-storage.md line 30 (section \"The credentials this stack uses\") defines it (settings reference, sandbox.credentials). The deny belongs to the filesystem layer, so filesystem isolation stays on, and a sandboxed read of a store file must fail through a ~/ path and through its absolute path. Network arms: measure the network allowlist once as configured and once in a separate arm with sandbox.network.strictAllowlist true, which CLI --settings can set; in that arm a sandboxed request to a host outside the allowlist must be denied. Without it, permission mode decides such a host, and bypassPermissions mode allows it (settings reference, sandbox.network.strictAllowlist); the permission mode itself stays the user's decision (PS-1 in docs/harness-rules-convergence-20260922.md). Both extra arms follow a 2026-09-27 peer practice sweep. The deferral also requires gh, git push, codex and the paper runner, and that sandboxed commands cannot reach the user systemd bus. Raise this gate at every wave review until it is measured.",
       "source_paths": [
-        "blueprints/convergence-practice/native-worker/README.md",
-        "blueprints/convergence-practice/native-recovery/README.md",
-        "blueprints/us-equities/worker-supervision/README.md",
-        "blueprints/convergence-practice/worker-recovery/README.md",
-        "docs/restricted-worker-compatibility.md",
-        "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json"
+        "docs/decisions/2026-09-24-secret-storage.md",
+        "docs/secret-storage.md",
+        "docs/harness-rules-convergence-20260922.md",
+        "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+        "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md"
       ]
     },
     {
@@ -281,5 +280,10 @@
       ]
     }
   ],
-  "open_gates": []
+  "open_gates": [
+    {
+      "id": "claude-code-sandbox-profile",
+      "gap_id": "claude-code-sandbox-profile"
+    }
+  ]
 }

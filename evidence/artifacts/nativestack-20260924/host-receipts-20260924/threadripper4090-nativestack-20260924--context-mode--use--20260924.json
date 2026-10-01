@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "threadripper4090-nativestack-20260924--context-mode--use--20260924",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "threadripper4090-nativestack-20260924",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "threadripper4090-nativestack-20260924"
+  },
+  "catalog_revision": "8eacd8b60f1d8b1369065415d4a4c5edf30f2eb1",
+  "recorded_by": {
+    "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+  },
+  "component_id": "context-mode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 evidence/artifacts/nativestack-20260924/checks.py context-mode",
+      "exit": 0,
+      "duration_s": 0.539,
+      "output_sha256": "366ee920268be941564ebc1c16569842c09408ed079cbea0d7e185bbd84ededc",
+      "output_excerpt": "Context Mode returned the indexed Repository integrity row and its No installed-runtime claim boundary.\n"
+    }
+  ],
+  "tool_versions": {
+    "context-mode": "1.0.169"
+  },
+  "observed_at_utc": "2026-09-24T04:21:58Z",
+  "result": "pass",
+  "claim": "Live lookup returned a source-specific answer absent from the query; explicit content assertions passed.",
+  "limitations": [
+    "Retained metadata validation is not a fresh execution of the underlying component. Original commands, times, exits and stream digests are in execution-ledger.json; raw streams remain private. Prior failures and scope limitations remain."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-24T04:21:58Z",
+      "reviewer": {
+        "identity_sha256": "46d4a459eea6422b216a62e713ba1421b09f023efc6b1f68c3cefd4e282ad08e"
+      }
+    }
+  ]
+}

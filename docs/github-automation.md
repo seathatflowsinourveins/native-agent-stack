@@ -97,17 +97,17 @@ against the existing maintenance task. Assign each dependency one updater.
 
 Use installed upstream checks; avoid a home-grown workflow parser as the primary
 validator. The existing pinned zizmor lane checks workflow security. Upstream
-[actionlint](https://github.com/rhysd/actionlint) checks workflow syntax, expressions
+[actionlint](https://github.com/kjanat/actionlint) checks workflow syntax, expressions
 and action usage. Neither executes a job or establishes model-task quality.
 
-The upstream [binary installation procedure](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)
-supports a task-local download and provenance verification, with no global install:
+Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its The 2026-09-20 and 2026-09-21 results and the shellcheck finding below used this procedure against rhysd/actionlint v1.7.12 ([its install doc at v1.7.12](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)).
+[binary installation procedure](https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md?plain=1#L124-L134) supports a task-local download and provenance verification, with no global install:
 
 ```sh
-gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.7.12
-gh attestation verify -R rhysd/actionlint actionlint_1.7.12_linux_amd64.tar.gz
-sha256sum --check --ignore-missing actionlint_1.7.12_checksums.txt
-tar -xzf actionlint_1.7.12_linux_amd64.tar.gz actionlint
+gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.17.0
+gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz
+sha256sum --check --ignore-missing actionlint_1.17.0_checksums.txt
+tar -xzf actionlint_1.17.0_linux_amd64.tar.gz actionlint
 ./actionlint -version
 ```
 
@@ -115,7 +115,7 @@ Run the download in an empty owned temporary directory. From the repository,
 invoke that binary on the selected workflow files, then use the existing check:
 
 ```sh
-zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows
+zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .
 python3 scripts/validate.py
 ```
 
@@ -187,10 +187,11 @@ closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsi
 (id 23829417, created 2026-09-22T11:08:53-04:00) is also active.
 
 The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
-*target*, not this applied state: it adds `dependency-review` and `osv-scanner`
-to the required checks, keeps the strict up-to-date policy off, and adds a
-CodeQL `code_scanning` rule and squash-only merges (see "Automation closure,
-2026-09-22" below). It does not add `required_signatures`: a measured run
+*target*, not this applied state: it adds `dependency-review`, `osv-scanner`
+and (2026-09-25) `validate-macos` to the required checks, keeps the strict
+up-to-date policy off, and adds a CodeQL `code_scanning` rule and squash-only
+merges (see "Automation closure, 2026-09-22" below, and "validate-macos
+required (2026-09-25)" in that same decision record). It does not add `required_signatures`: a measured run
 blocked PRs whose branch commits are unsigned, even with signed squash merges. The coordinator applies it after
 the change that adds `security-scan.yml` merges; until then the GET above is
 the ground truth. [tag-ruleset.json](../.github/tag-ruleset.json) (ruleset
@@ -220,14 +221,18 @@ ruleset, use `gh api --method DELETE repos/seathatflowsinourveins/native-agent-s
 leave unrelated settings intact. Reverting the workflow/dependency commit restores
 prior scheduling. Dependabot has no auto-merge; its version PRs still need reviewed
 source/hash updates. The automation maintainer owns the actionlint release/checksum,
-CI lock and ruleset; Dependabot owns GitHub Actions references plus, since
-2026-09-22, the `pip` fixture entry in `.github/dependabot.yml`
-(`blueprints/gap-wave2-20260923/grype-known-cve-fixture`, `ignore: urllib3`,
-`open-pull-requests-limit: 0`), which suppresses security-update PRs for that
-pin (`ignore` applies to security updates; `exclude-paths` and the PR limit
-apply only to version updates) while its alerts still appear via the
-dependency graph and are dismissed `not_used`; it owns no real Python or
-binary pin.
+CI lock and ruleset; Dependabot owns GitHub Actions references. The grype
+positive-control fixture at `blueprints/gap-wave2-20260923/grype-known-cve-fixture`
+is named `requirements.txt.fixture`, so Dependabot's pip manifest discovery
+never finds it there and `.github/dependabot.yml` needs no dedicated `pip`
+entry or `ignore: urllib3` rule for it (removed 2026-09-25); Dependabot owns
+no real Python, npm, NuGet or binary pin. Its security updates may propose a fix
+for the renamed CI lock `.github/requirements-ci.txt` or a frozen npm/uv lock; the
+maintainer still owns the reviewed relock and closes the bot PR. The 23 NuGet
+`packages.lock.json` overlays and the `.lock`-named pip locks are outside the
+dependency graph, so `security-scan.yml`'s `osv-scanner` job is their only
+vulnerability-alert path (closure record, section 8,
+"Ecosystems without a version-update entry (2026-09-25)").
 
 [Native artifact attestations](catalog-provenance.md) identify the producing
 workflow and revision for a manually published catalog/evidence archive. The
@@ -263,9 +268,17 @@ changed" and "frozen local source differs". `native-token-e2e.yml` is bound by n
 test, but its current SHA-256 is recorded in four execution receipts and artifacts, so
 an edit would detach the file from its dated run evidence. A cosmetic comment does not
 justify re-freezing a plan or detaching a receipt, so those six comments wait for the
-next functional change. The
+next functional change. (Update 2026-09-26, changed after `v2026.09.26.2`: that change came
+with the `harden-runner` step for all three files, so the six comments now name exact releases
+(`# v7.0.1`, `# v8.0.1`), see
+[`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md).) The
 publication job's two write permissions now carry explanatory comments. No SHA,
-permission, trigger or step changed.
+permission, trigger or step changed. Convention since then (restored 2026-09-25 for
+`catalog-freshness.yml:propose` and the three `saturation-tracking.yml` jobs): every
+job-level grant other than `contents: read` carries a same-line `# why` comment.
+Only zizmor's `pedantic` persona (`undocumented-permissions`) reports a missing
+comment, so the `regular` CI gate does not catch this regression; tests compare
+scopes with the comment stripped (`scopes()` in `tests/test_workflow_hardening.py`).
 
 Findings that appear only at zizmor's stricter personas are retained with reasons in
 [github-automation-evidence.json](github-automation-evidence.json) under
@@ -280,13 +293,24 @@ remain the execution evidence.
 Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
-change) and `adoption-bootstrap.yml` (weekly Monday 06:47 UTC, plus push/PR
-when `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
-change; described in full further below). None of these three appear in
-`main-ruleset.json`'s required status checks; a required check must run on
-every PR, and a scheduled lane does not. Update 2026-09-22: `sbom-vuln` is no
-longer report-only; it fails its own job on a High or Critical grype match
-(see "Secret and supply-chain scanning"), but it is still not a required check.
+change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
+`bootstrap-macos-brew` jobs (weekly Monday 06:47 UTC, plus push when
+`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
+change, or on a pull request that touches the same paths -- described in full
+further below). None of these appear in `main-ruleset.json`'s required status
+checks; a required check must run on every PR, and a scheduled or path-gated
+lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+fails its own job on a High or Critical grype match (see "Secret and
+supply-chain scanning"), but it is still not a required check.
+`adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
+(2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
+at all, so `validate-macos` itself reports a status on every pull request and
+is a required check (see "validate-macos required (2026-09-25)" in
+[docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
+A `changes` job, added in the same workflow, diffs the pull request's base and
+head with plain `git` (no new third-party action) to keep the other three jobs
+path-gated on `pull_request` the same way GitHub's own `paths:` filter already
+path-gates them on `push`.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -306,6 +330,16 @@ a fixed-tool pin table (actionlint, gitleaks, syft, zizmor, grype,
 `$GITHUB_STEP_SUMMARY`, and uploads both as a 30-day artifact. It opens no
 issue and writes nothing back to the repository; a maintainer reads the
 summary/artifact and decides whether a real lane review is warranted.
+`drift.md` then adds a report-only trading table, built from
+`build_manifest.py --trading-freshness-out` (also retained in the artifact).
+The drift diff lists only rows that changed and only ids the published
+manifest already has. The trading table lists every pinned trading component:
+each selected us-equities card, plus the pins in `extract_layers.py`'s
+`TRADING_PIN_SOURCES` that no card carries (hftbacktest, nautilus-ibapi,
+rust-ibapi). Each row shows pin vs upstream latest, the last release and
+default-branch commit dates, a dormancy flag (no release or commit in 180+
+days) and the archived flag. Dormant or archived rows never set
+`drift-status.txt` and are never read into the `propose` job's component ids.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed
@@ -330,6 +364,14 @@ findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
 --fail-on high`, so a High or Critical match fails the job; the job is
 path-filtered, so it is not a required check (see "Automation closure,
 2026-09-22").
+
+Update 2026-09-28: `practice-references-freshness.yml` (Thursdays 06:41 UTC, plus
+manual dispatch) runs `tools/sota-convergence/practice_references.py` over
+`catalogs/foundation/practice-references.json`. It reports archived, stale (no
+default-branch commit in 90 days), renamed or missing repositories and
+default-branch commits since each pin, and never changes a pin. It is not a
+required check; it fails only when the checker's offline tests fail or the
+catalog is malformed, including a decision record that does not exist.
 
 ## Secret and supply-chain scanning, 2026-09-22
 
@@ -404,6 +446,19 @@ untracked files.
 
 ## Ruleset upgrade, 2026-09-22
 
+**Superseded 2026-09-25.** The snapshot below (required checks `validate`,
+`token-report`, `secret-scan`; `allowed_merge_methods: ["squash", "rebase"]`)
+predates several fields the target file has gained since. The current
+committed target is [`.github/main-ruleset.json`](../.github/main-ruleset.json)
+(required checks also add `dependency-review`, `osv-scanner`,
+`verdict-review-gate`, `validate-macos` and `sota-sources`, the last not yet
+live on 2026-09-25; `allowed_merge_methods:
+["squash"]` only), compared field by field against the live ruleset in
+[`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
+section 10 ("Rulesets"). This section is kept as history and is not
+corrected in place; the `gh api` commands below still apply (a `PUT` is
+idempotent), just against the current target file.
+
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
 rule (`required_approving_review_count: 0` -- unchanged from today's
@@ -447,6 +502,77 @@ gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/238
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23859358 --input .github/tag-creation-ruleset.json
 ```
 
+### Agent branch ruleset (2026-09-28)
+
+`.github/agent-branch-ruleset.json` ("Agent branches: no history rewrite") applies
+`non_fast_forward` with no bypass to `refs/heads/openhands/*` and
+`refs/heads/openhands/**/*`. These are the branches the host-local OpenHands
+resolver pushes, one per issue. The driver pushes with the owner's `gh` login, so
+a bypass for the admin role or for the owner's account would free it too. (A bypass
+granted only to a separate GitHub App would not.) The rule therefore has no bypass
+at all. It enforces server-side what the upstream OpenHands resolver does
+client-side, opening numbered branches instead of force-pushing
+([OpenHands/extensions@bea7a20c](https://github.com/OpenHands/extensions/tree/bea7a20c)
+`github-issue-to-pr` `scripts/main.py` L449-463).
+
+Rule patterns use `fnmatch` with `FNM_PATHNAME`, where `*` does not cross `/`
+([creating rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository),
+fetched 2026-09-28). There, `**/` may match zero directories, so
+`refs/heads/openhands/**/*` alone should also cover single-level names; GitHub's
+docs describe `releases/**/*` the same way. The single-level pattern is kept as an
+explicit, harmless duplicate.
+
+The ruleset leaves three things alone:
+- **Branch deletion.** `delete_branch_on_merge` is on, and a deletion rule would
+  also block post-merge auto-delete and the owner's cleanup
+  ([automatic deletion](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches)).
+  An admin-bypass deletion rule would protect nothing, because the driver acts as
+  the admin. The driver therefore closes delete-and-recreate on its own side: no ref
+  DELETE, no `--delete` and no `:ref` refspec.
+- **Main.** Ruleset 23739774 already requires checks, squash-only merges, linear
+  history and thread resolution, with no bypass. An approval rule would bind the
+  owner and the driver identically, because they are the same identity.
+- **Never-merge, no-ready, no-tag and no-workflow-edit.** These stay client-side
+  while the driver uses the owner's login.
+
+Overturn it in either of these cases:
+- a receipt shows the driver deleting or recreating an `openhands/*` ref: add
+  `{"type": "deletion"}` without bypass. That rule also blocks the owner's manual
+  deletion
+  ([restrict deletions](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#restrict-deletions)),
+  so merged `openhands/*` branches then stay until a cleanup window. In that window,
+  PUT the ruleset with `enforcement: "disabled"`, delete the branches, then restore
+  `active`;
+- any client-side limit above must hold server-side: move the driver to a dedicated
+  GitHub App identity without the `workflows` permission.
+
+**Applied 2026-09-28 as ruleset 24132241.**
+- The POST returned `enforcement: active`, no bypass actors, `non_fast_forward`
+  only, and both patterns. `GET .../rulesets/24132241` matches the committed file
+  field by field (name, target, enforcement, bypass actors, conditions, rules).
+- `GET .../rules/branches/openhands/issue-1` and
+  `GET .../rules/branches/openhands/nested/issue-1` each list `non_fast_forward`
+  (ruleset 24132241). Both were `[]` before.
+- Behaviour check with the owner login:
+  1. Pushed probe branch `openhands/ruleset-probe-20260928` at `9b874acc`.
+  2. A `--force-with-lease` rewrite to a sibling commit was refused with
+     `GH013: Repository rule violations ... Cannot force-push to this branch`, and
+     the branch stayed at `9b874acc`.
+  3. Deleting the probe branch succeeded, leaving no `openhands/*` refs.
+- No `push`-event workflow runs on these branches, because every `push:` trigger
+  names `main` or `v*` tags, so the probe, which had no pull request, started
+  none. Once a pull request is open from an `openhands/*` branch, each push
+  triggers `pull_request` `synchronize` runs (`validate.yml`, `token-report.yml`)
+  as it would for any branch
+  ([pull_request events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
+
+Edit it in place:
+
+```sh
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/24132241 --input .github/agent-branch-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/openhands/issue-1
+```
+
 ## Recorded decisions, 2026-09-22
 
 **Dependabot's `pip` ecosystem is NOT activated** (re-affirmed 2026-09-22 with
@@ -462,9 +588,15 @@ upstream release (see "Secret and supply-chain scanning" above for why
 grype's own pin is fixed like the others whatever `sbom-vuln`'s gating
 role), so the gap is covered by a different, already-built lane
 rather than by Dependabot.
-Precondition to revisit: rename `.github/requirements-ci.lock` to a
-Dependabot-discoverable name (e.g. `requirements-ci.txt` with a
-`--require-hashes` format Dependabot's pip ecosystem parses) and re-evaluate.
+**Revisited 2026-09-25: renamed, version updates still off.** The lock is now
+`.github/requirements-ci.txt` (byte-identical, SHA-256 `e4759645...`), a name
+the dependency graph parses, so Dependabot alerts and security updates can cover
+zizmor. No pip version-update entry is added. Expected cost: a zizmor
+security-update PR fails `test_zizmor_pin_matches_requirements_lock` and the
+evidence-hash check; the maintainer does the reviewed relock and closes the bot
+PR, as with #97/#98 -> #99. Post-merge acceptance and the fallback (a
+`package-ecosystem: pip` entry for `/.github` with `open-pull-requests-limit: 0`)
+are in the closure record, section 8.
 Security updates, enabled 2026-09-22, did open pip PRs: #97 (mlx 0.29.3 ->
 0.29.4) and #98 (transformers 5.0.0rc1 -> 5.10.1) against
 `tools/mlx-smoke/requirements.lock.txt`. `gh pr checks 97` and `98` show every
@@ -492,15 +624,14 @@ generating catalogs and running local scripts.
 **Ownership.** The GitHub automation maintainer owns binary pins (actionlint,
 gitleaks, syft, grype, and workflow-declared package pins like
 `nautilus_trader`) and repository rulesets. Dependabot owns GitHub Actions
-references, plus (since 2026-09-22) the `pip` fixture entry in
-`.github/dependabot.yml` added for the intentionally vulnerable
-`grype-known-cve-fixture` pin (`ignore: urllib3` suppresses security-update
-PRs for that pin; `open-pull-requests-limit: 0` also stops version-update
-PRs; the dependency graph still raises alerts on it regardless, dismissed
-`not_used`) -- it does not, and per the decision above still does
-not, own any real Python or binary pin. (2026-09-22: repository-level
-security updates may now propose a fix for an alerted lock; a maintainer
-still owns the reviewed relock.)
+references; it does not, and per the decision above still does not, own any
+real Python or binary pin. The intentionally vulnerable
+`grype-known-cve-fixture` pin is retained as `requirements.txt.fixture` (not
+`requirements.txt`), so it never surfaces as a Dependabot/dependency-graph
+manifest at all and `.github/dependabot.yml` needs no dedicated `pip` entry
+or `ignore: urllib3` for it (removed 2026-09-25, replacing the 2026-09-22
+entry). (2026-09-22: repository-level security updates may now propose a fix
+for an alerted lock; a maintainer still owns the reviewed relock.)
 
 Each decision above names its evidence (the exact filename/permission gap
 checked), the alternative considered (activate now) and the exact
@@ -663,30 +794,40 @@ workflow artifact (`scorecard-results-<run_id>`, 5-day retention).
 the full commit SHA of its latest release `v2.21.1`
 (`e14015d583714f6e62063499dc959a02595150a1`, from
 `gh api repos/step-security/harden-runner/releases/latest`), runs as the
-*first* step, before checkout, with `egress-policy: audit` (never `block`),
-on 21 of 25 `ubuntu-24.04` jobs (measured 2026-09-23 at HEAD: every job across
-`.github/workflows/*.yml` whose `runs-on` is a literal `ubuntu-` label, using
-`tests/test_workflow_hardening.py`'s own job/first-step parser -- 25 such jobs
-total, 4 in the hash-frozen exemptions below, and all 21 remaining jobs start
-with `harden-runner` in audit mode, per
-`test_every_ubuntu_job_starts_with_harden_runner_in_audit_mode`). The four exempt jobs are those whose
-workflows are byte-pinned by retained evidence: `source` and `destination`
-(`native-offhost-app-state.yml`, pinned in
-`blueprints/convergence-practice/offhost-app-state/plan.json`'s
-`frozen_sources`), `synthetic-restore` (`native-offhost-restore.yml`, pinned
-in `blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
+*first* step, before checkout, with `egress-policy: audit` (never `block`).
+Measured 2026-09-26 with `tests/test_workflow_hardening.py`'s own job/first-step
+parser (changed after `v2026.09.26.2`): all 32 jobs across `.github/workflows/*.yml`
+whose `runs-on` is a literal `ubuntu-` label start with it, and so do 3 of the 4
+`macos-` jobs, because the pinned release also supports GitHub-hosted macOS runners
+in audit mode. The one job without it is `hardware-profile-smoke.yml`'s
+`macos-profile`, a named ownership exemption (another task owns that file), not a
+platform one. `test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode`
+fails on any other `ubuntu` or `macos` job without the step, and on a job whose
+runner label is neither.
+
+Until 2026-09-26 four `ubuntu` jobs were exempt because retained evidence pinned
+their workflows' exact bytes: `source` and `destination`
+(`native-offhost-app-state.yml`, `frozen_sources` of
+`blueprints/convergence-practice/offhost-app-state/plan.json`),
+`synthetic-restore` (`native-offhost-restore.yml`,
+`blueprints/convergence-practice/offhost-restore/hosted-plan.json`) and
 `native-token-tools` (`native-token-e2e.yml`, recorded in four dated execution
-receipts). Adding a step to one of those needs the evidence re-run and
-re-pinned. `bootstrap-macos` runs on `macos-15`, which `harden-runner` does not
-support. `tests/test_workflow_hardening.py` classifies every job: an unhardened
-`ubuntu` job outside the named exemptions fails, an unrecognized runner label
-fails, and each exemption fails as soon as its workflow drifts from the pinned
-hash. The exemptions and their overturn condition are recorded in the
-"Integration follow-up" of
+receipts). The exemptions and their overturn condition are in the "Integration
+follow-up" of
 [`docs/decisions/2026-09-22-actions-hardening-fix-round.md`](decisions/2026-09-22-actions-hardening-fix-round.md).
-Audit mode only logs
-observed egress; it cannot fail a job or block a network call, so it changes
-no existing pass/fail behavior.
+All four now start with the step
+([`docs/decisions/2026-09-26-token-workflow-hardening.md`](decisions/2026-09-26-token-workflow-hardening.md)):
+`HASH_FROZEN` in the test is empty, and
+`test_formerly_exempt_workflows_stay_hardened` keeps the four jobs hardened. No run
+has executed the step in them yet. Local `--install` runs, which call
+`scripts/native_token_ci.py` directly, re-recorded the `native-token-tools` harness
+receipts against the new workflow bytes (`fb06cf92…`,
+[evidence](../evidence/artifacts/token-workflow-hardening-20260926/README.md)); the
+pull request's hosted run of that job is the step's first execution there. The three
+off-host jobs got the step with a refresh of only their plans' prospective bindings,
+as on 2026-09-20, so each workflow's next dispatch is its first run with the step.
+Audit mode only logs observed egress; it cannot fail a job or block a network call,
+so it changes no existing pass/fail behavior.
 
 **`dependency-review.yml` (actions/dependency-review-action).** Pinned to
 the full commit SHA of its latest release `v5.0.0`
@@ -751,7 +892,15 @@ setting **"Allow GitHub Actions to create and approve pull requests"**
 before `propose`'s `gh pr create` step can succeed, matching
 [GitHub's own documentation for this restriction](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 This is a coordinator-only, one-time action, the same way the ruleset
-application above is.
+application above is. The same toggle also lets any workflow's `GITHUB_TOKEN`
+approve a pull request, so it stays on only with a guard (2026-09-25):
+`tests/test_workflow_hardening.py`'s `NoWorkflowApprovesPullRequestsTests`
+allows `pull-requests: write` only on `catalog-freshness.yml:propose`, no
+`actions: write` anywhere, and no `gh pr review`, `--approve`, `pulls/<n>/reviews`,
+`APPROVE` or auto-approve action in any workflow. Before the ruleset requires
+approving reviews, move `propose` to a GitHub App installation token and then turn
+the setting off ([record](decisions/2026-09-23-bot-pr-dispatch.md),
+"Approval guard (2026-09-25)").
 
 **What the bot PR actually contains.** `propose` downloads `freshness`'s own
 artifact (`catalog-freshness-${{ github.run_id }}`, same run), force-creates
@@ -837,9 +986,11 @@ one instead of overlapping at all -- keyed on whether the run is a manual
 silently replace a pending manual request in the same queue slot (GitHub's
 default concurrency queue holds one pending run per group, and a newly
 queued run cancels/replaces it; the `queue: max` property that allows up to
-100 queued runs instead is rejected by this repository's pinned actionlint
-1.7.12, which does not yet recognize that key -- see
-[the decision record](decisions/2026-09-23-bot-pr-dispatch.md)). Two runs
+100 queued runs instead was not used because the actionlint pinned on 2026-09-23,
+rhysd/actionlint 1.7.12, rejected that key -- see
+[the decision record](decisions/2026-09-23-bot-pr-dispatch.md); kjanat/actionlint
+1.17.0, pinned since 2026-09-28, accepts it, and re-adopting it is a separate
+change). Two runs
 *within* the same category can still replace each other's pending slot
 (an accepted, lower-stakes loss: the later same-category request already
 supersedes the earlier one), and a manual and a scheduled run can therefore
@@ -1162,23 +1313,45 @@ holds the evidence, alternatives and overturn comparison for each item.
   [`docs/decisions/2026-09-22-codeql-first-analysis.md`](decisions/2026-09-22-codeql-first-analysis.md)); Dependabot security
   updates on; Actions `sha_pinning_required: true`; squash-only merges with
   auto-merge allowed and branches deleted on merge; immutable releases on;
-  private vulnerability reporting on.
+  private vulnerability reporting on. Fork PR workflow approval: moved
+  2026-09-25 from `first_time_contributors` (GET at 2026-09-25T06:34:07Z) to
+  all external contributors (`all_external_contributors`), applied by the
+  owner with the PUT in the record's "GitHub hardening follow-up
+  (2026-09-25)" section. A same-day after-GET confirms the live value is
+  `all_external_contributors`
+  ([record](decisions/2026-09-22-github-automation-closure.md#2026-09-25-re-check-against-current-practice),
+  "2026-09-25 re-check against current practice").
 - **`security-scan.yml`.** The `osv-scanner` job (OSV-Scanner 2.6.0,
   checksum-verified) scans every lockfile and manifest listed in
   `.github/osv-scanner-lockfiles.json` with `--no-resolve` and fails on any
-  vulnerability not ignored in `.github/osv-scanner.toml`; it runs on every PR
-  (a required check in branch ruleset 23739774). Off PRs it keeps its SARIF as
-  an artifact that the tool-free `osv-sarif-upload` job uploads (category
-  `osv-scanner`). `tests/test_osv_lockfile_coverage.py` fails when a
+  vulnerability not ignored in `.github/osv-scanner.toml`; the inventory entries
+  that name `.github/osv-scanner-frozen-macos.toml` (today the one frozen macOS
+  lock) are scanned in an invocation of their own under that config alone,
+  because an explicit `--config` applies to every input of one invocation. It
+  runs on every PR (a required check in branch ruleset 23739774). Off PRs it
+  keeps both SARIF reports as one artifact that the tool-free
+  `osv-sarif-upload` job uploads (categories `osv-scanner` and
+  `osv-scanner-frozen-macos`). `tests/test_osv_lockfile_coverage.py` fails when a
   tracked lockfile is missing from the list. Its `excluded` list may name only
-  a deliberately vulnerable test fixture, with a reason and an evidence path:
-  today only `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt`
-  (urllib3 1.26.4, the grype positive control for gap ci-supply-chain[13];
-  OSV-Scanner reports its 9 advisories, exit 1, when scanned on its own). The `zizmor-online` job
+  a deliberately vulnerable test fixture, with a reason and an evidence path;
+  today it lists three gap-wave-2 DVC-lock evidence fixtures under
+  `evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/`
+  (captured dependency lists from an isolated probe environment, not a shipped
+  dependency). It no longer lists the grype positive control for gap
+  ci-supply-chain[13] (urllib3 1.26.4, `tests/test_grype_known_cve_fixture.py`):
+  that fixture is retained as
+  `blueprints/gap-wave2-20260923/grype-known-cve-fixture/requirements.txt.fixture`
+  -- a name no manifest/lockfile scanner recognizes, so it needs no exclusion
+  (the test copies it into a fresh temp dir as `requirements.txt` immediately
+  before invoking grype, never into the repository tree). The `zizmor-online` job
   (push/schedule/dispatch) reuses the hash-locked zizmor with its online
   audits in a `contents: read` job; the tool-free `zizmor-sarif-upload` job
-  uploads its SARIF (category `zizmor`); findings do not fail it. The
-  offline zizmor PR gate in `validate.yml` is unchanged.
+  uploads its SARIF (category `zizmor`); findings do not fail it. Since
+  2026-09-25 the required `validate` job's zizmor step also runs the online
+  audits (impostor-commit, known-vulnerable-actions, ref-confusion,
+  ref-version-mismatch) with the read-only job token and fails on findings,
+  and both zizmor runs audit the repository root, so `.github/dependabot.yml`
+  is collected too (closure record, "GitHub hardening follow-up (2026-09-25)").
 - **Gates.** `dependency-review.yml` fails on high advisories;
   `supply-chain.yml`'s grype scan fails at `--fail-on high` with the reviewed
   `.grype.yaml`; Scorecard SARIF goes to code scanning.

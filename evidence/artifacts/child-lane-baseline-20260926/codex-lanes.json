@@ -1,0 +1,306 @@
+{
+  "files_scanned": 420,
+  "files_skipped_unmodified": 76,
+  "generated_at": "2026-09-26T20:13:58.797696+00:00",
+  "groups": {
+    "negative_controls": {
+      "fetch": {
+        "ctx_fetch_and_index": 0,
+        "ctx_fetch_and_index_share": 0.0,
+        "shell_curl_wget": 0,
+        "shell_curl_wget_loopback": 0,
+        "web_open_page": 1006,
+        "web_other": 113,
+        "web_search": 404
+      },
+      "file_changes": 0,
+      "first_prompt_tokens": {
+        "max": 202653,
+        "median": 21805,
+        "min": 15915,
+        "n": 106,
+        "p10": 19176,
+        "p90": 26948
+      },
+      "function_calls": {
+        "followup_task": 3,
+        "list_agents": 1,
+        "send_message": 33,
+        "spawn_agent": 11
+      },
+      "marker_sessions": 0,
+      "mcp_calls": {
+        "codex": 150
+      },
+      "mcp_failed": {},
+      "rtk_prefix_share": 0.5818,
+      "rtk_prefixed_shell_calls": 64,
+      "sessions": 107,
+      "sessions_using_mcp_server": {
+        "codex": 75
+      },
+      "sessions_with_skill_md_read": 34,
+      "shell_calls": 110,
+      "skill_md_reads": {
+        "find-skills": 2,
+        "fp-check": 19,
+        "iterative-retrieval": 15,
+        "search-first": 21,
+        "semgrep": 1,
+        "supply-chain-risk-auditor": 23,
+        "variant-analysis": 7,
+        "verification-before-completion": 34,
+        "writing-for-agents": 2
+      },
+      "tool_calls": 1831
+    },
+    "unclassified": {
+      "fetch": {
+        "ctx_fetch_and_index": 0,
+        "ctx_fetch_and_index_share": null,
+        "shell_curl_wget": 0,
+        "shell_curl_wget_loopback": 0,
+        "web_open_page": 0,
+        "web_other": 0,
+        "web_search": 0
+      },
+      "file_changes": 0,
+      "first_prompt_tokens": {
+        "max": null,
+        "median": null,
+        "min": null,
+        "n": 0,
+        "p10": null,
+        "p90": null
+      },
+      "function_calls": {},
+      "marker_sessions": 0,
+      "mcp_calls": {},
+      "mcp_failed": {},
+      "rtk_prefix_share": null,
+      "rtk_prefixed_shell_calls": 0,
+      "sessions": 0,
+      "sessions_using_mcp_server": {},
+      "sessions_with_skill_md_read": 0,
+      "shell_calls": 0,
+      "skill_md_reads": {},
+      "tool_calls": 0
+    },
+    "workers": {
+      "fetch": {
+        "ctx_fetch_and_index": 123,
+        "ctx_fetch_and_index_share": 0.9462,
+        "shell_curl_wget": 2,
+        "shell_curl_wget_loopback": 0,
+        "web_open_page": 5,
+        "web_other": 1,
+        "web_search": 23
+      },
+      "file_changes": 98,
+      "first_prompt_tokens": {
+        "max": 22698,
+        "median": 19395,
+        "min": 16562,
+        "n": 125,
+        "p10": 19086,
+        "p90": 21705
+      },
+      "function_calls": {
+        "followup_task": 8,
+        "list_agents": 1,
+        "request_user_input_async": 2,
+        "send_message": 86,
+        "sleep": 2,
+        "spawn_agent": 18,
+        "wait": 52
+      },
+      "marker_sessions": 132,
+      "mcp_calls": {
+        "ai-memory": 2,
+        "codebase-memory": 6,
+        "context-mode": 1856,
+        "headroom": 3,
+        "jcodemunch": 2,
+        "qmd": 30,
+        "serena": 7,
+        "socraticode": 2
+      },
+      "mcp_failed": {
+        "context-mode": 88,
+        "jcodemunch": 2
+      },
+      "rtk_prefix_share": 0.4046,
+      "rtk_prefixed_shell_calls": 195,
+      "sessions": 132,
+      "sessions_using_mcp_server": {
+        "ai-memory": 1,
+        "codebase-memory": 1,
+        "context-mode": 104,
+        "headroom": 1,
+        "jcodemunch": 1,
+        "qmd": 2,
+        "serena": 1,
+        "socraticode": 1
+      },
+      "sessions_with_skill_md_read": 86,
+      "shell_calls": 482,
+      "skill_md_reads": {
+        "diagnosing-bugs": 12,
+        "find-skills": 17,
+        "modern-python": 5,
+        "search-first": 86,
+        "security-best-practices": 39,
+        "tdd": 6,
+        "verification-before-completion": 87
+      },
+      "tool_calls": 2686
+    },
+    "workers_by_kind": {
+      "exec": {
+        "fetch": {
+          "ctx_fetch_and_index": 96,
+          "ctx_fetch_and_index_share": 0.9697,
+          "shell_curl_wget": 2,
+          "shell_curl_wget_loopback": 0,
+          "web_open_page": 1,
+          "web_other": 0,
+          "web_search": 11
+        },
+        "file_changes": 98,
+        "first_prompt_tokens": {
+          "max": 20332,
+          "median": 19368,
+          "min": 16562,
+          "n": 107,
+          "p10": 19011,
+          "p90": 19808
+        },
+        "function_calls": {
+          "followup_task": 8,
+          "request_user_input_async": 2,
+          "send_message": 17,
+          "sleep": 2,
+          "spawn_agent": 18,
+          "wait": 52
+        },
+        "marker_sessions": 114,
+        "mcp_calls": {
+          "ai-memory": 2,
+          "codebase-memory": 6,
+          "context-mode": 1463,
+          "headroom": 3,
+          "jcodemunch": 2,
+          "qmd": 30,
+          "serena": 7,
+          "socraticode": 2
+        },
+        "mcp_failed": {
+          "context-mode": 80,
+          "jcodemunch": 2
+        },
+        "rtk_prefix_share": 0.3886,
+        "rtk_prefixed_shell_calls": 171,
+        "sessions": 114,
+        "sessions_using_mcp_server": {
+          "ai-memory": 1,
+          "codebase-memory": 1,
+          "context-mode": 86,
+          "headroom": 1,
+          "jcodemunch": 1,
+          "qmd": 2,
+          "serena": 1,
+          "socraticode": 1
+        },
+        "sessions_with_skill_md_read": 74,
+        "shell_calls": 440,
+        "skill_md_reads": {
+          "diagnosing-bugs": 11,
+          "find-skills": 12,
+          "modern-python": 5,
+          "search-first": 73,
+          "security-best-practices": 39,
+          "tdd": 6,
+          "verification-before-completion": 85
+        },
+        "tool_calls": 2164
+      },
+      "subagent": {
+        "fetch": {
+          "ctx_fetch_and_index": 27,
+          "ctx_fetch_and_index_share": 0.871,
+          "shell_curl_wget": 0,
+          "shell_curl_wget_loopback": 0,
+          "web_open_page": 4,
+          "web_other": 1,
+          "web_search": 12
+        },
+        "file_changes": 0,
+        "first_prompt_tokens": {
+          "max": 22698,
+          "median": 22124,
+          "min": 19601,
+          "n": 18,
+          "p10": 19623,
+          "p90": 22487
+        },
+        "function_calls": {
+          "list_agents": 1,
+          "send_message": 69
+        },
+        "marker_sessions": 18,
+        "mcp_calls": {
+          "context-mode": 393
+        },
+        "mcp_failed": {
+          "context-mode": 8
+        },
+        "rtk_prefix_share": 0.5714,
+        "rtk_prefixed_shell_calls": 24,
+        "sessions": 18,
+        "sessions_using_mcp_server": {
+          "context-mode": 18
+        },
+        "sessions_with_skill_md_read": 12,
+        "shell_calls": 42,
+        "skill_md_reads": {
+          "diagnosing-bugs": 1,
+          "find-skills": 5,
+          "search-first": 13,
+          "verification-before-completion": 2
+        },
+        "tool_calls": 522
+      }
+    }
+  },
+  "kind": "codex_lane_usage_report",
+  "limits": "Counts come from rollout records inside [since, until): item_completed McpToolCall, CommandExecution, Extension and FileChange items and function_call records, one tool call per id (a function_call's call_id is its item's id in the rollouts of codex-cli 0.155.1 and 0.157.1) counted in the window of the call's first record before until, so a call requested before since and completed inside is not counted again and adjacent windows add up, while its shell, MCP and fetch lanes count in the window of its item_completed event; token_count for the first prompt (input tokens, cached included) and response_item calls for SKILL.md reads. Shell, MCP and fetch counts therefore need item_completed events, an EventMsg whose persistence depends on the rollout's history mode (codex-rs/rollout/src/policy.rs): sessions_by_history_mode reports session_meta.history_mode, and sessions_with_tool_calls_but_no_item_events counts sessions whose own records before until hold model tool calls but no such event, whose shell, MCP and fetch lanes read as zero. Session properties (kind, originator, history mode, user_config, marker) use every record before until. Records a spawned sub-agent's rollout copied from its parent (ordinal below subagent_history_start_ordinal) count toward those properties only, never as the child's calls. The marker is looked for in developer messages only. The rtk prefix is the first word of the shell script; curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N, and a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (web page opens + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Server, function, originator and history-mode names that are not name-shaped are counted under (other). Sessions whose user config was ignored are negative controls, never workers. Rollout files not modified since the window start are skipped unread.",
+  "marker": "<context_window_protection>",
+  "parse_errors": 0,
+  "records_without_timestamp": 0,
+  "roots_count": 1,
+  "schema_version": 1,
+  "sessions_by_history_mode": {
+    "paginated": 239
+  },
+  "sessions_by_kind": {
+    "exec": 210,
+    "subagent": 29
+  },
+  "sessions_by_originator": {
+    "codex_exec": 239
+  },
+  "sessions_in_window": 239,
+  "sessions_ran_past_window_end": 2,
+  "sessions_started_before_window": 0,
+  "sessions_with_tool_calls_but_no_item_events": 0,
+  "user_config": {
+    "applied": 132,
+    "ignored": 107,
+    "method": "ignored: the session's skill catalog (developer <skills_instructions> or world_state host_skills) lists the SKILL.md of a manifest skill with codex_enabled=false. Codex reads skill enablement rules only from the User and SessionFlags config layers (codex-rs/config/src/skills_config.rs, rust-v0.157.1) and --ignore-user-config loads the User layer as an empty table (codex-rs/config/src/loader/mod.rs), so the trial's enabled=false entries in the user config stop applying. applied: the catalog lists manifest skills, none of them codex_enabled=false. unknown: no catalog.",
+    "unknown": 0
+  },
+  "window": {
+    "since": "2026-09-25T17:18:00+00:00",
+    "until": "2026-09-26T15:05:00+00:00"
+  }
+}

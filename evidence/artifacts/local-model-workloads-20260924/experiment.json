@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "local-inference",
+  "task_and_failure": "Find local-model workloads beyond memory and RAG that could deliver measurable value on a 64 GB M5 Pro for the US-equities north star and native agent engineering, without local models replacing the cloud primary agents. Failure addressed: single-family discovery anchoring. Two blind lanes from different families answered one frozen packet, their one disagreement was judged blind in three presentation orders, and only workloads both lanes proposed as trials carry the trial decision.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "e94fb5b2cbdf330d59cf3c593ff2dab729bcea80"
+    },
+    {
+      "url": "https://github.com/fastino-ai/GLiNER2",
+      "revision": "55656fbfa01d3d4a77485e1a1eeeaf682990ccdf"
+    },
+    {
+      "url": "https://github.com/FluidInference/FluidAudio",
+      "revision": "21493f8dac5a97e65742e6ff26f42f164c2fda0f"
+    },
+    {
+      "url": "https://github.com/Blaizzy/mlx-audio",
+      "revision": "4ab7e6f7dedd69a136cfaa318c5dc8aed5119446"
+    },
+    {
+      "url": "https://github.com/PaddlePaddle/PaddleOCR",
+      "revision": "dab3fe35379033fdcb2d0e9572fac0b36c9a9ebf"
+    },
+    {
+      "url": "https://github.com/amazon-science/chronos-forecasting",
+      "revision": "10afa9ebe016e514f9d7dc1aa873f66af57e116b"
+    },
+    {
+      "url": "https://github.com/ibm-granite/granite-tsfm",
+      "revision": "fe7a35697723e2a2f5246ae979474bfc554e26c0"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+    },
+    {
+      "url": "https://huggingface.co/CohereLabs/cohere-transcribe-03-2026",
+      "revision": "b1eacc2686a3d08ceaae5f24a88b1d519620bc09"
+    },
+    {
+      "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3",
+      "revision": "541d1f99c6b0c3cd0b11a95167540bb8edefd82b"
+    },
+    {
+      "url": "https://huggingface.co/StarDoc-AI/TeleOCR",
+      "revision": "a61433186527cb53958bf354e34ae673c19cec4b"
+    },
+    {
+      "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6",
+      "revision": "c5630abae1d940eafe0697512a0325494b02ab42"
+    },
+    {
+      "url": "https://huggingface.co/amazon/chronos-2",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c"
+    },
+    {
+      "url": "https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2",
+      "revision": "d6a79570cac0f33d526601cd3a0fc7c80a8f9a2f"
+    },
+    {
+      "url": "https://huggingface.co/fastino/gliner2.5-base-v1",
+      "revision": "b0c10b23313ec3ff028821dff298dd743e010706"
+    }
+  ],
+  "discovery_provenance": [
+    "The frozen packet (sha256 38586709f488bcbe0d2488f4d8c0fdbb8c41a99e1a0286c67ba6d6103ace5eb7) went to a Claude Opus 5.5 general-purpose research subagent with web search and to Codex GPT-6 Astra at high effort through codex exec (read-only sandbox, user config ignored, hooks disabled, live web search).",
+    "Neither lane was given the other's output or the repository catalogs. The Codex event stream shows 14 web searches or page opens and one read of the packet, none naming the excluded repositories, and the Codex return (19:11 EDT) predates the Claude return (19:35 EDT). The Claude lane's tool log was not retained.",
+    "The one disagreement, tabular foundation models for mover prediction, went to a blind gpt-6-sol judge at high effort in three presentation orders (original, label-swapped and a later reversed listing that put the skip return first); all three judgments preferred the skip return.",
+    "The coordinator wrote the convergence table after both lanes and the first two judgments returned; the reversed-listing judgment came later and is recorded as a dated addendum. Pins were checked afterwards through the GitHub and Hugging Face APIs, and the returns were sealed as JSON with their original hashes."
+  ],
+  "license_and_compatibility": "Discovery only; nothing was installed, downloaded or executed. Licenses as reported by the APIs at the pins: GLiNER2, FluidAudio, PaddleOCR, chronos-forecasting and granite-tsfm Apache-2.0 and mlx-audio MIT; Qwen3.8-27B, gliner2.5-base-v1, Cohere Transcribe 03-2026, TeleOCR, PaddleOCR-VL-1.6, Chronos-2 and TTM r2 apache-2.0, with Cohere gated behind automatically approved terms; Parakeet-TDT-0.6B-v3 CC-BY-4.0. Compatibility of each runtime with the M5 Pro and macOS 26.5 is unverified.",
+  "baseline_and_candidate": {
+    "baseline": "Cloud primary agents (Claude Opus 5.5 and GPT-6 Astra) for every research task; local models limited to memory, conversational recall and document and code RAG.",
+    "candidate": "Measured local trials of the four converged workloads (catalyst tagging and extraction, earnings-call transcription, image-only exhibit OCR, volatility and volume time-series features), each keeping the cloud or deterministic baseline until its acceptance gate passes."
+  },
+  "frozen_inputs": {
+    "base_revision": "e94fb5b2cbdf330d59cf3c593ff2dab729bcea80",
+    "tasks": [
+      "local-workload-discovery",
+      "tabular-adjudication-original",
+      "tabular-adjudication-swapped",
+      "tabular-adjudication-reversed",
+      "convergence-record-check"
+    ],
+    "roles": [
+      "claude-lane",
+      "codex-lane",
+      "adjudicator",
+      "coordinator"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json",
+        "sha256": "b30696c8e8720ae2d3bc04ca850304098f603874c8f2e79516b7f655185f6196"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json",
+        "sha256": "5122de310479d12d674aaa49bbab09d7a61c4624fbce2a66b36405a50df21f77"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+        "sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/convergence.json",
+        "sha256": "18768da848d2b5c114a0fc0922703d542298ab0a67a0a4c324900c14616d5675"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/packet.json",
+        "sha256": "c72fc158ae8f74a1fb33dc606bd94ba16159a75c7cb111d71c47effa01435a02"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+        "sha256": "43487581f6d0dc5f7e9b093121d16cc6c74aae473dd43071e333a0193c3ea5bc"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+        "sha256": "dc1afd18b206521fa578d51c5d9f72f803d05eb3ff677f6575a1e9eab89d8058"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+        "sha256": "5ada31de5eeb9058ec79424a1df29f656f2c6fbd1cc0d77001daf22364e790f2"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/adjudication-key.json",
+        "sha256": "631fdb341681d10cc139a8b888a032dcc2775e27fd15bbdba1c68b5f94f8ce0f"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/provenance.json",
+        "sha256": "fb4ebf2dd0ede2c0c1c3f3dba1c1e7dbba6e75e7941048e6149d1543e2429ca9"
+      },
+      {
+        "path": "evidence/artifacts/local-model-workloads-20260924/usage.json",
+        "sha256": "eea0ecfdfd6c022208f0c812dd634c7ba6fff4b0455e875dce017d051ba4ab73"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Lanes: the packet's output contract (one row per workload with grade-labelled evidence, throughput, a frozen acceptance test and adopt, trial or skip; a not-local list; at most 900 words). Judges: one letter then at most 120 words. A workload is a converged trial only when both lanes proposed it as a trial. Semantic quality and source truth are not graded here; each trial's own acceptance gate is the later quality test.",
+    "usage_rule": "No savings claim. Record native counters as reported and map them to contract categories only where their scope is known; unknown stays null and nothing is summed across runs."
+  },
+  "runtime_and_platform": {
+    "platform": "Cloud models with live web search for the lanes and the judge; the coordinator host is the MacBook Pro 16-inch (Apple M5 Pro, 64 GB, macOS 26.5) the packet describes. No local inference ran.",
+    "tools": [
+      {
+        "name": "Claude Code general-purpose research subagent",
+        "version": "claude-opus-5-5; client version not recorded"
+      },
+      {
+        "name": "Codex CLI (codex exec), lane run",
+        "version": "gpt-6-astra, high effort; CLI version not recorded"
+      },
+      {
+        "name": "Codex CLI (codex exec), judge runs",
+        "version": "v0.155.0-alpha.16.4 per the run logs; gpt-6-sol, high effort"
+      },
+      {
+        "name": "Repository offline validators",
+        "version": "base e94fb5b2cbdf330d59cf3c593ff2dab729bcea80 plus this change"
+      }
+    ],
+    "isolation": "Lanes worked from the packet and the web only; the Codex lane ran with a read-only sandbox, user config ignored and hooks disabled, and the judges with a read-only sandbox and approval never (user config ignored and hooks disabled per the coordinator). No OS-enforced blindness is claimed for the Claude subagent."
+  },
+  "commands": [
+    "Claude Code general-purpose research subagent (claude-opus-5-5, web search) given the packet text; exact invocation not retained",
+    "codex exec (gpt-6-astra, reasoning effort high, read-only sandbox, --ignore-user-config, hooks disabled, live web search) with the packet file in its working directory; exact argv not retained",
+    "codex exec (gpt-6-sol, reasoning effort high, read-only sandbox, approval never, --ignore-user-config, hooks disabled, live web search) with the adjudicator prompt, once per presentation order (original, label-swapped, reversed listing); exact argv not retained",
+    "python3.13 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/local-model-workloads-20260924.json#/repository_decisions",
+    "python3.13 scripts/catalog_decisions.py --check"
+  ],
+  "observations": [
+    {
+      "id": "claude-lane",
+      "task": "local-workload-discovery",
+      "role": "claude-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the frozen local-workload packet (Claude Opus 5.5 subagent); discovery only. Quality is the packet's output contract (a row per workload with evidence, throughput, acceptance test and verdict; a not-local list; at most 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/claude/lane-return-1.json",
+          "sha256": "b30696c8e8720ae2d3bc04ca850304098f603874c8f2e79516b7f655185f6196"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-lane",
+      "task": "local-workload-discovery",
+      "role": "codex-lane",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "discovery",
+      "scope": "Blind web-research return to the frozen local-workload packet (Codex GPT-6 Astra, high effort); discovery only. Quality is the packet's output contract (a row per workload with evidence, throughput, acceptance test and verdict; a not-local list; at most 900 words), not source truth. No process exit status was retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/codex/lane-return-1.json",
+          "sha256": "5122de310479d12d674aaa49bbab09d7a61c4624fbce2a66b36405a50df21f77"
+        },
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/usage.json",
+          "sha256": "eea0ecfdfd6c022208f0c812dd634c7ba6fff4b0455e875dce017d051ba4ab73"
+        }
+      ],
+      "usage": {
+        "uncached_input": 117118,
+        "cache_creation": 0,
+        "cache_read": 1015680,
+        "output": 5130,
+        "reasoning_in_output": 1311,
+        "total": 1137928,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-original",
+      "task": "tabular-adjudication-original",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "discovery",
+      "scope": "Blind A/B judgment of the tabular foundation-model disagreement, original order with the trial return listed first as Return A (gpt-6-sol, high effort); contract is one letter then at most 120 words. Exit status not retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/a.json",
+          "sha256": "43487581f6d0dc5f7e9b093121d16cc6c74aae473dd43071e333a0193c3ea5bc"
+        },
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+          "sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-swapped",
+      "task": "tabular-adjudication-swapped",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "discovery",
+      "scope": "Blind A/B judgment of the tabular foundation-model disagreement, label-swapped order with the trial return still listed first, as Return B (gpt-6-sol, high effort); contract is one letter then at most 120 words. Exit status not retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/b.json",
+          "sha256": "dc1afd18b206521fa578d51c5d9f72f803d05eb3ff677f6575a1e9eab89d8058"
+        },
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+          "sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjudicator-reversed",
+      "task": "tabular-adjudication-reversed",
+      "role": "adjudicator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "discovery",
+      "scope": "Blind A/B judgment of the tabular foundation-model disagreement, reversed listing with the skip return first as Return A, run on a different ChatGPT account (gpt-6-sol, high effort); contract is one letter then at most 120 words. Exit status not retained; exit_code 0 records normal completion.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication-inputs/c.json",
+          "sha256": "5ada31de5eeb9058ec79424a1df29f656f2c6fbd1cc0d77001daf22364e790f2"
+        },
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/adjudication/tabular-skip-1.json",
+          "sha256": "cfbfb077d09ef85a75edd583b0ff22bcfab07bc8c26d43c8113dc56aff54f546"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "coordinator-artifact-check",
+      "task": "convergence-record-check",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Offline consistency of the registered supplement after the sealed returns were assembled: the decision index validated at 857 identities, 500 beyond stars and 2,008 typed references, and each embedded source text matched its original sha256 at assembly. No source truth or model quality is graded.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/convergence.json",
+          "sha256": "18768da848d2b5c114a0fc0922703d542298ab0a67a0a4c324900c14616d5675"
+        },
+        {
+          "path": "evidence/artifacts/local-model-workloads-20260924/provenance.json",
+          "sha256": "fb4ebf2dd0ede2c0c1c3f3dba1c1e7dbba6e75e7941048e6149d1543e2429ca9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "Discovery only: no workload was installed, downloaded or executed on the Mac, and every throughput figure is measured elsewhere or estimated.",
+    "No process exit status was retained for the lanes or the judges; exit_code 0 records normal completion (the Claude subagent's completion report; codex exec's turn.completed and final message).",
+    "Contract quality covers the output shape only; semantic quality and source truth are not graded.",
+    "Usage: only the Codex lane's categories are known. The Claude subagent reported 289,352 total tokens, 120 tool uses and 1,725 s, and the judges' logs 45,165, 40,307 and 61,883 'tokens used'; these are kept natively in usage.json but not recorded as invocation totals, because their scope (cumulative or final context, cached input included or not) was not established.",
+    "The judge is one model (gpt-6-sol) from the Codex lane's family, and no refuter was run. Listing position is counterbalanced for this one question: across three judgments, skip was chosen when listed second (twice: the original and the label-swapped runs) and when listed first (the reversed run).",
+    "The reversed-listing judgment ran on a different ChatGPT account from the first two because the first account's weekly limit was exhausted; model, effort and settings were unchanged.",
+    "The Claude lane's blindness rests on the packet instruction; its tool log was not retained.",
+    "Convergence is at the workload level: Cohere Transcribe, TeleOCR and TTM r2.1 were named by one lane only, and granite-tsfm by neither (the coordinator mapped the TTM challenger to its library).",
+    "Pins were taken after the lanes ran, from default-branch heads and Hugging Face main revisions; the lanes cited unpinned URLs. Both lanes may share training-era blind spots."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "The four converged workloads only, as measured trials against their lane-given acceptance gates on this Mac: catalyst tagging and extraction (Qwen3.8-27B default, GLiNER2 challenger), earnings-call transcription (Cohere Transcribe 03-2026 through mlx-audio default, Parakeet-TDT-0.6B-v3 through FluidAudio challenger), image-only exhibit OCR (TeleOCR default, PaddleOCR-VL-1.6 challenger) and volatility and volume time-series features (Chronos-2 default, TTM r2.1 through granite-tsfm challenger). Single-lane leads, the adjudicated skip and the not-local workloads are outside it.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Nothing on the host changed. Revert the catalog supplement, its decision-index registration and the identity-count updates; keep this sealed evidence as dated history.",
+  "next_decision_changing_test": "Run the lane-given gates on this Mac, cheapest first: Earnings-21/22 WER and real-time factor for Cohere Transcribe and Parakeet against Whisper-large-v3-turbo; macro-F1 on 1,000 stratified 8-Ks plus 300 hand-checked for Qwen3.8-27B and GLiNER2 against frontier labels; 300 10-Q statement tables scored against XBRL facts for TeleOCR and PaddleOCR-VL-1.6; realized-variance QLIKE against Log-HAR for Chronos-2 and TTM. A workload is adopted only when its gate passes with pinned revisions and measured resource use.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

@@ -1,0 +1,12 @@
+script hashes:
+186dd8914a6c18850261d3bf34a3fd2f2c8767d6696931a99c90f1eeb79c9376  rtk-hook-acceptance-v2.sh
+df7a7fb3721090809dc79b20fd09456b26f614f7fe320d6a0ed28e1c7a08f74e  rtk-hook-acceptance-v3.sh
+v2-050 rc=0 pass=42 fail=0 note=1 2026-09-25T18:47:45Z..2026-09-25T18:47:48Z
+v2-049 rc=1 pass=34 fail=8 note=1 2026-09-25T18:47:48Z..2026-09-25T18:47:51Z
+v3-050 rc=1 pass=87 fail=1 note=4 2026-09-25T18:47:51Z..2026-09-25T18:47:56Z
+v3-049 rc=1 pass=78 fail=10 note=4 2026-09-25T18:47:56Z..2026-09-25T18:48:00Z
+v3-fake-block rc=1 pass=4 fail=100 note=11 2026-09-25T18:48:00Z..2026-09-25T18:48:02Z
+v3-fake-allow rc=1 pass=17 fail=85 note=11 2026-09-25T18:48:02Z..2026-09-25T18:48:07Z
+verify-0.50.0 rc=0 :: PASS  native binary hook registered in settings.json 154/154 tests passed 
+verify-0.49.0 rc=0 :: PASS  native binary hook registered in settings.json 154/154 tests passed 
+leftover mktemp dirs under tmp: 0

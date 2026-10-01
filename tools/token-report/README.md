@@ -12,27 +12,27 @@ counter capture uses the Python standard library and installed upstream tools.
 ## Install the selected upstream tools once
 
 The [native recipes](../../recipes/README.md) contain the pinned release and
-checksum procedure for RTK 0.49.0, plus the official upstream source links.
+checksum procedure for RTK 0.50.0, plus the official upstream source links.
 Keep a working existing installation; installation is not a step in each refresh.
 For a new Linux x86_64 installation, the upstream commands are:
 
 ```sh
 REPORT_TOOLS="${XDG_DATA_HOME:-$HOME/.local/share}/native-token-report"
-mkdir -p "$REPORT_TOOLS/rtk-0.49.0"
-gh release download v0.49.0 --repo rtk-ai/rtk \
+mkdir -p "$REPORT_TOOLS/rtk-0.50.0"
+gh release download v0.50.0 --repo rtk-ai/rtk \
   --pattern rtk-x86_64-unknown-linux-musl.tar.gz \
-  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.49.0"
+  --pattern checksums.txt --dir "$REPORT_TOOLS/rtk-0.50.0"
 (
   set -eu
-  cd "$REPORT_TOOLS/rtk-0.49.0"
+  cd "$REPORT_TOOLS/rtk-0.50.0"
   sha256sum --check --ignore-missing checksums.txt
   tar -xf rtk-x86_64-unknown-linux-musl.tar.gz
 )
 uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
 uv tool install jcodemunch-mcp==1.108.319
-npm install --prefix "$REPORT_TOOLS/mcporter-0.13.13" mcporter@0.13.13
-export PATH="$REPORT_TOOLS/rtk-0.49.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.13.13/node_modules/.bin:$HOME/.local/bin:$PATH"
+npm install --prefix "$REPORT_TOOLS/mcporter-0.14.1" mcporter@0.14.1
+export PATH="$REPORT_TOOLS/rtk-0.50.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.1/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```
 
 The checksum command must report the selected archive as `OK`. Other operating
@@ -81,6 +81,101 @@ The initializer therefore uses the upstream default `.code-index` root. It does
 not modify that root's configuration. Using its `counter` tool surface keeps six
 resident MCP tools; changing the surface is separate from this reporter.
 
+## Optional scheduled refresh
+
+The reporter itself still installs no scheduler (see the top of this page); a
+separate, opt-in pair of drafted systemd `--user` templates can call `refresh`
+on a schedule instead of by hand:
+[`token-report-refresh.service`](../../adoption/templates/systemd/token-report-refresh.service)
+and [`.timer`](../../adoption/templates/systemd/token-report-refresh.timer). Like
+this repository's other drafted units
+(`adoption/templates/systemd/codex-broker-reaper.{service,timer}`), no host has
+loaded, started or enabled either one; the coordinator installs them after
+review, substituting `@REPOSITORY@` (this checkout's path) and
+`@REPORT_CONFIG@` (the `--config` path from "Create one explicit configuration
+and refresh" above) first.
+
+Before installing, give that configuration's `"rtk"`, `"headroom"` and, if
+set, `"toon"` keys absolute installed paths (for example by passing
+`--rtk "$REPORT_TOOLS/rtk-0.50.0/rtk" --headroom "$REPORT_TOOLS/headroom-0.37.0/bin/headroom"`
+at `init-config` time, or by editing an existing config.json directly).
+`initialize_config` stores those fields verbatim, unlike `jcodemunch`/
+`mcporter`, which it resolves once with `shutil.which()` at init time, so a
+bare name such as this page's own interactive-shell example
+(`--rtk rtk --headroom headroom`) only resolves through that shell's exported
+`PATH` and would fail under a systemd `--user` manager's own minimal `PATH`.
+There is no `--toon` flag at `init-config` time (see "Exact artifact
+comparisons" below): give it an absolute path the same way, directly in an
+existing config.json.
+
+Two more prerequisites apply to whatever actually *runs* this service, not
+just the shell used to install it. `ExecStart=` pins `/usr/bin/python3`
+directly, so that exact interpreter must itself satisfy "Python 3.11+ is
+required" above, regardless of any other `python3` a shell's `PATH` might
+resolve. Node is different: `mcporter` and the optional `toon` executable
+(see "Exact artifact comparisons" below) are each a `#!/usr/bin/env node`
+script, and while `initialize_config` resolves the configured `--mcporter`
+value to an absolute path once with `shutil.which()` at `init-config` time
+-- there is no matching `--toon` flag, so give `"toon"` an absolute path
+directly in an existing config.json instead, the same way as `"rtk"`/
+`"headroom"` above -- running either resolved absolute path still makes
+`env` re-resolve `node` through *the executing process's own* `PATH`, not
+the shell `init-config` ran in. When this configuration selects
+jcodemunch/mcporter capture or sets `"toon"`, confirm a qualifying `node`
+already resolves under `systemctl --user show-environment` before
+installing (`mcporter`'s own `package.json` requires `>=24`; the installed
+`@toon-format/cli` sets no `engines.node` floor of its own, but its
+`bin/toon.mjs` still needs a working `node` to run that same kind of
+shebang). A `node` exported only by an interactive shell's `nvm`/`fnm`
+rc-file init, or otherwise missing from the manager's typically minimal
+`PATH`, makes just that one capture report an issue: the refresh itself
+still completes and the reporter exits nonzero, but with `"toon"`
+configured specifically, that means *every* scheduled run hits this and
+exits nonzero, since `refresh` treats any issue as a failed run. If needed,
+prepend a qualifying `node`'s directory to the manager's own full `PATH` --
+read the existing value first with `systemctl --user show-environment` --
+in an explicit `Environment=PATH=...` line on the installed unit;
+*replacing* the whole `PATH` instead of prepending to it would also change
+what any other bare-name command in the unit resolves to (the unit's
+`ExecCondition=` calls `/bin/date` by absolute path for exactly this
+reason, so it is unaffected either way). Setting an absolute `"node"` key
+directly in config.json (parallel to `"rtk"`/`"headroom"`/`"toon"`) only
+covers this reporter's own internal tokenizer-count invocation used while
+comparing `toon` output; it does not change what `"toon"`'s own `env node`
+shebang above resolves at run time.
+
+The timer's four fixed local times a day (03:15, 10:15, 16:15, 22:15) never
+land inside the Sat/Sun 05:00-09:00 quiet window on any on-schedule fire
+(checked with `systemd-analyze calendar`), and `systemd-analyze --user verify`
+passes on both files. A calendar timer can still catch up on a missed tick
+immediately after the host resumes from sleep, per `man systemd.timer`. When
+that resume lands on a Saturday or Sunday between 05:00 and 09:00, the
+service's own `ExecCondition=` re-checks the real clock at run time and skips
+that one run instead of executing it, without marking the unit failed; a
+Monday-Friday resume in that same clock window is not a quiet window and
+still runs the refresh normally. See both unit files' own comments for the
+exact verified source lines and command output this rests on. The service
+sets `HEADROOM_UPDATE_CHECK=off`, `HEADROOM_OFFLINE=1`
+and `DO_NOT_TRACK=1` so a scheduled run's one Headroom call
+(`headroom savings --json`) never makes a network call; that call is
+otherwise a pure read against the shared `~/.headroom` state (no
+`HEADROOM_WORKSPACE_DIR` redirect is needed or set), which is what the
+dashboard row for it is supposed to reflect.
+
+Installing the timer also means the [native dashboard adapter](../../observability/native-data/README.md)
+sees a fresh `refresh` only every few hours instead of on an unpredictable
+manual cadence. Its own `stale_after_seconds` (a key in that adapter's
+private config, schema in
+[`config.example.json`](../../observability/native-data/config.example.json),
+bounds 1-86400 enforced in `observability/native-data/snapshot.py`, default
+1800) is shorter than the timer's largest gap between two runs (7 hours =
+25200 seconds) and would otherwise mark the token-report row stale between
+ticks. Raise it to 28800 (8 hours) by hand in that private file when the
+timer is installed: comfortably above the 7-hour gap plus the service's
+`TimeoutStartSec=900` margin, while still catching a scheduler that has
+actually stopped well inside a day. This reporter does not read or write
+that adapter's config; nothing here changes it automatically.
+
 ## Optional Context Mode snapshots
 
 Add only the exact runtime stats roots you want to read:
@@ -98,16 +193,114 @@ For an explicitly captured direct `ctx_stats` response, supply
 There is no implicit search of Codex or Claude transcripts.
 
 Historical event imports require explicit `rtk_database` or `headroom_events`
-paths. `inspect_project_history` additionally queries retained RTK working
-directories; `inspect_hook_history` additionally inspects the configured Context
-Mode roots' hook metadata. Both default to false and are unnecessary for counters.
+paths. An `rtk_database` path also enables RTK's client-visible view (see below).
+`inspect_project_history` additionally queries retained RTK working directories;
+`inspect_hook_history` additionally inspects the configured Context Mode roots'
+hook metadata. Both default to false and are unnecessary for counters.
+
+## Optional upstream reports
+
+A tool with no savings counter can still report its own usage, cache or index state.
+Select each report explicitly with `report_sources`. The reporter runs its command at
+refresh, retains the complete output like any other capture, and records the parsed
+report beside the tool's coverage row. **A report never carries a savings value**,
+even when upstream names a field "saved": its `saved` is always null, so nothing is
+added to a counter. `kind` is one of `usage report` (tokens consumed), `status report`
+(index or store state), `cache report` (cache hits and cached tokens) or
+`savings report` (an upstream estimate retained as evidence, not counted).
+
+```json
+"report_sources": [
+  {"name": "ccusage claude daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "claude", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Claude Code sessions only; consumption, not avoided tokens"},
+  {"name": "ccusage codex daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "codex", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Codex sessions only; consumption, not avoided tokens"},
+  {"name": "ai-memory status", "tool": "ai-memory", "kind": "status report",
+   "argv": ["/abs/ai-memory", "status", "--json"], "boundary": "Store and index state; no token counter"},
+  {"name": "qmd catalog status", "tool": "qmd", "kind": "status report", "format": "text",
+   "argv": ["/abs/qmd", "--index", "native-agent-stack-catalog", "status"],
+   "boundary": "Named index state; the default index is a different store"},
+  {"name": "agentsview usage daily", "tool": "agentsview", "kind": "usage report",
+   "argv": ["/abs/agentsview", "usage", "daily", "--no-sync", "--offline", "--json"],
+   "boundary": "Archived sessions only; --no-sync reads without syncing new history"},
+  {"name": "OmniRoute prompt cache", "tool": "omniroute", "kind": "cache report",
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
+   "boundary": "Cached input tokens over the gateway's retained usage history (30 days by upstream default); the response also carries upstream savings estimates, retained as evidence and never counted"},
+  {"name": "OmniRoute compression", "tool": "omniroute", "kind": "savings report",
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
+   "boundary": "Upstream compression estimate with skip reasons; since=all spans the gateway's retained analytics (30 days by upstream default), not its lifetime; retained, never counted"}
+]
+```
+
+Each ccusage entry selects one source, as upstream's `ccusage claude daily` and
+`ccusage codex daily` do; the bare `ccusage daily` covers every detected source and
+mixes agents in one report. The OmniRoute entries give curl as `/usr/bin/curl`;
+adjust that absolute path per host.
+
+`tool` must be the component id in `manifests/stack.json` (for example
+`jcodemunch-mcp`), so the report lands on that component's row. Its command and
+boundary also replace the row's generic "no counter" text. A report is stored under
+the scope `Report / <name>`, which never equals a counter's scope, so it cannot
+replace a counter's last good value. Names must stay unique after punctuation is
+folded into `-`, because each name becomes a capture folder. `format` defaults to
+`json`; a JSON report that fails to parse, or a nonzero exit, is a failed report,
+and the last good report stays separate. Give `curl` `--fail-with-body`, so an HTTP
+error exits nonzero while its body is still retained. `timeout` defaults to 60
+seconds (1–600). Select only aggregate routes: OmniRoute's `/api/usage/analytics`
+and call-log routes carry per-account rows with account emails.
+
+`argv` is stored literally: in each capture's `receipt.json`, in the ledger
+snapshots and in `manifest.json` and `manifest.html`. Keep credentials out of it; a
+command that needs one should read it from the environment, which the reporter
+passes to every command unchanged. Give `argv[0]` as an absolute path: commands run
+in the configured `project` directory, so a relative path resolves against it (a
+bare name such as `curl` is searched on `PATH`). A command runs with the reporter's
+standard input until it exits or its `timeout` expires. Its whole output is held in
+memory, and a successful JSON report is stored twice in its snapshot, as
+`stdout_text` and as the parsed `raw`, so use bounded queries for full-history
+reports.
+
+The OmniRoute entries send no credential. OmniRoute (the 3.8.50 pin in
+`manifests/stack.json`) answers both routes without one only while its login is
+off (`requireLogin` false; the upstream default is true) or during first-run setup
+from loopback (`src/shared/utils/apiAuth.ts`). Otherwise they require management
+credentials, such as a dashboard session or a manage-scope API key in an
+`Authorization: Bearer` header, never in the URL. A host that keeps the dashboard
+login therefore gets 401: `curl --fail-with-body` exits 22, and the refresh records
+a failed report and an issue and exits nonzero. Do not add the key to `argv`, which
+is retained verbatim (see above). Use curl's header-file form instead,
+`-H @/absolute/path/omniroute.header`, which `curl --manual` describes as adding "a
+header for each line in the input file" (added in curl 7.55.0). The file holds the
+one line `Authorization: Bearer <key>`, with mode `0600`, outside every worktree like
+the [secret store](../../docs/secret-storage.md#storage-rules); only its path is
+retained.
+
+Loading the configuration rejects a report entry whose `argv` element contains a NUL
+character, whose name, `tool`, `boundary` or `argv` element cannot be encoded as
+UTF-8 (a lone surrogate such as `\ud800` in the JSON), or whose name folds to a
+capture folder label over 100 characters (`report-` plus the folded name, so the
+folded name keeps at most 93). It also rejects a `counter_scopes` value or
+`context_roots` name that starts with `Report / `, the prefix reserved for reports.
+A report whose `tool` is not a component id is still
+captured and recorded, but it adds an issue, so every refresh exits nonzero until
+the id is corrected; a stack manifest that is missing, unreadable or lists no
+component skips this check.
+
+The [scheduled unit](../../adoption/templates/systemd/token-report-refresh.service)
+is a oneshot with `TimeoutStartSec=900`, and a refresh runs its captures one after
+another. The sum of the report `timeout`s and the counter captures' own 60-second
+limits must therefore stay within those 900 seconds, or systemd marks the run
+failed and stops it. A steady-state refresh with a 106,000-row RTK history took about 35
+seconds (measured once on one host, 2026-09-29 UTC).
 
 ## Exact artifact comparisons
 
 Install the pinned tokenizer only if you need retained-text comparisons:
 
 ```sh
-npm install --prefix "$REPORT_TOOLS/tokenizer" gpt-tokenizer@3.4.0
+npm install --prefix "$REPORT_TOOLS/tokenizer" --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 ```
 
 Set `tokenizer_module` in the private configuration to the absolute path of
@@ -131,8 +324,37 @@ comparison against compact JSON, with that result stored separately.
 ## Read the numbers correctly
 
 - RTK global and project snapshots overlap. The report never sums them.
-- Headroom 0.37.0 calls a 30-day estimate `lifetime`.
-- Context Mode 1.0.169 uses retained-event and byte estimates with finite retention.
+- RTK's total is uncapped. Each row saves `max(0, raw - filtered)`, with both
+  sides in `ceil(bytes/4)`, so a few very large outputs can dominate the total.
+  Rows where filtering made the output longer count as 0.
+- When `rtk_database` is configured, the global snapshot adds `client_visible`,
+  which re-counts every row as a client first shows the output:
+  - whole up to `client_inline_chars` (default 30000, allowed 4000–128000);
+  - otherwise a preview of at most `client_preview_chars` (default 2000, which
+    must stay below the inline limit).
+
+  Those defaults are Claude Code 2.1.282's `bashOutputMaxChars` and its
+  saved-output preview. The boundary text says "by default" only when both
+  limits are the defaults.
+  - **Sign:** the view keeps the sign, so an expansion, or a filtered output
+    longer than the raw output's preview, counts as `added`. Its net therefore
+    differs from the floored upstream total.
+  - **It is a model, not a bound:**
+    - bytes stand in for characters, which is exact only for ASCII;
+    - the preview's wrapper text and later reads of saved output files are not
+      counted;
+    - rows from scripts that no client displayed are included;
+    - Codex has its own output limits.
+  - **Mismatch check:** if the configured database holds more than 1% fewer rows
+    than `rtk gain` reported, the view is omitted and an issue names the
+    mismatch. The 1% allows for retention pruning between the two reads.
+- Headroom 0.37.0 calls a 30-day estimate `lifetime`, and
+  `headroom savings --json` also prints zero when its ledger file does not
+  exist. When the report names its ledger path, the snapshot records
+  `ledger_present`. It resolves a relative path from the configured project, the
+  directory Headroom runs in, so an absent ledger is not read as a measured zero.
+- Context Mode 1.0.169 uses retained-event and byte estimates with finite
+  retention. Its `tokens_saved_lifetime` is retained events × 256.
 - jcodemunch's persistent total estimates bytes avoided divided by four and can
   include repeated verification reads. Its schema-size estimate is a separate field.
 - Exact artifact counts use `o200k_base`; they are not provider billing or measured

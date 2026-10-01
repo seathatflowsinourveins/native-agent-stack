@@ -114,6 +114,22 @@ class RecipeHistoryTests(unittest.TestCase):
         for name, expected in history["unchanged_historical_evidence"].items():
             self.assertEqual(hashlib.sha256((HERE / name).read_bytes()).hexdigest(), expected)
 
+    def test_relocated_frozen_inputs_keep_their_original_bytes(self):
+        history = json.loads((HERE / "history/recipe-revisions.json").read_text())
+        repo = HERE.parents[2]
+        for row in history.get("relocated_frozen_inputs", []):
+            with self.subTest(record=row["record"]):
+                old = (HERE / row["original"]["retained_path"]).read_bytes()
+                current = (HERE / row["record"]).read_bytes()
+                self.assertEqual(hashlib.sha256(old).hexdigest(), row["original"]["sha256"])
+                self.assertEqual(hashlib.sha256(current).hexdigest(), row["current_sha256"])
+                moved = row["relocated"]
+                # Only the path changes; the frozen hash names the same retained bytes.
+                self.assertEqual(
+                    old.replace(moved["from_path"].encode(), moved["to_path"].encode()), current)
+                self.assertEqual(
+                    hashlib.sha256((repo / moved["to_path"]).read_bytes()).hexdigest(), moved["sha256"])
+
 
 if __name__ == "__main__":
     unittest.main()

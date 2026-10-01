@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "kind": "blind_lane_return",
+  "lane": "codex",
+  "packet": "sota-models",
+  "run_label": "codex-sota-models-lane",
+  "attempt": 1,
+  "packet_sha256": "1847b3a1a0508078076f8d114e9ea1a021a92f8322f8e13e4f2482ca18f5a51a",
+  "model": {
+    "name": "gpt-6-astra",
+    "effort": null,
+    "family": "openai"
+  },
+  "model_note": "GPT-6 Astra as the coordinator's stage-one note names it; the retained JSON event stream does not repeat the session header, so the resolved model, the effort and the Codex CLI version are not recorded.",
+  "client": "codex exec with live web search, working directory the coordinator's lanes directory; sandbox and config flags were not retained",
+  "source_file": "sota-models-codex.md",
+  "original_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+  "original_bytes": 6589,
+  "recorder_header": null,
+  "recorder_header_note": null,
+  "blinded_sha256": "a3fa6b77be06cb7456c6c41f95a315a8d506d62e3b277aa7d1704544aeb737f0",
+  "return_text": "As of **2026-09-24**, these are ranked **benchmark candidates**. I found no evidence establishing a universal winner or guaranteed 20-second completion on this Mac. Scores below are **vendor/author-reported**, not independently reproduced; different benchmark protocols are not directly comparable.\n\n**1. Text embeddings**\n\n1. **Nemotron-3-Embed-8B-BF16 — NVIDIA; strongest quality challenger.** Released **2026-07-16**; **8B, OpenMDW-1.1, 32,768 tokens**. NVIDIA’s **July 15 leaderboard snapshot** shows first place; its evaluation reports **RTEB16 nDCG@10 78.46**, **MMTEB retrieval 75.45**. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16), [release/results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`Abiray/Nemotron-3-Embed-8B-GGUF`](https://huggingface.co/Abiray/Nemotron-3-Embed-8B-GGUF), `Nemotron-3-Embed-8B-Q8_0.gguf`; publication date **unverified**.\n\n2. **Nemotron-3-Embed-1B-BF16 — NVIDIA; efficiency challenger.** Released **2026-07-16**; **1.14B, OpenMDW-1.1, 32,768 tokens**. Same evaluation: **RTEB16 72.38**, **MMTEB retrieval 71.04**. The release quotes partner-reported **LongMemEval Retrieval@10 80.38%**; methodology and S variant remain unconfirmed. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), [results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`mlx-community/Nemotron-3-Embed-1B-BF16-8bit`](https://huggingface.co/mlx-community/Nemotron-3-Embed-1B-BF16-8bit); publication date **unverified**.\n\n3. **Qwen3-Embedding-8B — Alibaba/Qwen; established deployment control.** Released **2025-06-05**; **8B, Apache-2.0, 32K tokens**. **MMTEB retrieval 70.88**, comparison snapshot **2025-05-24**. [Release](https://qwenlm.github.io/blog/qwen3-embedding/), [card/results](https://huggingface.co/Qwen/Qwen3-Embedding-8B). Official [`Qwen/Qwen3-Embedding-8B-GGUF`](https://huggingface.co/Qwen/Qwen3-Embedding-8B-GGUF/commits/main/Qwen3-Embedding-8B-Q8_0.gguf): Q8_0 first uploaded **2025-06-05**, replaced **2025-07-15**.\n\n**2. Reranking**\n\n1. **MemReranker-4B — IAAR-Shanghai; closest workload match.** [Official weights](https://huggingface.co/IAAR-Shanghai/MemReranker-4B/commits/main) published **2026-04-27**; **4B, Apache-2.0, 32K base context**, trained at **8,192 tokens**. **May 7 paper snapshot:** LongMemEval **nDCG@10 0.8354**, **MAP 0.8043**, using a fixed top-50 candidate set. [Paper](https://arxiv.org/html/2605.06132v1). Community MLX [`nisavid/MemReranker-4B-OptiQ-4bit`](https://huggingface.co/nisavid/MemReranker-4B-OptiQ-4bit); first publication **unverified**, updated July 11.\n\n2. **Jina Reranker v3.5 — Jina AI; compact listwise candidate.** Released **2026-07-27**; **0.6B, CC-BY-NC-4.0, 131K combined context**. [Specifications](https://jina.ai/models/jina-reranker-v3.5). **August 3 evaluation:** **BEIR nDCG@10 63.20**, **MIRACL 74.11**. [Results](https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation). Official [`jinaai/jina-reranker-v3.5-mlx`](https://huggingface.co/jinaai/jina-reranker-v3.5-mlx/commits/main) published **2026-07-24**; requires its custom reranking implementation.\n\n3. **Ettin Reranker 400M v1 — Tom Aarsen/Sentence Transformers; Node candidate.** Released **2026-05-19**; **401.6M, Apache-2.0, 8K tokens**. Same-day **MTEB English v2 retrieval nDCG@10 0.6091**, averaged across six retrievers/ten tasks. [Release/results](https://huggingface.co/blog/ettin-reranker). Official [`cross-encoder/ettin-reranker-400m-v1`](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/commit/6fc3168063f7ab30e071f379bc483859e02a4c87), `onnx/model_qint8_arm64.onnx`, published **May 19**. MLX/GGUF and Transformers.js integration **unverified**.\n\n**3. Consolidation and listwise LLM**\n\n1. **Qwen3.5-9B — Alibaba/Qwen; retain as control.** Released **2026-03-02**; **9B, Apache-2.0, 262,144 native context**, extensible to 1,010,000. **LongBench v2 55.2**; card observed September 24, evaluation date unspecified. This supports long-context processing, not ranking accuracy. [Release history](https://github.com/QwenLM/Qwen3.8/blob/main/README.md), [card](https://huggingface.co/Qwen/Qwen3.5-9B). Community [`mlx-community/Qwen3.5-9B-4bit`](https://huggingface.co/mlx-community/Qwen3.5-9B-4bit/commits/main) published **March 2**.\n\n2. **LFM2.5-2.6B — Liquid AI; speed challenger.** Released **2026-08-04**; **2.69B, LFM1.0, 131,072 tokens**. No direct memory/retrieval score found; **IFStruct 85.49** is only a structured-output proxy, card observed September 24. [Release](https://www.liquid.ai/blog/lfm2-5-2-6b), [card](https://huggingface.co/LiquidAI/LFM2.5-2.6B). Official [`LiquidAI/LFM2.5-2.6B-GGUF`](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF/commits/main) published **August 4**; current `LFM2.5-2.6B-Q4_K_M.gguf` uploaded **August 19**.\n\n3. **MemReader-4B-thinking — IAAR-Shanghai; consolidation-only experiment.** [Paper released April 9, 2026](https://arxiv.org/abs/2604.07877); **4B, Apache-2.0, 40,960 tokens**. **LongMemEval 83.00%** is a whole-pipeline result requiring four memory tools, not standalone summarization/listwise ranking. [Card/results](https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking/blob/main/README.md). Community [`mradermacher/MemReader-4B-thinking-GGUF`](https://huggingface.co/mradermacher/MemReader-4B-thinking-GGUF); publication date **unverified**.\n\n**Benchmark replacements:** Nemotron 1B challenges your current 0.6B embedder and Node embedding default; Nemotron 8B challenges the 4B/8B embedders. All three rerankers challenge the bundled cross-encoder and current LLM reranking. LFM challenges Qwen3.5-9B for both tasks; MemReader challenges consolidation only. Keep existing models as controls; measure session recall, answer correctness, consolidation fidelity and complete-request p95 latency at 4K/8K.\n\n**Risks:** Jina’s license is noncommercial; Liquid’s is custom. Nemotron needs correct bidirectional attention/pooling; an [unresolved LM Studio report](https://github.com/lmstudio-ai/lmstudio-bug-tracker/issues/2177) documents wrong-dimensional outputs. Specialized rerankers need adapters. Reserve context for queries/templates and entire candidate lists. Liquid always reasons; its [220 tokens/s M5 Max CPU result](https://www.liquid.ai/blog/lfm2-5-2-6b) does not establish M5 Pro prefill or 20-second latency. Local speed and quantized accuracy remain unverified.\n\nThe browser permission check denied live Hugging Face leaderboard access; September 24 standings were not verified.",
+  "output_contract_check": {
+    "shortlist_counts": {
+      "1. Text embeddings": 3,
+      "2. Reranking": 3,
+      "3. Consolidation and listwise LLM": 3
+    },
+    "shortlist_limit_per_role": 3,
+    "within_shortlist_limit": true,
+    "words_whitespace_split": 528,
+    "word_scope": "the whole return",
+    "word_limit": 900,
+    "within_limit": true
+  },
+  "sections": [
+    {
+      "heading": null,
+      "text": "As of **2026-09-24**, these are ranked **benchmark candidates**. I found no evidence establishing a universal winner or guaranteed 20-second completion on this Mac. Scores below are **vendor/author-reported**, not independently reproduced; different benchmark protocols are not directly comparable."
+    },
+    {
+      "heading": "1. Text embeddings",
+      "text": "1. **Nemotron-3-Embed-8B-BF16 — NVIDIA; strongest quality challenger.** Released **2026-07-16**; **8B, OpenMDW-1.1, 32,768 tokens**. NVIDIA’s **July 15 leaderboard snapshot** shows first place; its evaluation reports **RTEB16 nDCG@10 78.46**, **MMTEB retrieval 75.45**. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16), [release/results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`Abiray/Nemotron-3-Embed-8B-GGUF`](https://huggingface.co/Abiray/Nemotron-3-Embed-8B-GGUF), `Nemotron-3-Embed-8B-Q8_0.gguf`; publication date **unverified**.\n\n2. **Nemotron-3-Embed-1B-BF16 — NVIDIA; efficiency challenger.** Released **2026-07-16**; **1.14B, OpenMDW-1.1, 32,768 tokens**. Same evaluation: **RTEB16 72.38**, **MMTEB retrieval 71.04**. The release quotes partner-reported **LongMemEval Retrieval@10 80.38%**; methodology and S variant remain unconfirmed. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), [results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`mlx-community/Nemotron-3-Embed-1B-BF16-8bit`](https://huggingface.co/mlx-community/Nemotron-3-Embed-1B-BF16-8bit); publication date **unverified**.\n\n3. **Qwen3-Embedding-8B — Alibaba/Qwen; established deployment control.** Released **2025-06-05**; **8B, Apache-2.0, 32K tokens**. **MMTEB retrieval 70.88**, comparison snapshot **2025-05-24**. [Release](https://qwenlm.github.io/blog/qwen3-embedding/), [card/results](https://huggingface.co/Qwen/Qwen3-Embedding-8B). Official [`Qwen/Qwen3-Embedding-8B-GGUF`](https://huggingface.co/Qwen/Qwen3-Embedding-8B-GGUF/commits/main/Qwen3-Embedding-8B-Q8_0.gguf): Q8_0 first uploaded **2025-06-05**, replaced **2025-07-15**."
+    },
+    {
+      "heading": "2. Reranking",
+      "text": "1. **MemReranker-4B — IAAR-Shanghai; closest workload match.** [Official weights](https://huggingface.co/IAAR-Shanghai/MemReranker-4B/commits/main) published **2026-04-27**; **4B, Apache-2.0, 32K base context**, trained at **8,192 tokens**. **May 7 paper snapshot:** LongMemEval **nDCG@10 0.8354**, **MAP 0.8043**, using a fixed top-50 candidate set. [Paper](https://arxiv.org/html/2605.06132v1). Community MLX [`nisavid/MemReranker-4B-OptiQ-4bit`](https://huggingface.co/nisavid/MemReranker-4B-OptiQ-4bit); first publication **unverified**, updated July 11.\n\n2. **Jina Reranker v3.5 — Jina AI; compact listwise candidate.** Released **2026-07-27**; **0.6B, CC-BY-NC-4.0, 131K combined context**. [Specifications](https://jina.ai/models/jina-reranker-v3.5). **August 3 evaluation:** **BEIR nDCG@10 63.20**, **MIRACL 74.11**. [Results](https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation). Official [`jinaai/jina-reranker-v3.5-mlx`](https://huggingface.co/jinaai/jina-reranker-v3.5-mlx/commits/main) published **2026-07-24**; requires its custom reranking implementation.\n\n3. **Ettin Reranker 400M v1 — Tom Aarsen/Sentence Transformers; Node candidate.** Released **2026-05-19**; **401.6M, Apache-2.0, 8K tokens**. Same-day **MTEB English v2 retrieval nDCG@10 0.6091**, averaged across six retrievers/ten tasks. [Release/results](https://huggingface.co/blog/ettin-reranker). Official [`cross-encoder/ettin-reranker-400m-v1`](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/commit/6fc3168063f7ab30e071f379bc483859e02a4c87), `onnx/model_qint8_arm64.onnx`, published **May 19**. MLX/GGUF and Transformers.js integration **unverified**."
+    },
+    {
+      "heading": "3. Consolidation and listwise LLM",
+      "text": "1. **Qwen3.5-9B — Alibaba/Qwen; retain as control.** Released **2026-03-02**; **9B, Apache-2.0, 262,144 native context**, extensible to 1,010,000. **LongBench v2 55.2**; card observed September 24, evaluation date unspecified. This supports long-context processing, not ranking accuracy. [Release history](https://github.com/QwenLM/Qwen3.8/blob/main/README.md), [card](https://huggingface.co/Qwen/Qwen3.5-9B). Community [`mlx-community/Qwen3.5-9B-4bit`](https://huggingface.co/mlx-community/Qwen3.5-9B-4bit/commits/main) published **March 2**.\n\n2. **LFM2.5-2.6B — Liquid AI; speed challenger.** Released **2026-08-04**; **2.69B, LFM1.0, 131,072 tokens**. No direct memory/retrieval score found; **IFStruct 85.49** is only a structured-output proxy, card observed September 24. [Release](https://www.liquid.ai/blog/lfm2-5-2-6b), [card](https://huggingface.co/LiquidAI/LFM2.5-2.6B). Official [`LiquidAI/LFM2.5-2.6B-GGUF`](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF/commits/main) published **August 4**; current `LFM2.5-2.6B-Q4_K_M.gguf` uploaded **August 19**.\n\n3. **MemReader-4B-thinking — IAAR-Shanghai; consolidation-only experiment.** [Paper released April 9, 2026](https://arxiv.org/abs/2604.07877); **4B, Apache-2.0, 40,960 tokens**. **LongMemEval 83.00%** is a whole-pipeline result requiring four memory tools, not standalone summarization/listwise ranking. [Card/results](https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking/blob/main/README.md). Community [`mradermacher/MemReader-4B-thinking-GGUF`](https://huggingface.co/mradermacher/MemReader-4B-thinking-GGUF); publication date **unverified**.\n\n**Benchmark replacements:** Nemotron 1B challenges your current 0.6B embedder and Node embedding default; Nemotron 8B challenges the 4B/8B embedders. All three rerankers challenge the bundled cross-encoder and current LLM reranking. LFM challenges Qwen3.5-9B for both tasks; MemReader challenges consolidation only. Keep existing models as controls; measure session recall, answer correctness, consolidation fidelity and complete-request p95 latency at 4K/8K.\n\n**Risks:** Jina’s license is noncommercial; Liquid’s is custom. Nemotron needs correct bidirectional attention/pooling; an [unresolved LM Studio report](https://github.com/lmstudio-ai/lmstudio-bug-tracker/issues/2177) documents wrong-dimensional outputs. Specialized rerankers need adapters. Reserve context for queries/templates and entire candidate lists. Liquid always reasons; its [220 tokens/s M5 Max CPU result](https://www.liquid.ai/blog/lfm2-5-2-6b) does not establish M5 Pro prefill or 20-second latency. Local speed and quantized accuracy remain unverified.\n\nThe browser permission check denied live Hugging Face leaderboard access; September 24 standings were not verified."
+    }
+  ],
+  "items": [
+    {
+      "section": "1. Text embeddings",
+      "marker": "1.",
+      "name": "Nemotron-3-Embed-8B-BF16 — NVIDIA; strongest quality challenger.",
+      "text": "1. **Nemotron-3-Embed-8B-BF16 — NVIDIA; strongest quality challenger.** Released **2026-07-16**; **8B, OpenMDW-1.1, 32,768 tokens**. NVIDIA’s **July 15 leaderboard snapshot** shows first place; its evaluation reports **RTEB16 nDCG@10 78.46**, **MMTEB retrieval 75.45**. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16), [release/results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`Abiray/Nemotron-3-Embed-8B-GGUF`](https://huggingface.co/Abiray/Nemotron-3-Embed-8B-GGUF), `Nemotron-3-Embed-8B-Q8_0.gguf`; publication date **unverified**."
+    },
+    {
+      "section": "1. Text embeddings",
+      "marker": "2.",
+      "name": "Nemotron-3-Embed-1B-BF16 — NVIDIA; efficiency challenger.",
+      "text": "2. **Nemotron-3-Embed-1B-BF16 — NVIDIA; efficiency challenger.** Released **2026-07-16**; **1.14B, OpenMDW-1.1, 32,768 tokens**. Same evaluation: **RTEB16 72.38**, **MMTEB retrieval 71.04**. The release quotes partner-reported **LongMemEval Retrieval@10 80.38%**; methodology and S variant remain unconfirmed. [Card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), [results](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb). Local: community [`mlx-community/Nemotron-3-Embed-1B-BF16-8bit`](https://huggingface.co/mlx-community/Nemotron-3-Embed-1B-BF16-8bit); publication date **unverified**."
+    },
+    {
+      "section": "1. Text embeddings",
+      "marker": "3.",
+      "name": "Qwen3-Embedding-8B — Alibaba/Qwen; established deployment control.",
+      "text": "3. **Qwen3-Embedding-8B — Alibaba/Qwen; established deployment control.** Released **2025-06-05**; **8B, Apache-2.0, 32K tokens**. **MMTEB retrieval 70.88**, comparison snapshot **2025-05-24**. [Release](https://qwenlm.github.io/blog/qwen3-embedding/), [card/results](https://huggingface.co/Qwen/Qwen3-Embedding-8B). Official [`Qwen/Qwen3-Embedding-8B-GGUF`](https://huggingface.co/Qwen/Qwen3-Embedding-8B-GGUF/commits/main/Qwen3-Embedding-8B-Q8_0.gguf): Q8_0 first uploaded **2025-06-05**, replaced **2025-07-15**."
+    },
+    {
+      "section": "2. Reranking",
+      "marker": "1.",
+      "name": "MemReranker-4B — IAAR-Shanghai; closest workload match.",
+      "text": "1. **MemReranker-4B — IAAR-Shanghai; closest workload match.** [Official weights](https://huggingface.co/IAAR-Shanghai/MemReranker-4B/commits/main) published **2026-04-27**; **4B, Apache-2.0, 32K base context**, trained at **8,192 tokens**. **May 7 paper snapshot:** LongMemEval **nDCG@10 0.8354**, **MAP 0.8043**, using a fixed top-50 candidate set. [Paper](https://arxiv.org/html/2605.06132v1). Community MLX [`nisavid/MemReranker-4B-OptiQ-4bit`](https://huggingface.co/nisavid/MemReranker-4B-OptiQ-4bit); first publication **unverified**, updated July 11."
+    },
+    {
+      "section": "2. Reranking",
+      "marker": "2.",
+      "name": "Jina Reranker v3.5 — Jina AI; compact listwise candidate.",
+      "text": "2. **Jina Reranker v3.5 — Jina AI; compact listwise candidate.** Released **2026-07-27**; **0.6B, CC-BY-NC-4.0, 131K combined context**. [Specifications](https://jina.ai/models/jina-reranker-v3.5). **August 3 evaluation:** **BEIR nDCG@10 63.20**, **MIRACL 74.11**. [Results](https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation). Official [`jinaai/jina-reranker-v3.5-mlx`](https://huggingface.co/jinaai/jina-reranker-v3.5-mlx/commits/main) published **2026-07-24**; requires its custom reranking implementation."
+    },
+    {
+      "section": "2. Reranking",
+      "marker": "3.",
+      "name": "Ettin Reranker 400M v1 — Tom Aarsen/Sentence Transformers; Node candidate.",
+      "text": "3. **Ettin Reranker 400M v1 — Tom Aarsen/Sentence Transformers; Node candidate.** Released **2026-05-19**; **401.6M, Apache-2.0, 8K tokens**. Same-day **MTEB English v2 retrieval nDCG@10 0.6091**, averaged across six retrievers/ten tasks. [Release/results](https://huggingface.co/blog/ettin-reranker). Official [`cross-encoder/ettin-reranker-400m-v1`](https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/commit/6fc3168063f7ab30e071f379bc483859e02a4c87), `onnx/model_qint8_arm64.onnx`, published **May 19**. MLX/GGUF and Transformers.js integration **unverified**."
+    },
+    {
+      "section": "3. Consolidation and listwise LLM",
+      "marker": "1.",
+      "name": "Qwen3.5-9B — Alibaba/Qwen; retain as control.",
+      "text": "1. **Qwen3.5-9B — Alibaba/Qwen; retain as control.** Released **2026-03-02**; **9B, Apache-2.0, 262,144 native context**, extensible to 1,010,000. **LongBench v2 55.2**; card observed September 24, evaluation date unspecified. This supports long-context processing, not ranking accuracy. [Release history](https://github.com/QwenLM/Qwen3.8/blob/main/README.md), [card](https://huggingface.co/Qwen/Qwen3.5-9B). Community [`mlx-community/Qwen3.5-9B-4bit`](https://huggingface.co/mlx-community/Qwen3.5-9B-4bit/commits/main) published **March 2**."
+    },
+    {
+      "section": "3. Consolidation and listwise LLM",
+      "marker": "2.",
+      "name": "LFM2.5-2.6B — Liquid AI; speed challenger.",
+      "text": "2. **LFM2.5-2.6B — Liquid AI; speed challenger.** Released **2026-08-04**; **2.69B, LFM1.0, 131,072 tokens**. No direct memory/retrieval score found; **IFStruct 85.49** is only a structured-output proxy, card observed September 24. [Release](https://www.liquid.ai/blog/lfm2-5-2-6b), [card](https://huggingface.co/LiquidAI/LFM2.5-2.6B). Official [`LiquidAI/LFM2.5-2.6B-GGUF`](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF/commits/main) published **August 4**; current `LFM2.5-2.6B-Q4_K_M.gguf` uploaded **August 19**."
+    },
+    {
+      "section": "3. Consolidation and listwise LLM",
+      "marker": "3.",
+      "name": "MemReader-4B-thinking — IAAR-Shanghai; consolidation-only experiment.",
+      "text": "3. **MemReader-4B-thinking — IAAR-Shanghai; consolidation-only experiment.** [Paper released April 9, 2026](https://arxiv.org/abs/2604.07877); **4B, Apache-2.0, 40,960 tokens**. **LongMemEval 83.00%** is a whole-pipeline result requiring four memory tools, not standalone summarization/listwise ranking. [Card/results](https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking/blob/main/README.md). Community [`mradermacher/MemReader-4B-thinking-GGUF`](https://huggingface.co/mradermacher/MemReader-4B-thinking-GGUF); publication date **unverified**."
+    }
+  ],
+  "tables": [],
+  "sources_read": [
+    "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+    "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb",
+    "https://huggingface.co/Abiray/Nemotron-3-Embed-8B-GGUF",
+    "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+    "https://huggingface.co/mlx-community/Nemotron-3-Embed-1B-BF16-8bit",
+    "https://qwenlm.github.io/blog/qwen3-embedding/",
+    "https://huggingface.co/Qwen/Qwen3-Embedding-8B",
+    "https://huggingface.co/Qwen/Qwen3-Embedding-8B-GGUF/commits/main/Qwen3-Embedding-8B-Q8_0.gguf",
+    "https://huggingface.co/IAAR-Shanghai/MemReranker-4B/commits/main",
+    "https://arxiv.org/html/2605.06132v1",
+    "https://huggingface.co/nisavid/MemReranker-4B-OptiQ-4bit",
+    "https://jina.ai/models/jina-reranker-v3.5",
+    "https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation",
+    "https://huggingface.co/jinaai/jina-reranker-v3.5-mlx/commits/main",
+    "https://huggingface.co/blog/ettin-reranker",
+    "https://huggingface.co/cross-encoder/ettin-reranker-400m-v1/commit/6fc3168063f7ab30e071f379bc483859e02a4c87",
+    "https://github.com/QwenLM/Qwen3.8/blob/main/README.md",
+    "https://huggingface.co/Qwen/Qwen3.5-9B",
+    "https://huggingface.co/mlx-community/Qwen3.5-9B-4bit/commits/main",
+    "https://www.liquid.ai/blog/lfm2-5-2-6b",
+    "https://huggingface.co/LiquidAI/LFM2.5-2.6B",
+    "https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF/commits/main",
+    "https://arxiv.org/abs/2604.07877",
+    "https://huggingface.co/IAAR-Shanghai/MemReader-4B-thinking/blob/main/README.md",
+    "https://huggingface.co/mradermacher/MemReader-4B-thinking-GGUF",
+    "https://github.com/lmstudio-ai/lmstudio-bug-tracker/issues/2177"
+  ],
+  "event_stream": {
+    "items_completed": {
+      "agent_message": 6,
+      "command_execution": 1,
+      "web_search": 15,
+      "mcp_tool_call": 3
+    },
+    "web_search_items": 15,
+    "search_actions": 11,
+    "search_queries": 31,
+    "other_web_actions": 4,
+    "commands": [
+      {
+        "command": "/bin/zsh -lc 'cat sota-models-packet.md'",
+        "exit_code": 0
+      }
+    ],
+    "commands_note": "Commands as the stream records them, except that a local skills directory path is generalized to <agent-skills directory>.",
+    "mcp_tool_calls": [
+      {
+        "server": "cua_repl",
+        "tool": "js",
+        "status": "failed",
+        "outcome": "Browser is not available: iab"
+      },
+      {
+        "server": "cua_repl",
+        "tool": "js",
+        "status": "completed",
+        "outcome": "returned the browser API guide; no page was loaded"
+      },
+      {
+        "server": "cua_repl",
+        "tool": "js",
+        "status": "failed",
+        "outcome": "the browser security policy rejected opening the RTEB leaderboard because the user declined permission"
+      }
+    ]
+  },
+  "event_stream_page_opens": [
+    "https://huggingface.co/spaces/embedding-benchmark/RTEB/tree/main",
+    "https://embedding-benchmark-rteb.hf.space",
+    "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md"
+  ],
+  "event_stream_other_actions": [
+    ""
+  ],
+  "limits": [
+    "Discovery only: the lane did web research; nothing was installed, downloaded or executed on the Mac or VelaNext.",
+    "sections, items and tables are the recorder's transcription; every string in them is an exact substring of return_text (the answer part), and return_text is authoritative.",
+    "sources_read lists the URLs the answer cites, in order of first appearance; it is not a record of pages opened.",
+    "The JSON event stream (not committed) shows one local read of the packet (exit 0), 15 completed web_search items (11 searches carrying 31 queries and 4 other actions: 3 page opens and 1 empty) and 3 calls to a computer-use browser tool, none of which loaded a page. The return's last line reports that the leaderboard access was denied. No query or open names the excluded repositories; their only occurrence is the packet text the read echoed.",
+    "The coordinator's stage-one note said 30 web searches; amendment A15.2 corrects this to 15, which the stream confirms."
+  ]
+}

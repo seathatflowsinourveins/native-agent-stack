@@ -1,0 +1,24 @@
+# the facts-refuter test fails on the base templates (expect FAILED)
+# base (origin/main): b26add90becaed49cfd74f3cf48126b7fa9b5c86; tools/sota-convergence/landscape-sweep/templates.json from the base, every other file from the PR branch
+# blobs as run (git hash-object):
+#   366e9ad50aada106fce09d962b8e73d9d8d796d6  tests/test_adoption_docs_consistency.py
+#   df58da0b5af3a227de8ecf67b08ac7fcb373de42  tests/test_landscape_sweep_harness.py
+#   2705d4707837ea74223e851c0e355212c983aaba  docs/harness-defaults.md
+#   578322fe0881b1f5a29da2426bcc209ba51e9124  tools/sota-convergence/landscape-sweep/templates.json
+# Python 3.13.15
+$ python3 -m unittest tests.test_landscape_sweep_harness.TemplateTests.test_the_facts_refuter_states_the_unknown_field_maintenance_and_license_exceptions
+F
+======================================================================
+FAIL: test_the_facts_refuter_states_the_unknown_field_maintenance_and_license_exceptions (tests.test_landscape_sweep_harness.TemplateTests.test_the_facts_refuter_states_the_unknown_field_maintenance_and_license_exceptions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<pr1>/tests/test_landscape_sweep_harness.py", line 283, in test_the_facts_refuter_states_the_unknown_field_maintenance_and_license_exceptions
+    self.assertIn(phrase, facts)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 'a null upstream_now field means unknown' not found in 'ROLE: facts/identity refuter for ONE layer. Assume every proposal below may contain a false or unsupported fact.\nLayer: <<LAYER_ID>> -- requirement: <<REQUIREMENT>>\nProposals (JSON):\n<<PROPOSALS>>\nFor EACH proposal check with primary sources (GitHub API/pages via gh api or fetch; official docs): the repository exists at that canonical URL (or its rename), is not archived or abandoned contrary to the claim, and the license, latest release, release date, stars/activity and every cited evidence URL actually say what the proposal claims. Vote refuted=true if any material factual claim is false, unsupported by its cited source, or unverifiable; refuted=false only when you verified the facts. Default to refuted=true when uncertain. Give confidence 0..1, short reasoning, and the refs (URLs) you checked. One vote per proposal, same repository string. Set role to facts and layer_id to <<LAYER_ID>>.\nVerification budget (hard): at most 8 web searches, 10 page fetches and 30 GitHub API calls in total for all proposals.'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+# exit 1
