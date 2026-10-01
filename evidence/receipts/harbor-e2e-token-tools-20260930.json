@@ -1,0 +1,1078 @@
+{
+  "schema_version": 1,
+  "id": "harbor-e2e-token-tools-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "rtk",
+    "context-mode",
+    "serena",
+    "jcodemunch-mcp",
+    "headroom"
+  ],
+  "result_class": "e2e-results-summary",
+  "recorded_at_utc": "2026-10-01T09:28:54Z",
+  "claim": "On an upstream harness (Harbor v0.23.0, built-in claude_code agent), 288 trials on 36 SWE-bench Verified tasks established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does. On the catalog protocol's own metric (complete provider tokens, paired on the tasks both arms solved) headroom used 13% fewer tokens (ratio 0.867, interval 0.775 to 0.971) without an established cost reduction, rtk is inconclusive (0.955, 0.847 to 1.078), context-mode used 18% and jcodemunch 41% more. No trial in the run spawned a subagent.",
+  "evidence_class": "actual provider execution on one host: the 288 trials ran on 2026-09-30 from 06:16Z to 14:29Z, all after the preregistration freeze at 06:15:44Z; installation, oracle grading (no model call) and three smoke jobs ran earlier (2026-09-29 to 2026-09-30 06:14Z) and are not among the 288; historical for any new host (a new host collects its own evidence); summary receipt, the raw trial logs stay in private host state",
+  "run": {
+    "harness": "Harbor v0.23.0 (built-in claude_code agent)",
+    "client": "Claude Code 2.1.285",
+    "model": "Sonnet 5.5 at effort medium",
+    "trials": 288,
+    "tasks": 36,
+    "task_source": "SWE-bench/SWE-bench_Verified at 78f471bf, 36 of 36 tasks field-identical and oracle-verified",
+    "repetitions": "one trial per arm and task",
+    "arms": [
+      "lean",
+      "lean-r2 (time-matched repeat)",
+      "rtk",
+      "context-mode",
+      "serena",
+      "jcodemunch",
+      "headroom",
+      "full (five-tool stack)"
+    ],
+    "base_arms": "lean for rtk, context-mode, serena and jcodemunch (phase 1); lean-r2 for headroom and full (phase 2)",
+    "tools_under_test": {
+      "rtk": {
+        "version": "v0.50.0",
+        "install": "install.sh from the v0.50.0 tag, as its README documents",
+        "documented_in": "rtk-ai/rtk@1d87b8e7"
+      },
+      "context-mode": {
+        "version": "v1.0.169 (commit 589d8214)",
+        "install": "plugin marketplace pinned to the v1.0.169 tag, then plugin install, as its README documents",
+        "documented_in": "mksglu/context-mode@589d8214"
+      },
+      "serena": {
+        "version": "serena-agent 1.7.0 (PyPI)",
+        "install": "uv tool install, serena init, claude mcp add with its recommended system-prompt override and hooks block, as its client docs document",
+        "documented_in": "oraios/serena@949a27ef"
+      },
+      "jcodemunch": {
+        "version": "jcodemunch-mcp 1.108.319 (PyPI)",
+        "install": "uv tool install and its documented non-interactive init",
+        "documented_in": "jgravelle/jcodemunch-mcp@8f7b34ab"
+      },
+      "headroom": {
+        "version": "headroom-ai 0.39.1 with the all extra (PyPI)",
+        "install": "uv tool install, then deploy --scope provider --providers manual --target claude in the default cache mode (a proxy on a local port)",
+        "documented_in": "chopratejas/headroom@d13e1966"
+      },
+      "full": "the five tools above installed together through the same commands (codebase-memory-mcp is in no arm: its workspace rule refuses a top-level repository root)",
+      "also_pinned": {
+        "claude_code": "2.1.285 (agent kwarg)",
+        "node": "v22.23.3 (sha256-checked tarball pre-step, identical for every arm)",
+        "harbor": "0.23.0",
+        "scipy": "1.18.1",
+        "statsmodels": "0.15.0",
+        "numpy": "2.5.3"
+      }
+    },
+    "wrapper_and_configuration_identity": {
+      "freeze_file_sha256": "794580c3efb034fe0a06c08b5a05ca38c85a3c58979054eb3d1c3d1c99a99b9d",
+      "note": "every wrapper, configuration and analysis file below is hash-listed in the freeze file; today's sha256 of each equals the frozen one",
+      "frozen_inputs": [
+        {
+          "file": "PREREGISTRATION.md",
+          "frozen_sha256": "73266ab1221ac17112430628a9eeafebf685095c70836f8768754bb4ed45e49c",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "arms/native_arms.py",
+          "frozen_sha256": "d61287f6dc35f6d923ede6c1b8858eea470001a4a34739f89e2672bb43b159b9",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "arms/make_arms.py",
+          "frozen_sha256": "92f00b9b3009c668d7abb1285e97690e512a4b351adbe2166b0e4b285b83072f",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "arms/arms.json",
+          "frozen_sha256": "0dd4f4f47afc69ada8f92c8be586bf05b65a1e92c921743d75bd0c81daaeab76",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "make_job.py",
+          "frozen_sha256": "f5e8691ed254ccf6be2119ce0889c3f2037ef8ddcca145134481ac308de2e6ea",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "base_config.json",
+          "frozen_sha256": "54ccaf440627b88172d4614901aac9e74334646007705a85fa5d8ee59ba1d9f9",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "analyze.py",
+          "frozen_sha256": "a93ddd3b0f3b706abc5f006245ac7ebdf8fe7ea45b5b51d497e29733a815d313",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "run_job.sh",
+          "frozen_sha256": "1fd5ad61dc6aa91f80c7f6d9b439e7b53cf7532df97678adc55f2c7c1045071d",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "run_batch.sh",
+          "frozen_sha256": "7d5d2231c1318e43e0ef7c526396088aa1f72d56fb9918daaf5d7911bd3ece25",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "smoke_gate.py",
+          "frozen_sha256": "c08e7c88c035369a76bc0e39f40e47039dee2bd9626141d8f8f63f3b47e4d7ea",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "meters.sh",
+          "frozen_sha256": "1051189779afabb94a8d4e671e3f196dc5c32cd54c1afe8b3cf3b25df5a80862",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "make_allowlist_tasks.py",
+          "frozen_sha256": "d09cf2ceb3c409b078f349c4fe0a23778448ae4079c060a67f1f459f9215202a",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "datasets/swebench-verified-allowlist/_policy.json",
+          "frozen_sha256": "c65c27e2ee940a94992f3e91264103e32cba7906e91d1f3f599c3562f585a7d1",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "tasks_final.json",
+          "frozen_sha256": "b4455129593895889eeb7b9c7e2756ba33acc99848e912a50b3cee023cda3027",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "provenance.json",
+          "frozen_sha256": "017166381417119e1dcf91abe8b6b2aa2a0013f9336285bb5adf32832449bd93",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "selection.json",
+          "frozen_sha256": "89841879ba0fad5fbb548c924da80be1b269ae079e3b660c0942c28edd9a770a",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "select_tasks.py",
+          "frozen_sha256": "dc1ba0bdce34d359d33ee176f90c623174556b33d1b039913a515f6ff0b10dcf",
+          "unchanged_since_freeze": true
+        },
+        {
+          "file": "harbor-0.23.0.dist-info/RECORD",
+          "frozen_sha256": "5cb03cd7929edadbd01c4b0f9c1d4b7bbc48b4a3d1b884c706d93b0f3b2c873a",
+          "unchanged_since_freeze": "not re-verified (installed distribution record or an aggregate)"
+        },
+        {
+          "file": "datasets/swebench-verified-allowlist/** (aggregate of all task files)",
+          "frozen_sha256": "4d8dd1892eb3c3773332c4a82d78898f4eedb37128b70e1b35a43954cec7581d",
+          "unchanged_since_freeze": "not re-verified (installed distribution record or an aggregate)"
+        }
+      ]
+    },
+    "preregistration": {
+      "frozen_utc": "2026-09-30T06:15:44Z",
+      "record": "FREEZE.md and FREEZE.sha256 (both under originals); the freeze lists the sha256 of the preregistration, the arm wrappers, the job and analysis scripts and the task list",
+      "inputs_unchanged_since_the_freeze": "17 of 17 re-hashed files equal their frozen hashes and the newest modification time among them is 2026-09-30T06:15:30Z, not later than the freeze; two further entries (the installed Harbor distribution record and the aggregate of the task files) were not re-hashed",
+      "trials_started_before_the_freeze": 0,
+      "first_trial_started_utc": "2026-09-30T06:16:05Z",
+      "seconds_from_freeze_to_first_trial": 21,
+      "earlier_executions_not_in_the_288": "installation jobs, oracle grading jobs (the gold patch, no model call) and three smoke jobs of a spare task; see log_accounting"
+    },
+    "infrastructure_failures": {},
+    "interrupted_or_retried_jobs": 0,
+    "statistics": {
+      "cost": "paired geometric-mean cost ratio over tasks, BCa bootstrap interval, permutation test with Holm adjustment",
+      "seed": 20260929,
+      "noninferiority_margin_resolve_rate": -0.1,
+      "scipy": "1.18.1",
+      "statsmodels": "0.15.0",
+      "resolve_rate": "see resolve_rate_procedure"
+    },
+    "cost_metric": "Claude Code client-side total_cost_usd at API list prices, run under a subscription token: not the plan meter"
+  },
+  "log_accounting": {
+    "purpose": "account for every claude-code.txt log the scans read: 308 files against 288 analysed trials",
+    "claude_code_txt_files": 308,
+    "logs_of_the_288_analysed_trials": 288,
+    "other_logs": 20,
+    "other_logs_by_job": {
+      "smoke job stopped and discarded before the egress fix (about 4 minutes)": 6,
+      "smoke job that failed authentication": 7,
+      "smoke job that passed the wiring and egress gate (7 of 7)": 7
+    },
+    "task_of_the_other_logs": "django__django-14011, a spare task that is not among the 36",
+    "other_logs_in_the_36_task_set": 0,
+    "batch_jobs": 72,
+    "trials_per_phase_1_job": [
+      5
+    ],
+    "trials_per_phase_2_job": [
+      3
+    ],
+    "distinct_task_arm_pairs_among_the_288": 288,
+    "rows_without_a_reward": 0,
+    "jobs_renamed_interrupted_or_quarantined": 0,
+    "reading": "no trial of the batch was retried, interrupted or left out: every batch job holds exactly one trial per arm and task, every trial has a reward, and the analysis rule skips discarded, failed, interrupted and quarantined jobs by name; the 20 other logs are smoke jobs run before the batch, none of which is a trial of the 36-task set"
+  },
+  "schedule": {
+    "design": "one Harbor job per task, in the order of the task list; phase 1 (lean, rtk, context-mode, serena, jcodemunch) over all 36 tasks, then phase 2 (headroom, full, lean-r2); within a job the arm order is random.Random(task index).shuffle(arm list) and two trials run at a time",
+    "freeze_utc": "2026-09-30T06:15:44Z",
+    "first_trial_start_utc": "2026-09-30T06:16:05Z",
+    "last_trial_start_utc": "2026-09-30T14:13:17Z",
+    "last_trial_finish_utc": "2026-09-30T14:29:14Z",
+    "phases": {
+      "p1": {
+        "jobs": 36,
+        "trials": 180,
+        "first_trial_start_utc": "2026-09-30T06:16:05Z",
+        "last_trial_finish_utc": "2026-09-30T10:15:17Z"
+      },
+      "p2": {
+        "jobs": 36,
+        "trials": 108,
+        "first_trial_start_utc": "2026-09-30T10:15:26Z",
+        "last_trial_finish_utc": "2026-09-30T14:29:14Z"
+      }
+    },
+    "n_concurrent_trials_in_every_job_config": [
+      2
+    ],
+    "arm_order_checks": {
+      "configured_order_equals_the_seeded_shuffle": "72 of 72",
+      "realised_start_order_equals_the_configured_order": "72 of 72"
+    },
+    "arm_position_counts_by_phase": {
+      "p1 context-mode": {
+        "1": 8,
+        "2": 7,
+        "3": 6,
+        "4": 10,
+        "5": 5
+      },
+      "p1 jcodemunch": {
+        "1": 9,
+        "2": 5,
+        "3": 6,
+        "4": 7,
+        "5": 9
+      },
+      "p1 lean": {
+        "1": 6,
+        "2": 11,
+        "3": 4,
+        "4": 9,
+        "5": 6
+      },
+      "p1 rtk": {
+        "1": 4,
+        "2": 8,
+        "3": 8,
+        "4": 6,
+        "5": 10
+      },
+      "p1 serena": {
+        "1": 9,
+        "2": 5,
+        "3": 12,
+        "4": 4,
+        "5": 6
+      },
+      "p2 full": {
+        "1": 16,
+        "2": 11,
+        "3": 9
+      },
+      "p2 headroom": {
+        "1": 12,
+        "2": 11,
+        "3": 13
+      },
+      "p2 lean-r2": {
+        "1": 8,
+        "2": 14,
+        "3": 14
+      }
+    },
+    "minutes_between_first_and_last_trial_start_in_a_job": {
+      "p1": {
+        "median": 3.4,
+        "max": 8.6
+      },
+      "p2": {
+        "median": 2.1,
+        "max": 5.1
+      }
+    },
+    "timestamps": "the trial start and finish times are the trial result.json fields (UTC); the job-level times in the same records are host-local (UTC-4) naive times and were converted for the cross-check",
+    "comparison_structure": "each treatment arm is compared with the base arm of its own phase, run in the same job: the same task, the same time window and a seeded random order; the base arms of the two phases (lean and lean-r2) differ by phase and time of day, which is what the A/A control (lean-r2 against lean) measures"
+  },
+  "token_categories_per_arm": {
+    "arms": {
+      "context-mode": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 161044,
+        "mean_cache_read": 149135,
+        "mean_cache_write": 11894,
+        "mean_uncached_input": 14,
+        "mean_output": 1952,
+        "cache_read_share_of_input": 0.926,
+        "mean_cost_usd": 0.097
+      },
+      "full": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 146533,
+        "mean_cache_read": 132476,
+        "mean_cache_write": 14046,
+        "mean_uncached_input": 12,
+        "mean_output": 1519,
+        "cache_read_share_of_input": 0.904,
+        "mean_cost_usd": 0.0979
+      },
+      "headroom": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 138228,
+        "mean_cache_read": 129188,
+        "mean_cache_write": 9026,
+        "mean_uncached_input": 14,
+        "mean_output": 1920,
+        "cache_read_share_of_input": 0.935,
+        "mean_cost_usd": 0.0812
+      },
+      "jcodemunch": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 171483,
+        "mean_cache_read": 159405,
+        "mean_cache_write": 12062,
+        "mean_uncached_input": 16,
+        "mean_output": 1979,
+        "cache_read_share_of_input": 0.93,
+        "mean_cost_usd": 0.0999
+      },
+      "lean": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 126623,
+        "mean_cache_read": 118198,
+        "mean_cache_write": 8412,
+        "mean_uncached_input": 13,
+        "mean_output": 1823,
+        "cache_read_share_of_input": 0.933,
+        "mean_cost_usd": 0.0755
+      },
+      "lean-r2": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 132451,
+        "mean_cache_read": 123872,
+        "mean_cache_write": 8565,
+        "mean_uncached_input": 14,
+        "mean_output": 1899,
+        "cache_read_share_of_input": 0.935,
+        "mean_cost_usd": 0.0781
+      },
+      "rtk": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 129383,
+        "mean_cache_read": 120707,
+        "mean_cache_write": 8662,
+        "mean_uncached_input": 13,
+        "mean_output": 1788,
+        "cache_read_share_of_input": 0.933,
+        "mean_cost_usd": 0.0767
+      },
+      "serena": {
+        "trials": 36,
+        "mean_input_total_incl_cache": 130110,
+        "mean_cache_read": 120609,
+        "mean_cache_write": 9489,
+        "mean_uncached_input": 12,
+        "mean_output": 1598,
+        "cache_read_share_of_input": 0.927,
+        "mean_cost_usd": 0.0781
+      }
+    },
+    "trials_with_negative_uncached_input": 0,
+    "definition": "input_total = Harbor n_input_tokens, which already includes cache reads and cache writes; uncached = input_total - cache_read - cache_write",
+    "cache_conditions": "the prompt cache is shared by every trial that used the same token and was neither controlled nor recorded per trial; the arm order is randomized and blocked by task, and the usage categories of every arm are recorded here, so a systematic cache advantage can be read off them: the cache-read share of the input is 0.90 to 0.94 in every arm"
+  },
+  "results": [
+    {
+      "arm": "context-mode",
+      "base_arm": "lean",
+      "tasks": 36,
+      "cost_ratio_geomean": 1.34,
+      "cost_ratio_ci95": [
+        1.209,
+        1.456
+      ],
+      "p_holm": 0.0006,
+      "p_holm_note": "Monte Carlo test with 20,000 resamples: 0.0006 is its resolution floor, read it as p <= 0.0006",
+      "tasks_with_higher_cost": 33,
+      "resolve_rate_arm": 0.806,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.111,
+        0.167
+      ],
+      "non_inferior_at_minus_0.10": false,
+      "mean_turns_arm_and_base": [
+        7.6,
+        6.8
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        107.2,
+        35.1
+      ],
+      "trials_using_any_mcp_tool": 0
+    },
+    {
+      "arm": "full",
+      "base_arm": "lean-r2",
+      "tasks": 36,
+      "cost_ratio_geomean": 1.301,
+      "cost_ratio_ci95": [
+        1.176,
+        1.411
+      ],
+      "p_holm": 0.0006,
+      "p_holm_note": "Monte Carlo test with 20,000 resamples: 0.0006 is its resolution floor, read it as p <= 0.0006",
+      "tasks_with_higher_cost": 29,
+      "resolve_rate_arm": 0.667,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.25,
+        0.0
+      ],
+      "non_inferior_at_minus_0.10": false,
+      "mean_turns_arm_and_base": [
+        6.2,
+        7.2
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        108.9,
+        32.8
+      ],
+      "trials_using_any_mcp_tool": 1
+    },
+    {
+      "arm": "headroom",
+      "base_arm": "lean-r2",
+      "tasks": 36,
+      "cost_ratio_geomean": 0.983,
+      "cost_ratio_ci95": [
+        0.901,
+        1.102
+      ],
+      "p_holm": 1.0,
+      "tasks_with_higher_cost": 13,
+      "resolve_rate_arm": 0.778,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.083,
+        0.083
+      ],
+      "non_inferior_at_minus_0.10": true,
+      "mean_turns_arm_and_base": [
+        7.4,
+        7.2
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        54.8,
+        32.8
+      ],
+      "trials_using_any_mcp_tool": 0
+    },
+    {
+      "arm": "jcodemunch",
+      "base_arm": "lean",
+      "tasks": 36,
+      "cost_ratio_geomean": 1.387,
+      "cost_ratio_ci95": [
+        1.23,
+        1.553
+      ],
+      "p_holm": 0.0006,
+      "p_holm_note": "Monte Carlo test with 20,000 resamples: 0.0006 is its resolution floor, read it as p <= 0.0006",
+      "tasks_with_higher_cost": 29,
+      "resolve_rate_arm": 0.75,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.167,
+        0.111
+      ],
+      "non_inferior_at_minus_0.10": false,
+      "mean_turns_arm_and_base": [
+        9.5,
+        6.8
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        34.9,
+        35.1
+      ],
+      "trials_using_any_mcp_tool": 33
+    },
+    {
+      "arm": "rtk",
+      "base_arm": "lean",
+      "tasks": 36,
+      "cost_ratio_geomean": 1.027,
+      "cost_ratio_ci95": [
+        0.946,
+        1.186
+      ],
+      "p_holm": 1.0,
+      "tasks_with_higher_cost": 18,
+      "resolve_rate_arm": 0.778,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.111,
+        0.111
+      ],
+      "non_inferior_at_minus_0.10": false,
+      "mean_turns_arm_and_base": [
+        6.9,
+        6.8
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        32.0,
+        35.1
+      ],
+      "trials_using_any_mcp_tool": 0
+    },
+    {
+      "arm": "serena",
+      "base_arm": "lean",
+      "tasks": 36,
+      "cost_ratio_geomean": 1.063,
+      "cost_ratio_ci95": [
+        0.952,
+        1.159
+      ],
+      "p_holm": 0.7197,
+      "tasks_with_higher_cost": 21,
+      "resolve_rate_arm": 0.694,
+      "resolve_rate_base": 0.778,
+      "resolve_difference_ci95": [
+        -0.194,
+        0.028
+      ],
+      "non_inferior_at_minus_0.10": false,
+      "mean_turns_arm_and_base": [
+        6.9,
+        6.8
+      ],
+      "mean_wall_seconds_arm_and_base": [
+        28.9,
+        35.1
+      ],
+      "trials_using_any_mcp_tool": 17
+    }
+  ],
+  "control": {
+    "lean_r2_against_lean_cost_ratio": 1.045,
+    "ci95": [
+      0.93,
+      1.2
+    ],
+    "p": 0.54,
+    "note": "the cost A/A control; the headroom, rtk and serena intervals are as wide as this one, so those three results are inconclusive rather than neutral; reproduced by an independent audit on 2026-10-01"
+  },
+  "regime": {
+    "lean_cost_per_trial_usd": 0.0755,
+    "median_turns": 7,
+    "approximate_agent_seconds": 35,
+    "note": "short single-session tasks: fixed per-session overhead dominates"
+  },
+  "resolve_rate_procedure": {
+    "unit": "the task: one trial per arm and task, so the per-task reward is 0 or 1 and the per-task difference is arm minus base, in {-1, 0, 1}",
+    "interval_as_preregistered": "scipy.stats.bootstrap on the 36 paired differences, method percentile, 10,000 resamples, two-sided 95%, one numpy generator seeded 20260929 that the run shares with its other bootstrap and permutation calls",
+    "noninferiority_rule": "non-inferior at the margin -0.10 when the lower end of that two-sided 95% interval is above -0.10 (the conservative reading: equivalent to a one-sided 97.5% bound)",
+    "multiplicity": "none for the resolve intervals; Holm adjustment is applied to the six cost permutation p-values only; no simultaneous interval is used",
+    "paired_tables_and_sensitivity": {
+      "rtk": {
+        "base_arm": "lean",
+        "tasks": 36,
+        "both_solved": 26,
+        "arm_only": 2,
+        "base_only": 2,
+        "neither": 6,
+        "difference": 0.0,
+        "percentile_two_sided_95": [
+          -0.111,
+          0.111
+        ],
+        "bca_two_sided_95": [
+          -0.111,
+          0.111
+        ],
+        "percentile_one_sided_95": [
+          -0.083,
+          0.083
+        ],
+        "mcnemar_exact_two_sided_p": 1.0,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": false,
+          "bca_two_sided_95": false,
+          "percentile_one_sided_95": true
+        }
+      },
+      "context-mode": {
+        "base_arm": "lean",
+        "tasks": 36,
+        "both_solved": 25,
+        "arm_only": 4,
+        "base_only": 3,
+        "neither": 4,
+        "difference": 0.0278,
+        "percentile_two_sided_95": [
+          -0.111,
+          0.167
+        ],
+        "bca_two_sided_95": [
+          -0.111,
+          0.167
+        ],
+        "percentile_one_sided_95": [
+          -0.083,
+          0.139
+        ],
+        "mcnemar_exact_two_sided_p": 1.0,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": false,
+          "bca_two_sided_95": false,
+          "percentile_one_sided_95": true
+        }
+      },
+      "serena": {
+        "base_arm": "lean",
+        "tasks": 36,
+        "both_solved": 24,
+        "arm_only": 1,
+        "base_only": 4,
+        "neither": 7,
+        "difference": -0.0833,
+        "percentile_two_sided_95": [
+          -0.194,
+          0.028
+        ],
+        "bca_two_sided_95": [
+          -0.222,
+          0.028
+        ],
+        "percentile_one_sided_95": [
+          -0.194,
+          0.0
+        ],
+        "mcnemar_exact_two_sided_p": 0.375,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": false,
+          "bca_two_sided_95": false,
+          "percentile_one_sided_95": false
+        }
+      },
+      "jcodemunch": {
+        "base_arm": "lean",
+        "tasks": 36,
+        "both_solved": 24,
+        "arm_only": 3,
+        "base_only": 4,
+        "neither": 5,
+        "difference": -0.0278,
+        "percentile_two_sided_95": [
+          -0.167,
+          0.111
+        ],
+        "bca_two_sided_95": [
+          -0.167,
+          0.111
+        ],
+        "percentile_one_sided_95": [
+          -0.139,
+          0.083
+        ],
+        "mcnemar_exact_two_sided_p": 1.0,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": false,
+          "bca_two_sided_95": false,
+          "percentile_one_sided_95": false
+        }
+      },
+      "headroom": {
+        "base_arm": "lean-r2",
+        "tasks": 36,
+        "both_solved": 27,
+        "arm_only": 1,
+        "base_only": 1,
+        "neither": 7,
+        "difference": 0.0,
+        "percentile_two_sided_95": [
+          -0.083,
+          0.083
+        ],
+        "bca_two_sided_95": [
+          -0.083,
+          0.083
+        ],
+        "percentile_one_sided_95": [
+          -0.056,
+          0.056
+        ],
+        "mcnemar_exact_two_sided_p": 1.0,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": true,
+          "bca_two_sided_95": true,
+          "percentile_one_sided_95": true
+        }
+      },
+      "full": {
+        "base_arm": "lean-r2",
+        "tasks": 36,
+        "both_solved": 23,
+        "arm_only": 1,
+        "base_only": 5,
+        "neither": 7,
+        "difference": -0.1111,
+        "percentile_two_sided_95": [
+          -0.25,
+          0.0
+        ],
+        "bca_two_sided_95": [
+          -0.25,
+          0.0
+        ],
+        "percentile_one_sided_95": [
+          -0.222,
+          0.0
+        ],
+        "mcnemar_exact_two_sided_p": 0.219,
+        "lower_bound_above_margin": {
+          "percentile_two_sided_95 (preregistered)": false,
+          "bca_two_sided_95": false,
+          "percentile_one_sided_95": false
+        }
+      }
+    },
+    "sensitivity_run": "2026-10-01, scipy 1.18.1, statsmodels 0.15.0, numpy 2.5.3; the generator restarts at the same seed for each interval, so its percentile bounds can differ from the preregistered run's by Monte Carlo error (at most 0.03 here); BCa is scipy.stats.bootstrap's BCa, the one-sided bound is the lower end of its 90% percentile interval, the exact p is statsmodels' exact McNemar test on the discordant pairs",
+    "reading": "with 36 tasks a difference moves in steps of 1/36 = 0.028: headroom's preregistered lower bound -0.083 is 0.017, under one step, above the margin, with 2 discordant pairs (1 against 1); it stays above the margin under BCa and under the one-sided bound, but a different interval family (an exact or score-based paired interval) is not tested here and could place it below the margin, so the headroom non-inferiority is method-sensitive. rtk and context-mode meet the margin only under the one-sided bound; serena, jcodemunch and the full stack do not under any of the three."
+  },
+  "subagent_scan": {
+    "purpose": "decide whether this run can say anything about subagents",
+    "method": "text scan of every file named claude-code.txt (the stream-json output) under the jobs directory, and of the client's own session transcripts of the trials; counts only",
+    "patterns": [
+      "\"name\":\"Agent\" or \"name\":\"Task\" (tool_use of the delegation tool; the client's init event lists the tool as Task, its tool_use blocks name it Agent)",
+      "\"parent_tool_use_id\":\"toolu_ (a non-null parent link)",
+      "\"isSidechain\":true (transcripts)"
+    ],
+    "files_scanned": {
+      "stream_logs_of_the_288_trials": 288,
+      "stream_logs_of_the_smoke_jobs": 20,
+      "client_session_transcripts": 308,
+      "client_session_transcripts_of_the_288_trials": 288,
+      "files_skipped": 0
+    },
+    "delegation_tool_calls": {
+      "stream_logs_of_the_288_trials": 0,
+      "stream_logs_of_the_smoke_jobs": 0,
+      "client_session_transcripts": 0
+    },
+    "sidechain_lines_in_client_session_transcripts": 0,
+    "subagents_directories_found": 0,
+    "client_version_of_the_transcripts": {
+      "2.1.285": 308
+    },
+    "lines_with_a_non_null_parent_link": {
+      "count": 35,
+      "by_event_type_and_parent_tool": {
+        "tool_progress/Bash": 35
+      },
+      "reading": "all are tool_progress events attached to a Bash tool_use, not messages of a subagent"
+    },
+    "delegation_tool_was_available": {
+      "stream_logs_whose_init_event_lists_the_tool": "288 of 288"
+    },
+    "excluded_from_the_transcript_scan": "344 test-fixture .jsonl files of the installed context-mode plugin (in the saved sessions tree, under the plugins directory) hold 172 sidechain lines as test data; they are not session transcripts",
+    "positive_controls": {
+      "same_files_shape_control": "all 288 stream logs of the 288 trials hold tool_use blocks of the compact shape the patterns rely on (1817 blocks; most used: Bash 1347, Read 145, Edit 143)",
+      "live_capture": {
+        "what": "a headless claude -p run (stream-json, --verbose) asked to call the delegation tool exactly once; captured stdout, scanned with the same patterns as the trial logs",
+        "client": "2.1.286",
+        "model": "claude-haiku-4-5-20251001",
+        "capture_sha256": "9491a1ebcee671be5066a484238c1c21d9f28a7da731d25d03d0ecaec8987870",
+        "capture_bytes": 223867,
+        "delegation_tool_use_lines_found": 1,
+        "delegation_tool_use_block_name": "Agent",
+        "init_event_lists_the_tool_as": [
+          "Task"
+        ],
+        "parent_linked_lines_found": 2,
+        "parent_linked_line_kinds": "assistant messages of the subagent (thinking, text)",
+        "recorded_under": "originals"
+      },
+      "persisted_transcripts": {
+        "what": "real delegation tool_use blocks (same compact serialization, same name patterns) in the client's persisted session transcripts of this host, by client version; counts only",
+        "files_scanned": 189,
+        "blocks_by_client_version": {
+          "2.1.281 Agent": 14,
+          "2.1.282 Agent": 70,
+          "2.1.283 Agent": 185,
+          "2.1.284 Agent": 52,
+          "2.1.285 Agent": 69,
+          "2.1.286 Agent": 21
+        },
+        "blocks_at_2_1_285": 69
+      }
+    },
+    "reading": "no trial of the run spawned a subagent: the delegation tool was available in every trial and was not called, no message carries a subagent parent link, and the transcripts hold no sidechain; the same scanner detects a real subagent call in a live capture and in persisted transcripts. The live capture is at client 2.1.286 while the trials ran 2.1.285; the 2.1.285 serialization is shown in the persisted-transcript format only. Per-subagent attribution through Harbor is therefore untested; a trial's saved log directory keeps agent/claude-code.txt, agent/trajectory.json and a sessions tree with the transcript"
+  },
+  "trial_output_manifest": {
+    "trials": 288,
+    "files_per_trial": [
+      "result.json",
+      "agent/claude-code.txt"
+    ],
+    "line_format": "job<TAB>arm<TAB>sha256(result.json)<TAB>sha256(agent/claude-code.txt), sorted by job then arm, LF line ends",
+    "manifest_bytes": 49920,
+    "manifest_sha256": "23d1b346b90e2f4f7b19fc5c8fd1ae4d4f4bc0d72c69709b1110075dac0c4ea3",
+    "newest_input_file_is_older_than_batch_analysis_json": true,
+    "seconds_between_newest_input_and_analysis": 58,
+    "recompute": "for each of the 288 analysed trials take the sha256 of its result.json and of its agent/claude-code.txt (the two files the analysis reads), write one line job TAB arm TAB sha256(result.json) TAB sha256(claude-code.txt), sort by job then arm, join with LF and end with LF: the sha256 of that text is manifest_sha256; the manifest file itself is under originals",
+    "binds": "the per-trial result.json and stream log of every analysed trial, so a copy of the raw outputs can be checked against this receipt"
+  },
+  "reproduction": {
+    "what": "the preregistered analysis script (hash under originals and in the freeze file), run unchanged on the 72 preserved batch job directories with the frozen library versions (scipy 1.18.1, statsmodels 0.15.0, numpy 2.5.3)",
+    "when": "2026-10-01",
+    "result": "its JSON output and its stdout are byte-identical to the stored batch-analysis.json and batch-analysis.stdout (both hashed under originals)",
+    "reads": "result.json and agent/claude-code.txt of each trial, exactly the files the trial_output_manifest hashes; none of them is newer than the stored analysis output"
+  },
+  "originals": {
+    "location": "private host state of the Harbor E2E session (not in the repository); verify a copy against these hashes",
+    "files": [
+      {
+        "name": "FREEZE.md",
+        "sha256": "6d4cf821069a5d4dfb7e631b44e04b23cf2fddfa7d885f8ba14649551e7bd34c",
+        "bytes": 301
+      },
+      {
+        "name": "FREEZE.sha256",
+        "sha256": "794580c3efb034fe0a06c08b5a05ca38c85a3c58979054eb3d1c3d1c99a99b9d",
+        "bytes": 1697
+      },
+      {
+        "name": "HANDOFF.md",
+        "sha256": "02819fcc9ca0dcaebfce5ea6e6beb32962cbd3522c5af185e3e93ccc0739b5a0",
+        "bytes": 19721
+      },
+      {
+        "name": "PREREGISTRATION.md",
+        "sha256": "73266ab1221ac17112430628a9eeafebf685095c70836f8768754bb4ed45e49c",
+        "bytes": 12340
+      },
+      {
+        "name": "RESULTS.md",
+        "sha256": "d752cb05709e955929cdb83452479163b1dce93f3367c8ac0b37d2c24179dde3",
+        "bytes": 3184
+      },
+      {
+        "name": "analyze.py",
+        "sha256": "a93ddd3b0f3b706abc5f006245ac7ebdf8fe7ea45b5b51d497e29733a815d313",
+        "bytes": 8525
+      },
+      {
+        "name": "batch-analysis.json",
+        "sha256": "6fc59186167eacd25895558b14c3a3877d28c45a1ea434bfe2f5224c9e86a988",
+        "bytes": 142649
+      },
+      {
+        "name": "batch-analysis.stdout",
+        "sha256": "4b6f54e91ac16cece4b043f6f6d06a7a8473895a060d2b427c3dab221312ae09",
+        "bytes": 7482
+      },
+      {
+        "name": "trial-output-manifest-20261001.tsv",
+        "sha256": "23d1b346b90e2f4f7b19fc5c8fd1ae4d4f4bc0d72c69709b1110075dac0c4ea3",
+        "bytes": 49920
+      },
+      {
+        "name": "controls/subagent-positive-control-20261001.jsonl",
+        "sha256": "9491a1ebcee671be5066a484238c1c21d9f28a7da731d25d03d0ecaec8987870",
+        "bytes": 223867
+      },
+      {
+        "name": "receipt-scripts-20261001/harbor_receipt_extra.py",
+        "sha256": "34390f225420ee0bf15f052050bbb6a6c69df14d55aadba6514640929978c6cf",
+        "bytes": 17085
+      },
+      {
+        "name": "receipt-scripts-20261001/harbor_resolve_sensitivity.py",
+        "sha256": "e584ff097d34507c1abe5038d7c08ffb19873157b8397a860ad2ead29b07537d",
+        "bytes": 3212
+      },
+      {
+        "name": "receipt-scripts-20261001/harbor_tokens_per_accepted.py",
+        "sha256": "340d6c6038857c7d51bbccedbc96560d115be00ed606d498419e1f27ba597786",
+        "bytes": 2791
+      },
+      {
+        "name": "receipt-scripts-20261001/build_harbor_receipt.py",
+        "sha256": "3df0c0494cc93a94a5edf03b46f1a146987ee491de53b58afada754a8bc9abc3",
+        "bytes": 33267
+      }
+    ]
+  },
+  "catalog_protocol_metric": {
+    "protocol": "catalogs/landscape/foundation.json, token-efficiency layer, overturn_protocol (lines 2737-2750 at 5adcc3a4): arms = cheapest adequate native baseline, RTK-formatted command output, Headroom guarded compression with original recovery, Context Mode explicit processing lane, Repomix selected-file outline; metric = complete native provider tokens per accepted task, including retries and child attempts, at equal correctness under hidden acceptance",
+    "coverage": {
+      "arms_covered": "native baseline (lean, lean-r2), rtk, headroom, context-mode (serena, jcodemunch and the full stack also ran)",
+      "arm_not_covered": "Repomix selected-file outline",
+      "correctness_gate": "the SWE-bench verifier (hidden tests) accepts a trial; the pair ratio uses only tasks that both arms solved",
+      "not_measured": [
+        "required-fact preservation and exact original recovery (reported separately by the protocol)",
+        "retries and child attempts (one trial per arm and task, no subagent was spawned)",
+        "the multi-agent regime"
+      ]
+    },
+    "computation": {
+      "source": "the per-trial rows of batch-analysis.json (hash under originals); a trial's input field already includes its cache reads and writes, so tokens = input + output, a raw count that is not cost-weighted",
+      "per_accepted_trial": "all tokens of the arm's 36 trials divided by its accepted trials (failed trials included)",
+      "paired_ratio": "geometric mean over the tasks both arms solved of tokens(arm) / tokens(base arm)",
+      "interval": "percentile bootstrap over those tasks, 10,000 resamples, seed 20260929",
+      "script": "recomputed by the Gate A owner on 2026-10-01, no model call; the script is under originals"
+    },
+    "results": {
+      "rtk": {
+        "base_arm": "lean",
+        "tasks_solved_by_both": 26,
+        "accepted_trials_arm": 28,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 168647,
+        "tokens_per_accepted_trial_base": 165145,
+        "ratio_tokens_per_accepted_trial": 1.021,
+        "paired_token_ratio_geomean": 0.955,
+        "paired_token_ratio_ci95_percentile": [
+          0.847,
+          1.078
+        ]
+      },
+      "context-mode": {
+        "base_arm": "lean",
+        "tasks_solved_by_both": 25,
+        "accepted_trials_arm": 29,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 202340,
+        "tokens_per_accepted_trial_base": 165145,
+        "ratio_tokens_per_accepted_trial": 1.225,
+        "paired_token_ratio_geomean": 1.181,
+        "paired_token_ratio_ci95_percentile": [
+          1.027,
+          1.341
+        ]
+      },
+      "serena": {
+        "base_arm": "lean",
+        "tasks_solved_by_both": 24,
+        "accepted_trials_arm": 25,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 189660,
+        "tokens_per_accepted_trial_base": 165145,
+        "ratio_tokens_per_accepted_trial": 1.148,
+        "paired_token_ratio_geomean": 0.984,
+        "paired_token_ratio_ci95_percentile": [
+          0.819,
+          1.153
+        ]
+      },
+      "jcodemunch": {
+        "base_arm": "lean",
+        "tasks_solved_by_both": 24,
+        "accepted_trials_arm": 27,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 231282,
+        "tokens_per_accepted_trial_base": 165145,
+        "ratio_tokens_per_accepted_trial": 1.4,
+        "paired_token_ratio_geomean": 1.407,
+        "paired_token_ratio_ci95_percentile": [
+          1.144,
+          1.72
+        ]
+      },
+      "headroom": {
+        "base_arm": "lean-r2",
+        "tasks_solved_by_both": 27,
+        "accepted_trials_arm": 28,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 180191,
+        "tokens_per_accepted_trial_base": 172735,
+        "ratio_tokens_per_accepted_trial": 1.043,
+        "paired_token_ratio_geomean": 0.867,
+        "paired_token_ratio_ci95_percentile": [
+          0.775,
+          0.971
+        ]
+      },
+      "full": {
+        "base_arm": "lean-r2",
+        "tasks_solved_by_both": 23,
+        "accepted_trials_arm": 24,
+        "accepted_trials_base": 28,
+        "tokens_per_accepted_trial_arm": 222078,
+        "tokens_per_accepted_trial_base": 172735,
+        "ratio_tokens_per_accepted_trial": 1.286,
+        "paired_token_ratio_geomean": 1.105,
+        "paired_token_ratio_ci95_percentile": [
+          0.94,
+          1.303
+        ]
+      }
+    }
+  },
+  "host_prerequisite_observations": {
+    "rootless_docker_subordinate_ids": {
+      "observed": "run records of 2026-09-29 (HANDOFF.md status of 23:15Z) and a read of /etc/subuid and /etc/subgid on 2026-10-01 08:1xZ",
+      "claim": "The SWE-bench images of six matplotlib tasks logged a pull error with 65,536 subordinate ids in rootless Docker (lchown invalid argument). After /etc/subuid and /etc/subgid were widened to 262,144 entries, the four of those tasks that are in the final 36-task set pulled and ran their trials; the other two were candidates that the final set does not contain, and their later outcome is not recorded here. Widening is therefore a recorded step of this harness for these images, not a general default.",
+      "evidence": {
+        "error_in_the_oracle_selection_job_logs": "lchown <path>: invalid argument (path elided), found in 12 log files of the oracle-selection job",
+        "tasks_with_the_error": [
+          "matplotlib__matplotlib-23299",
+          "matplotlib__matplotlib-23314",
+          "matplotlib__matplotlib-24627",
+          "matplotlib__matplotlib-24637",
+          "matplotlib__matplotlib-25960",
+          "matplotlib__matplotlib-26291"
+        ],
+        "tasks_with_the_error_in_the_final_task_set_and_run_after_widening": [
+          "matplotlib__matplotlib-23314",
+          "matplotlib__matplotlib-24637",
+          "matplotlib__matplotlib-25960",
+          "matplotlib__matplotlib-26291"
+        ],
+        "tasks_with_the_error_not_in_the_final_task_set": [
+          "matplotlib__matplotlib-23299",
+          "matplotlib__matplotlib-24627"
+        ],
+        "entries_per_file_now": {
+          "subuid": 262144,
+          "subgid": 262144
+        },
+        "backups_of_the_previous_files_exist": true,
+        "docker_version": "29.8.1",
+        "originals": "HANDOFF.md is listed under originals with its sha256"
+      },
+      "upstream_documentation": [
+        "https://docs.docker.com/engine/security/rootless/ (prerequisites, read 2026-10-01): /etc/subuid and /etc/subgid should contain at least 65,536 subordinate UIDs and GIDs for the user",
+        "https://docs.docker.com/engine/security/rootless/troubleshoot/ (docker pull errors, read 2026-10-01): lchown <FILE>: invalid argument means the number of available entries is not sufficient; the number required varies across images; 65,536 entries are sufficient for most images"
+      ],
+      "rule_for_a_new_host": "start at 65,536; widen only when that error appears, record the image, the error text and the range chosen"
+    }
+  },
+  "limitations": [
+    "short single-session tasks, one repetition per arm and task, Sonnet 5.5 at medium effort: not the host default (Opus at max) and not the multi-agent regime",
+    "arm wrappers and the analysis script are local integration code, labelled as such in the preregistration; the harness itself is upstream",
+    "the cost metric is a list-price estimate, not a bill and not the plan meter",
+    "context-mode and the full stack used their MCP tools in 0 of 36 and 1 of 36 trials, so their rows mostly price the presence of the tools",
+    "the shared prompt cache was neither controlled nor recorded per trial: the arm order is randomized and blocked by task and every arm's usage categories are recorded, but a cache effect on cost cannot be excluded, and the A/A control bounds the cross-phase difference only",
+    "the preregistration freeze is a local record (FREEZE.md and FREEZE.sha256, with the inputs re-hashed today), not an externally timestamped commit; the hash line at the end of PREREGISTRATION.md still holds its placeholder, the freeze hashes are in FREEZE.sha256",
+    "the resolve-rate non-inferiority result is method-sensitive on 36 tasks: headroom's preregistered lower bound is 0.017 above the margin with 2 discordant pairs, and rtk and context-mode meet the margin only under a one-sided bound",
+    "the zero-subagent scan reads the delegation tool and parent links in 308 stream logs and 308 client transcripts; its live positive control was captured at client 2.1.286 while the trials ran 2.1.285",
+    "the catalog protocol's token metric covers four of its five arms (no Repomix outline arm) and is a raw token count, not cost-weighted"
+  ],
+  "reproduced_by": "an independent Opus audit on 2026-10-01 recomputed every cost ratio and rate under results from the raw per-trial result files and logs and found them equal to the figures here; on the same day the Gate A owner re-ran the preregistered analysis script on the preserved outputs and reproduced batch-analysis.json byte for byte (see reproduction); the catalog_protocol_metric, token_categories_per_arm, schedule, log_accounting, subagent_scan and resolve_rate_procedure blocks were computed by the Gate A owner from the per-trial rows and records and are not independently reproduced"
+}
