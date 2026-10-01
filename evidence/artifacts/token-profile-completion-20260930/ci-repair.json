@@ -892,6 +892,25 @@
     ],
     "astra_acceptance": "PASS:179 receipts8782 files26 convergence records, unique IDs/paths; main2 terminal records and topic2 token records exact; all14 topic/four main anti-pattern changes preserved; frozen token artifacts untouched;17 native source paths match e537."
   },
+  "concurrent_main_50bba7bb_reconciliation_20261001": {
+    "parent_topic": "893eaa6dd2a97ad20bda1a6e03f4fb5d3b9e56a4",
+    "main": "50bba7bb0a58fedf094089478f751c1f577d6267",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/commit/50bba7bb0a58fedf094089478f751c1f577d6267",
+    "trigger": "Fresh PR/native branch observations found an actual conflict after main accepted PR564 paper receipts and PR549 GPT bridge lifecycle changes.",
+    "native_merge": {"command": "rtk proxy git merge --no-commit --no-ff 50bba7bb0a58fedf094089478f751c1f577d6267", "native_exit": 1, "conflicts": ["manifests/evidence.json", "observability/grand-dashboard/state.json"]},
+    "resolution": "Preserve accepted main sources and frozen paper receipts. Keep main's recorded dashboard checkpoint2026-10-01T03:10:02Z, all topic token/memory acceptance fields and actual merged-state hash; update the checksum of the auto-merged model-routing document. No new provider or paper operation.",
+    "dashboard_state": {"bytes": 18608, "sha256": "39445d4d7f21da7fce28f9fcdc9e3b6e65b1a205067aaf1210f347dfe9eb9a44"},
+    "model_routing_document": {"bytes": 40876, "sha256": "35bd334f8b922a0ed36fd51dc46ef66f9cf398f615645c245b1c2d2a35c9d390"},
+    "preflights": "A JSON field parsed without its enclosing object failed before any write. An assumed scripts/check_grand_dashboard.py path returned native2; maintained script discovery selected scripts/new_host_grand_list.py instead.",
+    "native_checks": {
+      "integrity": {"command": "rtk proxy python3 scripts/validate.py", "native_exit": 0, "components": 69, "hashed_files": 8830, "profiles": 4, "receipts": 179, "original_sha256": "c17ca9962b4c4d8ecd59b6d011965cea899e9ee025c1559d550dcb3dfdb4d8b9"},
+      "convergence": {"command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded --json", "native_exit": 0, "records": 26, "observations": 142, "original_sha256": "b16bedfa410147a047342bb4422a7c7b9417971a60576c3ba81a52ded4ee979e"},
+      "dashboard_source_check": {"command": "rtk proxy python3 scripts/new_host_grand_list.py --check", "native_exit": 0, "layers": 32, "winners": 66, "original_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"},
+      "diff": {"command": "rtk proxy git diff --check", "native_exit": 0}
+    },
+    "independent_source_acceptance": "PASS: immutable-parent Astra review confirms41/44 incoming files byte-identical to main, three shared files preserving both sides, unique179 receipts8830 files26 experiments, complete parent record union, unchanged token hook sources/tests/qualification and17/17 native E2E input hashes. Review's first document extraction included a diff-prefix space; corrected comparison finds zero missing additions.",
+    "scope": "Accepted-source reconciliation, exact artifact and native integrity checks. Original E2E and provider executions keep their recorded revisions; no replay or savings attributed to this merge."
+  },
   "hook_refresh_boundary_repair_20261001": {
     "astra_trigger": "Consequential interaction between supported native settings merge and upstream memory-hook lifecycle; concrete failure reproduced after bounded host registration repair.",
     "sources": [
