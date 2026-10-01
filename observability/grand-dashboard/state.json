@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-01T13:24:37Z",
+  "recorded_at_utc": "2026-10-01T16:45:45Z",
   "meaning": "Recorded checkpoint adding bounded local Codex daemon, scoped cross-family memory and native helper recovery to preserved foundation, paper and simulation records. Automatic managed Codex push and cold git seeding remain held; linked receipts retain their own dates and scopes. Emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -396,6 +396,13 @@
       "title": "Disposable memory qualification cleanup",
       "state": "eight owned documents deleted and independently absent / six others preserved / native background work retained / cached page history separate",
       "evidence_ref": "evidence/artifacts/hindsight-native-qualification-cleanup-20261001/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "sdk-pair-candidate-01593-20261001",
+      "title": "SDK and bundled CLI 0.159.3 candidate qualification",
+      "state": "local paired installation and protocol passed / separate native-account marker completed with native usage / accepted gateway HTTP 429 held, cause unknown / historical qualification remains active / 209-test module run retains one qualification failure and 32 skips",
+      "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
     }
   ],
   "workers": [
