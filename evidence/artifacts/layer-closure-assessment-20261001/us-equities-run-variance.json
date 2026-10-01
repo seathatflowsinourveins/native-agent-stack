@@ -1,0 +1,135 @@
+{
+ "schema_version": 1,
+ "kind": "layer-closure-assessment-run-variance",
+ "catalog": "us-equities",
+ "note": "Layers whose assessor and refuter ran more than once because the workflow was resumed after a sign-in. The artifact's assessments use the last complete refuted result per layer. Statuses only; the other runs' texts are not retained here.",
+ "layers_with_more_than_one_run": 6,
+ "layers_with_a_differing_item": 2,
+ "layers": [
+  {
+   "layer_id": "agents-models-workers",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    },
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    }
+   ],
+   "items_that_differ": []
+  },
+  {
+   "layer_id": "backtesting-engine",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "partial",
+     "item_5": "partial"
+    },
+    {
+     "item_1": "met",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "partial"
+    }
+   ],
+   "items_that_differ": [
+    "item_1",
+    "item_4"
+   ]
+  },
+  {
+   "layer_id": "evaluation-experiments",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    },
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    }
+   ],
+   "items_that_differ": []
+  },
+  {
+   "layer_id": "execution-broker",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "unmet",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    },
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "unmet",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    }
+   ],
+   "items_that_differ": []
+  },
+  {
+   "layer_id": "portfolio-risk",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "unmet",
+     "item_4": "unmet",
+     "item_5": "unmet"
+    },
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "unmet",
+     "item_4": "unmet",
+     "item_5": "partial"
+    }
+   ],
+   "items_that_differ": [
+    "item_5"
+   ]
+  },
+  {
+   "layer_id": "research-factors-ml",
+   "runs": [
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "partial"
+    },
+    {
+     "item_1": "partial",
+     "item_2": "partial",
+     "item_3": "partial",
+     "item_4": "unmet",
+     "item_5": "partial"
+    }
+   ],
+   "items_that_differ": []
+  }
+ ]
+}
