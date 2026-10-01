@@ -184,6 +184,7 @@
       "new_host_steps": [
         "Install the skills CLI 1.7.0 into its isolated prefix from the pinned tarball, checking its sha256 and npm integrity, and set SKILLS_BIN to its absolute path (the bare `skills` command is not on PATH).",
         "Run `python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --dry-run --json`, then the same without --dry-run; the full-profile run's skills step does the same.",
+        "Before the Codex configuration is applied, run the separate renderer call of adoption/update.md, `python3 tools/adoption/install_skills.py --print-codex-config`, which prints the [[skills.config]] lines for the Codex config.toml.",
         "Run `python3 scripts/skills_status.py --skills-bin \"$SKILLS_BIN\" --json` and read back each client's native discovery, including a Codex listing after its skills config write.",
         "Record a sanitized install, discovery and activation receipt with one failing control (a deliberately absent skill)."
       ],
@@ -732,7 +733,7 @@
       },
       "reasons": [
         {"text": "The token-efficiency adoption profile (14 pinned components) was accepted as the selection on 2026-09-30 in #540; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
+        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) the run established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1; context-mode a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack 1.301 [1.176, 1.411], p at most 0.0006); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does (1.045 [0.93, 1.20]).", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
         {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "cd7db158"}},
@@ -750,7 +751,7 @@
         "Run `bash adoption/bootstrap-linux.sh --profile token-efficiency`; every one of its 14 components has a Linux pin.",
         "Install the Context Mode Claude plugin from its SHA-pinned source and start one session before the settings step: the plugin's start.mjs writes the SessionStart cache-heal hook under ~/.claude/hooks, which the settings template's SessionStart entry runs.",
         "Then apply the settings template (the claude-settings step of --configure-full-profile) and check that ~/.claude/hooks/context-mode-cache-heal.mjs exists.",
-        "Run each winner's acceptance command and record a profile receipt that covers all 13 required commands and the client wiring.",
+        "Run each winner's acceptance command, then record a profile receipt that covers all 13 required commands and the client wiring with `python3 scripts/adoption_status.py --client-wiring --pinned-versions --json` (client wiring is reported only with the opt-in --client-wiring flag).",
         "Run the Gate A multi-agent adoption E2E on the new distribution before any savings claim."
       ],
       "gates": [
@@ -1749,6 +1750,7 @@
       "winners": [
         {
           "component_id": "nautilus-trader",
+          "role": "selected destination engine",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
           "pin_source": "catalogs/us-equities/runtime-target.json:26",
@@ -1758,6 +1760,7 @@
         },
         {
           "component_id": "lean",
+          "role": "frozen comparison oracle, not the destination",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
           "pin_source": "manifests/stack.json:1368",
@@ -1767,6 +1770,7 @@
         },
         {
           "component_id": "alpaca-py",
+          "role": "separate Alpaca path",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
           "pin_source": "catalogs/us-equities/runtime-target.json:99",
@@ -1817,6 +1821,7 @@
       "winners": [
         {
           "component_id": "nautilus-trader",
+          "role": "selected IBKR path; local broker acceptance not established",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
           "pin_source": "catalogs/us-equities/runtime-target.json:26",
@@ -1826,6 +1831,7 @@
         },
         {
           "component_id": "alpaca-py",
+          "role": "Alpaca broker boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
           "pin_source": "catalogs/us-equities/runtime-target.json:99",
@@ -1835,6 +1841,7 @@
         },
         {
           "name": "adaptive-paper (the engine folder blueprints/us-equities/adaptive-paper on main at the #559 merge; the custom Alpaca adapter on NautilusTrader's LiveNode)",
+          "role": "Alpaca paper engine",
           "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
           "pin": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
           "pin_source": "blueprints/us-equities/adaptive-paper/README.md",
@@ -1844,6 +1851,7 @@
         },
         {
           "component_id": "lean",
+          "role": "frozen comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
           "pin_source": "manifests/stack.json:1368",
@@ -1895,6 +1903,7 @@
       "winners": [
         {
           "component_id": "nautilus-trader",
+          "role": "engine of record for risk limits",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
           "pin_source": "catalogs/us-equities/runtime-target.json:26",
@@ -1904,6 +1913,7 @@
         },
         {
           "component_id": "lean",
+          "role": "comparison oracle",
           "repository": "https://github.com/QuantConnect/Lean",
           "pin": "985ef30 with documented dependency remediation",
           "pin_source": "manifests/stack.json:1368",
@@ -1913,6 +1923,7 @@
         },
         {
           "component_id": "alpaca-py",
+          "role": "Alpaca boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
           "pin_source": "catalogs/us-equities/runtime-target.json:99",
@@ -1922,6 +1933,7 @@
         },
         {
           "component_id": "skfolio",
+          "role": "walk-forward splitter only; winner in one place of the layer entry and conditional in another",
           "repository": "https://github.com/skfolio/skfolio",
           "pin": "1.2.9",
           "pin_source": "manifests/stack.json:1493",
