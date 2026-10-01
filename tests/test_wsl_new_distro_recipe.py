@@ -19,7 +19,8 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
 - no recipe command shuts WSL down, updates it, edits .wslconfig, changes the default distribution,
   or terminates, unregisters or manages any distribution but ``<Name>`` (decision 4), and the one
   install command is ``--install --from-file ... --name <Name> --location ... --no-launch``;
-- the first-boot checklist and the receipt example name exactly the recipe's steps;
+- the first-boot checklist names exactly the recipe's steps, and the receipt example holds one entry per recipe command
+  line, under its step, once per occurrence, and nothing else (review finding 1 of PR #569);
 - the three findings of the 2026-10-01 cross-family review stay fixed:
   - after the first launch, W5 expects ``status: disabled`` by ``disabled-by-marker-file`` and reads completion and
     errors from /var/lib/cloud/data/result.json and status.json (cloud-init 26.1 cloudinit/cmd/status.py:284-286 and
@@ -264,10 +265,22 @@ def receipt_errors(receipt: dict, recipe: str, component_ids: set[str]) -> list[
     limitations = receipt.get("limitations")
     if not isinstance(limitations, list) or not limitations or not all(isinstance(item, str) and item for item in limitations):
         errors.append("limitations must be a non-empty list of text")
+    # Review finding 1 of PR #569: the receipt carries every W and F command, so its entries are compared with the
+    # recipe's command rows (the rows the command-table check reads), once per occurrence, and nothing else.
+    rows = recipe_rows(recipe)
     steps = set(STEP_RE.findall(recipe))
-    named = {entry.get("step") for entry in receipt.get("steps", []) if isinstance(entry, dict)}
-    if not named or not named <= steps:
-        errors.append(f"receipt steps {sorted(map(str, named))} are not all recipe steps {sorted(steps)}")
+    if {step for step, _, _ in rows} != steps:
+        errors.append(f"recipe steps without a command line: {sorted(steps - {step for step, _, _ in rows})}")
+    entries = [entry for entry in receipt.get("steps", []) if isinstance(entry, dict)]
+    named = {str(entry.get("step")) for entry in entries}
+    if named != steps:
+        errors.append(f"receipt steps {sorted(named)} are not the recipe steps {sorted(steps)}")
+    expected = Counter((step, command) for step, _, command in rows)
+    listed = Counter((str(entry.get("step")), str(entry.get("cmd"))) for entry in entries)
+    errors += [f"the receipt example lacks recipe command {step}: {command}"
+               for (step, command), count in sorted((expected - listed).items()) for _ in range(count)]
+    errors += [f"receipt entry is not a recipe command: {step}: {command}"
+               for (step, command), count in sorted((listed - expected).items()) for _ in range(count)]
     for entry in receipt.get("steps", []):
         if not isinstance(entry, dict) or not {"step", "cmd", "exit", "output_excerpt"} <= set(entry):
             errors.append(f"receipt step {entry!r} lacks step, cmd, exit or output_excerpt")
@@ -592,6 +605,22 @@ class ReceiptExampleTests(unittest.TestCase):
                              "limitations": dict(receipt, limitations=[])}.items():
             with self.subTest(mutant=name):
                 self.assertTrue(receipt_errors(mutant, recipe, self.components))
+
+    def test_the_check_rejects_a_missing_step_a_missing_command_and_an_extra_command(self):
+        """Review finding 1 of PR #569: a receipt that omits a step or a command, or adds one, fails."""
+        receipt, recipe = json.loads(read(RECEIPT_EXAMPLE)), read(RECIPE)
+        entries = receipt["steps"]
+        last = entries[-1]
+        mutants = {
+            "missing step": [entry for entry in entries if entry["step"] != "W1"],
+            "missing command": [entry for entry in entries if entry is not last],
+            "extra command under a real step": [*entries, dict(last, cmd="echo not in the recipe")],
+            "duplicated command": [*entries, dict(last)],
+        }
+        for name, steps in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(steps, entries)
+                self.assertTrue(receipt_errors(dict(receipt, steps=steps), recipe, self.components))
 
 
 class HostWideRuleTests(unittest.TestCase):

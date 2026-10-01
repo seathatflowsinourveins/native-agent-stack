@@ -47,9 +47,183 @@
   },
   "steps": [
     {
+      "step": "W1",
+      "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --version",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath 'Z:\\WSL\\<Name>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\<Name>.user-data')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ProgressPreference = 'SilentlyContinue'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\\WSL\\downloads\\SHA256SUMS'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath 'Z:\\WSL\\downloads\\SHA256SUMS' -Pattern ' \\*ubuntu-24\\.04\\.5-wsl-amd64\\.wsl$').Line.Split(' ')[0]",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq 'Ubuntu-24.04'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl').Hash.ToLowerInvariant()",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W2",
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected) { throw 'sha256 mismatch: do not install' }",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "$Text = [System.IO.File]::ReadAllText('<checkout>\\adoption\\templates\\wsl\\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data'), $Text)",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -TotalCount 1",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -Pattern '^- name: ', '^    default='",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\<Name>.user-data') -SimpleMatch -Pattern '${'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
       "step": "W4",
       "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
       "exit": 0,
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
     {
@@ -59,10 +233,208 @@
       "output_excerpt": "<sanitized output>"
     },
     {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec id -u",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --long",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W6",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-failed.tar'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Hash.ToLowerInvariant()",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-failed.tar').Length",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl' --version 2",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "touch /etc/cloud/cloud-init.disabled",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --running",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Name>' --exec id -un",
+      "exit": "<path B only: exit code; null on path A>",
+      "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
       "step": "F1",
       "cmd": "systemctl is-system-running --wait",
       "exit": 0,
       "output_excerpt": "running"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl --failed --no-legend",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl list-unit-files --type=service --no-pager",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F2",
+      "cmd": "sudo loginctl enable-linger \"$(id -un)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
     },
     {
       "step": "F2",
@@ -75,6 +447,168 @@
       "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
       "exit": 0,
       "output_excerpt": "<WSL_USER> directory\n<WSL_USER> socket"
+    },
+    {
+      "step": "F3",
+      "cmd": "systemctl --user is-system-running --wait",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get update",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F4",
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' jq libatomic1 uidmap",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F6",
+      "cmd": "test -e ~/.bash_profile || printf '%s\\n' 'if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi' > ~/.bash_profile",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F6",
+      "cmd": "cat ~/.bash_profile",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "mkdir -p ~/code",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git clone https://github.com/seathatflowsinourveins/native-agent-stack.git ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack rev-parse HEAD",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack ls-remote origin refs/heads/main",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -m json.tool 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F8",
+      "cmd": "git check-ignore 'adoption/hosts/<host>.json'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp add --scope local jcodemunch -e \"CODE_INDEX_PATH=$HOME/.code-index\" -e JCODEMUNCH_SHARE_SAVINGS=0 -- \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp get jcodemunch",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
     }
   ]
 }
