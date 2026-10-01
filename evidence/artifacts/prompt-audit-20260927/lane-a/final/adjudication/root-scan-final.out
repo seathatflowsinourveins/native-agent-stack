@@ -1,0 +1,9 @@
+23991 root files; {'MAPPING': 0, 'PHRASES': 0} [] | root paths matching ACCESS: 0 []
+adjudication-inputs/x5c.AB.json: ['WEB']
+adjudication-inputs/x5c.BA.json: ['WEB']
+packets/x5c.json: ['WEB']
+prompts/claude-task-AB.txt: ['WEB']
+prompts/claude-task-BA.txt: ['WEB']
+prompts/judge-AB.txt: ['WEB']
+prompts/judge-BA.txt: ['WEB']
+schemas/adjudicate.json: clean

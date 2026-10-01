@@ -1,0 +1,6 @@
+20129 omniroute-fw.service: NOT in scope; running omniroute-3.8.51-2f42a9ac-pr13788 (87c4c488d) MainPID=945817 NRestarts=0
+20128 omniroute.service: running omniroute-3.8.51-2f42a9ac-pr13788-affinity2 (ae5539a56) -> omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 (cf6748d04, shim v2); lines changed: ['Description', 'Environment', 'ExecStart']; prefix problems: []
+saved prior unit files to switch-2026-09-30T06:32:49Z
+20128: health=True (ok) running prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 identity_ok=True MainPID=3262255 NRestarts=0
+20129 omniroute-fw.service: untouched; running omniroute-3.8.51-2f42a9ac-pr13788 (87c4c488d) MainPID=945817 NRestarts=0
+switched: ['20128'] | rollback dir: <STATE>/omniroute-tokensave-20260929/switch-2026-09-30T06:32:49Z

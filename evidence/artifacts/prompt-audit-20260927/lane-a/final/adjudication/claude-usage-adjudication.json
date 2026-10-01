@@ -1,0 +1,31 @@
+{
+ "note": "Per-call provider usage of these Claude subagents, read from their transcripts and deduplicated by API message id. Anthropic usage fields are disjoint (input_tokens excludes cache reads and cache writes), so they are listed side by side, never added. advisor_calls counts server-side advisor calls, whose own model usage is not in these fields. harness_counters are the completion notification's own counters. The coordinator session is not included.",
+ "adj-final-AB": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 20,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 42,
+   "cache_creation_input_tokens": 111141,
+   "cache_read_input_tokens": 1566491,
+   "output_tokens": 36988
+  }
+ },
+ "adj-final-BA": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 18,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 38,
+   "cache_creation_input_tokens": 127162,
+   "cache_read_input_tokens": 1695328,
+   "output_tokens": 32006
+  }
+ }
+}

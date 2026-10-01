@@ -1,0 +1,544 @@
+{
+ "tool": "headroom",
+ "group": "g2-context-sandbox",
+ "repo": "https://github.com/headroomlabs-ai/headroom",
+ "pin": "0.37.0 (uv-tool headroom-ai[mcp]==0.37.0; 0.39.0 was qualified but not switched because of an omission-count defect)",
+ "installed_version": "headroom, version 0.37.0 (native `headroom --version`)",
+ "role": "On-demand lossy MCP compression with exact retrieval of the original through the CCR store; no automatic traffic interception. Lanes: Claude and Codex user-scope MCP (offline env), mcporter --stdio for subagents or CLI. Counters: headroom savings --json and MCP headroom_stats. Landscape: token-efficiency winner.",
+ "lanes": [
+  "Claude user-scope MCP (headroom mcp serve --proxy-url http://127.0.0.1:1)",
+  "Codex user-scope MCP",
+  "mcporter --stdio",
+  "CLI: headroom savings --json"
+ ],
+ "upstream": {
+  "latest_release": "v0.39.1, 2026-09-26, https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1 ; the fresh releases API reports publication at 2026-09-26T20:31:39Z and PyPI also reports 0.39.1, https://pypi.org/pypi/headroom-ai/json . The earlier v0.39.0 research and cached latest-release page are superseded.",
+  "latest_date": "2026-09-26",
+  "our_pin": "Active enforced version is headroom-ai[mcp] 0.37.0 (manifests/stack.json:513; adoption/pins-linux-x86_64.json:263), https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0 . Version 0.39.0 was staged/qualified but not switched because its omission notice counts retained lines as omitted (assembled token-cards/cards/headroom.json pin; docs/decisions/2026-09-25-codex-mcp-scope.md:210), https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0 .",
+  "behind_by": "Three published stable releases newer than active 0.37.0: v0.38.0 (2026-09-21), https://github.com/headroomlabs-ai/headroom/releases/tag/v0.38.0 ; v0.39.0 (2026-09-25), https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0 ; and v0.39.1 (2026-09-26), https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1 . The staged 0.39.0 candidate is now one patch release behind; no commit-distance claim is made.",
+  "recommended_install": {
+   "command": "pip install \"headroom-ai[mcp]\"",
+   "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#installation"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "For on-demand compression, run headroom mcp install, then start/restart Claude Code and verify the MCP tools. Upstream exposes headroom_compress, headroom_retrieve and headroom_stats without requiring a proxy. Automatic traffic compression is a different, optional route using headroom proxy and explicit client routing to that proxy.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#setup-for-claude-code"
+   },
+   "codex": {
+    "how": "Use Codex's native stdio MCP registration with command headroom and args [mcp, serve]; add --proxy-url only to identify a deliberately selected proxy. Upstream's MCP-host instructions explicitly support Codex and do not require mcporter between Codex and Headroom.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#mcp-host-configuration"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "The v0.39.1 README's seeded, offline proof table reports 17199 -> 13597 tokens (21%) for code search, 55957 -> 24340 (57%) for SRE incident debugging, 58801 -> 33895 (42%) for codebase exploration, and 46067 -> 32429 (30%) for GitHub issue triage. These are upstream benchmark scenarios measured with its provider tokenizer and shipped compress(), not the host's measured cards.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/README.md#proof"
+   },
+   {
+    "claim": "Upstream says repeated JSON arrays and logs can exceed 90% compression, while prose and already-dense output compress little; it directs users to their own savings measurements rather than presenting one universal compression rate.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/README.md#proof"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "On-demand MCP compression happens after the LLM receives content, and its calls/results themselves enter session context. A smaller compression response is therefore not automatically the complete workflow or provider-billing reduction; retrieval costs and repeated subagent interactions matter.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#claude-code-usage-attributes-a-large-share-to-headroom-mcp"
+   },
+   {
+    "text": "headroom_compress requires a content string and returns a retrieval hash. The documented local original-content TTL is one hour; proxy storage normally expires after 30 minutes, configurable via HEADROOM_CCR_TTL_SECONDS. Required facts must be checked and originals recovered while available.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx"
+   },
+   {
+    "text": "The CLI is supplied by the PyPI distribution. The similarly named npm headroom-ai package is a TypeScript SDK and does not supply the headroom CLI.",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/README.md"
+   },
+   {
+    "text": "The failed content=@file transport shape is not evidence that Headroom cannot accept file contents: its required MCP input is content, while mcporter supports key=@path when the target is selected correctly. File-argument and target-selection contract: https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md#mcporter-call-servertool .",
+    "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#headroom_compress"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "v0.38.0 includes protection of Bash control flow, byte-exact file-read output through the lossless fold, and accounting changes such as counting compression savings once per conversation. These changes do not constitute an explicit fix for the log omission-count defect.",
+    "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.38.0"
+   },
+   {
+    "text": "v0.39.0 adds protect_messages as a compression veto, descriptions of what CCR dropped (#3635), retrievable sentinels for dropped scalar-array items (#3692), and cache-prefix fixes. These are related fidelity features, but the live v0.38.0/v0.39.0 release notes and CHANGELOG contain no explicit fix for the measured log omission notice counting kept lines; the local 0.39.0 qualification itself still found that defect. Do not infer that the switch blocker is resolved from those entries.",
+    "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0"
+   },
+   {
+    "text": "Newly released v0.39.1 fixes the 0.39.0 proxy TPM limiter indefinitely refusing large-context requests (#3806). Its release note does not address log omission counts; qualifying the latest candidate against that retained fixture remains necessary. Complete changelog also checked: https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/CHANGELOG.md .",
+    "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "headroom",
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "version": "0.37.0",
+   "license": "Apache-2.0",
+   "profile": "supporting",
+   "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
+   "freshness": "Installed tested pin equals the September 21 current stable release. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
+   "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
+  },
+  "how_we_install": "Active installation uses CPython 3.13 and the upstream MCP extra: uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0' (recipes/README.md:96 and :494-502). The current portable bootstrap downloads and verifies the pinned platform wheel before uv installs the equivalent headroom-ai[mcp] @ file:// package; dependencies still resolve through uv's index (adoption/pins-linux-x86_64.json:263; adoption/bootstrap.md:159). The card records 0.39.0 as staged but not switched; this research does not install or switch either candidate.",
+  "claude_wiring": "recipes/README.md:500-505 registers headroom at Claude user scope using the upstream headroom mcp serve command, an unreachable loopback proxy URL http://127.0.0.1:1, and HEADROOM_OFFLINE=1, HF_HUB_OFFLINE=1, TRANSFORMERS_OFFLINE=1 and DO_NOT_TRACK=1. This selects local on-demand compression/retrieval, with no automatic provider interception. adoption/templates/claude.settings.template.json has no headroom plugin or tool registration, and none of examples/claude-native/agents/*.md explicitly names headroom tools in its allowlist; only isolated-builder.md:4 and evidence-reviewer.md:4 name context-mode ctx_* tools.",
+  "codex_wiring": "adoption/templates/codex.config.template.toml:55-70 registers headroom directly at user scope with args [mcp, serve, --proxy-url, http://127.0.0.1:1] and all four offline environment guards. It is not routed through mcporter. The live repo .codex/config.toml has no headroom table because this server is at user scope; selected read-only inspection of $HOME/.codex/config.toml confirmed the same direct launch but only HEADROOM_OFFLINE=1 and DO_NOT_TRACK=1, so the two Hugging Face guards in the newer template have not reached this host's user registration (adoption/bootstrap.md:245; recipes/README.md:505).",
+  "lane_rule": "Use Headroom only for selected content that passes fidelity checks; retain originals, call headroom_compress then headroom_retrieve by returned hash, include recovery cost, and do not stack compressors on one artifact (docs/token-session-handbook.md:106-117 and :130; recipes/README.md:507-525). The supplied worker token-lanes block explicitly names Headroom for large selected text. The native recipe states there is no headroom compress CLI subcommand; the operation here is the MCP tool.",
+  "deviations_from_upstream": [
+   {
+    "what": "The active pin is held at 0.37.0 despite a qualified 0.39.0 candidate and newly released 0.39.1.",
+    "why": "docs/decisions/2026-09-25-codex-mcp-scope.md:210 and evidence/artifacts/sota-refresh-20260925/headroom-039/results.json:667 and :726 record an omission notice whose counts include retained lines, potentially implying that a kept error was dropped. The assembled card's pin note preserves that switch blocker. Related new compression features do not prove the specific defect fixed.",
+    "fix": "Keep the active pin until the latest candidate passes the retained omission-count and required-fact fixtures, with compression and exact recovery assessed separately. Qualify 0.39.1 rather than silently treating the now-older staged 0.39.0 as current; update the stale freshness prose at manifests/stack.json:543 when the decision is recorded.",
+    "pr": "#307"
+   },
+   {
+    "what": "Native-stack selects local, on-demand MCP compression with a dead proxy URL instead of upstream's optional automatic traffic proxy.",
+    "why": "The retained scope is selected-artifact compression with exact original recovery, not rerouting every Claude/Codex model request (recipes/README.md:507-525; manifests/stack.json:544). This is an upstream-supported MCP mode, not missing installation functionality: https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx#mcp-only-no-proxy .",
+    "fix": "Retain this explicit scope and report complete compression/retrieval cost. Evaluate automatic proxy routing separately only if the intended workload changes; its headline performance is not the measured performance of this adaptation.",
+    "pr": null
+   },
+   {
+    "what": "The live Codex user registration lacks two offline guards already present in the portable template.",
+    "why": "recipes/README.md:505 explains that HEADROOM_OFFLINE's Hugging Face environment setup runs at proxy startup, not headroom mcp serve; the template consequently also sets HF_HUB_OFFLINE and TRANSFORMERS_OFFLINE. The live selected registration still contains only HEADROOM_OFFLINE and DO_NOT_TRACK. The same recipe separately notes the tiktoken cache requirement, so the four variables should not be described as a blanket guarantee for every tokenizer download.",
+    "fix": "Bring the host registration into line with adoption/templates/codex.config.template.toml:66-70 and preserve the documented pre-populated tiktoken-cache handling when qualifying a cold-cache setup. No host registration was changed here.",
+    "pr": null
+   },
+   {
+    "what": "The first retained compression command used an incomplete mcporter target-selection shape and failed; a corrected invocation succeeded.",
+    "why": "The first card entry uses --name headroom --tool headroom_compress content=@file without --server, and returns exit 1 with content missing. mcporter v0.14.1 src/cli/call-arguments.ts:170-171 consumes the first positional token as selector when server is absent, before parsing named arguments; --name names an ephemeral server but does not supply the parser's --server selection (https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L164). Headroom correctly requires content, and @file itself is supported.",
+    "fix": "Use the retained successful --server headroom --tool headroom_compress content=@file shape, or a complete server.tool selector with an explicit JSON payload. Preserve the initial failure in the evidence rather than reporting that every upstream command passed.",
+    "pr": null
+   },
+   {
+    "what": "Installed, explicitly named guidance has not produced any Headroom invocation in the measured lanes-block worker population.",
+    "why": "The assembled card reports workflow_children_with_lanes_block mcp_calls 0, cli_calls 0 and agents_using 0 out of agents 22, despite the supplied lanes text naming Headroom. The example-agent allowlists do not explicitly name Headroom tools. This establishes an adoption gap in that population, not a runtime failure or proof that every task needed compression.",
+    "fix": "Review artifact suitability, access and concrete compress/retrieve examples in intended worker workflows before attributing expected savings to installation or guidance alone; add explicit tool access only for agents intended to use this lane.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Requalify the omission-count fixture and complete recovery on v0.39.1; neither v0.38.0/v0.39.0 changelog entries nor v0.39.1's TPM fix establish that the switch blocker is resolved (evidence/receipts/headroom-039-qualification-20260925.json).",
+   "Apply the template's HF_HUB_OFFLINE and TRANSFORMERS_OFFLINE guards to the live Codex registration, retaining the separate tiktoken cache caveat (recipes/README.md:505).",
+   "Use complete mcporter target selection in future fixtures and keep the retained initial failed command attributed to both its transport and target tool.",
+   "Investigate why the eligible lanes-block workflow population records no invocation; preserve the zero rather than converting named guidance into an adoption claim."
+  ],
+  "assessment": "The on-demand MCP adaptation is upstream-supported, but its held 0.37.0 pin and unapplied host guards mean latest-release and portable-template alignment are incomplete. In assembled token-cards/cards/headroom.json, the first upstream_commands entry failed with exit 1 ('content argument not delivered') through incomplete mcporter target selection, while the corrected --server invocation returned 'passed: 181,305 -> 13,834 Headroom tokens (92.4% saved)'. The separate o200k_base exact artifact comparisons are claude_subagent 237691 -> 56939, change_pct -76.0, and codex_worker 210316 -> 14611, change_pct -93.1, with fidelity 'headroom_retrieve returned byte-identical original (PASS); verifier: agree, 1 defects'; native_counter.delta 167471 tokens is a separate native estimate, and native_snapshot.saved 579411 tokens has scope 'Native / last 30 days', whose lifetime-named field is capped at that window. workflow_children_with_lanes_block records mcp_calls 0, cli_calls 0 and agents_using 0 with agents 22 despite explicit Headroom guidance, so installation and naming alone have not delivered adoption in that population, and none of these differently scoped figures is summed or substituted for another."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T17:52:24.521Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " headroom_retrieve returned byte-identical original (PASS); verifier: agree, 1 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 240 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 --env HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws --env HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg --name headroom --tool headroom_compress content=@<scratch>/rr/headroom/base.txt --output json --no-oauth --timeout 180000",
+    "exit": 1,
+    "returned": "failed (exit 1): content argument not delivered"
+   },
+   {
+    "cmd": "timeout -k 5 30 env HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg $HOME/.local/share/codex-ecosystem/bin/headroom --version",
+    "exit": null,
+    "returned": "passed: version matches the pin 0.37.0"
+   },
+   {
+    "cmd": "timeout -k 5 60 env HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg $HOME/.local/share/codex-ecosystem/bin/headroom savings --json",
+    "exit": null,
+    "returned": "ok: isolated ledger absent, report reads 0"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter list --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 --env HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws --env HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg --name headroom --schema --json --no-oauth --timeout 60000",
+    "exit": null,
+    "returned": "passed: 3 tools listed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 --env HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws --env HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg --name headroom --tool headroom_stats --output json --no-oauth --timeout 60000",
+    "exit": null,
+    "returned": "ok: 0 compressions; proxy unreachable by design"
+   },
+   {
+    "cmd": "timeout -k 5 240 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 --env DO_NOT_TRACK=1 --env HEADROOM_WORKSPACE_DIR=<scratch>/rr/headroom/state/ws --env HEADROOM_CONFIG_DIR=<scratch>/rr/headroom/state/cfg --name headroom --server headroom --tool headroom_compress content=@<scratch>/rr/headroom/base.txt --output json --no-oauth --timeout 180000",
+    "exit": null,
+    "returned": "passed: 181,305 -> 13,834 Headroom tokens (92.4% saved)"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 34,
+  "records_shown": [
+   {
+    "id": "headroom-e2e-01-version",
+    "status": "passed: version matches the pin 0.37.0",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 30 env HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 HEADROOM_WORKSPACE_DIR=$RR/headroom/state/ws HEADROOM_CONFIG_DIR=$RR/headroom/state/cfg $HOME/.local/share/codex-ecosystem/bin",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 0.25,\n  \"returned\": \"headroom, version 0.37.0\",\n  \"install\": \"uv tool headroom-ai[mcp]==0.37.0 on CPython 3.13.15 (uv-receipt.toml requirement and entrypoint), linked as $HOME/.local/share/codex-ecosystem/bin/headroom\"\n}",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-02-savings-before",
+    "status": "ok: isolated ledger absent, report reads 0",
+    "kind": "upstream native operation (counter read)",
+    "command": "timeout -k 5 60 env HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 HEADROOM_WORKSPACE_DIR=$RR/headroom/state/ws HEADROOM_CONFIG_DIR=$RR/headroom/state/cfg $HOME/.local/share/codex-ecosystem/bin",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 0.25,\n  \"schema_version\": 1,\n  \"ledger_path\": \"$RR/headroom/state/ws/savings_events.jsonl\",\n  \"lifetime\": {\n    \"tokens_saved\": 0,\n    \"tokens_before\": 0,\n    \"cost_usd\": 0.0,\n    \"calls\": 0,\n    \"savings_percent\": 0.0\n  },\n  \"ledger_absent\": \"yes: `test ! -e $RR/headroom/state` exit",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-03-mcp-list",
+    "status": "passed: 3 tools listed",
+    "kind": "upstream native operation (tool discovery)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter list --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 1.17,\n  \"status\": \"ok\",\n  \"server_duration_ms\": 549,\n  \"transport\": \"STDIO $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1\",\n  \"tools\": [\n    {\n      \"name\": \"headroom_compress\",\n      \"required\": [\n        \"content\"\n      ]\n    },\n    {\n     ",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-04-stats-before",
+    "status": "ok: 0 compressions; proxy unreachable by design",
+    "kind": "upstream native operation (MCP counter read)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 21.16,\n  \"compressions\": 0,\n  \"retrievals\": 0,\n  \"total_tokens_saved\": 0,\n  \"sub_agents\": null,\n  \"proxy\": {\n    \"url\": \"http://127.0.0.1:1\",\n    \"status\": \"unreachable\",\n    \"error\": \"ConnectTimeout: \",\n    \"warning\": \"Configured proxy http://127.0.0.1:1 is unreachable (ConnectTimeo",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-05-git-log-baseline",
+    "status": "ok: 150 commits captured",
+    "kind": "plumbing baseline (native git output, task input)",
+    "command": "timeout -k 5 60 env GIT_OPTIONAL_LOCKS=0 git -C $WT log --stat -150",
+    "observation": "{\n  \"evidence_class\": \"native git output used as the task input; git is not a token-saving component\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 1.86,\n  \"fixture\": \"wt-rr detached at 803bc3514ef05129c57118d8cbad0c61dd4ab141\",\n  \"raw\": {\n    \"bytes\": 672368,\n    \"sha256\": \"c7c88ebe5c190327aafb70304bd47c49f3d4c029de88a26a50470b5b9b0f8abf\",\n    \"lines\": 11592,\n    \"commits\": 150\n  },\n  \"exact_o200k_tokens\": 181298,\n  \"sanitiz",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-06-compress-attempt1-failed",
+    "status": "failed (exit 1): content argument not delivered",
+    "kind": "upstream native operation (failed attempt, kept as a result)",
+    "command": "timeout -k 5 240 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 1,\n  \"wall_seconds\": 1.15,\n  \"returned\": {\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Input validation error: 'content' is a required property\"\n      }\n    ],\n    \"isError\": true\n  },\n  \"cause\": \"mcporter 0.14.1 takes the first positional token as the selector when no --server is g",
+    "attachments": 4
+   },
+   {
+    "id": "headroom-e2e-06-compress",
+    "status": "passed: 181,305 -> 13,834 Headroom tokens (92.4% saved)",
+    "kind": "upstream native operation (compression)",
+    "command": "timeout -k 5 240 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 6.99,\n  \"returned\": {\n    \"hash\": \"c7c88ebe5c190327aafb7030\",\n    \"original_tokens\": 181305,\n    \"compressed_tokens\": 13834,\n    \"tokens_saved\": 167471,\n    \"savings_percent\": 92.4,\n    \"transforms\": [\n      \"router:mixed:0.08\"\n    ],\n    \"note\": \"Original stored with hash=c7c88ebe5c",
+    "attachments": 3
+   },
+   {
+    "id": "headroom-e2e-07-retrieve",
+    "status": "passed: exact original returned in a new process (sha256 match)",
+    "kind": "upstream native operation (exact retrieval)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 1.21,\n  \"hash\": \"c7c88ebe5c190327aafb7030\",\n  \"returned\": {\n    \"source\": \"local\",\n    \"error\": null,\n    \"original_bytes\": 672368,\n    \"original_sha256\": \"c7c88ebe5c190327aafb70304bd47c49f3d4c029de88a26a50470b5b9b0f8abf\",\n    \"original_item_count\": 0,\n    \"compressed_item_count\": 0,",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-08-retrieve-negative",
+    "status": "passed: error returned for an unknown hash",
+    "kind": "upstream native operation (negative control)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 16.14,\n  \"returned\": {\n    \"error\": \"Content not found. It may have expired or the hash may be incorrect.\",\n    \"hash\": \"000000000000000000000000\",\n    \"hint\": \"To recover: if the compression marker references a file Read, re-read that file (the path is in the marker; disk is the sou",
+    "attachments": 2
+   },
+   {
+    "id": "headroom-e2e-09-stats-after",
+    "status": "passed: counts the other processes' compression and retrieval",
+    "kind": "upstream native operation (MCP counter read)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter call --stdio $HOME/.local/share/codex-ecosystem/bin/headroom mcp serve --proxy-url http://127.0.0.1:1 --env HEADROOM_OFFLINE=1 --env HF_HUB_OFFLINE=1 --env",
+    "observation": "{\n  \"evidence_class\": \"native execution (the upstream command's own returned output on this host)\",\n  \"exit_code\": 0,\n  \"wall_seconds\": 21.18,\n  \"own_process\": {\n    \"compressions\": 0,\n    \"retrievals\": 0,\n    \"total_tokens_saved\": 0\n  },\n  \"sub_agents\": {\n    \"compressions\": 1,\n    \"retrievals\": 1,\n    \"tokens_saved\": 167471,\n    \"total_input_tokens\": 181305,\n    \"total_output_tokens\": 13834\n  },\n  \"combined\": {\n   ",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "git log --stat -150 output vs headroom_compress response; headroom_retrieve returned byte-identical original (PASS)",
+    "before_tokens": 237691,
+    "after_tokens": 56939,
+    "change_pct": -76.0,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:55.683019+00:00",
+    "last_seen": "2026-09-25T21:07:55.683019+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's headroom task; answer verified against the baseline (PASS)",
+    "before_tokens": 210316,
+    "after_tokens": 14611,
+    "change_pct": -93.1,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:52.334458+00:00",
+    "last_seen": "2026-09-26T13:51:52.334458+00:00"
+   }
+  ],
+  "native_counter": {
+   "command": "headroom savings --json",
+   "before": null,
+   "after": null,
+   "delta": 167471,
+   "unit": "tokens"
+  },
+  "native_snapshot": [
+   {
+    "tool": "headroom",
+    "scope": "Native / last 30 days",
+    "saved": 579411,
+    "unit": "tokens",
+    "observed_utc": "2026-09-26T22:54:08.714497+00:00",
+    "basis": "Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events. | kind: upstream estimate"
+   }
+  ],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 6,
+    "cli_calls": 135,
+    "agents_using": 58,
+    "agents": 1010,
+    "pct_agents_using": 0.0574
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 6,
+    "cli_calls": 135,
+    "agents_using": 58,
+    "agents": 988,
+    "pct_agents_using": 0.0587
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 11,
+    "agents_using": 6,
+    "agents": 71,
+    "pct_agents_using": 0.0845
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 38,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 3,
+    "cli_calls": 2,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": []
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "accurate",
+  "findings": [],
+  "checked": [
+   "Live latest-release check: https://github.com/headroomlabs-ai/headroom/releases/latest resolves to v0.39.1; its release page records 2026-09-26T20:31:39Z, and https://pypi.org/pypi/headroom-ai/json reports 0.39.1.",
+   "Fetched every cited release page: v0.37.0, v0.38.0, v0.39.0 and v0.39.1. Confirmed the three releases newer than active 0.37.0 and the stated dates for v0.38.0, v0.39.0 and v0.39.1. The staged 0.39.0 candidate is one patch release behind.",
+   "Fetched the cited v0.39.1 docs/content/docs/mcp.mdx through raw.githubusercontent.com. Confirmed pip install headroom-ai[mcp], headroom mcp install, headroom mcp serve, the three MCP tools, generic host/Codex support, optional explicit proxy URL and the supported MCP-only mode.",
+   "Verified the same MCP documentation's required content string, returned retrieval hash, one-hour local storage TTL, 30-minute proxy TTL and HEADROOM_CCR_TTL_SECONDS setting. Its usage discussion supports the card's distinction between compression-response size, accumulated MCP context and complete workflow cost.",
+   "Fetched the cited v0.39.1 README. Confirmed all four seeded offline proof-table token pairs and percentages: 17199 to 13597 (21%), 55957 to 24340 (57%), 58801 to 33895 (42%), and 46067 to 32429 (30%). Confirmed the provider-tokenizer/shipped-compress basis, content-dependent compression caveat and npm TypeScript SDK versus PyPI CLI distinction.",
+   "Checked v0.38.0 release notes for Bash protection, byte-exact file-read lossless folding and once-per-conversation savings accounting; v0.39.0 for protect_messages, dropped-content descriptions, scalar-array retrieval sentinels and cache-prefix fixes; and v0.39.1 for the TPM-limiter fix. Searched the complete cited v0.39.1 CHANGELOG.md and found no explicit repair of the retained omitted-line count defect.",
+   "Compared native_adaptation.stack_entry with REPO/manifests/stack.json and checked adoption/pins-linux-x86_64.json, recipes/README.md, adoption/bootstrap.md and evidence/receipts/headroom-039-qualification-20260925.json. These support active 0.37.0, CPython 3.13/MCP-extra installation, verified-wheel bootstrap behavior and the held 0.39.0 candidate. The card itself identifies the manifest freshness prose as stale and does not use it to claim current-release alignment.",
+   "Checked REPO/adoption/templates/codex.config.template.toml, the live project config and selected non-secret user-config settings. Headroom connects directly using mcp serve and the unreachable loopback proxy URL; the template has four guards while the live user entry has only HEADROOM_OFFLINE and DO_NOT_TRACK.",
+   "Checked the Claude recipe, settings template and all example-agent allowlists. The recipe supplies direct user-scope Headroom MCP registration; the settings template and example allowlists do not explicitly name Headroom tools. recipes/README.md supports the separate Hugging Face offline guards and the tiktoken cold-cache caveat.",
+   "Checked docs/token-session-handbook.md and recipes/README.md for selected-artifact use, fidelity checks, original retrieval, recovery cost and the prohibition on stacking compressors. These agree with the adaptation's on-demand scope.",
+   "Checked the retained first and corrected upstream_commands entries and fetched the cited mcporter v0.14.1 CLI reference and call-arguments.ts. The first call lacks --server, exits 1 and lacks content; the corrected call includes --server headroom and reports 181,305 to 13,834 Headroom tokens (92.4%). The source supports the selector-consumption explanation and key=@path support.",
+   "Checked assessment values against the assembled evidence: claude_subagent 237691 to 56939 (-76.0%) and codex_worker 210316 to 14611 (-93.1%) use o200k_base; fidelity preserves byte-identical recovery with verifier agreement and 1 defect; native_counter.delta is 167471 and the separate native_snapshot.saved is 579411.",
+   "Compared all six invoke_rates populations directly with SP/token-cards/invoke_by_tool.json. The quoted workflow_children_with_lanes_block mcp_calls 0, cli_calls 0, agents_using 0 and agents 22 match exactly. The assessment does not infer a runtime failure or a compression requirement for every task from zero invocation.",
+   "Checked evidence-class separation and native_snapshot.basis: the lifetime-named snapshot is explicitly capped at the last 30 days, is not treated as a fresh delta, and is not summed with the native delta, exact comparisons or local integration result. The shared mcporter command attribution respects the method note.",
+   "Scanned the complete card for ~, bare <user>, <tmp>, the supplied session UUID and arbitrary UUID-shaped strings: no matches. gpt6_review remains pending."
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "headroom",
+   "verdict": "adapted-with-gaps",
+   "summary": "On-demand MCP compression and retrieval are upstream-supported, but this host retains 0.37.0 while latest is 0.39.1 and lacks two offline guards already present in its template (https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx; groups/verdict-evidence.json). Historical Claude 237691→56939 (76.0%) and Codex 210316→14611 (93.1%) comparisons measure selected compression responses with their recorded answer/recovery checks, not recovery-inclusive provider savings (../html-report/savings.json#report_comparisons). The separate retained fixture compresses body text 181298→13827 (92.4%) but compression plus full retrieval is 181298→195125 (+7.6%), so eligibility depends on the required information and recovery cost; the native counter remains a separate estimate (../rr/headroom/out/13-compare-compressed.stdout; ../rr/headroom/out/14-compare-recovery.stdout). The scan labels 58/1010 Ultracode workflow children (5.74%, 6 MCP and 135 CLI matches), 1/301 eligible Codex workers (0.33%, 3 MCP and 2 CLI matches), and 0/22 workflow_children_with_lanes_block as users (invoke_by_tool.json). Next, qualify 0.39.1 against the retained omission-count and recovery cases, reconcile the host guards and complete target selection, and measure useful compression including any retrieval.",
+   "gaps": [
+    {
+     "gap": "The active pin is held below latest; 0.39.1's proxy rate-limit patch does not establish resolution of the retained omission-count defect.",
+     "evidence": "evidence/receipts/headroom-039-qualification-20260925.json; https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1",
+     "action": "Qualify the latest release on omission counts, required facts and exact retrieval before considering a local pin change.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Live Codex registration lacks HF_HUB_OFFLINE and TRANSFORMERS_OFFLINE, which the portable template supplies for MCP mode.",
+     "evidence": "groups/verdict-evidence.json#host_wiring_readback; adoption/templates/codex.config.template.toml; recipes/README.md:505",
+     "action": "Align the selected host registration with the template; preserve the separate pre-populated tiktoken-cache requirement rather than claiming the four flags cover every download.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Compression-only savings can disappear or become expansion when the task requires full original retrieval.",
+     "evidence": "../rr/headroom/out/13-compare-compressed.stdout; ../rr/headroom/out/14-compare-recovery.stdout; ../rr/headroom/out/15-compare-envelope.stdout",
+     "action": "Choose this lane only when its retained facts satisfy the task and report complete compression, response-envelope and recovery costs separately.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The first fixture call omitted the MCPorter server selector; zero use in the lane-block subset also leaves guidance effectiveness unestablished.",
+     "evidence": "../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; ../rr/returned-results.json#headroom-e2e-06-compress; invoke_by_tool.json; https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts",
+     "action": "Use an unambiguous server/tool target, retain the failed attempt, and inspect suitable-artifact opportunities and intended worker access before attributing savings to installation.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest stable is 0.39.1, published 2026-09-26, while the installed executable remains 0.37.0.",
+     "evidence": "https://api.github.com/repos/headroomlabs-ai/headroom/releases/latest; https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; groups/verdict-evidence.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The selected local MCP-only mode is an upstream-supported architecture and does not require automatic model-traffic proxying.",
+     "evidence": "https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx",
+     "result": "holds"
+    },
+    {
+     "claim": "The 0.39.1 release proves that the omission-count switch blocker is fixed.",
+     "evidence": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; evidence/receipts/headroom-039-qualification-20260925.json",
+     "result": "unverified"
+    },
+    {
+     "claim": "Historical exact counts are 237691→56939 and 210316→14611, with eligibility limited to their recorded selected-artifact checks.",
+     "evidence": "../html-report/savings.json#report_comparisons; groups/verdict-evidence.json#historical_comparison_recount",
+     "result": "holds"
+    },
+    {
+     "claim": "The retained body-only comparison saves 181298→13827, whereas compression plus complete retrieval expands to 195125.",
+     "evidence": "../rr/headroom/out/13-compare-compressed.stdout; ../rr/headroom/out/14-compare-recovery.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "The response-envelope comparison is a distinct 181298→14906 measurement.",
+     "evidence": "../rr/headroom/out/15-compare-envelope.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "The initial file-argument failure establishes that Headroom or MCPorter does not support file-backed content.",
+     "evidence": "../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; ../rr/returned-results.json#headroom-e2e-06-compress; https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md; https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The host has the two general offline variables but lacks the two Hugging Face guards present in the template.",
+     "evidence": "groups/verdict-evidence.json#host_wiring_readback; recipes/README.md:505",
+     "result": "holds"
+    },
+    {
+     "claim": "The scan reports 58/1010 workflow children, 1/301 eligible Codex workers and 0/22 lane-block children.",
+     "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+     "result": "holds"
+    },
+    {
+     "claim": "The 167471 native delta and 579411 last-30-days snapshot are separately scoped native estimates, not additional provider savings.",
+     "evidence": "cards/headroom.json#adapted_performance; ../html-report/savings.json#native_snapshot; ../rr/headroom/out/16-reconcile.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "Selected compression percentages establish causal provider or whole-session savings.",
+     "evidence": "../rr/headroom/out/14-compare-recovery.stdout; cards/headroom.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "qmd",
+    "gpt-tokenizer"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 29
+    },
+    "shell_commands": 3,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-a.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 47,
+     "qmd": 3
+    },
+    "shell_commands": 1,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 28
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 237,691->56,939 (76.0%); lifetime savings +183,904 vs exact 180,752 (beacon was on then, since fixed). #343: 210,316->14,611 (93.1%) native MCP offline. #316: artifact bundled compress and retr…"
+}

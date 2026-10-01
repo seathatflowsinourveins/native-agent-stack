@@ -1,0 +1,16 @@
+#!/bin/bash
+# second_instance_inner.sh PREFIX RAWDIR: with shim v2 on PATH, a second `omniroute serve` on a port a real server already holds must be refused by the bind probe.
+set -u
+PREFIX="$1"; RAW="$2"
+stamp() { date -u +%FT%TZ; }
+"$PREFIX/bin/omniroute" serve --port 20197 --no-open --no-tray > "$RAW/serve-1.log" 2>&1 &
+S1=$!
+for i in $(seq 1 60); do [ "$(curl -s -m 3 -o /dev/null -w '%{http_code}' http://127.0.0.1:20197/api/health 2>/dev/null)" = "200" ] && break; sleep 1; done
+echo "[$(stamp)] first instance health: $(curl -s -m 3 -o /dev/null -w '%{http_code}' http://127.0.0.1:20197/api/health)"
+"$PREFIX/bin/omniroute" serve --port 20197 --no-open --no-tray > "$RAW/serve-2.log" 2>&1
+rc=$?
+echo "[$(stamp)] second instance exit code: $rc"
+grep -m1 -E 'already in use' "$RAW/serve-2.log" | sed -E 's/\x1b\[[0-9;]*m//g' | cut -c1-140
+echo "[$(stamp)] first instance still healthy: $(curl -s -m 3 -o /dev/null -w '%{http_code}' http://127.0.0.1:20197/api/health)"
+kill -TERM "$S1"; wait "$S1" 2>/dev/null
+exit 0

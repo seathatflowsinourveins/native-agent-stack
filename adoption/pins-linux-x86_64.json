@@ -51,11 +51,11 @@
     },
     {
       "id": "codex",
-      "version": "0.157.1",
+      "version": "0.159.2",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.157.1.tgz",
-      "sha256": "813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73",
-      "install_note": "npm registry tarball for @openai/codex@0.157.1 (thin wrapper package, 4,904 bytes); npm dist.integrity sha512-qJ/UZ0bmYP+/Umav1L9WpmtMYeA6q1+4r4qILSYOKQZhP7WRdjyTQWz3O0dTImZ9RT7AazZa85D87xRDHogcHw== matched the download, `npm audit signatures` verified its registry signature and attestation, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726 (evidence/receipts/codex-01571-qualification-20260926.json). npm resolves the platform package @openai/codex@0.157.1-linux-x64 itself (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8, dist.integrity sha512-Eac8XlC0nCXSeUjDU9l8yLJ6P9evv1mO+AnvILoNwlegBC7B3AVXqJ05QcMhQX7RcJ3Lk2618ykCb2X2ui8VAQ==); its native binary is byte-identical to the GitHub release asset's. `npm install --global --prefix tools/codex-0.157.1 <verified codex-0.157.1.tgz>`. 0.157.x copies itself into CODEX_HOME/packages/app-server-daemon and starts a self-updating background app-server on its first interactive launch unless the daemon_auto_start feature is false: adoption/templates/codex.config.template.toml sets it, and a host whose ~/.codex/config.toml is not rendered from that template runs `codex features disable daemon_auto_start` before its first interactive launch. The complete native package (codex-code-mode-host, bundled rg) is a separate, larger GitHub release asset; this pin follows the npm alternative.",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2.tgz",
+      "sha256": "cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2",
+      "install_note": "npm registry tarball for @openai/codex@0.159.2 (thin wrapper package, 4,904 bytes); npm dist.integrity sha512-SE13C3nZCYoVL569BdegoOl6vwjb7o2sXOo7ivwVzaVoY0cswwi0/6pIE0TyO/C0vIkQh3jslExitET7PBTfIg== matched the download, `npm audit signatures` verified its registry signature and attestation, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5 (evidence/receipts/codex-01592-qualification-20260930.json). npm resolves the platform package @openai/codex@0.159.2-linux-x64 itself (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba, dist.integrity sha512-RrCZ1X52wpa1lOsXtCtSyhjOFdQPh7LH5Ccv8HsKmd/2UXbUwxXFqWXFK3JzatquUNGtW/TLox5Y7qVOGkV0/Q==); its native binary is byte-identical to the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz's, and from 0.159.x its vendor tree is the complete native package: all 44 files (codex, codex-code-mode-host, bundled rg and bwrap, the voice host) are byte-identical to the GitHub release asset codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 the release's codex-package_SHA256SUMS lists. `npm install --global --prefix tools/codex-0.159.2 <verified codex-0.159.2.tgz>`. 0.157.x copies itself into CODEX_HOME/packages/app-server-daemon and starts a self-updating background app-server on its first interactive launch unless the daemon_auto_start feature is false (measured at 0.157.1; at 0.159.2 `codex features list` still lists daemon_auto_start as stable and on by default, and `codex features disable daemon_auto_start` still writes it off): adoption/templates/codex.config.template.toml sets it, and a host whose ~/.codex/config.toml is not rendered from that template runs `codex features disable daemon_auto_start` before its first interactive launch.",
       "version_probe": {
         "method": "exec",
         "command": "codex",
@@ -66,11 +66,11 @@
     },
     {
       "id": "claude-code",
-      "version": "2.1.281",
+      "version": "2.1.284",
       "kind": "native",
-      "url": "https://downloads.claude.ai/claude-code-releases/2.1.281/linux-x64/claude",
-      "sha256": "56fe3da88458465fb27d7e9299dddb3fead55750fb9c2de795f233b5eea6dce1",
-      "install_note": "minimum version; native auto-update on the latest channel. Raised from 2.1.280 (1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b, verified 2026-09-23 by downloading the linux-x64 binary and re-hashing it) in step with the macOS pin, since shared components keep one version on both platforms: 2.1.281 fixes a recursive rm of command-substitution output running unprompted in auto and --dangerously-skip-permissions mode. This sha256 is the 2.1.281 manifest.json's platforms.linux-x64.checksum (fetched 2026-09-24, size 237375560); the linux-x64 binary was not re-downloaded or re-hashed for it, and fetch() verifies the served bytes against it before anything runs. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.281`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling: adoption/bootstrap-linux.sh's install_native (identical to bootstrap-macos.sh's since 2026-09-24) keeps a ~/.local/bin/claude whose --version already reports 2.1.281 or newer, logging `Kept installed claude-code <version>` with nothing downloaded or installed, and runs the checksum-verified install only when that launcher is missing, older or unreadable, so re-running the bootstrap never moves a newer auto-updated install back to this pin. No DISABLE_AUTOUPDATER opt-out is set.",
+      "url": "https://downloads.claude.ai/claude-code-releases/2.1.284/linux-x64/claude",
+      "sha256": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f",
+      "install_note": "minimum version; native auto-update on the latest channel. Raised from 2.1.281 (56fe3da88458465fb27d7e9299dddb3fead55750fb9c2de795f233b5eea6dce1, that release's manifest.json platforms.linux-x64.checksum fetched 2026-09-24, size 237375560; its binary was not re-downloaded or re-hashed) in step with the macOS pin, since shared components keep one version on both platforms: 2.1.284 is the first release whose `sonnet` alias resolves to Sonnet 5.5 (`claude-sonnet-5-5`; CHANGELOG.md 2.1.284: \"Added Claude Sonnet 5.5 (`claude-sonnet-5-5`), now the default Sonnet model on the Anthropic API\"; https://code.claude.com/docs/en/model-config lists `sonnet` as Sonnet 5.5 from v2.1.284 and Sonnet 5 from v2.1.197, both read 2026-09-29), so an older client routes `sonnet` to Sonnet 5 on the Anthropic API; the 2.1.281 fix for a recursive rm of command-substitution output running unprompted in auto and --dangerously-skip-permissions mode stays included. This sha256 is the 2.1.284 manifest.json's platforms.linux-x64.checksum (https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json, fetched 2026-09-29: commit 2b8ce618c24de26410e4bdfc4e1d592accd61f61, buildDate 2026-09-28T02:36:51Z, size 243059896). First independent byte check, without a download: the 2.1.284 linux-x64 binary that Claude Code's own native updater had already installed on the NativeStack WSL2 host (~/.local/share/claude/versions/2.1.284, 243059896 bytes) re-hashes to the same digest (2026-09-29). Also re-hashed on 2026-09-29: the binary streamed from this pin's URL (HTTP 200, 243059896 bytes) hashes to the same digest. The manifest itself was verified with the documented procedure (https://code.claude.com/docs/en/setup#binary-integrity-and-code-signing) on 2026-09-29: the key at https://downloads.claude.ai/keys/claude-code.asc, imported into an empty keyring, has the documented fingerprint 31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE, and `gpg --verify manifest.json.sig manifest.json` reported `Good signature from \"Anthropic Claude Code Release Signing <security@anthropic.com>\"` (gpg's untrusted-key warning is expected; a copy of the manifest with one byte changed failed with BAD signature). The key's own certification, expiry and revocation were not checked, and the fingerprint comes from the same documentation. fetch() still verifies the served bytes against this sha256 before anything runs. Superseded the prior npm-wrapper pin (2.1.278, DISABLE_AUTOUPDATER=1) once the native installer became the reference path: fetch the binary, verify its sha256, then run `\"$bin\" install 2.1.284`, matching ~/codex-ecosystem/bin/bootstrap-linux.sh's own claude-code step. The installed binary self-manages ~/.local/share/claude/versions and the ~/.local/bin/claude launcher and auto-updates on the latest channel from there; this pin is a floor, not a ceiling: adoption/bootstrap-linux.sh's install_native (identical to bootstrap-macos.sh's since 2026-09-24) keeps a ~/.local/bin/claude whose --version already reports 2.1.284 or newer, logging `Kept installed claude-code <version>` with nothing downloaded or installed, and runs the checksum-verified install only when that launcher is missing, older or unreadable, so re-running the bootstrap never moves a newer auto-updated install back to this pin. No DISABLE_AUTOUPDATER opt-out is set.",
       "bin": "claude",
       "version_probe": {
         "method": "exec",
@@ -143,12 +143,27 @@
       }
     },
     {
+      "id": "context-hub",
+      "version": "0.1.4",
+      "kind": "npm",
+      "url": "https://registry.npmjs.org/@aisuite/chub/-/chub-0.1.4.tgz",
+      "sha256": "ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f",
+      "install_note": "2026-09-26 fetch of the npm registry tarball for @aisuite/chub@0.1.4 (35884 compressed bytes), independently SHA-256 hashed. npm dist.integrity sha512-/Jwme37Jqc3MQLBbtbTmPzW1wSBrZadkwCmcLd3YReBW2t99bHpimy+8qS333oGC4cu9/3WpF2MYTK7fYG6q8Q== matches both Python hashlib and a fresh OpenSSL SHA-512/base64 digest; SHA-1 also matches npm dist.shasum 39fad45082d70f0067c352024b96eca20ba0e77c. `npm install --global --prefix tools/context-hub-0.1.4 @aisuite/chub@0.1.4`, matching recipes/README.md and manifests/stack.json. Registry metadata lists no optionalDependencies; this package digest does not pin transitive dependencies or establish native acceptance. Set telemetry: false and feedback: false in ~/.chub/config.yaml; use CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 only where HOME or CHUB_DIR is overridden (andrewyng/context-hub v0.1.4 docs/cli-reference.md:215-229 and SECURITY.md:28; recipes/README.md#context-hub-opt-out).",
+      "version_probe": {
+        "method": "exec",
+        "command": "chub",
+        "args": [
+          "--cli-version"
+        ]
+      }
+    },
+    {
       "id": "context-mode",
       "version": "1.0.169",
       "kind": "npm",
       "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz",
       "sha256": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
-      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. recipes/README.md flags that the npm context-mode@1.0.169 release is a DIFFERENT source revision from the native plugin pin (git 6f0cc6841c687e754059f36714a11233fda1a02b installed via `codex plugin marketplace add` / `claude plugin marketplace add`) and is not a substitute for full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
+      "install_note": "npm dist.integrity sha512-94JIaFuLjF9SO2BsGTrbGtyT44K95+9OC8BdbaL/UT76xOkanJLfUR5CzmNw+GELXZQqH4nBrKg9wjBnSFkVnQ== matched. The npm context-mode@1.0.169 package and native plugin pin 6f0cc6841c687e754059f36714a11233fda1a02b use the same context-mode source; separately built bundles that differ by one vendored expression (evidence/artifacts/context-mode-codex-binding-20260926/README.md#packages). Distinct installation surfaces still require full plugin evidence. This pin installs the npm CLI package only (`npm install --global --prefix tools/context-mode-1.0.169 context-mode@1.0.169`) so the script can place an executable on PATH; it does NOT install or replace the client-native plugin, and does not by itself establish the plugin-level acceptance recorded elsewhere in the catalog.",
       "version_probe": {
         "method": "npm-metadata",
         "note": "No version flag: every argv other than its named subcommands and --help falls through to starting its MCP stdio server, so the package version is read from npm metadata instead (observed 2026-09-25 with context-mode 1.0.169)."
@@ -246,11 +261,11 @@
     },
     {
       "id": "ccusage",
-      "version": "20.0.24",
+      "version": "20.0.26",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.24.tgz",
-      "sha256": "69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183",
-      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. npm registry tarball for ccusage@20.0.24 downloaded fresh and independently sha256-hashed; npm dist.integrity sha512-sHq7axM0ucbFS4m5xFzS7NxYSmOP1+PSDup3nVb+pitI3eEuwEiGObhsXvu47DSvB2hHpEts/quA3/0EE5i1Zw== matches a fresh openssl sha512/base64 digest of the same download exactly. `npm install --global --prefix tools/ccusage-20.0.24 ccusage@20.0.24`, the npm form recipes/native-upgrades-20260921.md's isolated-prefix installation documents, and the exact version manifests/stack.json already pins. `ccusage --version` prints `ccusage 20.0.24` and exits; confirmed 2026-09-25 in an isolated `npm --prefix` scratch install, not the shared host copy.",
+      "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz",
+      "sha256": "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2",
+      "install_note": "2026-09-27 move from 20.0.24 (evidence/receipts/ccusage-20026-qualification-20260927.json). npm registry tarball for ccusage@20.0.26 downloaded fresh and independently hashed; npm dist.integrity sha512-46TTmFKcuNyWbtqj8HZqWTmVQIsApvGO4xP+E2VL5NC/oMjdtHOv9svVTsHX1WQgetbNOV4GdvQGHLG22vXZgg== and dist.shasum a0d190787b26183dd78797283c59db3ec9ee7817 match fresh sha512 and sha1 digests of the same download. The tarball carries only the JavaScript launcher; `npm view ccusage@20.0.26 optionalDependencies` lists six `@ccusage/ccusage-*@20.0.26` native builds and npm resolves `@ccusage/ccusage-linux-x64` at install time, outside this hash. `npm install --global --prefix tools/ccusage-20.0.26 ccusage@20.0.26`, the npm form recipes/native-upgrades-20260921.md's isolated-prefix installation documents, and the exact version manifests/stack.json pins. `ccusage --version` prints `ccusage 20.0.26` on the host install the coordinator switched to on 2026-09-27; the 20.0.24 prefix is retained for rollback.",
       "version_probe": {
         "method": "exec",
         "command": "ccusage",
@@ -294,17 +309,17 @@
     },
     {
       "id": "socraticode",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "kind": "npm",
       "ignore_scripts": true,
-      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.14.0.tgz",
-      "sha256": "3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46",
+      "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz",
+      "sha256": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
       "checksum_source": "npm_registry_integrity_crosscheck",
-      "checksum_ref": "npm view socraticode@1.14.0 dist.integrity read 2026-09-25; the tarball was downloaded to a scratch directory and independently sha256- and sha512-hashed, both matching, and the sha256 also matches adoption/pins-macos-arm64.json's existing socraticode pin exactly",
-      "install_note": "2026-09-25 addition to complete the `token-efficiency` profile's Linux pin coverage: mirrors adoption/pins-macos-arm64.json's existing `socraticode` entry (same version, url, sha256 and `--ignore-scripts`). AGPL-3.0-only; upstream commercial alternative. `npm install --global --prefix tools/socraticode-1.14.0 --ignore-scripts socraticode@1.14.0`, exactly recipes/README.md's documented recipe, which this pin now also drives through the bootstrap script instead of only a manual install. `--ignore-scripts` (this pin's own `ignore_scripts: true` field, read by `install_npm`) skips native postinstall/build steps. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on this host.",
+      "checksum_ref": "npm view socraticode@1.15.0 dist.integrity (sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ==) and dist.shasum read 2026-09-27; the tarball was downloaded to a scratch directory and independently sha256-, sha512- and sha1-hashed, all matching (evidence/receipts/socraticode-1150-qualification-20260927.json). adoption/pins-macos-arm64.json keeps 1.14.0 until a Mac qualifies 1.15.0",
+      "install_note": "Moved from 1.14.0 on 2026-09-27 (docs/decisions/2026-09-25-workstation-sota-refresh.md, the cutover update; evidence/receipts/socraticode-1150-qualification-20260927.json). AGPL-3.0-only; upstream commercial alternative. recipes/README.md's recipe is `npm install --global --prefix tools/socraticode-1.15.0 --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0`: `--before` reproduces the qualified dependency tree, because the package ships no shrinkwrap and later releases inside its dependency ranges (undici 6.29.0, @lumis-sh/wasm-eex 0.26.2) resolve without it. The bootstrap's `install_npm` installs this pin's verified tarball with `--ignore-scripts` (this pin's own `ignore_scripts: true` field) but passes no `--before`, so its dependency tree can differ from the qualified one. Only a reviewed archive hash, not a claim of a working native codebase-index handshake on a new host.",
       "version_probe": {
         "method": "npm-metadata",
-        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
+        "note": "No argument parsing at all: every invocation, --help and --version included, starts its MCP stdio server (dist/index.js never reads process.argv; observed 2026-09-25 with socraticode 1.14.0, matching the macOS pin's own note, and 1.15.0's dist/index.js still reads none), so the package version is read from npm metadata instead. Never run `socraticode --version` or with no arguments on a real install -- it starts the server."
       }
     }
   ]

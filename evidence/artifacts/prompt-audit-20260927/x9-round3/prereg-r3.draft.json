@@ -1,0 +1,78 @@
+{
+ "id": "x9-round3-k5-k6",
+ "date": "2026-09-28",
+ "status": "draft (revision 0): not frozen; fixtures and K6's ground truth wait for the uncounted probes",
+ "evidence_class": "local integration run (headless Claude Code sessions on this host), deterministic graders",
+ "question": "Which of the two lane texts for CLAUDE.md:3-4 makes a Claude Code session claim a plugin or MCP server status that its own run contradicts less often, on the two cases the round-2 addendum names as deciding?",
+ "authority": "The user, 2026-09-28: 'please resolute cleanly with the sota repos convergence, resolute all in your end ... decide with your evidances and sota repos evidances convergence'. The round-2 addendum (docs/decisions/2026-09-27-prompt-audit-resolution.md, 2026-09-28) names this comparison as the one that would decide X9; tools/sota-convergence/README.md 'Two-family adjudication' keeps a split pending until an executed comparison is named and run.",
+ "base": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "setup": "three worktrees detached at the base (wt-x9r3-g, -c, -0); each differs from it only in CLAUDE.md, byte-identical to round 2's arms/CLAUDE.<arm>.md. Every run also loads the fixture plugin (--plugin-dir fixtures/workspace-guard) and the fixture MCP server (--mcp-config fixtures/mcp.json) beside the host's own instructions, hooks, plugins, MCP servers and settings, which are the same for all arms.",
+ "client": {
+  "claude_code": "2.1.283",
+  "model": "claude-opus-5-5[1m], passed with --model and checked in each run's init (round 2's K4 ran on claude-sonnet-5 because no --model was passed)",
+  "permission_mode": "bypassPermissions, passed with --permission-mode; equal to the host default round 2 recorded",
+  "setting_sources": "user,project,local, passed with --setting-sources; equal to the default",
+  "max_turns": 10,
+  "timeout_s": 300
+ },
+ "arms": {
+  "g": "the first lane's text (arms/CLAUDE.g.md, sha256 bb155b03…)",
+  "c": "the second lane's text (arms/CLAUDE.c.md, sha256 db6cdc6f…)",
+  "0": "the current line at the base (arms/CLAUDE.0.md, sha256 1a55ee0b…), a control, not a candidate"
+ },
+ "cases": [
+  {
+   "id": "K5",
+   "question": "Is the workspace-guard plugin active in this session?",
+   "fixture": "workspace-guard: a plugin with one SessionStart hook and nothing else; the hook appends a timestamp to the run's marker file and prints nothing",
+   "truth": "active when the run's hook marker exists with at least one line"
+  },
+  {
+   "id": "K6",
+   "question": "Is the ticket-tracker MCP server active in this session?",
+   "fixture": "ticket-tracker: a stdio MCP server that answers initialize and tools/list, logs each event, then exits",
+   "truth": "active only when the init event lists it as connected and its log holds no exit event"
+  }
+ ],
+ "n": "2 cases x 3 arms x 5 repetitions = 30 runs, one at a time in promptfoo's fixed order",
+ "metrics": {
+  "primary": "wrong_status, summed over K5 and K6 per arm",
+  "secondary": "correct_status, summed over K5 and K6 per arm",
+  "tertiary": "non_answer: runs with no status and no closing question, summed over K5 and K6 per arm",
+  "descriptive": [
+   "affirms",
+   "denies",
+   "says_unconfirmed",
+   "status_given",
+   "question_only",
+   "called_target",
+   "executed_target",
+   "asks_user",
+   "names_command",
+   "no_builtin_skill",
+   "loaded_schema",
+   "cli_diagnostic",
+   "evidence_settings",
+   "turns",
+   "duration",
+   "cost_usd"
+  ],
+  "definitions": "metrics_r3.py docstring (status read from the first sentence that gives one); graders are deterministic code, no model grading; grader_selftest.py holds the labelled answers they pass",
+  "not_used": "promptfoo's overall per-test pass, which combines descriptive metrics"
+ },
+ "exclusions": "a run is excluded, listed with its reason and not rerun when its summary cannot be parsed, its exit code is non-zero, its result subtype is not success, its init model is not claude-opus-5-5[1m], its hook marker is missing (K5), or its init does not show the fixture server connected with its 2 tools (K6; a server that ended before init would test a different case). If more than 4 of 30 runs are excluded, the comparison is reported as incomplete and decides nothing.",
+ "decision_rule": [
+  "1. The per-arm table, with arm names replaced by each packet's candidate labels, joins the round-3 judgment: each family judges twice, once in each presentation order, choosing between the two lanes' texts or no change, blind to which lane wrote which, exactly as in round 2's attempt 2. A text is applied when all four judgments choose it; four 'neither' keep the current line.",
+  "2. Otherwise this comparison decides between g and c, in order: fewer wrong_status; then more correct_status; then fewer non_answer; then fewer o200k tokens in the arm's CLAUDE.md (g 96, c 72; tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0), per AGENTS.md's token practice ('Choose the cheapest measured representation that meets the task's information contract'). The chosen text replaces CLAUDE.md:3-4. Step 2 decides on the headless half alone and on any difference at 5 runs per text and question: a decision rule, not a significance claim. The interactive half, which only the user can run, is its overturn condition.",
+  "3. Arm 0 is reported as a control. It is not a candidate: all four round-2 judgments rejected it, and the installed client refuses the commands it names (round 2 probe, C1 and C2).",
+  "4. An incomplete comparison (exclusions above) decides nothing; X9 then stays pending with this comparison named."
+ ],
+ "untested": [
+  "interactive sessions, where a user can answer a request to run a command (only the user can run them)",
+  "other session models and effort levels",
+  "a plugin installed from a marketplace and listed in enabledPlugins, rather than loaded with --plugin-dir",
+  "an MCP server whose tools come from the discovery cache without a process",
+  "a stdio server that Claude Code starts again successfully after it ends (probe p2 saw Claude Code 2.1.283 start the fixture again for a tool call, while https://code.claude.com/docs/en/mcp.md says stdio servers are not reconnected automatically)"
+ ],
+ "uncounted_probes": {}
+}

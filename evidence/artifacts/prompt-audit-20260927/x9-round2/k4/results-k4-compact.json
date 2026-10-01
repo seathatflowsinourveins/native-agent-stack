@@ -1,0 +1,747 @@
+{
+ "harness": {
+  "promptfooVersion": "0.123.1",
+  "nodeVersion": "v24.21.0",
+  "platform": "linux",
+  "arch": "x64",
+  "exportedAt": "2026-09-28T03:03:34.288Z",
+  "evaluationCreatedAt": "2026-09-28T02:55:23.910Z"
+ },
+ "eval_id": "eval-zbt-2026-09-28T02:55:23",
+ "runtime_options": {
+  "eventSource": "cli",
+  "showProgressBar": false,
+  "repeat": 3,
+  "maxConcurrency": 1,
+  "cache": false
+ },
+ "stats": {
+  "successes": 0,
+  "failures": 9,
+  "errors": 0,
+  "tokenUsage": {
+   "prompt": 0,
+   "completion": 0,
+   "cached": 0,
+   "total": 0,
+   "numRequests": 9,
+   "completionDetails": {
+    "reasoning": 0,
+    "acceptedPrediction": 0,
+    "rejectedPrediction": 0,
+    "cacheReadInputTokens": 0,
+    "cacheCreationInputTokens": 0
+   },
+   "assertions": {
+    "total": 0,
+    "prompt": 0,
+    "completion": 0,
+    "cached": 0,
+    "numRequests": 0,
+    "completionDetails": {
+     "reasoning": 0,
+     "acceptedPrediction": 0,
+     "rejectedPrediction": 0,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0
+    }
+   }
+  },
+  "durationMs": 490354,
+  "evaluationDurationMs": 490354
+ },
+ "rows": [
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 41144,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": true,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": true,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T025524Z-1683412.jsonl",
+    "exit": 0,
+    "duration_ms": 40966,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3237628000000001,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 67810,
+     "cache_read_input_tokens": 122454,
+     "output_tokens": 2802
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "pending",
+      "socraticode": "pending"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 26522,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": true,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": true,
+    "evidence_settings": false,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T025605Z-1690071.jsonl",
+    "exit": 0,
+    "duration_ms": 26408,
+    "result_subtype": "success",
+    "num_turns": 1,
+    "cost_usd": 0.1494604,
+    "usage": {
+     "input_tokens": 2,
+     "cache_creation_input_tokens": 31458,
+     "cache_read_input_tokens": 24872,
+     "output_tokens": 1865
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "pending",
+      "socraticode": "pending"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 49230,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T025633Z-1693371.jsonl",
+    "exit": 0,
+    "duration_ms": 49126,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.24529520000000002,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 44499,
+     "cache_read_input_tokens": 149136,
+     "output_tokens": 3746
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "pending",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "pending",
+      "socraticode": "pending"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 167451,
+   "assertions": {
+    "affirms": false,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": false,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T025722Z-1700425.jsonl",
+    "exit": 0,
+    "duration_ms": 167400,
+    "result_subtype": "success",
+    "num_turns": 1,
+    "cost_usd": 0.257311,
+    "usage": {
+     "input_tokens": 2,
+     "cache_creation_input_tokens": 1213,
+     "cache_read_input_tokens": 67715,
+     "output_tokens": 90
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 29926,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T030010Z-1724341.jsonl",
+    "exit": 0,
+    "duration_ms": 29885,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.19932039999999998,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 36220,
+     "cache_read_input_tokens": 142642,
+     "output_tokens": 2590
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 37811,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T030040Z-1727411.jsonl",
+    "exit": 0,
+    "duration_ms": 37772,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.2204856,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 38525,
+     "cache_read_input_tokens": 205198,
+     "output_tokens": 2533
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 38442,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T030119Z-1732785.jsonl",
+    "exit": 0,
+    "duration_ms": 38400,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.23417120000000002,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 38912,
+     "cache_read_input_tokens": 204786,
+     "output_tokens": 3755
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 25167,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": false,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T030157Z-1738123.jsonl",
+    "exit": 0,
+    "duration_ms": 25127,
+    "result_subtype": "success",
+    "num_turns": 2,
+    "cost_usd": 0.054299200000000006,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 2894,
+     "cache_read_input_tokens": 114126,
+     "output_tokens": 1989
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K4",
+    "target": "claude-hud"
+   },
+   "latency_ms": 70660,
+   "assertions": {
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "wrong_status": false,
+    "asks_user": false,
+    "names_command": true,
+    "evidence_settings": true,
+    "evidence_cli": false,
+    "no_builtin_skill": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T030223Z-1742767.jsonl",
+    "exit": 0,
+    "duration_ms": 70619,
+    "result_subtype": "success",
+    "num_turns": 8,
+    "cost_usd": 0.1811364,
+    "usage": {
+     "input_tokens": 16,
+     "cache_creation_input_tokens": 7257,
+     "cache_read_input_tokens": 483882,
+     "output_tokens": 5530
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-sonnet-5",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld in the published copy: this answer head quotes client configuration files]"
+   }
+  }
+ ]
+}

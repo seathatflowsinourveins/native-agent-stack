@@ -1,0 +1,93 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "backtesting-engine",
+ "title": "Backtesting engine",
+ "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+ "requirement_sha256": "05654fcd99ad74800f9912a667b3e6ec90af3014531c71fea9511dbba1bd72fd",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "nautilustrader",
+   "repository": "https://github.com/nautechsystems/nautilus_trader",
+   "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "lean",
+   "repository": "https://github.com/QuantConnect/Lean",
+   "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "cvxportfolio",
+   "repository": "https://github.com/cvxgrp/cvxportfolio",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "lumiwealth/lumibot",
+   "repository": "https://github.com/Lumiwealth/lumibot",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "nkaz001/hftbacktest",
+   "repository": "https://github.com/nkaz001/hftbacktest",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "whchien/ai-trader",
+   "repository": "https://github.com/whchien/ai-trader",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "The SPY/LEAN parity gate has not passed. verdict.json is BLOCKED with 4 failed checks. mapping-manifest.json marks market_on_open_proxy and distributions_and_cash as unsupported in Nautilus 2.0.0rc5. The comparison statuses for one_stress, two_zero, two_stress, adaptive_stress and over_limit remain ",
+  "Nautilus's only unchanged upstream native run is on synthetic FX data. Its US-equity evidence is local integration only: the SPY replay (evidence class HIST) and the AAPL diagnostic. The AAPL diagnostic uses synthetic scheduled fills over 15 sessions and deliberately avoids corporate-action dates.",
+  "Nautilus 2.0.0rc5 is a prerelease (runtime-target.json line 29: prerelease true). The packet's upstream metadata lists v1.231.0 as the latest non-prerelease. That version comes from packet-generated metadata, not a retained receipt.",
+  "No IBKR broker acceptance: runtime-target.json records local_broker_acceptance not_established. Native in-flight broker fault behavior is also unqualified.",
+  "The LEAN oracle's SPY simulations run on bundled upstream sample files, not an accepted vendor dataset. Its status is scoped to known stress exposure and margin mechanics only. The Alpaca brokerage model and adapter initialization were not exercised."
+ ],
+ "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": []
+ },
+ "known_repositories": [
+  "ai4finance-foundation/finrl",
+  "alpacahq/alpaca-py",
+  "cvxgrp/cvxportfolio",
+  "edtechre/pybroker",
+  "gnzsnz/ib-gateway-docker",
+  "ib-api-reloaded/ib_async",
+  "kernc/backtesting.py",
+  "lumiwealth/lumibo",
+  "mementum/backtrader",
+  "mhallsmoore/qstrader",
+  "microsoft/qlib",
+  "nautechsystems/nautilus_trader",
+  "nkaz001/hftbacktes",
+  "polakowo/vectorb",
+  "pst-group/pysystemtrade",
+  "pyportfolio/pyportfolioop",
+  "quantconnect/lean",
+  "quantconnect/lean.brokerages.alpaca",
+  "quantconnect/mcp-server",
+  "skfolio/skfolio",
+  "stefan-jansen/zipline-reloaded",
+  "tauricresearch/tradingagents",
+  "whchien/ai-trader"
+ ],
+ "seeded_candidates_20260926": []
+}

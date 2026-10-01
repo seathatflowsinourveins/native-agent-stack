@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "scripts/hooks/secret_path_guard.py"
 HOST_HOOK = Path.home() / ".claude" / "hooks" / "secret_path_guard.py"
 IN_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI", "").lower() == "true"
+# The OpenHands runtime-worker session-key directory (PR #425's host driver); the run id and arm in the file names
+# below are illustrative.
+OH_SECRETS = "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets"
 
 BLOCKED = {
     "cat ~/.config/native-agent-stack/alpaca-paper.env": "credential_store_path",
@@ -91,6 +94,18 @@ BLOCKED = {
     "ls ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack": "credential_store_path",
     "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
     "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
+    # A numbered pointer (PAPER_ENV_FILE_2 is the second paper account's, 2026-09-29): the word boundary after
+    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed the guard (checked against the previous guard)
+    # while the account-1 form was blocked.
+    "cat \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"${PAPER_ENV_FILE_2}\"": "credential_file_read",
+    "head -n 3 \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "while read -r l; do :; done < \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"$SEC_CONTACT_ENV_2\"": "credential_file_read",
+    "set -x; . \"$PAPER_ENV_FILE_2\"": "trace_while_sourcing",
+    "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
+    ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -164,6 +179,112 @@ BLOCKED = {
     "sudo -iu root cat .env": "dotenv_read",
     "nice -n 5 cat .env": "dotenv_read",
     "stdbuf -o0 cat .env": "dotenv_read",
+    # Home credential stores as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key (a glob
+    # too), the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an option's `=` value, and Codex shell
+    # snapshots, which record every exported value. The rest of each store follows further down.
+    "cat ~/.ssh/id_ed25519": "credential_file_read",
+    "cp ~/.ssh/id_rsa /tmp/key": "credential_file_read",
+    "base64 \"$HOME/.ssh/id_ecdsa\"": "credential_file_read",
+    "cat ~/.ssh/id_*": "credential_file_read",
+    "cat ~/.aws/credentials": "credential_file_read",
+    "jq . ~/.docker/config.json": "credential_file_read",
+    "grep token ~/.kube/config": "credential_file_read",
+    "cat ~/.git-credentials": "credential_file_read",
+    "cat ~/.netrc": "credential_file_read",
+    "curl --netrc-file=/home/example/.netrc https://example.invalid": "credential_file_read",
+    "head -5 ~/.npmrc": "credential_file_read",
+    "cat ~/.pypirc": "credential_file_read",
+    "grep -r OMNIROUTE ~/.codex/shell_snapshots/": "credential_file_read",
+    "cat \"$CODEX_HOME\"/shell_snapshots/*.sh": "credential_file_read",
+    "dd if=/home/example/.npmrc of=/tmp/npmrc": "credential_file_read",
+    # GNU cp -t/--target-directory names the destination first, so every other operand is a source (cp(1)).
+    "cp -t /tmp /tmp/lane/shell_snapshots/example.sh": "credential_file_read",
+    "cp -vt /tmp ~/.netrc": "credential_file_read",
+    "cp --target-directory /tmp ~/.pypirc": "credential_file_read",
+    # A search keeps every argument when -e/-f supply the patterns or an option that can take a file or glob
+    # comes before the pattern (`--include .netrc` and rg's `-g .netrc` select that file).
+    "grep -r --include .netrc token ~": "credential_file_read",
+    "rg --hidden -g .netrc token ~": "credential_file_read",
+    "grep -e token ~/.netrc": "credential_file_read",
+    "grep -f ~/.git-credentials notes.txt": "credential_file_read",
+    "grep -A 2 token ~/.netrc": "credential_file_read",
+    # rtk 0.50.0 runs these (`rtk --help`): `read`, `smart`, `json` and `log` read their files, `run` hands its
+    # command to `sh -c`, `proxy`/`summary`/`err`/`test` run the command after them, and `env` prints the
+    # environment. Every rule reads that command (test_every_rule_applies_behind_rtk_proxy).
+    "rtk read ~/.ssh/id_ed25519": "credential_file_read",
+    "rtk grep token ~/.kube/config": "credential_file_read",
+    "rtk json ~/.docker/config.json": "credential_file_read",
+    "rtk run -c 'cat ~/.netrc'": "credential_file_read",
+    "rtk run --skip-env cat ~/.git-credentials": "credential_file_read",
+    "rtk -v summary --ultra-compact cat ~/.aws/credentials": "credential_file_read",
+    "rtk proxy cat .env": "dotenv_read",
+    "rtk env": "environment_dump",
+    # OmniRoute keeps its secrets in .env layers and server.env in its data directory: dotenv files there, now
+    # reported as reads of the data directory, which the store rule checks first.
+    "cat ~/.omniroute/.env": "credential_file_read",
+    "cat ~/.config/omniroute/server.env": "credential_file_read",
+    "cat /srv/omniroute-data/.env": "dotenv_read",
+    # Every path the template's credential-store Read denies cover (2026-09-27 independent verification). rtk 0.50.0
+    # rewrites `cat`, `head` and `tail -n` of them to `rtk read` before Claude Code checks its rules, so on an RTK
+    # host the guard is what stops those readers (test_every_template_read_deny_has_a_blocked_bash_reader). Anything
+    # in the SSH, GnuPG, AWS, Azure, kube and OmniRoute directories counts, `.pub`, `config` and a key under any name
+    # included, because the template denies all of ~/.ssh (a carve-out is an open user decision that would change
+    # both); so do each directory itself and a glob in it, and the Docker home as a whole.
+    "cat ~/.ssh/config": "credential_file_read",
+    "cat ~/.ssh/id_ed25519.pub": "credential_file_read",
+    "cp ~/.ssh/id_*.pub /tmp/keys/": "credential_file_read",
+    "cp -t /tmp/keys ~/.ssh/id_ed25519.pub": "credential_file_read",
+    "cat ~/.ssh/github_deploy_key": "credential_file_read",
+    "cat ~/.aws/config": "credential_file_read",
+    "cat ~/.azure/msal_token_cache.json": "credential_file_read",
+    "cat ~/.omniroute/storage.sqlite": "credential_file_read",
+    "cat ~/.config/omniroute/storage.sqlite": "credential_file_read",
+    "cat /mnt/c/Users/example/AppData/Roaming/omniroute/storage.sqlite": "credential_file_read",
+    "cat ~/.gnupg/private-keys-v1.d/ABCD.key": "credential_file_read",
+    "tail ~/.kube/cache/discovery/example/servergroups.json": "credential_file_read",
+    "cat ~/.ssh/*": "credential_file_read",
+    "head -n 100 ~/.ssh/*": "credential_file_read",
+    "base64 ~/.ssh/*": "credential_file_read",
+    "cp -r ~/.ssh /tmp/k": "credential_file_read",
+    "rsync -a ~/.ssh/ /tmp/k/": "credential_file_read",
+    "grep -r BEGIN ~/.ssh": "credential_file_read",
+    "grep -r -A 40 PRIVATE ~/.ssh/": "credential_file_read",
+    "cat ~/.aws/*": "credential_file_read",
+    "cp -r ~/.aws /tmp/a": "credential_file_read",
+    "cat ~/.kube/*": "credential_file_read",
+    "find ~/.ssh -type f -exec cat {} +": "credential_file_read",
+    "find ~/.aws -name credentials -exec cat {} \\;": "credential_file_read",
+    "rtk read ~/.aws/*": "credential_file_read",
+    "cat ~/.docker/*": "credential_file_read",
+    "cp -r ~/.docker /tmp/d": "credential_file_read",
+    "cat ~/.config/nativestack/example.key": "credential_file_read",
+    # Erring toward blocking (docs/secret-storage.md): a client whose key or home option names a store as the
+    # operand of a program the guard treats as a reader. A key named in ~/.ssh/config or loaded with ssh-add, and
+    # gpg without --homedir, pass.
+    "scp -i ~/.ssh/nas_key build.tgz nas:/volume1/": "credential_file_read",
+    "rsync -a -e 'ssh -i ~/.ssh/nas_key' dist/ nas:/volume1/dist/": "credential_file_read",
+    "gpg --homedir ~/.gnupg --list-keys": "credential_file_read",
+    # OpenHands runtime-worker session keys (2026-09-28): for each attempt the host driver writes the agent-server
+    # key to <run-id>-<arm>.server.env (Docker env-file syntax) and <run-id>-<arm>.headers (a `curl -H @file` header
+    # line) in a 0700 secrets directory, and deletes both once the attempt's containers are removed. A reader, copy or
+    # search of either file, of the directory itself and of a glob in it is blocked. The .server.env file, which the
+    # dotenv rule already caught, is now reported as a read of the directory, which the store rule checks first; curl
+    # is one of the guard's readers, so a curl that reads the header file is blocked too, as `curl --netrc-file` is.
+    f"cat {OH_SECRETS}/rw-1-engines-on.headers": "credential_file_read",
+    f"head -c 80 {OH_SECRETS}/rw-1-engines-on.headers": "credential_file_read",
+    f"cp {OH_SECRETS}/rw-1-engines-on.headers /tmp/h": "credential_file_read",
+    f"grep -r X-Session-API-Key {OH_SECRETS}": "credential_file_read",
+    f"rg -uu . {OH_SECRETS}/": "credential_file_read",
+    f"rg Key {OH_SECRETS}/*.headers": "credential_file_read",
+    f"cat {OH_SECRETS}/*": "credential_file_read",
+    f"cp -r {OH_SECRETS} /tmp/s": "credential_file_read",
+    f"cat {OH_SECRETS}/rw-1-engines-on.server.env": "credential_file_read",
+    "cat \"$HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/rw-1-engines-on.headers\"":
+        "credential_file_read",
+    "tail -n 1 \"${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/runtime-workers/openhands/secrets\"/*":
+        "credential_file_read",
+    "curl -H @\"$HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/rw-1-engines-on.headers\" "
+    "http://127.0.0.1:8000/alive": "credential_file_read",
 }
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
@@ -353,6 +474,18 @@ ALLOWED = [
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
     "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+    # The second paper account (2026-09-29): its pointer handed to a loader or a size check, as account 1's is.
+    "python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_2\" --output out.json",
+    "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
+    "wc -c \"$PAPER_ENV_FILE_2\"",
+    "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
+    # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
+    "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE\"'",
+    "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
+    "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
@@ -372,6 +505,10 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status tavily_api_key",
     "python3 scripts/kernel_keyring.py revoke tavily_api_key",
     "( set +x; read -rs K && printf %s \"$K\" | python3 scripts/kernel_keyring.py store tavily_api_key )",
+    # The keyring-only key's one move into the file store (2026-09-29, docs/decisions/2026-09-29-key-management.md):
+    # exec hands its one variable to the create-only writer, started with -I -S, which prints only "tavily: stored".
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- "
+    "python3 -I -S tools/credentials/set_credential.py tavily --from-env",
     f"{EXEC} tvly auth --json",
     f"{EXEC} tvly --json auth",
     f"{EXEC} tvly search \"<query>\" --depth basic --max-results 5 --json",
@@ -422,6 +559,12 @@ ALLOWED = [
     f"{EXEC} tvly search set --json",
     "tvly auth --json > auth.json",
     "tvly auth --json 2>&1",
+    # Commands that live lanes schedule (2026-09-28 non-regression): the paper lane's key wrapper starting a command,
+    # keyring status without a name, and exec's own help. The documented exec forms, `kernel_keyring.py exec <name>
+    # <ENV_VAR> -- <command>`, are above ({EXEC} and {DEMO_EXEC}) and in test_documented_keyring_commands_pass.
+    "sh ~/.local/state/native-agent-stack/alpaca-paper/paperkeys.sh run 1 -- echo ok",
+    "python3 scripts/kernel_keyring.py status",
+    "python3 scripts/kernel_keyring.py exec --help",
 ]
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
@@ -528,10 +671,67 @@ SAFE_CORPUS = [
     "tvly search \"agent harness\" --depth basic --max-results 4 --json",
     "tvly --version",
     "ls ~/.tavily",
+    # The home credential-store rule blocks readers only: clients that use a key or a store, listings, status
+    # and mode changes pass (the H4 chmod of Codex snapshots included), and so do the Docker and Codex files that
+    # hold no credential.
+    "ssh-add",
+    "ssh-add ~/.ssh/id_ed25519",
+    "ssh -i ~/.ssh/id_ed25519 git@github.com",
+    "ssh-keygen -y -f ~/.ssh/id_ed25519",
+    "ls -la ~/.ssh",
+    "ls -la ~/.aws ~/.kube ~/.gnupg",
+    "chmod 700 ~/.ssh",
+    "stat -c '%a %U' ~/.ssh/id_ed25519",
+    "gh ssh-key add ~/.ssh/id_ed25519.pub --title example",
+    "kubectl --kubeconfig ~/.kube/config get pods",
+    "curl --netrc https://example.invalid",
+    "chmod 600 ~/.codex/shell_snapshots/*.sh",
+    "ls ~/.codex/shell_snapshots",
+    "cat ~/.docker/buildx/current",
+    "cat ~/.codex/config.toml",
+    # A search's own pattern is not a file it reads (grep(1): PATTERNS before FILE), when only plain flags
+    # come before it; dd writes its of= file; cp -t copies into the directory it names.
+    "rg shell_snapshots docs",
+    "grep -nF '.ssh/id_ed25519' README.md",
+    "rg -n '\\.aws/credentials' docs",
+    "git grep -n '.kube/config' -- docs",
+    "grep -- ~/.netrc README.md",
+    "dd of=/home/example/.npmrc if=template.npmrc",
+    "cp -t /tmp/out docs/secret-storage.md",
+    # Ordinary rtk use: filtered git, raw re-runs through `rtk proxy`, reading a repository file, a listing.
+    "rtk git status",
+    "rtk proxy git show HEAD:README.md",
+    "rtk proxy python3 -m unittest tests.test_secret_path_guard",
+    "rtk read README.md",
+    "rtk grep -n shell_snapshots docs",
+    "rtk ls ~/.ssh",
+    "rtk hook check 'git push origin HEAD'",
+    "rtk --version",
+    # The OpenHands session-key rule blocks readers only (2026-09-28): a listing, status, mode changes, an existence
+    # check after cleanup, a `docker run --env-file` that hands the file to Docker, the rest of the runtime-worker
+    # state and a search whose pattern names the directory pass. So does a code search of OH_SESSION_API_KEYS_0,
+    # which is not one of the guard's secret names (docs/secret-storage.md, "Home and tool credential stores").
+    f"ls -la {OH_SECRETS}",
+    f"stat -c '%a %U' {OH_SECRETS}/rw-1-engines-on.headers",
+    f"chmod 700 {OH_SECRETS}",
+    f"chmod 600 {OH_SECRETS}/rw-1-engines-on.headers",
+    f"test ! -e {OH_SECRETS}/rw-1-engines-on.headers && echo deleted",
+    f"docker run --rm --env-file {OH_SECRETS}/rw-1-engines-on.server.env example/agent-server",
+    "cat ~/.local/state/native-agent-stack/runtime-workers/openhands/runs/rw-1/engines-on/status.json",
+    "rg -n 'runtime-workers/openhands/secrets' docs",
+    "rg -n OH_SESSION_API_KEYS_0 docs",
+    "grep -n OH_SESSION_API_KEYS_0 docs/secret-storage.md",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
+    # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
+    # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
+    "cat \"$PAPER_ENV_FILE_B\"",
+    # systemd-run is not a modelled launcher: a reader it starts is not inspected, for either account (found 2026-09-29 while
+    # adding the loader-path rows above); with --pipe --wait its output returns to the caller.
+    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"",
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
@@ -567,6 +767,32 @@ EXPECTED_PASS_THROUGH = [
     f"{DEMO_EXEC} sh -c 'eval echo \\$KK_DEMO_TOK$0' EN",
     f"{EXEC} script -qc 'export -p' /dev/null",
     "watch -n 5 cat .env",
+    # Home credential stores: a relative read after `cd`, a client that prints its own store, a program that
+    # opens a store itself (the database file name is illustrative), an archiver on a store, a glob that names a
+    # store only after the shell expands it, a copy or search of an ancestor of a store (~/.config, the Codex
+    # home that holds shell_snapshots) or of a directory that holds an older store file (~/.claude, whose
+    # .credentials.json the mention rule covers only by name), and an OmniRoute DATA_DIR elsewhere.
+    "cd ~/.aws && cat credentials",
+    "kubectl config view --raw",
+    "gpg --export-secret-keys --armor",
+    "sqlite3 ~/.omniroute/gateway.sqlite .dump",
+    "tar czf /tmp/k.tgz ~/.ssh",
+    "cat ~/.n*rc",
+    "cp -r ~/.config /tmp/c",
+    "cp -r ~/.codex /tmp/c",
+    "grep -r token ~/.claude",
+    "cat /srv/omniroute-data/storage.sqlite",
+    # OpenHands session keys (2026-09-28): the agent-server holds its key in its container environment, and the guard
+    # does not model docker subcommands, so printenv or a shell in the container and a full inspect, whose
+    # Config.Env holds the key, pass (the container name is illustrative). The variable name is not a listed secret
+    # name, so a shell in the container expanding it passes too. A search of the state directory that holds
+    # secrets/, and a relative read after `cd`, pass as for the home stores.
+    "docker exec rw-1-engines-on-server printenv",
+    "docker exec rw-1-engines-on-server printenv OH_SESSION_API_KEYS_0",
+    "docker exec rw-1-engines-on-server sh -c 'echo \"$OH_SESSION_API_KEYS_0\"'",
+    "docker inspect rw-1-engines-on-server",
+    "grep -r X-Session-API-Key ~/.local/state/native-agent-stack/runtime-workers/openhands",
+    "cd ~/.local/state/native-agent-stack/runtime-workers/openhands && cat secrets/rw-1-engines-on.headers",
 ]
 
 
@@ -596,6 +822,47 @@ class SecretPathGuardTests(unittest.TestCase):
                 expected = {reason, "environment_dump_in_keyring_exec"} if reason.startswith("environment_dump") \
                     else {reason}
                 self.assertIn(guard.check(f"{EXEC} {command}"), expected)
+
+    def test_every_rule_applies_behind_rtk_proxy(self):
+        # rtk 0.50.0's `proxy` runs the command after it unfiltered, and agents are told to re-run a command
+        # that way (`rtk proxy <command>`), so every blocked command stays blocked, for the same reason, behind
+        # it and behind rtk's own flags. Found by the 2026-09-27 cross-family review: `rtk proxy cat F` passed.
+        for command, reason in BLOCKED.items():
+            for prefix in ("rtk proxy ", "rtk -v proxy --skip-env "):
+                with self.subTest(command=command, prefix=prefix):
+                    self.assertEqual(guard.check(prefix + command), reason)
+
+    def test_every_template_read_deny_has_a_blocked_bash_reader(self):
+        # The settings template registers `rtk hook claude`. rtk 0.50.0 rewrites `cat`, `head` and `tail -n` of a file
+        # to `rtk read` (src/discover/rules.rs), Claude Code evaluates its permission rules against the command a hook
+        # returns (hooks, PreToolUse `updatedInput`), and RTK leaves a command alone only when a Bash(...) deny rule
+        # matches it (src/hooks/permissions.rs, append_bash_rules), so on such a host the Read denies do not stop
+        # those readers. The guard reads the command as written, so for every anchored Read deny of the template and
+        # the project settings (the `**/` twins and `!` carve-outs aside) a concrete path under it must be blocked
+        # for each reader and for the rewritten form. Found by the 2026-09-27 independent verification; a probe
+        # project holding the template's deny rules showed `rtk hook check 'cat ~/.ssh/config'` -> `rtk read`.
+        rules = set()
+        for settings in ("adoption/templates/claude.settings.template.json", ".claude/settings.json"):
+            deny = json.loads((ROOT / settings).read_text(encoding="utf-8"))["permissions"]["deny"]
+            rules.update(match.group(1) for rule in deny
+                         if (match := re.fullmatch(r"Read\(((?:~/|//|\.env).*)\)", rule)))
+        self.assertGreaterEqual(len(rules), 26)
+        for pattern in sorted(rules):
+            path = re.sub(r"^//", "/", pattern).replace("**", "sample.txt").replace("*", "sample")
+            for command in (f"cat {path}", f"head -n 5 {path}", f"tail -n 3 {path}", f"rtk read {path}"):
+                with self.subTest(rule=pattern, command=command):
+                    self.assertIsNotNone(guard.check(command))
+
+    def test_template_denies_the_openhands_session_key_directory(self):
+        # The template reaches every session on a host, so it denies Claude's file tools the directory that holds
+        # each OpenHands runtime-worker attempt's session key (2026-09-28), with its Context Mode twin right after it;
+        # test_every_template_read_deny_has_a_blocked_bash_reader then expects the guard to block its readers.
+        deny = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))[
+            "permissions"]["deny"]
+        rule = f"Read({OH_SECRETS}/**)"
+        self.assertEqual(rule, "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)")
+        self.assertIn(rule, deny)
+        self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + rule[len("Read(~/"):])
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.
@@ -682,13 +949,50 @@ class SecretPathGuardTests(unittest.TestCase):
                      "Read(~/.cache/huggingface/token)", "Read(~/.cache/huggingface/stored_tokens)",
                      "Bash(printenv *)", "Bash(env)", "Bash(gh auth token *)",
                      "Bash(hf auth token)", "Bash(hf auth token *)",
-                     "Bash(git credential fill*)", "Bash(gh auth git-credential *)"):
+                     "Bash(git credential fill*)", "Bash(gh auth git-credential *)",
+                     # Context Mode twins (docs/secret-storage.md, "User-level guards"): 1.0.169 compiles a
+                     # Read glob literally, without expanding `~/` or `//`, and matches it against absolute
+                     # paths, while Claude Code bounds `**/` to the current directory.
+                     "Read(**/.config/native-agent-stack/**)", "Read(**/.config/ecosystem-observability/*.env)",
+                     "Read(**/.config/nativestack/*.key)", "Read(**/.claude/.credentials.json)",
+                     "Read(**/.codex/auth.json)", "Read(**/.config/gh/hosts.yml)",
+                     "Read(**/.cache/huggingface/token)", "Read(**/.cache/huggingface/stored_tokens)",
+                     "Read(**/proc/*/environ)", "Read(**/.env)", "Read(**/.env.*)",
+                     # Home credential stores (2026-09-27, synthesis H6 and PR-A): SSH, GnuPG, cloud, kube,
+                     # Docker, git-credential, netrc, npm and PyPI files, the OmniRoute data directories
+                     # and Codex's shell snapshots, each with its twin.
+                     "Read(~/.ssh/**)", "Read(**/.ssh/**)", "Read(~/.gnupg/**)", "Read(~/.aws/**)",
+                     "Read(~/.azure/**)", "Read(~/.kube/**)", "Read(~/.docker/config.json)",
+                     "Read(~/.git-credentials)", "Read(~/.netrc)", "Read(~/.npmrc)", "Read(~/.pypirc)",
+                     "Read(~/.omniroute/**)", "Read(~/.config/omniroute/**)",
+                     "Read(~/.codex/shell_snapshots/**)", "Read(**/.codex/shell_snapshots/**)"):
             self.assertIn(rule, deny)
-        self.assertLess(deny.index("Read(.env.*)"), deny.index("Read(!.env.example)"))
+        # A `!` carve-out reaches only the rules listed before it in the same file, so every `.env` rule,
+        # twins included, precedes both carve-outs (a twin appended after them would re-deny .env.example).
+        for rule in ("Read(.env)", "Read(.env.*)", "Read(**/.env)", "Read(**/.env.*)"):
+            for carve_out in ("Read(!.env.example)", "Read(!.env.*.example)"):
+                self.assertLess(deny.index(rule), deny.index(carve_out), (rule, carve_out))
         hooks = settings["hooks"]["PreToolUse"]
         self.assertEqual(hooks[0]["matcher"], "Bash")
         self.assertIn("scripts/hooks/secret_path_guard.py", hooks[0]["hooks"][0]["command"])
         self.assertNotIn("/home/", json.dumps(settings))
+
+    def test_every_anchored_read_deny_has_a_context_mode_twin(self):
+        # Each `Read(~/X)` or `Read(//X)` deny needs `Read(**/X)` beside it: Claude Code honours the anchored
+        # form, Context Mode's server-side path check only the `**/` form (docs/secret-storage.md). The
+        # hand-merge block for hosts without the template carries the same twins.
+        deny = json.loads((ROOT / ".claude/settings.json").read_text())["permissions"]["deny"]
+        anchored = [rule for rule in deny if re.fullmatch(r"Read\((?:~/|//)[^)]+\)", rule)]
+        self.assertGreaterEqual(len(anchored), 9)
+        block = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8").split(
+            "## User-level guards (deployed by the Claude profile)", 1)[1].split("```json", 1)[1].split("```", 1)[0]
+        for rule in anchored:
+            twin = "Read(**/" + re.sub(r"^Read\((?:~/|//)", "", rule)
+            with self.subTest(rule=rule):
+                self.assertIn(twin, deny)
+                self.assertEqual(deny.index(twin), deny.index(rule) + 1, "the twin sits right after its original")
+                self.assertIn(f'"{rule}"', block)
+                self.assertIn(f'"{twin}"', block)
 
 
     def test_host_profile_copy_is_verbatim(self):

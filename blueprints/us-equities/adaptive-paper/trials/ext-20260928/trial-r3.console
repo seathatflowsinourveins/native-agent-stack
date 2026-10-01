@@ -1,0 +1,10 @@
+ext-20260928-3 scan start 16:25:58 ET
+scan rc=0 end 16:26:03 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 7, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "KNRX"], "regime_factor": 1.0, "sha256": "ac4e31d0ea28cb5a0bd17af4dae1d1bdba95daf832a15e94fabb4adbc134fe83"}
+check rc=0 16:26:04 ET
+synthetic rc=0 16:26:09 ET
+paper start 16:26:09 ET
+paper rc=0 end 17:26:43 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}

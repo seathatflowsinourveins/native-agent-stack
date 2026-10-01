@@ -1,0 +1,172 @@
+{
+ "catalog": "foundation",
+ "layer_id": "scheduling-supervision",
+ "title": "Scheduling and supervision",
+ "requirement": "Run selected local workflows with visible history, bounded process trees, cancellation and recoverable effects appropriate to the actual workload.",
+ "research_status": "on_requirement_change",
+ "next_action": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+ "requirement_sha256": "0500b3a76f92e3729e633ed4b18dd687983369dce5bf162e612fffa0b3be513d",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "pin": "2.16.6",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "systemd",
+   "repository": "https://github.com/systemd/systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Prefect",
+   "repository": "https://github.com/PrefectHQ/prefect",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Dagster",
+   "repository": "https://github.com/dagster-io/dagster",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Restate",
+   "repository": "https://github.com/restatedev/restate",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "beads",
+   "repository": "https://github.com/gastownhall/beads",
+   "pin": "1.3.0",
+   "upstream": {
+    "latest": "v1.3.0",
+    "released_at": "2026-09-15",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 27430,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "pin": "2.16.6",
+   "upstream": {
+    "latest": "v2.17.2",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 4085,
+    "license": "GPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "systemd",
+   "repository": "https://github.com/systemd/systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "upstream": {
+    "latest": "v262",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 16747,
+    "license": "GPL-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  }
+ ],
+ "open_gaps": [
+  "Physical-PC reboot, power loss, a crash of the host or user manager, and recovery on an independent host are not established (decisions.json lines 2349, 2406, 2423; service-reboot/plan.json excluded list lines 47-56).",
+  "No evidence covers remote model-provider cancellation, when billing stops, or distributed or external exactly-once effects, including broker orders (job-recovery/plan.json line 17 excludes them).",
+  "All accepted workloads are synthetic or no-model. No real application workflow has been scheduled or recovered.",
+  "Dagu upstream v2.17.0 is newer than the accepted 2.16.6 pin and has not been re-qualified. The existing runner rejects any other version (run.py lines 120-122), so a re-qualification needs a new frozen plan and runner.",
+  "No harness exists to run Temporal, Restate or Prefect against the same frozen cases. Any comparison with a challenger needs new project work before it can run."
+ ],
+ "overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/Nukesor/pueue",
+   "https://github.com/dbos-inc/dbos-transact-py",
+   "https://github.com/skarnet/s6",
+   "https://github.com/windmill-labs/windmill"
+  ]
+ },
+ "known_repositories": [
+  "dagster-io/dagster",
+  "dagucloud/dagu",
+  "dbos-inc/dbos-transact-py",
+  "healthchecks/healthchecks",
+  "nukesor/pueue",
+  "prefecthq/prefec",
+  "restatedev/restate",
+  "skarnet/s6",
+  "systemd/systemd",
+  "temporalio/temporal",
+  "windmill-labs/windmill"
+ ],
+ "seeded_candidates_20260926": []
+}

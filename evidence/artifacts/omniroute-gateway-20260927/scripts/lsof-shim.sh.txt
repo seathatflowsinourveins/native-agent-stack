@@ -1,0 +1,15 @@
+#!/bin/sh
+# Local adaptation for OmniRoute release/v3.8.51 at a58000c7, used only on the omniroute.service PATH.
+# bin/cli/commands/serve.mjs:252-261 (added by f8f923e8, #14538) calls findListeningPids() (bin/cli/utils/pid.mjs:73),
+# which runs `lsof -ti :PORT` and returns null when lsof exits non-zero. lsof exits 1 when nothing listens,
+# which is the normal free-port case. With a free port the caller then reads null.length, and `omniroute serve` exits 1.
+# This wrapper turns lsof's no-match status (1 with empty output) into 0, so discovery returns [] and upstream's own
+# bind probe still guards the port. Every other outcome passes through unchanged.
+# Remove it when upstream handles the null case. Adaptation recorded 2026-09-27.
+out=$(/usr/bin/lsof "$@")
+rc=$?
+[ -n "$out" ] && printf '%s\n' "$out"
+if [ "$rc" -eq 1 ] && [ -z "$out" ]; then
+  exit 0
+fi
+exit "$rc"

@@ -1,0 +1,49 @@
+// Offline probe (no network, no gateway, no model call): what the Codex executor of the checkout it runs in would put on the wire as `model`
+// and `reasoning` for a set of requested model ids and body efforts. It calls CodexExecutor.transformRequest, the step that resolves the
+// model-id suffix, the body effort and the per-model clamp, on a fresh scratch DATA_DIR.
+// Usage (from a build's source checkout, network blocked by the preload): run.sh effort_probe.ts <out.json>
+import fs from "node:fs";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const outPath = process.argv[2];
+const mod = await import(pathToFileURL(path.join(process.cwd(), "open-sse/executors/codex.ts")).href);
+const executor = new mod.CodexExecutor();
+
+// [requested model id, effort in the request body or null for none]
+const CASES: Array<[string, string | null]> = [
+  ["gpt-6.1-sol", "max"],
+  ["gpt-6.1-sol", "xhigh"],
+  ["gpt-6.1-sol", "ultra"],
+  ["gpt-6.1-sol-max", null],
+  ["gpt-6.1-sol-ultra", null],
+  ["gpt-6.1-sol-xhigh", null],
+  ["gpt-6.1-sol-high", null],
+  ["gpt-6.1-sol-max", "low"],
+  ["gpt-6.1-sol", null],
+  ["gpt-6-astra-max", null],
+  ["gpt-6-astra", "max"],
+  ["gpt-6-sol-max", null],
+  ["gpt-6-sol", "ultra"],
+];
+
+const rows: any[] = [];
+for (const [model, effort] of CASES) {
+  const body: Record<string, unknown> = {
+    model,
+    input: [{ type: "message", role: "user", content: [{ type: "input_text", text: "ping" }] }],
+    stream: true,
+    ...(effort ? { reasoning: { effort } } : {}),
+  };
+  const wire: any = executor.transformRequest(model, body, true, { providerSpecificData: {} } as any);
+  rows.push({
+    requested_model: model,
+    body_effort: effort,
+    wire_model: wire.model ?? null,
+    wire_reasoning_effort: wire.reasoning?.effort ?? null,
+    wire_reasoning_keys: wire.reasoning ? Object.keys(wire.reasoning).sort() : null,
+  });
+}
+const out = { note: "wire_* is the body the executor built; nothing was sent. A case with no body effort and no suffix shows the connection default path, which depends on the gateway's thinking-budget setting and the connection defaults (a fresh scratch store here), so it is informational.", rows };
+fs.writeFileSync(outPath, JSON.stringify(out, null, 1) + "\n");
+console.log(JSON.stringify(rows.map((r) => `${r.requested_model} body=${r.body_effort ?? "-"} -> model=${r.wire_model} effort=${r.wire_reasoning_effort ?? "-"}`), null, 1));

@@ -1,0 +1,146 @@
+{
+ "catalog": "foundation",
+ "layer_id": "isolation",
+ "title": "Isolation",
+ "requirement": "Separate edits and apply a real filesystem/network boundary only where the selected task requires enforced restrictions.",
+ "research_status": "on_requirement_change",
+ "next_action": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+ "requirement_sha256": "0bf4bf6c3c95d0db4a706e900c65c4d8bb7c745c26f6fdd6ae8c866945c4df49",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "sandbox-runtime",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "pin": "0.0.77",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Apple Container",
+   "repository": "https://github.com/apple/container",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "disposition": "conditional"
+  },
+  {
+   "name": "E2B",
+   "repository": "https://github.com/e2b-dev/E2B",
+   "disposition": "conditional"
+  },
+  {
+   "name": "gVisor",
+   "repository": "https://github.com/google/gvisor",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "apple-container",
+   "repository": "https://github.com/apple/container",
+   "pin": "1.4.1",
+   "upstream": {
+    "latest": "1.4.1",
+    "released_at": "2026-09-09",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 50174,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "sandbox-runtime",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "pin": "0.0.77",
+   "upstream": {
+    "latest": "v0.0.77",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 5339,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "pin": "0.79.0",
+   "upstream": {
+    "latest": "v0.79.0",
+    "released_at": "2026-09-21",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8413,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  }
+ ],
+ "open_gaps": [
+  "sandbox-runtime network evidence covers only temporary IPv4 loopback HTTP on this Linux/WSL host. TLS, SOCKS, DNS rebinding, IPv6, remote hosts and general sandbox escape are not established (native-sandbox-network-20260920.json limitations).",
+  "The filesystem receipt (runtime-tools.json, recorded 2026-09-19) records no sandbox-runtime version. That the filesystem permit/deny results apply to the 0.0.77 pin is inferred, not recorded. Only the network receipt names 0.0.77.",
+  "The first sandboxed request fails because upstream starts its socat listeners in the background without waiting for readiness. The accepted command relies on bounded curl connection-refused retries.",
+  "An overlapping denied-read/write path produced an ephemeral hidden mount: the write exited 0 while the host stayed unchanged (runtime-tools.json line 30). Direct denial is shown only by a separate fixture.",
+  "No candidate has a resource-limit, hostile-workload or VM-boundary qualification."
+ ],
+ "overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/TencentCloud/CubeSandbox",
+   "https://github.com/firecracker-microvm/firecracker",
+   "https://github.com/BloopAI/vibe-kanban",
+   "https://github.com/kata-containers/kata-containers"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/sandbox-runtime",
+  "apple/container",
+  "bloopai/vibe-kanban",
+  "dagger/container-use",
+  "e2b-dev/e2b",
+  "firecracker-microvm/firecracker",
+  "google/gvisor",
+  "kata-containers/kata-containers",
+  "max-sixty/worktrunk",
+  "moby/moby",
+  "nolabs-ai/nono",
+  "podman-container-tools/podman",
+  "tencentcloud/cubesandbox",
+  "zouuup/landrun"
+ ],
+ "seeded_candidates_20260926": []
+}

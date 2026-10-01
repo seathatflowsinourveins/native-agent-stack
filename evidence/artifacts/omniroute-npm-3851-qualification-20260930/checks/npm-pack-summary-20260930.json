@@ -1,0 +1,15 @@
+[
+  {
+    "id": "omniroute@3.8.51",
+    "name": "omniroute",
+    "version": "3.8.51",
+    "size": 137907369,
+    "unpackedSize": 546111751,
+    "shasum": "12e56f049e617edca50cc17835ea807dbf8c2042",
+    "integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+    "filename": "omniroute-3.8.51.tgz",
+    "entryCount": 26761,
+    "bundled": [],
+    "files": "<26761 entries omitted here; entryCount above is their number>"
+  }
+]

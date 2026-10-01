@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "tool": "context-hub",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.545Z",
+  "upstream_repository": "https://github.com/andrewyng/context-hub",
+  "pin": {
+    "version": "0.1.4",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:379",
+      "recipes/README.md:91"
+    ],
+    "scope": "Repository metadata; not an installed-client observation"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/context-hub/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "v0.1.4",
+      "published_at": "2026-04-27T22:10:03Z",
+      "source_url": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "npm @aisuite/chub",
+            "version": "0.1.4",
+            "published_at": "2026-04-27T22:40:27Z",
+            "source_url": "https://registry.npmjs.org/@aisuite%2fchub"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 78,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.1.4",
+    "published_at": "2026-04-27T22:10:03Z",
+    "html_url": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/andrewyng/context-hub/releases/latest",
+    "resolved_tag_commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "0.1.4",
+    "latest": "0.1.4",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/andrewyng/context-hub/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    },
+    {
+      "date": "2026-09-27",
+      "field": "scratch finding provenance",
+      "change": "The scratch prose grouped the one-language auto-selection change with merged main work and identified PR #182. GitHub reports PR #182 closed with merged_at=null. The behavior is verified at landed commit a59508b717bf3149f6d341b2b6f147724df9043f; cite that commit, not a claim that the PR merged.",
+      "source_url": "https://api.github.com/repos/andrewyng/context-hub/pulls/182",
+      "returned_fields": {
+        "state": "closed",
+        "merged_at": null
+      },
+      "verification_url": "https://github.com/andrewyng/context-hub/commit/a59508b717bf3149f6d341b2b6f147724df9043f"
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "Merged PR #244 gates local annotations behind explicit opt-in and labels included annotation content as untrusted input; this is after v0.1.4.",
+      "source_urls": [
+        "https://github.com/andrewyng/context-hub/pull/244"
+      ],
+      "revision": "29d3431738ae17c5ed2aa8440909e9cc058a16cb",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/andrewyng/context-hub/compare/v0.1.4...29d3431738ae17c5ed2aa8440909e9cc058a16cb",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The landed registry change automatically selects the language when a document has exactly one language variant; it is five commits after v0.1.4.",
+      "source_urls": [
+        "https://github.com/andrewyng/context-hub/commit/a59508b717bf3149f6d341b2b6f147724df9043f"
+      ],
+      "revision": "a59508b717bf3149f6d341b2b6f147724df9043f",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/andrewyng/context-hub/compare/v0.1.4...a59508b717bf3149f6d341b2b6f147724df9043f",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5",
+    "head_commit": "67dcbeb2eb42c808549f08397920ad58be7c2206",
+    "commits_after_latest_release": 78,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/andrewyng/context-hub/compare/v0.1.4...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "No native chub execution or annotation-safety behavior was exercised."
+  ]
+}

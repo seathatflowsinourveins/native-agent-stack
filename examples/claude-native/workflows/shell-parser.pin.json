@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "scope": "The tree-sitter-bash install that child-usage.mjs loadShellParser() checks before it parses any shell text for the CLI-lane reading (U1 pivot decision D1). Nothing here is vendored: the install is made with the command below, and the loader refuses to run a byte it has not hashed against this file.",
+  "packages": {
+    "web-tree-sitter": {
+      "version": "0.27.0",
+      "integrity": "sha512-XK08gj6RwTMQatAG7uVRP8MunqotL/XC19vHgkSPKmELgbGPBj4ECvB8haHOUnyj6ls2B8t42UTro14zxGgAHg==",
+      "upstream": {
+        "repository": "tree-sitter/tree-sitter",
+        "tag": "v0.27.0",
+        "tag_commit": "6070dbfefd326bd735e5683eb128cc1b57dad0c0",
+        "npm_git_head": "6070dbfefd326bd735e5683eb128cc1b57dad0c0",
+        "released": "2026-08-30"
+      }
+    },
+    "tree-sitter-bash": {
+      "version": "0.25.1",
+      "integrity": "sha512-7hMytuYIMoXOq24yRulgIxthE9YmggZIOHCyPTTuJcu6EU54tYD+4G39cUb28kxC6jMf/AbPfWGLQtgPTdh3xw==",
+      "upstream": {
+        "repository": "tree-sitter/tree-sitter-bash",
+        "tag": "v0.25.1",
+        "tag_commit": "a06c2e4415e9bc0346c6b86d401879ffb44058f7",
+        "npm_git_head": "801326684a26ffc4e749bb016c50c6c30bdfa345",
+        "released": "2025-12-02",
+        "note": "The tag names the commit 'Regenerate parser for 0.25.1' (2025-12-02 17:01 UTC); the npm package was published from the commit before it, 'v0.25.1' (16:57 UTC). The wasm below is the file the npm tarball ships."
+      }
+    }
+  },
+  "files": {
+    "node_modules/tree-sitter-bash/package.json": "757d74350c9a8cf2635010326ef3b28b59c392e705906af4d98e5a45fcaff32d",
+    "node_modules/tree-sitter-bash/tree-sitter-bash.wasm": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+    "node_modules/web-tree-sitter/package.json": "707dd14277ba63ca8dcaad6b6df8051e23df78c878b5cbdc27885b3cfd72bfac",
+    "node_modules/web-tree-sitter/web-tree-sitter.cjs": "743de33347202f863b6714fc7218c455d93f751943d43500500f6c5c65654dce",
+    "node_modules/web-tree-sitter/web-tree-sitter.js": "7c49e3c1d87e24e0bb4c2def909d17154dfde281f5f8280225450090bb4b8110",
+    "node_modules/web-tree-sitter/web-tree-sitter.wasm": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"
+  },
+  "install": {
+    "command": "npm install --prefix <directory> --ignore-scripts --no-audit --no-fund --save-exact web-tree-sitter@0.27.0 tree-sitter-bash@0.25.1",
+    "default_directory": ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1",
+    "lockfile": "package-lock.json",
+    "reference_implementation": "openai/codex rust-v0.157.1 (36650394c5b38c2990ccf2a3457165ca3e9d9726) codex-rs/shell-command/src/bash.rs, dependency tree-sitter-bash = \"0.25\" at codex-rs/Cargo.toml:522"
+  },
+  "verified": {
+    "date": "2026-09-29",
+    "how": "npm view <package>@<version> dist.integrity gitHead; gh api repos/<repository>/git/ref/tags/<tag> and the commits it names; sha256sum of each installed file; upstream repository not archived (tree-sitter/tree-sitter-bash pushed 2026-09-13)"
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "id": "wsl-terminal-defaults-20260929",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, and 2.1.283 in a second distro; Codex 0.157.1; bash 5.2.21; Windows Terminal 1.24.11911.0) the repository now carries the terminal defaults that had been set by hand on the host. Merging the linux-wsl2 Claude Code overlay into the live settings with the repository's merge tool changed nothing (the merge equalled the live file), exactly one Notification group holds the bell command, and its matcher equals the overlay's (the acceptance script checks the matcher because the merge alone cannot see it). The rendered Codex template loads under `codex --strict-config` (the run stops at authentication, never at configuration); a wrong type for `[tui] notifications` and an unknown top-level key are refused, and an unknown key inside `[tui]` is not. The static `adoption_status.py --login-shell` model agreed with the real bash login search in all 512 combinations of three startup files over eight states, a FIFO made bash block (the model calls it unusable and unread), and a control that takes an empty file as absent disagreed in 26. In the second distro, the two per-project Claude profiles of the Windows Terminal settings dropped `suppressApplicationTitle` and gained the quiet bell, the audible-and-taskbar bell style and `COLORTERM` through the profile environment key, with every other profile and setting unchanged; the overlay merged into that distro's Claude settings changed only `$schema`, `hooks` and `preferredNotifChannel`, and its installed hook command printed exactly one BEL. The host practice repository's terminal-profile check now scans the live settings file and passed with 0 findings (the pre-change settings file fails it with 8 findings on the two per-project profiles), and its 22 single-defect controls each failed for exactly their rule.",
+  "limitations": [
+    "One workstation and one Ubuntu 24.04 distro plus one second distro (the independent-observation class of docs/acceptance-evidence-policy.md). Another host collects its own evidence, and none of the new files is in the pinned release: a new host gets them only after a release carries them and the manifest is re-pinned.",
+    "No Windows Terminal tab was opened or measured after the second distro's profile change, and no session of that distro was started or observed after its overlay. Claude Code applies edits to `hooks` to a running session without a restart (settings reference, \"When edits take effect\"), so open sessions there should pick the overlay up; that was not observed, and an audible or taskbar bell for the alert path was not observed by the user in this work.",
+    "The profile example was checked as JSON against the policy. It declares no `guid`, so Windows Terminal derives a stable one from the folder and profile names (read in its source at the installed tag); it was not loaded into Windows Terminal or installed on any host. The host's deployed fragment is the practice repository's own file.",
+    "The `--login-shell` check reads file metadata only and models bash's login search from the source of bash 5.3 (shell.c execute_profile_file, builtins/evalfile.c) and the installed 5.2.21 on Linux; it does not run a login shell, read a startup file (so a non-empty file's hand-off is unknown, reported as null), or cover /etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode, an sh-mode login or macOS's bash 3.2. A special file is reported unusable: bash reads a device as empty and blocks on a FIFO, and both end the search; an unusable ~/.profile is reached but not read, so profile_read is false; HOME is the environment's, else the passwd entry's, else \"/\", the way bash falls back.",
+    "The Codex acceptance is a configuration load: no Codex notification was produced in this work, `async-question` does not exist at the macOS pin's tag (inert there) and Codex 0.155.1 was not run. Codex does not validate keys inside `[tui]`, so the repository's test pins that table's setting names. A `request_user_input` question notifies as `plan-mode-prompt` at both tags (tool_requests.rs L449-458), so `async-question` adds only the asynchronous questions 0.155.1 lacks.",
+    "The second distro's `tui` is `fullscreen` by its own setting; `CLAUDE_CODE_ALT_SCREEN_FULL_REPAINT` was not set, as the upstream documentation makes it a reactive fix and no stale rendering was observed or measured.",
+    "The host practice repository has no remote (commits fcd291f, 396d1c1, 9500656, c14e8c3, 9f615ad and d0c7d9c); its check and controls are recorded here as results only. The Windows Terminal settings patch and the second distro's merge were host operations on private files, recorded as values.",
+    "The second distro's Claude Code is 2.1.283, one release before this host's. A scan of the installed binaries (this host's 2.1.282, 2.1.283 and 2.1.284, and that distro's 2.1.283) found the `notifications_disabled` and `terminalSequence` literals and `worker_permission_prompt` emitted from the same two team-inbox call sites in each (the second distro's binary is byte-identical to this host's 2.1.283 by SHA-256 prefix, and its occurrence counts by `grep -a -o` equal this host's scan), so the whole matcher is live there. The changelog dates `terminalSequence` to 2.1.141 and has no entry for `notifications_disabled`, which the settings reference documents. The hook was run in that distro.",
+    "The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a Notification hook that already runs the bell command: after a later matcher change the old group must be edited or removed first. The acceptance script checks the group count and the matcher for that reason, and a unit test proves it refuses a catch-all group and an older matcher.",
+    "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac.",
+    "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): codex_tui_strict_check.py counts a run as loaded only with Codex's session banner and exits 1 unless the template loaded and both configuration controls were refused; overlay_noop_check.py also requires disableAllHooks not to be true and labels its verdict as a check of the user settings file only; login_shell_bash_truth.py and the 512-combination test now also compare first_read; the platform page's advice about profiles.defaults was corrected (Windows Terminal ranks a profile's own value, then profiles.defaults, then a fragment's profile). The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
+  ],
+  "evidence_class": "independent observation: the installed Codex under --strict-config, the installed bash, the repository's merge tool and the Windows Terminal and Claude Code settings of two distros on this host; the unit tests and the practice repository's controls are local integration checks and synthetic fixtures",
+  "recorded_at_utc": "2026-09-29T16:08:55Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
+    "identity": "one workstation; the running user's Claude Code and Codex configuration, the Windows Terminal settings and a second WSL distro"
+  },
+  "data": {
+    "overlay_merge_against_live_settings": {
+      "dry_run_exit": 0,
+      "merged_equals_live": true,
+      "bell_groups_in_live": 1,
+      "bell_group_matcher_equals_overlay": true,
+      "overlay_in_effect": true
+    },
+    "codex_strict_config": {
+      "codex": "0.157.1",
+      "template_loads": true,
+      "wrong_type_refused": true,
+      "unknown_top_level_key_refused": true,
+      "unknown_key_inside_tui_refused": false,
+      "run_stops_at_authentication": true
+    },
+    "login_shell_model_against_real_bash": {
+      "bash": "5.2.21",
+      "combinations": 512,
+      "mismatches": 0,
+      "negative_control_disagreements": 26,
+      "states": [
+        "absent",
+        "empty",
+        "content",
+        "directory",
+        "dangling symlink",
+        "symlink to file",
+        "device (/dev/null)",
+        "unreadable"
+      ],
+      "fifo_case": {
+        "bash_blocked": true,
+        "model": [
+          "unusable",
+          "bash_profile",
+          false
+        ]
+      },
+      "stat_error_cases": {
+        "symlink_loop_ELOOP": "unusable and unread",
+        "home_is_a_file_ENOTDIR": "unusable and unread",
+        "home_not_searchable_EACCES": "unusable and unread"
+      }
+    },
+    "second_distro": {
+      "windows_terminal_settings": {
+        "profiles_before": 14,
+        "profiles_after": 14,
+        "every_other_profile_equal": true,
+        "defaults_equal": true,
+        "other_top_level_keys_equal": true
+      },
+      "project_profile_1": {
+        "suppressApplicationTitle_present_before": true,
+        "suppressApplicationTitle_present_after": false,
+        "bellStyle_after": [
+          "audible",
+          "taskbar"
+        ],
+        "bellSound_is_windows_ding": true,
+        "colorterm_after": "truecolor",
+        "tabTitle_kept": true,
+        "commandline_unchanged": true,
+        "tabColor_unchanged": true,
+        "keys_added": [
+          "bellSound",
+          "bellStyle",
+          "environment"
+        ],
+        "keys_removed": [
+          "suppressApplicationTitle"
+        ]
+      },
+      "project_profile_2": {
+        "suppressApplicationTitle_present_before": true,
+        "suppressApplicationTitle_present_after": false,
+        "bellStyle_after": [
+          "audible",
+          "taskbar"
+        ],
+        "bellSound_is_windows_ding": true,
+        "colorterm_after": "truecolor",
+        "tabTitle_kept": true,
+        "commandline_unchanged": true,
+        "tabColor_unchanged": true,
+        "keys_added": [
+          "bellSound",
+          "bellStyle",
+          "environment"
+        ],
+        "keys_removed": [
+          "suppressApplicationTitle"
+        ]
+      },
+      "claude_code": "2.1.283",
+      "login_files": {
+        "bash_profile": "absent",
+        "bash_login": "absent",
+        "profile": "content"
+      },
+      "overlay": {
+        "changed_top_level_keys": [
+          "$schema",
+          "hooks",
+          "preferredNotifChannel"
+        ],
+        "preferredNotifChannel": "notifications_disabled",
+        "notification_groups": 1,
+        "other_hook_events_equal": true,
+        "hook_output_is_one_bel": true,
+        "matcher_types": 7,
+        "settings_mode": "600",
+        "backup_kept_in_that_distro": true
+      },
+      "tui": "fullscreen",
+      "scrub_variable_in_its_settings": false,
+      "claude_code_binaries_scan": {
+        "this_distro_versions_scanned": [
+          "2.1.282",
+          "2.1.283",
+          "2.1.284"
+        ],
+        "worker_permission_prompt_call_sites_each": 2,
+        "notifications_disabled_and_terminalSequence_literals_present_in_each": true,
+        "second_distro_2_1_283_by_grep_occurrences": {
+          "notifications_disabled": 5,
+          "terminalSequence": 17,
+          "worker_permission_prompt": 3,
+          "worker_permission_prompt_call_sites": 2
+        },
+        "second_distro_binary_identical_to_this_hosts_2_1_283_by_sha256_prefix": true,
+        "read_by": "claude_binary_notification_scan.py (this distro) and grep -a -c (the second distro, which has no Python)"
+      }
+    },
+    "practice_repository": {
+      "commits": [
+        "fcd291f",
+        "396d1c1",
+        "9500656",
+        "c14e8c3",
+        "9f615ad",
+        "d0c7d9c"
+      ],
+      "terminal_profile_check": {
+        "exit": 0,
+        "profiles_checked": 5,
+        "settings_files_scanned": 1,
+        "findings": 0
+      },
+      "controls": {
+        "fragment_mutants": 9,
+        "settings_mutants": 10,
+        "derived_guid_override_mutants": 3,
+        "unmutated_inputs": 4,
+        "problems": 0
+      },
+      "fragment_without_guid": {
+        "before_c14e8c3_exit": 1,
+        "before_c14e8c3_error": "KeyError on the guid lookup",
+        "at_c14e8c3_exit": 0,
+        "at_c14e8c3_override_under_the_derived_guid_of_a_title_suppression": "passed unchecked (exit 0)",
+        "now_exit_for_that_override": 1,
+        "derivation": "UUIDv5 of the profile name under UUIDv5 of the folder name under the fragment namespace, UTF-16LE (Profile::_GenerateGuidForProfile)"
+      },
+      "doctor_checks_passed": [
+        "terminal-profiles",
+        "login-shell-path"
+      ],
+      "pre_change_settings_file": {
+        "exit": 1,
+        "findings": 8,
+        "profiles_named": 2,
+        "distinct_rules": 4
+      }
+    },
+    "unit_tests": {
+      "modules": [
+        "test_adoption_status",
+        "test_windows_terminal_defaults",
+        "test_adoption_docs_consistency",
+        "test_render_config",
+        "test_apply_claude_settings"
+      ],
+      "ran": 214,
+      "result": "OK (skipped=1)"
+    },
+    "decisions": {
+      "defaults_live_in_the_repository": true,
+      "overlay_separate_from_base_template": true,
+      "bootstrap_writes_shell_startup_files": false,
+      "codex_needed_only_list_in_the_shared_template": true,
+      "fullscreen_repaint_variable_set": false,
+      "second_distro_profiles_follow_the_policy": true
+    }
+  },
+  "provenance": {
+    "artifacts_dir": "evidence/artifacts/wsl-terminal-defaults-20260929",
+    "scripts_sha256": {
+      "claude_binary_notification_scan.py": "9a7a198b1c71af87efd9ff60c77b24b3f05154a69809e5c29c5ddeeee5775808",
+      "codex_tui_strict_check.py": "9660ea362bed9fa6ebc642adfab1b5cf7348b76f5a0cf4bb664a6b4370bcd00d",
+      "login_shell_bash_truth.py": "fc2bd10af1b87aea10cc652f57140cd83695bffeeefb5c484236a22346fc9db5",
+      "overlay_noop_check.py": "d664484902a07ee14c4ed2f412726baa3fdd3ff0920ed1f3ffe3725b3400682b"
+    },
+    "commands": [
+      "python3 -B overlay_noop_check.py <checkout>",
+      "TMPDIR=<private dir> python3 -B codex_tui_strict_check.py <checkout>",
+      "python3 -B login_shell_bash_truth.py <checkout>",
+      "python3 -B claude_binary_notification_scan.py (this distro), and grep -a -o | wc -l of the same literals plus a SHA-256 prefix comparison for the second distro's binary",
+      "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+      "byte-safe rewrite of the two per-project profile objects in the Windows Terminal settings.json after a backup, then a values-only read-back",
+      "the overlay merged into a copy of the second distro's Claude settings with tools/adoption/apply_claude_settings.py, written back atomically after a backup, then a values-only read-back",
+      "checks/check-terminal-profiles.py and checks/check-terminal-profiles-controls.py (practice repository commit fcd291f)"
+    ],
+    "upstream_sources": "docs/decisions/2026-09-28-terminal-experience.md (Repository-carried defaults)"
+  }
+}

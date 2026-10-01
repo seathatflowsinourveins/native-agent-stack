@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "kind": "unchanged_upstream_test_execution",
+  "source": {
+    "repository": "trailofbits/skills",
+    "revision": "82fe8226252622fa807643bdca1710901198553a",
+    "url": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/Makefile#L105"
+  },
+  "raw_outputs": "Private owned run directory; full original returned stdout/stderr retained, never published.",
+  "runs": [
+    {
+      "id": "semgrep-scan",
+      "command": "rtk proxy bash plugins/static-analysis/tests/run_scan_tests.sh",
+      "exit_code": 0,
+      "script_sha256": "6fd2bb51e4223a40164b78ae0aa9d3eb3ea3a29d19766f44f6c2ef449c1b0db6",
+      "stdout_sha256": "b3376b72705ae2e65fafc874f2beeaba76480a59f4277e1411a663aeb931aaf6",
+      "stdout_bytes": 421,
+      "stderr_bytes": 0,
+      "returned_tail": [
+        "104 passed, 0 failed, 104 run",
+        "104 assertions passed"
+      ]
+    },
+    {
+      "id": "semgrep-workflow-and-mutation",
+      "command": "rtk proxy bash plugins/static-analysis/tests/run_workflow_tests.sh",
+      "exit_code": 0,
+      "script_sha256": "c740758d259e2c0949bf460730bf3bdd653b227677e6640faa414c3192ea1afd",
+      "stdout_sha256": "0faeb23fa081cd4be64a360df38695de24fa493b9d4add466a5cc3cfd96d71ff",
+      "stdout_bytes": 42,
+      "stderr_bytes": 0,
+      "returned_lines": [
+        "65 assertions passed",
+        "66 assertions passed"
+      ]
+    }
+  ],
+  "scope": "Unchanged upstream hermetic scan/workflow tests and mutation checks. Semgrep/git stubs and dry-run cases; not a real Semgrep scan, Claude workflow or model run.",
+  "outer_exit_observer": "Coordinator's native exec/write_stdin results; output hashes are independently recheckable."
+}

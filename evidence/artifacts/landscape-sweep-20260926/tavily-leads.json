@@ -1,0 +1,698 @@
+{
+ "schema_version": 1,
+ "id": "landscape-sweep-20260926-tavily-leads",
+ "kind": "discovery_leads",
+ "evidence_class": "not_evidence",
+ "claim": "Discovery leads for the verdict wave, not evidence: for each layer, the GitHub repositories that the coordinator's Tavily Research (pro) report named and that the 2026-09-26 sweep neither proposed nor already knew. No Tavily report text is retained; request ids are hashed (uuid-sha256, 16 hex).",
+ "method": [
+  "tavily_crosscheck.py (the 2026-09-26 prototype's script, run on the converted returns.json): the GitHub repositories each report names in its text and sources, minus the layer's merged proposals and the github.com repositories its layer input names (missed_by_script).",
+  "This file splits missed_by_script further. known_to_layer_input: in the input's bare known_repositories, including slugs the prototype cut with rstrip('.git'); the script's github.com pattern does not read those. in_repository_catalogs: named in this checkout's catalogs or manifests. proposed_elsewhere_in_sweep: proposed by either family or dropped by the merge cap in any layer of this sweep. leads: the rest."
+ ],
+ "totals": {
+  "layers": 32,
+  "named": 208,
+  "missed_by_script": 136,
+  "known_to_layer_input": 11,
+  "in_repository_catalogs": 57,
+  "proposed_elsewhere_in_sweep": 4,
+  "leads": 64
+ },
+ "layers": {
+  "agent-sdks": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:17:21.423511+00:00",
+    "response_time_s": 241.93,
+    "request_id": "uuid-sha256:d75368c8c8fb69de"
+   },
+   "tavily_named": 8,
+   "overlap_with_sweep": 2,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "deepset-ai/haystack",
+    "langchain-ai/langchain",
+    "microsoft/agent-framework",
+    "microsoft/autogen"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "langchain-ai/langgraphjs",
+    "tsharp/agent-runtime"
+   ]
+  },
+  "agents-models-workers": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:17:21.313777+00:00",
+    "response_time_s": 367.68,
+    "request_id": "uuid-sha256:328496932080c117"
+   },
+   "tavily_named": 11,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "bentoml/bentoml",
+    "chroma-core/chroma",
+    "huggingface/text-generation-inference",
+    "langchain-ai/langchain"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "amikos-tech/chromadb-ops",
+    "predibase/lorax"
+   ]
+  },
+  "backtesting-engine": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:17:21.323807+00:00",
+    "response_time_s": 230.79,
+    "request_id": "uuid-sha256:15743fa5db629cee"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 4,
+   "known_to_layer_input": [
+    "kernc/backtesting.py",
+    "mementum/backtrader",
+    "polakowo/vectorbt"
+   ],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "fbertram/turingtrader"
+   ]
+  },
+  "ci-supply-chain": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:17:21.304485+00:00",
+    "response_time_s": 211.19,
+    "request_id": "uuid-sha256:f24d31992e2f71c6"
+   },
+   "tavily_named": 9,
+   "overlap_with_sweep": 2,
+   "missed_by_script": 7,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "slsa-framework/slsa-github-generator"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "actions/attest-build-provenance",
+    "anchore/sbom-action",
+    "attestplane/attestplane",
+    "cyclonedx/cdxgen-action",
+    "sbom-tool/sbom-tools-action",
+    "spdx/tools-golang"
+   ]
+  },
+  "code-navigation": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:21:02.885671+00:00",
+    "response_time_s": 211.49,
+    "request_id": "uuid-sha256:da41bcb42a233de6"
+   },
+   "tavily_named": 6,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 5,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "github/codeql-action",
+    "run-llama/llama_index"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "assets/img",
+    "docs/codeql-overview",
+    "sourcegraph/cody-vs"
+   ]
+  },
+  "data-quality-orchestration": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:21:12.711404+00:00",
+    "response_time_s": 261.96,
+    "request_id": "uuid-sha256:2eb608f9d413f2e9"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "apache/airflow",
+    "argoproj/argo-workflows",
+    "evidentlyai/evidently",
+    "great-expectations/great_expectations",
+    "sodadata/soda-core"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "whylabs/whylogs"
+   ]
+  },
+  "document-retrieval": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:21:32.687909+00:00",
+    "response_time_s": 290.59,
+    "request_id": "uuid-sha256:3cdc010aafdae8a5"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 5,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "deepset-ai/haystack"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "grobidorg/grobid",
+    "layout-parser/layout-parser",
+    "run-llama/llama-parse-ts",
+    "unstructured-io/unstructured-js-client"
+   ]
+  },
+  "durable-memory": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:23:33.004765+00:00",
+    "response_time_s": 276.68,
+    "request_id": "uuid-sha256:94ae022b9860a8a1"
+   },
+   "tavily_named": 6,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 3,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "chroma-core/chroma",
+    "milvus-io/milvus"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "qdrant/qdrant-helm"
+   ]
+  },
+  "evaluation-experiments": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:24:44.196400+00:00",
+    "response_time_s": 248.85,
+    "request_id": "uuid-sha256:220d4605054f7ffc"
+   },
+   "tavily_named": 6,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 4,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "open-compass/opencompass"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "evalplus/evalplus",
+    "evolvinglmms-lab/lmms-eval",
+    "openai/simple-evals"
+   ]
+  },
+  "execution-broker": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:25:43.932007+00:00",
+    "response_time_s": 251.77,
+    "request_id": "uuid-sha256:9c15f4eea4c52e9e"
+   },
+   "tavily_named": 5,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 3,
+   "known_to_layer_input": [
+    "mementum/backtrader",
+    "quantconnect/lean"
+   ],
+   "in_repository_catalogs": [
+    "quantconnect/lean-cli"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "git-github-automation": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:26:24.020478+00:00",
+    "response_time_s": 210.12,
+    "request_id": "uuid-sha256:5b80959ea2c0469f"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 3,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "k1low/gh-pr-reviews",
+    "kbrdn1/gwm-cli",
+    "peter-evans/create-pull-request"
+   ]
+  },
+  "hosting-services": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:28:14.349676+00:00",
+    "response_time_s": 303.07,
+    "request_id": "uuid-sha256:47f1287d48a64c98"
+   },
+   "tavily_named": 8,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 8,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "abiosoft/colima"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "88plug/k3d-gpu",
+    "eknkc/ssr-benchmark",
+    "jakkaj/k3d-gpu",
+    "kludex/starlette",
+    "pallets/quart",
+    "sanic-org/sanic",
+    "tanrax/python-api-frameworks-benchmark"
+   ]
+  },
+  "identity-provenance": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:28:55.457642+00:00",
+    "response_time_s": 203.16,
+    "request_id": "uuid-sha256:d8348daeb8fb0c18"
+   },
+   "tavily_named": 4,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 2,
+   "known_to_layer_input": [
+    "treeverse/lakefs"
+   ],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "pachyderm/pachyderm"
+   ]
+  },
+  "instructions-skills": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:29:55.164679+00:00",
+    "response_time_s": 308.44,
+    "request_id": "uuid-sha256:630f0bc5534417b6"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 3,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "orchestra-research/ai-research-skills"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "langchain-ai/langchain-skills",
+    "langchain-ai/skills-benchmarks"
+   ]
+  },
+  "isolation": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:30:05.139519+00:00",
+    "response_time_s": 347.73,
+    "request_id": "uuid-sha256:7e5d48795df8f9cd"
+   },
+   "tavily_named": 8,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 4,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "google/nsjail",
+    "netblue30/firejail",
+    "wasmedge/wasmedge"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "kata-containers/documentation"
+   ]
+  },
+  "market-data-reference": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:32:26.508219+00:00",
+    "response_time_s": 271.1,
+    "request_id": "uuid-sha256:daa57616b6ac57fb"
+   },
+   "tavily_named": 10,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 5,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "quantconnect/lean"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "finos/openmama",
+    "mypmc/marketstore",
+    "openmama/openmama",
+    "questdb/questdb-trading-data-demo"
+   ]
+  },
+  "mcp-surfaces": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:33:25.701598+00:00",
+    "response_time_s": 282.5,
+    "request_id": "uuid-sha256:71dc5acc60dd0751"
+   },
+   "tavily_named": 6,
+   "overlap_with_sweep": 2,
+   "missed_by_script": 4,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "modelcontextprotocol/modelcontextprotocol",
+    "modelcontextprotocol/python-sdk",
+    "modelcontextprotocol/servers",
+    "modelcontextprotocol/typescript-sdk"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "native-clients": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:35:06.595677+00:00",
+    "response_time_s": 202.71,
+    "request_id": "uuid-sha256:33e285870aa85f2a"
+   },
+   "tavily_named": 4,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 4,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "anthropics/anthropic-sdk-go",
+    "dongri/openai-api-rs",
+    "jeremychone/rust-genai",
+    "yanceyofficial/rs-openai"
+   ]
+  },
+  "observability-hosting": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:35:56.571787+00:00",
+    "response_time_s": 247.51,
+    "request_id": "uuid-sha256:f0799688b01689e9"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 7,
+   "known_to_layer_input": [
+    "prometheus/prometheus"
+   ],
+   "in_repository_catalogs": [
+    "bytecodealliance/wasmtime",
+    "firecracker-microvm/firecracker",
+    "google/gvisor",
+    "kata-containers/kata-containers",
+    "wasmerio/wasmer"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "yanghaku/wasmer-gpu-go"
+   ]
+  },
+  "observation-inference": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:37:07.832639+00:00",
+    "response_time_s": 323.46,
+    "request_id": "uuid-sha256:50484fb095eaf79a"
+   },
+   "tavily_named": 8,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "fluent/fluent-bit",
+    "grafana/mimir",
+    "open-telemetry/opentelemetry-collector",
+    "openobserve/openobserve",
+    "victoriametrics/victoriametrics"
+   ],
+   "proposed_elsewhere_in_sweep": [
+    "victoriametrics/victorialogs (observability-hosting)"
+   ],
+   "leads": []
+  },
+  "portfolio-risk": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:38:17.516008+00:00",
+    "response_time_s": 208.94,
+    "request_id": "uuid-sha256:a1ffb477a0f6eb40"
+   },
+   "tavily_named": 8,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 5,
+   "known_to_layer_input": [
+    "nautechsystems/nautilus_trader"
+   ],
+   "in_repository_catalogs": [
+    "lballabio/quantlib",
+    "mhallsmoore/qstrader"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "auto-differentiation/quantlib-risks-py",
+    "quantales/pyquantlib"
+   ]
+  },
+  "quality-evaluation": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:38:37.678163+00:00",
+    "response_time_s": 189.74,
+    "request_id": "uuid-sha256:5f26aeebabb962e3"
+   },
+   "tavily_named": 2,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 1,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "vibrantlabsai/ragas"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "recovery-portability": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:40:07.921886+00:00",
+    "response_time_s": 168.49,
+    "request_id": "uuid-sha256:f5e0d047e43d9c0f"
+   },
+   "tavily_named": 2,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 0,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "research-factors-ml": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:41:48.658591+00:00",
+    "response_time_s": 186.49,
+    "request_id": "uuid-sha256:efe41686d25bd580"
+   },
+   "tavily_named": 9,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 6,
+   "known_to_layer_input": [
+    "ai4finance-foundation/finrl",
+    "mementum/backtrader",
+    "quantconnect/lean"
+   ],
+   "in_repository_catalogs": [
+    "cloudquant/backtrader",
+    "quantopian/alphalens"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "jialuechen/torchquant"
+   ]
+  },
+  "scheduling-supervision": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:41:48.670593+00:00",
+    "response_time_s": 199.38,
+    "request_id": "uuid-sha256:621c549b53f5c009"
+   },
+   "tavily_named": 4,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 1,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "flyteorg/flyte"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "secrets-credentials": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:42:39.242880+00:00",
+    "response_time_s": 229.94,
+    "request_id": "uuid-sha256:118e2828ae9bd3d7"
+   },
+   "tavily_named": 3,
+   "overlap_with_sweep": 2,
+   "missed_by_script": 0,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": []
+  },
+  "security-supply-chain": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:42:58.950400+00:00",
+    "response_time_s": 297.81,
+    "request_id": "uuid-sha256:7db174f08f1160d3"
+   },
+   "tavily_named": 9,
+   "overlap_with_sweep": 2,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "yelp/detect-secrets"
+   ],
+   "proposed_elsewhere_in_sweep": [
+    "cdxgen/cdxgen (ci-supply-chain)"
+   ],
+   "leads": [
+    "aboutcode-org/scancode-toolkit",
+    "awslabs/git-secrets",
+    "cyclonedx/cdxgen",
+    "microsoft/sbom-tool"
+   ]
+  },
+  "semantic-rag": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:44:59.764044+00:00",
+    "response_time_s": 257.34,
+    "request_id": "uuid-sha256:1dc8d3bde65efd8e"
+   },
+   "tavily_named": 7,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 6,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "milvus-io/milvus",
+    "weaviate/weaviate"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "activeloopai/deeplake",
+    "igor-im/code-rag",
+    "jonnoc/coderag",
+    "kdegroup/coderag"
+   ]
+  },
+  "storage-compute": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:45:09.729527+00:00",
+    "response_time_s": 244.18,
+    "request_id": "uuid-sha256:05326354ad5a3a91"
+   },
+   "tavily_named": 3,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 2,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "timescale/timescaledb"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "timescale/docs"
+   ]
+  },
+  "token-efficiency": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:46:30.506854+00:00",
+    "response_time_s": 303.21,
+    "request_id": "uuid-sha256:c0072f1f1e47b29f"
+   },
+   "tavily_named": 9,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 8,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "ggml-org/llama.cpp",
+    "infiniflow/ragflow",
+    "run-llama/llama_index"
+   ],
+   "proposed_elsewhere_in_sweep": [
+    "turboderp-org/exllamav3 (observation-inference)",
+    "vllm-project/vllm-metal (agents-models-workers, semantic-rag)"
+   ],
+   "leads": [
+    "bowang-lab/vllm",
+    "flashinfer-ai/flashinfer",
+    "zilliztech/gptcache"
+   ]
+  },
+  "web-research": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:48:00.328600+00:00",
+    "response_time_s": 286.72,
+    "request_id": "uuid-sha256:bf5ca776a7579473"
+   },
+   "tavily_named": 6,
+   "overlap_with_sweep": 0,
+   "missed_by_script": 3,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "tavily-ai/skills"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "alphaxiv/openresearch-cli",
+    "alxdr3k/tavily-cli"
+   ]
+  },
+  "workers": {
+   "report": {
+    "status": "completed",
+    "created_at": "2026-09-26T04:49:21.046007+00:00",
+    "response_time_s": 228.21,
+    "request_id": "uuid-sha256:a365bfa4eac04345"
+   },
+   "tavily_named": 5,
+   "overlap_with_sweep": 1,
+   "missed_by_script": 3,
+   "known_to_layer_input": [],
+   "in_repository_catalogs": [
+    "crewaiinc/crewai",
+    "openai/openai-agents-python"
+   ],
+   "proposed_elsewhere_in_sweep": [],
+   "leads": [
+    "microsoft/sico"
+   ]
+  }
+ }
+}

@@ -1,0 +1,67 @@
+test_broken_answer_and_symlink_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_broken_answer_and_symlink_cannot_pass) ... ok
+test_deleted_or_skipped_test_and_extra_files_are_rejected (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_deleted_or_skipped_test_and_extra_files_are_rejected) ... ok
+test_fixed_copy_passes_and_frozen_source_stays_broken (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_fixed_copy_passes_and_frozen_source_stays_broken) ... ok
+test_no_native_red_observation_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_no_native_red_observation_cannot_pass) ... ok
+test_red_after_edit_cannot_pass (test_runtime_worker_openhands.OpenHandsFrozenOracleTests.test_red_after_edit_cannot_pass) ... ok
+test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit) ... ERROR
+test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage (test_runtime_worker_openhands.OpenHandsReceiptTests.test_gateway_reads_only_authorized_columns_and_preserves_unknown_usage) ... ok
+test_skills_and_mcp_require_observations (test_runtime_worker_openhands.OpenHandsReceiptTests.test_skills_and_mcp_require_observations) ... ok
+test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt) ... ERROR
+test_checker_rejects_an_empty_result (test_runtime_worker_openhands.OpenHandsRecipeTests.test_checker_rejects_an_empty_result) ... ok
+test_fresh_call_headers_keep_session_affinity (test_runtime_worker_openhands.OpenHandsRecipeTests.test_fresh_call_headers_keep_session_affinity) ... ok
+test_gateway_model_and_container_topology (test_runtime_worker_openhands.OpenHandsRecipeTests.test_gateway_model_and_container_topology) ... ok
+test_immutable_artifacts (test_runtime_worker_openhands.OpenHandsRecipeTests.test_immutable_artifacts) ... ok
+test_installer_and_runtime_are_scoped (test_runtime_worker_openhands.OpenHandsRecipeTests.test_installer_and_runtime_are_scoped) ... ok
+test_mcp_limits (test_runtime_worker_openhands.OpenHandsRecipeTests.test_mcp_limits) ... ok
+test_no_public_binds_or_secret_material (test_runtime_worker_openhands.OpenHandsRecipeTests.test_no_public_binds_or_secret_material) ... ok
+test_qmd_guard_requires_explicit_scope_and_lexical_query (test_runtime_worker_openhands.OpenHandsRecipeTests.test_qmd_guard_requires_explicit_scope_and_lexical_query) ... ok
+test_runtime_model_override_and_native_tool_filter (test_runtime_worker_openhands.OpenHandsRecipeTests.test_runtime_model_override_and_native_tool_filter) ... ok
+test_serena_activates_plain_fixture_and_keeps_metadata_outside_it (test_runtime_worker_openhands.OpenHandsRecipeTests.test_serena_activates_plain_fixture_and_keeps_metadata_outside_it) ... ok
+
+======================================================================
+ERROR: test_cleanup_timeout_does_not_erase_primary_exit (test_runtime_worker_openhands.OpenHandsReceiptTests.test_cleanup_timeout_does_not_erase_primary_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands.py", line 256, in test_cleanup_timeout_does_not_erase_primary_exit
+    self.assertEqual(host.execute_container(["synthetic"], "fixture", log, 1), 7)
+                     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/blueprints/runtime-workers/openhands/host.py", line 136, in execute_container
+    subprocess.run(DOCKER + ["rm", "-f", name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   check=False, timeout=30)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1238, in _execute_mock_call
+    raise result
+subprocess.TimeoutExpired: Command '['synthetic-cleanup']' timed out after 30 seconds
+
+======================================================================
+ERROR: test_truncated_native_summary_retains_failed_attempt_receipt (test_runtime_worker_openhands.OpenHandsReceiptTests.test_truncated_native_summary_retains_failed_attempt_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands.py", line 244, in test_truncated_native_summary_retains_failed_attempt_receipt
+    report = module.create_receipt(result, database=result / "absent.sqlite")
+  File "<worktree>/blueprints/runtime-workers/openhands/receipt.py", line 126, in create_receipt
+    native = read_json(summary)
+  File "<worktree>/blueprints/runtime-workers/openhands/recipe.py", line 20, in read_json
+    return json.loads(Path(path).read_text())
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 13 (char 12)
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.539s
+
+FAILED (errors=2)

@@ -1,0 +1,37 @@
+{
+ "note": "Each published copy whose hash differs from its frozen or sent hash, compared with the packager's clean() applied to the original found by that hash; <agent-id-N> is compared as <agent-id>.",
+ "lists": {
+  "final/adjudication/frozen-final.sha256": {
+   "void_patterns_final.py": "differs only by the packager's replacements",
+   "audit_selftest_final.py": "differs only by the packager's replacements",
+   "audit-selftest-final.json": "differs only by the packager's replacements",
+   "build_adjudication_final.py": "differs only by the packager's replacements",
+   "prompts/claude-task-AB.txt": "differs only by the packager's replacements",
+   "prompts/claude-task-BA.txt": "differs only by the packager's replacements",
+   "prompts/judge-AB.txt": "differs only by the packager's replacements",
+   "prompts/judge-BA.txt": "differs only by the packager's replacements"
+  },
+  "final/frozen-a2.sha256": {
+   "audit_selftest_a2.py": "differs only by the packager's replacements",
+   "build_lane_a2.py": "differs only by the packager's replacements",
+   "prompts/gpt6-prompt.txt": "differs only by the packager's replacements",
+   "prompts/claude-brief.txt": "differs only by the packager's replacements"
+  },
+  "adjudication/attempt2/sent-sha256.json": {
+   "prompts/claude-task-AB.txt": "differs only by the packager's replacements",
+   "prompts/claude-task-BA.txt": "differs only by the packager's replacements",
+   "prompts/judge-AB.txt": "differs only by the packager's replacements",
+   "prompts/judge-BA.txt": "differs only by the packager's replacements"
+  },
+  "final/adjudication/sent-sha256.json": {
+   "prompts/claude-task-AB.txt": "differs only by the packager's replacements",
+   "prompts/claude-task-BA.txt": "differs only by the packager's replacements",
+   "prompts/judge-AB.txt": "differs only by the packager's replacements",
+   "prompts/judge-BA.txt": "differs only by the packager's replacements"
+  },
+  "final/sent-sha256.json": {
+   "prompts/gpt6-prompt.txt": "differs only by the packager's replacements",
+   "prompts/claude-brief.txt": "differs only by the packager's replacements"
+  }
+ }
+}

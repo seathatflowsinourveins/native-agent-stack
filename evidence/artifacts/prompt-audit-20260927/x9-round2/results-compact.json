@@ -1,0 +1,2290 @@
+{
+ "harness": {
+  "promptfooVersion": "0.123.1",
+  "nodeVersion": "v24.21.0",
+  "platform": "linux",
+  "arch": "x64",
+  "exportedAt": "2026-09-28T02:36:42.511Z",
+  "evaluationCreatedAt": "2026-09-28T02:23:58.983Z"
+ },
+ "eval_id": "eval-xmG-2026-09-28T02:23:58",
+ "runtime_options": {
+  "eventSource": "cli",
+  "showProgressBar": false,
+  "repeat": 3,
+  "maxConcurrency": 1,
+  "cache": false
+ },
+ "stats": {
+  "successes": 0,
+  "failures": 27,
+  "errors": 0,
+  "tokenUsage": {
+   "prompt": 0,
+   "completion": 0,
+   "cached": 0,
+   "total": 0,
+   "numRequests": 27,
+   "completionDetails": {
+    "reasoning": 0,
+    "acceptedPrediction": 0,
+    "rejectedPrediction": 0,
+    "cacheReadInputTokens": 0,
+    "cacheCreationInputTokens": 0
+   },
+   "assertions": {
+    "total": 0,
+    "prompt": 0,
+    "completion": 0,
+    "cached": 0,
+    "numRequests": 0,
+    "completionDetails": {
+     "reasoning": 0,
+     "acceptedPrediction": 0,
+     "rejectedPrediction": 0,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0
+    }
+   }
+  },
+  "durationMs": 763504,
+  "evaluationDurationMs": 763504
+ },
+ "rows": [
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 15236,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022359Z-1137529.jsonl",
+    "exit": 0,
+    "duration_ms": 15187,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.3193956,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34532,
+     "cache_read_input_tokens": 102278,
+     "output_tokens": 1133
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "pending",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes, the socraticode MCP server is active in this session. Its tools loaded and two read-only calls to it returned results.\n\n- **Tools are listed:** 26 `mcp__socraticode__*` tools appear in this session's deferred-tool list, from `codebase_"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 14910,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022414Z-1142940.jsonl",
+    "exit": 0,
+    "duration_ms": 14865,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.316406,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34249,
+     "cache_read_input_tokens": 102150,
+     "output_tokens": 1098
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes, the socraticode MCP server is active in this session. I loaded two of its tools and called them, and both returned live answers.\n\n1. **Tools are registered:** the session's tool list includes 24 socraticode tools, from `codebase_about`"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 17087,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T022429Z-1151282.jsonl",
+    "exit": 0,
+    "duration_ms": 17043,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.32274680000000006,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34502,
+     "cache_read_input_tokens": 102134,
+     "output_tokens": 1314
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes. The socraticode MCP server is connected and answering tool calls in this session.\n\n1. **The session lists its tools.** The system reminder lists 29 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_status` and `codebase"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 24231,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022446Z-1155075.jsonl",
+    "exit": 0,
+    "duration_ms": 24190,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.3324818,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 34652,
+     "cache_read_input_tokens": 148469,
+     "output_tokens": 1277
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects,mcp__socraticode__codebase_health",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_health",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes. The socraticode MCP server is running in this session, and I called its tools rather than just seeing them listed.\n\n- **Listed:** The session's list of available tools includes 27 `mcp__socraticode__*` tools, such as `codebase_search`,"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 11546,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022511Z-1161048.jsonl",
+    "exit": 0,
+    "duration_ms": 11503,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.0497236,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 878,
+     "cache_read_input_tokens": 134978,
+     "output_tokens": 784
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes. The socraticode MCP server is connected and responding in this session.\n\n- **Its tools are registered:** the session's list of available tools includes about 30 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_status` "
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 17770,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T022523Z-1164248.jsonl",
+    "exit": 0,
+    "duration_ms": 17727,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.3179934,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34117,
+     "cache_read_input_tokens": 101967,
+     "output_tokens": 1232
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes. The socraticode MCP server is connected and answering in this session.\n\n**Evidence:**\n\n1. **Its tools are registered.** The session's deferred-tool list includes 28 `mcp__socraticode__*` tools, such as `codebase_search`, `codebase_stat"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 15027,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022541Z-1172140.jsonl",
+    "exit": 0,
+    "duration_ms": 14983,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.061237400000000004,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 1377,
+     "cache_read_input_tokens": 135187,
+     "output_tokens": 1158
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes. The socraticode MCP server is active in this session: I loaded its tools and two read-only calls to it returned results.\n\n- **Its tools are registered here.** All 25 `mcp__socraticode__*` tools appear in this session's deferred-tool li"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 12756,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022556Z-1180183.jsonl",
+    "exit": 0,
+    "duration_ms": 12714,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.0520288,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 1034,
+     "cache_read_input_tokens": 134964,
+     "output_tokens": 837
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_status,mcp__socraticode__codebase_list_projects",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "Yes, socraticode is active in this session.\n\n- **Tools are registered:** the session lists 26 `mcp__socraticode__*` tools as deferred. Loading `codebase_status` and `codebase_list_projects` returned their full schemas from the server.\n- **T"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K1",
+    "target": "socraticode"
+   },
+   "latency_ms": 16439,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T022609Z-1187549.jsonl",
+    "exit": 0,
+    "duration_ms": 16396,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.0657416,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 1520,
+     "cache_read_input_tokens": 134988,
+     "output_tokens": 1328
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__socraticode__codebase_list_projects,mcp__socraticode__codebase_status",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**Yes.** The socraticode MCP server is connected in this session and answered live tool calls.\n\n1. **Its tools are registered.** The session's deferred-tool list has 26 `mcp__socraticode__*` tools, from `codebase_about` to `codebase_watch`."
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 22684,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022626Z-1201189.jsonl",
+    "exit": 0,
+    "duration_ms": 22641,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3683056,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 39575,
+     "cache_read_input_tokens": 56748,
+     "output_tokens": 2017
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** The GitHub MCP server isn't active in this session, and I found no configuration for it.\n\n- **No GitHub tools loaded:** the session's deferred tool list has no `mcp__github__*` names. A tool search for \"github\" returned only built-i"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 26021,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022649Z-1210454.jsonl",
+    "exit": 0,
+    "duration_ms": 25979,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3769922,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 39707,
+     "cache_read_input_tokens": 56701,
+     "output_tokens": 2399
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** There is no GitHub MCP server running in this session.\n\n- **No GitHub tools are loaded.** None of this session's tools come from a server called `github`. The MCP tools that are present come from these servers: `ai-memory`, `codebas"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 30742,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T022715Z-1220695.jsonl",
+    "exit": 0,
+    "duration_ms": 30697,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.3817244,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 36512,
+     "cache_read_input_tokens": 150382,
+     "output_tokens": 2976
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "No. The GitHub MCP server isn't active in this session.\n\n1. **No GitHub tools are loaded.** The session's tool list has MCP tools from nine servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode`, `"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 31233,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022746Z-1230887.jsonl",
+    "exit": 0,
+    "duration_ms": 31191,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.19304259999999998,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 13220,
+     "cache_read_input_tokens": 141593,
+     "output_tokens": 2947
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "+github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** No GitHub MCP server is active in this session.\n\n- **No tools in the session:** The deferred-tool list has no `mcp__github__*`, `mcp__plugin_*github*` or `mcp__claude_ai_*` tools. I searched ToolSearch for `github` and then for tool"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 23185,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022817Z-1237326.jsonl",
+    "exit": 0,
+    "duration_ms": 23145,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.1986908,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 17700,
+     "cache_read_input_tokens": 89574,
+     "output_tokens": 1958
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "+github",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github pull request issue repository",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** Nothing in this session shows a GitHub MCP server as active.\n\n- **No GitHub tools are loaded.** The MCP tools available here come from eight servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `context-mode` (a plugin"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 23781,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T022841Z-1241960.jsonl",
+    "exit": 0,
+    "duration_ms": 23736,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.1321522,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 7620,
+     "cache_read_input_tokens": 141241,
+     "output_tokens": 2146
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** No GitHub MCP server is loaded in this session.\n\n- **Loaded tools:** this session's deferred tool list has MCP tools from only eight servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode`, "
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 32674,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T022905Z-1248866.jsonl",
+    "exit": 0,
+    "duration_ms": 32534,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.19062159999999997,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 13124,
+     "cache_read_input_tokens": 147128,
+     "output_tokens": 2809
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "+github pull request issue",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "**No.** No GitHub MCP server is connected in this session.\n\n**What this session exposes:**\n- **Loaded tools:** the MCP tools here come from ai-memory, codebase-memory, headroom, jcodemunch, context-mode (a plugin), qmd, serena and socratico"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 24361,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T022938Z-1256818.jsonl",
+    "exit": 0,
+    "duration_ms": 24306,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.416219,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 45042,
+     "cache_read_input_tokens": 111495,
+     "output_tokens": 1678
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "pending",
+      "socraticode": "pending"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "+github pull request issue",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "No, the GitHub MCP server is not active in this session.\n\n- **No GitHub tools are loaded.** Every MCP tool this session has comes from one of seven servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena` and `socr"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K2",
+    "target": "github"
+   },
+   "latency_ms": 23457,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T023003Z-1263908.jsonl",
+    "exit": 0,
+    "duration_ms": 23415,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.129453,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 7365,
+     "cache_read_input_tokens": 140945,
+     "output_tokens": 2116
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "github",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "No, the GitHub MCP server is not active in this session.\n\n- **Loaded tools:** this session has tools from these MCP servers: `ai-memory`, `codebase-memory`, `headroom`, `jcodemunch`, `qmd`, `serena`, `socraticode` and the context-mode plugi"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 58370,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T023026Z-1273890.jsonl",
+    "exit": 0,
+    "duration_ms": 58323,
+    "result_subtype": "success",
+    "num_turns": 11,
+    "cost_usd": 0.4260104,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 41194,
+     "cache_read_input_tokens": 105472,
+     "output_tokens": 3767
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ai-memory__memory_status,mcp__codebase-memory__list_projects,mcp__headroom__headroom_stats,mcp__jcodemunch__menu,mcp__plugin_context-mode_context-mode__ctx_stats,mcp__qmd__status,mcp__sere",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "list indexed repos",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I couldn't run `/mcp` myself: it's a built-in client command and isn't available to me as a skill. Instead I made one read-only call to each MCP server that has tools in this session. All eight answered.\n\n| Server | Probe | Result |\n|---|--"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 44812,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T023125Z-1296103.jsonl",
+    "exit": 0,
+    "duration_ms": 44761,
+    "result_subtype": "success",
+    "num_turns": 11,
+    "cost_usd": 0.38588279999999997,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 39881,
+     "cache_read_input_tokens": 104354,
+     "output_tokens": 2297
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__qmd__status,mcp__ai-memory__memory_status,mcp__codebase-memory__list_projects,mcp__headroom__headroom_stats,mcp__jcodemunch__menu,mcp__plugin_context-mode_context-mode__ctx_stats,mcp__sere",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "ListMcpResourcesTool",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I can't run `/mcp` because it's a command only you can type. Instead I sent a read-only call to every MCP server that has tools in this session. **All 8 replied.**\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-memory` | `memory_status` |"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 22403,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T023210Z-1314557.jsonl",
+    "exit": 0,
+    "duration_ms": 22360,
+    "result_subtype": "success",
+    "num_turns": 1,
+    "cost_usd": 0.3063348,
+    "usage": {
+     "input_tokens": 2,
+     "cache_creation_input_tokens": 32798,
+     "cache_read_input_tokens": 11914,
+     "output_tokens": 2078
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [],
+    "final_head": "I can't run `/mcp` myself. It's a built-in Claude Code command that only you can type. What I can see is which MCP servers have tools registered in this session, and a server only shows up there if it connected and listed its tools.\n\n**8 se"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 51610,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T023233Z-1322232.jsonl",
+    "exit": 0,
+    "duration_ms": 51568,
+    "result_subtype": "success",
+    "num_turns": 12,
+    "cost_usd": 0.4343088,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 42191,
+     "cache_read_input_tokens": 160144,
+     "output_tokens": 3236
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "serena",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__qmd__status,mcp__ai-memory__memory_status,mcp__headroom__headroom_stats,mcp__codebase-memory__list_projects,mcp__socraticode__codebase_status,mcp__plugin_context-mode_context-mode__ctx_sta",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__serena__list_memories",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I can't run `/mcp` myself: it's a built-in client command, not a skill I can call. Instead I checked the session's own MCP tools. **Eight MCP servers are connected, and each one answered a read-only call.** Headroom's proxy backend isn't wo"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 50765,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T023324Z-1335970.jsonl",
+    "exit": 0,
+    "duration_ms": 50723,
+    "result_subtype": "success",
+    "num_turns": 11,
+    "cost_usd": 0.136813,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 7302,
+     "cache_read_input_tokens": 137365,
+     "output_tokens": 2545
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__qmd__status,mcp__headroom__headroom_stats,mcp__plugin_context-mode_context-mode__ctx_stats,mcp__codebase-memory__list_projects,mcp__jcodemunch__menu,mcp__serena__list_memories,mcp__socrati",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "ListMcpResourcesTool",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I can't run `/mcp` because only you can type it. Instead I made one read-only call to each MCP server that has tools in this session, and all 8 answered:\n\n| Server | Call | Result |\n|---|---|---|\n| `qmd` | `status` | 269 docs in 4 collectio"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 21742,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T023415Z-1351223.jsonl",
+    "exit": 0,
+    "duration_ms": 21699,
+    "result_subtype": "success",
+    "num_turns": 1,
+    "cost_usd": 0.0518904,
+    "usage": {
+     "input_tokens": 2,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 44712,
+     "output_tokens": 2147
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [],
+    "final_head": "I can't run `/mcp` because it's a built-in command that only you can type. What I can do is report which MCP servers have tools loaded in this session. Their tools show up in my deferred-tool list, and a server only appears there after it h"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 50978,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T023437Z-1356811.jsonl",
+    "exit": 0,
+    "duration_ms": 50920,
+    "result_subtype": "success",
+    "num_turns": 10,
+    "cost_usd": 0.1287758,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 6626,
+     "cache_read_input_tokens": 137019,
+     "output_tokens": 2417
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__qmd__status,mcp__ai-memory__memory_status,mcp__codebase-memory__list_projects,mcp__headroom__headroom_stats,mcp__jcodemunch__menu,mcp__plugin_context-mode_context-mode__ctx_stats,mcp__sere",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I can't run `/mcp` myself because it's a built-in client command. Instead I sent one read-only call to each MCP server that shows up in this session. **All 8 answered:**\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-memory` | `memory_sta"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 47884,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "executed_target": true,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T023529Z-1372010.jsonl",
+    "exit": 0,
+    "duration_ms": 47816,
+    "result_subtype": "success",
+    "num_turns": 10,
+    "cost_usd": 0.1342134,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 6968,
+     "cache_read_input_tokens": 136927,
+     "output_tokens": 2553
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__qmd__status,mcp__headroom__headroom_stats,mcp__codebase-memory__list_projects,mcp__socraticode__codebase_list_projects,mcp__jcodemunch__menu,mcp__serena__list_memories,mcp__plugin_context-",
+      "is_error": false
+     },
+     {
+      "name": "mcp__qmd__status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__headroom__headroom_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__codebase-memory__list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__socraticode__codebase_list_projects",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__jcodemunch__menu",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__serena__list_memories",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ai-memory__memory_status",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "I can't run `/mcp` myself because it's a command only you can type. Instead I loaded one tool from every MCP server this session exposes and made a read-only call to each. All 8 answered:\n\n| Server | Probe | Result |\n|---|---|---|\n| `ai-mem"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K3",
+    "target": ""
+   },
+   "latency_ms": 24904,
+   "assertions": {
+    "correct": true,
+    "answered": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "executed_target": false,
+    "cli_diagnostic": false,
+    "asks_user": false,
+    "names_command": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T023617Z-1383533.jsonl",
+    "exit": 0,
+    "duration_ms": 24861,
+    "result_subtype": "success",
+    "num_turns": 1,
+    "cost_usd": 0.061890400000000005,
+    "usage": {
+     "input_tokens": 2,
+     "cache_creation_input_tokens": 0,
+     "cache_read_input_tokens": 44712,
+     "output_tokens": 2647
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "mcp_servers": {
+      "plugin:context-mode:context-mode": "connected",
+      "ai-memory": "connected",
+      "serena": "connected",
+      "jcodemunch": "connected",
+      "codebase-memory": "connected",
+      "qmd": "connected",
+      "headroom": "connected",
+      "socraticode": "connected"
+     },
+     "plugins": [
+      "agents-md",
+      "claude-hud",
+      "codex",
+      "context-mode",
+      "telemetry"
+     ]
+    },
+    "calls": [],
+    "final_head": "I can't run `/mcp` myself because it's an interactive command only you can type. What I can see is this session's tool registry, and tools only show up there for servers that connected. Based on that, **8 MCP servers are connected**:\n\n| Ser"
+   }
+  }
+ ]
+}

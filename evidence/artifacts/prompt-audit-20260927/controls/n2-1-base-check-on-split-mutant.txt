@@ -1,0 +1,17 @@
+# the base's log check misses a split table (expect [])
+# base (origin/main): b26add90becaed49cfd74f3cf48126b7fa9b5c86; tests/test_adoption_docs_consistency.py from the base, every other file from the PR branch
+# blobs as run (git hash-object):
+#   c0e562676aa3231c38f9406bbdd72c79facd51cd  tests/test_adoption_docs_consistency.py
+#   df58da0b5af3a227de8ecf67b08ac7fcb373de42  tests/test_landscape_sweep_harness.py
+#   2705d4707837ea74223e851c0e355212c983aaba  docs/harness-defaults.md
+#   ad76cedb630e23398933d37b0c03ee7ec008dfbf  tools/sota-convergence/landscape-sweep/templates.json
+# Python 3.13.15
+$ python3 -c import importlib
+T = importlib.import_module("tests.test_adoption_docs_consistency")
+good = ("## Upstream\n\n### Anti-pattern log\n\n"
+        "| Date | Anti-pattern | What happened | Rule or check that prevents it | Where enforced |\n"
+        "| --- | --- | --- | --- | --- |\n| 2026-09-26 | a | b `x \\| y` | c | d |\n\n## Next\n")
+split = good.replace("| c | d |\n", "| c | d |\n\n| 2026-09-26 | e | f | g | h |\n")
+print("split-table mutant errors:", T.UpstreamVerificationSectionTests.log_errors(split))
+split-table mutant errors: []
+# exit 0

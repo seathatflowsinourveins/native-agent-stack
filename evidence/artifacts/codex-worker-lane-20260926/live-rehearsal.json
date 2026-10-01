@@ -1,0 +1,302 @@
+{
+  "what": "Live rehearsal of prove_codex_lane.py's worker checks on the real Codex home, with the post-apply state given as -c overrides (scripts/rehearse_live.py.txt); no Codex file changed. Usage counters are Codex's own turn.completed fields, per run, never summed.",
+  "first_run": {
+    "window_utc": [
+      "2026-09-26T22:27:49Z",
+      "2026-09-26T22:28:55Z"
+    ],
+    "output": [
+      "quota gate open: scripts/codex_quota.py --gate 90.0: exit 0, used 15%",
+      "[PASS] workers worker-one (cwd): status completed, pwd printed $SCRATCH/worker-one",
+      "[PASS] workers worker-two (-C): status completed, pwd printed $SCRATCH/worker-two",
+      "[PASS] approval with the profile keys: status completed, error ''",
+      "[PASS] approval control without them: status failed, refused for approval True",
+      "[FAIL] rtk-worker: commands seen: [\"/bin/bash -lc 'rtk git status --short'\"]",
+      "result: FAIL (4 pass, 1 fail)",
+      "rc=0"
+    ],
+    "checks": [
+      {
+        "check": "workers worker-one (cwd)",
+        "ok": true,
+        "detail": "status completed, pwd printed $SCRATCH/worker-one"
+      },
+      {
+        "check": "workers worker-two (-C)",
+        "ok": true,
+        "detail": "status completed, pwd printed $SCRATCH/worker-two"
+      },
+      {
+        "check": "approval with the profile keys",
+        "ok": true,
+        "detail": "status completed, error ''"
+      },
+      {
+        "check": "approval control without them",
+        "ok": true,
+        "detail": "status failed, refused for approval True"
+      },
+      {
+        "check": "rtk-worker",
+        "ok": false,
+        "detail": "commands seen: [\"/bin/bash -lc 'rtk git status --short'\"]"
+      }
+    ],
+    "commands": {
+      "worker-one (cwd)": [],
+      "worker-two (-C)": [],
+      "approval (profile keys)": [],
+      "approval control (no profile keys)": [],
+      "rtk-worker (project AGENTS.md)": [
+        "/bin/bash -lc 'rtk git status --short'"
+      ]
+    },
+    "mcp_calls": {
+      "worker-one (cwd)": [
+        [
+          "context-mode",
+          "ctx_execute",
+          "completed"
+        ]
+      ],
+      "worker-two (-C)": [
+        [
+          "context-mode",
+          "ctx_execute",
+          "completed"
+        ]
+      ],
+      "approval (profile keys)": [
+        [
+          "ai-memory",
+          "memory_query",
+          "completed"
+        ]
+      ],
+      "approval control (no profile keys)": [
+        [
+          "ai-memory",
+          "memory_query",
+          "failed"
+        ]
+      ],
+      "rtk-worker (project AGENTS.md)": [
+        [
+          "context-mode",
+          "ctx_execute_file",
+          "failed"
+        ],
+        [
+          "context-mode",
+          "ctx_execute_file",
+          "failed"
+        ],
+        [
+          "context-mode",
+          "ctx_execute",
+          "completed"
+        ]
+      ]
+    },
+    "runs": [
+      {
+        "name": "worker-one (cwd)",
+        "exit": 0,
+        "timed_out": false,
+        "seconds": 13.8,
+        "usage": {
+          "input_tokens": 33601,
+          "cached_input_tokens": 28672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 183,
+          "reasoning_output_tokens": 42
+        }
+      },
+      {
+        "name": "worker-two (-C)",
+        "exit": 0,
+        "timed_out": false,
+        "seconds": 13.8,
+        "usage": {
+          "input_tokens": 33610,
+          "cached_input_tokens": 28672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 213,
+          "reasoning_output_tokens": 63
+        }
+      },
+      {
+        "name": "approval (profile keys)",
+        "exit": 0,
+        "timed_out": false,
+        "seconds": 47.8,
+        "usage": {
+          "input_tokens": 35168,
+          "cached_input_tokens": 28672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 119,
+          "reasoning_output_tokens": 0
+        }
+      },
+      {
+        "name": "approval control (no profile keys)",
+        "exit": 0,
+        "timed_out": false,
+        "seconds": 47.8,
+        "usage": {
+          "input_tokens": 33649,
+          "cached_input_tokens": 31360,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 275,
+          "reasoning_output_tokens": 124
+        }
+      },
+      {
+        "name": "rtk-worker (project AGENTS.md)",
+        "exit": 0,
+        "timed_out": false,
+        "seconds": 47.8,
+        "usage": {
+          "input_tokens": 82321,
+          "cached_input_tokens": 71680,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1172,
+          "reasoning_output_tokens": 721
+        }
+      }
+    ],
+    "claude_cfg_files": [
+      "context-mode",
+      "context-mode-cache-heal.mjs",
+      "heal-partial-install.log",
+      "hooks"
+    ]
+  },
+  "rtk_worker_rerun_with_the_shell_tool_named": {
+    "verdict": true,
+    "detail": "status command rtk-prefixed True; blob read \"/bin/bash -lc 'rtk proxy git show HEAD:big.txt'\": raw True, exit 0, 21300 of 21300 bytes, byte-exact True",
+    "blob_sha256": "79cb30c3a0f46cd75a4ed5168e6050e22affbe6ff0285a9d8a72c373e13c5678",
+    "blob_bytes": 21300,
+    "items": [
+      {
+        "id": "item_1",
+        "type": "command_execution",
+        "command": "/bin/bash -lc 'rtk git status --short'",
+        "aggregated_output": "",
+        "exit_code": 0,
+        "status": "completed"
+      },
+      {
+        "id": "item_2",
+        "type": "command_execution",
+        "command": "/bin/bash -lc 'rtk proxy git show HEAD:big.txt'",
+        "aggregated_output": "0000 codex worker lane exactness fixture: a line long enough to add up\n0001 codex worker lane exactness fixture: a line long enough to add up\n0002 codex worker lane exactness fixture: a line long enou ...(cut for the record)",
+        "exit_code": 0,
+        "status": "completed",
+        "aggregated_output_sha256": "79cb30c3a0f46cd75a4ed5168e6050e22affbe6ff0285a9d8a72c373e13c5678",
+        "aggregated_output_bytes": 21300
+      }
+    ],
+    "usage": {
+      "input_tokens": 40794,
+      "cached_input_tokens": 32256,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 136,
+      "reasoning_output_tokens": 43
+    },
+    "exit": 0,
+    "seconds": 12.8
+  },
+  "approval_rerun_with_raw_items": [
+    {
+      "name": "with the profile's ai-memory keys",
+      "verdict": true,
+      "detail": "status completed, error ''",
+      "items": [
+        {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "ai-memory",
+          "tool": "memory_query",
+          "arguments": {
+            "workspace": "local",
+            "project": "native-agent-stack",
+            "query": "codex worker lane"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "(result text omitted from the record)"
+              }
+            ],
+            "structured_content": null
+          },
+          "error": null,
+          "status": "completed"
+        }
+      ],
+      "usage": {
+        "input_tokens": 35119,
+        "cached_input_tokens": 24320,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 142,
+        "reasoning_output_tokens": 0
+      },
+      "exit": 0,
+      "seconds": 19.4
+    },
+    {
+      "name": "control, without them",
+      "verdict": true,
+      "detail": "status failed, refused for approval True",
+      "items": [
+        {
+          "id": "item_1",
+          "type": "mcp_tool_call",
+          "server": "ai-memory",
+          "tool": "memory_query",
+          "arguments": {
+            "workspace": "local",
+            "project": "native-agent-stack",
+            "query": "codex worker lane"
+          },
+          "result": null,
+          "error": {
+            "message": "MCP tool call requires approval, but approval policy is never"
+          },
+          "status": "failed"
+        }
+      ],
+      "usage": {
+        "input_tokens": 33573,
+        "cached_input_tokens": 28672,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 378,
+        "reasoning_output_tokens": 234
+      },
+      "exit": 0,
+      "seconds": 19.4
+    }
+  ],
+  "host_files_before_and_after": {
+    "before": [
+      "~/.codex/config.toml a673f0b4e63f81b6 1790453559",
+      "~/.codex/AGENTS.md a8056071fa5d094c 1790220908",
+      "~/.codex/RTK.md 278274ef3d08c858 1790220908",
+      "~/.codex/hooks.json b30204015bae7db2 1790381984",
+      "~/.claude/settings.json d77a40f44b81ad4f 1790453559",
+      "~/.claude/plugins/installed_plugins.json 2bbfe7c45d962572 1790221100",
+      "config.toml': No such file or directory"
+    ],
+    "after": [
+      "~/.codex/config.toml a673f0b4e63f81b6 1790453559",
+      "~/.codex/AGENTS.md a8056071fa5d094c 1790220908",
+      "~/.codex/RTK.md 278274ef3d08c858 1790220908",
+      "~/.codex/hooks.json b30204015bae7db2 1790381984",
+      "~/.claude/settings.json d77a40f44b81ad4f 1790453559",
+      "~/.claude/plugins/installed_plugins.json 2bbfe7c45d962572 1790221100",
+      "config.toml': No such file or directory"
+    ]
+  }
+}

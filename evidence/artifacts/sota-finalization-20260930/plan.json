@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "kind": "native_practice_finalization_plan",
+  "scope": "foundation-cpu selected native skills and Codex/Claude practice on the current Linux/WSL host; user explicitly deferred second-machine acceptance",
+  "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "rust-v0.159.2",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "revision": "v2.1.285",
+      "url": "https://github.com/anthropics/claude-code/blob/v2.1.285/CHANGELOG.md"
+    },
+    {
+      "repository": "anthropics/skills",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "path": "skills/skill-creator/SKILL.md",
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md"
+    },
+    {
+      "repository": "vercel-labs/skills",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "url": "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md"
+    },
+    {
+      "url": "https://developers.openai.com/blog/eval-skills"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/headless"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/skills"
+    }
+  ],
+  "gates": [
+    {
+      "id": "current-client-qualification",
+      "acceptance": "Installed-version upstream source review, native app-server configuration write/readback, isolated apply/rollback; required meaningful local integration checks; exact-version and idle protections retained."
+    },
+    {
+      "id": "skill-routing",
+      "acceptance": "Frozen focused routing cases, actual native skill read/invocation and concrete task outcomes; record all misses, false positives and native failures separately for Codex and Claude."
+    },
+    {
+      "id": "task-baseline",
+      "acceptance": "At least one identical native Claude task with skill discovery enabled and native --disable-slash-commands baseline at the same explicit model/effort. A passing baseline is not a quality gain."
+    },
+    {
+      "id": "claude-convergence",
+      "acceptance": "Native Claude Opus at max independently critiques the integrated changes/evidence; adjudicate findings by original pinned sources and actual checks, preserve dissent and failures. Final review has no unresolved blocking source/acceptance finding within the declared scope."
+    },
+    {
+      "id": "portability",
+      "acceptance": "Deferred by the user's explicit 'Finish this host first' answer. Current-host fresh-prefix or hosted smoke cannot count as second-machine acceptance."
+    },
+    {
+      "id": "publication-integrity",
+      "acceptance": "Relevant unchanged checks, scoped convergence validator, evidence/catalog validator, generated guide check and whitespace check pass on final inputs; historical upstream tests stay distinct from integration tests."
+    }
+  ],
+  "model_policy": {
+    "codex_coordinator": {
+      "model": "gpt-6.1-sol",
+      "effort": "ultra"
+    },
+    "codex_worker": {
+      "model": "gpt-6.1-sol",
+      "effort": "max"
+    },
+    "claude_review": {
+      "model": "opus",
+      "effort": "max"
+    },
+    "preserve_explicit_role_definitions": true,
+    "astra_escalation": "Consequential architecture, conflicting primary evidence or failure unresolved after one bounded Sol repair; record trigger and acceptance."
+  },
+  "state_policy": "Do not inspect credential values, kill active clients, bypass idle/version protections or overwrite concurrent owners. Logs and per-host active state remain private; publish compact sanitized receipts.",
+  "quality_rule": "Qualification is scoped to observed gates. No universal SOTA, all-28 implicit routing, broad superiority or efficiency claim.",
+  "usage_rule": "Retain per-native-attempt usage once; keep cache subsets separate, failed attempts visible and unknown counters null."
+}

@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "id": "claude-model-effort-probes-20260929",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "Twenty-seven native probes and two session counts on Claude Code 2.1.284 (the client version recorded in every transcript), run between 2026-09-28T21:20Z and 2026-09-29T00:40Z and each read from the model and effort recorded in the session's or child's own transcript, found that (1) in headless one-turn sessions the ultracode setting neither raised a session that had no per-model level (a Sonnet 5.5 session ran at medium although the user settings' top-level effortLevel was xhigh) nor overrode a per-model level passed with --settings (low won for both Sonnet 5.5 and Opus 5.5), a project settings file's top-level effortLevel or modelSettings entry of xhigh raised a Sonnet 5.5 session to xhigh, and the Ultracode reminder text stayed present at max effort set by flag or environment variable; (2) in headless sessions a subagent that no per-call model or definition names ran the lead's model, CLAUDE_CODE_SUBAGENT_MODEL=opus put it on Opus 5.5 under a Sonnet 5.5 lead, and a child on another model ran at that model's own saved level or default (xhigh for Opus 5.5, medium for Sonnet 5.5); (3) in the interactive coordinator session, whose effort a model picker had set to max, every probe child that named no effort (an unnamed subagent, an Opus subagent named by per-call model, two workflow stages and a named teammate: C1 and C3 to C6) ran at max, the Opus 5.5 one (C3) included, so the lead's session effort reached a child of either model, and the two project agents whose definitions declare effort max (C2, C8) also ran at max, which their definitions explain; and (4) after the host user settings saved claude-sonnet-5-5 at xhigh and CLAUDE_CODE_SUBAGENT_MODEL=opus, a fresh headless Sonnet 5.5 session ran at xhigh and its unnamed subagent ran on Opus 5.5 at xhigh.",
+  "limitations": [
+    "Local observation of one workstation and one client version (2.1.284); not a provider ledger, and the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+    "Cases A, B and D are headless one-turn sessions in fresh scratch directories that read the host's user settings (ultracode true, a top-level effortLevel of xhigh, modelSettings for claude-opus-5-5 only before the change, no CLAUDE_CODE_SUBAGENT_MODEL before the change); the setting values are not retained beyond that shape. Case A1 therefore shows that the user settings' top-level xhigh did not reach a Sonnet 5.5 session that had no per-model entry; an interactive fresh session's default was not measured.",
+    "Cases C come from the interactive coordinator session, whose own effort was max because a model picker set it; each child kind was observed once, so C1 and C3 to C6 show the inheritance rule for one child of each kind, not its variance (C3 is the only child of the other model that named no effort), and they show the interactive effort reaching children of both models, not what a headless child of another model runs at (that is B2 and B3); C2 and C8 run project agents whose definitions declare effort max, so they show the definition, not inheritance. C7 counts the coordinator's unique assistant messages up to 2026-09-29T00:40:00Z (its transcript keeps growing); every message count in this receipt counts each assistant message id once.",
+    "The Ultracode reminder text is the indicator the 2026-09-23 record used for an active Ultracode; it is not proof of workflow behaviour. This receipt does not show that dynamic-workflow orchestration is active or inactive at a given effort, although the interactive max session ran workflows when asked.",
+    "Tool use was not exercised in cases A and C1 to C6 (one-turn replies), and B and D used only the Agent tool, so effort or model changes over a long tool-heavy session are untested.",
+    "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every number from a client's own transcripts, given the results files the run scripts write and, for C, the coordinator's transcript.",
+    "The 2026-09-23 record's probes on 2.1.281 found that ultracode took precedence over a saved per-model level and that a max session removed the reminder; that record stays as history for 2.1.281 and this receipt does not re-test 2.1.281."
+  ],
+  "evidence_class": "independent observation: native Claude Code 2.1.284 headless and interactive sessions on this host, with the model and effort recorded per assistant message in each transcript and paired controls (ultracode on and off, a saved level and none, an environment default and none)",
+  "recorded_at_utc": "2026-09-29T00:39:37Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the running user's Claude Code user settings (shape only) and one interactive coordinator session"
+  },
+  "data": {
+    "client_version": "2.1.284 (Claude Code), recorded in every transcript read",
+    "counting": "assistant_messages and the message counts in main and child count each assistant message id once",
+    "session_effort": [
+      {
+        "case": "A1",
+        "probe": "sonnet-default",
+        "arguments": "--model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "medium",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A2",
+        "probe": "opus-default",
+        "arguments": "--model opus",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A3",
+        "probe": "sonnet-max",
+        "arguments": "--model sonnet --effort max",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A4",
+        "probe": "opus-max",
+        "arguments": "--model opus --effort max",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "max",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A5",
+        "probe": "sonnet-noultra",
+        "arguments": "--model sonnet --settings {ultracode:false}",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "medium",
+        "ultracode_reminder_lines": 0,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A6",
+        "probe": "opus-noultra",
+        "arguments": "--model opus --settings {ultracode:false}",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 0,
+        "run_utc": "2026-09-29T00:20Z"
+      },
+      {
+        "case": "A7",
+        "probe": "sonnet-noultra-pinned",
+        "arguments": "--model sonnet --settings {ultracode:false, modelSettings.claude-sonnet-5-5.effortLevel:xhigh}",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 0,
+        "run_utc": "2026-09-29T00:20Z to 2026-09-29T00:21Z"
+      },
+      {
+        "case": "A8",
+        "probe": "env-max-sonnet",
+        "arguments": "CLAUDE_CODE_EFFORT_LEVEL=max --model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:21Z"
+      },
+      {
+        "case": "A9",
+        "probe": "env-xhigh-sonnet",
+        "arguments": "CLAUDE_CODE_EFFORT_LEVEL=xhigh --model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:21Z"
+      },
+      {
+        "case": "A10",
+        "probe": "ultra-sonnet-low",
+        "arguments": "--model sonnet --settings {modelSettings.claude-sonnet-5-5.effortLevel:low} (ultracode true from the user settings)",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "low",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:22Z"
+      },
+      {
+        "case": "A11",
+        "probe": "ultra-opus-low",
+        "arguments": "--model opus --settings {modelSettings.claude-opus-5-5.effortLevel:low} (ultracode true from the user settings)",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "low",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:22Z"
+      },
+      {
+        "case": "A12",
+        "probe": "ultra-sonnet-toplow",
+        "arguments": "--model sonnet --settings {effortLevel:low} (ultracode true from the user settings)",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "low",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:22Z"
+      },
+      {
+        "case": "A13",
+        "probe": "proj-top-xhigh-sonnet",
+        "arguments": "--model sonnet, project settings file {effortLevel:xhigh}",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:23Z"
+      },
+      {
+        "case": "A14",
+        "probe": "proj-modelsettings-sonnet",
+        "arguments": "--model sonnet, project settings file {modelSettings.claude-sonnet-5-5.effortLevel:xhigh}",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:23Z"
+      },
+      {
+        "case": "A15",
+        "probe": "proj-top-xhigh-opus",
+        "arguments": "--model opus, project settings file {effortLevel:xhigh}",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "run_utc": "2026-09-29T00:23Z"
+      }
+    ],
+    "child_model_and_effort": [
+      {
+        "case": "B1",
+        "probe": "sub-control-sonnet",
+        "setup": "Sonnet 5.5 main session, unnamed general-purpose Agent-tool subagent, no per-call model, no environment default",
+        "main": "claude-sonnet-5-5 at medium (2 assistant messages)",
+        "run_utc": "2026-09-29T00:21Z",
+        "child": "claude-sonnet-5-5 at medium (1 assistant message)"
+      },
+      {
+        "case": "B2",
+        "probe": "sub-opusdefault-sonnet",
+        "setup": "the same with CLAUDE_CODE_SUBAGENT_MODEL=opus",
+        "main": "claude-sonnet-5-5 at medium (3 assistant messages)",
+        "run_utc": "2026-09-29T00:21Z to 2026-09-29T00:22Z",
+        "child": "claude-opus-5-5 at xhigh (1 assistant message)"
+      },
+      {
+        "case": "B3",
+        "probe": "sub-opusdefault-opus",
+        "setup": "Opus 5.5 main session, the same subagent with CLAUDE_CODE_SUBAGENT_MODEL=sonnet",
+        "main": "claude-opus-5-5 at xhigh (2 assistant messages)",
+        "run_utc": "2026-09-29T00:22Z",
+        "child": "claude-sonnet-5-5 at medium (1 assistant message)"
+      }
+    ],
+    "host_readback_after_settings_change": [
+      {
+        "case": "D1",
+        "probe": "readback-sonnet",
+        "setup": "after the host settings gained modelSettings.claude-sonnet-5-5.effortLevel xhigh and env.CLAUDE_CODE_SUBAGENT_MODEL opus: --model sonnet, fresh session",
+        "main": "claude-sonnet-5-5 at xhigh (1 assistant message)",
+        "run_utc": "2026-09-29T00:31Z"
+      },
+      {
+        "case": "D2",
+        "probe": "readback-sonnet-subagent",
+        "setup": "the same settings: --model sonnet main session, unnamed general-purpose Agent-tool subagent, no per-call model",
+        "main": "claude-sonnet-5-5 at xhigh (2 assistant messages)",
+        "run_utc": "2026-09-29T00:31Z",
+        "child": "claude-opus-5-5 at xhigh (1 assistant message)"
+      },
+      {
+        "case": "D3",
+        "probe": "readback-opus-subagent",
+        "setup": "the same settings: --model opus main session, the same subagent",
+        "main": "claude-opus-5-5 at xhigh (2 assistant messages)",
+        "run_utc": "2026-09-29T00:31Z to 2026-09-29T00:32Z",
+        "child": "claude-opus-5-5 at xhigh (1 assistant message)"
+      }
+    ],
+    "interactive_session": [
+      {
+        "case": "C1",
+        "child": "unnamed general-purpose Agent-tool subagent, no model",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C2",
+        "child": "evidence-reviewer agent (definition model opus, effort max)",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C3",
+        "child": "general-purpose Agent-tool subagent with model opus",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C4",
+        "child": "Workflow agent() with neither model nor effort",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C5",
+        "child": "Workflow agent() with model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C6",
+        "child": "named teammate, no model (the team configuration recorded model sonnet)",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 1,
+        "run_utc": "2026-09-28T23:20Z"
+      },
+      {
+        "case": "C7",
+        "child": "the coordinator session itself, counted up to 2026-09-29T00:40:00Z",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 367,
+        "run_utc": "2026-09-28T21:20Z to 2026-09-29T00:39Z"
+      },
+      {
+        "case": "C8",
+        "child": "stack-researcher Agent-tool child with per-call model sonnet (its definition declares effort max)",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort": "max",
+        "assistant_messages": 38,
+        "run_utc": "2026-09-28T21:47Z to 2026-09-28T21:58Z"
+      }
+    ]
+  },
+  "provenance": {
+    "command": "bash run.sh; bash run2.sh; bash run3.sh; bash run4.sh; bash run5.sh (each writes its results file, one line per case); python3 extract_all.py results.tsv results2.tsv results3.tsv results4.tsv results5.tsv (cases A, B and D); python3 extract_interactive.py <coordinator transcript> --until 2026-09-29T00:40:00Z (cases C)",
+    "script_sha256": {
+      "extract_all.py": "9535f190af3c0a5f5d7a6b05e25835b56079bc693ae6cba5f36b774d44e5e7a6",
+      "extract_interactive.py": "089446bfe0be3f817b26480b5786caa2c04b450bd74bc3b562963eb2bcb27750",
+      "run.sh": "70e309060fc713ff36c19d4eed1d500d7e56e5ca4e8be2d9e5e31da6ff777901",
+      "run2.sh": "5345e3cfb75abf5b41c0d66143eb4323565cf48118888dc14ee19802ccd9eba6",
+      "run3.sh": "19ba6e2dcc2e6ceac155803fc8b4e11b4e7bce1c166b0b220b66a1c3c982059f",
+      "run4.sh": "15775b27167c480ce739c03d0cafae57b760ba7229fe82ee59beba6802637d73",
+      "run5.sh": "9eb90e4f928fdee8a7f7fe8ab71daa16a6b60455b00a3148e7136ab013cdcf65"
+    },
+    "scripts": {
+      "run.sh": "#!/usr/bin/env bash\n# Effort and Ultracode probes on Claude Code 2.1.284, one headless one-turn session per case, each in a fresh scratch\n# directory (as the 2026-09-23 probes did), reading the host's user settings. Writes one line per case to results.tsv.\nset -u\nBASE=<scratch>\nmkdir -p \"$BASE\"\n: > \"$BASE/results.tsv\"\nrun_case() {\n  local name=\"$1\"; shift\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir\"\n  ( cd \"$dir\" && timeout 240 claude -p \"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\" \\\n      --max-turns 2 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" >> \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results.tsv\"\n}\nrun_case sonnet-default --model sonnet\nrun_case opus-default --model opus\nrun_case sonnet-max --model sonnet --effort max\nrun_case opus-max --model opus --effort max\nrun_case sonnet-noultra --model sonnet --settings '{\"ultracode\":false}'\nrun_case opus-noultra --model opus --settings '{\"ultracode\":false}'\nrun_case sonnet-noultra-pinned --model sonnet --settings '{\"ultracode\":false,\"modelSettings\":{\"claude-sonnet-5-5\":{\"effortLevel\":\"xhigh\"}}}'\necho done > \"$BASE/DONE\"\n",
+      "run2.sh": "#!/usr/bin/env bash\n# Second probe set on Claude Code 2.1.284: the effort environment variable, and CLAUDE_CODE_SUBAGENT_MODEL with an unnamed subagent.\nset -u\nBASE=<scratch>\n: > \"$BASE/results2.tsv\"\nrun_case() {\n  local name=\"$1\"; local envs=\"$2\"; local prompt=\"$3\"; shift 3\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir\"\n  ( cd \"$dir\" && env $envs timeout 300 claude -p \"$prompt\" --max-turns 5 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results2.tsv\"\n}\nSIMPLE=\"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\"\nAGENTP=\"Use the Agent tool exactly once, with subagent_type general-purpose and no model parameter, and the prompt: Reply with exactly the text PROBE-B-OK and nothing else, using no tools. After it returns, reply with exactly the text DONE.\"\nrun_case env-max-sonnet \"CLAUDE_CODE_EFFORT_LEVEL=max\" \"$SIMPLE\" --model sonnet\nrun_case env-xhigh-sonnet \"CLAUDE_CODE_EFFORT_LEVEL=xhigh\" \"$SIMPLE\" --model sonnet\nrun_case sub-control-sonnet \"PROBE_NOOP=1\" \"$AGENTP\" --model sonnet --allowedTools Agent\nrun_case sub-opusdefault-sonnet \"CLAUDE_CODE_SUBAGENT_MODEL=opus\" \"$AGENTP\" --model sonnet --allowedTools Agent\nrun_case sub-opusdefault-opus \"CLAUDE_CODE_SUBAGENT_MODEL=sonnet\" \"$AGENTP\" --model opus --allowedTools Agent\necho done > \"$BASE/DONE2\"\n",
+      "run3.sh": "#!/usr/bin/env bash\n# Third probe set on Claude Code 2.1.284: does ultracode:true (the host setting) override a saved per-model effort, for each model?\nset -u\nBASE=<scratch>\n: > \"$BASE/results3.tsv\"\nrun_case() {\n  local name=\"$1\"; shift\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir\"\n  ( cd \"$dir\" && timeout 240 claude -p \"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\" --max-turns 2 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results3.tsv\"\n}\nrun_case ultra-opus-low --model opus --settings '{\"modelSettings\":{\"claude-opus-5-5\":{\"effortLevel\":\"low\"}}}'\nrun_case ultra-sonnet-low --model sonnet --settings '{\"modelSettings\":{\"claude-sonnet-5-5\":{\"effortLevel\":\"low\"}}}'\nrun_case ultra-sonnet-toplow --model sonnet --settings '{\"effortLevel\":\"low\"}'\necho done > \"$BASE/DONE3\"\n",
+      "run4.sh": "#!/usr/bin/env bash\n# Fourth probe set on Claude Code 2.1.284: does a committed PROJECT settings file raise a Sonnet 5.5 session (and an Opus child) to xhigh?\nset -u\nBASE=<scratch>\n: > \"$BASE/results4.tsv\"\nmk_case() {  # name, project settings json, then claude args\n  local name=\"$1\"; local proj=\"$2\"; shift 2\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir/.claude\"\n  printf '%s' \"$proj\" > \"$dir/.claude/settings.json\"\n  ( cd \"$dir\" && timeout 240 claude -p \"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\" --max-turns 2 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results4.tsv\"\n}\nmk_case proj-top-xhigh-sonnet '{\"effortLevel\":\"xhigh\"}' --model sonnet\nmk_case proj-modelsettings-sonnet '{\"modelSettings\":{\"claude-sonnet-5-5\":{\"effortLevel\":\"xhigh\"}}}' --model sonnet\nmk_case proj-top-xhigh-opus '{\"effortLevel\":\"xhigh\"}' --model opus\necho done > \"$BASE/DONE4\"\n",
+      "run5.sh": "#!/usr/bin/env bash\n# Read-back after the host configuration change of 2026-09-29: the user settings now save claude-sonnet-5-5 at xhigh and default an\n# unnamed child to opus. Fresh headless sessions, no environment overrides.\nset -u\nBASE=<scratch>\nBASE=<scratch>\n: > \"$BASE/results5.tsv\"\nrun_case() {\n  local name=\"$1\"; local prompt=\"$2\"; shift 2\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir\"\n  ( cd \"$dir\" && timeout 300 claude -p \"$prompt\" --max-turns 5 --output-format json \"$@\" < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results5.tsv\"\n}\nSIMPLE=\"Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.\"\nAGENTP=\"Use the Agent tool exactly once, with subagent_type general-purpose and no model parameter, and the prompt: Reply with exactly the text PROBE-B-OK and nothing else, using no tools. After it returns, reply with exactly the text DONE.\"\nrun_case readback-sonnet \"$SIMPLE\" --model sonnet\nrun_case readback-sonnet-subagent \"$AGENTP\" --model sonnet --allowedTools Agent\nrun_case readback-opus-subagent \"$AGENTP\" --model opus --allowedTools Agent\necho done > \"$BASE/DONE5\"\n",
+      "extract_all.py": "#!/usr/bin/env python3\n\"\"\"Read the native transcripts of headless probe cases: python3 extract_all.py results.tsv [results2.tsv ...].\n\nEach line of a results file is \"<case name> <case directory>\". For every case this prints the resolved model, the recorded effort\nand the client version of the main session and of every subagent transcript below it, counting each assistant message id once (a\nmessage spans several transcript rows, one per content block), plus the number of transcript lines holding the Ultracode reminder text.\n\"\"\"\nimport collections\nimport glob\nimport json\nimport os\nimport sys\n\nPROJECTS = os.path.expanduser(\"~/.claude/projects\")\n\n\ndef summarize(path, cutoff=None):\n    \"\"\"Unique assistant messages of one transcript, up to an optional UTC ISO cutoff (rows carry ISO timestamps).\"\"\"\n    seen, versions, stamps, reminder = {}, set(), [], 0\n    for line in open(path, errors=\"replace\"):\n        try:\n            row = json.loads(line)\n        except ValueError:\n            continue\n        stamp = str(row.get(\"timestamp\", \"\"))\n        if cutoff and stamp > cutoff:\n            continue\n        if row.get(\"version\"):\n            versions.add(row[\"version\"])\n        if stamp:\n            stamps.append(stamp)\n        message = row.get(\"message\") or {}\n        if message.get(\"role\") == \"assistant\" and message.get(\"model\") and message[\"model\"] != \"<synthetic>\":\n            seen.setdefault(message.get(\"id\"), (message[\"model\"], str(row.get(\"effort\"))))\n        if \"Ultracode is on: optimize\" in line:\n            reminder += 1\n    return {\"messages\": len(seen),\n            \"models\": dict(collections.Counter(v[0] for v in seen.values())),\n            \"efforts\": dict(collections.Counter(v[1] for v in seen.values())),\n            \"versions\": sorted(versions),\n            \"utc\": [min(stamps), max(stamps)] if stamps else None,\n            \"reminder_lines\": reminder}\n\n\ndef case_paths(name, case_dir):\n    \"\"\"The main transcript and the subagent transcripts of one headless case, or None when the client kept none.\"\"\"\n    encoded = case_dir.replace(\"/\", \"-\").replace(\"_\", \"-\")\n    projects = [d for d in glob.glob(os.path.join(PROJECTS, \"*\")) if os.path.basename(d) == encoded] or \\\n               [d for d in glob.glob(os.path.join(PROJECTS, \"*\")) if os.path.basename(d).endswith(\"case-\" + name)]\n    if not projects:\n        return None\n    mains = sorted(glob.glob(os.path.join(projects[0], \"*.jsonl\")), key=os.path.getmtime)\n    return (mains[-1] if mains else None), sorted(glob.glob(os.path.join(projects[0], \"*\", \"subagents\", \"agent-*.jsonl\")))\n\n\ndef main(results_files):\n    for results in results_files:\n        for entry in open(results):\n            name, case_dir = entry.split()\n            paths = case_paths(name, case_dir)\n            if not paths:\n                print(name, \"| no transcript directory\")\n                continue\n            main_path, sub_paths = paths\n            print(name, \"| main:\", summarize(main_path) if main_path else None, \"| subagents:\", [summarize(p) for p in sub_paths])\n\n\nif __name__ == \"__main__\":\n    main(sys.argv[1:])\n",
+      "extract_interactive.py": "#!/usr/bin/env python3\n\"\"\"Read the interactive coordinator session's own transcripts: python3 extract_interactive.py <session transcript file> [--until <UTC ISO time>].\n\nThe session's subagent transcripts sit in the directory next to the file, named after it. Each probe child is found by what the client\nrecorded about it: the description of a direct Agent-tool child or teammate (its .meta.json), or the label of a workflow agent (its\nworkflow's journal.jsonl). Prints, per case, the number of unique assistant message ids and the resolved model and recorded effort\nof those messages. The coordinator itself (C7) is counted up to --until, because its transcript keeps growing.\n\"\"\"\nimport glob\nimport json\nimport os\nimport sys\n\nfrom extract_all import summarize\n\ndef by_description(root, text):\n    for meta in glob.glob(os.path.join(root, \"subagents\", \"agent-*.meta.json\")):\n        if text in json.load(open(meta)).get(\"description\", \"\"):\n            return meta[: -len(\".meta.json\")] + \".jsonl\"\n\n\ndef by_label(root, label):\n    for journal in glob.glob(os.path.join(root, \"subagents\", \"workflows\", \"*\", \"journal.jsonl\")):\n        for line in open(journal):\n            row = json.loads(line)\n            if row.get(\"type\") == \"started\" and row.get(\"label\") == label:\n                return os.path.join(os.path.dirname(journal), \"agent-%s.jsonl\" % row[\"agentId\"])\n\n\ndef probe_cases(session):\n    \"\"\"The transcript of each interactive probe case (None when the client kept none), in case order.\"\"\"\n    root = os.path.splitext(session)[0]\n    return [\n        (\"C1\", by_description(root, \"Probe: unnamed default subagent model\")),\n        (\"C2\", by_description(root, \"Probe: reviewer frontmatter model\")),\n        (\"C3\", by_description(root, \"Probe: explicit opus override\")),\n        (\"C4\", by_label(root, \"inherit-none\")),\n        (\"C5\", by_label(root, \"alias-sonnet\")),\n        (\"C6\", by_description(root, \"Probe: named teammate default model\")),\n        (\"C7\", session),\n        (\"C8\", by_description(root, \"Terminal-Bench 4.0 run path scout\")),\n    ]\n\n\nif __name__ == \"__main__\":\n    session = sys.argv[1]\n    until = sys.argv[sys.argv.index(\"--until\") + 1] if \"--until\" in sys.argv else None\n    for name, path in probe_cases(session):\n        print(name, summarize(path, until if name == \"C7\" else None) if path else \"transcript not found\")\n"
+    }
+  }
+}

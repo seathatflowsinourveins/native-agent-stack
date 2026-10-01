@@ -605,7 +605,9 @@ jobs:
   # reports a status on every pull request and can safely be required.
   validate-macos:
     runs-on: macos-15
-    timeout-minutes: 30
+    # Raised from 30 to 60 on 2026-09-29: after #502 this job took 1148s in run 36572588263 (limit 1800s) and
+    # the #381 token-E2E tooling still to merge adds an estimated 900 to 1300s of tests on this slower runner.
+    timeout-minutes: 60
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

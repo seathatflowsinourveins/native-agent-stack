@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-chdb-io-chdb",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/chdb-io/chdb",
+ "reviewed_commit": "7ff589c6e673a2980c005194c1ffe2feb48360b8",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "storage-compute"
+ ],
+ "claim": "Source and documentation review of chdb-io/chdb at commit 7ff589c6e673a2980c005194c1ffe2feb48360b8 (license Apache-2.0), read from README.md at that commit. Repository description: \"chDB is an in-process OLAP SQL Engine 🚀 powered by ClickHouse\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2908,
+  "pushed_at": "2026-09-23T23:00:12Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@7ff589c6e673a2980c005194c1ffe2feb48360b8",
+   "text": "> chDB is an in-process SQL OLAP Engine powered by ClickHouse [^1] > For more details: [The birth of chDB](https://auxten.com/the-birth-of-chdb/)"
+  },
+  {
+   "source": "README.md@7ff589c6e673a2980c005194c1ffe2feb48360b8",
+   "text": "* **🐼 Pandas-compatible DataStore API** - Use familiar pandas syntax with ClickHouse performance * **🌐 Runs in the browser via WebAssembly** - [chDB-Wasm](https://github.com/chdb-io/chdb-wasm) compiles the full engine to WASM; try it live at [wasm.chdb.io](https://wasm.chdb.io) * In-process SQL OLAP Engine, powered by ClickHouse * No need to install ClickHouse * Minimized data copy from C++ to Python with [python memoryview](https://docs.python.org/3/c-api/memoryview.html) * Input&Output support"
+  },
+  {
+   "source": "README.md@7ff589c6e673a2980c005194c1ffe2feb48360b8",
+   "text": "- 📖 <a href=\"https://app.hex.tech/partnerships/app/chDB-Tutorial-032XsQ4qoKtlXxcw49joav/latest\" target=\"_blank\"><b>Getting Started Tutorial</b></a> — set up your first connection - 🚀 <a href=\"https://app.hex.tech/signup/clickhouse-30\" target=\"_blank\"><b>Extended 30-day Hex Trial</b></a> — full access to ClickHouse integrations"
+  }
+ ]
+}

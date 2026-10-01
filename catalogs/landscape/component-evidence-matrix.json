@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-22",
+  "checked_at": "2026-09-27",
   "rows": [
     {
       "adjudication_ref": null,
@@ -34,6 +34,77 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 1,
+        "components": [
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "codex"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 0,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 1,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "codex",
+            "matched_by": "id",
+            "winner_ids": [
+              "codex"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agent-sdks",
       "open_executable_now_gaps": 12,
@@ -83,8 +154,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T13:10:37Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -134,6 +205,172 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 7,
+        "components": [
+          {
+            "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "gitleaks",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qmd",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "repomix",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "rtk",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "syft",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "syft"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "toon",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "zizmor",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "zizmor"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 7,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 7,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "syft",
+            "matched_by": "id",
+            "winner_ids": [
+              "syft"
+            ]
+          },
+          {
+            "id": "zizmor",
+            "matched_by": "id",
+            "winner_ids": [
+              "zizmor"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:actions-attest"
+        ]
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "ci-supply-chain",
       "open_executable_now_gaps": 9,
@@ -295,7 +532,7 @@
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "jCodeMunch",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp"
@@ -310,6 +547,203 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 10,
+        "components": [
+          {
+            "adopted_as": "ast-grep",
+            "adopted_as_candidates": [
+              "ast-grep"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ast-grep",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codebase-memory-mcp",
+            "adopted_as_candidates": [
+              "codebase-memory-mcp"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codebase-memory-mcp",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "jcodemunch-mcp",
+            "adopted_as_candidates": [
+              "jcodemunch-mcp"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "jcodemunch-mcp",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "mcp-inspector",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "mcporter",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qdrant",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "repomix",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "serena",
+            "adopted_as_candidates": [
+              "serena"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "serena",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "serena"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "socraticode",
+            "adopted_as_candidates": [
+              "socraticode"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "socraticode",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "toon",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 9
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 8,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 9,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 10,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "serena",
+            "matched_by": "id",
+            "winner_ids": [
+              "serena"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "code-navigation",
       "open_executable_now_gaps": 2,
@@ -391,6 +825,137 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 4,
+        "components": [
+          {
+            "adopted_as": "context-hub",
+            "adopted_as_candidates": [
+              "context-hub"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "context-hub",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "markitdown",
+            "adopted_as_candidates": [
+              "markitdown"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "markitdown",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "markitdown"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "poppler",
+            "adopted_as_candidates": [
+              "poppler"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "poppler",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "poppler"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "qmd",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "qmd"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 3,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 4,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "markitdown",
+            "matched_by": "id",
+            "winner_ids": [
+              "markitdown"
+            ]
+          },
+          {
+            "id": "poppler",
+            "matched_by": "id",
+            "winner_ids": [
+              "poppler"
+            ]
+          },
+          {
+            "id": "qmd",
+            "matched_by": "id",
+            "winner_ids": [
+              "qmd"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "document-retrieval",
       "open_executable_now_gaps": 5,
@@ -606,6 +1171,133 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 5,
+        "components": [
+          {
+            "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "ai-memory",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "ai-memory"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qdrant",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "restic",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 4
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 4,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 4,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 5,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "ai-memory",
+            "matched_by": "id",
+            "winner_ids": [
+              "ai-memory"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "durable-memory",
       "open_executable_now_gaps": 9,
@@ -651,12 +1343,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T14:37:15Z",
-                "pass": 2
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-27T23:28:12Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -693,6 +1385,172 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 7,
+        "components": [
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex-for-claude",
+            "adopted_as_candidates": [
+              "codex-for-claude"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex-for-claude",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "difftastic",
+            "adopted_as_candidates": [
+              "difftastic"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "difftastic",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "difftastic"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "playwright-test",
+            "adopted_as_candidates": [
+              "playwright-test"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "playwright-test",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "promptfoo",
+            "adopted_as_candidates": [
+              "promptfoo"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "promptfoo",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "shellcheck",
+            "adopted_as_candidates": [
+              "shellcheck"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "shellcheck",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "worktrunk",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "worktrunk"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 5,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 7,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "difftastic",
+            "matched_by": "id",
+            "winner_ids": [
+              "difftastic"
+            ]
+          },
+          {
+            "id": "worktrunk",
+            "matched_by": "id",
+            "winner_ids": [
+              "worktrunk"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:cli-cli"
+        ]
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "git-github-automation",
       "open_executable_now_gaps": 11,
@@ -896,6 +1754,193 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 8,
+        "components": [
+          {
+            "adopted_as": "apple-container",
+            "adopted_as_candidates": [
+              "apple-container"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "apple-container",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "fastapi",
+            "adopted_as_candidates": [
+              "fastapi"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "fastapi",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "fastapi"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "mcp-inspector",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "mcporter",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "nextjs",
+            "adopted_as_candidates": [
+              "nextjs"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "nextjs",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "nextjs"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "omniroute",
+            "adopted_as_candidates": [
+              "omniroute"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "omniroute",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "postgresql",
+            "adopted_as_candidates": [
+              "postgresql"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "postgresql",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "postgresql"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "react",
+            "adopted_as_candidates": [
+              "react"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "react",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 7,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 8,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "fastapi",
+            "matched_by": "id",
+            "winner_ids": [
+              "fastapi"
+            ]
+          },
+          {
+            "id": "nextjs",
+            "matched_by": "id",
+            "winner_ids": [
+              "nextjs"
+            ]
+          },
+          {
+            "id": "postgresql",
+            "matched_by": "id",
+            "winner_ids": [
+              "postgresql"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "hosting-services",
       "open_executable_now_gaps": 6,
@@ -1145,6 +2190,220 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 11,
+        "components": [
+          {
+            "adopted_as": "affaan-m/ECC",
+            "adopted_as_candidates": [
+              "affaan-m/ECC"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "affaan-m/ECC",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "affaan-m/ECC"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ai-memory",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "context-mode",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "davila7/claude-code-templates",
+            "adopted_as_candidates": [
+              "davila7/claude-code-templates"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "davila7/claude-code-templates",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qmd",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "rtk",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "shanraisshan/claude-code-best-practice",
+            "adopted_as_candidates": [
+              "shanraisshan/claude-code-best-practice"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "shanraisshan/claude-code-best-practice",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "skills-ref",
+            "adopted_as_candidates": [
+              "skills-ref"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "skills-ref",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "tavily-cli",
+            "adopted_as_candidates": [
+              "tavily-cli"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "tavily-cli",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 1,
+            "true": 0,
+            "unknown": 10
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 5,
+            "unknown": 5
+          },
+          "verdict_winner": {
+            "false": 10,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 11,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "affaan-m/ECC",
+            "matched_by": "id",
+            "winner_ids": [
+              "affaan-m/ECC"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:openai-skills",
+          "candidate:typesafe-ai-skills"
+        ]
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "instructions-skills",
       "open_executable_now_gaps": 10,
@@ -1322,6 +2581,114 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 3,
+        "components": [
+          {
+            "adopted_as": "apple-container",
+            "adopted_as_candidates": [
+              "apple-container"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "apple-container",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "sandbox-runtime",
+            "adopted_as_candidates": [
+              "sandbox-runtime"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "sandbox-runtime",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "sandbox-runtime"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "worktrunk",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "worktrunk"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 2,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 3,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "sandbox-runtime",
+            "matched_by": "id",
+            "winner_ids": [
+              "sandbox-runtime"
+            ]
+          },
+          {
+            "id": "worktrunk",
+            "matched_by": "id",
+            "winner_ids": [
+              "worktrunk"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "isolation",
       "open_executable_now_gaps": 16,
@@ -1435,6 +2802,100 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 2,
+        "components": [
+          {
+            "adopted_as": "mcp-inspector",
+            "adopted_as_candidates": [
+              "mcp-inspector"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "mcp-inspector",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "mcp-inspector"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "mcporter",
+            "adopted_as_candidates": [
+              "mcporter"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "mcporter",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "mcporter"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 2,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "mcp-inspector",
+            "matched_by": "id",
+            "winner_ids": [
+              "mcp-inspector"
+            ]
+          },
+          {
+            "id": "mcporter",
+            "matched_by": "id",
+            "winner_ids": [
+              "mcporter"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "mcp-surfaces",
       "open_executable_now_gaps": 12,
@@ -1577,6 +3038,156 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 6,
+        "components": [
+          {
+            "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ai-memory",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "claude-code"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "codex"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "context-mode",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qmd",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "rtk",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 4
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 5,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 4,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 6,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "claude-code",
+            "matched_by": "id",
+            "winner_ids": [
+              "claude-code"
+            ]
+          },
+          {
+            "id": "codex",
+            "matched_by": "id",
+            "winner_ids": [
+              "codex"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "native-clients",
       "open_executable_now_gaps": 9,
@@ -1626,8 +3237,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T14:39:22Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -1676,8 +3287,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T13:10:37Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -1761,6 +3372,291 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 15,
+        "components": [
+          {
+            "adopted_as": "agentsview",
+            "adopted_as_candidates": [
+              "agentsview"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "agentsview",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "alertmanager",
+            "adopted_as_candidates": [
+              "alertmanager"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "alertmanager",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "ccusage",
+            "adopted_as_candidates": [
+              "ccusage"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ccusage",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-hud",
+            "adopted_as_candidates": [
+              "claude-hud"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-hud",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "grafana",
+            "adopted_as_candidates": [
+              "grafana"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "grafana",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "huggingface-hub-native",
+            "adopted_as_candidates": [
+              "huggingface-hub-native"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "huggingface-hub-native",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "llama-cpp",
+            "adopted_as_candidates": [
+              "llama-cpp"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "llama-cpp",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "loki",
+            "adopted_as_candidates": [
+              "loki"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "loki",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "loki"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "ntfy",
+            "adopted_as_candidates": [
+              "ntfy"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ntfy",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "omniroute",
+            "adopted_as_candidates": [
+              "omniroute"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "omniroute",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "opentelemetry-collector-contrib",
+            "adopted_as_candidates": [
+              "opentelemetry-collector-contrib"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "opentelemetry-collector-contrib",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "opentelemetry-collector-contrib"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "otel-tui",
+            "adopted_as_candidates": [
+              "otel-tui"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "otel-tui",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "prometheus",
+            "adopted_as_candidates": [
+              "prometheus"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "prometheus",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "prometheus"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "vllm",
+            "adopted_as_candidates": [
+              "vllm"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "vllm",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 12
+          },
+          "pin_current": {
+            "false": 3,
+            "true": 12,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 12,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 15,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "loki",
+            "matched_by": "id",
+            "winner_ids": [
+              "loki"
+            ]
+          },
+          {
+            "id": "opentelemetry-collector-contrib",
+            "matched_by": "id",
+            "winner_ids": [
+              "opentelemetry-collector-contrib"
+            ]
+          },
+          {
+            "id": "prometheus",
+            "matched_by": "id",
+            "winner_ids": [
+              "prometheus"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "observation-inference",
       "open_executable_now_gaps": 8,
@@ -1964,6 +3860,240 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 12,
+        "components": [
+          {
+            "adopted_as": "difftastic",
+            "adopted_as_candidates": [
+              "difftastic"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "difftastic",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "fastapi",
+            "adopted_as_candidates": [
+              "fastapi"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "fastapi",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "gitleaks",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "nextjs",
+            "adopted_as_candidates": [
+              "nextjs"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "nextjs",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "playwright-test",
+            "adopted_as_candidates": [
+              "playwright-test"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "playwright-test",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "playwright-test"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "postgresql",
+            "adopted_as_candidates": [
+              "postgresql"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "postgresql",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "promptfoo",
+            "adopted_as_candidates": [
+              "promptfoo"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "promptfoo",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "promptfoo"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "react",
+            "adopted_as_candidates": [
+              "react"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "react",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "shellcheck",
+            "adopted_as_candidates": [
+              "shellcheck"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "shellcheck",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "skills-ref",
+            "adopted_as_candidates": [
+              "skills-ref"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "skills-ref",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "syft",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "zizmor",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 1,
+            "true": 1,
+            "unknown": 10
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 10,
+            "unknown": 2
+          },
+          "verdict_winner": {
+            "false": 10,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 12,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "playwright-test",
+            "matched_by": "id",
+            "winner_ids": [
+              "playwright-test"
+            ]
+          },
+          {
+            "id": "promptfoo",
+            "matched_by": "id",
+            "winner_ids": [
+              "promptfoo"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "quality-evaluation",
       "open_executable_now_gaps": 9,
@@ -2105,6 +4235,163 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 7,
+        "components": [
+          {
+            "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ai-memory",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "dagu",
+            "adopted_as_candidates": [
+              "dagu"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "dagu",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qdrant",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "restic",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "restic"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "systemd",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 6
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 4,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 6,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 7,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "restic",
+            "matched_by": "id",
+            "winner_ids": [
+              "restic"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": [
+          "candidate:astral-sh-uv"
+        ]
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "recovery-portability",
       "open_executable_now_gaps": 4,
@@ -2250,6 +4537,142 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 5,
+        "components": [
+          {
+            "adopted_as": "beads",
+            "adopted_as_candidates": [
+              "beads"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "beads",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "dagu",
+            "adopted_as_candidates": [
+              "dagu"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "dagu",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "dagu"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "systemd",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "systemd"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 3
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 2,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 3,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 5,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "dagu",
+            "matched_by": "id",
+            "winner_ids": [
+              "dagu"
+            ]
+          },
+          {
+            "id": "systemd",
+            "matched_by": "id",
+            "winner_ids": [
+              "systemd"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "scheduling-supervision",
       "open_executable_now_gaps": 5,
@@ -2395,6 +4818,105 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 3,
+        "components": [
+          {
+            "adopted_as": "gitleaks",
+            "adopted_as_candidates": [
+              "gitleaks"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "gitleaks",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "gitleaks"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "syft",
+            "adopted_as_candidates": [
+              "syft"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "syft",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "zizmor",
+            "adopted_as_candidates": [
+              "zizmor"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "zizmor",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 2
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 3,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 2,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 3,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "gitleaks",
+            "matched_by": "id",
+            "winner_ids": [
+              "gitleaks"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "secrets-credentials",
       "open_executable_now_gaps": 5,
@@ -2490,6 +5012,165 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 6,
+        "components": [
+          {
+            "adopted_as": "ai-memory",
+            "adopted_as_candidates": [
+              "ai-memory"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ai-memory",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "huggingface-hub-native",
+            "adopted_as_candidates": [
+              "huggingface-hub-native"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "huggingface-hub-native",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qdrant",
+            "adopted_as_candidates": [
+              "qdrant"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "qdrant",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "qdrant"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "restic",
+            "adopted_as_candidates": [
+              "restic"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "restic",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "socraticode",
+            "adopted_as_candidates": [
+              "socraticode"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "socraticode",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "socraticode"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "vllm",
+            "adopted_as_candidates": [
+              "vllm"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "vllm",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "vllm"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 3
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 4,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 3,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 6,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "qdrant",
+            "matched_by": "id",
+            "winner_ids": [
+              "qdrant"
+            ]
+          },
+          {
+            "id": "socraticode",
+            "matched_by": "id",
+            "winner_ids": [
+              "socraticode"
+            ]
+          },
+          {
+            "id": "vllm",
+            "matched_by": "id",
+            "winner_ids": [
+              "vllm"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "semantic-rag",
       "open_executable_now_gaps": 10,
@@ -2717,7 +5398,7 @@
       "alternatives": [
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
@@ -2745,6 +5426,193 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 8,
+        "components": [
+          {
+            "adopted_as": "ccusage",
+            "adopted_as_candidates": [
+              "ccusage"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "ccusage",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "ccusage"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "context-mode",
+            "adopted_as_candidates": [
+              "context-mode"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "context-mode",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "headroom",
+            "adopted_as_candidates": [
+              "headroom"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "headroom",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "headroom"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "jcodemunch-mcp",
+            "adopted_as_candidates": [
+              "jcodemunch-mcp"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "jcodemunch-mcp",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "qmd",
+            "adopted_as_candidates": [
+              "qmd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "qmd",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "repomix",
+            "adopted_as_candidates": [
+              "repomix"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "repomix",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "rtk",
+            "adopted_as_candidates": [
+              "rtk"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "rtk",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "rtk"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "toon",
+            "adopted_as_candidates": [
+              "toon"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "toon",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 7,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 8,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "ccusage",
+            "matched_by": "id",
+            "winner_ids": [
+              "ccusage"
+            ]
+          },
+          {
+            "id": "headroom",
+            "matched_by": "id",
+            "winner_ids": [
+              "headroom"
+            ]
+          },
+          {
+            "id": "rtk",
+            "matched_by": "id",
+            "winner_ids": [
+              "rtk"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "token-efficiency",
       "open_executable_now_gaps": 4,
@@ -2948,6 +5816,137 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 4,
+        "components": [
+          {
+            "adopted_as": "agent-browser",
+            "adopted_as_candidates": [
+              "agent-browser"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "agent-browser",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "agent-browser"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "openresearch",
+            "adopted_as_candidates": [
+              "openresearch"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "openresearch",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "openresearch"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "playwright-cli",
+            "adopted_as_candidates": [
+              "playwright-cli"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "playwright-cli",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "tavily-cli",
+            "adopted_as_candidates": [
+              "tavily-cli"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "tavily-cli",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "tavily-cli"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 3,
+            "true": 0,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 1,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 4,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "agent-browser",
+            "matched_by": "id",
+            "winner_ids": [
+              "agent-browser"
+            ]
+          },
+          {
+            "id": "openresearch",
+            "matched_by": "id",
+            "winner_ids": [
+              "openresearch"
+            ]
+          },
+          {
+            "id": "tavily-cli",
+            "matched_by": "id",
+            "winner_ids": [
+              "tavily-cli"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "web-research",
       "open_executable_now_gaps": 7,
@@ -3170,6 +6169,156 @@
         }
       ],
       "catalog": "foundation",
+      "convergence": {
+        "all_rows": 6,
+        "components": [
+          {
+            "adopted_as": "beads",
+            "adopted_as_candidates": [
+              "beads"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "beads",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "claude-code",
+            "adopted_as_candidates": [
+              "claude-code"
+            ],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "claude-code",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "claude-code"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": "codex",
+            "adopted_as_candidates": [
+              "codex"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "codex-for-claude",
+            "adopted_as_candidates": [
+              "codex-for-claude"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "codex-for-claude",
+            "pin_current": "true",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "systemd",
+            "adopted_as_candidates": [
+              "systemd"
+            ],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "systemd",
+            "pin_current": "unknown",
+            "resolved_by": "id",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": "worktrunk",
+            "adopted_as_candidates": [
+              "worktrunk"
+            ],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "worktrunk",
+            "pin_current": "false",
+            "resolved_by": "id",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "worktrunk"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 1,
+            "true": 1,
+            "unknown": 4
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 3,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 4,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 6,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "claude-code",
+            "matched_by": "id",
+            "winner_ids": [
+              "claude-code"
+            ]
+          },
+          {
+            "id": "worktrunk",
+            "matched_by": "id",
+            "winner_ids": [
+              "worktrunk"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "workers",
       "open_executable_now_gaps": 7,
@@ -3219,8 +6368,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 0,
-                "latest": null,
-                "pass": 0
+                "latest": "2026-09-27T14:39:22Z",
+                "pass": 4
               },
               "qualified_models": []
             }
@@ -3418,6 +6567,173 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 19,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "codex-native-sdk",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "codex-native-sdk"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "foundation-ai-memory",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "foundation-ai-memory"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-context-mode",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-qdrant",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-rtk",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-serena",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "foundation-socraticode",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "foundation-socraticode"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "vllm",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 4,
+            "true": 4,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 8,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "codex-native-sdk",
+            "matched_by": "id",
+            "winner_ids": [
+              "codex-native-sdk"
+            ]
+          },
+          {
+            "id": "foundation-ai-memory",
+            "matched_by": "id",
+            "winner_ids": [
+              "foundation-ai-memory"
+            ]
+          },
+          {
+            "id": "foundation-socraticode",
+            "matched_by": "id",
+            "winner_ids": [
+              "foundation-socraticode"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "agents-models-workers",
       "open_executable_now_gaps": 9,
@@ -3583,6 +6899,92 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 3,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "lean",
+            "pin_current": "unknown",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "lean"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "nautilustrader",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "nautilustrader"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 1,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 2,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "lean",
+            "matched_by": "id",
+            "winner_ids": [
+              "lean"
+            ]
+          },
+          {
+            "id": "nautilustrader",
+            "matched_by": "id",
+            "winner_ids": [
+              "nautilustrader"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "backtesting-engine",
       "open_executable_now_gaps": 8,
@@ -3708,6 +7110,78 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 4,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-pandera",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-pandera"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 1,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "dagu",
+            "matched_by": "id",
+            "winner_ids": [
+              "dagu"
+            ]
+          },
+          {
+            "id": "data-pandera",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-pandera"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "data-quality-orchestration",
       "open_executable_now_gaps": 6,
@@ -3854,6 +7328,92 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 7,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "inspect-ai",
+            "pin_current": "unknown",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "inspect-ai"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 0,
+            "unknown": 1
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 1,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 4,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "data-mlflow",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-mlflow"
+            ]
+          },
+          {
+            "id": "foundation-agent-retrieval-bench",
+            "matched_by": "id",
+            "winner_ids": [
+              "foundation-agent-retrieval-bench"
+            ]
+          },
+          {
+            "id": "inspect-ai",
+            "matched_by": "id",
+            "winner_ids": [
+              "inspect-ai"
+            ]
+          },
+          {
+            "id": "mlflow",
+            "matched_by": "repository",
+            "winner_ids": [
+              "data-mlflow"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "evaluation-experiments",
       "open_executable_now_gaps": 8,
@@ -3990,6 +7550,100 @@
       "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json",
       "alternatives": [],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 5,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "adaptive-paper-alpaca-adapter",
+            "pin_current": "unknown",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "alpaca-py",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "data-alpaca-py",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "lean-alpaca",
+            "pin_current": "unknown",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "nautilus-ibkr-adapter",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 0,
+            "unknown": 5
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 3,
+            "unknown": 2
+          },
+          "verdict_winner": {
+            "false": 5,
+            "true": 0,
+            "unknown": 0
+          }
+        },
+        "in_use": 5,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "pending_lanes",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 0,
+        "reopened_by": [],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "pending_lanes",
       "layer_id": "execution-broker",
       "open_executable_now_gaps": 0,
@@ -4053,6 +7707,83 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 8,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "false",
+            "id": "data-dvc",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-dvc"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-socraticode",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 1,
+            "true": 0,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 1,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 2,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "data-dvc",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-dvc"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "identity-provenance",
       "open_executable_now_gaps": 2,
@@ -4171,6 +7902,113 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 11,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-alpaca-py",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-alpaca-py"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-edgartools",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-edgartools"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-exchange-calendars",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-exchange-calendars"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 3,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 2,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 3,
+            "unknown": 0
+          }
+        },
+        "in_use": 3,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "data-alpaca-py",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-alpaca-py"
+            ]
+          },
+          {
+            "id": "data-edgartools",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-edgartools"
+            ]
+          },
+          {
+            "id": "data-exchange-calendars",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-exchange-calendars"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "market-data-reference",
       "open_executable_now_gaps": 8,
@@ -4322,6 +8160,148 @@
       "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
       "alternatives": [],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 14,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "alertmanager",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "grafana",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "loki",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "ntfy",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "opentelemetry-collector",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "opentelemetry-collector-contrib",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "prometheus",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "restic",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "sandbox-runtime",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 0,
+            "unknown": 9
+          },
+          "pin_current": {
+            "false": 2,
+            "true": 7,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 9,
+            "true": 0,
+            "unknown": 0
+          }
+        },
+        "in_use": 9,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "pending_lanes",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 0,
+        "reopened_by": [],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "pending_lanes",
       "layer_id": "observability-hosting",
       "open_executable_now_gaps": 1,
@@ -4356,6 +8336,69 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 4,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "quantstats",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 0,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 0,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 0,
+            "unknown": 0
+          }
+        },
+        "in_use": 1,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "skfolio",
+            "matched_by": "id",
+            "winner_ids": [
+              "skfolio"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "portfolio-risk",
       "open_executable_now_gaps": 10,
@@ -4554,6 +8597,114 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 22,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-edgartools",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-edgartools"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-markitdown",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "foundation-qmd",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "vllm",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 3
+          },
+          "pin_current": {
+            "false": 3,
+            "true": 1,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 3,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 4,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 2,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "data-edgartools",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-edgartools"
+            ]
+          },
+          {
+            "id": "skfolio",
+            "matched_by": "id",
+            "winner_ids": [
+              "skfolio"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "research-factors-ml",
       "open_executable_now_gaps": 9,
@@ -4664,6 +8815,99 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 5,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "gitleaks",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "gitleaks"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "syft",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "syft"
+            ],
+            "winner_match": "id"
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          },
+          "pin_current": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 0,
+            "true": 2,
+            "unknown": 0
+          }
+        },
+        "in_use": 2,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 3,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "gitleaks",
+            "matched_by": "id",
+            "winner_ids": [
+              "gitleaks"
+            ]
+          },
+          {
+            "id": "grype",
+            "matched_by": "id",
+            "winner_ids": [
+              "grype"
+            ]
+          },
+          {
+            "id": "syft",
+            "matched_by": "id",
+            "winner_ids": [
+              "syft"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "security-supply-chain",
       "open_executable_now_gaps": 12,
@@ -4881,6 +9125,83 @@
         }
       ],
       "catalog": "us-equities",
+      "convergence": {
+        "all_rows": 10,
+        "components": [
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "true",
+            "id": "data-duckdb",
+            "pin_current": "false",
+            "resolved_by": "decision",
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-duckdb"
+            ],
+            "winner_match": "id"
+          },
+          {
+            "adopted_as": null,
+            "adopted_as_candidates": [],
+            "converged": false,
+            "host_e2e": "unknown",
+            "id": "data-pandera",
+            "pin_current": "true",
+            "resolved_by": "decision",
+            "verdict_winner": "false",
+            "winner_ids": [],
+            "winner_match": null
+          }
+        ],
+        "converged": 0,
+        "factors": {
+          "host_e2e": {
+            "false": 0,
+            "true": 1,
+            "unknown": 1
+          },
+          "pin_current": {
+            "false": 1,
+            "true": 1,
+            "unknown": 0
+          },
+          "verdict_winner": {
+            "false": 1,
+            "true": 1,
+            "unknown": 0
+          }
+        },
+        "in_use": 2,
+        "invoke": null,
+        "invoke_reason": "no post-fix invoke receipt yet",
+        "layer_state": "recorded_reopened",
+        "manifest_layer_found": true,
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
+        "unresolved": [],
+        "verdict_checked_at": "2026-09-22",
+        "winner_rows": [
+          {
+            "id": "data-duckdb",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-duckdb"
+            ]
+          }
+        ],
+        "winners_without_manifest_row": []
+      },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "storage-compute",
       "open_executable_now_gaps": 5,
@@ -4948,8 +9269,134 @@
     }
   ],
   "schema_version": 1,
-  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present). It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
+  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
   "summary": {
+    "convergence": {
+      "catalogs": {
+        "foundation": {
+          "converged": 0,
+          "in_use": 130,
+          "layers": 20,
+          "share": 0.0,
+          "unresolved": 0
+        },
+        "us-equities": {
+          "converged": 0,
+          "in_use": 40,
+          "layers": 12,
+          "share": 0.0,
+          "unresolved": 0
+        }
+      },
+      "definitions": [
+        {
+          "definition": "Exactly one of: pending_lanes (the verdict ledger row's verdict_status is pending_lanes); no_selection (verdict_status no_selection, or a recorded verdict with no winners; scripts/landscape.py allows no other status); recorded_reopened (a recorded verdict, and a completed sweep in catalogs/saturation/ledger.json that covers the layer is dated after the row's checked_at); confirmed_current (a recorded verdict that no covering completed sweep is dated after). A sweep on the verdict's own date is not after it, a stopped sweep never counts, and a row without an ISO checked_at counts every covering completed sweep as after it.",
+          "term": "layer_state"
+        },
+        {
+          "definition": "The layer's rows in the newest committed sweep manifest (catalogs/sota-convergence/manifest-YYYYMMDD.json with the latest checked_at; foundation[].components for a foundation layer, trading[].entries for a us-equities layer) that resolve to an adopted component, the headline denominator. A foundation row resolves to manifests/stack.json components by its id, else by a tools/sota-convergence/receipt-component-aliases.json alias, else by its repository (scripts/host_receipts.py normalize_repository), with no uniqueness condition: adopted_as_candidates lists the stack components matched that way, and adopted_as names the single one or is null when several share the alias or repository. A us-equities entry is in use when its decision is default; a conditional entry is not in use. The unit is the layer-component row: every resolving row counts, so a component in several layers counts once per layer and two rows of one layer that resolve to the same stack component both count; per-catalog and overall sums count these rows, not distinct components.",
+          "term": "in_use"
+        },
+        {
+          "definition": "true when the row is a winner of the layer's recorded verdict by component id, by an alias in either direction, or by the same repository (scripts/host_receipts.py normalize_repository); false otherwise, including in a pending_lanes layer, which has no recorded verdict yet.",
+          "term": "verdict_winner"
+        },
+        {
+          "definition": "true when the newest sweep manifest row has pin_comparison compared and pin_behind_upstream false; false when it is compared and behind; unknown when it was not compared.",
+          "term": "pin_current"
+        },
+        {
+          "definition": "true when this layer's own matrix winner entry for the component (the winner the row matches by the first of id, alias and repository) has e2e_state accepted or host_verified on linux-wsl2-x86_64; false for any other e2e_state; unknown when the layer's matrix row has no winner entry for it.",
+          "term": "host_e2e"
+        },
+        {
+          "definition": "layer_state is confirmed_current and verdict_winner, pin_current and host_e2e are all true; an unknown factor is not converged and stays counted as unknown. The summary gives converged / in_use per catalog and overall as integers, with a share (four decimal places) only where in_use > 0.",
+          "term": "converged"
+        },
+        {
+          "definition": "Every row of the layer in the newest sweep manifest, in use or not.",
+          "term": "all_rows"
+        },
+        {
+          "definition": "The layer's manifest rows that match a winner of its recorded verdict, whether or not they are in use and whether or not a later sweep reopened the verdict. With all_rows it is the comparability column, not a score.",
+          "term": "recorded_winner_rows"
+        },
+        {
+          "definition": "true when the newest sweep manifest has the layer in its catalog's section; false when it does not, or no sweep manifest is committed, and then all_rows is 0.",
+          "term": "manifest_layer_found"
+        },
+        {
+          "definition": "The winners of the layer's recorded verdict that no row of the layer in the newest sweep manifest matches (the verdict_winner match), listed and never counted. Row counts and winner counts differ because one winner can match several rows; winner_rows[].winner_ids gives the exact per-row mapping.",
+          "term": "winners_without_manifest_row"
+        },
+        {
+          "definition": "Summary list of the newest sweep manifest's layers, in either section, that have no row in this matrix; listed, never counted.",
+          "term": "manifest_layers_without_matrix_row"
+        },
+        {
+          "definition": "Manifest rows that could not be resolved (a row without a component id, a foundation row with no manifests/stack.json id, alias or repository match, or a trading entry without a default or conditional decision), counted and listed with the reason, never dropped.",
+          "term": "unresolved"
+        },
+        {
+          "definition": "null until a post-fix invoke receipt exists; every null carries the reason 'no post-fix invoke receipt yet'.",
+          "term": "invoke"
+        }
+      ],
+      "frozen_at": "2026-09-27",
+      "layer_states": {
+        "confirmed_current": 0,
+        "no_selection": 0,
+        "pending_lanes": 2,
+        "recorded_reopened": 30
+      },
+      "manifest_layers_without_matrix_row": [],
+      "newest_manifest": {
+        "checked_at": "2026-09-29",
+        "id": "sota-convergence-20260929",
+        "path": "catalogs/sota-convergence/manifest-20260929.json"
+      },
+      "newest_verdict_checked_at": {
+        "foundation": "2026-09-22",
+        "us-equities": "2026-09-22"
+      },
+      "overall": {
+        "converged": 0,
+        "in_use": 170,
+        "layers": 32,
+        "share": 0.0,
+        "unresolved": 0
+      },
+      "sources": {
+        "aliases": "tools/sota-convergence/receipt-component-aliases.json",
+        "completed_sweeps": [
+          {
+            "date": "2026-09-23",
+            "layers": 32,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "layers": 32,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "layers": 20,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "host_e2e_platform": "linux-wsl2-x86_64",
+        "saturation_ledger": "catalogs/saturation/ledger.json",
+        "stack": "manifests/stack.json",
+        "verdict_ledgers": {
+          "foundation": "catalogs/landscape/foundation.json",
+          "us-equities": "catalogs/landscape/us-equities.json"
+        }
+      }
+    },
     "needs_host": {
       "linux-wsl2-x86_64": [
         {

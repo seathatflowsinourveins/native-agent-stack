@@ -1,0 +1,17 @@
+ok    the unmutated script passes every case: exit 0, 27 cases, 0 problems
+ok    mutant, the staging file has the fixed name again (a symlink at that name is followed): controls exit 1, failing cases 1 (expected 1)
+ok    mutant, the bell hook's extra keys are no longer checked: controls exit 1, failing cases 2 (expected 2)
+ok    mutant, the matcher is no longer compared with the overlay's: controls exit 1, failing cases 2 (expected 2)
+ok    mutant, 'nothing to do' looks at the matcher only: controls exit 1, failing cases 2 (expected 2)
+ok    mutant, 'nothing to do' ignores whether the bell group equals the overlay's: controls exit 1, failing cases 2 (expected 2)
+ok    mutant, an existing overlay key may be overwritten: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, no backup is taken: controls exit 1, failing cases 7 (expected 7)
+ok    mutant, the live file is not compared with the read before the backup: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, the live file is not compared with the read right before the replace: controls exit 1, failing cases 2 (expected 2)
+ok    mutant, the backup is not compared with the read: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, another hook in the bell group is no longer refused: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, keys beyond matcher and hooks on the bell group are no longer refused: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, the file mode is not kept: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, two bell groups are no longer refused: controls exit 1, failing cases 1 (expected 1)
+ok    mutant, a symlinked settings file is no longer refused up front: controls exit 1, failing cases 1 (expected 1)
+16 runs, 0 problems

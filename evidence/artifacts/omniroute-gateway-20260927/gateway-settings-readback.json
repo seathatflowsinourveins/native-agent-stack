@@ -1,0 +1,21 @@
+{
+ "a2aEnabled": false,
+ "compression": {
+  "defaultMode": "off",
+  "enabled": false,
+  "exclusions": [
+   "codex/*"
+  ]
+ },
+ "mcpEnabled": false,
+ "promptCacheAffinityEnabled": true,
+ "providerStrategies": {
+  "codex": {
+   "fallbackStrategy": "round-robin",
+   "stickyRoundRobinLimit": 1
+  }
+ },
+ "requireLogin": false,
+ "sessionAffinityTtlMs": 14400000,
+ "thinkingBudgetMode": "passthrough"
+}

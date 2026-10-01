@@ -1,0 +1,445 @@
+{
+ "schema": "omniroute-effective-plan-extract/1",
+ "class": "our integration check: the gateway's own plan resolver run offline on the live settings; no request reached /v1/*, nothing was written to a gateway, no model was called",
+ "captured": "2026-09-30T03:14:14+00:00",
+ "method": "GET-only read-back of /api/settings/compression and /api/context/combos on both gateways (allowlist-filtered, no credential route), then the S1 screen's plan_table harness with the compression modules imported from the live 20128 build's source tree (B2, ae5539a56); the harness's chatCore mirror was written at c19983a66 and its plan resolution matched the live build (below)",
+ "cross_check": "the same table computed earlier from the c19983a66 source (00:46Z, after the delta) is row-for-row identical (598 rows) and the live settings are unchanged since then (compared without captured_at); c19983a66 is the head of the scratch worktree of the earlier 20128 candidate, the three carries on 81c9b6da (not published)",
+ "variants_extracted": [
+  "live-20129",
+  "live-20128",
+  "20128+master-on",
+  "20128+master-on,no-exclusion"
+ ],
+ "est_tokens": 20000,
+ "rows": [
+  {
+   "variant": "live-20129",
+   "header": null,
+   "mode": "stacked",
+   "source": "default",
+   "pipeline": [
+    "session-dedup",
+    "ccr",
+    "lite"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=default"
+  },
+  {
+   "variant": "live-20129",
+   "header": "off",
+   "mode": "off",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "default",
+   "mode": "stacked",
+   "source": "request-header",
+   "pipeline": [
+    "session-dedup",
+    "ccr",
+    "lite"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "safe",
+   "mode": "stacked",
+   "source": "default",
+   "pipeline": [
+    "session-dedup",
+    "ccr",
+    "lite"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=default"
+  },
+  {
+   "variant": "live-20129",
+   "header": "allow-lossy",
+   "mode": "stacked",
+   "source": "request-header",
+   "pipeline": [
+    "session-dedup",
+    "ccr",
+    "lite",
+    "rtk:minimal",
+    "codex-responses",
+    "headroom",
+    "relevance",
+    "caveman:lite",
+    "aggressive",
+    "llmlingua",
+    "ultra"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "engine:lite",
+   "mode": "lite",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "lite; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "engine:rtk",
+   "mode": "rtk",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "rtk; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "fw-rtk",
+   "mode": "stacked",
+   "source": "request-header",
+   "pipeline": [
+    "rtk:minimal"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=request-header"
+  },
+  {
+   "variant": "live-20129",
+   "header": "Standard Savings",
+   "mode": "stacked",
+   "source": "request-header",
+   "pipeline": [
+    "session-dedup",
+    "lite"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=request-header"
+  },
+  {
+   "variant": "live-20128",
+   "header": null,
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "off",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "default",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "safe",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "allow-lossy",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "engine:lite",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "engine:rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "fw-rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "live-20128",
+   "header": "Standard Savings",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": null,
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "off",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "default",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "safe",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "allow-lossy",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "engine:lite",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "engine:rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "fw-rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on",
+   "header": "Standard Savings",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": false,
+   "excluded": true,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": null,
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "off",
+   "mode": "off",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=request-header"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "default",
+   "mode": "off",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=request-header"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "safe",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "allow-lossy",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "engine:lite",
+   "mode": "lite",
+   "source": "request-header",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "lite; source=request-header"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "engine:rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "fw-rtk",
+   "mode": "off",
+   "source": "off",
+   "pipeline": [],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "off; source=off"
+  },
+  {
+   "variant": "20128+master-on,no-exclusion",
+   "header": "Standard Savings",
+   "mode": "stacked",
+   "source": "request-header",
+   "pipeline": [
+    "session-dedup",
+    "lite"
+   ],
+   "prompt_compression_enabled": true,
+   "excluded": false,
+   "output_styles_would_apply": false,
+   "response_meta": "stacked; source=request-header"
+  }
+ ],
+ "reading": "20129: a request with no header gets stacked [session-dedup, ccr, lite] (source default); `off` gives no engine (source request-header). The header `allow-lossy` does not select the ten-engine operator plan of the engines map: a stored combo named allow-lossy exists on 20129 (a peer-owned row; eleven engines including headroom), and a named combo is matched before the keyword is consulted (planResolution.ts:56-57 at 2f42a9ac1), so it resolves to that combo with source request-header. The seeded 'Standard Savings' combo is [session-dedup, lite]. 20128 as running (master off, codex/* excluded): every header gives off. With the master on and the exclusion removed, a headerless request would still resolve to off (its engines map is not explicit and defaultMode is off), while `engine:lite` and the Standard Savings combo would resolve to their engines: enabling the headerless lane there needs the engines map stored as well as the master switch."
+}

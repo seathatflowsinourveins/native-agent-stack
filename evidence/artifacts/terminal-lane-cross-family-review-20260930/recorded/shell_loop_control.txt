@@ -1,0 +1,3 @@
+child exits 130 after its cleanup: bash exit 0, lines ['continued-1', 'continued-2', 'continued-3']
+child ends BY SIGINT after its cleanup: bash exit -2, lines []
+the loop went on after an exit 130: True; the loop stopped after a death by SIGINT: True

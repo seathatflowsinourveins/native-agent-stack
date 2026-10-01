@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "kind": "native-claude-finalization-review",
+  "recorded_at_utc": "2026-09-30T07:48:32.431569+00:00",
+  "scope": "Current Linux/WSL host finalization source/evidence review. Native reviewer findings are leads; primary-source checks are separate. No second-host qualification.",
+  "evidence_class": "native_model_execution",
+  "is_unchanged_upstream_test": false,
+  "invocation": {
+    "native_cli": "claude",
+    "native_version": "2.1.285",
+    "model_alias_requested": "opus",
+    "effort_requested": "max",
+    "native_model_reported": "claude-opus-5-5",
+    "permission_mode": "dontAsk",
+    "output_format": "stream-json",
+    "verbose": true,
+    "no_session_persistence": true,
+    "json_schema_used": true,
+    "builtin_tools": "Read,Glob,Grep,Bash,WebFetch,WebSearch,ToolSearch",
+    "allowed_tools": "Read,Glob,Grep,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search,mcp__plugin_context-mode_context-mode__ctx_execute,mcp__plugin_context-mode_context-mode__ctx_execute_file",
+    "disallowed_tools": [
+      "Write",
+      "Edit",
+      "NotebookEdit",
+      "Agent"
+    ],
+    "sources": [
+      "https://code.claude.com/docs/en/headless",
+      "https://code.claude.com/docs/en/cli-reference",
+      "Installed Claude --help",
+      "context-mode 1.0.169 src/server.ts:1648,2043; previously native-observed ctx_execute name in public results.json"
+    ]
+  },
+  "preregistration": {
+    "before_native_call": true,
+    "prompt_sha256": "ae187f20f4d97f895c61a8a590a5c0077025604f00e780b340fdef7f7c852039",
+    "preregistration_sha256": "5e4e4db6690d61c7bb7d6ad534265795a87129847aa2b480f0e3bf3b18477da3",
+    "schema_sha256": "d4fe37e75a9e066fe571e0c12c3a6650cd1ef3bed9072a720b4020a75808fa91",
+    "input_count": 25,
+    "inputs": [
+      {
+        "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+        "bytes": 9272,
+        "sha256": "f24f922b720ec899f4e422a0142c1dec9dee560cbafdf7e0f0f25a39c92cd652"
+      },
+      {
+        "path": "adoption/skills/lifecycle.md",
+        "bytes": 6808,
+        "sha256": "2af6341bac2444b8f6a55689e025e522a8340faa2c4b8be8881e2b89bd58f7ad"
+      },
+      {
+        "path": "adoption/skills/manifest.json",
+        "bytes": 50187,
+        "sha256": "6044ee66070ff128e0aa29d8439604920fc20b75a4ac6962e4804f9730fda50e"
+      },
+      {
+        "path": "blueprints/runtime-workers/skills/manifest.json",
+        "bytes": 185060,
+        "sha256": "6b92a9bd8c91f75e2eac03e60372cb84b6d21d5fce01b2e1a8e2441e6fe74a3f"
+      },
+      {
+        "path": "catalogs/landscape/native-practice.json",
+        "bytes": 19759,
+        "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6"
+      },
+      {
+        "path": "adoption/templates/codex.AGENTS.template.md",
+        "bytes": 3822,
+        "sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d"
+      },
+      {
+        "path": "adoption/templates/codex.config.template.toml",
+        "bytes": 12317,
+        "sha256": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb"
+      },
+      {
+        "path": "adoption/templates/codex.stack-worker.config.toml",
+        "bytes": 4573,
+        "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9"
+      },
+      {
+        "path": "tools/adoption/apply_codex_lane.py",
+        "bytes": 66168,
+        "sha256": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b"
+      },
+      {
+        "path": "tests/test_codex_worker_lane.py",
+        "bytes": 102992,
+        "sha256": "cbe4864af05db0809a5d7eb9e3a171a0e62510688bb6a3d1e64df7164746a75f"
+      },
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+        "bytes": 14536,
+        "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e"
+      },
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+        "bytes": 12094,
+        "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec"
+      },
+      {
+        "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+        "bytes": 6327,
+        "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/README.md",
+        "bytes": 5499,
+        "sha256": "56a4263174d05b0cc8e183405f73dab187b1decf8b1290577492a8e728250e74"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+        "bytes": 138745,
+        "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+        "bytes": 3474,
+        "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+      },
+      {
+        "path": "evidence/artifacts/native-skill-finalization-20260930/operations.json",
+        "bytes": 16663,
+        "sha256": "5d3fff78473c1deb4f6da3a2d2574b8e6817e4e1b398ba48c845b5bbd69c812b"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/plan.json",
+        "bytes": 4009,
+        "sha256": "3dde5fa6158eeb003e3629a2f7d95cdd2b2fc3cd4beadd77e31b1b402416341d"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/source-review.json",
+        "bytes": 5312,
+        "sha256": "531cea77c0e0439e152c9b0d06f7b3dae7ab554794ed79f7bb1cffa033618c52"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/upstream-tests.json",
+        "bytes": 1710,
+        "sha256": "d4300c679ba959d2d6117d954c9906e82617e0d3c98608d2990f6206030e5e30"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+        "bytes": 7178,
+        "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/installed-skills.json",
+        "bytes": 13929,
+        "sha256": "6a97cccc2c4a4555913d28abfcaf119f52dccf82ac256dd9d7dcf051bfdbf943"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/allowed-tree-drift.json",
+        "bytes": 8516,
+        "sha256": "e0699d300b63a206b81ed90247ffa5e00febb3b566d01e36a4d3e6dad64130fb"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+        "bytes": 3464,
+        "sha256": "fb73c52c796ef25e7393b21f8a820cae42013de3eb9599d883b261256c8dd420"
+      },
+      {
+        "path": "evidence/artifacts/sota-finalization-20260930/verification.json",
+        "bytes": 4524,
+        "sha256": "a761aaba8b156256b45472a3d4a0107f19318447c2c03d831851a72810385ddc"
+      }
+    ]
+  },
+  "actual_return": {
+    "exit_code": 0,
+    "native_result_subtype": "success",
+    "native_result_is_error": false,
+    "structured_output_present": true,
+    "verdict": "changes_required",
+    "elapsed_seconds": 990.1422540759668,
+    "native_duration_ms": 986890,
+    "native_duration_api_ms": 959517,
+    "native_num_turns": 77,
+    "stream_event_count": 711,
+    "parse_failure_count": 0,
+    "tool_counts": {
+      "ToolSearch": 1,
+      "Bash": 15,
+      "Read": 22,
+      "mcp__plugin_context-mode_context-mode__ctx_execute": 17,
+      "Grep": 10,
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file": 10,
+      "StructuredOutput": 1
+    },
+    "native_permission_denial_count": 2
+  },
+  "original_final_review": {
+    "summary": "The current updater (sha256 73ab2454\u2026) is logically correct. Its exact-version, idle, reviewed-hash, expectedVersion and atomic-write guards are intact. The owned-profile migration recognizes only the byte-exact prior template (a8b2198, reproduced from 5cfa2400) and its single authorized Astra-to-Sol substitution (658246, reproduced). The generated command now calls profile_state() and carries --expect-profile-sha256. Rollback restores only bytes the run still owns. The model-evaluation scope, the 27-skill convergence (upstream trees verified, including all 15 unchanged directories), the uv.lock-only exception and the hermetic Semgrep suites are all accepted. Two blocking problems remain. (1) The whole finalization is built on a stale main checkout (5cfa2400), 24 commits behind remote main cc1f6ce1. Remote main changed the same updater (#514) and tests, and 3-way merges of both conflict, so the reviewed updater cannot land unchanged. The pin, stack row and receipt id codex-01592-qualification-20260930 duplicate work on the unmerged D4 owner branch, which has a different receipt at the same path, contrary to the recorded handoff. (2) The prepared idle rollout's source checksum omits the imported scripts/codex_quota.py. Its three target files are frozen items in Gate A's window-W snapshot, with no recorded owner coordination. It is frozen to the stale-base source, and its armed state is not stated. Nonblocking gaps: unqualified 'same_remaining_native_argv' booleans, the missing finalization receipt, unrecorded final-input validator and full-suite runs, and a stale current_native_skills pointer.",
+    "findings": [
+      {
+        "id": "F1",
+        "severity": "blocking",
+        "verdict": "defect",
+        "claim": "The reviewed updater, tests, pin, stack row and Codex receipt are publishable and integrate cleanly with current main and the recorded owner boundary.",
+        "reason": "The main checkout HEAD is 5cfa2400, which is 24 commits behind origin/main cc1f6ce1 (equal to the remote main via git ls-remote at review time). origin/main changed tools/adoption/apply_codex_lane.py by +241/-4 (7e0ef0dd, #514: role carriers; its docstring now reads 'four changes, five with --omniroute-profile' against the working tree's 'three changes, four'). It also changed tests/test_codex_worker_lane.py (+959), scripts/adoption_status.py (+169/-10), codex.config.template.toml, manifests/stack.json and prove_codex_lane.py. A read-only git merge-file of the working-tree updater and of the test file onto origin/main each returned 1 conflict, so sha256 73ab\u2026 and cbe4864a\u2026 cannot be what lands. Separately, the root's own Sol decision says the D4 owner (sota-default-harness-setup) holds the apply_codex_lane.py exact-version guard and native fixtures and that competing pin/manifest work must not be imported. The foundation-quality-defaults receipt records 'installer guard/native fixtures remain owner-managed'. The unmerged D4 branch (d971f92e pin, 893a9496 receipt/stack row, a52e5129 CODEX_VERSION) makes the same changes. It adds evidence/receipts/codex-01592-qualification-20260930.json with different content (sha256 f9ce3af0\u2026, 423 lines) at the same path and id as root's untracked receipt (0d41e2ea\u2026, 38 lines). No handback or ownership transfer is recorded in the finalization evidence.",
+        "citations": [
+          "tools/adoption/apply_codex_lane.py:4",
+          "tools/adoption/apply_codex_lane.py:95",
+          "git show origin/main:tools/adoption/apply_codex_lane.py lines 1-8 (7e0ef0dd, #514)",
+          "git merge-file (ours=working tree, base=5cfa2400, theirs=origin/main): apply_codex_lane.py exit 1, tests/test_codex_worker_lane.py exit 1",
+          "docs/decisions/2026-09-30-sol-primary-quality-defaults.md:59-67",
+          "evidence/receipts/foundation-quality-defaults-20260930.json:314-321",
+          "git log origin/main..claude/sota-defaults-d4-codex-0159-20260930 (d971f92e, 35bebe4f, 814af345, 893a9496, a52e5129, b3c1277b)",
+          "evidence/receipts/codex-01592-qualification-20260930.json (root) vs claude/sota-defaults-d4-codex-0159-20260930:evidence/receipts/codex-01592-qualification-20260930.json",
+          "adoption/pins-linux-x86_64.json codex entry diff; manifests/stack.json codex row diff",
+          "AGENTS.md: 'Hand off to a live session that owns an area instead of editing it.'"
+        ],
+        "required_action": "Before publication, rebase the finalization onto current main and integrate the owned-profile migration with #514's role-carrier installer step (preconditions, the already-in-place check, record fields and rollback order). Reconcile with the D4 owner: either record a handback and supersede D4's receipt, or give the two receipts distinct ids so each id has one content, and keep one pin/stack row. Re-run the updater test module plus a native scratch dry-run/apply/rollback on the rebased source, record the new source and test hashes, and re-review the rebased diff."
+      },
+      {
+        "id": "F2",
+        "severity": "blocking",
+        "verdict": "defect",
+        "claim": "The prepared production idle rollout guards the exact reviewed source and host inputs and preserves concurrent-owner protections.",
+        "reason": "idle-rollout.json lists six checksum inputs, but the updater imports scripts/codex_quota.py (sha256 fa0e3c9e\u2026) and uses its AppServer and ProbeError for every production config/read and config/batchWrite. That module is not guarded, while adoption/pins-linux-x86_64.json, which the updater does not read, is. The three rollout targets (~/.codex/config.toml, AGENTS.md and stack-worker.config.toml) are frozen items in Gate A's window-W freeze snapshot. The W contract requires no carrier or instruction change during the run, and the rollout rewrites the Codex global instruction block (top rule now 215 words). No coordination with the Gate A owner is recorded, and the timer has no W refusal. The frozen inputs pin the stale-base lane from F1, and the run record would state catalog_commit 5cfa2400 via git_head() even though the executed source is uncommitted. The receipt says prepared_not_applied, but it does not say whether the transient retry timer is armed. 'root is still an active guarded client' reads as an armed timer that the idle guard is refusing.",
+        "citations": [
+          "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:30-55",
+          "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:60-65",
+          "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:85",
+          "tools/adoption/apply_codex_lane.py:72",
+          "tools/adoption/apply_codex_lane.py:375",
+          "tools/adoption/apply_codex_lane.py:389-396",
+          "tools/adoption/apply_codex_lane.py:839-841",
+          "tools/adoption/apply_codex_lane.py:877",
+          "tools/token-e2e/freeze_snapshot.py:741-745",
+          "tools/token-e2e/freeze_snapshot.py:1071-1077",
+          "docs/decisions/2026-09-28-delegated-decisions.md:99-100",
+          "tests/test_codex_worker_lane.py:45-48"
+        ],
+        "required_action": "Keep the rollout unarmed, or disarm it and record that it is disarmed, until the rebased source from F1 is re-reviewed and re-frozen. Extend the ExecStartPre checksum set to the updater's full import closure (at least scripts/codex_quota.py) and record it. Obtain and record Gate A owner acknowledgment, or add a refusal while a W seal is active. In the finalization receipt, record the explicit armed/disarmed state, the arm and expiry times, and the exact frozen hashes."
+      },
+      {
+        "id": "F3",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The current updater preserves its exact-version, idle, source and concurrent-change guards and implements an exact owned-profile migration, a complete generated command and owned-bytes-only rollback.",
+        "reason": "Apply fails unless codex --version is 0.159.2, and the updater checks the context-mode start.mjs digest and requires daemon_auto_start=false. It fails while pgrep -x codex finds a process, and rollback also refuses in that case. It requires the reviewed config/AGENTS hashes, plus --expect-profile-sha256 when the state is 'migrate'. It re-checks the app-server's view before batchWrite with expectedVersion. profile_state() returns 'migrate' only for a digest in OWNED_PROFILE_SOURCES; any other differing profile fails. Apply writes a 0600 backup, journals the source, mode and replacing flag before the write, and does a hash-guarded atomic replace that preserves the file mode. Rollback restores only when current bytes equal the applied target and the backup equals the recorded prior digest; otherwise it reports a conflict and leaves the file. The generated apply command (line 822) calls plan.profile_state(). The lane sends no model/default_subagent_model keys, because owned_edits covers only lane keys. The synthetic tests cover the missing/wrong hash, unknown-custom refusal, command-line-only assertion, interrupted-journal rollback, later-writer conflict, changed-backup conflict and idle refusal. The upstream contracts match: the config writer allows only the user config, has an expectedVersion conflict path and deletes nulls; app-server refuses --profile.",
+        "citations": [
+          "tools/adoption/apply_codex_lane.py:99-112",
+          "tools/adoption/apply_codex_lane.py:215-236",
+          "tools/adoption/apply_codex_lane.py:255-272",
+          "tools/adoption/apply_codex_lane.py:466-471",
+          "tools/adoption/apply_codex_lane.py:524-576",
+          "tools/adoption/apply_codex_lane.py:786-788",
+          "tools/adoption/apply_codex_lane.py:815-822",
+          "tools/adoption/apply_codex_lane.py:872-896",
+          "tools/adoption/apply_codex_lane.py:913-915",
+          "tools/adoption/apply_codex_lane.py:955-959",
+          "tools/adoption/apply_codex_lane.py:998-1019",
+          "tests/test_codex_worker_lane.py:494-576",
+          "tests/test_codex_worker_lane.py:597-604",
+          "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs#L235-L253",
+          "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/cli/src/main.rs#L1861-L1885"
+        ],
+        "required_action": "None for the logic. Carry it through the F1 rebase unchanged in behavior."
+      },
+      {
+        "id": "F4",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The owned-profile provenance digests are exact and source-derived.",
+        "reason": "Independently reproduced: git show 5cfa2400:adoption/templates/codex.stack-worker.config.toml hashes to a8b2198\u2026 (it equals HEAD's template). Replacing the single 'model = \"gpt-6-astra\"' line (count 1) with gpt-6.1-sol yields 658246\u2026. The current template 7cc85870\u2026 differs from 658246 only in comment lines. idle-rollout's reviewed host profile hash is 658246.",
+        "citations": [
+          "tools/adoption/apply_codex_lane.py:99-112",
+          "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json:53-77",
+          "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:25-29",
+          "adoption/templates/codex.stack-worker.config.toml (sha256 7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9)"
+        ],
+        "required_action": "None."
+      },
+      {
+        "id": "F5",
+        "severity": "nonblocking",
+        "verdict": "accepted",
+        "claim": "profile-command-correction.json correctly supersedes the d239 command claim, with a failing regression on the old source, a passing run on the current source and a native dry run carrying the reviewed digest.",
+        "reason": "The correction is additive and preserves the incorrect historical claim. The source hashes chain beb4ceff (native acceptance) \u2192 d239 (buggy delta) \u2192 73ab (current, matches). The current test's assertion is limited to the generated '  python3 ' line. Recorded limits: the regression excerpt prints digest a8b2198. Because the test's 'before' is the live PROFILE_TEMPLATE (line 496), which is 7cc858\u2026 in the current tree, the regression and recovery must have run in a tree with the HEAD template, and neither the test-file nor the template hash is recorded. On 73ab only the single targeted test and a native dry run are recorded; the native apply/rollback/idempotence steps ran on beb4ceff. The delta is confined to dry-run printing (line 822), so this is acceptable as a recorded limitation.",
+        "citations": [
+          "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json:6-67",
+          "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json:104-108",
+          "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json:118-200",
+          "tests/test_codex_worker_lane.py:496",
+          "tests/test_codex_worker_lane.py:541-542",
+          "tools/adoption/apply_codex_lane.py:822"
+        ],
+        "required_action": "When re-verifying after the F1 rebase, record the test-file and template hashes alongside the updater hash for the targeted and full-suite runs."
+      },
+      {
+        "id": "F6",
+        "severity": "nonblocking",
+        "verdict": "defect",
+        "claim": "The baseline evidence consistently scopes argv equality to after debug-path normalization.",
+        "reason": "The decision doc and verification.json (verdict 'qualified') correctly say literal argv differs at the per-run --debug-file destination. results.json summary.baseline and usage-summary.json comparison.same_prompt_baseline both assert 'same_remaining_native_argv': true with no qualifier. Equality holds only because the sanitized control sets replace the destination with <private-path> (controls-2 and controls-4 differ only by --disable-slash-commands). README says 'remaining native controls matched' without the qualifier.",
+        "citations": [
+          "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json:106-114",
+          "evidence/artifacts/native-skill-finalization-20260930/results.json summary.baseline and native_control_sets controls-2/controls-4",
+          "evidence/artifacts/native-skill-finalization-20260930/README.md:25",
+          "docs/decisions/2026-09-30-sota-native-finalization.md:72-73",
+          "evidence/artifacts/sota-finalization-20260930/verification.json:68-75"
+        ],
+        "required_action": "Without rewriting the frozen results, add an explicit qualifier in README.md and the finalization receipt: remaining argv matches only after the per-run --debug-file destination is normalized, and the literal argv bytes differ."
+      },
+      {
+        "id": "F7",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "Native model evidence: 29 runs (14 Codex, 15 Claude), original failures retained, no universal claims, counters scoped once.",
+        "reason": "The runs list has 29 entries (15 claude-*, 14 codex-*), all outer exits 0, no timeouts. The original set is 25 runs with 23 passes; the w05 and w10 failures are kept, the Codex w02/w04 load misses and 3 explicit-load limits are recorded, and 12 negatives had 0 false positives. The 4 follow-ups were preregistered separately. The frozen writing-for-agents source is unchanged upstream (tree ad292585 identical at c55ee460 and d81f3a18; SKILL.md 551adca9\u2026), and search-first is pinned at c70874fa. The evaluation did not exercise the repinned architecture or Semgrep skills, and this is stated. Route metadata is explicitly not backend attestation. Usage is one cumulative result per run, cache/reasoning are subsets, advisor (Fable) buckets are kept separate, no runs are missing usage, and orchestration is excluded.",
+        "citations": [
+          "evidence/artifacts/native-skill-finalization-20260930/results.json summary",
+          "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json:1-69",
+          "evidence/artifacts/native-skill-finalization-20260930/operations.json:141-160",
+          "evidence/artifacts/native-skill-finalization-20260930/operations.json:240-250",
+          "evidence/artifacts/sota-finalization-20260930/native-actions.json:152-157",
+          "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md"
+        ],
+        "required_action": "None."
+      },
+      {
+        "id": "F8",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The selected inventory is 27 skills: three updated upstream directories, one upstream-removed skill retired, 15 unchanged directories and nine previously fresh core skills.",
+        "reason": "The manifest has 27 skills: Claude 19 on / 5 name-only / 3 user-invocable-only; Codex 11 enabled. The description sums (7,114 and 3,016) equal the budget fields. Upstream checks: trailofbits 82fe8226 is current HEAD, the semgrep tree is 32c70e1f and SKILL.md is 52162605\u2026/15678 bytes, with DEFAULT_MAX_TARGET_BYTES=20000000 at run-scans.sh:21. mattpocock d81f3a18 is current HEAD, codebase-design and improve-codebase-architecture trees match, resolving-merge-conflicts is absent and the changeset records its removal. All 15 unchanged directories' manifest tree SHAs equal the current upstream HEAD trees. The retired skill is excluded in the manifest, set 'off' in the Claude template, and remains only in dated records. The runtime catalog has 136 entries with consistent budget sums. Skills 1.7.0 = 7407f389, and 'check' falls through to runUpdate, as lifecycle.md states.",
+        "citations": [
+          "adoption/skills/manifest.json budget and excluded entries",
+          "adoption/templates/claude.settings.template.json:329",
+          "docs/decisions/2026-09-30-sota-native-finalization.md:17-32",
+          "evidence/artifacts/sota-finalization-20260930/source-review.json",
+          "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep/scripts/run-scans.sh#L21",
+          "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md",
+          "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/cli.ts#L398-L401",
+          "adoption/skills/lifecycle.md:94-116"
+        ],
+        "required_action": "None. Optionally bump blueprints/runtime-workers/skills/manifest.json checked_at (still 2026-09-27) to match its 2026-09-30 entry changes."
+      },
+      {
+        "id": "F9",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The supply-chain-risk-auditor uv.lock-only exception is preserved.",
+        "reason": "allowed-tree-drift.json: 13 upstream and 13 local blobs, 12 matching, with only scripts/uv.lock differing. No missing, extra or out-of-set files. The in-memory substitution reconstructs manifest tree 954cc68e, which equals the tree at current upstream HEAD 82fe8226 (verified).",
+        "citations": [
+          "evidence/artifacts/sota-finalization-20260930/allowed-tree-drift.json comparison/substitution",
+          "adoption/skills/lifecycle.md:55-61",
+          "evidence/artifacts/sota-finalization-20260930/verification.json:22-30"
+        ],
+        "required_action": "None."
+      },
+      {
+        "id": "F10",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The Semgrep upstream suites are unchanged hermetic upstream fixtures, distinct from real scans or workflow acceptance.",
+        "reason": "Script hashes 6fd2bb51\u2026 and c740758d\u2026 match the files at 82fe8226 (verified). run_scan_tests.sh declares dry-run and stub semgrep/git binaries, and run_workflow_tests.sh declares workflow mutation checks. The artifact and the decision doc claim no real scan or model workflow.",
+        "citations": [
+          "evidence/artifacts/sota-finalization-20260930/upstream-tests.json:10-38",
+          "docs/decisions/2026-09-30-sota-native-finalization.md:119-123",
+          "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/tests/run_scan_tests.sh#L4-L5",
+          "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/tests/run_workflow_tests.sh#L4"
+        ],
+        "required_action": "None."
+      },
+      {
+        "id": "F11",
+        "severity": "nonblocking",
+        "verdict": "unverified",
+        "claim": "The publication-integrity gate passes on final inputs.",
+        "reason": "The plan's gate requires the validator, convergence validator, guide check and whitespace check on final inputs. The recorded validate.py runs are worker-stage exit 1 (not hash-listed) in qualification.json and operations.json. No final validate.py or full test_codex_worker_lane run on the 73ab/cbe4864a pair is recorded. My read-only consistency check found manifests/evidence.json hash-lists all 8117 files with 0 mismatches and no unlisted untracked files, and all 173 receipts agree with the manifest. My attempt to run validate.py was denied in this review.",
+        "citations": [
+          "evidence/artifacts/sota-finalization-20260930/plan.json:59-62",
+          "evidence/artifacts/codex-01592-qualification-20260930/qualification.json:249-262",
+          "evidence/artifacts/native-skill-finalization-20260930/operations.json:272-282",
+          "manifests/evidence.json"
+        ],
+        "required_action": "After the F1 rebase, run and record validate.py, the scoped convergence validator, the guide build check, git diff --check and the full codex worker lane suite on the final inputs, with exit codes and hashes, in the finalization receipt."
+      },
+      {
+        "id": "F12",
+        "severity": "nonblocking",
+        "verdict": "unverified",
+        "claim": "The finalization receipt carries the final results and the production rollout state.",
+        "reason": "The decision doc, the Codex receipt ('global_profile_rollout': 'separate finalization receipt') and the harness-defaults anti-pattern row all point to a finalization receipt. No such receipt exists in evidence/receipts or the manifest's receipts list. idle-rollout.json is not linked from any document, and the decision doc never states PREPARED_NOT_APPLIED explicitly.",
+        "citations": [
+          "docs/decisions/2026-09-30-sota-native-finalization.md:104-109",
+          "docs/decisions/2026-09-30-sota-native-finalization.md:127-131",
+          "evidence/receipts/codex-01592-qualification-20260930.json:29",
+          "docs/harness-defaults.md:92"
+        ],
+        "required_action": "Publish the finalization receipt and register it. Link idle-rollout.json, state PREPARED_NOT_APPLIED with the armed/disarmed state, and include this review's findings and their dispositions."
+      },
+      {
+        "id": "F13",
+        "severity": "nonblocking",
+        "verdict": "defect",
+        "claim": "Adoption entry points lead to the current skill lifecycle.",
+        "reason": "adoption/manifest.json 'current_native_skills' still points to catalogs/landscape/native-practice.json. That is the unchanged 2026-09-21 record of 3 skills with unpinned 'npx --yes skills add' commands, not the current 27-skill manifest and the pinned Skills 1.7.0 lifecycle.",
+        "citations": [
+          "adoption/manifest.json:117",
+          "catalogs/landscape/native-practice.json (checked_at 2026-09-21, installation_method)",
+          "adoption/skills/lifecycle.md:3-19"
+        ],
+        "required_action": "Point current_native_skills at adoption/skills/manifest.json and lifecycle.md, or mark native-practice.json as a dated supplement superseded by them."
+      },
+      {
+        "id": "F14",
+        "severity": "none",
+        "verdict": "accepted",
+        "claim": "The new evidence is privacy-safe.",
+        "reason": "A scan of the new artifacts, the receipt, the decision doc, lifecycle.md, the updater and the tests found no /home paths (except the /home/example fixture), no bare host user name, no session UUIDs, keys or emails. A generic '~/.claude/' appears inside a model output. idle-rollout.json publishes only sha256 digests of the host config and AGENTS files, not their contents or paths.",
+        "citations": [
+          "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:25-29",
+          "evidence/artifacts/native-skill-finalization-20260930/operations.json:211-213"
+        ],
+        "required_action": "None."
+      }
+    ],
+    "pending_state_at_reviewed_snapshot": "Production idle rollout: PREPARED_NOT_APPLIED (idle-rollout.json status 'prepared_not_applied'; application_state 'No production application observed'). Nothing shows it active or applied, or that the production updater has succeeded on this host. The only updater acceptance is in scratch/synthetic homes. The receipt does not say whether the transient retry timer is armed, and it must stay unarmed until F1 and F2 are resolved. Its 24-hour expiry is transient and not restart-persistent. Other pending items: the rebase onto main and reconciliation with the D4 owner, the finalization receipt, and final-input publication checks. Second-host acceptance is deferred by the user's instruction.",
+    "review_limits": [
+      "My only execution attempt, scripts/validate.py, was denied by the Bash permission mode, so no repository tests were run. Checks were read-only: file hashing, manifest/receipt consistency, git object reads, a merge-file simulation in /tmp, and public upstream blobless clones and raw reads.",
+      "I did not read private raw captures, the host Codex home, the systemd unit/timer state or the private checksum file. The timer's armed state, the host file hashes and the host binary equality cannot be independently verified.",
+      "I did not rerun the 29 model trials or any upstream suite, as instructed.",
+      "I did not call the advisor or any other model/agent, per your 'no other models' constraint.",
+      "The remote main was verified equal to local origin/main (cc1f6ce1) via git ls-remote at review time. The D4 branch state comes from local refs only.",
+      "Reviewed working-tree hashes: updater 73ab2454\u2026, tests cbe4864a\u2026, operations.json 5d3fff78\u2026, decision doc f24f922b\u2026. Any document or receipt refresh made by root after these hashes is outside this review."
+    ]
+  },
+  "usage": {
+    "counter_scope": "One final cumulative native result, once. modelUsage/cache/reasoning are overlapping views or subsets, not additive. Separate from the 29 skill-evaluation runs.",
+    "native_input_tokens": 138,
+    "native_cache_creation_input_tokens": 306376,
+    "native_cache_read_input_tokens": 13025856,
+    "native_output_tokens": 97173,
+    "native_thinking_tokens": 61211,
+    "thinking_subset_of_output": true,
+    "cache_creation_by_ttl": {
+      "ephemeral_1h_input_tokens": 306376,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "service_tier": "standard",
+    "native_model_usage_nonadditive": {
+      "claude-opus-5-5": {
+        "inputTokens": 138,
+        "outputTokens": 97173,
+        "cacheReadInputTokens": 13025856,
+        "cacheCreationInputTokens": 306376,
+        "webSearchRequests": 0,
+        "costUSD": 7.0001912,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 61211,
+        "canonicalModel": "claude-opus-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "native_reported_total_cost_usd": 7.0001912,
+    "cost_basis": "Native reported list-price estimate; actual billing unknown.",
+    "coordinator_usage": "unknown"
+  },
+  "input_changes_during_review": [
+    {
+      "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "before_sha256": "f24f922b720ec899f4e422a0142c1dec9dee560cbafdf7e0f0f25a39c92cd652",
+      "after_sha256": "3bbcd81a1eb0ccb8136b75b4b75baf46aabe31abb3db71f19b342972affb1287"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "before_sha256": "fb73c52c796ef25e7393b21f8a820cae42013de3eb9599d883b261256c8dd420",
+      "after_sha256": "2ba2a6b99861436a7e2c1e1b00ee6b26f7f787f95ee624ad7337208ae5b6e842"
+    }
+  ],
+  "original_capture_integrity": {
+    "raw_capture_kept_private": true,
+    "original_stream_and_debug_hashes": {
+      "stdout.jsonl": "9018ecc866c913a66818d192d3564fccb4c2d8cd827f0da27facec6ebc2254d8",
+      "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "debug.log": "3ccb70c0dfec23b97a1ffeeff9488f60534f66dd127d85e616ef8f5918981018"
+    },
+    "summary_sha256": "2dda31707b982670f931d75bc1d030ccda52ff5521ee4211758893f4cb00a664",
+    "original_native_result_sha256": "86089935d5df46a878432321c24790926ef43eac1c67d4e38f5417dcd5efd173",
+    "original_structured_verdict_sha256": "3ec5fd3bedd13d9bc639c19ebb919d3c4c856fde61fd1d0f53406f27df2bc27b"
+  },
+  "completion_limits": [
+    "Changes-required is the original review verdict; it does not clear current-main integration or production application.",
+    "Only the original source hash 73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b was reviewed; a rebased source is a new input.",
+    "The coordinator changed the decision document and idle rollout receipt during review; the original reviewer saw prepared_not_applied, while a later current receipt recorded queued_waiting_for_idle. No production application was observed.",
+    "Gate A window-W activity is an inference/unknown, not independently observed live seal state.",
+    "No additional model call, model-suite rerun or upstream-test rerun followed the review.",
+    "Original full native result and raw events remain private; only bounded sanitized verdict/counters/source hashes are suitable for public receipts."
+  ]
+}

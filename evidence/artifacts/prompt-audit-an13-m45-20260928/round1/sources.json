@@ -1,0 +1,297 @@
+{
+ "sources": [
+  {
+   "id": "S1",
+   "question": "Q1",
+   "publisher": "Anthropic",
+   "title": "Prompting best practices",
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "Comprehensive guide to prompt engineering techniques for Claude's latest models, covering clarity, examples, XML structuring, thinking, and agentic systems.",
+     "locator": "page description (frontmatter)"
+    },
+    {
+     "text": "Claude responds well to clear, explicit instructions. Being specific about your desired output can help enhance results. If you want \"above and beyond\" behavior, explicitly request it rather than relying on the model to infer this from vague prompts.",
+     "locator": "General principles > Be clear and direct"
+    },
+    {
+     "text": "Claude's latest models are trained for precise instruction following and benefit from explicit direction to use specific tools. If you say \"can you suggest some changes,\" Claude will sometimes provide suggestions rather than implementing them, even if making changes might be what you intended.",
+     "locator": "Tool use > Tool usage"
+    },
+    {
+     "text": "Claude Opus 4.5 and Claude Opus 4.6 are also more responsive to the system prompt than previous models. If your prompts were designed to reduce undertriggering on tools or skills, these models may now overtrigger. The fix is to dial back any aggressive language. Where you might have said \"CRITICAL: You MUST use this tool when...\", you can use more normal prompting like \"Use this tool when...\".",
+     "locator": "Tool use > Tool usage"
+    },
+    {
+     "text": "If your prompts previously encouraged the model to be more thorough, you should tune that guidance for Claude Opus 4.6:",
+     "locator": "Thinking and reasoning > Overthinking and excessive thoroughness"
+    },
+    {
+     "text": "**Remove over-prompting.** Tools that undertriggered in previous models are likely to trigger appropriately now. Instructions like \"If in doubt, use \\[tool]\" will cause overtriggering.",
+     "locator": "Thinking and reasoning > Overthinking and excessive thoroughness (bullet list)"
+    },
+    {
+     "text": "**Tune anti-laziness prompting:** If your prompts previously encouraged the model to be more thorough or use tools more aggressively, dial back that guidance. Claude 4.6 models are more proactive and may overtrigger on instructions that were needed for previous models.",
+     "locator": "Migration considerations, item 6 (list introduced by \"When migrating to current Claude models from earlier generations:\")"
+    },
+    {
+     "text": "**Tell Claude what to do instead of what not to do** [...] * Instead of: \"Do not use markdown in your response\" * Try: \"Your response should be composed of smoothly flowing prose paragraphs.\"",
+     "locator": "Output and formatting > Control the format of responses, item 1 ([...] marks text between the item and its examples that was not captured)"
+    }
+   ],
+   "establishes": "The page says Claude's latest models are trained for precise instruction following. It pins its model-specific advice to named models: dialing back aggressive language (\"CRITICAL: You MUST...\") to Claude Opus 4.5 and Opus 4.6, removing over-prompting to Opus 4.6, and tuning anti-laziness prompting to Claude 4.6 models. Its formatting section advises saying what to do rather than what not to do."
+  },
+  {
+   "id": "S2",
+   "question": "Q1",
+   "publisher": "Anthropic",
+   "title": "Prompting Claude Sonnet 5",
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "Claude Sonnet 5 interprets prompts literally and explicitly, particularly at lower effort levels. It does not silently generalize an instruction from one item to another, and it does not infer requests you didn't make. The upside of this literalism is precision, and it generally performs better for API use cases with carefully tuned prompts, structured extraction, and pipelines where you want predictable behavior. If you need Claude to apply an instruction broadly, state the scope explicitly (for example, \"Apply this formatting to every section, not just the first one\").",
+     "locator": "More literal instruction following"
+    }
+   ],
+   "establishes": "This page says Claude Sonnet 5 interprets prompts literally, does not carry an instruction over from one item to another, and should be given the scope explicitly when an instruction is meant to apply broadly."
+  },
+  {
+   "id": "S3",
+   "question": "Q1",
+   "publisher": "Anthropic",
+   "title": "Prompting Claude Fable 5",
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "Instruction-following is improved enough that you can steer most behaviors with a brief instruction rather than enumerating each behavior by name.",
+     "locator": "Strong instruction following"
+    },
+    {
+     "text": "Report outcomes faithfully: if tests fail, say so with the output; if a step was skipped, say that; when something is done and verified, state it plainly without hedging.",
+     "locator": "Ground progress claims during long runs (text inside a sample prompt)"
+    }
+   ],
+   "establishes": "This page says Claude Fable 5's instruction following lets a brief instruction steer most behaviors. Its \"state it plainly\" wording sits inside a sample prompt about the model's own progress reports, not in advice to prompt authors."
+  },
+  {
+   "id": "S4",
+   "question": "Q1",
+   "publisher": "Anthropic",
+   "title": "Prompting Claude Opus 5",
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "If your review prompt says \"only report high-severity issues\" or \"be conservative,\" the model may follow that instruction literally and report less; ask it to report everything and filter in a separate pass instead.",
+     "locator": "Capability improvements > Code review and bug-finding bullet"
+    },
+    {
+     "text": "Claude Opus 5 catches and fixes its own mistakes well without prompting. Avoid instructing re-checks it already performs (\"double-check your answer,\" \"re-verify before responding\"); like verification instructions, these compound with the model's own behavior and add cost without improving results.",
+     "locator": "Self-correction"
+    },
+    {
+     "text": "State corrections plainly and briefly, then continue the task.",
+     "locator": "Self-correction (text inside a sample prompt)"
+    }
+   ],
+   "establishes": "This page says Claude Opus 5 may follow a review-scope instruction literally, and that re-check instructions add to the model's own behavior and raise cost without improving results. Its \"plainly\" wording sits inside a sample prompt about the model's own corrections."
+  },
+  {
+   "id": "S5",
+   "question": "Q1",
+   "publisher": "Anthropic (Claude Code docs)",
+   "title": "Best practices for Claude Code",
+   "url": "https://code.claude.com/docs/en/best-practices.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "If Claude keeps skipping one instruction, add emphasis such as \"IMPORTANT\" to that line alone. If you emphasize many lines, none of them stands out.",
+     "locator": "Configure your environment > Write an effective CLAUDE.md"
+    }
+   ],
+   "establishes": "Claude Code's own guidance for CLAUDE.md files advises adding emphasis such as \"IMPORTANT\" only to a single instruction Claude keeps skipping, and says that emphasizing many lines makes none stand out."
+  },
+  {
+   "id": "S6",
+   "question": "Q2",
+   "publisher": "Anthropic (Claude Code docs)",
+   "title": "Commands",
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "Commands control Claude Code from inside a session. They provide a quick way to switch models, manage permissions, clear context, run a workflow, and more.",
+     "locator": "Commands (introduction)"
+    },
+    {
+     "text": "Type `/` to see the commands available to you, or type `/` followed by letters to filter.",
+     "locator": "Commands (introduction)"
+    },
+    {
+     "text": "A command is only recognized at the start of your message. Text that follows the command name becomes its arguments.",
+     "locator": "Commands (introduction)"
+    },
+    {
+     "text": "Use `/mcp` to set up any servers the project needs, ask Claude to create any [subagents](/docs/en/sub-agents) you want, and run `/permissions` to set your approval rules.",
+     "locator": "Commands across a typical workflow (First session in a repo)"
+    },
+    {
+     "text": "When the conversation gets long, `/context` shows what's filling the window and `/compact` summarizes it to free space.",
+     "locator": "Commands across a typical workflow (During a task)"
+    },
+    {
+     "text": "The table below lists all the commands included in Claude Code. Most are built-in commands whose behavior is coded into the CLI.",
+     "locator": "All commands"
+    },
+    {
+     "text": "`/verify` runs only when you invoke it. Before v2.1.215, Claude could also run `/verify` on its own.",
+     "locator": "All commands (list of marked entries, Skill)"
+    },
+    {
+     "text": "`/deep-research` runs only when you invoke it. Before v2.1.218, Claude could also start it on its own.",
+     "locator": "All commands (list of marked entries, Workflow)"
+    },
+    {
+     "text": "Visualize current context usage as a colored grid. Shows optimization suggestions for context-heavy tools, memory bloat, and capacity warnings.",
+     "locator": "All commands table, row `/context [all]` (first two sentences)"
+    },
+    {
+     "text": "Manage MCP server connections and OAuth authentication. Run with no argument to open the interactive list, pass `reconnect <server>` to reconnect one disconnected server, or pass `enable`/`disable` with a server name or `all` to change connection state without opening the dialog. Also available in non-interactive mode (`-p`), where running it with no argument prints a text summary of server status instead of opening the list; requires Claude Code v2.1.205 or later",
+     "locator": "All commands table, row for /mcp"
+    }
+   ],
+   "establishes": "The commands reference presents commands as something the user types at the start of a message. It describes /context as a colored grid of context usage and /mcp as MCP server connection and OAuth management. It notes that two bundled entries Claude used to run on its own now run only when the user invokes them."
+  },
+  {
+   "id": "S7",
+   "question": "Q2",
+   "publisher": "Anthropic (Claude Code docs)",
+   "title": "Extend Claude with skills",
+   "url": "https://code.claude.com/docs/en/skills.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision (https://code.claude.com/docs/en/slash-commands.md serves this same page)",
+   "quotes": [
+    {
+     "text": "By default, Claude can invoke any skill that doesn't have `disable-model-invocation: true` set. Skills that define `allowed-tools` grant Claude access to those tools without per-use approval during the turn that invokes the skill; the grant clears when you send your next message. Your [permission settings](/docs/en/permissions) still govern baseline approval behavior for all other tools. A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not.",
+     "locator": "Advanced patterns > Restrict Claude's skill access"
+    },
+    {
+     "text": "With `user-invocable: false`, you can't invoke the skill, but Claude still can. To keep Claude from invoking it through the Skill tool, set `disable-model-invocation: true`.",
+     "locator": "Advanced patterns > Restrict Claude's skill access (Note)"
+    },
+    {
+     "text": "Bundled skills are prompt-based: they give Claude detailed instructions and let it orchestrate the work using its tools. Most built-in commands instead execute fixed logic directly.",
+     "locator": "Bundled skills"
+    }
+   ],
+   "establishes": "The skills page says Claude invokes skills through the Skill tool, that a few built-in commands are available through it (it names /init and /security-review), and that other built-in commands such as /compact are not. It does not say either way whether /mcp or /context is available."
+  },
+  {
+   "id": "S8",
+   "question": "Q2",
+   "publisher": "Anthropic (Claude Code docs)",
+   "title": "How Claude remembers your project",
+   "url": "https://code.claude.com/docs/en/memory.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision",
+   "quotes": [
+    {
+     "text": "CLAUDE.md and CLAUDE.local.md files in the directory hierarchy above the working directory are loaded at launch. Files in subdirectories load on demand when Claude reads files in those directories.",
+     "locator": "CLAUDE.md files > Choose where to put CLAUDE.md files"
+    },
+    {
+     "text": "Claude also discovers `CLAUDE.md` and `CLAUDE.local.md` files in subdirectories under your current working directory. Instead of loading them at launch, they are included when Claude reads files in those subdirectories.",
+     "locator": "CLAUDE.md files > How CLAUDE.md files load"
+    },
+    {
+     "text": "**As Claude works in subdirectories**: a subdirectory's `AGENTS.md`, when Claude opens a file there with the Read tool and that subdirectory has none of the three `CLAUDE.md` files of its own",
+     "locator": "AGENTS.md > When Claude Code reads AGENTS.md"
+    },
+    {
+     "text": "Nested CLAUDE.md files in subdirectories and rules with [`paths:` frontmatter](#path-specific-rules) reload as Claude reads files they apply to.",
+     "locator": "Troubleshoot memory issues > Instructions seem lost after `/compact`"
+    }
+   ],
+   "establishes": "The memory page says CLAUDE.md files above the working directory load at launch, while CLAUDE.md files in subdirectories load when Claude reads files there. The same on-read rule applies to a subdirectory's AGENTS.md."
+  },
+  {
+   "id": "S9",
+   "question": "Q3",
+   "publisher": "OpenAI (openai/openai-cookbook)",
+   "title": "GPT-5 prompting guide",
+   "url": "https://github.com/openai/openai-cookbook/blob/6dc6324fb9ed780b32b787f23fad336e9f1eff15/examples/gpt-5/gpt-5_prompting_guide.ipynb",
+   "retrieved": "2026-09-27",
+   "revision": "6dc6324fb9ed780b32b787f23fad336e9f1eff15 (openai-cookbook main, committed 2026-09-26T00:02:08Z); rendered at https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_prompting_guide",
+   "quotes": [
+    {
+     "text": "Cursor found that sections of their prompt that had been effective with earlier models needed tuning to get the most out of GPT-5. Here is one example below:",
+     "locator": "Maximizing coding performance, from planning to execution > Collaborative coding in production: Cursor’s GPT-5 prompt tuning > System prompt and parameter tuning"
+    },
+    {
+     "text": "Be THOROUGH when gathering information. Make sure you have the FULL picture before replying. Use additional tool calls or clarifying questions as needed.",
+     "locator": "same section, inside the <maximize_context_understanding> example block"
+    },
+    {
+     "text": "While this worked well with older models that needed encouragement to analyze context thoroughly, they found it counterproductive with GPT-5, which is already naturally introspective and proactive at gathering context. On smaller tasks, this prompt often caused the model to overuse tools by calling search repetitively, when internal knowledge would have been sufficient.",
+     "locator": "same section"
+    },
+    {
+     "text": "To solve this, they refined the prompt by removing the maximize_ prefix and softening the language around thoroughness. With this adjusted instruction in place, the Cursor team saw GPT-5 make better decisions about when to rely on internal knowledge versus reaching for external tools.",
+     "locator": "same section"
+    }
+   ],
+   "establishes": "OpenAI's GPT-5 guide reports Cursor's experience with GPT-5 specifically: a capitalized \"Be THOROUGH ... FULL picture\" instruction that worked with older models was counterproductive with GPT-5, causing tool overuse on small tasks, and softening its language fixed this."
+  },
+  {
+   "id": "S10",
+   "question": "Q3",
+   "publisher": "OpenAI",
+   "title": "Using GPT-6 (Model guidance, OpenAI API docs)",
+   "url": "https://developers.openai.com/api/docs/guides/latest-model.md",
+   "retrieved": "2026-09-27",
+   "revision": "web page, no revision; frontmatter latestModelInfo.model: gpt-6-astra; https://developers.openai.com/api/docs/guides/prompt-guidance.md redirects here",
+   "quotes": [
+    {
+     "text": "- [Instruction following](#instruction-following): GPT-6 Astra is stronger at general instruction following than our previous models, giving you greater control over its behavior. It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`. We **strongly recommend** auditing skills and other files accessible to your model for instructions that could influence its behavior.",
+     "locator": "Prompting best practices > GPT-6 Astra behavior"
+    },
+    {
+     "text": "GPT-6 Astra is better able to follow longer instructions, but can also be more sensitive to information in context. For example, unclear or conflicting guidance in a skill file may cause the model to pause and block work early. Make the priority of user instructions and skills explicit.",
+     "locator": "Prompting best practices > Instruction following"
+    }
+   ],
+   "establishes": "OpenAI's current GPT-6 Astra guidance says the model follows instructions more strongly and is more sensitive to instructions in skills and files such as AGENTS.md, and it recommends auditing those files."
+  },
+  {
+   "id": "U1",
+   "url": "https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md",
+   "retrieved": "2026-09-28",
+   "note": "The pinned upstream file, copied byte for byte to <work>/sources/verification-before-completion-8ca22dba.SKILL.md. sha256 2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3, 3646 bytes, which equals the adoption manifest's skill_md_sha256 and the installed user-level copy's sha256 on this host. The GitHub contents API gives the same blob (7d45333cc4a4) at 8ca22dba and on upstream main on 2026-09-28, so the pin is upstream's current file.",
+   "quote": ""
+  },
+  {
+   "id": "U2",
+   "url": "https://github.com/obra/superpowers/commit/3be5aad3dd24",
+   "retrieved": "2026-09-28",
+   "note": "The latest upstream commit that touches skills/verification-before-completion/SKILL.md (committed 2026-07-24), from the GitHub commits API filtered by path. The two earlier ones are 2025-10-17 and 2025-10-16.",
+   "quote": "refactor(skills): drop persuasion sections from verification-before-completion\n\nWhy This Matters (failure-memory testimonials), the dishonesty reframing\nin the Overview, and The Bottom Line recap all restate stakes the Iron\nLaw, gate function, and rationalization table already enforce. This is\nthe eval-gated class: the bet is that discipline holds without the\npersuasion prose — evals on this branch decide."
+  },
+  {
+   "id": "U3",
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md",
+   "retrieved": "2026-09-28",
+   "note": "Section 'Task scope and over-verification'. The session model of this repository's coordinator and builder is Opus 5.5; its own guide is at https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md.",
+   "quote": "Claude Opus 5 verifies its own work without being told to. If your prompt contains explicit verification instructions (\"include a final verification step for any non-trivial task,\" \"use a subagent to verify\"), remove them: instructions like these cause over-verification on Claude Opus 5, and removing them reduces wasted tokens with no loss in quality. The same applies to legacy harness scaffolding that adds separate verification steps."
+  }
+ ]
+}

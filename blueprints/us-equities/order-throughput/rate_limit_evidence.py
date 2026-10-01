@@ -18,6 +18,24 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 OUTPUT = HERE / "rate-limit-evidence-20260924.json"
 TRIALS = "blueprints/us-equities/adaptive-paper/trials"
+# The trial files this dated record was built from (2026-09-24). A trial committed later carries its own receipt
+# and must not move these totals, so the scan reads this fixed set instead of every trials/*.json.
+DATED_TRIAL_FILES = (
+    "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/diag-d-paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/trial-c-paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/preflight.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/paper-output.json",
+    "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/recover-output.json",
+)
 UNATTRIBUTED = ("blueprints/us-equities/broad-universe/receipt.json",
                 "blueprints/us-equities/broad-universe/watchlist-20260921.json")
 ORIGIN = {"read": "trading", "submit": "trading", "cancel": "trading", "data_read": "data"}
@@ -64,7 +82,8 @@ def _walk_any(node, found):
 
 def observations(root=ROOT):
     files, totals = [], Counter()
-    for path in sorted((root / TRIALS).rglob("*.json")):
+    for relative in DATED_TRIAL_FILES:
+        path = root / relative
         found = []
         _walk_http(json.loads(path.read_text()), found)
         if not found:

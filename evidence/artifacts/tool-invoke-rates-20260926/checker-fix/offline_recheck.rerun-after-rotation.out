@@ -1,0 +1,5 @@
+INFO events files scanned: 4; tagged lines found: 0; forbidden strings: 26 (added 'pwd': True)
+PASS every tagged events-file line parsed as OTLP JSON :: lines=0 parsed=0
+FAIL every tagged events-file record's body is exactly '[content omitted]' :: records=0 not_fixed=0 empty_batches=0
+FAIL the events file holds this run's tagged records without command/prompt text (any length) or content/identity keys :: lines=0 value hits=0 banned keys=[]
+SUMMARY offline_recheck (events-file sink only; Loki sink not re-queried): 1 passed, 2 failed

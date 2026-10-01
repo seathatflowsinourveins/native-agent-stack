@@ -1,0 +1,204 @@
+{
+  "claude": "2.1.286 (Claude Code)",
+  "bubblewrap": true,
+  "bubblewrap_version": "bubblewrap 0.9.0",
+  "arms": [
+    {
+      "arm": "A_control_no_scrub",
+      "scrub_variable": false,
+      "real_bash_profile_present_before": false,
+      "client_exit": 1,
+      "entries_created": 9,
+      "empty_files_created": 0,
+      "directories_created": 6,
+      "empty_directories_created": 2,
+      "created_in_home_top_level": [
+        ".claude",
+        ".claude.json"
+      ],
+      "created_in_working_dir": [],
+      "bash_profile_exists_after": false,
+      "bash_profile_empty_after": false,
+      "bash_profile_mode_after": null,
+      "real_bash_profile_untouched": null,
+      "login_path_had_local_bin_before": true,
+      "login_path_has_local_bin_after": true,
+      "client_temp_entries_in_private_dir": {
+        "messaging_socket_dirs": 1,
+        "sandbox_multiplexer_sockets": 0,
+        "file_watch_probe_dirs": 1,
+        "client_state_dirs": 1,
+        "other": 0
+      }
+    },
+    {
+      "arm": "B_scrub_stock_home",
+      "scrub_variable": true,
+      "real_bash_profile_present_before": false,
+      "client_exit": 1,
+      "entries_created": 49,
+      "empty_files_created": 27,
+      "directories_created": 19,
+      "empty_directories_created": 12,
+      "created_in_home_top_level": [
+        ".bash_aliases",
+        ".bash_profile",
+        ".bashrc",
+        ".bunfig.toml",
+        ".claude",
+        ".claude.json",
+        ".config",
+        ".gitconfig",
+        ".netrc",
+        ".npmrc",
+        ".pip",
+        ".yarnrc",
+        ".yarnrc.yml",
+        ".zshrc"
+      ],
+      "created_in_working_dir": [
+        ".claude",
+        ".claude/agents",
+        ".claude/commands",
+        ".env",
+        ".env.development",
+        ".env.development.local",
+        ".env.local",
+        ".env.production",
+        ".env.production.local",
+        ".env.test",
+        ".env.test.local",
+        ".gitmodules",
+        ".npmrc",
+        ".yarnrc",
+        ".yarnrc.yml",
+        "bunfig.toml",
+        "node_modules",
+        "node_modules/.bin",
+        "package-lock.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "yarn.lock"
+      ],
+      "bash_profile_exists_after": true,
+      "bash_profile_empty_after": true,
+      "bash_profile_mode_after": "0o644",
+      "real_bash_profile_untouched": null,
+      "login_path_had_local_bin_before": true,
+      "login_path_has_local_bin_after": false,
+      "native_doctor": {
+        "sandbox_off": {
+          "exit": 0,
+          "warnings_found": 3,
+          "mentions_bash_profile": false,
+          "mentions_mask_stale_or_placeholder": false
+        },
+        "sandbox_on_with_planted_stale_mask_file": {
+          "exit": 0,
+          "warnings_found": 4,
+          "mentions_bash_profile": false,
+          "mentions_mask_stale_or_placeholder": true,
+          "names_planted_stale_mask_file": true
+        }
+      },
+      "client_temp_entries_in_private_dir": {
+        "messaging_socket_dirs": 1,
+        "sandbox_multiplexer_sockets": 1,
+        "file_watch_probe_dirs": 1,
+        "client_state_dirs": 1,
+        "other": 2
+      }
+    },
+    {
+      "arm": "C_scrub_real_bash_profile",
+      "scrub_variable": true,
+      "real_bash_profile_present_before": true,
+      "client_exit": 1,
+      "entries_created": 48,
+      "empty_files_created": 26,
+      "directories_created": 19,
+      "empty_directories_created": 12,
+      "created_in_home_top_level": [
+        ".bash_aliases",
+        ".bashrc",
+        ".bunfig.toml",
+        ".claude",
+        ".claude.json",
+        ".config",
+        ".gitconfig",
+        ".netrc",
+        ".npmrc",
+        ".pip",
+        ".yarnrc",
+        ".yarnrc.yml",
+        ".zshrc"
+      ],
+      "created_in_working_dir": [
+        ".claude",
+        ".claude/agents",
+        ".claude/commands",
+        ".env",
+        ".env.development",
+        ".env.development.local",
+        ".env.local",
+        ".env.production",
+        ".env.production.local",
+        ".env.test",
+        ".env.test.local",
+        ".gitmodules",
+        ".npmrc",
+        ".yarnrc",
+        ".yarnrc.yml",
+        "bunfig.toml",
+        "node_modules",
+        "node_modules/.bin",
+        "package-lock.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "yarn.lock"
+      ],
+      "bash_profile_exists_after": true,
+      "bash_profile_empty_after": false,
+      "bash_profile_mode_after": "0o644",
+      "real_bash_profile_untouched": true,
+      "login_path_had_local_bin_before": true,
+      "login_path_has_local_bin_after": true,
+      "client_temp_entries_in_private_dir": {
+        "messaging_socket_dirs": 1,
+        "sandbox_multiplexer_sockets": 1,
+        "file_watch_probe_dirs": 0,
+        "client_state_dirs": 1,
+        "other": 2
+      }
+    }
+  ],
+  "scratch_removed": true,
+  "real_home_placeholder_names_unchanged": true,
+  "real_home_names_checked": 19,
+  "real_home_compared_by": "lstat mode, size, mtime and inode",
+  "real_home_names_changed": [],
+  "real_home_names_unmeasured": [],
+  "real_temp_top_level_entries_new_during_run": {
+    "in_tmp_excluding_the_shared_file": {
+      "messaging_socket_dirs": 0,
+      "sandbox_multiplexer_sockets": 0,
+      "file_watch_probe_dirs": 0,
+      "client_state_dirs": 0,
+      "other": 1
+    },
+    "in_tmp_claude_uid": {
+      "messaging_socket_dirs": 0,
+      "sandbox_multiplexer_sockets": 0,
+      "file_watch_probe_dirs": 0,
+      "client_state_dirs": 0,
+      "other": 0
+    }
+  },
+  "shared_temp_file": {
+    "name": "inline-comments-buffer.jsonl",
+    "present_before_run": false,
+    "appeared_during_run": true,
+    "removed_by_script": true,
+    "present_after_script": false
+  }
+}

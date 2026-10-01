@@ -1,0 +1,535 @@
+{
+ "tool": "context-mode",
+ "group": "g2-context-sandbox",
+ "repo": "https://github.com/mksglu/context-mode",
+ "pin": "1.0.169 (npm pin; the Claude/Codex plugin reviewed revision 6f0cc6841c687e754059f36714a11233fda1a02b is not an enforced pin)",
+ "installed_version": "npm context-mode 1.0.169 (`npm ls --global --prefix .../context-mode-1.0.169`, never --version); Claude plugin 1.0.169, gitCommitSha 6f0cc6841c68 (installed_plugins.json)",
+ "role": "Keeps large file or command output inside a sandbox and returns only what the code prints; also indexed search. Lanes: Claude main (plugin MCP bound to the session project $HOME/code/native-agent-stack); Claude subagents (inherit the parent's project root); Codex (plugin plus user-scope server); CLI server through mcporter. Counter: ctx_stats and stats-*.json. Landscape: token-efficiency alternative (measured comparison).",
+ "lanes": [
+  "Claude Code plugin MCP and hooks",
+  "Codex plugin and user-scope MCP",
+  "npm CLI server via mcporter (explicit CONTEXT_MODE_PROJECT_DIR)"
+ ],
+ "upstream": {
+  "latest_release": "v1.0.169, 2026-06-29, https://github.com/mksglu/context-mode/releases/tag/v1.0.169 ; rechecked using the uncached upstream releases API and npm registry, https://registry.npmjs.org/context-mode .",
+  "latest_date": "2026-06-29",
+  "our_pin": "Enforced npm version: 1.0.169, published 2026-06-29 (https://registry.npmjs.org/context-mode); its release tag v1.0.169 resolves to 589d8214d56740a28b5f7bf63167743d586b0b40 (https://github.com/mksglu/context-mode/releases/tag/v1.0.169). The native plugin is a separate source identity, reviewed at 6f0cc6841c687e754059f36714a11233fda1a02b (https://github.com/mksglu/context-mode/tree/6f0cc6841c687e754059f36714a11233fda1a02b), although it also declares 1.0.169. The Codex recipe selects that revision with --ref; manifests/stack.json:433 records source_pin: null (None), so this is not an enforced/verified catalog source pin equivalent to the npm pin. Current recipes/README.md:92 and :119 explicitly correct the Claude nuance: Claude's marketplace source has no commit ref and installs default-branch HEAD, with installed gitCommitSha checked against the reviewed revision afterward.",
+  "behind_by": "No newer stable release. At the live observation, main was a2fda46b3cb82753f8c2d67953c881a0dd48b648: 144 commits after the npm release tag, https://github.com/mksglu/context-mode/compare/v1.0.169...a2fda46b3cb82753f8c2d67953c881a0dd48b648 ; 11 commits after the separately reviewed plugin revision, https://github.com/mksglu/context-mode/compare/6f0cc6841c687e754059f36714a11233fda1a02b...a2fda46b3cb82753f8c2d67953c881a0dd48b648 . Both compare pages were visited; fresh compare API results supplied the counts. The latter comparison changes only stats.json.",
+  "recommended_install": {
+   "command": "/plugin marketplace add mksglu/context-mode\n/plugin install context-mode@context-mode",
+   "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#install"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Upstream's preferred Claude Code route is the native marketplace plugin, followed by restart or /reload-plugins and /context-mode:ctx-doctor. The plugin supplies MCP tools, skills and lifecycle hooks; SessionStart supplies routing guidance without writing a project instruction file. The command in recommended_install is entered in Claude Code.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#install"
+   },
+   "codex": {
+    "how": "Upstream documents codex plugin marketplace add mksglu/context-mode, installation from the plugin UI, features.hooks = true and features.plugin_hooks = true where gated, acceptance of plugin hook trust, and a restart. ctx stats verifies MCP reachability, not hook execution. The bundled .codex-plugin/mcp.json supplies the server; the native-stack replacement launch described below repairs its project-binding behavior at the reviewed revision.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#install"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Upstream advertises an example reduction from 315 KB to 5.4 KB, described as 98% context reduction. This is an upstream example of keeping bulk data out of context, not a measured provider-billing result for this host.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "At reviewed commit 6f0cc6841c687e754059f36714a11233fda1a02b, start.mjs:9 captures the launch directory, :38-40 rejects plugin-cache/marketplace directories as project roots, and :49-50 sets CONTEXT_MODE_PROJECT_DIR only when a safe launch directory is available. src/util/project-dir.ts:319-346 tries the project environment before the Codex newest-session-log heuristic, then PWD and process cwd; the heuristic is not a session identity binding. Resolver source: https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/util/project-dir.ts#L319 .",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs#L9"
+   },
+   {
+    "text": "CONTEXT_MODE_DIR selects writable storage, not the execution/indexing project: src/session/db.ts:28 names the storage override; :174-203 place sessions and stats under <root>/sessions and content under <root>/content. Changing it alone does not replace CONTEXT_MODE_PROJECT_DIR's worktree binding.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/session/db.ts#L174"
+   },
+   {
+    "text": "ctx_execute_file enforces the bound project boundary, including resolved absolute paths, traversal and symlink escapes; the source explicitly associates this with issue #852. A readable file outside that root can therefore be refused by this tool.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/server.ts#L1167"
+   },
+   {
+    "text": "Codex hook routing depends on the relevant feature flags and trusted hook commands; MCP availability or ctx stats alone does not establish it. Upstream describes Codex session continuity as partial.",
+    "url": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "No release newer than the enforced npm 1.0.169 was found in the fresh GitHub release and npm checks; main and the separately reviewed native plugin must not be treated as the published npm runtime merely because package version strings agree. Registry cross-check: https://registry.npmjs.org/context-mode .",
+    "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+   },
+   {
+    "text": "Since the reviewed plugin revision, observed main changes only installation statistics in stats.json. There is no runtime change in that comparison to justify a plugin runtime upgrade; this does not erase the older npm-tag versus reviewed-plugin source distinction.",
+    "url": "https://github.com/mksglu/context-mode/compare/6f0cc6841c687e754059f36714a11233fda1a02b...a2fda46b3cb82753f8c2d67953c881a0dd48b648"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "context-mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "version": "1.0.169",
+   "license": "Elastic-2.0",
+   "profile": "core",
+   "role": "Local execution, file processing, indexed retrieval, native context hooks",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "The npm CLI is installed into the versioned ecosystem prefix with npm install --global --prefix \"$STACK_HOME/tools/context-mode-1.0.169\" context-mode@1.0.169 (adoption/pins-linux-x86_64.json:146). Native plugin installation is separate: Codex marketplace --ref 6f0cc6841c687e754059f36714a11233fda1a02b and plugin add, while Claude uses an unreferenced marketplace source and plugin install (recipes/README.md:92, :119-127). adoption/bootstrap.md:435 checks installed gitCommitSha against the reviewed revision; npm metadata alone does not validate the plugin.",
+  "claude_wiring": "adoption/templates/claude.settings.template.json:198 enables context-mode@context-mode and :203 declares its marketplace; :92 includes the host cache-heal hook. recipes/README.md:126 installs at Claude user scope. Among examples/claude-native/agents/*.md, only isolated-builder.md:4 and evidence-reviewer.md:4 explicitly allowlist the plugin's ctx_execute, ctx_execute_file, ctx_batch_execute and ctx_search tools; the other example agents do not. Neither of those allowlists names headroom or mcporter tools.",
+  "codex_wiring": "The portable default in adoption/templates/codex.config.template.toml:79-96 runs the pinned npm package's upstream start.mjs with node and no cwd or fixed CONTEXT_MODE_PROJECT_DIR, while disabling the plugin's own MCP server and retaining its hooks/skills; adoption/templates/project.codex.config.template.toml:18-23 explains the separate fixed-project option. The host's actual .codex/config.toml:17-31 instead disables the bundled server and launches the plugin-cache start.mjs with cwd and CONTEXT_MODE_PROJECT_DIR both fixed to this main checkout. Selected read-only inspection of $HOME/.codex/config.toml found this repo trusted, the plugin enabled, and no user-scope mcp_servers.context-mode entry: the session-bound template fix has not been deployed there. These native MCP clients call context-mode directly, without mcporter.",
+  "lane_rule": "Use Context Mode for large selected output and programmatic extraction, retain failures and original recovery, and choose one context method per artifact; do not stack compressors (docs/token-session-handbook.md:106-117, :129; recipes/README.md:528-565). For this worker the supplied token-lanes block requires explicit cd to its working directory because the connected server is bound to the main checkout; out-of-root scratchpad data is read within ctx_execute rather than handed to ctx_execute_file.",
+  "deviations_from_upstream": [
+   {
+    "what": "Root-cause verdict: 'the isolation variable is CONTEXT_MODE_DIR' is correct only for storage isolation and is incorrect as the remedy for Codex session/worktree binding.",
+    "why": "At reviewed commit 6f0cc6841c687e754059f36714a11233fda1a02b, start.mjs:9 and :38-50 bind CONTEXT_MODE_PROJECT_DIR to a safe launch directory (https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs#L38); src/util/project-dir.ts:319-346 consumes that project binding before the newest Codex log. In contrast, src/session/db.ts:28 and :174-203 resolve storage from CONTEXT_MODE_DIR (https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/session/db.ts#L174). blueprints/gap-wave2-20260923/foundation__mcp-surfaces/iso.py:237 and evidence/artifacts/sota-refresh-20260925/mcporter/results-y-attempt1.json:139 demonstrate the storage override, not an alternate execution-root variable.",
+    "fix": "Keep the two controls distinct: derive CONTEXT_MODE_PROJECT_DIR from each session's own launch directory for worktree binding; use a separate CONTEXT_MODE_DIR only when a separate storage root is required. Do not replace PROJECT_DIR with DIR in the Codex binding repair.",
+    "pr": null
+   },
+   {
+    "what": "The portable Codex template replaces upstream's bundled plugin MCP launch with an explicit user-scope node/start.mjs launch.",
+    "why": "Upstream .codex-plugin/mcp.json sets cwd to '.', which resolves to the plugin directory; start.mjs deliberately refuses to turn that into a project binding, exposing the newest-session-log fallback. The local integration evidence and source analysis are retained in evidence/artifacts/context-mode-codex-binding-20260926/README.md:16-31 and docs/decisions/2026-09-25-codex-mcp-scope.md:216-226. The latter explicitly says the tests were not real concurrent Codex sessions.",
+    "fix": "Retain the no-cwd upstream start.mjs launch in adoption/templates/codex.config.template.toml:87, keep only the bundled MCP server disabled, and qualify a real concurrent native-session check before claiming complete host isolation. The bare context-mode CLI is not the equivalent no-cwd fix; the retained source analysis shows that it skips start.mjs.",
+    "pr": null
+   },
+   {
+    "what": "The live fixed-directory override is a documented project option, but this host has not adopted the portable session-bound default; it is not a committed override inherited by every worktree.",
+    "why": "recipes/README.md:528-565 intentionally documents both fixed-project and session-bound forms, and adoption/templates/project.codex.config.template.toml:22-23 explicitly preserves the former. The Decision 3 reversal's residual at docs/decisions/2026-09-25-codex-mcp-scope.md:225 says neither host config was changed, matching the current read-back. The repo is trusted, so its local .codex/config.toml can override user settings (docs/token-session-handbook.md:224; https://developers.openai.com/plugins/build/plugins#enable-or-disable-a-plugin-for-a-repo), but currently there is no fixed session-bound user entry to override. git ls-files returned no .codex/config.toml, and git check-ignore identified .git/info/exclude:9; ordinary Git worktrees therefore do not inherit this file. These documents distinguish scope and adoption state rather than contradicting each other.",
+    "fix": "Deploy the user-scope template and explicitly choose whether the main checkout should retain its fixed-project exception. For session-relative behavior, remove or replace that host-only fixed override; otherwise it will take precedence wherever loaded. Do not claim every worktree is forced to main by a committed file: fresh worktrees instead remain exposed to the bundled plugin's heuristic until the user-scope fix is adopted. No host configs were changed in this research.",
+    "pr": null
+   },
+   {
+    "what": "The reviewed plugin revision is not enforced uniformly across clients or by manifests/stack.json.",
+    "why": "recipes/README.md:119 records that Codex --ref checks out the reviewed SHA, whereas Claude's marketplace accepts branch/tag refs and the current recipe installs default-branch HEAD; source_pin remains null at manifests/stack.json:433. A shared version label of 1.0.169 cannot prove source identity.",
+    "fix": "Retain the installed gitCommitSha comparison from adoption/bootstrap.md:435, report Codex and Claude plugin identities separately, and only mark a source pin enforced when the actual installer and verifier enforce it.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Adopt the session-bound Codex user template on this host and reconcile the intentional main-checkout override; extend wiring verification to resolve the server's actual project root, not merely plugin enabled state (docs/decisions/2026-09-25-codex-mcp-scope.md:225).",
+   "Retain distinct npm and native-plugin provenance, including Claude's installed revision check; do not describe source_pin: null as an enforced source pin (recipes/README.md:92).",
+   "Assess guidance and tool availability in worker populations before expanding routing; only the two named example-agent allowlists explicitly include ctx_* tools, and measured invocation is strongly associated with the lanes-block population without proving causation."
+  ],
+  "assessment": "The portable adaptation uses upstream tools and a source-justified binding repair, but live host adoption remains incomplete and CONTEXT_MODE_DIR alone cannot fix worktree selection. The assembled token-cards/cards/context-mode.json exact artifact comparison entries for claude_subagent and codex_worker each record 97952 -> 204 tokens, change_pct -99.8, encoding o200k_base; its separate e2e_returned_results.fidelity is 'verified against the file (PASS); verifier: agree, 3 defects', not an unqualified clean pass. native_counter.after 3244032 tokens and the Claude Code native_snapshot.saved 3244032 are the tool's cumulative event/byte estimate, distinct from those controlled comparisons and not avoided provider usage; the Codex native_snapshot.saved 6311424 is separately scoped and is not added to either. In invoke_rates, workflow_children_with_lanes_block has pct_agents_using 0.9545, agents_using 21 and agents 22, while full workflow_children has pct_agents_using 0.1604, agents_using 162 and agents 1010: the population gap supports guidance/coverage as an adoption factor, not a recalculated universal savings rate."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T17:57:17.797Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " verified against the file (PASS); verifier: agree, 3 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 60 npm ls --global --prefix $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169 --depth=0 --json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/context-mode/mcporter.json call context-mode.ctx_execute_file --args {\"path\":\"<scratch>/docs/grand-catalog-handbook.md\",\"language\":\"python\",\"code\":\"h=[l for l in FILE_CONTENT.splitlines() if l.startswith(\\\"## \\\")]\\nprint(len(h))\\nprint(\\\"\\\\n\\\".join(h[:10]))\"} --output text --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 env TMPDIR=<scratch>/rr/context-mode/state/hooktmp CLAUDE_PROJECT_DIR=<scratch> CLAUDE_CONFIG_DIR=<scratch>/rr/context-mode/state/claude CONTEXT_MODE_PLATFORM=claude-code $HOME/.local/share/codex-ecosystem/bin/context-mode hook claude-code pretooluse",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 env TMPDIR=<scratch>/rr/context-mode/state/hooktmp CLAUDE_PROJECT_DIR=<scratch> CLAUDE_CONFIG_DIR=<scratch>/rr/context-mode/state/claude CONTEXT_MODE_PLATFORM=claude-code $HOME/.local/share/codex-ecosystem/bin/context-mode hook claude-code posttooluse",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 84,
+  "records_shown": [
+   {
+    "id": "context-mode-npm-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 npm ls --global --prefix $HOME/.local/share/codex-ecosystem/tools/context-mode-1.0.169 --depth=0 --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution (npm metadata)\", \"returned\": {\"version\": \"1.0.169\", \"overridden\": false}, \"pin\": \"1.0.169\", \"pin_match\": true, \"note\": \"context-mode's own --version is never run (it starts the server); the owned npm prefix is read instead.\"}",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-mcporter-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --version",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"returned\": \"0.14.1\", \"pin\": \"0.14.1\", \"pin_match\": true}",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-mcp-ctx-stats-before",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats (upstream MCP tool), read before any other call on this server\", \"session_lines\": [\"context-mode  < 1 min  0 calls\", \"No tool calls yet. Use batch_execute or execute to start saving tokens.\"], \"host_scope_lines\": [\"you ran 366 conversations across 2 AI tools.\", \"25.8K events · 366 sessions · ~$32.96 saved lifetime\", \"Codex CLI            14.",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-mcp-ctx-execute-file",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_execute_file --args {\"path\":\"$WT/docs/grand-catalog-handbook.md\",\"language\":\"python\",\"code\":\"",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"task\": \"Count the '## ' headings of docs/grand-catalog-handbook.md (426,080 B) and print the first 10, in Python over FILE_CONTENT inside the context-mode sandbox.\", \"returned\": {\"text_bytes\": 623, \"shape\": \"path=<file> echo, fenced copy of the executed code, then stdout: '10' and the 10 headings\", \"server_counted_bytes\": 622, \"bytes_note\": \"The server's own by_",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-mcp-ctx-stats-after-execute",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats on the same server and connection, after ctx_execute_file\", \"session_lines\": [\"context-mode  < 1 min  2 calls\", \"1.6 KB entered context  |  0 tokens saved\"], \"delta_vs_before\": \"0 calls -> 2 calls (ctx_stats plus ctx_execute_file); '1.6 KB entered context | 0 tokens saved'\", \"finding\": \"The upstream session counter credits 0 tokens saved for",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-hook-pretooluse-read",
+    "status": "passed",
+    "kind": "upstream native operation (native execution) with a synthetic hook payload",
+    "command": "timeout -k 5 60 env TMPDIR=$RR/context-mode/state/hooktmp CLAUDE_PROJECT_DIR=$WT CLAUDE_CONFIG_DIR=$RR/context-mode/state/claude CONTEXT_MODE_PLATFORM=claude-code $HOME/.local/share/codex-ecosystem/bin/context-mode hook ",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution of the upstream hook script; the Claude Code payload is synthetic (not a live session)\", \"payload\": \"Read of the fixture handbook, offset 1, limit 40 (hook-input/pre-read.json)\", \"decision\": \"allow with additionalContext (read guidance); no deny, no input rewrite\", \"additional_context_bytes\": 405, \"accounting\": \"Because the file exceeds 50,000 B, the routing attach",
+    "attachments": 3
+   },
+   {
+    "id": "context-mode-hook-posttooluse-read",
+    "status": "passed",
+    "kind": "upstream native operation (native execution) with a synthetic hook payload",
+    "command": "timeout -k 5 60 env TMPDIR=$RR/context-mode/state/hooktmp CLAUDE_PROJECT_DIR=$WT CLAUDE_CONFIG_DIR=$RR/context-mode/state/claude CONTEXT_MODE_PLATFORM=claude-code $HOME/.local/share/codex-ecosystem/bin/context-mode hook ",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution of the upstream hook script; synthetic payload\", \"payload\": \"PostToolUse for the same Read, tool_response = the first 40 fixture lines in Read's result shape (hook-input/post-read.json)\", \"stdout\": \"empty by design (PostToolUse returns no decision)\", \"effect\": [{\"id\": 1, \"type\": \"file_read\", \"category\": \"file\", \"bytes_avoided\": 0, \"source_hook\": \"PostToolUse\"}, {\"i",
+    "attachments": 3
+   },
+   {
+    "id": "context-mode-hook-pretooluse-bash-cat",
+    "status": "passed",
+    "kind": "upstream native operation (native execution) with a synthetic hook payload",
+    "command": "timeout -k 5 60 env TMPDIR=$RR/context-mode/state/hooktmp CLAUDE_PROJECT_DIR=$WT CLAUDE_CONFIG_DIR=$RR/context-mode/state/claude CONTEXT_MODE_PLATFORM=claude-code $HOME/.local/share/codex-ecosystem/bin/context-mode hook ",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution of the upstream hook script; synthetic payload\", \"payload\": \"Bash 'cat <fixture handbook>' (hook-input/pre-bash-cat.json)\", \"decision\": \"allow with additionalContext (bash guidance, once per session); the 426 KB cat is neither blocked nor rewritten\", \"additional_context_bytes\": 681, \"accounting\": \"No redirectMeta for a generic Bash command, so no counter event is r",
+    "attachments": 3
+   },
+   {
+    "id": "context-mode-mcp-ctx-stats-after-hooks",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json call context-mode.ctx_stats --args {} --output json --no-oauth",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"counter\": \"ctx_stats on the same server and connection, after the hooks wrote the session DB\", \"conversation_lines\": [\"Without context-mode    416 KB  ████████████████████████████████    106.5K tokens\", \"With context-mode          1 B  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░         1 tokens\", \"100.0% kept out of context · your AI ran 106520× longer before /compact fir",
+    "attachments": 2
+   },
+   {
+    "id": "context-mode-mcp-daemon-status",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/context-mode/mcporter.json daemon status --json",
+    "observation": "{\"exit_code\": 0, \"evidence_class\": \"native execution\", \"daemon_pid\": 809544, \"servers\": 1, \"connection\": {\"connectionGeneration\": 1, \"connected\": true, \"activeCalls\": 0}, \"reading\": \"One server connection (generation 1) served all four ctx_* calls, so the before/after ctx_stats reads come from the same server process. The persisted stats file is named stats-pid-<daemon pid>.json because the server's parent is the dae",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "416 KB handbook: full file vs ctx_execute_file printed summary (heading count, first 10 headings, token-line count); verified against the file (PASS)",
+    "before_tokens": 97952,
+    "after_tokens": 204,
+    "change_pct": -99.8,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:15:10.175988+00:00",
+    "last_seen": "2026-09-25T21:15:10.175988+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's context-mode task; answer verified against the baseline (PASS)",
+    "before_tokens": 97952,
+    "after_tokens": 204,
+    "change_pct": -99.8,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:51.885008+00:00",
+    "last_seen": "2026-09-26T13:51:51.885008+00:00"
+   }
+  ],
+  "native_counter": {
+   "command": "ctx_stats({})",
+   "before": null,
+   "after": 3244032,
+   "delta": null,
+   "unit": "tokens"
+  },
+  "native_snapshot": [
+   {
+    "tool": "context-mode",
+    "scope": "Claude Code (Context Mode plugin)",
+    "saved": 3244032,
+    "unit": "tokens",
+    "observed_utc": "2026-09-26T22:54:09.875257+00:00",
+    "basis": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage. | kind: upstream event/byte estimate | session_estimated_saved=27109948"
+   },
+   {
+    "tool": "context-mode",
+    "scope": "Codex (Context Mode plugin)",
+    "saved": 6311424,
+    "unit": "tokens",
+    "observed_utc": "2026-09-26T22:54:09.890775+00:00",
+    "basis": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage. | kind: upstream event/byte estimate | session_estimated_saved=157255"
+   }
+  ],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 2233,
+    "cli_calls": 125,
+    "agents_using": 162,
+    "agents": 1010,
+    "pct_agents_using": 0.1604
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 253,
+    "cli_calls": 17,
+    "agents_using": 21,
+    "agents": 22,
+    "pct_agents_using": 0.9545
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 1980,
+    "cli_calls": 108,
+    "agents_using": 141,
+    "agents": 988,
+    "pct_agents_using": 0.1427
+   },
+   "agent_subagents": {
+    "mcp_calls": 1424,
+    "cli_calls": 6,
+    "agents_using": 51,
+    "agents": 71,
+    "pct_agents_using": 0.7183
+   },
+   "main_sessions": {
+    "mcp_calls": 171,
+    "cli_calls": 26,
+    "agents_using": 7,
+    "agents": 15,
+    "pct_agents_using": 0.4667
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 5293,
+    "cli_calls": 2,
+    "agents_using": 265,
+    "agents": 301,
+    "pct_agents_using": 0.8804
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": [
+    {
+     "client": "claude-code",
+     "mcp_server_name": "plugin_context-mode_context-mode",
+     "calls": "53"
+    },
+    {
+     "client": "codex_exec",
+     "mcp_server_name": "context-mode",
+     "calls": "112"
+    }
+   ]
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "accurate",
+  "findings": [],
+  "checked": [
+   "Live latest-release and date check: https://github.com/mksglu/context-mode/releases and https://github.com/mksglu/context-mode/releases/tag/v1.0.169 identify v1.0.169, published 2026-06-29; https://registry.npmjs.org/context-mode has latest 1.0.169 and the same publication date.",
+   "Release source identity: the release page links commit 589d8214d56740a28b5f7bf63167743d586b0b40. Fetched https://github.com/mksglu/context-mode/tree/6f0cc6841c687e754059f36714a11233fda1a02b and its raw package.json; that separately reviewed source also declares 1.0.169.",
+   "Live main remains a2fda46b3cb82753f8c2d67953c881a0dd48b648. Both cited compare pages confirm the respective 144-commit and 11-commit gaps. The reviewed-plugin-to-main diff changes only stats.json. GitHub API requests were rate-limited; the counts and changed file were independently recovered from the public compare pages and diff.",
+   "Fetched the cited README at 6f0cc6841c687e754059f36714a11233fda1a02b through raw.githubusercontent.com. Confirmed Claude marketplace/install commands, restart or reload, ctx-doctor, SessionStart routing without writing project instructions, Codex marketplace setup, hooks/plugin_hooks and trust requirements, MCP-only scope of ctx stats verification, and partial Codex session continuity.",
+   "Confirmed the cited README's 315 KB to 5.4 KB, 98% upstream example. The card identifies it as an upstream context example rather than measured host billing savings.",
+   "Fetched all cited source files at the reviewed commit: start.mjs, src/util/project-dir.ts, src/session/db.ts and src/server.ts. Confirmed safe launch-directory binding, project-environment precedence over the Codex session-log heuristic, CONTEXT_MODE_DIR storage roots, and the issue-852 project-boundary guard for ctx_execute_file. Also fetched .codex-plugin/mcp.json and confirmed cwd '.'. The release-tag start.mjs retains the described launch-directory binding.",
+   "Compared native_adaptation.stack_entry with REPO/manifests/stack.json and checked adoption/pins-linux-x86_64.json: npm 1.0.169 is pinned; source_pin remains null. recipes/README.md and adoption/bootstrap.md support the distinction between Codex --ref, Claude default-branch installation and the installed gitCommitSha comparison.",
+   "Checked REPO/adoption/templates/codex.config.template.toml, project.codex.config.template.toml and the live project .codex/config.toml: the portable node/start.mjs registration has no cwd or fixed CONTEXT_MODE_PROJECT_DIR, disables only the bundled plugin server, and differs from the live fixed-main-checkout override. Selected non-secret user-config settings confirm the enabled plugin, trusted checkout and absence of a user-scope context-mode server.",
+   "Verified the live project .codex/config.toml is absent from git ls-files and ignored by .git/info/exclude. Checked the binding decision's explicit host-adoption residual and its statement that real concurrent Codex sessions were not run, plus the retained binding source analysis and CONTEXT_MODE_DIR storage examples.",
+   "Checked the Claude settings template, example-agent tool allowlists, recipes/README.md and docs/token-session-handbook.md. Only isolated-builder and evidence-reviewer explicitly list the specified ctx_* tools; the templates and recipes support direct native MCP access and one context method per artifact.",
+   "Checked native_adaptation.assessment against the assembled evidence: both exact comparisons are 97952 to 204 o200k_base tokens, change_pct -99.8; native_counter.after is 3244032; the separate Claude and Codex snapshots are 3244032 and 6311424; fidelity preserves PASS with verifier agreement and 3 defects.",
+   "Compared invoke_rates.populations.workflow_children, workflow_children_with_lanes_block, workflow_children_without_lanes_block, agent_subagents, main_sessions and codex_exec_workers directly with SP/token-cards/invoke_by_tool.json. The assessment's workflow_children_with_lanes_block 0.9545 / 21 / 22 and workflow_children 0.1604 / 162 / 1010 values and population names match.",
+   "Checked evidence-class separation: exact comparisons, cumulative event/byte estimates, local integration and invoke populations are not summed or averaged; the assessment does not claim avoided provider usage or causation from the population association.",
+   "Scanned the complete card for ~, bare <user>, <tmp>, the supplied session UUID and arbitrary UUID-shaped strings: no matches. gpt6_review is pending rather than a prior final verdict."
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "context-mode",
+   "verdict": "adapted-with-gaps",
+   "summary": "The installed npm version matches latest stable 1.0.169, but the source-justified session-bound Codex template is still unapplied on this host and npm version equality does not identify the separately installed plugin source (docs/decisions/2026-09-25-codex-mcp-scope.md:216; groups/verdict-evidence.json; https://github.com/mksglu/context-mode/releases/tag/v1.0.169). Both historical lane comparisons are 97952→204 tokens (99.8%), eligible for the requested heading/count summary only; the separate returned-results top-ten-heading extraction is 97952→165 with its own passing check (../html-report/savings.json#report_comparisons; ../rr/context-mode/out/18-compare-execute-file.stdout; ../rr/context-mode/out/16-check-execute-file.stdout). The retained Claude 3244032 and Codex 6311424 saved-token snapshots are separately scoped event/byte estimates, not additional exact savings or avoided provider usage (../html-report/savings.json#native_snapshot). The scan labels 162/1010 Ultracode workflow children (16.04%, 2233 MCP and 125 CLI matches), 265/301 eligible Codex workers (88.04%, 5293 MCP and 2 CLI matches), and 21/22 workflow_children_with_lanes_block (95.45%) as users; the subgroup association is not causal evidence (invoke_by_tool.json). Next, adopt the reviewed launch binding, explicitly resolve the main-checkout exception, and verify real concurrent native sessions and worker access before declaring the host adaptation complete.",
+   "gaps": [
+    {
+     "gap": "The host still has a fixed-project override and no session-bound user registration, although the portable template implements the repair.",
+     "evidence": "groups/verdict-evidence.json#host_wiring_readback; docs/decisions/2026-09-25-codex-mcp-scope.md:216; adoption/templates/codex.config.template.toml",
+     "action": "Apply the reviewed no-cwd start.mjs registration, retain plugin hooks and skills, and explicitly choose whether the main checkout keeps its fixed-project exception.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The retained binding experiment uses real servers and synthetic session logs; it does not establish two concurrent native Codex sessions.",
+     "evidence": "evidence/artifacts/context-mode-codex-binding-20260926/README.md; docs/decisions/2026-09-25-codex-mcp-scope.md:224",
+     "action": "Run a bounded two-session, two-worktree native qualification that checks the actual server execution roots.",
+     "owner_pr": null
+    },
+    {
+     "gap": "A shared 1.0.169 label does not enforce identical npm and plugin source revisions across clients.",
+     "evidence": "groups/g2-context-sandbox/context-mode.upstream.json; recipes/README.md:92; recipes/README.md:119",
+     "action": "Record npm and plugin identities separately and verify the installed plugin revision instead of treating the version label as a source pin.",
+     "owner_pr": null
+    },
+    {
+     "gap": "High use in the 22-child lane-block subgroup does not establish general coverage or a causal improvement.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "action": "Audit intended workers' tool access and suitable-artifact opportunities, preserving the full population and subgroup denominators.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest stable and the installed npm package are 1.0.169.",
+     "evidence": "https://api.github.com/repos/mksglu/context-mode/releases/latest; https://github.com/mksglu/context-mode/releases/tag/v1.0.169; groups/verdict-evidence.json",
+     "result": "holds"
+    },
+    {
+     "claim": "Normal upstream plugin wiring distinguishes MCP reachability from trusted and enabled hooks.",
+     "evidence": "https://github.com/mksglu/context-mode/blob/main/README.md",
+     "result": "holds"
+    },
+    {
+     "claim": "CONTEXT_MODE_DIR alone is the session/worktree execution-root binding repair.",
+     "evidence": "https://github.com/mksglu/context-mode/blob/main/README.md; https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/start.mjs; docs/decisions/2026-09-25-codex-mcp-scope.md:218",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The portable binding repair is already deployed to this host's user-scope registration.",
+     "evidence": "groups/verdict-evidence.json#host_wiring_readback; docs/decisions/2026-09-25-codex-mcp-scope.md:225",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The historical 97952→204 pairs are reproducible artifact counts for limited summary contracts.",
+     "evidence": "../html-report/savings.json#report_comparisons; groups/verdict-evidence.json#historical_comparison_recount",
+     "result": "holds"
+    },
+    {
+     "claim": "The distinct returned-results extraction measures 97952→165 and passes its ten-heading check.",
+     "evidence": "../rr/context-mode/out/18-compare-execute-file.stdout; ../rr/context-mode/out/16-check-execute-file.stdout",
+     "result": "holds"
+    },
+    {
+     "claim": "The Claude 3244032 and Codex 6311424 native snapshots are scoped heuristics and must not be added to exact comparisons.",
+     "evidence": "../html-report/savings.json#native_snapshot; cards/context-mode.json#adapted_performance/native_snapshot",
+     "result": "holds"
+    },
+    {
+     "claim": "The retained scan reports 162/1010 workflow children, 265/301 eligible Codex workers and 21/22 lane-block children.",
+     "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+     "result": "holds"
+    },
+    {
+     "claim": "Real concurrent native-session isolation and causal provider savings are fully measured.",
+     "evidence": "docs/decisions/2026-09-25-codex-mcp-scope.md:224; cards/context-mode.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "qmd",
+    "gpt-tokenizer"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 29
+    },
+    "shell_commands": 3,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-a.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 47,
+     "qmd": 3
+    },
+    "shell_commands": 1,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 28
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296 and #343: 97,952->204 (99.8%) with ctx_execute_file on the 416 KB handbook; the #296 first attempt was refused outside the project root. #316: check-only baseline; the verifier noted the worker …"
+}

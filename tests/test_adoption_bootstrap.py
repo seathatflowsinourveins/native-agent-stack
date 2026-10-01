@@ -20,12 +20,15 @@ import json
 import os
 from pathlib import Path
 import platform
+import pty
 import re
+import select
 import shutil
 import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import tomllib
 import shlex
 import unittest
@@ -573,7 +576,7 @@ class InstallNativeLauncherTests(unittest.TestCase):
         "ln -sfn \"$HOME/.local/share/claude/versions/$2\" \"$HOME/.local/bin/claude\"\n"
     )
 
-    def run_install_native(self, script: Path, home: Path, bin_dir: Path):
+    def run_install_native(self, script: Path, home: Path, bin_dir: Path, bin_name: str = "claude"):
         text = script.read_text()
         match = re.search(r"(?ms)^install_native\(\) \{.*?^\}$", text)
         self.assertIsNotNone(match, f"install_native not found in {script}")
@@ -584,7 +587,7 @@ class InstallNativeLauncherTests(unittest.TestCase):
             f"bin_dir={shlex.quote(str(bin_dir))}\nmkdir -p \"$cache_dir\" \"$bin_dir\"\n"
             f"fetch() {{ cp {shlex.quote(str(stub))} \"$3\"; }}\n"
             + match.group(0)
-            + "\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 claude\n"
+            + f"\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 {shlex.quote(bin_name)}\n"
         )
         env = dict(os.environ, HOME=str(home))
         return subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
@@ -615,6 +618,165 @@ class InstallNativeLauncherTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertTrue((home / ".local/bin/claude").is_symlink())
                 self.assertEqual((home / ".local/bin/claude").read_text(), "REAL-BINARY\n")
+
+
+class InteractiveEffortLauncherTests(unittest.TestCase):
+    """The claude launcher that install_native writes adds `--effort max` to an interactive terminal launch and to nothing else
+    (docs/decisions/2026-09-29-max-default-effort.md). Each case runs the generated launcher against a stub client that reports
+    a version and records the exact arguments it receives (as JSON, so empty and multi-line arguments survive), on real
+    pseudo-terminals where the case needs a terminal. The last tests break the launcher nine ways and require the case table to
+    notice each one (a negative control for the table itself)."""
+
+    STUB_INSTALLER = InstallNativeLauncherTests.STUB_INSTALLER
+    STUB_CLIENT = (
+        "#!/usr/bin/env python3\n"
+        "import json, os, sys\n"
+        "if sys.argv[1:] == ['--version']:\n"
+        "    print(os.environ.get('STUB_VERSION', '2.1.284') + ' (Claude Code)')\n"
+        "else:\n"
+        "    print('RAN')\n"
+        "    print(json.dumps(sys.argv[1:]))\n"
+    )
+    # name: (arguments, stdin is a terminal, stdout is a terminal, extra environment, arguments the client must receive)
+    CASES = {
+        "terminal, no arguments": ([], True, True, {}, ["--effort", "max"]),
+        "terminal, --model opus": (["--model", "opus"], True, True, {}, ["--effort", "max", "--model", "opus"]),
+        "terminal, --resume": (["--resume", "abc"], True, True, {}, ["--effort", "max", "--resume", "abc"]),
+        "terminal, a subcommand": (["mcp", "list"], True, True, {}, ["--effort", "max", "mcp", "list"]),
+        "terminal, -c (no p in the cluster)": (["-c"], True, True, {}, ["--effort", "max", "-c"]),
+        "explicit --effort ultracode": (["--effort", "ultracode"], True, True, {}, ["--effort", "ultracode"]),
+        "explicit --effort=low": (["--effort=low"], True, True, {}, ["--effort=low"]),
+        "explicit --effort after other flags": (["--model", "opus", "--effort", "xhigh"], True, True, {},
+                                                ["--model", "opus", "--effort", "xhigh"]),
+        "headless -p": (["-p", "hi"], True, True, {}, ["-p", "hi"]),
+        "headless --print": (["--print", "hi"], True, True, {}, ["--print", "hi"]),
+        "headless -pc cluster": (["-pc", "hi"], True, True, {}, ["-pc", "hi"]),
+        "headless -cp cluster": (["-cp", "hi"], True, True, {}, ["-cp", "hi"]),
+        "-- ends the scan": (["--", "-p"], True, True, {}, ["--effort", "max", "--", "-p"]),
+        "empty argument kept": (["--model", "opus", ""], True, True, {}, ["--effort", "max", "--model", "opus", ""]),
+        "multi-line argument kept": (["fix\nthe bug"], True, True, {}, ["--effort", "max", "fix\nthe bug"]),
+        # documented limit: the scan does not know which options take a value, so an operand equal to an option name
+        # suppresses the default (the safe direction: nothing is added)
+        "operand equal to --effort (limit)": (["--system-prompt", "--effort", "hello"], True, True, {},
+                                              ["--system-prompt", "--effort", "hello"]),
+        "effort variable set": (["--model", "opus"], True, True, {"CLAUDE_CODE_EFFORT_LEVEL": "xhigh"}, ["--model", "opus"]),
+        "no terminal at all": (["--model", "opus"], False, False, {}, ["--model", "opus"]),
+        "stdout is a pipe": (["--model", "opus"], True, False, {}, ["--model", "opus"]),
+        "stdin is a pipe": (["--model", "opus"], False, True, {}, ["--model", "opus"]),
+        "client 2.1.281 (orchestration off at max)": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.281"}, ["--model", "opus"]),
+        "client 2.1.283": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.283"}, ["--model", "opus"]),
+        "client 2.1.99 (numeric, not text, order)": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.99"}, ["--model", "opus"]),
+        "client 2.1.284": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.284"}, ["--effort", "max", "--model", "opus"]),
+        "client 2.2.0": (["--model", "opus"], True, True, {"STUB_VERSION": "2.2.0"}, ["--effort", "max", "--model", "opus"]),
+        "client 3.0.1": (["--model", "opus"], True, True, {"STUB_VERSION": "3.0.1"}, ["--effort", "max", "--model", "opus"]),
+        "client version unreadable": (["--model", "opus"], True, True, {"STUB_VERSION": "weird"}, ["--model", "opus"]),
+    }
+
+    def install(self, script: Path, home: Path, bin_name: str = "claude") -> Path:
+        bin_dir = home / "eco" / "bin"
+        bin_dir.mkdir(parents=True)
+        result = InstallNativeLauncherTests.run_install_native(self, script, home, bin_dir, bin_name)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        native = home / ".local/share/claude/versions/2.1.280"
+        native.write_text(self.STUB_CLIENT)
+        native.chmod(0o755)
+        return bin_dir / bin_name
+
+    def run_launcher(self, launcher: Path, home: Path, argv, stdin_tty: bool, stdout_tty: bool, extra_env) -> list:
+        env = {k: v for k, v in os.environ.items() if k not in ("CLAUDE_CODE_EFFORT_LEVEL", "STUB_VERSION")}
+        env.update(HOME=str(home), **extra_env)
+        master, slave = pty.openpty()
+        opened = [master, slave]
+        proc = None
+        text = stderr = ""
+        try:
+            proc = subprocess.Popen(
+                [str(launcher), *argv],
+                stdin=slave if stdin_tty else subprocess.DEVNULL,
+                stdout=slave if stdout_tty else subprocess.PIPE,
+                stderr=subprocess.PIPE, env=env, close_fds=True)
+            # The parent keeps its own slave descriptor until the child is gone and the master is read: macOS discards a
+            # terminal's unread output when the last slave descriptor closes (apple-oss-distributions/xnu, bsd/kern/tty_dev.c
+            # ptsclose calls ttyclose, whose ttyflush(tp, FREAD | FWRITE) empties both queues), so closing it early lost the
+            # stub's lines on the macOS runner while Linux keeps them. With the slave held open the master never reports end
+            # of file, so the read stops once the stub's two lines are in, or once the child has exited and nothing more arrives.
+            if stdout_tty:
+                deadline = time.monotonic() + 30
+                quiet = 0
+                while text.count("\n") < 2 and quiet < 2:
+                    if select.select([master], [], [], 0.05)[0]:
+                        try:
+                            chunk = os.read(master, 65536)
+                        except OSError:
+                            break
+                        if not chunk:
+                            break
+                        text += chunk.decode()
+                        quiet = 0
+                    elif proc.poll() is not None:
+                        quiet += 1
+                    elif time.monotonic() > deadline:
+                        self.fail("the launcher did not finish within 30 seconds")
+                _, err = proc.communicate(timeout=30)
+            else:
+                out, err = proc.communicate(timeout=30)
+                text = out.decode()
+            stderr = err.decode(errors="replace")
+        finally:
+            if proc is not None and proc.poll() is None:
+                proc.kill()
+                proc.wait()
+            for fd in opened:
+                os.close(fd)
+        lines = [line.rstrip("\r") for line in text.splitlines()]
+        self.assertIn("RAN", lines, f"the stub client did not run: {text!r} (stderr {stderr[:300]!r})")
+        return json.loads(lines[lines.index("RAN") + 1])
+
+    def outcomes(self, launcher: Path, home: Path) -> dict:
+        return {name: self.run_launcher(launcher, home, argv, stdin_tty, stdout_tty, extra_env)
+                for name, (argv, stdin_tty, stdout_tty, extra_env, _) in self.CASES.items()}
+
+    def expected(self) -> dict:
+        return {name: case[4] for name, case in self.CASES.items()}
+
+    def test_only_an_interactive_launch_with_no_effort_choice_gets_max(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                self.assertEqual(self.outcomes(self.install(script, home), home), self.expected())
+
+    def test_the_case_table_fails_on_each_broken_launcher(self):
+        flag_line = "-p* | -[!-]*p* | --print | --print=* | --effort | --effort=*"
+        mutants = {
+            "always adds the flag": ('if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then', "if true; then"),
+            "ignores a missing terminal": ("[ -t 0 ] && [ -t 1 ] && ", ""),
+            "ignores the effort variable": (' && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]', ""),
+            "adds xhigh instead": ('--effort max "$@"', '--effort xhigh "$@"'),
+            "ignores an explicit effort": (flag_line, "-p* | -[!-]*p* | --print | --print=*"),
+            "ignores -p": (flag_line, "-[!-]*p* | --print | --print=* | --effort | --effort=*"),
+            "ignores a short-flag cluster": (flag_line, "-p* | --print | --print=* | --effort | --effort=*"),
+            "scans past --": ("      --) break ;;\n", ""),
+            "ignores the client version": ('"$((10#$patch))" -ge 284', '"$((10#$patch))" -ge 1'),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            launcher = self.install(SCRIPT_PATH, home)
+            original = launcher.read_text()
+            self.assertEqual(self.outcomes(launcher, home), self.expected())
+            for name, (old, new) in mutants.items():
+                with self.subTest(mutant=name):
+                    self.assertIn(old, original)
+                    launcher.write_text(original.replace(old, new, 1))
+                    launcher.chmod(0o755)
+                    self.assertNotEqual(self.outcomes(launcher, home), self.expected(), f"the case table missed: {name}")
+
+    def test_another_command_gets_the_plain_launcher(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                text = self.install(script, home, "othertool").read_text()
+                self.assertNotIn("--effort", text)
+                self.assertIn('exec "$HOME/.local/bin/othertool" "$@"', text)
 
 
 def shell_functions(text: str, *names: str) -> str:
@@ -1036,13 +1198,16 @@ class NativeInstallFloorTests(unittest.TestCase):
     the pin is kept with no download and no install; anything else takes the unchanged
     checksum-verified install."""
 
-    PIN = "2.1.281"
+    PIN = "2.1.284"
     URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/linux-x64/claude"
-    KEPT = ("2.1.281 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
-            "10.0.0 (Claude Code)", "2.1.281")
-    # 2.1.99 sorts after 2.1.281 as text but is older; a pre-release suffix,
-    # a non-version first word and empty output are not trusted as a version.
-    INSTALLED = ("2.1.280 (Claude Code)", "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
+    KEPT = ("2.1.284 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
+            "10.0.0 (Claude Code)", "2.1.284")
+    # 2.1.283 is one below the pin; 2.1.281 was the floor before 2026-09-29 and 2.1.280 the one
+    # before it, so a launcher on either now takes the install (2.1.284 is the first release whose
+    # `sonnet` alias resolves to Sonnet 5.5). 2.1.99 sorts after 2.1.284 as text but is older; a
+    # pre-release suffix, a non-version first word and empty output are not trusted as a version.
+    INSTALLED = ("2.1.283 (Claude Code)", "2.1.281 (Claude Code)", "2.1.280 (Claude Code)",
+                 "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
                  "2.1.290-dev (Claude Code)", "Claude Code", "")
 
     def _run(self, tmp_path: Path, version_line=None, launcher_exit=0, sha256=None, native_bin_dir=False):
@@ -1143,9 +1308,14 @@ class NativeInstallFloorTests(unittest.TestCase):
     def test_a_failing_version_probe_takes_the_verified_install(self):
         self.assert_installed("2.1.290 (Claude Code)", launcher_exit=1)
 
+    def test_the_fixture_pin_is_the_repositorys_real_claude_code_floor(self):
+        # The fixture pins one version so the floor logic can be exercised; a floor raise must move it with the real pin.
+        real = next(t for t in json.loads(PINS_PATH.read_text())["tools"] if t["id"] == "claude-code")
+        self.assertEqual(self.PIN, real["version"])
+
     def test_the_install_path_still_fails_closed_on_a_checksum_mismatch(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result, installs, downloads, *_ = self._run(Path(tmp), "2.1.280 (Claude Code)", sha256="0" * 64)
+            result, installs, downloads, *_ = self._run(Path(tmp), "2.1.283 (Claude Code)", sha256="0" * 64)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Checksum mismatch", result.stderr)
             self.assertEqual(downloads.splitlines(), [self.URL])
@@ -1183,8 +1353,8 @@ class RtkConfigReminderTests(unittest.TestCase):
     rtk-ai/rtk v0.50.0 release asset) is a raw capture in
     evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt, not the E2E receipt (sibling PR #316's
     evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json is cited only for the
-    discovery). The reminder fires unless all four entries are present exactly once, including for a
-    config that still has only the original two, or the original two plus a second, four-entry line.
+    discovery). The reminder fires unless all five entries are present exactly once, including for a
+    config that still has only the original two, or the original two plus a second, five-entry line.
     2026-09-26 (Codex review of #314): the text check alone is not enough, because rtk also ignores a
     TOML-valid file that does not deserialize (a [tracking] table without history_days fails
     TrackingConfig, src/core/config.rs at 1d87b8e7) and then rewrites everything. So once the text
@@ -1200,7 +1370,9 @@ class RtkConfigReminderTests(unittest.TestCase):
     ENTRY_2 = '"diff"'
     ENTRY_3 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'"
     ENTRY_4 = r"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"
-    ENTRIES = (ENTRY_1, ENTRY_2, ENTRY_3, ENTRY_4)
+    # F2 (docs/decisions/2026-09-26-token-practice-f1-f9.md): standalone jq stays native.
+    ENTRY_5 = '"jq"'
+    ENTRIES = (ENTRY_1, ENTRY_2, ENTRY_3, ENTRY_4, ENTRY_5)
     EXCLUDE_ITEMS = "[" + ", ".join(ENTRIES) + "]"
     # Matches recipes/README.md's pretty-printed, one-entry-per-line block exactly
     # (test_the_recipes_exact_block_gets_no_reminder asserts the two stay identical).
@@ -1209,7 +1381,7 @@ class RtkConfigReminderTests(unittest.TestCase):
     # Codex's #314 counterexample: the exact recipe text, TOML-valid, but rtk rejects the file.
     REJECTED = CONFIGURED + "[tracking]\nenabled = false\n"
     PROBES = ["git show HEAD:x | tail -n 5", "git -C . show --no-color HEAD:x | tail -n 5", "diff a missing",
-              "git branch -a", "git -C . branch"]
+              "git branch -a", "git -C . branch", "jq -r .x f.json"]
     HINT = "rtk ignores a config it cannot load"
     # `hook check` answers of the stub rtk.
     HOOK = {
@@ -1217,6 +1389,7 @@ class RtkConfigReminderTests(unittest.TestCase):
         "rewrite": 'echo "rtk $3"; exit 0',
         "unsupported": "echo \"error: unrecognized subcommand 'check'\" >&2; exit 2",
         "branch rewritten": 'case "$3" in *branch*) echo "rtk $3"; exit 0 ;; esac; echo "No rewrite for: $3" >&2; exit 1',
+        "jq rewritten": 'case "$3" in jq*) echo "rtk $3"; exit 0 ;; esac; echo "No rewrite for: $3" >&2; exit 1',
         "excluded with a warning": 'echo "rtk: warning: invalid exclude_commands pattern" >&2; echo "No rewrite for: $3" >&2; exit 1',
     }
 
@@ -1372,8 +1545,8 @@ class RtkConfigReminderTests(unittest.TestCase):
                 self.assertEqual(config.read_bytes(), text.encode(), "the reminder must never write the config")
 
     def test_each_missing_entry_gets_exactly_one_reminder(self):
-        """Leave-one-out: three of the four entries present, one missing -- exactly one reminder,
-        naming all four (the recommendation to replace, never just append)."""
+        """Leave-one-out: four of the five entries present, one missing -- exactly one reminder,
+        naming all five (the recommendation to replace, never just append)."""
         for index in range(len(self.ENTRIES)):
             remaining = self.ENTRIES[:index] + self.ENTRIES[index + 1:]
             text = self.config_with(*remaining)
@@ -1388,7 +1561,7 @@ class RtkConfigReminderTests(unittest.TestCase):
     def test_a_duplicate_exclude_commands_key_is_reminded(self):
         """A second exclude_commands line is invalid TOML (rtk silently loads defaults), so the
         reminder must fire even though, read alone, either line would be complete: the old
-        two-entry line plus a correct new four-entry line, and the new line duplicated verbatim."""
+        two-entry line plus a correct new five-entry line, and the new line duplicated verbatim."""
         old_plus_new = f"[hooks]\nexclude_commands = [{self.ENTRY_1}, {self.ENTRY_2}]\n{self.CONFIGURED}"
         new_plus_new = self.CONFIGURED + self.CONFIGURED
         for text in (old_plus_new, new_plus_new):
@@ -1452,6 +1625,10 @@ class RtkConfigReminderTests(unittest.TestCase):
             "Codex #291 counterexample: empty list, entries only in comments": (
                 "[hooks]\nexclude_commands = []\n" + "".join(f"# {entry}\n" for entry in self.ENTRIES),
                 "rewrite", self.PROBES[0]),
+            # GPT-6 review of #377: "jq" only in a comment passes the text check while rtk still rewrites
+            # jq; the jq probe catches it.
+            "GPT-6 #377 counterexample: jq only in a comment": (
+                self.CONFIGURED.replace('  "jq",\n', '  # "jq",\n'), "jq rewritten", "jq -r .x f.json"),
         }
         for name, (text, hook, probe) in cases.items():
             with self.subTest(name), tempfile.TemporaryDirectory() as tmp:
@@ -1490,10 +1667,13 @@ class RtkConfigReminderRealBinaryTests(unittest.TestCase):
 
     SINGLE_REGEX = r"^git(\s+\S+)*\s+show(\s+\S+)*\s+(:\S|[^\s-]\S*:)"
     CONFIGS = {
-        "the recipe's four-entry block": (RtkConfigReminderTests.CONFIGURED, 0, False),
+        "the recipe's five-entry block": (RtkConfigReminderTests.CONFIGURED, 0, False),
         # Codex's #314 counterexample: exact text, but TrackingConfig needs history_days, so rtk ignores it.
         "[tracking] without history_days": (RtkConfigReminderTests.REJECTED, 1, True),
         "[tracking] with history_days": (RtkConfigReminderTests.REJECTED + "history_days = 90\n", 0, False),
+        # GPT-6 review of #377: the text check passes on a commented "jq", but the real rtk still rewrites jq.
+        "four entries plus a commented jq": (
+            RtkConfigReminderTests.CONFIGURED.replace('  "jq",\n', '  # "jq",\n'), 1, True),
         "2026-09-25 two-entry line": (RtkConfigReminderTests.OLD_TWO_ENTRY, 1, False),
         "the tested single-regex alternative": (f"[hooks]\nexclude_commands = ['{SINGLE_REGEX}', \"diff\"]\n", 1, False),
         "no config": (None, 1, False),
@@ -1545,7 +1725,7 @@ class RtkExclusionInstructionTests(unittest.TestCase):
     which is invalid TOML: rtk 0.50.0 then loads its defaults and the hook keeps rewriting
     (`duplicate key `hooks` in document root`; evidence/artifacts/macos-token-pins-20260926/
     rtk-hooks-table-control.txt). Replacing a "line" also breaks the recipe's own multi-line value.
-    So every instruction that puts the four entries into rtk's config (the paragraph before each copy
+    So every instruction that puts the entries into rtk's config (the paragraph before each copy
     of the recipe's block in a Markdown page outside evidence/, bootstrap.md step 4a and the macOS
     rtk pin's install_note) says to replace the key's whole value inside the existing `[hooks]`
     table and to add the header only when the file has no `[hooks]` table, and none says to replace
@@ -1595,7 +1775,7 @@ class RtkExclusionInstructionTests(unittest.TestCase):
                 for phrase in self.REQUIRED:
                     self.assertIn(phrase.lower(), words)
 
-    def test_bootstrap_step_4a_keeps_the_four_entry_value_verbatim(self):
+    def test_bootstrap_step_4a_keeps_the_five_entry_value_verbatim(self):
         self.assertIn(f"`exclude_commands = {RtkConfigReminderTests.EXCLUDE_ITEMS}`",
                       self.instructions()["adoption/bootstrap.md step 4a"])
 

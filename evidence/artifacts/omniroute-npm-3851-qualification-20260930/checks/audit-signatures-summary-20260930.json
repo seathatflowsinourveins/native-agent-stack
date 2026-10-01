@@ -1,0 +1,29 @@
+{
+ "command": "npm audit signatures --json --include-attestations (npm 11.19.0, throwaway project, host network)",
+ "command_window_utc": [
+  "2026-09-30T05:06:19Z",
+  "2026-09-30T05:06:30Z"
+ ],
+ "top_level_keys": [
+  "invalid",
+  "missing",
+  "verified"
+ ],
+ "counts": {
+  "invalid": 0,
+  "missing": 0,
+  "verified": 233
+ },
+ "omniroute_entries_in_verified": 1,
+ "omniroute": {
+  "name": "omniroute",
+  "version": "3.8.51",
+  "location": "node_modules/omniroute",
+  "registry": "https://registry.npmjs.org/",
+  "attestation_predicate_types": [
+   "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+   "https://slsa.dev/provenance/v1"
+  ],
+  "attestations_url": "https://registry.npmjs.org/-/npm/v1/attestations/omniroute@3.8.51"
+ }
+}

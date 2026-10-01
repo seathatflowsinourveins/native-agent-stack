@@ -1,0 +1,135 @@
+{
+ "note": "wire_* is the body the executor built; nothing was sent. A case with no body effort and no suffix shows the connection default path, which depends on the gateway's thinking-budget setting and the connection defaults (a fresh scratch store here), so it is informational.",
+ "rows": [
+  {
+   "requested_model": "gpt-6.1-sol",
+   "body_effort": "max",
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "xhigh",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol",
+   "body_effort": "xhigh",
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "xhigh",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol",
+   "body_effort": "ultra",
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "xhigh",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol-max",
+   "body_effort": null,
+   "wire_model": "gpt-6.1-sol-max",
+   "wire_reasoning_effort": "medium",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol-ultra",
+   "body_effort": null,
+   "wire_model": "gpt-6.1-sol-ultra",
+   "wire_reasoning_effort": "medium",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol-xhigh",
+   "body_effort": null,
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "xhigh",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol-high",
+   "body_effort": null,
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "high",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol-max",
+   "body_effort": "low",
+   "wire_model": "gpt-6.1-sol-max",
+   "wire_reasoning_effort": "low",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6.1-sol",
+   "body_effort": null,
+   "wire_model": "gpt-6.1-sol",
+   "wire_reasoning_effort": "medium",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6-astra-max",
+   "body_effort": null,
+   "wire_model": "gpt-6-astra",
+   "wire_reasoning_effort": "max",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6-astra",
+   "body_effort": "max",
+   "wire_model": "gpt-6-astra",
+   "wire_reasoning_effort": "max",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6-sol-max",
+   "body_effort": null,
+   "wire_model": "gpt-6-sol",
+   "wire_reasoning_effort": "max",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  },
+  {
+   "requested_model": "gpt-6-sol",
+   "body_effort": "ultra",
+   "wire_model": "gpt-6-sol",
+   "wire_reasoning_effort": "max",
+   "wire_reasoning_keys": [
+    "effort",
+    "summary"
+   ]
+  }
+ ]
+}

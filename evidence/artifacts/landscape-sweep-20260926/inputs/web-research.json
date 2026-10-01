@@ -1,0 +1,174 @@
+{
+ "catalog": "foundation",
+ "layer_id": "web-research",
+ "title": "Web research",
+ "requirement": "Retrieve attributable primary sources and interact with selected pages through bounded native commands without another standing research-agent stack.",
+ "research_status": "on_requirement_change",
+ "next_action": "Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.",
+ "requirement_sha256": "c90c7296603e2905021600b07d55018b752fa8a02b017d57e946a1bc77fc75e6",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "tavily-cli",
+   "repository": "https://github.com/tavily-ai/tavily-cli",
+   "pin": "0.1.8",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "agent-browser",
+   "repository": "https://github.com/vercel-labs/agent-browser",
+   "pin": "0.38.1",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "openresearch",
+   "repository": "https://github.com/alphaXiv/OpenResearch",
+   "pin": "0.2.7",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "disposition": "overlap"
+  },
+  {
+   "name": "Crawl4AI",
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Cua Driver",
+   "repository": "https://github.com/trycua/cua",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "Firecrawl MCP",
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "Browser Use",
+   "repository": "https://github.com/browser-use/browser-use",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "agent-browser",
+   "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+   "pin": "0.38.1",
+   "upstream": {
+    "latest": "v0.38.1",
+    "released_at": "2026-09-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "stars": 43196,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "openresearch",
+   "repository": "https://github.com/alphaXiv/OpenResearch",
+   "pin": "0.2.7",
+   "upstream": {
+    "latest": "v0.2.10",
+    "released_at": "2026-09-23",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 5729,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "playwright-cli",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "pin": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+   "upstream": {
+    "latest": "v0.1.21",
+    "released_at": "2026-09-18",
+    "prerelease": false,
+    "pushed_at": "2026-09-18",
+    "stars": 13573,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "tavily-cli",
+   "repository": "https://github.com/tavily-ai/tavily-cli",
+   "pin": "0.1.8",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-21",
+    "stars": 18,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  }
+ ],
+ "open_gaps": [
+  "No measured comparison between agent-browser and Playwright CLI exists. Their shared decision is conditional, and neither has been shown better.",
+  "The agent-browser fixture receipt (evidence/receipts/desktop-cli-workflows.json lines 42-61) records no version or host OS. Its 0.38.1 pin rests on a separate version check, not on the fixture run.",
+  "Browser-session recovery and compatibility with arbitrary websites are unestablished (catalogs/foundation/decisions.json lines 1070-1071). The Playwright run needed a loopback HTTP recovery after a file-protocol rejection.",
+  "Tavily Search reliability for a specific target is unestablished. One of the three retained searches missed the intended Nautilus adapter guide, and only a direct extraction of the known URL recovered it (evidence/receipts/native-tavily-session-20260920.json lines 11 and 83). Map, Crawl, Research an",
+  "The Tavily evidence is three small searches (3, 4 and 3 results) and two single-URL extractions with zero failures. That is not a completeness or accuracy benchmark, and the results do not establish that their sources' claims are correct."
+ ],
+ "overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+ "sweep_20260923": {
+  "survived": [
+   "https://github.com/exa-labs/exa-mcp-server"
+  ],
+  "refuted": [
+   "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+   "https://github.com/jina-ai/reader",
+   "https://github.com/steel-dev/steel-browser",
+   "https://github.com/browserbase/stagehand"
+  ]
+ },
+ "known_repositories": [
+  "alphaxiv/openresearch",
+  "browser-use/browser-use",
+  "browserbase/stagehand",
+  "chromedevtools/chrome-devtools-mcp",
+  "exa-labs/exa-mcp-server",
+  "firecrawl/firecrawl-mcp-server",
+  "jina-ai/reader",
+  "microsoft/playwright-cl",
+  "steel-dev/steel-browser",
+  "tavily-ai/tavily-cl",
+  "trycua/cua",
+  "unclecode/crawl4a",
+  "vercel-labs/agent-browser"
+ ],
+ "seeded_candidates_20260926": []
+}

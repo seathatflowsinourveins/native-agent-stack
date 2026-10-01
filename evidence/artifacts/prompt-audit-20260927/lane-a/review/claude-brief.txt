@@ -1,0 +1,78 @@
+Objective: review one unpushed pull-request head against original source and its retained evidence, and return
+source-cited defects and gaps. You are read-only; the coordinator ran the commands and supplies their results below.
+
+Worktree (read files here by absolute path): <worktree>
+Change: `git diff origin/main...HEAD` in that worktree, two commits. The coordinator lists the changed files below;
+read each one from the worktree.
+
+What the change claims:
+- line 3 of `examples/claude-native/CLAUDE.md` (X5a) and of `adoption/templates/codex.AGENTS.template.md` (X5c) now
+  carry the operator's 2026-09-28 top rule, decided by two independent model lanes and, for X5c, a blind adjudication
+  in both presentation orders by both model families;
+- the Codex template's pin in `tests/test_codex_worker_lane.py` (`TOP_RULE_SHA256`, word count 153) is recomputed;
+- three anti-pattern rows are appended to `docs/harness-defaults.md`;
+- the decision record is `docs/decisions/2026-09-28-top-rule-templates.md`;
+- the retained evidence is `evidence/artifacts/prompt-audit-20260927/lane-a/` (121 files, README first), registered
+  in `manifests/evidence.json`.
+
+Check, citing file:line for every finding:
+1. Each factual claim in the decision record and in `lane-a/README.md` against the retained files: verdicts,
+   confidences, tallies, counts, usage figures, byte/word/token numbers, test counts, exit codes, dates, and which
+   agent type ran which lane (the usage files name `agent_type`). Report any claim the evidence does not support.
+2. Whether each new template line keeps that file's tested obligations (`PortableTopRuleTests` in
+   `tests/test_install_claude_profile.py`; `TemplateTests` in `tests/test_codex_worker_lane.py`) and its existing
+   meaning, and is consistent with `docs/harness-defaults.md#upstream-verification-and-compounding-learning`.
+3. The three anti-pattern rows against that log's column rules (the paragraph above the table) and against the
+   evidence of what happened.
+4. Private content in the record and the 121 evidence files: host paths, a user name, session or thread ids, UUIDs,
+   email addresses, tokens, installed plugin or skill names, quotations of client configuration or settings files.
+   Placeholders such as `<user>`, `<tmp-root>`, `<session-id>`, `<uuid>` and `~/` are intended.
+5. Whether the record follows `docs/acceptance-evidence-policy.md` (evidence classes kept distinct; no local check
+   presented as upstream acceptance; no behavior claim).
+
+Do not review the vendored workflow scripts, and do not propose changing the operator's wording itself.
+
+Command results supplied by the coordinator (run in the worktree after the rebase):
+Changed files (git diff --stat origin/main...HEAD): adoption/templates/codex.AGENTS.template.md, docs/decisions/2026-09-28-top-rule-templates.md (new), docs/harness-defaults.md (3 rows), examples/claude-native/CLAUDE.md, tests/test_codex_worker_lane.py, manifests/evidence.json (registration only), and 121 new files under evidence/artifacts/prompt-audit-20260927/lane-a/.
+
+```
+$ sha256sum --check --strict SHA256SUMS: exit 0
+SUMMARY passed=254 failed=0 total=254
+SUMMARY passed=74 failed=0 total=74
+$ python3 -B scripts/validate.py
+{"components": 69, "hashed_files": 7634, "profiles": 4, "receipts": 161, "status": "passed"}
+exit 0
+$ python3 -B scripts/host_receipts.py validate
+{"receipts": 182, "status": "passed"}
+exit 0
+$ python3 -B scripts/validate_catalogs.py
+Catalog structure and evidence classes validated; source claims and native executions were not rerun.
+exit 0
+$ python3 -B scripts/validate_foundation.py --root . --json
+exit 0
+$ python3 -B scripts/validate_convergence.py --all-recorded --root . --json
+exit 0
+$ python3 -B scripts/component_matrix.py --check
+exit 0
+$ python3 -B scripts/new_host_grand_list.py --check
+{"status": "passed", "layers": 32, "winners": 66}
+exit 0
+$ python3 -B scripts/build_ecosystem.py --check
+exit 0
+$ node --test blueprints/native-skill-practice/test-contract.cjs
+exit 0
+$ python3 -B evidence/artifacts/prompt-audit-20260927/lane-a/verify_lane_a.py
+all checks passed
+exit 0
+$ python3 -B -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency
+Ran 353 tests in 55.192s
+OK (skipped=15)
+exit 0
+$ python3 -m unittest   (full suite, on the previous head: base 4a8b729a, the same content except the decision record's line 9)
+Ran 6864 tests in 711.657s
+FAILED (failures=1, errors=1, skipped=765): tests.test_order_throughput...live_base_url and tests.test_gpt6_family_tiering_20260926...sigterm, the two host failures that also fail on unmodified main (TMPDIR and /tmp/.git on this host)
+```
+
+Output format: first line `VERDICT: agree` or `VERDICT: changes-needed`, then numbered findings, each with severity
+(blocker / should-fix / nit), file:line, the evidence (quoted lines) and the fix. Then list anything you could not
+check. Keep it under 900 words.

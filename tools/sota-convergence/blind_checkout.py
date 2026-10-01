@@ -228,6 +228,7 @@ LABEL_VALUES = frozenset({
     "retain_2.3.1_pending_functional_acceptance",
     "source-reviewed-not-executed",
     "language alternative only",
+    "fixed",
 })
 # Free-text blueprint values classified by review, keyed by the sha256 of the exact
 # string so the classification does not repeat the text. LABEL_TEXT_SHA256 values
@@ -246,6 +247,7 @@ LABEL_TEXT_SHA256 = frozenset({
 DATA_VALUES = frozenset({"all_events", "top_20"})
 DATA_VALUE_SHA256 = frozenset({
     "012c690424af3c14cb13030a4c2194070e0fb677fe9907532fbe49e07bc6b3e5",
+    "02459061751691ce72c0ed507442bdae0dcb8e4c650c617bbf617a4f29a98b77",
     "030a370a1ba75ca7f9c8a49c076d9b9aed94f5b5225a54826d4d2ecf926729bc",
     "089c43f0e2f95a4c46d617e4fdaca5102f148b02e36581eb6eb2deda20bd7eee",
     "0dc1c8c8d26ceaf9cd684a2c083c9670b8da26a152a33d6e161a76b202092ab1",

@@ -1,0 +1,20 @@
+"""Summarize the JSON that `npm audit signatures --json --include-attestations` returned for the throwaway project that installed
+omniroute@3.8.51: the counts of its three lists, and for omniroute itself its location, registry and the predicate types of its
+attestation bundles. Certificates, signatures and transparency-log data are left out (they are large and add nothing to the counts).
+Usage: audit_json_summary.py <audit JSON file> <window start UTC> <window end UTC>   (the two times are the command's printed start and end)"""
+import json
+import sys
+
+path, start, end = sys.argv[1], sys.argv[2], sys.argv[3]
+doc = json.load(open(path, encoding="utf-8"))
+out = {"command": "npm audit signatures --json --include-attestations (npm 11.19.0, throwaway project, host network)",
+       "command_window_utc": [start, end], "top_level_keys": sorted(doc.keys()),
+       "counts": {key: len(doc[key]) for key in ("invalid", "missing", "verified")}}
+mine = [item for item in doc["verified"] if item.get("name") == "omniroute"]
+out["omniroute_entries_in_verified"] = len(mine)
+if mine:
+    item = mine[0]
+    out["omniroute"] = {"name": item["name"], "version": item["version"], "location": item["location"], "registry": item["registry"],
+                        "attestation_predicate_types": [bundle["predicateType"] for bundle in item.get("attestationBundles", [])],
+                        "attestations_url": item.get("attestations", {}).get("url")}
+print(json.dumps(out, indent=1))

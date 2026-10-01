@@ -193,16 +193,180 @@ locally with `GH_TOKEN` set and no `--offline`, using
   enforced by the unit test. Since 2026-09-26 two time-boxed entries (until
   2026-12-24) exist for the evaluation-only Lumibot 4.6.1 lock of the SPY
   one_zero engine trial (run offline under bwrap, never installed outside
-  that trial). osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id in every
-  scanned lockfile (one `--config` for the whole inventory), so both apply
-  repo-wide. Today only the Lumibot lock pins an affected version, and
-  `tests/test_osv_lockfile_coverage.py` fails if any other inventory lockfile
-  pins nltk at any version or setuptools below 83.0.0:
-  GHSA-8mgp-746c-j5xp (nltk 3.10.3, no patched release) and
-  GHSA-h35f-9h28-mq5c (setuptools 80.10.2; the environment was installed
-  binary-only on Linux). At expiry the Lumibot lock and both ignores are
-  deleted unless a verdict has adopted Lumibot (trading lane, 2026-09-26; the
-  OSV policy owner decides). Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
+  that trial): GHSA-8mgp-746c-j5xp (nltk 3.10.3) and GHSA-h35f-9h28-mq5c
+  (setuptools 80.10.2; the environment was installed binary-only on Linux).
+  Since 2026-09-29 three more (until 2026-10-13) covered advisories published
+  that day, which failed every later pull_request run of the required check
+  (runs 36613233591, 36617653508 and 36618373159):
+  GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv (oauthlib 3.3.1, in the
+  OpenHands recipe lock and the same Lumibot lock) and GHSA-w6j9-cwv2-h6wq
+  (PyJWT 2.13.0, OpenHands lock only); see **oauthlib and PyJWT
+  (2026-09-29)** below. The PyJWT one ended on 2026-09-30, leaving two (**PyJWT
+  relock (2026-09-30)** below).
+  osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id and expiry only
+  ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112)),
+  and the workflow's single `--config` replaces every per-directory
+  `osv-scanner.toml` ([`docs/configuration.md`](https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md)),
+  so both ignores apply repo-wide.
+  **Scoped, digest-bound allowlist (2026-09-27).** `IGNORE_ALLOWED_LOCKS` in
+  `tests/test_osv_lockfile_coverage.py` maps each inventory lockfile that may
+  pin an affected version to the advisories whose non-reachability was
+  reviewed for it, the sha256 of the lock content that review covered and
+  the repository path of its evidence. The test reads each inventory
+  `uv.lock` and requirements-format file as pip's
+  [requirements-file format](https://pip.pypa.io/en/stable/reference/requirements-file-format/)
+  defines it: backslash continuations are joined before comments are
+  stripped, names compare after PEP 503 normalization, and
+  `-r`/`--requirement` and `-c`/`--constraint` includes are followed
+  recursively, relative to the including file, each file read once
+  (osv-scanner 2.6.0 itself follows only `-r`). It fails when an inventory
+  lockfile or a file it includes carries, for an advisory its entry does
+  not list, any nltk requirement, pinned or not, or a setuptools requirement
+  with a version or specifier other than a single `==` or `===` pin of a
+  plain release (digits and dots) at or above 83.0.0. Plain releases compare
+  as integer tuples, so `83` counts as below `83.0.0`; a `v` prefix, a pre-,
+  post-, dev- or local release, a range such as `>=70` (which OSV scans as
+  70) or a URL counts as affected, as the test fails closed rather than
+  implement PEP 440. A bare `setuptools` gives OSV no version to match and
+  does not count. The test also fails closed on a line that is neither an
+  include, a documented pip option that names no package, nor a name-led
+  requirement (so `-e`, a path or a URL), on a continued line that holds a
+  comment (pip strips it after joining, OSV-Scanner before, so the two read
+  different requirements) and on an include that names no file. An allowed
+  lock is exempt only for its own lines and must be self-contained: the test
+  fails when it contains an include line, whose target its digest cannot
+  cover. It further fails when an allowed lock's bytes no longer match the
+  reviewed sha256 or the lock is missing (re-review reachability, then
+  record the new digest and evidence); when the evidence file is missing;
+  and when an entry lists an advisory with no scope or no active ignore. An
+  ignore is active only while its `ignoreUntil` is after today's UTC date:
+  OSV-Scanner stops applying it on that date
+  ([`config.go:149-157`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L149-L157)
+  compares it with the current time; its TOML decoder reads a bare date as
+  midnight in the host's zone). The earlier set of
+  allowed paths exempted a listed lock from every advisory and bound nothing
+  to its content, so a lock added for the nltk advisory alone (the pending
+  GPT Researcher and crawl4ai runtime locks, #426 and #428) could have gained
+  a setuptools pin below 83 or been relocked without failing. Until
+  2026-09-29 one entry allowed both advisories for the Lumibot lock; its
+  digest equals the `lock_sha256` its evidence recorded. nltk has no patched release as of
+  2026-09-27 (PyPI latest 3.10.3); the fixes are merged on develop
+  (nltk#3757, #3759, #3813). **Expiry:** relock every allowed lock onto the
+  first nltk release that ships those fixes, then delete the nltk ignore;
+  delete the Lumibot lock, and with it the setuptools ignore, unless a
+  verdict has adopted Lumibot (trading lane, 2026-09-26; the OSV policy
+  owner decides). If no fixed nltk release ships before 2026-12-24,
+  re-review reachability for each allowed lock and extend the ignore with a
+  new dated reason, or remove the allowed locks and the ignore: from that
+  date the test counts the ignore as inactive and fails while an allowed
+  lock still lists it. **Alternatives considered:** per-directory
+  `osv-scanner.toml` files (replaced by the workflow's single `--config`) and
+  `[[PackageOverrides]]` (matched by package and version rather than lock,
+  and `vulnerability.ignore` drops every advisory of that package).
+  **Overturn:** OSV-Scanner scopes an ignore to paths, or the workflow scans
+  each lock with its own config. Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
+  **oauthlib and PyJWT (2026-09-29).** Three Medium advisories were
+  published that day (GitHub and OSV records). GHSA-hj66-6f7g-4r5v (oauthlib
+  through 3.3.1) is JSONP callback injection in `RevocationEndpoint` with
+  `enable_jsonp=True`, and GHSA-xpv3-w29h-x7cv (oauthlib 3.x) is an `==`
+  comparison of the PKCE `code_verifier` in an oauthlib authorization
+  server; oauthlib 4.0.0 fixes both. GHSA-w6j9-cwv2-h6wq (PyJWT 2.9.0 to
+  2.13.0) lets one malformed RSA key abort parsing of a whole JWK Set;
+  PyJWT 2.14.0 fixes it. A local run of the CI command at `ed29398` failed
+  with five findings: all three in
+  `blueprints/runtime-workers/openhands/requirements.lock` (oauthlib 3.3.1,
+  PyJWT 2.13.0) and the two oauthlib ones in the Lumibot lock. Neither lock
+  is relocked here: the Lumibot lock is a frozen record, and the OpenHands
+  lock is a live recipe whose owner relocks it. Each advisory is ignored
+  until 2026-10-13, and `IGNORE_ALLOWED_LOCKS` allows both locks at their
+  reviewed sha256. The review downloaded one hash-verified artifact per requirement of either
+  lock (336 and 263 of 264; ibapi, a locally built wheel, from its
+  PyPI sdist) and searched its source. Nothing constructs an oauthlib
+  `RevocationEndpoint` with `enable_jsonp` or imports oauthlib's grant
+  types, endpoints or servers: oauthlib is imported only by
+  requests-oauthlib's client code and, in the Lumibot lock, by a kubernetes
+  exception import. PyJWT's `PyJWKSet`, `PyJWK` and `PyJWKClient` appear
+  only in the LiteLLM proxy server and in google-auth's ID-token
+  verification, which the recipe does not run and no installed package
+  calls. With the ignores the same run exits 0, "No issues found".
+  **Expiry:** the OpenHands owner relocks onto oauthlib 4.0.0 and PyJWT
+  2.14.0 and, in the same change, deletes that lock's `IGNORE_ALLOWED_LOCKS`
+  entry (its sha256 pin fails any change to the lock), the PyJWT ignore and
+  its `IGNORE_SCOPES` entry. The Lumibot lock keeps oauthlib 3.3.1, so on
+  2026-10-13 the scan and the allowed-lock test fail again by design: renew
+  the two oauthlib ignores for that lock alone with a new dated reason, or
+  delete the lock. The Lumibot entry now names the new record as its
+  evidence; that record carries forward the 2026-09-26 nltk and setuptools
+  review at the same sha256. Evidence: `evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json`.
+  **PyJWT relock (2026-09-30).** Ten PyJWT advisories, all published on 2026-09-29 (GHSA-w6j9-cwv2-h6wq at 18:23Z, the other
+  nine between 23:11Z and 23:43Z), affect 2.13.0; OSV and GitHub list 2.14.0 as the first patched release for all ten
+  (the 2.14.0 changelog names nine, and its entry for the tenth cites an id neither database serves). The nine (one
+  Critical at CVSS 9.1, five High, three Medium) failed the required check on the OpenHands recipe lock in run
+  36657687493, the one log read; main push runs from 23:33Z on also concluded failure (logs not read; the first two were
+  created before the last two advisories were published). The lock was relocked onto PyJWT 2.14.0 with the recipe's own
+  method, and this entry's Expiry sentence above is superseded for that lock: the GHSA-w6j9-cwv2-h6wq ignore and its
+  `IGNORE_SCOPES` entry are deleted, and the lock's `IGNORE_ALLOWED_LOCKS` entry keeps the two oauthlib advisories at the
+  relocked sha256, with the new record as its evidence, which carries the 2026-09-29 review forward (the lock diff is
+  the three PyJWT lines; PyJWT 2.14.0's wheel and sdist have no oauthlib reference, and the same search over
+  requests-oauthlib's wheel hits, so it can). oauthlib stays at 3.3.1: as of 2026-09-30T04:30:20Z, 4.0.0 (published
+  2026-09-28T06:01Z) is inside the 7-day window the upstream workspace applies, until 2026-10-05T06:01:19Z, and its two
+  advisories are ignored until 2026-10-13; a 2026-09-30 pre-check found the same test outcome for requests-oauthlib
+  2.0.0's unit tests and imports under oauthlib 3.3.1 and 4.0.0. **Alternatives considered:** PyJWT 2.15.1 or 2.15.0
+  (inside the same window as of 2026-09-30T04:30:20Z, and the scan is clean at 2.14.0); relocking oauthlib 4.0.0 now; extending
+  the ignores to the nine (rejected: one is Critical and a fixed release exists). **Result:** the workflow's command
+  over the 49 lockfiles exits 0 with no PyJWT ignore, and the previous lock under the same config exits 1. **Expiry and
+  owner:** tracked in #518; owner bc (session native-agent-stack-bc), unless reassigned there; a decision point at
+  2026-09-30T16:56:01Z (PyJWT 2.15.0 leaves the window; the reason 2.14.0 stays is recorded in the receipt), the joint relock
+  earliest 2026-10-05T18:40:43Z, due 2026-10-08: relock onto oauthlib 4.0.0 and PyJWT 2.15.1 (or record why 2.14.0 stays),
+  repeat the import and requests-oauthlib checks on the real lock, and delete the OpenHands entry in the same change; on
+  2026-10-13 renew the oauthlib ignores for the Lumibot lock alone or delete that lock. **Overturn:** (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
+  **Not covered:** the image's server binary and the grader venv (PyJWT 2.13.0 and 2.10.1), and any run of the recipe.
+  Evidence: `evidence/receipts/osv-openhands-pyjwt-relock-20260930.json`.
+  **urllib3 and PyJWT relock and a frozen macOS lock (2026-09-30).** Five advisories whose OSV records were published on
+  2026-09-30 (14:46Z to 15:41Z) fail the required check on fresh runs; a local run of the workflow's old command at `11227bfd`
+  exits 1 with exactly these five (returned outputs, section E): GHSA-8988-9cw3-xx77 (urllib3 1.26.0 through 2.7.0, HTTPS proxy
+  TLS settings not applied consistently), GHSA-vxq7-64xx-v4gw (unbounded chunk-size line buffered) and GHSA-gh4c-6fx4-qh6g
+  (chunked Deflate streaming loops), all fixed in urllib3 2.8.0 (PyPI files uploaded 2026-09-15T19:29Z, outside every cooldown);
+  GHSA-42vr-xj54-vc7v (PyJWT below 2.15.0: a raw RecursionError from a deeply nested payload), fixed in PyJWT 2.15.0, whose
+  files were uploaded 2026-09-23T16:55Z to 16:56Z and left the upstream workspace's 7-day `exclude-newer` window at
+  2026-09-30T16:56:01Z, which is overturn condition (a) of the 2026-09-30T04:30Z choice in the OpenHands recipe's `research.md`
+  and the decision point of issue #518, so the lock moves; all four in `blueprints/runtime-workers/openhands/requirements.lock`;
+  and GHSA-vcvr-r3jv-pc5j (next 16.2.0 through 16.3.5, `next/og` `ImageResponse`, fixed in 16.3.6, released 2026-09-22) in the
+  frozen macOS variant lock. One change carries all of them, because the check scans the whole inventory and each fix alone
+  leaves it red. The OpenHands lock was relocked with the recipe's own method plus `--upgrade-package urllib3==2.8.0` and
+  `--upgrade-package pyjwt==2.15.0` in place of 2.14.0: the five upgrades of the 2026-09-30 relock reproduce the committed lock
+  byte for byte, the new lock differs in the urllib3 and PyJWT entries only, the recipe's hashed install, `uv pip check` and the
+  SDK import check pass, and the lock's `IGNORE_ALLOWED_LOCKS` entry, `pins.json` and its evidence move to the new sha256
+  together. The carried-forward oauthlib review holds: the four oauthlib source files it names are byte-identical in the new
+  venv and oauthlib 3.3.1 is unchanged. The macOS lock is a frozen evidence artifact for which the tree records no owner (its
+  only commit is #201, and neither its experiment record nor `docs/lanes.md` names one), so it is not patched: its advisory is
+  excepted until 2026-12-24 under the policy above. **The exception is scoped by the scanner, not by a reader of the lock.**
+  OSV-Scanner 2.6.0 applies an explicit `--config` to every input of one invocation (`docs/configuration.md`,
+  `internal/config/manager.go`, `Manager.Get`), so an `[[IgnoredVulns]]` entry in the one config would hide the advisory in
+  every lock of the inventory. The exception therefore lives in `.github/osv-scanner-frozen-macos.toml` (one entry, nothing
+  else); the inventory entry of the frozen lock names that config and the 48 others name none; `security-scan.yml` builds the
+  two `--lockfile` lists from the inventory with `jq` (parser flags preserved), fails unless their sizes sum to the inventory's,
+  scans each list in an invocation of its own under its own config (the ordinary `.github/osv-scanner.toml` has no entry for the
+  advisory), fails on the worse exit status, and on other events writes, keeps and uploads both SARIF reports under two
+  categories. `tests/test_osv_lockfile_coverage.py` binds the frozen config to that one lock and its sha256 (`FROZEN_LOCKS`),
+  checks the partition and the workflow's shape, and runs the same field and 90-day checks on both configs. Native controls with
+  the pinned binary are retained (section H): the workflow's own scan step, extracted from the file and run by bash, exits 0 in
+  both forms; the frozen lock under the ordinary config exits 1 and reports next 16.3.5; three inputs that hide a vulnerable
+  `next` in YAML the scanner reads exit 1 as ordinary locks and 0 under the frozen config, which is why that config is bound to
+  one path. **History:** the first design kept the exception in the one config and bounded it with readers of pnpm, package-lock
+  and yarn locks in the test module. Five cross-family reviews and then an independent verifier run by the Codex root, with the
+  pinned scanner, refuted it one YAML or JSON feature at a time (quoted keys, aliases, tarball entries, tagged keys, merge
+  keys); the reviews are kept as the failed conditions and the readers were deleted. **Alternatives considered:** exclusion from
+  the inventory (rejected: `excluded` is for test fixtures only, by test); editing the frozen lock (its bytes are hash-bound
+  evidence); waiting for an owner (none recorded); a dated ignore for the PyJWT advisory (rejected: the fix was available at the
+  decision point, and an ignore needs its own reachability review); nested `osv-scanner.toml` files next to the locks (OSV's
+  per-directory lookup applies only without an explicit `--config`, which would move every existing repo-wide ignore into
+  per-directory files; a later cleanup could do that). **Overturn:** the frozen lock stops being kept, or an application built
+  from it is run (then bump `next` and delete the config, the inventory key and the `FROZEN_LOCKS` row); OSV lists an advisory
+  for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
+  build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
+  relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
@@ -1548,6 +1712,96 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   every open pull request whose branch predates the job until it is rebased, so the
   owner of #294 applies it when those branches are rebased or merged. Close it with
   the section-10 PUT of the committed file and a dated after-GET here.
+- **Drift closed (2026-09-27).** Historical, recorded by the PR author, output not
+  retained: a before-GET at 21:00:04Z listed the same seven checks, without
+  `sota-sources` (`updated_at` 2026-09-24T23:02:29-04:00). At 21:00:13Z,
+  `gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json`
+  ran with the file as committed on `main` at `e82e6be7`. An after-GET the same
+  minute listed all eight required checks and matched the committed file in every
+  rule, target, condition and bypass actor (`updated_at` 2026-09-27T17:00:13-04:00).
+  Historical corroboration: read-only calls on 2026-09-28 found the eight checks
+  required on `main` (`rules/branches/main`) and #410's `sota-sources` check
+  failing (`evidence/artifacts/prompt-audit-20260927/lane-a/round1/packet.md`
+  L90-92).
+
+  Measured 2026-09-29T03:18:04Z, read-only, in bash, with `origin/main` at
+  `b0fb65b4`, which was then the tip of `main` on GitHub:
+  ```sh
+  diff <(gh api repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 \
+           | jq -S 'del(._links, .created_at, .current_user_can_bypass, .id, .node_id, .source, .source_type, .updated_at) | .rules |= sort_by(.type)') \
+       <(git show origin/main:.github/main-ruleset.json | jq -S '.rules |= sort_by(.type)')
+  ```
+  It exited 0: the live ruleset equals the committed file in `name`, `target`,
+  `enforcement` (`active`), `bypass_actors` (none), `conditions` and every rule.
+  The required contexts are `validate`, `token-report`, `secret-scan`,
+  `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
+  `sota-sources`, with `strict_required_status_checks_policy: false`. Two
+  differences are normalized away, and nothing else differs:
+  - The eight deleted top-level keys are response metadata that the file does not
+    carry. The file has no key the live ruleset lacks.
+  - `rules` differs in order only: the API lists `required_status_checks` first
+    and the file lists it fifth. Without either `sort_by`, the same `diff` exits 1.
+
+  With `57fb6d89` in place of `origin/main` (the negative control) the command
+  exits 1 and reports only the `sota-sources` context. The live `updated_at` is
+  2026-09-27T17:00:13.533-04:00, the second of the recorded PUT, so the ruleset
+  has not been updated since.
+
+  Open pull requests at the PUT (historical, recorded by the PR author, output not
+  retained):
+  - #410 fails `sota-sources` and cannot merge until its sources are fixed.
+  - #205 and #216 had no `sota-sources` run: their last runs predate the job. A
+    new `pull_request` run can report it, and a rebase is not the only way to
+    start one: `validate.yml` also runs on `reopened` and `edited`
+    (`.github/workflows/validate.yml` L6-9), and `docs/lanes.md` ("Hot-file
+    protocol") makes a pushed merge of `main` as valid as a rebase. GitHub starts
+    no `pull_request` run while a pull request has a merge conflict
+    ([events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
+    Reporting the check is not passing it: the job reads only the pull request's
+    description (`.github/workflows/validate.yml` L517-521). Measured
+    2026-09-29T03:18:04Z (`gh pr view <N> --json mergeable,statusCheckRollup`):
+    both are `CONFLICTING`, with no `sota-sources` run.
+  - #415 and #417 pass it.
+
+  **Merge-guard mechanics** (moved here from `docs/lanes.md`; each measured or read
+  on 2026-09-29): `gh pr merge --match-head-commit` becomes the `expectedHeadOid` of
+  the `mergePullRequest` mutation (cli/cli v2.101.0
+  [`http.go` L77-80](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/merge/http.go#L77-L80)
+  and `merge.go` L294). GitHub's GraphQL schema describes it as "OID that the pull
+  request head ref must match to allow merge; if omitted, no check is performed"
+  ([`MergePullRequestInput`](https://docs.github.com/en/graphql/reference/pulls#input-object-mergepullrequestinput)).
+  `gh pr view --json statusCheckRollup` keeps superseded runs of the same head:
+  merged #389, #411 and #413 each show an earlier `sota-sources` failure and a later
+  success, which is why `docs/lanes.md` reads the head with `gh pr checks --required`
+  instead. That command lists the required checks with the latest run of each
+  (`gh pr checks 389 --required` printed the eight required checks, all passing,
+  exit 0; #436 exit 1 with `validate-macos` failing; #409 exit 8 while checks were
+  pending; `gh pr checks --help` names exit 8 for pending checks).
+
+  **Correction (2026-09-29, after the entry above):** the exit code is not the
+  verdict. On #437 the coordinator cancelled its queued `validate-macos` run on
+  purpose, and `gh pr checks 437 --required` (run through `rtk proxy`, which does not
+  filter the output) printed the seven passing checks and `validate-macos fail`, and
+  exited 0; `--json name,bucket` gave `bucket: cancel` for that check. gh v2.101.0
+  explains both: `checks.go` L248-252 returns exit 1 when `counts.Failed > 0`, else
+  exit 8 when `counts.Pending > 0`, else 0, and `aggregate.go` L72-88 sends
+  `CANCELLED` to bucket `cancel` (`counts.Canceled`) and `SKIPPED`/`NEUTRAL` to
+  `skipping`, neither of which changes the exit code; `checks.go` L189-191 returns
+  after the JSON export, so `--json` exits 0 in every state. The same source shows
+  that a failed check wins over a pending one (exit 1), which the entry's earlier
+  wording ("1 when one has failed and none is pending") did not say. GitHub's own
+  ruleset still refuses a merge while a required check is cancelled, so no merge was
+  wrongly allowed; the error was in the documented pre-merge read. `docs/lanes.md`
+  now prints the required-check count and the set of buckets and merges only on
+  `pass`, and `tests/test_merge_guard_doc.py` fails if that text drifts back to the
+  exit-code reading. **Overturn:** a newer gh that counts `cancel` as failing or
+  changes the `--json` exit code; re-read `checks.go` when the pinned gh moves.
+
+  **Rollback:** PUT the committed file from before #294, `57fb6d89`. The only
+  change `git diff 57fb6d89 7bbb021e -- .github/main-ruleset.json` makes is
+  adding the `sota-sources` context, and `main` (`b0fb65b4`) still carries
+  `7bbb021e`'s file, so the command holds while that stays true:
+  `git show 57fb6d89:.github/main-ruleset.json | gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input -`.
 - **Fork-approval after-GET (closes the pending step above).** "GitHub
   hardening follow-up (2026-09-25)" decided `all_external_contributors` and
   left "record the dated after-GET here" open. A live, read-only GET of

@@ -1,0 +1,148 @@
+{
+  "binary": "2.1.285",
+  "types": {
+    "agent_completed": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "agent_needs_input": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "auth_success": {
+      "notificationType_literals": 2,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "computer_use_enter": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": false,
+      "overlay_matcher_names_it": false
+    },
+    "computer_use_exit": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": false,
+      "overlay_matcher_names_it": false
+    },
+    "elicitation_complete": {
+      "notificationType_literals": 3,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "elicitation_dialog": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "elicitation_response": {
+      "notificationType_literals": 6,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "elicitation_url_dialog": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "idle_prompt": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "model_refusal_fallback": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": false,
+      "overlay_matcher_names_it": false
+    },
+    "permission_prompt": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "push_notification": {
+      "notificationType_literals": 1,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": false,
+      "overlay_matcher_names_it": true
+    },
+    "quota_auto_resume_disabled": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "quota_auto_resume_fired": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "quiet",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": false
+    },
+    "quota_auto_resume_stale": {
+      "notificationType_literals": 0,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": true,
+      "overlay_matcher_names_it": true
+    },
+    "worker_permission_prompt": {
+      "notificationType_literals": 2,
+      "matcher_value": true,
+      "decision": "ring",
+      "documented_in_the_hooks_reference": false,
+      "overlay_matcher_names_it": true
+    }
+  },
+  "base_array_size": 15,
+  "catalog_found": true,
+  "catalogs_resolved": true,
+  "catalogs": [
+    {
+      "spread": "Ojo",
+      "base_candidates": 1,
+      "base_size": 15,
+      "extras": [
+        "elicitation_complete",
+        "elicitation_response"
+      ]
+    }
+  ],
+  "catalog_candidates": 1,
+  "unrecognized_catalogs": 0,
+  "catalog_extra_values": [
+    "elicitation_complete",
+    "elicitation_response"
+  ],
+  "matcher_values": 17,
+  "unknown": [],
+  "decision_disagrees_with_the_overlay": [],
+  "decided_but_not_in_this_binary": []
+}

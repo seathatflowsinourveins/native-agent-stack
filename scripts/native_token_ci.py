@@ -10,7 +10,23 @@ npm-installed tools) comes from PATH. Each fixture runs the pinned tool's own CL
 MCP commands (upstream native operations) and this repository's checks assert on what
 they return: local integration evidence of upstream native operations. The one
 upstream test is `rtk verify --require-all`, which runs the inline filter tests built
-into RTK's release binary.
+into RTK's release binary. Discriminating inputs make RTK, MarkItDown, ast-grep, Repomix
+and TOON each produce output that a passthrough or a plain-text tool would not (a compacted
+long git log, converted HTML elements, a multi-line structural match, bodies dropped by
+compression, a tabular encoding); each such check is also held against the baseline it must
+differ from (git's own log, the raw and the tag-stripped HTML, a line regex, the uncompressed
+pack, the JSON input).
+
+The 2026-09-26 additions follow the same rule. RTK's Claude-hook exclusions are probed with
+`rtk hook check` under the recipe's exclusions plus `jq` and under RTK's defaults, and its
+known inexact rewrites are run natively, through `rtk` and through `rtk proxy`. context-mode's
+`ctx_doctor` and `ctx_execute` run through MCPorter; its indexed answer is held against the raw
+output. Serena and ai-memory run through a plain MCP stdio session (initialize,
+notifications/initialized, then each request in turn), so Serena's initialize and tools/list
+answers are compared byte for byte with the pinned install's and ai-memory's disposable store
+is written and read back from separate server processes. context-hub's config-file telemetry
+opt-out is checked offline, in a new network namespace, against a copy without the file.
+agentsview gets `--version` and `--help` with its telemetry opt-out set.
 """
 
 from __future__ import annotations
@@ -18,9 +34,11 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import hashlib
+from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
+import queue
 import re
 import shlex
 import shutil
@@ -28,36 +46,66 @@ import signal
 import subprocess
 import tarfile
 import tempfile
+import threading
 import time
+import tomllib
 import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
+# and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
+SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
 PINS = {"rtk": "0.50.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
         "mcporter": "0.14.1", "markitdown": "0.1.8", "ast-grep": "0.45.3",
-        "ccusage": "20.0.24", "codebase-memory-mcp": "0.11.0", "headroom": "0.37.0",
-        "jcodemunch-mcp": "1.108.319"}
+        "ccusage": "20.0.26", "codebase-memory-mcp": "0.11.0", "headroom": "0.37.0",
+        "jcodemunch-mcp": "1.108.319", "context-mode": "1.0.169",
+        "serena": f"2.0.0.dev0 @ {SERENA_COMMIT}", "ai-memory": "2.4.1", "context-hub": "0.1.4",
+        "agentsview": "0.43.0"}
+# The Linux adoption pins, checked against PINS for every tool they list (version, and Serena's
+# commit), and against a downloaded release archive whose URL they record (its sha256).
+ADOPTION_PINS = "adoption/pins-linux-x86_64.json"
 # npm-kind: id -> registry package name, installed exactly like the existing three.
 PACKAGES = {"qmd": "@tobilu/qmd", "repomix": "repomix", "toon": "@toon-format/cli",
-            "mcporter": "mcporter", "ast-grep": "@ast-grep/cli", "ccusage": "ccusage"}
+            "mcporter": "mcporter", "ast-grep": "@ast-grep/cli", "ccusage": "ccusage",
+            "context-mode": "context-mode", "context-hub": "@aisuite/chub"}
+# Executable name where it differs from the component id.
+BINARIES = {"context-hub": "chub"}
+# No usable version flag: context-mode starts its MCP stdio server for any argv other than its
+# subcommands (the adoption pin's version_probe is npm-metadata), and chub rejects --version. The
+# installed package metadata that `npm list` reports names their version instead.
+NPM_METADATA_VERSION = ("context-mode", "context-hub")
 # codebase-memory-mcp keeps its rendezvous socket at
 # $CBM_RUNTIME_DIR/cbm-daemon-<euid>/cbm-<16 hex>.sock and refuses a path that does not
 # fit a Unix socket address (108 bytes on Linux, including the terminating NUL).
 CBM_SOCKET_NAME = "cbm-" + "0" * 16 + ".sock"
 UNIX_SOCKET_PATH_MAX = 107
-# GitHub-release-tarball kind: id -> (base URL template, asset filename, path to the
-# binary inside the extracted tree). Verified the same way as rtk's existing pin:
-# a freshly fetched checksums.txt naming the exact asset once (verify_archive).
+# GitHub-release-tarball kind: id -> (base URL template, asset filename template, path to the
+# binary inside the extracted tree, and the publisher's checksum file when it is not
+# checksums.txt). Verified the same way as rtk's existing pin: a freshly fetched checksum file
+# naming the exact asset once (verify_archive). ai-memory publishes one `<asset>.sha256` sidecar
+# per asset and agentsview a release-wide SHA256SUMS.
 GITHUB_RELEASES = {
     "rtk": {"base": "https://github.com/rtk-ai/rtk/releases/download/v{version}",
             "asset": "rtk-x86_64-unknown-linux-musl.tar.gz", "binary": "rtk"},
     "codebase-memory-mcp": {
         "base": "https://github.com/DeusData/codebase-memory-mcp/releases/download/v{version}",
         "asset": "codebase-memory-mcp-linux-amd64.tar.gz", "binary": "codebase-memory-mcp"},
+    "ai-memory": {"base": "https://github.com/akitaonrails/ai-memory/releases/download/v{version}",
+                  "asset": "ai-memory-linux-x86_64.tar.gz", "binary": "ai-memory",
+                  "checksums": "ai-memory-linux-x86_64.tar.gz.sha256"},
+    "agentsview": {"base": "https://github.com/kenn-io/agentsview/releases/download/v{version}",
+                   "asset": "agentsview_{version}_linux_amd64.tar.gz", "binary": "agentsview",
+                   "checksums": "SHA256SUMS"},
 }
 # uv-tool kind: id -> PyPI distribution spec (differs from id for headroom's [mcp] extra).
 UV_TOOLS = {"markitdown": "markitdown", "headroom": "headroom-ai[mcp]",
             "jcodemunch-mcp": "jcodemunch-mcp"}
+# uv-tool-from-git kind: `uv tool install --python 3.13 git+<url>@<commit>`, the command of
+# recipes/README.md's serena row and adoption/bootstrap-linux.sh install_uv_tool_from_git, whose
+# read-back this harness repeats: the tool environment's uv-receipt.toml must record rev=<commit>.
+UV_GIT_TOOLS = {"serena": {"url": "https://github.com/oraios/serena", "commit": SERENA_COMMIT,
+                           "environment": "serena-agent", "distribution": "serena_agent"}}
 # uv itself is plumbing, not one of the measured tools: pinned and hash-verified the
 # same way as adoption/pins-linux-x86_64.json's own uv 0.12.17 entry, so uv-tool-kind
 # installs never depend on whatever the runner happens to have on PATH.
@@ -70,13 +118,39 @@ SOURCE_FILES = ("scripts/native_token_ci.py", ".github/workflows/native-token-e2
                 "fixtures/before.py", "fixtures/after.py", "fixtures/greeting.html",
                 "fixtures/headroom-note.txt", "fixtures/headroom-records.json",
                 "fixtures/ccusage-synthetic-claude/projects/native-ci-synthetic-project/synthetic-session.jsonl",
-                "fixtures/ast_grep_calls.py")
+                "fixtures/ast_grep_calls.py", "fixtures/ast_grep_shell_calls.py",
+                "fixtures/markitdown-multi-element.html", "adoption/pins-linux-x86_64.json",
+                "fixtures/rtk-hook-exclusions.toml", "fixtures/context-mode-build.log")
 # Frozen ast-grep input and outcome (1-based lines): the two real subprocess.run calls,
 # one written with a space before its argument list, versus a plain-text grep for the
 # call prefix, which finds the first call plus a comment and a string literal instead.
 AST_GREP_FIXTURE = "fixtures/ast_grep_calls.py"
 AST_GREP_CALL_LINES = [9, 13]
 AST_GREP_TEXT_LINES = [9, 16, 17]
+# A pattern no line-based search expresses: subprocess.run calls with a shell=True keyword argument
+# anywhere in their argument list. Frozen outcome as 1-based [start, end] lines: the one-line call
+# and the call spread over lines 12-16. The closest single-line regex instead finds the one-line
+# call, a comment and a string (lines 8, 24, 31) and misses the spread-out call.
+AST_GREP_SHELL_FIXTURE = "fixtures/ast_grep_shell_calls.py"
+AST_GREP_SHELL_PATTERN = "subprocess.run($$$, shell=True, $$$)"
+AST_GREP_SHELL_CALL_RANGES = [[8, 8], [12, 16]]
+AST_GREP_SHELL_TEXT_REGEX = r"subprocess\.run\(.*shell=True"
+AST_GREP_SHELL_TEXT_LINES = [8, 24, 31]
+# RTK 0.50.0's `git log` filter (src/cmds/git/git_cmd.rs, run_log and filter_log_output) prints one
+# `%h %s (%ar) <%an>` header per commit and at most three non-empty body lines, drops Signed-off-by
+# and Co-authored-by trailers, ends a longer body with `[+N lines omitted]`, and without -N shows the
+# ten newest commits. Each fixture commit has five body lines and both trailers.
+RTK_LOG_COMMITS = 12
+RTK_LOG_DEFAULT_LIMIT = 10
+# MarkItDown input with one of each element its HTML converter turns into Markdown, plus a script,
+# a style sheet and a comment whose text must not survive conversion. The markers are letters
+# only: markdownify escapes Markdown characters such as `_`, so `NATIVE_CI_X` leaked into a
+# paragraph came out as `NATIVE\_CI\_X` and a literal search missed it (a 2026-09-26 control).
+MARKITDOWN_MULTI_ELEMENT = "fixtures/markitdown-multi-element.html"
+MARKITDOWN_HIDDEN_TEXT = ("NativeCiScriptBody", "NativeCiStyleBody", "NativeCiHtmlComment")
+# TOON 4.1.1 (its encoder is bundled in the CLI, no runtime dependency) writes fixtures/records.json,
+# a uniform array of objects, as one tabular block: a header naming the length and fields, then rows.
+TOON_TABULAR_RECORDS = "items[2]{name,enabled,count}:\n  alpha,true,2\n  beta,false,3"
 # Headroom inputs. The records are a compact JSON array of objects, the input its SmartCrusher
 # compresses (upstream README: "SmartCrusher — universal JSON: arrays of dicts"). The note is
 # below compress()'s default min_tokens_to_compress (250), which Headroom stores unchanged.
@@ -87,6 +161,78 @@ HEADROOM_NOTE = "fixtures/headroom-note.txt"
 JCODEMUNCH_SYMBOL = {"id": "fixtures/after.py::greeting#function", "kind": "function", "name": "greeting",
                      "file": "fixtures/after.py", "line": 1, "end_line": 2}
 JCODEMUNCH_SYMBOL_SOURCE = 'def greeting(name):\n    return "Hello, " + name + "!"'
+# RTK's Claude-hook exclusions: recipes/README.md's four exclude_commands entries plus "jq". Each
+# probe is (command, `rtk hook check --agent claude` answer under those exclusions, answer under
+# RTK's defaults), where None is "No rewrite for: <command>" with exit 1. Recorded on the pinned
+# 0.50.0 (hook-check.txt of evidence/artifacts/rtk-exclude-widen-20260926 for the recipe rows).
+RTK_HOOK_EXCLUSIONS = "fixtures/rtk-hook-exclusions.toml"
+RTK_HOOK_PROBES = (
+    # recipes/README.md: excluded forms, including the bootstrap reminder's own probes.
+    ("git show HEAD:x | tail -n 5", None, "rtk git show HEAD:x | tail -n 5"),
+    ("git -C . show --no-color HEAD:x | tail -n 5", None, "rtk git -C . show --no-color HEAD:x | tail -n 5"),
+    ("diff a.txt missing.txt", None, "rtk diff a.txt missing.txt"),
+    ("git -C repo show HEAD:x", None, "rtk git -C repo show HEAD:x"),
+    ("git --git-dir /r/.git show HEAD:x", None, "rtk git --git-dir /r/.git show HEAD:x"),
+    ("git --work-tree /w branch -a", None, "rtk git --work-tree /w branch -a"),
+    ("git branch -a", None, "rtk git branch -a"),
+    ("git -C . branch", None, "rtk git -C . branch"),
+    # recipes/README.md: forms the anchored patterns must still let through.
+    ("git show HEAD~1", "rtk git show HEAD~1", "rtk git show HEAD~1"),
+    ("git show --stat HEAD", "rtk git show --stat HEAD", "rtk git show --stat HEAD"),
+    ("git --git-dir /r/.git status", "rtk git --git-dir /r/.git status", "rtk git --git-dir /r/.git status"),
+    ("git push origin branch", "rtk git push origin branch", "rtk git push origin branch"),
+    ('git commit -m "update branch docs"', 'rtk git commit -m "update branch docs"',
+     'rtk git commit -m "update branch docs"'),
+    # The fifth exclusion: a standalone jq keeps its exact output; the git part beside it is still rewritten.
+    ("jq -r .x f.json", None, "rtk jq -r .x f.json"),
+    ("git status && jq .", "rtk git status && jq .", "rtk git status && rtk jq ."),
+    # Negative controls: only a part that can run through RTK alone is rewritten; `gh` feeding
+    # `head` and `ls` feeding `wc` stay raw, and a call is only all-covered when every part is.
+    ("git status && gh pr view 1 | head -n 5", "rtk git status && gh pr view 1 | head -n 5",
+     "rtk git status && gh pr view 1 | head -n 5"),
+    ("gh pr view 1 | head -n 5", None, None),
+    ("git status && gh pr view 1", "rtk git status && rtk gh pr view 1", "rtk git status && rtk gh pr view 1"),
+    ("git status && ls -la | wc -l", "rtk git status && ls -la | wc -l", "rtk git status && ls -la | wc -l"),
+)
+RTK_HOOK_NEGATIVE_CONTROLS = ("git status && gh pr view 1 | head -n 5", "gh pr view 1 | head -n 5",
+                              "git status && gh pr view 1", "git status && ls -la | wc -l")
+RTK_HOOK_JQ_PROBES = ("jq -r .x f.json", "git status && jq .")
+# RTK exactness arms: each inexact rewrite the exclusions route around, run natively, through
+# `rtk <command>` (what the hook would produce) and through `rtk proxy <command>` (the raw recovery).
+# Ported from the 2026-09-26 RTK coverage study's exactness script (checks T1-T7) without its
+# development-build arm; the frozen outcomes are rtk 0.50.0's.
+RTK_EXACT_BLOB_LINES = 400
+RTK_EXACT_JQ_ROWS = 60
+RTK_EXACT_JQ_FILTER = '.[] | "\\(.id) \\(.name) \\(.note)"'
+RTK_JQ_MAX_LINES, RTK_JQ_MAX_WIDTH = 40, 120  # rtk 0.50.0 src/filters/jq.toml
+# Serena answers from the pinned commit, recorded 2026-09-26 on the NativeStack host's installed copy
+# and on a fresh `uv tool install` of the same commit (identical): the exact response lines, newline
+# included, to this harness's initialize (id 1) and tools/list (id 2) requests with no project active.
+SERENA_INITIALIZE_SHA256 = "5277f280d5eeb79d76c620b8676144aab4d33b83dd1d89c7c222a853c676e494"
+SERENA_TOOLS_LIST_SHA256 = {"claude-code": "d2e22bcef4d45e867ca580dae8f50ad5738d31f4b348531ea1a88844994b5083",
+                            "codex": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"}
+# Each context's own exclusion (src/serena/resources/config/contexts/{claude-code,codex}.yml at the
+# commit): claude-code drops search_for_pattern and codex drops replace_content.
+SERENA_CONTEXT_ONLY_TOOLS = {"claude-code": "replace_content", "codex": "search_for_pattern"}
+MCP_PROTOCOL_VERSION = "2025-06-18"
+MCP_CLIENT_INFO = {"name": "native-token-ci", "version": "1"}
+# ai-memory disposable store: two pages in one project; only the first holds the marker.
+AI_MEMORY_SCOPE = {"workspace": "native-ci", "project": "fixture"}
+AI_MEMORY_PAGES = ({"path": "notes/amberquartz.md",
+                    "body": "# Amberquartz retention\n\nThe amberquartz fixture keeps 19 entries.\n"},
+                   {"path": "notes/decoy.md", "body": "# Decoy note\n\nNothing about the marker here.\n"})
+AI_MEMORY_MARKER = "amberquartz"
+# context-mode: a 24,016-byte synthetic build log with one marker line, far above ctx_execute's
+# 5,120-byte threshold for indexing output that carries an `intent`.
+CONTEXT_MODE_LOG = "fixtures/context-mode-build.log"
+CONTEXT_MODE_INTENT = "amberquartz verdict"
+CONTEXT_MODE_MARKER = "amberquartz verdict: 19"
+# context-hub's own opt-out file (src/lib/config.js and telemetry.js at 0.1.4).
+CHUB_OPT_OUT = "telemetry: false\nfeedback: false\n"
+CHUB_QUERY = "stripe"
+CHUB_CONTROL_TIMEOUT = 15
+# agentsview commands the recipes and the token practice use.
+AGENTSVIEW_COMMANDS = ("session search", "session list", "usage daily")
 
 
 def digest(data: bytes) -> str:
@@ -129,6 +275,14 @@ def verify_archive(archive: Path, checksums: str) -> None:
             "Publisher checksum is not SHA-256")
     require(digest(archive.read_bytes()) == matches[0].lower(), "Archive checksum mismatch")
     verify_safe_tar_members(archive)
+
+
+def verify_adoption_archive(name: str, url: str, archive: Path) -> None:
+    """An archive that the Linux adoption pins record at the same URL must also match their sha256,
+    a hash this repository keeps independently of the publisher's checksum file."""
+    pinned = adoption_archive_sha256(name, url)
+    if pinned is not None:
+        require(digest(archive.read_bytes()) == pinned, f"{name} archive differs from its adoption pin")
 
 
 def verify_pack(xml: str, originals: dict[str, str]) -> None:
@@ -214,6 +368,196 @@ def jcodemunch_index_file(repo: str) -> str:
     return f"{safe[0]}-{safe[1]}.db"
 
 
+def rtk_log_message(number: int) -> str:
+    """Message of long-log fixture commit `number`: a subject, five body lines and two trailers."""
+    details = "".join(f"Detail {line} of change {number:03d}: public synthetic text.\n" for line in range(1, 6))
+    return (f"CI_LOG_{number:03d} synthetic change\n\n{details}\n"
+            "Signed-off-by: Native CI Fixture <ci@example.invalid>\n"
+            "Co-authored-by: Native CI Fixture <ci@example.invalid>\n")
+
+
+def rtk_compacted_log(output: str, newest: int, count: int) -> bool:
+    """`output` is exactly RTK's compact log of fixture commits newest, newest - 1, ... (`count` of
+    them): each commit's header, its first three body lines and `[+2 lines omitted]`, nothing else.
+    The abbreviated hash and the relative date are the only parts left open."""
+    blocks = [rf"[0-9a-f]{{7,40}} CI_LOG_{number:03d} synthetic change \([^()\n]+\) <Native CI Fixture>"
+              + "".join(rf"\n  Detail {line} of change {number:03d}: public synthetic text\." for line in (1, 2, 3))
+              + r"\n  \[\+2 lines omitted\]" for number in range(newest, newest - count, -1)]
+    return re.fullmatch("\n".join(blocks) + "\n", output) is not None
+
+
+def rtk_ledger_delta(before: dict, after: dict) -> dict[str, int]:
+    """Change in the `rtk gain --format json` summary counters between two readings."""
+    return {key: after["summary"][key] - before["summary"][key]
+            for key in ("total_commands", "total_input", "total_output", "total_saved")}
+
+
+def markdown_elements(text: str) -> dict[str, bool]:
+    """Which elements of MARKITDOWN_MULTI_ELEMENT `text` holds as Markdown. The bullet, emphasis and
+    code-block spellings that markdownify can emit are all accepted; HTML markup never is."""
+    lines = [item.rstrip() for item in text.splitlines()]
+
+    def line(pattern: str) -> bool:
+        return any(re.fullmatch(pattern, item) for item in lines)
+
+    def row(*cells: str) -> str:
+        return r"\|\s*" + r"\s*\|\s*".join(re.escape(cell) for cell in cells) + r"\s*\|"
+
+    fences = [index for index, item in enumerate(lines) if re.fullmatch(r"(?:```|~~~)\S*", item)]
+    code = ["rtk git log -20", "markitdown page.html"]
+    return {
+        "headings": line(r"# Release checklist") and line(r"## Pinned tools") and line(r"### Steps"),
+        "table": (line(row("Tool", "Version", "Check")) and line(r"\|(?:\s*:?-{3,}:?\s*\|){3}")
+                  and line(row("rtk", "0.50.0", "inline filter tests"))
+                  and line(row("markitdown", "0.1.8", "structure oracle"))
+                  and line(row("ast-grep", "0.45.3", "call-site oracle"))),
+        "ordered_list": (line(r"1\. Install into a fresh prefix") and line(r"2\. Run each fixture")
+                         and line(r"3\. Keep only sanitized output")),
+        "nested_list": (line(r"[*+-] Record every command") and line(r" {2,}[*+-] including failures")
+                        and line(r"[*+-] Never read account state")),
+        "link": "[upgrade guide](https://example.invalid/guide)" in text,
+        "emphasis": "**pinned**" in text and re.search(r"(?<![*_])[*_]scoped[*_](?![*_])", text) is not None,
+        "blockquote": line(r"> Evidence is not authority\."),
+        "code_block": ((len(fences) >= 2 and lines[fences[0] + 1:fences[1]] == code)
+                       or all(line(" {4}" + re.escape(item)) for item in code)),
+        "inline_code_and_entity": "Tom & Jerry use `--offline` mode." in text,
+        "image": "![Pipeline diagram](diagram.png)" in text,
+    }
+
+
+class _TextOnly(HTMLParser):
+    """Collects every text node of a document: the output of plain tag stripping."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+
+def tag_stripped_text(html: str) -> str:
+    parser = _TextOnly()
+    parser.feed(html)
+    parser.close()
+    return "".join(parser.parts)
+
+
+def pack_file_texts(xml: str) -> dict[str, str]:
+    """Each packed file's text in a Repomix XML pack, keyed by its path."""
+    return {item.attrib.get("path"): item.text or "" for item in ET.fromstring(xml).findall(".//file")}
+
+
+def adoption_pin_mismatches(adoption: dict[str, dict]) -> list[str]:
+    """Tools whose adoption pin (keyed by id) names another version, or for Serena another commit,
+    than PINS. Tools the adoption pins do not list are not compared."""
+    mismatched = []
+    for name, pin in PINS.items():
+        entry = adoption.get(name)
+        if entry is None:
+            continue
+        version, _, commit = pin.partition(" @ ")
+        if entry.get("version") != version or (commit and entry.get("commit") != commit):
+            mismatched.append(name)
+    return mismatched
+
+
+def adoption_archive_sha256(name: str, url: str) -> str | None:
+    """The sha256 the Linux adoption pins record for `name`'s archive at exactly `url`, if any."""
+    for entry in json.loads((ROOT / ADOPTION_PINS).read_text())["tools"]:
+        if entry.get("id") == name and entry.get("url") == url and entry.get("sha256"):
+            return entry["sha256"].lower()
+    return None
+
+
+def npm_prefix(binary: str) -> Path:
+    """The npm --prefix an npm-installed executable came from: the parent of the lib/node_modules
+    that holds its package, found by resolving the bin link."""
+    resolved = Path(binary).resolve()
+    for folder in resolved.parents:
+        if folder.name == "node_modules" and folder.parent.name == "lib":
+            return folder.parent.parent
+    raise AssertionError(f"Not an npm --prefix installation: {binary}")
+
+
+def uv_git_identity(environment: Path, name: str) -> dict[str, str | None]:
+    """What a uv tool environment records about its git source: uv-receipt.toml's requirement and
+    the installed distribution's PEP 610 direct_url.json commit."""
+    tool = UV_GIT_TOOLS[name]
+    receipt = tomllib.loads((environment / "uv-receipt.toml").read_text())
+    sources = [item.get("git") for item in receipt.get("tool", {}).get("requirements", [])]
+    direct = sorted(environment.glob(f"lib/python*/site-packages/{tool['distribution']}-*.dist-info/direct_url.json"))
+    commit = json.loads(direct[0].read_text()).get("vcs_info", {}).get("commit_id") if len(direct) == 1 else None
+    return {"uv_receipt_git": sources[0] if len(sources) == 1 else None, "direct_url_commit": commit}
+
+
+def uv_git_identity_matches(identity: dict[str, str | None], name: str) -> bool:
+    tool = UV_GIT_TOOLS[name]
+    return (identity.get("uv_receipt_git") == f"{tool['url']}?rev={tool['commit']}"
+            and identity.get("direct_url_commit") == tool["commit"])
+
+
+def hook_decision(entry: dict, command: str) -> str | None:
+    """`rtk hook check` answer from its recorded command entry: the rewritten command (exit 0,
+    stdout), or None for `No rewrite for: <command>` (exit 1, stderr). RTK's own `[rtk] ` notice
+    lines on stderr (such as its "No hook installed" hint) are not part of the answer."""
+    stderr = [line for line in entry["stderr"].splitlines() if line.strip() and not line.startswith("[rtk] ")]
+    stdout = entry["stdout"].strip()
+    if entry["exit_code"] == 0 and stdout and "\n" not in stdout and not stderr:
+        return stdout
+    if entry["exit_code"] == 1 and not stdout and stderr == [f"No rewrite for: {command}"]:
+        return None
+    raise AssertionError(f"rtk hook check gave an unrecognized answer for: {command}")
+
+
+def tail_lines(text: str, count: int) -> list[str]:
+    """What `tail -n <count>` keeps of `text`, as lines."""
+    return text.splitlines()[-count:]
+
+
+def mcp_result(line: bytes) -> dict:
+    """The `result` of one JSON-RPC response line; an error response fails the fixture."""
+    message = json.loads(line)
+    require("error" not in message and isinstance(message.get("result"), dict), "MCP request returned an error")
+    return message["result"]
+
+
+def mcp_tool_json(line: bytes):
+    """A tools/call result whose single text content is JSON, parsed; a tool error fails the fixture."""
+    result = mcp_result(line)
+    require(result.get("isError") is not True, "MCP tool call reported isError")
+    content = result.get("content") or []
+    require(len(content) == 1 and content[0].get("type") == "text", "MCP tool result is not one text item")
+    return json.loads(content[0]["text"])
+
+
+def serena_tool_names(line: bytes) -> list[str]:
+    return [tool["name"] for tool in mcp_result(line)["tools"]]
+
+
+def serena_contexts_differ(names: dict[str, list[str]]) -> bool:
+    """Each context serves the tool the other context's configuration excludes, and only its own."""
+    first, second = SERENA_CONTEXT_ONLY_TOOLS
+    return (SERENA_CONTEXT_ONLY_TOOLS[first] in names[first] and SERENA_CONTEXT_ONLY_TOOLS[first] not in names[second]
+            and SERENA_CONTEXT_ONLY_TOOLS[second] in names[second] and SERENA_CONTEXT_ONLY_TOOLS[second] not in names[first])
+
+
+def context_mode_indexed(text: str, raw: str) -> bool:
+    """ctx_execute indexed a large output instead of returning it: its answer reports the indexed
+    sections and the section count matched for the intent, is under a quarter of the raw size, and
+    repeats fewer than ten of the raw lines."""
+    indexed = re.search(r'(?m)^Indexed [1-9][0-9]* sections from "execute:shell" into knowledge base\.$', text)
+    matched = re.search(rf'(?m)^[1-9][0-9]* sections? matched "{re.escape(CONTEXT_MODE_INTENT)}" \(', text)
+    repeated = sum(1 for line in raw.splitlines() if line and line in text)
+    return (indexed is not None and matched is not None and 4 * len(text.encode()) < len(raw.encode())
+            and repeated < 10)
+
+
+def context_mode_small_answer(code: str, output: str) -> str:
+    """ctx_execute 1.0.169's answer to a small output: the code in a fenced block, then the output."""
+    return f"```shell\n{code}\n```\n\n{output}"
+
+
 class Run:
     def __init__(self, output: Path, work: Path):
         self.output, self.work = output, work
@@ -237,9 +581,19 @@ class Run:
                        "No LLM or embedding model: MarkItDown runs the ONNX file-type classifier bundled in its "
                        "magika dependency, and Headroom's token counter downloads tiktoken's o200k_base "
                        "vocabulary into TMPDIR at run time",
-                       "Top-level package pins only: npm and uv tool (PyPI) dependencies resolve at "
-                       "installation without a lockfile or pinned hashes; the uv archive is the only "
-                       "download checked against a hash pinned in this harness",
+                       "Top-level package pins only: npm and uv tool (PyPI) dependencies, Serena's too "
+                       "(installed from its pinned git commit), resolve at installation without a lockfile "
+                       "or pinned hashes; the uv archive is checked against a hash pinned in this harness, "
+                       "and the RTK and ai-memory archives also against adoption/pins-linux-x86_64.json",
+                       "Network after installation, besides Headroom's vocabulary: context-mode 1.0.169's "
+                       "MCP server requests registry.npmjs.org/context-mode/latest at every start (no opt-out "
+                       "at this pin), and one chub update fetches the context-hub registry with its telemetry "
+                       "and feedback opt-outs set",
+                       "context-hub's offline arms run in a new user and network namespace (unshare -rn); its "
+                       "control arm, which lacks the opt-out file, runs only there. agentsview runs with "
+                       "AGENTSVIEW_TELEMETRY_ENABLED=0",
+                       "Serena runs with no project, so no language server starts; ai-memory runs with no "
+                       "embedding provider; agentsview is checked through --version and --help only",
                        "RTK counters are fixture-local estimates, not provider savings",
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
@@ -274,9 +628,18 @@ class Run:
             "CBM_CACHE_DIR": str(work / "cache/codebase-memory-mcp"), "CBM_RUNTIME_DIR": str(work / "cbm"),
             "MCPORTER_DAEMON_DIR": str(work / "mcp"),
             "CLAUDE_CONFIG_DIR": str(ROOT / "fixtures/ccusage-synthetic-claude"),
+            # The 2026-09-26 tools, each through its documented setting: context-mode's
+            # sessions/content root, Serena's home, ai-memory's data directory (with its
+            # documented no-embedding choice, so no model download), context-hub's directory,
+            # and agentsview's data directory with its telemetry opt-out
+            # (internal/telemetry/telemetry.go at v0.43.0).
+            "CONTEXT_MODE_DIR": str(work / "data/context-mode"), "SERENA_HOME": str(work / "data/serena"),
+            "AI_MEMORY_DATA_DIR": str(work / "data/ai-memory"), "AI_MEMORY_EMBEDDING_PROVIDER": "none",
+            "CHUB_DIR": str(work / "data/chub"), "AGENTSVIEW_DATA_DIR": str(work / "data/agentsview"),
+            "AGENTSVIEW_TELEMETRY_ENABLED": "0",
         })
         for folder in ("config", "cache/qmd", "cache/jcodemunch", "data/rtk", "data/uv-tools",
-                       "data/headroom", "config/headroom", "config/mcporter",
+                       "data/headroom", "config/headroom", "config/mcporter", "data/agentsview",
                        "state", "tmp", "config/qmd", "install", "install/uv-tools-bin"):
             (work / folder).mkdir(parents=True, exist_ok=True)
         for private in ("cbm", "cache/codebase-memory-mcp", "mcp"):
@@ -307,16 +670,34 @@ class Run:
             replacements.append((os.environ["HOME"], "<NATIVE_HOME>"))
         for source, target in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
             value = value.replace(source, target)
+        # Source: scripts/validate.py:PRIVATE_CONTENT. Keep these two patterns and
+        # their flags in sync if that tuple changes.
+        value = re.sub(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", "<UUID>", value, flags=re.I)
+        value = re.sub(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)",
+                       "<HOME-EXAMPLE>", value)
         return value
 
     def flush(self) -> None:
         (self.output / "receipt.json").write_text(json.dumps(self.report, indent=2) + "\n")
 
+    def environment(self, overrides: dict[str, str | None] | None = None) -> dict[str, str]:
+        """The run environment with per-command overrides; a None value removes the key."""
+        environment = dict(self.env)
+        for key, value in (overrides or {}).items():
+            if value is None:
+                environment.pop(key, None)
+            else:
+                environment[key] = value
+        return environment
+
     def command(self, label: str, argv: list[str], cwd: Path | None = None,
-                nonzero: bool = False, timeout: int = 90) -> str:
+                nonzero: bool | None = False, timeout: int = 90,
+                env: dict[str, str | None] | None = None) -> str:
+        """Run one command. `nonzero` False expects exit 0, True a nonzero exit and None accepts any
+        exit, which the caller then checks; `env` overrides the run environment for this command."""
         start = time.monotonic()
         timed_out = False
-        process = subprocess.Popen(argv, cwd=cwd or self.work, env=self.env,
+        process = subprocess.Popen(argv, cwd=cwd or self.work, env=self.environment(env),
                                    stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, start_new_session=True)
         try:
@@ -331,17 +712,25 @@ class Run:
                 stdout, stderr = process.communicate()
         entry = {"label": label, "argv": [self.clean(arg) for arg in argv],
                  "cwd": self.clean(str(cwd or self.work)), "exit_code": process.returncode,
-                 "expected_exit": "nonzero" if nonzero else "zero", "timed_out": timed_out,
+                 "expected_exit": "any" if nonzero is None else "nonzero" if nonzero else "zero",
+                 "timed_out": timed_out,
                  "elapsed_seconds": round(time.monotonic() - start, 3),
                  "stdout_raw_sha256": digest(stdout), "stderr_raw_sha256": digest(stderr),
                  "stdout": self.clean(stdout.decode("utf-8", errors="replace")),
                  "stderr": self.clean(stderr.decode("utf-8", errors="replace"))}
+        if env:
+            entry["env_overrides"] = {key: None if value is None else self.clean(value) for key, value in env.items()}
         self.report["commands"].append(entry)
         self.flush()
         require(not timed_out, f"{label}: timed out")
-        require((process.returncode != 0) if nonzero else (process.returncode == 0),
-                f"{label}: unexpected exit {process.returncode}")
+        if nonzero is not None:
+            require((process.returncode != 0) if nonzero else (process.returncode == 0),
+                    f"{label}: unexpected exit {process.returncode}")
         return stdout.decode("utf-8")
+
+    def last_command(self) -> dict:
+        """The receipt entry of the command that ran last: exit code, and sanitized stdout/stderr."""
+        return self.report["commands"][-1]
 
     def check(self, label: str, condition: bool) -> None:
         self.report["checks"].append({"label": label, "passed": bool(condition)})
@@ -364,22 +753,25 @@ class Run:
                          "--no-fund", f"{PACKAGES[name]}@{PINS[name]}"], timeout=360)
             self.command(f"installed-metadata-{name}", ["npm", "list", "--global", "--prefix",
                          str(prefix), "--depth=0", "--json"])
-            return str(prefix / "bin" / name)
+            return str(prefix / "bin" / BINARIES.get(name, name))
         if name in GITHUB_RELEASES:
             release = GITHUB_RELEASES[name]
-            asset, base = release["asset"], release["base"].format(version=PINS[name])
-            for filename in (asset, "checksums.txt"):
+            asset = release["asset"].format(version=PINS[name])
+            base = release["base"].format(version=PINS[name])
+            sums = release.get("checksums", "checksums.txt")
+            for filename in (asset, sums):
                 self.command(f"download-{name}-{filename}", ["curl", "--disable", "--fail", "--silent",
                              "--show-error", "--location", "--output", str(prefix / filename),
                              f"{base}/{filename}"])
             archive = prefix / asset
-            checksums = (prefix / "checksums.txt").read_text()
+            checksums = (prefix / sums).read_text()
             verify_archive(archive, checksums)
+            verify_adoption_archive(name, f"{base}/{asset}", archive)
             # One key per tool; "rtk_archive_sha256" is also what retained reproductions read
             # (evidence/artifacts/sota-refresh-20260925/rtk/native_token_ci_rtk_only.py).
             self.report[f"{name.replace('-', '_')}_archive_sha256"] = digest(archive.read_bytes())
             self.command(f"{name}-publisher-checksum", ["sha256sum", "--check", "--ignore-missing",
-                                                        "checksums.txt"], cwd=prefix)
+                                                        sums], cwd=prefix)
             self.command(f"{name}-archive-members", ["tar", "-tf", asset], cwd=prefix)
             self.command(f"{name}-extract", ["tar", "-xf", asset], cwd=prefix)
             return str(prefix / release["binary"])
@@ -387,6 +779,12 @@ class Run:
             uv = self.ensure_uv()
             self.command(f"install-{name}", [uv, "tool", "install", "--python", "3.13",
                          f"{UV_TOOLS[name]}=={PINS[name]}"], timeout=360)
+            self.command(f"installed-metadata-{name}", [uv, "tool", "list"])
+            return str(Path(self.env["UV_TOOL_BIN_DIR"]) / name)
+        if name in UV_GIT_TOOLS:
+            uv, tool = self.ensure_uv(), UV_GIT_TOOLS[name]
+            self.command(f"install-{name}", [uv, "tool", "install", "--python", "3.13",
+                         f"git+{tool['url']}@{tool['commit']}"], timeout=600)
             self.command(f"installed-metadata-{name}", [uv, "tool", "list"])
             return str(Path(self.env["UV_TOOL_BIN_DIR"]) / name)
         raise AssertionError(f"No install method registered for {name}")
@@ -416,10 +814,15 @@ class Run:
         self.tools["uv"] = str(uv)
         return self.tools["uv"]
 
-    def observe(self, label: str, directory: Path) -> list[str]:
-        """Record what a tool wrote under a redirected state directory (directories end in /)."""
-        found = sorted(path.relative_to(directory).as_posix() + ("/" if path.is_dir() else "")
-                       for path in directory.rglob("*"))
+    def observe(self, label: str, directory: Path, skip: tuple[str, ...] = ()) -> list[str]:
+        """Record what a tool wrote under a redirected state directory (directories end in /). The
+        contents of directories named in `skip` (such as a tool's own .git) are left out. Relative
+        paths never contain this run's own work/output/tool/HOME strings, but a tool's own
+        generated filenames can still be UUID-shaped (ai-memory's page ids), so each entry still
+        goes through `clean()` for its PRIVATE_CONTENT redaction pass."""
+        found = sorted(self.clean(path.relative_to(directory).as_posix() + ("/" if path.is_dir() else ""))
+                       for path in directory.rglob("*")
+                       if not any(part in skip for part in path.relative_to(directory).parts[:-1]))
         self.report["state_observations"][label] = found
         self.flush()
         return found
@@ -456,6 +859,48 @@ def rtk_fixture(run: Run) -> None:
     # fixture directory, finds no hook and skips, so no client configuration is consulted.
     verify = run.command("rtk-verify-inline-filter-tests", [tool, "verify", "--require-all"], repo)
     run.check("rtk-upstream-inline-filter-tests-pass", rtk_inline_tests_passed(verify))
+
+
+def rtk_long_log_fixture(run: Run) -> None:
+    """RTK's git log filter on a history long enough to differ from git's own output: every commit
+    compacted, a smaller output than raw git, the default ten-commit window, an exact proxy
+    passthrough, and a ledger saving recorded for the filtered call only."""
+    repo, messages = run.work / "git-long-fixture", run.work / "git-long-messages"
+    repo.mkdir()
+    messages.mkdir()
+    run.command("git-long-init", ["git", "init", "--quiet"], repo)
+    for key, value in (("user.name", "Native CI Fixture"), ("user.email", "ci@example.invalid")):
+        run.command(f"git-long-{key}", ["git", "config", key, value], repo)
+    for number in range(RTK_LOG_COMMITS):
+        message = messages / f"{number:03d}.txt"
+        message.write_text(rtk_log_message(number))
+        run.command(f"git-long-commit-{number:03d}", ["git", "commit", "--quiet", "--allow-empty",
+                                                     "--file", str(message)], repo)
+    tool, count, newest = run.tools["rtk"], f"-{RTK_LOG_COMMITS}", RTK_LOG_COMMITS - 1
+    raw = run.command("git-long-log-baseline", ["git", "log", count], repo)
+    before = json.loads(run.command("rtk-long-gain-before", [tool, "gain", "--format", "json"], repo))
+    compact = run.command("rtk-long-git-log", [tool, "git", "log", count], repo)
+    filtered = json.loads(run.command("rtk-long-gain-after-filter", [tool, "gain", "--format", "json"], repo))
+    proxied = run.command("rtk-long-proxy-git-log", [tool, "proxy", "git", "log", count], repo)
+    after = json.loads(run.command("rtk-long-gain-after-proxy", [tool, "gain", "--format", "json"], repo))
+    default = run.command("rtk-long-default-git-log", [tool, "git", "log"], repo)
+    saving, passthrough = rtk_ledger_delta(before, filtered), rtk_ledger_delta(filtered, after)
+    run.report["rtk_long_log"] = {"commits": RTK_LOG_COMMITS, "raw_bytes": len(raw.encode()),
+                                  "rtk_bytes": len(compact.encode()), "default_bytes": len(default.encode()),
+                                  "ledger_filter_delta": saving, "ledger_proxy_delta": passthrough}
+    run.flush()
+    run.check("rtk-long-log-compacts-every-commit", rtk_compacted_log(compact, newest, RTK_LOG_COMMITS))
+    run.check("rtk-long-log-raw-baseline-rejected-and-larger",
+              not rtk_compacted_log(raw, newest, RTK_LOG_COMMITS) and len(compact.encode()) < len(raw.encode()))
+    run.check("rtk-long-log-proxy-exact-stdout", proxied == raw)
+    run.check("rtk-long-log-ledger-records-the-filter-saving",
+              saving["total_commands"] == 1 and saving["total_saved"] > 0
+              and saving["total_saved"] == saving["total_input"] - saving["total_output"])
+    run.check("rtk-long-log-ledger-records-no-proxy-saving",
+              passthrough["total_commands"] == 1 and passthrough["total_saved"] == 0
+              and passthrough["total_input"] == passthrough["total_output"])
+    run.check("rtk-long-log-default-window-ten-newest-commits",
+              rtk_compacted_log(default, newest, RTK_LOG_DEFAULT_LIMIT))
 
 
 def qmd_fixture(run: Run) -> None:
@@ -514,6 +959,13 @@ def repomix_fixture(run: Run) -> None:
     content = compressed.read_text()
     run.check("repomix-structural-output-only", all(name in content for name in originals)
               and "greeting" in content and "DO_NOT_PACK_CI_UNSELECTED" not in content)
+    # The check above also passes on an uncompressed pack: compression must keep each signature and
+    # drop the function body that the exact originals pack above still holds.
+    structure = pack_file_texts(content)
+    run.check("repomix-compress-keeps-signatures-drops-bodies",
+              set(structure) == set(originals)
+              and all("def greeting(name)" in text and "return" not in text for text in structure.values())
+              and all("return" in text for text in originals.values()))
     run.artifact("repomix-structure.xml", compressed)
 
 
@@ -526,6 +978,12 @@ def toon_fixture(run: Run) -> None:
     run.command("toon-strict-decode", [cli, str(encoded), "--decode", "--strict", "-o", str(recovered)])
     verify_json_roundtrip(source.read_text(), recovered.read_text())
     run.check("toon-exact-json-value-roundtrip", True)
+    # Any valid TOON encoding round-trips (another delimiter, or the expanded list form), while a copied
+    # JSON file decodes to a different value; the compact tabular block, smaller than the JSON, is the
+    # form TOON is used for.
+    tabular = encoded.read_text()
+    run.check("toon-tabular-encoding-smaller-than-json",
+              tabular.rstrip("\n") == TOON_TABULAR_RECORDS and len(tabular.encode()) < len(source.read_bytes()))
     malformed = run.work / "malformed.toon"
     malformed.write_text("items[2]{name,count}:\n  alpha,1\n")
     run.command("toon-rejects-truncated-array", [cli, str(malformed), "--decode", "--strict"], nonzero=True)
@@ -547,6 +1005,29 @@ def markitdown_fixture(run: Run) -> None:
     run.command("markitdown-txt-passthrough", [binary, str(plain_source), "-o", str(passthrough)])
     run.check("markitdown-txt-passthrough-unchanged",
               passthrough.read_text().rstrip("\n") == plain_text.rstrip("\n"))
+
+
+def markitdown_multi_element_fixture(run: Run) -> None:
+    """MarkItDown's HTML converter on a page with one of each common element. Every element check
+    must hold on the converted Markdown and fail on the raw HTML and on its plain tag-stripped text."""
+    source = ROOT / MARKITDOWN_MULTI_ELEMENT
+    converted = run.work / "markitdown-multi-element.md"
+    run.command("markitdown-multi-element-html", [run.tools["markitdown"], str(source), "-o", str(converted)])
+    markdown, html = converted.read_text(), source.read_text()
+    stripped = tag_stripped_text(html)
+    found = markdown_elements(markdown)
+    baselines = {"raw_html": markdown_elements(html), "tag_stripped_text": markdown_elements(stripped)}
+    run.report["markitdown_multi_element"] = {"converted": found, **baselines}
+    run.flush()
+    run.check("markitdown-multi-element-structure-converted", all(found.values()))
+    # Searched with Markdown backslash escapes removed as well, so an escaped leak still counts.
+    unescaped = re.sub(r"\\(.)", r"\1", markdown)
+    run.check("markitdown-script-style-and-comment-text-dropped",
+              not any(text in candidate for text in MARKITDOWN_HIDDEN_TEXT for candidate in (markdown, unescaped)))
+    run.check("markitdown-element-checks-reject-raw-and-tag-stripped-html",
+              not any(value for baseline in baselines.values() for value in baseline.values())
+              and all(any(text in candidate for text in MARKITDOWN_HIDDEN_TEXT) for candidate in (html, stripped)))
+    run.artifact("markitdown-multi-element.md", converted)
 
 
 def ast_grep_fixture(run: Run) -> None:
@@ -573,6 +1054,22 @@ def ast_grep_fixture(run: Run) -> None:
                       "--pattern", "zzz_native_ci_nonexistent_call($$$ARGS)", AST_GREP_FIXTURE,
                       "--json=compact"], cwd=ROOT, nonzero=True))
     run.check("ast-grep-negative-control-zero-matches", none == [])
+
+
+def ast_grep_shell_fixture(run: Run) -> None:
+    """A structural pattern no line-based search expresses: calls that pass a shell=True keyword
+    argument, one spread over five lines, against the closest single-line regex."""
+    matches = json.loads(run.command("ast-grep-shell-true-calls", [run.tools["ast-grep"], "run", "--lang",
+                         "python", "--pattern", AST_GREP_SHELL_PATTERN, AST_GREP_SHELL_FIXTURE,
+                         "--json=compact"], cwd=ROOT))
+    text = run.command("ast-grep-shell-text-baseline-grep", ["grep", "-n", "-E", AST_GREP_SHELL_TEXT_REGEX,
+                       AST_GREP_SHELL_FIXTURE], cwd=ROOT)
+    text_lines = [int(line.split(":", 1)[0]) for line in text.splitlines() if line]
+    # ast-grep's JSON range lines are 0-based.
+    ranges = sorted([match["range"]["start"]["line"] + 1, match["range"]["end"]["line"] + 1] for match in matches)
+    run.check("ast-grep-shell-true-calls-match-across-lines",
+              {match["file"] for match in matches} == {AST_GREP_SHELL_FIXTURE}
+              and ranges == AST_GREP_SHELL_CALL_RANGES and text_lines == AST_GREP_SHELL_TEXT_LINES)
 
 
 def ccusage_fixture(run: Run) -> None:
@@ -767,6 +1264,466 @@ def jcodemunch_mcp_fixture(run: Run) -> None:
     run.observe("jcodemunch-mcp-server-home", server_home)
 
 
+def verify_version(run: Run, name: str, binary: str) -> None:
+    """Check an installed tool against its pin with the version probe its upstream supports: the
+    installed npm package metadata where the CLI has no version flag, otherwise `--version`, and for
+    a tool installed from a git commit, the commit its uv tool environment records."""
+    if name in NPM_METADATA_VERSION:
+        listed = json.loads(run.command(f"version-{name}", ["npm", "list", "--global", "--prefix",
+                                                           str(npm_prefix(binary)), "--depth=0", "--json"]))
+        installed = listed.get("dependencies", {}).get(PACKAGES[name], {}).get("version")
+        require(installed == PINS[name], f"Installed {name} differs from its manifest pin")
+        return
+    version = run.command(f"version-{name}", [binary, "--version"])
+    expected = PINS[name].partition(" @ ")[0]
+    require(re.search(rf"(?<![\d.]){re.escape(expected)}(?![\d.])", version) is not None,
+            f"Installed {name} differs from its manifest pin")
+    if name in UV_GIT_TOOLS:
+        environment = (Path(run.env["UV_TOOL_DIR"]) / UV_GIT_TOOLS[name]["environment"] if run.fresh_install
+                       else Path(binary).resolve().parent.parent)
+        identity = uv_git_identity(environment, name)
+        run.report[f"{name.replace('-', '_')}_source_identity"] = identity
+        run.flush()
+        require(uv_git_identity_matches(identity, name), f"Installed {name} is not the pinned commit")
+
+
+def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tuple[str, dict]],
+                      cwd: Path | None = None, env: dict[str, str | None] | None = None,
+                      timeout: int = 120) -> list[bytes]:
+    """One MCP stdio session as the specification defines it (2025-06-18: basic/lifecycle,
+    basic/transports#stdio): newline-delimited JSON-RPC on the server's stdin and stdout, the
+    `initialize` answer awaited before `notifications/initialized` is sent, then each request
+    awaited before the next. Returns the server's response lines exactly as it wrote them,
+    initialize first. The session is recorded like a command, with each request and the raw hash
+    of its answer. MCPorter is not used here: its 0.14.1 client first sends a `server/discover`
+    probe that ai-memory's server rejects by exiting, and its answers are re-serialized."""
+    start = time.monotonic()
+    process = subprocess.Popen(argv, cwd=cwd or run.work, env=run.environment(env),
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               start_new_session=True)
+    lines: queue.Queue = queue.Queue()
+    stdout, stderr = bytearray(), bytearray()
+
+    def pump(stream, sink: bytearray, forward: bool) -> None:
+        for chunk in iter(stream.readline, b""):
+            sink.extend(chunk)
+            if forward:
+                lines.put(chunk)
+        if forward:
+            lines.put(None)
+
+    readers = [threading.Thread(target=pump, args=(process.stdout, stdout, True), daemon=True),
+               threading.Thread(target=pump, args=(process.stderr, stderr, False), daemon=True)]
+    for reader in readers:
+        reader.start()
+    messages = [("initialize", {"protocolVersion": MCP_PROTOCOL_VERSION, "capabilities": {},
+                                "clientInfo": MCP_CLIENT_INFO}), *requests]
+    responses: list[bytes] = []
+    exchange: list[dict] = []
+    failure = None
+    try:
+        for number, (method, params) in enumerate(messages, 1):
+            request = {"jsonrpc": "2.0", "id": number, "method": method, "params": params}
+            process.stdin.write((json.dumps(request) + "\n").encode())
+            process.stdin.flush()
+            while True:
+                line = lines.get(timeout=max(0.0, start + timeout - time.monotonic()))
+                require(line is not None, f"server closed its stdout before answering {method}")
+                try:
+                    message = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(message, dict) and message.get("id") == number and (
+                        "result" in message or "error" in message):
+                    break
+            responses.append(line)
+            exchange.append({"request": run.clean(json.dumps(request)), "response_raw_sha256": digest(line)})
+            if number == 1:
+                process.stdin.write(b'{"jsonrpc": "2.0", "method": "notifications/initialized"}\n')
+                process.stdin.flush()
+    except queue.Empty:
+        failure = "timed out waiting for an answer"
+    except (AssertionError, OSError) as error:
+        failure = str(error)
+    finally:
+        try:
+            process.stdin.close()
+        except OSError:
+            pass
+        try:
+            process.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            signal_group(process, signal.SIGTERM)
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                signal_group(process, signal.SIGKILL)
+                process.wait()
+        for reader in readers:
+            reader.join(timeout=5)
+        entry = {"label": label, "argv": [run.clean(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
+                 "exit_code": process.returncode, "expected_exit": "any",
+                 "timed_out": failure == "timed out waiting for an answer",
+                 "elapsed_seconds": round(time.monotonic() - start, 3), "mcp_exchange": exchange,
+                 "stdout_raw_sha256": digest(bytes(stdout)), "stderr_raw_sha256": digest(bytes(stderr)),
+                 "stdout": run.clean(bytes(stdout).decode("utf-8", errors="replace")),
+                 "stderr": run.clean(bytes(stderr).decode("utf-8", errors="replace"))}
+        if env:
+            entry["env_overrides"] = {key: None if value is None else run.clean(value) for key, value in env.items()}
+        run.report["commands"].append(entry)
+        run.flush()
+    require(failure is None, f"{label}: {failure}")
+    return responses
+
+
+def rtk_hook_check_fixture(run: Run) -> None:
+    """RTK's Claude-hook decisions (`rtk hook check --agent claude`, the hook's own decision path)
+    under recipes/README.md's exclusions plus `jq`, and under RTK's defaults. Every probe must get
+    its recorded answer in both arms, and every form the exclusions keep native must be rewritten
+    under the defaults: otherwise the exclusions are not what keeps it native. RTK falls back to its
+    defaults without a warning when it cannot read a config file, so these answers, not the file,
+    are the read-back."""
+    tool = run.tools["rtk"]
+    configs = {"five-exclusions": run.work / "rtk-hook-config/five-exclusions",
+               "defaults": run.work / "rtk-hook-config/defaults"}
+    (configs["five-exclusions"] / "rtk").mkdir(parents=True)
+    configs["defaults"].mkdir(parents=True)
+    shutil.copyfile(ROOT / RTK_HOOK_EXCLUSIONS, configs["five-exclusions"] / "rtk/config.toml")
+    answers: dict[str, dict[str, str | None]] = {}
+    for arm, folder in configs.items():
+        answers[arm] = {}
+        for number, (probe, _excluded, _default) in enumerate(RTK_HOOK_PROBES, 1):
+            run.command(f"rtk-hook-check-{arm}-{number:02d}", [tool, "hook", "check", "--agent", "claude", probe],
+                        nonzero=None, env={"XDG_CONFIG_HOME": str(folder)})
+            answers[arm][probe] = hook_decision(run.last_command(), probe)
+    run.report["rtk_hook_check"] = answers
+    run.flush()
+    recorded = {probe: excluded for probe, excluded, _default in RTK_HOOK_PROBES}
+    defaults = {probe: default for probe, _excluded, default in RTK_HOOK_PROBES}
+    five = answers["five-exclusions"]
+    run.check("rtk-hook-five-exclusions-answer-every-probe-as-recorded", five == recorded)
+    run.check("rtk-hook-jq-excluded-and-the-git-part-beside-it-rewritten",
+              all(five[probe] == recorded[probe] for probe in RTK_HOOK_JQ_PROBES))
+    run.check("rtk-hook-negative-controls-rewrite-only-eligible-parts",
+              all(five[probe] == recorded[probe] for probe in RTK_HOOK_NEGATIVE_CONTROLS))
+    kept_native = [probe for probe, excluded, default in RTK_HOOK_PROBES if excluded is None and default is not None]
+    run.check("rtk-hook-defaults-rewrite-every-form-the-exclusions-keep-native",
+              answers["defaults"] == defaults and bool(kept_native)
+              and all(answers["defaults"][probe] is not None and five[probe] is None for probe in kept_native))
+
+
+def rtk_exact_rows() -> list[dict]:
+    """jq input: 60 rows, every ninth with a note long enough to pass RTK's 120-character width."""
+    return [{"id": number, "name": f"item-{number:03d}",
+             "note": ("long " + "x" * 150 + f" {number}") if number % 9 == 0 else f"short {number}"}
+            for number in range(1, RTK_EXACT_JQ_ROWS + 1)]
+
+
+def rtk_exactness_fixture(run: Run) -> None:
+    """RTK's inexact rewrites that the exclusions and the recipe's notes route around, each run
+    natively, through `rtk <command>` (what the hook produces when it rewrites) and through
+    `rtk proxy <command>` (the raw recovery path). One fixture history: a remote with main and
+    feature, and a clone with feature checked out in a linked worktree; 15 commits and a merge."""
+    tool = run.tools["rtk"]
+    base = run.work / "rtk-exactness"
+    source, bare, clone = base / "origin-src", base / "remote.git", base / "clone"
+    source.mkdir(parents=True)
+
+    def git(label: str, *arguments: str, cwd: Path = source) -> None:
+        run.command(f"rtk-exactness-git-{label}", ["git", *arguments], cwd)
+
+    git("init", "init", "--quiet", "--initial-branch=main")
+    for key, value in (("user.name", "Native CI Fixture"), ("user.email", "ci@example.invalid")):
+        git(f"config-{key}", "config", key, value)
+    blob = "".join(f"line {number:05d} abcdefghijklmnopqrstuvwxyz0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
+                   for number in range(1, RTK_EXACT_BLOB_LINES + 1))
+    (source / "big.txt").write_text(blob)
+    (source / "a.txt").write_text("alpha\nbeta\n")
+    (source / "b.txt").write_text("alpha\ngamma\n")
+    (source / "src/deep/pkg").mkdir(parents=True)
+    for number in (1, 2, 3):
+        (source / f"src/deep/pkg/f{number}.txt").write_text(f"needle {number}\n")
+    git("add-c0", "add", "--all")
+    git("commit-c0", "commit", "--quiet", "-m", "c0")
+    for number in range(1, 13):
+        with (source / "counter.txt").open("a") as counter:
+            counter.write(f"{number}\n")
+        git(f"add-c{number}", "add", "counter.txt")
+        git(f"commit-c{number}", "commit", "--quiet", "-m", f"c{number}")
+    git("branch-feature", "checkout", "--quiet", "-b", "feature")
+    (source / "feat.txt").write_text("f\n")
+    git("add-feat", "add", "feat.txt")
+    git("commit-feat", "commit", "--quiet", "-m", "feat")
+    git("checkout-main", "checkout", "--quiet", "main")
+    git("merge-feature", "merge", "--quiet", "--no-ff", "feature", "-m", "merge feature")
+    (source / "post.txt").write_text("post\n")
+    git("add-post", "add", "post.txt")
+    git("commit-post", "commit", "--quiet", "-m", "post")
+    git("clone-bare", "clone", "--quiet", "--bare", str(source), str(bare), cwd=base)
+    git("clone", "clone", "--quiet", str(bare), str(clone), cwd=base)
+    git("local-feature", "branch", "--quiet", "feature", "origin/feature", cwd=clone)
+    git("worktree-feature", "worktree", "add", "--quiet", str(base / "wt-feature"), "feature", cwd=clone)
+    rows = base / "rows.json"
+    rows.write_text(json.dumps(rtk_exact_rows()) + "\n")
+
+    def arms(label: str, argv: list[str], cwd: Path = clone) -> dict[str, dict]:
+        outcome = {}
+        for arm, prefix in (("native", []), ("rtk", [tool]), ("proxy", [tool, "proxy"])):
+            stdout = run.command(f"rtk-exactness-{label}-{arm}", [*prefix, *argv], cwd, nonzero=None)
+            outcome[arm] = {"exit": run.last_command()["exit_code"], "stdout": stdout}
+        return outcome
+
+    cases = {"t1-git-show-blob": arms("t1-git-show-blob", ["git", "show", "HEAD:big.txt"]),
+             "t1b-git-c-show-blob": arms("t1b-git-c-show-blob", ["git", "-C", ".", "show", "HEAD:big.txt"]),
+             "t2-diff-missing-file": arms("t2-diff-missing-file", ["diff", "a.txt", "missing.txt"]),
+             "t2b-diff-two-files": arms("t2b-diff-two-files", ["diff", "a.txt", "b.txt"]),
+             "t3-git-branch-all": arms("t3-git-branch-all", ["git", "branch", "-a"]),
+             "t4-git-log": arms("t4-git-log", ["git", "log"]),
+             "t4b-git-log-subjects": arms("t4b-git-log-subjects", ["git", "log", "--format=%s"]),
+             "t5-find-missing-dir": arms("t5-find-missing-dir", ["find", "nosuchdir", "-name", "*.txt"]),
+             "t6-grep-file-list": arms("t6-grep-file-list", ["grep", "-rl", "needle", "src"]),
+             "t7-jq-rows": arms("t7-jq-rows", ["jq", "-r", RTK_EXACT_JQ_FILTER, str(rows)], cwd=base)}
+    run.report["rtk_exactness"] = {case: {arm: {"exit": result["exit"], "bytes": len(result["stdout"].encode()),
+                                                "lines": len(result["stdout"].splitlines()),
+                                                "stdout_sha256": digest(result["stdout"].encode())}
+                                          for arm, result in outcome.items()} for case, outcome in cases.items()}
+    run.flush()
+    for name, check in rtk_exactness_checks(cases, blob).items():
+        run.check(name, check)
+
+
+def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[str, bool]:
+    """Frozen rtk 0.50.0 outcomes of the exactness arms, each held against the native arm."""
+    def lines(case: str, arm: str) -> list[str]:
+        return cases[case][arm]["stdout"].splitlines()
+
+    window = re.compile(r"\.\.\. \(\+[0-9]+ lines\) \[see remaining: rtk proxy git .*show .*HEAD:big\.txt.*\]")
+    blob_cases = ("t1-git-show-blob", "t1b-git-c-show-blob")
+    native_log, rtk_log = lines("t4-git-log", "native"), lines("t4-git-log", "rtk")
+    native_subjects, rtk_subjects = lines("t4b-git-log-subjects", "native"), lines("t4b-git-log-subjects", "rtk")
+    native_rows, rtk_rows = lines("t7-jq-rows", "native"), lines("t7-jq-rows", "rtk")
+    return {
+        "rtk-exactness-git-show-blob-window-changes-its-tail": all(
+            cases[case]["native"]["stdout"] == blob and cases[case]["rtk"]["exit"] == 0
+            and tail_lines(cases[case]["rtk"]["stdout"], 5) != tail_lines(blob, 5)
+            and bool(lines(case, "rtk")) and window.fullmatch(lines(case, "rtk")[-1]) is not None for case in blob_cases),
+        "rtk-exactness-diff-missing-file-exit-code-changes": (
+            cases["t2-diff-missing-file"]["native"]["exit"] == 2 and cases["t2-diff-missing-file"]["rtk"]["exit"] == 1),
+        "rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only": (
+            "+ feature" in lines("t3-git-branch-all", "native")
+            and "  remotes/origin/feature" in lines("t3-git-branch-all", "native")
+            and "  remote-only (1):" in lines("t3-git-branch-all", "rtk")
+            and "    feature" in lines("t3-git-branch-all", "rtk")),
+        "rtk-exactness-log-caps-at-ten-commits-and-drops-the-merge": (
+            sum(line.startswith("commit ") for line in native_log) == 16
+            and any(line.strip() == "merge feature" for line in native_log)
+            and len(rtk_log) == 10 and not any("merge feature" in line for line in rtk_log)
+            and len(native_subjects) == 16 and "merge feature" in native_subjects
+            and rtk_subjects == [line for line in native_subjects if line != "merge feature"]),
+        "rtk-exactness-find-on-a-missing-directory-masks-the-exit-code": (
+            cases["t5-find-missing-dir"]["native"]["exit"] == 1
+            and cases["t5-find-missing-dir"]["rtk"]["exit"] == 0 and cases["t5-find-missing-dir"]["rtk"]["stdout"] == ""),
+        "rtk-exactness-jq-truncates-rows-and-width": (
+            len(native_rows) == RTK_EXACT_JQ_ROWS and max(map(len, native_rows)) > RTK_JQ_MAX_WIDTH
+            and len(rtk_rows) == RTK_JQ_MAX_LINES + 2 and max(map(len, rtk_rows)) <= RTK_JQ_MAX_WIDTH
+            and rtk_rows[RTK_JQ_MAX_LINES] == f"... ({RTK_EXACT_JQ_ROWS - RTK_JQ_MAX_LINES} lines truncated)"
+            and re.fullmatch(r"\[full output: rtk recall [0-9a-f]+\]", rtk_rows[-1]) is not None),
+        "rtk-exactness-controls-diff-and-grep-unchanged": (
+            cases["t2b-diff-two-files"]["rtk"] == cases["t2b-diff-two-files"]["native"]
+            and cases["t2b-diff-two-files"]["native"]["exit"] == 1
+            and cases["t6-grep-file-list"]["rtk"] == cases["t6-grep-file-list"]["native"]
+            and len(lines("t6-grep-file-list", "native")) == 3),
+        "rtk-exactness-proxy-restores-native-output-and-exit": all(
+            outcome["proxy"] == outcome["native"] for outcome in cases.values()),
+    }
+
+
+def context_mode_fixture(run: Run) -> None:
+    """context-mode's own diagnosis and two ctx_execute calls through MCPorter, the stack.json
+    command form, with the npm release's MCP server confined to the run: CONTEXT_MODE_DIR for its
+    storage, a HOME inside the run (its doctor reads ~/.claude/settings.json) and no
+    CLAUDE_CONFIG_DIR. A large output with an intent must come back indexed rather than passed
+    through; a small output must come back exactly. The doctor's hook line fails by design: this
+    is the npm MCP server, not the client plugin that installs hooks."""
+    mcporter = ensure_mcporter(run)
+    project, home = run.work / "context-mode-project", run.work / "context-mode-home"
+    project.mkdir()
+    home.mkdir(mode=0o700)
+    storage = Path(run.env["CONTEXT_MODE_DIR"])
+    config = run.work / "config/mcporter/context-mode.json"
+    config.write_text(json.dumps({"imports": [], "mcpServers": {"context-mode": {
+        "command": run.tools["context-mode"], "cwd": str(project),
+        "env": {"CONTEXT_MODE_DIR": str(storage), "HOME": str(home)}}}}, indent=2) + "\n")
+
+    def call(label: str, tool: str, args: dict, output: str) -> str:
+        return run.command(label, [mcporter, "--config", str(config), "call", f"context-mode.{tool}",
+                                   "--args", json.dumps(args), "--output", output, "--no-oauth"],
+                           timeout=180, env={"CLAUDE_CONFIG_DIR": None})
+
+    doctor = call("context-mode-ctx-doctor", "ctx_doctor", {}, "text").splitlines()
+    run.report["context_mode_doctor_failures"] = [run.clean(line) for line in doctor if line.startswith("[FAIL]")]
+    run.flush()
+    run.check("context-mode-ctx-doctor-reports-the-pin-a-working-server-and-fts5",
+              f"[OK] Version: v{PINS['context-mode']}" in doctor
+              and all(any(line.startswith(prefix) for line in doctor)
+                      for prefix in ("[OK] Server test: PASS", "[OK] FTS5 / SQLite: PASS")))
+    run.check("context-mode-ctx-doctor-storage-under-context-mode-dir",
+              all(f"[OK] Storage {kind}: {storage / kind} (via CONTEXT_MODE_DIR)" in doctor
+                  for kind in ("sessions", "content")))
+    log = ROOT / CONTEXT_MODE_LOG
+    raw = log.read_text()
+    quoted = shlex.quote(str(log))
+    large = json.loads(call("context-mode-ctx-execute-large-output-with-intent", "ctx_execute",
+                            {"language": "shell", "code": f"cat {quoted}", "intent": CONTEXT_MODE_INTENT}, "json"))
+    answer = large["content"][0]["text"]
+    run.report["context_mode_execute"] = {"raw_output_bytes": len(raw.encode()), "answer_bytes": len(answer.encode())}
+    run.flush()
+    # The passthrough baseline is the raw output itself (what `cat` prints); it must fail the same check.
+    run.check("context-mode-ctx-execute-indexes-a-large-output-instead-of-returning-it",
+              CONTEXT_MODE_MARKER in raw.splitlines() and context_mode_indexed(answer, raw)
+              and not context_mode_indexed(raw, raw))
+    code = f"sha256sum {quoted} | cut -c1-64; wc -l < {quoted}"
+    small = json.loads(call("context-mode-ctx-execute-small-output", "ctx_execute",
+                            {"language": "shell", "code": code}, "json"))
+    run.check("context-mode-ctx-execute-returns-a-small-output-exactly",
+              small["content"][0]["text"] == context_mode_small_answer(
+                  code, f"{digest(log.read_bytes())}\n{raw.count(chr(10))}\n"))
+    stored = run.observe("context-mode-storage", storage)
+    run.observe("context-mode-server-home", home)
+    run.check("context-mode-index-inside-run",
+              any(path.startswith("content/") and path.endswith(".db") for path in stored))
+
+
+def serena_fixture(run: Run) -> None:
+    """Serena's initialize and tools/list answers for the claude-code and codex contexts, each from
+    a new server process with its own SERENA_HOME and no project, compared byte for byte with the
+    pinned install's (a change to tool definitions invalidates clients' prompt cache). The two
+    contexts must also serve different tools, which a server ignoring --context could not."""
+    binary = run.tools["serena"]
+    cwd = run.work / "serena-no-project"
+    cwd.mkdir()
+    answers = {}
+    for context in SERENA_TOOLS_LIST_SHA256:
+        answers[context] = mcp_stdio_session(
+            run, f"serena-{context}-initialize-and-tools-list",
+            [binary, "start-mcp-server", "--context", context, "--project-from-cwd",
+             "--enable-web-dashboard", "false", "--open-web-dashboard", "false"],
+            [("tools/list", {})], cwd=cwd, env={"SERENA_HOME": str(run.work / f"data/serena-{context}")})
+    names = {context: serena_tool_names(lines[1]) for context, lines in answers.items()}
+    run.report["serena_parity"] = {context: {"initialize_sha256": digest(lines[0]), "initialize_bytes": len(lines[0]),
+                                             "tools_list_sha256": digest(lines[1]), "tools_list_bytes": len(lines[1]),
+                                             "tools": names[context]} for context, lines in answers.items()}
+    run.flush()
+    run.check("serena-initialize-byte-parity-with-the-pinned-install",
+              all(digest(lines[0]) == SERENA_INITIALIZE_SHA256 for lines in answers.values()))
+    run.check("serena-tools-list-byte-parity-with-the-pinned-install",
+              {context: digest(lines[1]) for context, lines in answers.items()} == SERENA_TOOLS_LIST_SHA256)
+    run.check("serena-contexts-serve-their-own-tool-sets",
+              serena_contexts_differ(names) and answers["claude-code"][1] != answers["codex"][1])
+    homes = [run.observe(f"serena-home-{context}", run.work / f"data/serena-{context}") for context in answers]
+    run.check("serena-state-inside-run", all("serena_config.yml" in home for home in homes))
+
+
+def ai_memory_fixture(run: Run) -> None:
+    """ai-memory's disposable store: `init` into a data directory inside the run, then two stdio MCP
+    server processes, one writing a marker page and a decoy and a new one querying and reading. The
+    query must select only the marker page, a nonsense query must find nothing, and the body must
+    come back exactly. No embedding provider is configured, so no model is downloaded; the startup
+    log and the empty models directory are the read-back."""
+    binary = run.tools["ai-memory"]
+    store = Path(run.env["AI_MEMORY_DATA_DIR"])
+    run.command("ai-memory-init-disposable-store", [binary, "init", "--data-dir", str(store)])
+    serve = [binary, "serve", "--transport", "stdio", "--data-dir", str(store), "--no-watcher",
+             "--workspace", AI_MEMORY_SCOPE["workspace"], "--project", AI_MEMORY_SCOPE["project"]]
+
+    def tool(name: str, arguments: dict) -> tuple[str, dict]:
+        return "tools/call", {"name": name, "arguments": {**AI_MEMORY_SCOPE, **arguments}}
+
+    written = mcp_stdio_session(run, "ai-memory-write-marker-and-decoy-pages", serve,
+                                [tool("memory_write_page", page) for page in AI_MEMORY_PAGES])
+    for line in written[1:]:
+        mcp_tool_json(line)
+    marker = AI_MEMORY_PAGES[0]
+    answers = mcp_stdio_session(run, "ai-memory-query-and-read-from-a-new-process", serve,
+                                [tool("memory_query", {"query": AI_MEMORY_MARKER}),
+                                 tool("memory_query", {"query": "zzznativecimissing"}),
+                                 tool("memory_read_page", {"path": marker["path"]})])
+    log = run.last_command()["stderr"]
+    found, absent, page = (mcp_tool_json(line) for line in answers[1:])
+    hits = found.get("hits") or []
+    run.check("ai-memory-query-selects-only-the-marker-page",
+              [hit.get("path") for hit in hits] == [marker["path"]]
+              and f"<mark>{AI_MEMORY_MARKER}</mark>" in hits[0].get("snippet", "").lower())
+    run.check("ai-memory-nonsense-query-finds-nothing", absent == {"hits": []})
+    run.check("ai-memory-read-page-returns-the-exact-body-from-a-new-process",
+              page.get("path") == marker["path"] and page.get("body") == marker["body"])
+    stored = run.observe("ai-memory-store", store, skip=(".git",))
+    run.check("ai-memory-store-inside-run-without-a-model",
+              any(path.endswith(f"/{marker['path']}") for path in stored) and "db/memory.sqlite" in stored
+              and not any(path.startswith("models/") and not path.endswith("/") for path in stored)
+              and "vector search disabled" in log)
+
+
+def context_hub_fixture(run: Run) -> None:
+    """context-hub's own telemetry opt-out, `telemetry: false` and `feedback: false` in
+    $CHUB_DIR/config.yaml, checked offline: one online `chub update` (opt-out file present and the
+    environment opt-outs set) caches the registry, then two copies search it in a new network
+    namespace, one with the file and one without. identity.js writes client_id before any
+    telemetry request, so client_id is the discriminator; exit and duration are recorded."""
+    chub = run.tools["context-hub"]
+    warm, optout, control = (run.work / f"chub-{name}" for name in ("warm", "opt-out", "control"))
+    warm.mkdir()
+    (warm / "config.yaml").write_text(CHUB_OPT_OUT)
+    run.command("context-hub-update-registry-telemetry-off", [chub, "update"], timeout=180,
+                env={"CHUB_DIR": str(warm), "CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"})
+    cached = run.observe("context-hub-warm-registry", warm)
+    run.check("context-hub-registry-cached-without-client-id",
+              "sources/default/registry.json" in cached and "client_id" not in cached)
+    shutil.copytree(warm, optout)
+    shutil.copytree(warm, control)
+    (control / "config.yaml").unlink()
+    # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor; the workflow lifts it.
+    run.command("network-namespace-available", ["unshare", "-rn", "true"])
+    found = json.loads(run.command("context-hub-offline-search-with-config-opt-out",
+                                   ["unshare", "-rn", "timeout", "30", chub, "search", CHUB_QUERY, "--json"],
+                                   env={"CHUB_DIR": str(optout)}))
+    opted = run.last_command()
+    run.command("context-hub-offline-search-control-without-config",
+                ["unshare", "-rn", "timeout", str(CHUB_CONTROL_TIMEOUT), chub, "search", CHUB_QUERY, "--json"],
+                nonzero=None, timeout=CHUB_CONTROL_TIMEOUT + 30, env={"CHUB_DIR": str(control)})
+    controlled = run.last_command()
+    run.report["context_hub_offline"] = {
+        arm: {"exit_code": entry["exit_code"], "elapsed_seconds": entry["elapsed_seconds"]}
+        for arm, entry in (("config-opt-out", opted), ("control-without-config", controlled))}
+    run.flush()
+    run.check("context-hub-opt-out-search-offline-returns-results",
+              any(str(result.get("id", "")).startswith(f"{CHUB_QUERY}/") for result in found.get("results", [])))
+    run.check("context-hub-config-opt-out-writes-no-client-id",
+              "client_id" not in run.observe("context-hub-opt-out-dir", optout))
+    run.check("context-hub-control-without-config-writes-client-id",
+              "client_id" in run.observe("context-hub-control-dir", control))
+
+
+def agentsview_fixture(run: Run) -> None:
+    """agentsview `--version` and `--help` with its telemetry opt-out set, AGENTSVIEW_DATA_DIR and
+    a HOME inside the run. Thin by scope: the release names its pin and build commit and documents
+    the commands the recipes use, and neither call writes state."""
+    binary = run.tools["agentsview"]
+    home = run.work / "agentsview-home"
+    home.mkdir(mode=0o700)
+    version = run.command("agentsview-version-telemetry-off", [binary, "--version"], env={"HOME": str(home)})
+    usage = run.command("agentsview-help-telemetry-off", [binary, "--help"], env={"HOME": str(home)})
+    run.check("agentsview-version-names-the-pin-and-its-build-commit",
+              re.fullmatch(rf"agentsview v{re.escape(PINS['agentsview'])} \(commit [0-9a-f]{{40}}, built [^)\n]+\)\n",
+                           version) is not None)
+    run.check("agentsview-help-documents-the-recipe-commands",
+              all(re.search(rf"(?m)^ +{re.escape(command)} {{2,}}\S", usage) for command in AGENTSVIEW_COMMANDS)
+              and "AGENTSVIEW_DATA_DIR" in usage)
+    run.check("agentsview-version-and-help-write-no-state",
+              run.observe("agentsview-data-dir", Path(run.env["AGENTSVIEW_DATA_DIR"])) == []
+              and run.observe("agentsview-home", home) == [])
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True, help="New sanitized result directory")
@@ -783,21 +1740,35 @@ def main() -> int:
             components = {row["id"]: row for row in json.loads((ROOT / "manifests/stack.json").read_text())["components"]}
             for name, version in PINS.items():
                 require(components[name]["version"] == version, f"Manifest pin changed: {name}")
-            for name, fixture in (("rtk", rtk_fixture), ("qmd", qmd_fixture),
-                                  ("repomix", repomix_fixture), ("toon", toon_fixture),
-                                  ("markitdown", markitdown_fixture), ("ast-grep", ast_grep_fixture),
-                                  ("ccusage", ccusage_fixture),
-                                  ("codebase-memory-mcp", codebase_memory_mcp_fixture),
-                                  ("headroom", headroom_fixture),
-                                  ("jcodemunch-mcp", jcodemunch_mcp_fixture)):
+            adoption = {row["id"]: row for row in json.loads((ROOT / ADOPTION_PINS).read_text())["tools"]}
+            mismatched = adoption_pin_mismatches(adoption)
+            require(not mismatched, f"Adoption pin differs from the harness pin: {', '.join(mismatched)}")
+            # Built here, not at import, so a test's patch of a fixture function takes effect.
+            for name, fixtures in (("rtk", (rtk_fixture, rtk_long_log_fixture, rtk_hook_check_fixture,
+                                            rtk_exactness_fixture)),
+                                   ("qmd", (qmd_fixture,)),
+                                   ("repomix", (repomix_fixture,)), ("toon", (toon_fixture,)),
+                                   ("markitdown", (markitdown_fixture, markitdown_multi_element_fixture)),
+                                   ("ast-grep", (ast_grep_fixture, ast_grep_shell_fixture)),
+                                   ("ccusage", (ccusage_fixture,)),
+                                   ("codebase-memory-mcp", (codebase_memory_mcp_fixture,)),
+                                   ("headroom", (headroom_fixture,)),
+                                   ("jcodemunch-mcp", (jcodemunch_mcp_fixture,)),
+                                   ("context-mode", (context_mode_fixture,)), ("serena", (serena_fixture,)),
+                                   ("ai-memory", (ai_memory_fixture,)), ("context-hub", (context_hub_fixture,)),
+                                   ("agentsview", (agentsview_fixture,))):
                 try:
-                    binary = run.install(name) if args.install else shutil.which(name)
+                    binary = run.install(name) if args.install else shutil.which(BINARIES.get(name, name))
                     require(bool(binary), f"Missing native executable: {name}")
                     run.tools[name] = str(binary)
-                    version = run.command(f"version-{name}", [str(binary), "--version"])
-                    require(re.search(rf"(?<![\d.]){re.escape(PINS[name])}(?![\d.])", version) is not None,
-                            f"Installed {name} differs from its manifest pin")
-                    fixture(run)
+                    verify_version(run, name, str(binary))
+                    for fixture in fixtures:
+                        # Each fixture checks its own input, so one failure does not skip the next.
+                        try:
+                            fixture(run)
+                        except Exception as error:
+                            run.report["failures"].append({"component": name, "error": run.clean(str(error))})
+                            run.flush()
                 except Exception as error:
                     run.report["failures"].append({"component": name, "error": run.clean(str(error))})
                     run.flush()

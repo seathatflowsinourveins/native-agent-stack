@@ -19,9 +19,16 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-24.04
-    # Was 5 minutes with a fetch-depth: 1 checkout; raised to cover the added full-history
+    # Was 5 minutes with a fetch-depth: 1 checkout; raised to 10 to cover the added full-history
     # clone (the secret-scan job's comment below records ~34s locally for the same clone).
-    timeout-minutes: 10
+    # Raised to 20 on 2026-09-26: the unittest step alone ran 534s in run 36265075411, main's
+    # job took 598s in run 36263674462, and runs 36265075411, 36265091632 and 36269293122
+    # exceeded the 10-minute limit ("exceeded the maximum execution time of 10m0s").
+    # Raised to 40 on 2026-09-29: after #502 this job took 753s in run 36572588202 (limit 1200s) and the
+    # measurement tooling still to merge for the #381 token E2E (units U1 to U5, U9, U10, U13) adds an
+    # estimated 600 to 900s of unit tests (one of them alone runs about 190s locally), which would
+    # pass the old limit; the limit stays a hang guard, not a test-time budget.
+    timeout-minutes: 40
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -61,14 +68,27 @@ jobs:
           # docs/decisions/2026-09-22-github-automation-closure.md, "GitHub hardening follow-up (2026-09-25)".
           GH_TOKEN: ${{ github.token }}
         run: zizmor --no-config --no-ignores --persona regular --strict-collection .
-      - name: Check workflow syntax and expressions with pinned upstream actionlint
+      - name: Check workflow syntax and expressions with pinned kjanat/actionlint
+        # kjanat/actionlint, the maintained fork of rhysd/actionlint, replaced rhysd 1.7.12 in this step
+        # on 2026-09-28 (plan move M2): rhysd's main has had no commit since 2026-04-19
+        # (rhysd/actionlint#719, "rhysd (the author) inactive", open). Before the swap, the non-required
+        # actionlint-successor job ran this release beside 1.7.12, and both actionlint steps succeeded
+        # in all 25 push runs of this workflow on main from b60d5182 to f0219263
+        # (evidence/artifacts/actionlint-successor-swap-20260928/; parity trial:
+        # evidence/artifacts/actionlint-successor-parity-20260927/). v1.17.0 is an immutable release;
+        # its linux_amd64 archive carries SLSA provenance signed by
+        # kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0 (commit 08bb2c4f). It turns
+        # on three cache safety policies without a config file (its CHANGELOG.md line 13); none
+        # reports on this repository's workflows.
         env:
-          ACTIONLINT_VERSION: '1.7.12'
-          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+          ACTIONLINT_VERSION: '1.17.0'
+          # https://github.com/kjanat/actionlint/releases/tag/v1.17.0, asset
+          # actionlint_1.17.0_linux_amd64.tar.gz (the release's digest and actionlint_1.17.0_checksums.txt)
+          ACTIONLINT_SHA256: 620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a
         run: |
           mkdir -p "$RUNNER_TEMP/actionlint"
           curl --fail --silent --show-error --location --retry 3 \
-            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+            "https://github.com/kjanat/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
             --output "$RUNNER_TEMP/actionlint/archive.tar.gz"
           printf '%s  %s\n' "$ACTIONLINT_SHA256" "$RUNNER_TEMP/actionlint/archive.tar.gz" | sha256sum --check
           tar -xzf "$RUNNER_TEMP/actionlint/archive.tar.gz" -C "$RUNNER_TEMP/actionlint" actionlint
@@ -134,6 +154,39 @@ jobs:
             blueprints/us-equities/data/requirements.lock
           echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
           echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # examples/claude-native/workflows/shell-parser.pin.json pins web-tree-sitter and tree-sitter-bash (npm
+        # integrity values, the sha256 of the six files child-usage.mjs reads) and records the install command.
+        # This step runs that command with its <directory> placeholder filled in and retypes none of it. Without
+        # a verified install the kernel fails closed, so the Python lane tests and the node lane checks skip and
+        # this job passed with only the fail-closed gate exercised. tests/test_shell_parser_ci.py now fails this
+        # job when the loader does not report the pinned install, and fails the suite when this step is missing,
+        # late, retyped or no longer exported.
+        # The command is `npm install --ignore-scripts`, so no package script runs (npm/cli v10.9.8,
+        # workspaces/config/lib/definitions/definitions.js:863); the loader then checks every installed byte
+        # against the pin. The directory reaches the later steps of this job through the GITHUB_ENV file, not
+        # this step (github/docs, workflow-commands.md:652); a name outside [A-Za-z0-9._-] is refused so that
+        # no line can set another variable. The ubuntu-24.04 image 20260920.314.1 ships Node.js 22.23.2, Python
+        # 3.12.3 and npm 10.9.8 (actions/runner-images, Ubuntu2404-Readme.md).
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
       - name: Test validation failure modes
         run: python3 -m unittest
       - name: Test semantic evidence contract boundaries
@@ -309,6 +362,176 @@ jobs:
           if-no-files-found: warn
           include-hidden-files: false
           retention-days: 30
+
+  secret-scan-betterleaks:
+    # Non-required trial (plan move M3) of betterleaks v1.8.1 (github.com/betterleaks/betterleaks), the
+    # successor the gitleaks README on master names: "feature complete", "security patches only", focus
+    # moved to Betterleaks. Its context is not in .github/main-ruleset.json, so no run of it blocks a merge;
+    # the required secret-scan job above is unchanged. Verification, parity and triage:
+    # evidence/artifacts/betterleaks-parity-20260927/. The job is report-only, like security-scan.yml's
+    # zizmor online audits: findings and fixture-test assertion failures go to the step summary as counts
+    # and do not fail it, so it is red only when verification, the scanner or the test run errors. Its
+    # green therefore does not say that a change adds no secret: secret-scan stays the gate.
+    runs-on: ubuntu-24.04
+    # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
+    # peak resident set (gitleaks: 74 s, 3.3 GiB); the hosted-runner figures are pending its first run.
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        # GitHub runs an unspecified shell as `bash -e {0}` and `shell: bash` as
+        # `bash --noprofile --norc -eo pipefail {0}` (workflow syntax, jobs.<job_id>.steps[*].shell), so
+        # a check that fails inside a pipeline also fails its step.
+        shell: bash
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install cosign pinned by digest
+        env:
+          COSIGN_VERSION: 'v3.0.6'
+          # sigstore/cosign-installer v4.1.2 (6f9f17788090df1f26f669e9d70d6ae9567deba6) hardcodes this
+          # digest for its bootstrap cosign (action.yml, bootstrap_linux_amd64_sha); it equals the
+          # cosign-linux-amd64 entry of cosign v3.0.6's cosign_checksums.txt.
+          COSIGN_SHA256: c956e5dfcac53d52bcf058360d579472f0c1d2d9b69f55209e256fe7783f4c74
+        run: |
+          mkdir -p "$RUNNER_TEMP/cosign"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64" \
+            --output "$RUNNER_TEMP/cosign/cosign"
+          printf '%s  %s\n' "$COSIGN_SHA256" "$RUNNER_TEMP/cosign/cosign" | sha256sum --check
+          chmod +x "$RUNNER_TEMP/cosign/cosign"
+          "$RUNNER_TEMP/cosign/cosign" version
+      - name: Install betterleaks after Sigstore and checksum verification
+        id: install
+        env:
+          BETTERLEAKS_VERSION: '1.8.1'
+          BETTERLEAKS_SHA256: efa407244e1ea8e35f582b8a42becdeac08bdead04f68eb752adda722d583c2a
+          # checksums.txt is signed keylessly by betterleaks's own release workflow (.goreleaser.yml
+          # `signs:` runs cosign sign-blob --bundle); the certificate must name that workflow at this tag,
+          # GitHub's OIDC issuer, a push trigger and the tag's commit.
+          SIGNER_IDENTITY_REGEXP: '^https://github\.com/betterleaks/betterleaks/\.github/workflows/release\.yml@refs/tags/v1\.8\.1$'
+          SIGNER_COMMIT: 5eab48332cc48565864514e3bc6de89df091a7c4
+        run: |
+          mkdir -p "$RUNNER_TEMP/betterleaks"
+          cd "$RUNNER_TEMP/betterleaks"
+          archive="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+          for asset in "$archive" checksums.txt checksums.txt.sigstore.json; do
+            curl --fail --silent --show-error --location --retry 3 \
+              "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/${asset}" \
+              --output "$asset"
+          done
+          "$RUNNER_TEMP/cosign/cosign" verify-blob --bundle checksums.txt.sigstore.json \
+            --certificate-identity-regexp "$SIGNER_IDENTITY_REGEXP" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-github-workflow-repository betterleaks/betterleaks \
+            --certificate-github-workflow-ref "refs/tags/v${BETTERLEAKS_VERSION}" \
+            --certificate-github-workflow-sha "$SIGNER_COMMIT" \
+            --certificate-github-workflow-trigger push \
+            checksums.txt
+          sha256sum --check --ignore-missing --strict checksums.txt
+          printf '%s  %s\n' "$BETTERLEAKS_SHA256" "$archive" | sha256sum --check
+          tar -xzf "$archive" betterleaks
+          ./betterleaks version
+      - name: Run the gitleaks allowlist fixture tests with betterleaks (assertion failures do not fail this job)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          GITLEAKS_TESTS_REQUIRED: '1'
+        run: |
+          # The tests run the `gitleaks` on PATH, so a symlink gives that name to the verified binary.
+          # They read betterleaks's `null` empty report as no findings and a scan that does not complete
+          # as an error, so a failure here is a detection difference. The history-ancestry class is left
+          # out: the redacted history scan below covers that ground. (That class now redacts too; until
+          # 2026-09-28 it scanned without --redact and quoted its findings.)
+          # Assertion failures are reported, not failed: fixture tests d2, d4 and d5 fail on every run on a
+          # rule difference the receipt records (parity.json, fixtures_ported). unittest counts an
+          # AssertionError as a failure and any other exception as an error (CPython Lib/unittest/case.py,
+          # _addError); its closing status line reads "FAILED (failures=N)" only when every problem is a
+          # failure (Lib/unittest/runner.py, TextTestRunner.run), and it exits 1 for an unsuccessful run
+          # and 5 when no test ran (Lib/unittest/main.py). Anything else fails this step: an error, no
+          # test run, another exit status or no status line. A scanner error is such an error: the tests
+          # scan with --exit-code 0, under which betterleaks exits 0 only after writing its report
+          # (cmd/root.go at v1.8.1, lines 610-646), and their _scan_findings raises _ScannerError, not an
+          # AssertionError, for any other exit status and for a missing report.
+          mkdir -p "$RUNNER_TEMP/betterleaks/as-gitleaks"
+          ln -s ../betterleaks "$RUNNER_TEMP/betterleaks/as-gitleaks/gitleaks"
+          export PATH="$RUNNER_TEMP/betterleaks/as-gitleaks:$PATH"
+          test "$(gitleaks version)" = "1.8.1"
+          m=tests.test_gitleaks_config
+          log="$RUNNER_TEMP/betterleaks/fixtures.log"
+          status=0
+          python3 -m unittest -v "$m.GitleaksPresenceTests" "$m.GitleaksConfigContextRestrictionTests" "$m.GitleaksIgnoreFingerprintTests" 2>&1 | tee "$log" || status=$?
+          ran=$(grep -E '^Ran [0-9]+ tests? in ' "$log" | tail -n 1 || true)
+          result=$(grep -E '^(OK|FAILED|NO TESTS RAN)' "$log" | tail -n 1 || true)
+          {
+            echo "### betterleaks fixture tests (assertion failures do not fail this job)"
+            echo "${ran:-No unittest run line}; ${result:-no unittest status line}; unittest exit status $status"
+          } >> "$GITHUB_STEP_SUMMARY"
+          failures_only='^FAILED \(failures=[0-9]+(, skipped=[0-9]+)?\)$'
+          if [ "$status" -eq 1 ] && [[ "$result" =~ $failures_only ]]; then
+            status=0
+          fi
+          exit "$status"
+      - name: Scan git history for secrets with betterleaks (findings do not fail this job)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          # The secret-scan job's arguments. betterleaks 1.8.1 applies --max-target-megabytes to dir-mode
+          # files only (cmd/directory.go); its git source (cmd/git.go) has no size limit, so this scan
+          # also reads the generated explorer HTML in history that gitleaks skips as over 2 MB.
+          # Two flags keep gitleaks's behaviour (betterleaks cmd/root.go at v1.8.1):
+          # --max-archive-depth 0, because betterleaks opens archives to depth 8 by default (line 103)
+          # and gitleaks 8.30.1 does not open them (its cmd/root.go line 92); and --gitleaks-ignore-path
+          # .gitleaksignore, which always loads the reviewed fingerprints, where the default "." would
+          # prefer a .betterleaksignore (lines 100 and 281-291). A .betterleaksignore in the scanned
+          # directory is still read (lines 465-469), so tests/test_workflow_hardening.py keeps it absent.
+          # --exit-code 0 (line 82; default 1) makes findings exit 0, so they do not fail this job. A scan
+          # error still exits 1 before that status is used (lines 640-641, then 644-645), and a report that
+          # cannot be written is fatal (line 636), so the step keeps the scanner's own exit status.
+          # The redacted report stays on the runner; the log lists rule, file and line only, and the step
+          # summary counts findings by rule.
+          report="$RUNNER_TEMP/betterleaks/history.json"
+          status=0
+          "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
+            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="HEAD" \
+            --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
+          if [ -s "$report" ]; then
+            jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort | uniq -c
+          fi
+          {
+            echo "### betterleaks history scan (findings do not fail this job; secret-scan is the gate)"
+            if [ -s "$report" ]; then
+              jq -r '(. // []) | "Findings: \(length)", (group_by(.RuleID)[] | "- \(.[0].RuleID): \(length)")' "$report"
+            fi
+            echo "betterleaks exit status: $status"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+      - name: Scan working tree for secrets with betterleaks (findings do not fail this job)
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          # The same flags, exit status and step summary as the history scan above.
+          report="$RUNNER_TEMP/betterleaks/tree.json"
+          status=0
+          "$RUNNER_TEMP/betterleaks/betterleaks" dir . --config .gitleaks.toml --max-target-megabytes 2 \
+            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore \
+            --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
+          if [ -s "$report" ]; then
+            jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort
+          fi
+          {
+            echo "### betterleaks working-tree scan (findings do not fail this job; secret-scan is the gate)"
+            if [ -s "$report" ]; then
+              jq -r '(. // []) | "Findings: \(length)", (group_by(.RuleID)[] | "- \(.[0].RuleID): \(length)")' "$report"
+            fi
+            echo "betterleaks exit status: $status"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
 
   sota-sources:
     # Top rule (AGENTS.md): every change names the maintained repository or published reference it

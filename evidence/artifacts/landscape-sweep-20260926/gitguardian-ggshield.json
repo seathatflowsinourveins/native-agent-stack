@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-gitguardian-ggshield",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/GitGuardian/ggshield",
+ "reviewed_commit": "259c1cfa43767e7bcf5bca55505c04746037c3c5",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of GitGuardian/ggshield at commit 259c1cfa43767e7bcf5bca55505c04746037c3c5 (license MIT), read from README.md at that commit. Repository description: \"Detect and validate 500+ types of hardcoded secrets with advanced checks. Use it as a pre-commit hook, GitHub Action, or CLI for proactive secret detection and security.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1999,
+  "pushed_at": "2026-09-25T16:48:40Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@259c1cfa43767e7bcf5bca55505c04746037c3c5",
+   "text": "# [ggshield](https://github.com/GitGuardian/ggshield): protect your code with GitGuardian"
+  },
+  {
+   "source": "README.md@259c1cfa43767e7bcf5bca55505c04746037c3c5",
+   "text": "> [!IMPORTANT] > **macOS: upgrading to 1.54.0 triggers a Keychain prompt for `ggshield-py`**, a second binary that now reads your saved token as part of our performance improvements. Click **Always Allow**; it won't ask again."
+  },
+  {
+   "source": "README.md@259c1cfa43767e7bcf5bca55505c04746037c3c5",
+   "text": "`ggshield` is a CLI application that runs in your local environment or in a CI environment to help you detect more than 500+ types of secrets."
+  }
+ ]
+}

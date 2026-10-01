@@ -1,0 +1,16 @@
+{
+  "class": "artifact byte comparison, no installation or execution",
+  "source_commit": "fcc102a697874d54a357e36004e02c95040dbdc0",
+  "results": {
+    "sdk": {
+      "compared_source_python_files": 295,
+      "equal_files": 295,
+      "different_files": []
+    },
+    "tools": {
+      "compared_source_python_files": 93,
+      "equal_files": 93,
+      "different_files": []
+    }
+  }
+}

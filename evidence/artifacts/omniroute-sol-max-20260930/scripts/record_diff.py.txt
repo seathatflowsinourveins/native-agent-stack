@@ -1,0 +1,23 @@
+"""Path-by-path difference between two gateway_record.py outputs (schema omniroute-gateway-record/2). Usage: record_diff.py BEFORE.json AFTER.json"""
+import json
+import sys
+
+
+def flat(obj, prefix=""):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            yield from flat(value, prefix + "/" + key)
+    elif isinstance(obj, list):
+        for index, value in enumerate(obj):
+            yield from flat(value, prefix + "/" + str(index))
+    else:
+        yield prefix, obj
+
+
+before = dict(flat(json.load(open(sys.argv[1], encoding="utf-8"))))
+after = dict(flat(json.load(open(sys.argv[2], encoding="utf-8"))))
+paths = sorted(list(before.keys()) + [k for k in after.keys() if k not in before])
+different = [p for p in paths if before.get(p) != after.get(p)]
+print(f"paths before: {len(before)}, after: {len(after)}, different: {len(different)}")
+for path in different:
+    print(f"  {path}: {str(before.get(path))[:48]}  ->  {str(after.get(path))[:48]}")

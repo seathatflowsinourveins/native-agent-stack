@@ -1,0 +1,7929 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "7760b1dae2fa99e1b5de318a3f2db433caa22949",
+  "tool_sha256": "85b9581370b3bbfa31aa473616e350dcbac9cb9688178e339a5497ff26ad730d",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_8397ada1-777 --require-effort max",
+  "exit_code": 1,
+  "raw_output_sha256": "13e509dbb51b5f81de0c1b0e67c9fa3b0ecc802d82b1177f17749776c9d1bc67",
+  "measured_at_utc": "2026-09-26T17:50:08Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_8397ada1-777",
+  "status": "complete",
+  "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result; 8 earlier attempt(s) that returned nothing were re-run under the same call key (superseded_attempts, whose usage by_resolved_model counts)",
+  "multi_model_children": [],
+  "web_search": {
+   "calls": 200,
+   "capped": 46,
+   "capped_children": [
+    "discover:agents-models-workers",
+    "discover:observability-hosting",
+    "discover:security-supply-chain",
+    "refute-facts:instructions-skills",
+    "refute-facts:document-retrieval",
+    "refute-facts:durable-memory",
+    "refute-fit:durable-memory",
+    "refute-facts:web-research",
+    "refute-fit:web-research",
+    "refute-fit:hosting-services",
+    "refute-facts:observation-inference",
+    "refute-fit:agent-sdks",
+    "refute-facts:identity-provenance",
+    "refute-fit:identity-provenance",
+    "refute-facts:market-data-reference",
+    "refute-fit:market-data-reference",
+    "refute-facts:storage-compute",
+    "refute-fit:research-factors-ml",
+    "refute-fit:execution-broker",
+    "refute-fit:security-supply-chain",
+    "refute-fit:agents-models-workers",
+    "critic",
+    "discover:agents-models-workers:followup",
+    "discover:execution-broker:followup",
+    "discover:security-supply-chain:followup",
+    "discover:durable-memory:followup",
+    "discover:instructions-skills:followup",
+    "discover:quality-evaluation:followup",
+    "discover:research-factors-ml:followup",
+    "refute-fit:execution-broker:followup"
+   ]
+  },
+  "children": [
+   {
+    "agent_id": "a9cd82b5dff87b67c",
+    "label": "discover:native-clients",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 66,
+    "usage": {
+     "input_tokens": 132,
+     "output_tokens": 87662,
+     "cache_read_input_tokens": 8613225,
+     "cache_creation_input_tokens": 214486
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 132,
+      "output_tokens": 87662,
+      "cache_read_input_tokens": 8613225,
+      "cache_creation_input_tokens": 214486
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 41355,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a53becd0706fb74a0",
+    "label": "gpt6-discover:native-clients",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 15759,
+     "cache_read_input_tokens": 137747,
+     "cache_creation_input_tokens": 73854
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 15759,
+      "cache_read_input_tokens": 137747,
+      "cache_creation_input_tokens": 73854
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42324,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a084fd4b43c0eeacb",
+    "label": "gpt6-discover:instructions-skills",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 18253,
+     "cache_read_input_tokens": 402640,
+     "cache_creation_input_tokens": 126020
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 18253,
+      "cache_read_input_tokens": 402640,
+      "cache_creation_input_tokens": 126020
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad1206d6c72bcc649",
+    "label": "gpt6-discover:workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 21423,
+     "cache_read_input_tokens": 194779,
+     "cache_creation_input_tokens": 76590
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 21423,
+      "cache_read_input_tokens": 194779,
+      "cache_creation_input_tokens": 76590
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42314,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab6f66455c3c4a838",
+    "label": "gpt6-discover:isolation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 14834,
+     "cache_read_input_tokens": 162699,
+     "cache_creation_input_tokens": 85726
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 14834,
+      "cache_read_input_tokens": 162699,
+      "cache_creation_input_tokens": 85726
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42319,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afee1099ac3c1507c",
+    "label": "discover:instructions-skills",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 55,
+    "usage": {
+     "input_tokens": 110,
+     "output_tokens": 101054,
+     "cache_read_input_tokens": 7975185,
+     "cache_creation_input_tokens": 224907
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 110,
+      "output_tokens": 101054,
+      "cache_read_input_tokens": 7975185,
+      "cache_creation_input_tokens": 224907
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac9d49bcd5c35b5b5",
+    "label": "discover:workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 39,
+    "usage": {
+     "input_tokens": 78,
+     "output_tokens": 83814,
+     "cache_read_input_tokens": 4554405,
+     "cache_creation_input_tokens": 169984
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 78,
+      "output_tokens": 83814,
+      "cache_read_input_tokens": 4554405,
+      "cache_creation_input_tokens": 169984
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41351,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aea9d55794443b43f",
+    "label": "discover:isolation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 57,
+    "usage": {
+     "input_tokens": 114,
+     "output_tokens": 111096,
+     "cache_read_input_tokens": 8203739,
+     "cache_creation_input_tokens": 234106
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 114,
+      "output_tokens": 111096,
+      "cache_read_input_tokens": 8203739,
+      "cache_creation_input_tokens": 234106
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41353,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae360324451c72c4b",
+    "label": "discover:code-navigation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 41,
+    "usage": {
+     "input_tokens": 82,
+     "output_tokens": 83112,
+     "cache_read_input_tokens": 4406207,
+     "cache_creation_input_tokens": 175490
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 82,
+      "output_tokens": 83112,
+      "cache_read_input_tokens": 4406207,
+      "cache_creation_input_tokens": 175490
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "adaa9ce6db83a4fb8",
+    "label": "gpt6-discover:code-navigation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 9291,
+     "cache_read_input_tokens": 132499,
+     "cache_creation_input_tokens": 61664
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 9291,
+      "cache_read_input_tokens": 132499,
+      "cache_creation_input_tokens": 61664
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af7cc41a2392c8252",
+    "label": "discover:document-retrieval",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 52,
+    "usage": {
+     "input_tokens": 104,
+     "output_tokens": 102521,
+     "cache_read_input_tokens": 5791516,
+     "cache_creation_input_tokens": 170143
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 104,
+      "output_tokens": 102521,
+      "cache_read_input_tokens": 5791516,
+      "cache_creation_input_tokens": 170143
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af9a15df6e92cf826",
+    "label": "gpt6-discover:document-retrieval",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 15290,
+     "cache_read_input_tokens": 247199,
+     "cache_creation_input_tokens": 75058
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 15290,
+      "cache_read_input_tokens": 247199,
+      "cache_creation_input_tokens": 75058
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a0efb1d43b9f56f71",
+    "label": "discover:semantic-rag",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 63,
+    "usage": {
+     "input_tokens": 126,
+     "output_tokens": 96203,
+     "cache_read_input_tokens": 7933086,
+     "cache_creation_input_tokens": 195015
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 126,
+      "output_tokens": 96203,
+      "cache_read_input_tokens": 7933086,
+      "cache_creation_input_tokens": 195015
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a159974e4cb58a66e",
+    "label": "gpt6-discover:semantic-rag",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 13851,
+     "cache_read_input_tokens": 188095,
+     "cache_creation_input_tokens": 69200
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 13851,
+      "cache_read_input_tokens": 188095,
+      "cache_creation_input_tokens": 69200
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa5b3533562c6cef2",
+    "label": "discover:durable-memory",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 62,
+    "usage": {
+     "input_tokens": 124,
+     "output_tokens": 94854,
+     "cache_read_input_tokens": 10211081,
+     "cache_creation_input_tokens": 247346
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 124,
+      "output_tokens": 94854,
+      "cache_read_input_tokens": 10211081,
+      "cache_creation_input_tokens": 247346
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a7188a33d6748da5d",
+    "label": "gpt6-discover:durable-memory",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 11992,
+     "cache_read_input_tokens": 133545,
+     "cache_creation_input_tokens": 65823
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 11992,
+      "cache_read_input_tokens": 133545,
+      "cache_creation_input_tokens": 65823
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a474be72fbbab5a18",
+    "label": "discover:web-research",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 34,
+    "usage": {
+     "input_tokens": 68,
+     "output_tokens": 91475,
+     "cache_read_input_tokens": 3948939,
+     "cache_creation_input_tokens": 172284
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 68,
+      "output_tokens": 91475,
+      "cache_read_input_tokens": 3948939,
+      "cache_creation_input_tokens": 172284
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41353,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a83167a343a78a419",
+    "label": "gpt6-discover:web-research",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 13926,
+     "cache_read_input_tokens": 371409,
+     "cache_creation_input_tokens": 81307
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 13926,
+      "cache_read_input_tokens": 371409,
+      "cache_creation_input_tokens": 81307
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42319,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "abb11c15ca3abaedc",
+    "label": "discover:token-efficiency",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 8,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 50,
+    "usage": {
+     "input_tokens": 100,
+     "output_tokens": 90523,
+     "cache_read_input_tokens": 6063186,
+     "cache_creation_input_tokens": 176749
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 100,
+      "output_tokens": 90523,
+      "cache_read_input_tokens": 6063186,
+      "cache_creation_input_tokens": 176749
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa6ed0a24c83f715d",
+    "label": "gpt6-discover:token-efficiency",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 13844,
+     "cache_read_input_tokens": 136062,
+     "cache_creation_input_tokens": 70053
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 13844,
+      "cache_read_input_tokens": 136062,
+      "cache_creation_input_tokens": 70053
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a540de8f4a620ba74",
+    "label": "discover:quality-evaluation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 67,
+    "usage": {
+     "input_tokens": 134,
+     "output_tokens": 102964,
+     "cache_read_input_tokens": 9634798,
+     "cache_creation_input_tokens": 218176
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 134,
+      "output_tokens": 102964,
+      "cache_read_input_tokens": 9634798,
+      "cache_creation_input_tokens": 218176
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac1447f4e36de05b6",
+    "label": "gpt6-discover:quality-evaluation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 12573,
+     "cache_read_input_tokens": 131200,
+     "cache_creation_input_tokens": 59369
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 12573,
+      "cache_read_input_tokens": 131200,
+      "cache_creation_input_tokens": 59369
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aba017a41da9b7653",
+    "label": "discover:ci-supply-chain",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 63,
+    "usage": {
+     "input_tokens": 126,
+     "output_tokens": 134287,
+     "cache_read_input_tokens": 8769376,
+     "cache_creation_input_tokens": 216569
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 126,
+      "output_tokens": 134287,
+      "cache_read_input_tokens": 8769376,
+      "cache_creation_input_tokens": 216569
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41363,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a3690deedae2be421",
+    "label": "gpt6-discover:ci-supply-chain",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 14475,
+     "cache_read_input_tokens": 136708,
+     "cache_creation_input_tokens": 70561
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 14475,
+      "cache_read_input_tokens": 136708,
+      "cache_creation_input_tokens": 70561
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42344,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aad5261c2bf89d50c",
+    "label": "discover:scheduling-supervision",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 47,
+    "usage": {
+     "input_tokens": 94,
+     "output_tokens": 90761,
+     "cache_read_input_tokens": 5307665,
+     "cache_creation_input_tokens": 170766
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 94,
+      "output_tokens": 90761,
+      "cache_read_input_tokens": 5307665,
+      "cache_creation_input_tokens": 170766
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41363,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a4da3437e757283c8",
+    "label": "gpt6-discover:scheduling-supervision",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 21733,
+     "cache_read_input_tokens": 136403,
+     "cache_creation_input_tokens": 70635
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 21733,
+      "cache_read_input_tokens": 136403,
+      "cache_creation_input_tokens": 70635
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42344,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac72f8a0eeb3961c1",
+    "label": "discover:hosting-services",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 50,
+    "usage": {
+     "input_tokens": 100,
+     "output_tokens": 97026,
+     "cache_read_input_tokens": 5785245,
+     "cache_creation_input_tokens": 177860
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 100,
+      "output_tokens": 97026,
+      "cache_read_input_tokens": 5785245,
+      "cache_creation_input_tokens": 177860
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a81e1c667b0c48ad7",
+    "label": "gpt6-discover:hosting-services",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 15460,
+     "cache_read_input_tokens": 455795,
+     "cache_creation_input_tokens": 123453
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 15460,
+      "cache_read_input_tokens": 455795,
+      "cache_creation_input_tokens": 123453
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a91c07deb4554e956",
+    "label": "discover:recovery-portability",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 48,
+    "usage": {
+     "input_tokens": 96,
+     "output_tokens": 97698,
+     "cache_read_input_tokens": 5629135,
+     "cache_creation_input_tokens": 187288
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 96,
+      "output_tokens": 97698,
+      "cache_read_input_tokens": 5629135,
+      "cache_creation_input_tokens": 187288
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa3ccaf7666da2bdf",
+    "label": "gpt6-discover:recovery-portability",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 22956,
+     "cache_read_input_tokens": 435535,
+     "cache_creation_input_tokens": 85763
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 22956,
+      "cache_read_input_tokens": 435535,
+      "cache_creation_input_tokens": 85763
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a6d15d780d142b948",
+    "label": "discover:observation-inference",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 44,
+    "usage": {
+     "input_tokens": 88,
+     "output_tokens": 96066,
+     "cache_read_input_tokens": 4846289,
+     "cache_creation_input_tokens": 168126
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 88,
+      "output_tokens": 96066,
+      "cache_read_input_tokens": 4846289,
+      "cache_creation_input_tokens": 168126
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afcf1bdb7ab2b3fc2",
+    "label": "gpt6-discover:observation-inference",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 10793,
+     "cache_read_input_tokens": 152756,
+     "cache_creation_input_tokens": 91528
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 10793,
+      "cache_read_input_tokens": 152756,
+      "cache_creation_input_tokens": 91528
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a51ba8f2ed81b0b83",
+    "label": "discover:agent-sdks",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 9,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 55,
+    "usage": {
+     "input_tokens": 110,
+     "output_tokens": 95663,
+     "cache_read_input_tokens": 6949626,
+     "cache_creation_input_tokens": 184360
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 110,
+      "output_tokens": 95663,
+      "cache_read_input_tokens": 6949626,
+      "cache_creation_input_tokens": 184360
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab4abd493e54ee508",
+    "label": "gpt6-discover:agent-sdks",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 13386,
+     "cache_read_input_tokens": 222130,
+     "cache_creation_input_tokens": 91961
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 13386,
+      "cache_read_input_tokens": 222130,
+      "cache_creation_input_tokens": 91961
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a6f128f4c97b16553",
+    "label": "discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 32,
+    "usage": {
+     "input_tokens": 64,
+     "output_tokens": 93342,
+     "cache_read_input_tokens": 3907085,
+     "cache_creation_input_tokens": 178717
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 64,
+      "output_tokens": 93342,
+      "cache_read_input_tokens": 3907085,
+      "cache_creation_input_tokens": 178717
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41363,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afa908399d52f1ca3",
+    "label": "gpt6-discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 14471,
+     "cache_read_input_tokens": 183505,
+     "cache_creation_input_tokens": 63232
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 14471,
+      "cache_read_input_tokens": 183505,
+      "cache_creation_input_tokens": 63232
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42344,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a0aed2d5d704d67ea",
+    "label": "discover:secrets-credentials",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 44,
+    "usage": {
+     "input_tokens": 88,
+     "output_tokens": 88568,
+     "cache_read_input_tokens": 4853014,
+     "cache_creation_input_tokens": 163616
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 88,
+      "output_tokens": 88568,
+      "cache_read_input_tokens": 4853014,
+      "cache_creation_input_tokens": 163616
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a40b4243e476714f0",
+    "label": "gpt6-discover:secrets-credentials",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 9262,
+     "cache_read_input_tokens": 248543,
+     "cache_creation_input_tokens": 76223
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 9262,
+      "cache_read_input_tokens": 248543,
+      "cache_creation_input_tokens": 76223
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af44fda7e4933ed82",
+    "label": "discover:git-github-automation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 8,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 57,
+    "usage": {
+     "input_tokens": 114,
+     "output_tokens": 79655,
+     "cache_read_input_tokens": 6496889,
+     "cache_creation_input_tokens": 163540
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 114,
+      "output_tokens": 79655,
+      "cache_read_input_tokens": 6496889,
+      "cache_creation_input_tokens": 163540
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab25d97d88eff2a78",
+    "label": "gpt6-discover:git-github-automation",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 14913,
+     "cache_read_input_tokens": 132380,
+     "cache_creation_input_tokens": 62304
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 14913,
+      "cache_read_input_tokens": 132380,
+      "cache_creation_input_tokens": 62304
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac441a38463cc3c8a",
+    "label": "discover:market-data-reference",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 9,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 57,
+    "usage": {
+     "input_tokens": 114,
+     "output_tokens": 105897,
+     "cache_read_input_tokens": 7370269,
+     "cache_creation_input_tokens": 203818
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 114,
+      "output_tokens": 105897,
+      "cache_read_input_tokens": 7370269,
+      "cache_creation_input_tokens": 203818
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8b0d68bb38c1b6dd",
+    "label": "gpt6-discover:market-data-reference",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 27613,
+     "cache_read_input_tokens": 517318,
+     "cache_creation_input_tokens": 89164
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 27613,
+      "cache_read_input_tokens": 517318,
+      "cache_creation_input_tokens": 89164
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afddc8dd80483dcb7",
+    "label": "discover:identity-provenance",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max",
+     "low"
+    ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 37,
+    "usage": {
+     "input_tokens": 74,
+     "output_tokens": 54186,
+     "cache_read_input_tokens": 3225741,
+     "cache_creation_input_tokens": 120390
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 74,
+      "output_tokens": 54186,
+      "cache_read_input_tokens": 3225741,
+      "cache_creation_input_tokens": 120390
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac2b89ecd6071eaf1",
+    "label": "gpt6-discover:identity-provenance",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 11043,
+     "cache_read_input_tokens": 249533,
+     "cache_creation_input_tokens": 80983
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 11043,
+      "cache_read_input_tokens": 249533,
+      "cache_creation_input_tokens": 80983
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a1946f44f6f0cb33a",
+    "label": "discover:storage-compute",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 7,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 62,
+    "usage": {
+     "input_tokens": 124,
+     "output_tokens": 100732,
+     "cache_read_input_tokens": 8925896,
+     "cache_creation_input_tokens": 204548
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 124,
+      "output_tokens": 100732,
+      "cache_read_input_tokens": 8925896,
+      "cache_creation_input_tokens": 204548
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae418081549fa8c5c",
+    "label": "gpt6-discover:storage-compute",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 8567,
+     "cache_read_input_tokens": 298413,
+     "cache_creation_input_tokens": 70935
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 8567,
+      "cache_read_input_tokens": 298413,
+      "cache_creation_input_tokens": 70935
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a2a3c91fa2660a25a",
+    "label": "discover:data-quality-orchestration",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max",
+     "low"
+    ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 42,
+    "usage": {
+     "input_tokens": 84,
+     "output_tokens": 73456,
+     "cache_read_input_tokens": 4524834,
+     "cache_creation_input_tokens": 168395
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 84,
+      "output_tokens": 73456,
+      "cache_read_input_tokens": 4524834,
+      "cache_creation_input_tokens": 168395
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41365,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8d189e90bc786032",
+    "label": "gpt6-discover:data-quality-orchestration",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 16053,
+     "cache_read_input_tokens": 187072,
+     "cache_creation_input_tokens": 67112
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 16053,
+      "cache_read_input_tokens": 187072,
+      "cache_creation_input_tokens": 67112
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42349,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a219242384882db7d",
+    "label": "discover:research-factors-ml",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 53,
+    "usage": {
+     "input_tokens": 106,
+     "output_tokens": 102576,
+     "cache_read_input_tokens": 7038361,
+     "cache_creation_input_tokens": 201595
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 106,
+      "output_tokens": 102576,
+      "cache_read_input_tokens": 7038361,
+      "cache_creation_input_tokens": 201595
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aba5b8cc41cd7be2c",
+    "label": "gpt6-discover:research-factors-ml",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 4459,
+     "cache_read_input_tokens": 132162,
+     "cache_creation_input_tokens": 57006
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 4459,
+      "cache_read_input_tokens": 132162,
+      "cache_creation_input_tokens": 57006
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a5b67a7455db942d9",
+    "label": "discover:backtesting-engine",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 58,
+    "usage": {
+     "input_tokens": 116,
+     "output_tokens": 93832,
+     "cache_read_input_tokens": 6559978,
+     "cache_creation_input_tokens": 176562
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 116,
+      "output_tokens": 93832,
+      "cache_read_input_tokens": 6559978,
+      "cache_creation_input_tokens": 176562
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9399d2449f0620ee",
+    "label": "gpt6-discover:backtesting-engine",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 15120,
+     "cache_read_input_tokens": 133391,
+     "cache_creation_input_tokens": 63730
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 15120,
+      "cache_read_input_tokens": 133391,
+      "cache_creation_input_tokens": 63730
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a89192f85be03793b",
+    "label": "discover:execution-broker",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 3,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 34,
+    "usage": {
+     "input_tokens": 68,
+     "output_tokens": 105987,
+     "cache_read_input_tokens": 3379705,
+     "cache_creation_input_tokens": 161333
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 68,
+      "output_tokens": 105987,
+      "cache_read_input_tokens": 3379705,
+      "cache_creation_input_tokens": 161333
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41357,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a247336c553a800aa",
+    "label": "gpt6-discover:execution-broker",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 3747,
+     "cache_read_input_tokens": 215429,
+     "cache_creation_input_tokens": 31060
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 3747,
+      "cache_read_input_tokens": 215429,
+      "cache_creation_input_tokens": 31060
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42329,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a4a6c0521f213e014",
+    "label": "discover:portfolio-risk",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 5,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 54,
+    "usage": {
+     "input_tokens": 108,
+     "output_tokens": 101406,
+     "cache_read_input_tokens": 6973348,
+     "cache_creation_input_tokens": 198766
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 108,
+      "output_tokens": 101406,
+      "cache_read_input_tokens": 6973348,
+      "cache_creation_input_tokens": 198766
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a673e47a094af5f62",
+    "label": "gpt6-discover:portfolio-risk",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 10925,
+     "cache_read_input_tokens": 170547,
+     "cache_creation_input_tokens": 35142
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 8,
+      "output_tokens": 10925,
+      "cache_read_input_tokens": 170547,
+      "cache_creation_input_tokens": 35142
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a413d3fc737e6ae74",
+    "label": "discover:evaluation-experiments",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 68,
+    "usage": {
+     "input_tokens": 136,
+     "output_tokens": 106905,
+     "cache_read_input_tokens": 8604761,
+     "cache_creation_input_tokens": 358761
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 136,
+      "output_tokens": 106905,
+      "cache_read_input_tokens": 8604761,
+      "cache_creation_input_tokens": 358761
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41363,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a6df3b014dc202b75",
+    "label": "gpt6-discover:evaluation-experiments",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 13803,
+     "cache_read_input_tokens": 234428,
+     "cache_creation_input_tokens": 39346
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 13803,
+      "cache_read_input_tokens": 234428,
+      "cache_creation_input_tokens": 39346
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42344,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae2ad66cf7331e2ba",
+    "label": "discover:agents-models-workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 4,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:10:13.805Z"
+    },
+    "requests": 59,
+    "usage": {
+     "input_tokens": 118,
+     "output_tokens": 111884,
+     "cache_read_input_tokens": 8687604,
+     "cache_creation_input_tokens": 228423
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 118,
+      "output_tokens": 111884,
+      "cache_read_input_tokens": 8687604,
+      "cache_creation_input_tokens": 228423
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a57e68b33cd9f4548",
+    "label": "gpt6-discover:agents-models-workers",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 3,
+    "usage": {
+     "input_tokens": 6,
+     "output_tokens": 7021,
+     "cache_read_input_tokens": 113684,
+     "cache_creation_input_tokens": 31013
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 6,
+      "output_tokens": 7021,
+      "cache_read_input_tokens": 113684,
+      "cache_creation_input_tokens": 31013
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a93d117c31842a08d",
+    "label": "discover:observability-hosting",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:11:28.009Z"
+    },
+    "requests": 62,
+    "usage": {
+     "input_tokens": 124,
+     "output_tokens": 107547,
+     "cache_read_input_tokens": 7721722,
+     "cache_creation_input_tokens": 197268
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 124,
+      "output_tokens": 107547,
+      "cache_read_input_tokens": 7721722,
+      "cache_creation_input_tokens": 197268
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41359,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa234802f96930ec1",
+    "label": "gpt6-discover:observability-hosting",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 3,
+    "usage": {
+     "input_tokens": 6,
+     "output_tokens": 5980,
+     "cache_read_input_tokens": 110190,
+     "cache_creation_input_tokens": 28413
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 6,
+      "output_tokens": 5980,
+      "cache_read_input_tokens": 110190,
+      "cache_creation_input_tokens": 28413
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42334,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "acef8caab11c509d8",
+    "label": "discover:security-supply-chain",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T04:11:02.428Z"
+    },
+    "requests": 38,
+    "usage": {
+     "input_tokens": 76,
+     "output_tokens": 93450,
+     "cache_read_input_tokens": 4059024,
+     "cache_creation_input_tokens": 159791
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 76,
+      "output_tokens": 93450,
+      "cache_read_input_tokens": 4059024,
+      "cache_creation_input_tokens": 159791
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 41361,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a24e16982dc0bd411",
+    "label": "gpt6-discover:security-supply-chain",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 10730,
+     "cache_read_input_tokens": 233851,
+     "cache_creation_input_tokens": 37873
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 10730,
+      "cache_read_input_tokens": 233851,
+      "cache_creation_input_tokens": 37873
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 42339,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a22ce25edfdffea03",
+    "label": "refute-facts:workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 66350,
+     "cache_read_input_tokens": 341330,
+     "cache_creation_input_tokens": 130133
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 66350,
+      "cache_read_input_tokens": 341330,
+      "cache_creation_input_tokens": 130133
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 51981,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac48a1ca9af93e433",
+    "label": "refute-fit:workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 33,
+    "usage": {
+     "input_tokens": 66,
+     "output_tokens": 71266,
+     "cache_read_input_tokens": 3222131,
+     "cache_creation_input_tokens": 161966
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 66,
+      "output_tokens": 71266,
+      "cache_read_input_tokens": 3222131,
+      "cache_creation_input_tokens": 161966
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 49212,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a5a1a2b20282967ab",
+    "label": "gpt6-refute-fit:workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 12032,
+     "cache_read_input_tokens": 569262,
+     "cache_creation_input_tokens": 55693
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 12032,
+      "cache_read_input_tokens": 569262,
+      "cache_creation_input_tokens": 55693
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50801,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a422630607679a9e7",
+    "label": "refute-facts:native-clients",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 52642,
+     "cache_read_input_tokens": 358638,
+     "cache_creation_input_tokens": 118531
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 52642,
+      "cache_read_input_tokens": 358638,
+      "cache_creation_input_tokens": 118531
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 50781,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a10232b91f3cb2b18",
+    "label": "refute-fit:native-clients",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 62,
+     "output_tokens": 79936,
+     "cache_read_input_tokens": 3316828,
+     "cache_creation_input_tokens": 161226
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 62,
+      "output_tokens": 79936,
+      "cache_read_input_tokens": 3316828,
+      "cache_creation_input_tokens": 161226
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48010,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "acc2c804cb5982dd3",
+    "label": "gpt6-refute-fit:native-clients",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 62,
+     "output_tokens": 83242,
+     "cache_read_input_tokens": 2419285,
+     "cache_creation_input_tokens": 569837
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 62,
+      "output_tokens": 83242,
+      "cache_read_input_tokens": 2419285,
+      "cache_creation_input_tokens": 569837
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49594,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af924adda69015c93",
+    "label": "refute-facts:instructions-skills",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T04:24:53.764Z"
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 71481,
+     "cache_read_input_tokens": 735435,
+     "cache_creation_input_tokens": 120795
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 71481,
+      "cache_read_input_tokens": 735435,
+      "cache_creation_input_tokens": 120795
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52118,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac94ca78e69bf43b5",
+    "label": "refute-fit:instructions-skills",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 37,
+    "usage": {
+     "input_tokens": 74,
+     "output_tokens": 85774,
+     "cache_read_input_tokens": 4159517,
+     "cache_creation_input_tokens": 339179
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 74,
+      "output_tokens": 85774,
+      "cache_read_input_tokens": 4159517,
+      "cache_creation_input_tokens": 339179
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49345,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac6fa93e91f4748d4",
+    "label": "gpt6-refute-fit:instructions-skills",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 16,
+    "usage": {
+     "input_tokens": 32,
+     "output_tokens": 42691,
+     "cache_read_input_tokens": 789840,
+     "cache_creation_input_tokens": 799228
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 32,
+      "output_tokens": 42691,
+      "cache_read_input_tokens": 789840,
+      "cache_creation_input_tokens": 799228
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50940,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8ea5324e9148f6d4",
+    "label": "refute-facts:isolation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 45254,
+     "cache_read_input_tokens": 1123573,
+     "cache_creation_input_tokens": 128132
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 45254,
+      "cache_read_input_tokens": 1123573,
+      "cache_creation_input_tokens": 128132
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 50970,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af4c2ce57f88e2f43",
+    "label": "refute-fit:isolation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 38,
+    "usage": {
+     "input_tokens": 76,
+     "output_tokens": 96870,
+     "cache_read_input_tokens": 4160517,
+     "cache_creation_input_tokens": 307311
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 76,
+      "output_tokens": 96870,
+      "cache_read_input_tokens": 4160517,
+      "cache_creation_input_tokens": 307311
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48200,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af4b319f1c617db70",
+    "label": "gpt6-refute-fit:isolation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 14339,
+     "cache_read_input_tokens": 493672,
+     "cache_creation_input_tokens": 429225
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 14339,
+      "cache_read_input_tokens": 493672,
+      "cache_creation_input_tokens": 429225
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49800,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aebd6de3b691d2aeb",
+    "label": "refute-facts:code-navigation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 69920,
+     "cache_read_input_tokens": 1460307,
+     "cache_creation_input_tokens": 229966
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 69920,
+      "cache_read_input_tokens": 1460307,
+      "cache_creation_input_tokens": 229966
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51949,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a27d281610bc99ee6",
+    "label": "refute-fit:code-navigation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 29,
+    "usage": {
+     "input_tokens": 58,
+     "output_tokens": 84342,
+     "cache_read_input_tokens": 2988117,
+     "cache_creation_input_tokens": 219843
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 58,
+      "output_tokens": 84342,
+      "cache_read_input_tokens": 2988117,
+      "cache_creation_input_tokens": 219843
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49177,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa79eb4f11376ebc7",
+    "label": "gpt6-refute-fit:code-navigation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 14140,
+     "cache_read_input_tokens": 436047,
+     "cache_creation_input_tokens": 487567
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 14140,
+      "cache_read_input_tokens": 436047,
+      "cache_creation_input_tokens": 487567
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50790,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac47dd53bd1aabcef",
+    "label": "refute-facts:document-retrieval",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T04:35:08.469Z"
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 44438,
+     "cache_read_input_tokens": 382000,
+     "cache_creation_input_tokens": 84565
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 44438,
+      "cache_read_input_tokens": 382000,
+      "cache_creation_input_tokens": 84565
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51256,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a75c389dcb11f4dac",
+    "label": "refute-fit:document-retrieval",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 33,
+    "usage": {
+     "input_tokens": 66,
+     "output_tokens": 92432,
+     "cache_read_input_tokens": 3667277,
+     "cache_creation_input_tokens": 182148
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 66,
+      "output_tokens": 92432,
+      "cache_read_input_tokens": 3667277,
+      "cache_creation_input_tokens": 182148
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48752,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae557fe181fed8187",
+    "label": "gpt6-refute-fit:document-retrieval",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 22608,
+     "cache_read_input_tokens": 465115,
+     "cache_creation_input_tokens": 515554
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 22608,
+      "cache_read_input_tokens": 465115,
+      "cache_creation_input_tokens": 515554
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50709,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a10679993c4a46217",
+    "label": "refute-facts:semantic-rag",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 15,
+    "usage": {
+     "input_tokens": 30,
+     "output_tokens": 63211,
+     "cache_read_input_tokens": 1441137,
+     "cache_creation_input_tokens": 128594
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 30,
+      "output_tokens": 63211,
+      "cache_read_input_tokens": 1441137,
+      "cache_creation_input_tokens": 128594
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52184,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "addcd09d2b78f4aee",
+    "label": "refute-fit:semantic-rag",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 21,
+    "usage": {
+     "input_tokens": 42,
+     "output_tokens": 81172,
+     "cache_read_input_tokens": 2243319,
+     "cache_creation_input_tokens": 151127
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 42,
+      "output_tokens": 81172,
+      "cache_read_input_tokens": 2243319,
+      "cache_creation_input_tokens": 151127
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49411,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a3a0c293b0a1ea272",
+    "label": "gpt6-refute-fit:semantic-rag",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 15,
+    "usage": {
+     "input_tokens": 30,
+     "output_tokens": 13254,
+     "cache_read_input_tokens": 547438,
+     "cache_creation_input_tokens": 422592
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 30,
+      "output_tokens": 13254,
+      "cache_read_input_tokens": 547438,
+      "cache_creation_input_tokens": 422592
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51012,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac1a50af1fa6246c4",
+    "label": "refute-facts:durable-memory",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:03:48.064Z"
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 78001,
+     "cache_read_input_tokens": 614853,
+     "cache_creation_input_tokens": 145789
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 12,
+      "output_tokens": 78001,
+      "cache_read_input_tokens": 614853,
+      "cache_creation_input_tokens": 145789
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52354,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aefa9b2c86da57a0c",
+    "label": "refute-fit:durable-memory",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:08:14.704Z"
+    },
+    "requests": 42,
+    "usage": {
+     "input_tokens": 84,
+     "output_tokens": 85364,
+     "cache_read_input_tokens": 5696412,
+     "cache_creation_input_tokens": 180226
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 84,
+      "output_tokens": 85364,
+      "cache_read_input_tokens": 5696412,
+      "cache_creation_input_tokens": 180226
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49582,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af0e374bb400f2c50",
+    "label": "gpt6-refute-fit:durable-memory",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 15,
+    "usage": {
+     "input_tokens": 30,
+     "output_tokens": 14905,
+     "cache_read_input_tokens": 564216,
+     "cache_creation_input_tokens": 454198
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 30,
+      "output_tokens": 14905,
+      "cache_read_input_tokens": 564216,
+      "cache_creation_input_tokens": 454198
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51174,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad4ae6a48a7bd1f96",
+    "label": "refute-facts:web-research",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:16:33.209Z"
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 53237,
+     "cache_read_input_tokens": 579555,
+     "cache_creation_input_tokens": 117849
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 53237,
+      "cache_read_input_tokens": 579555,
+      "cache_creation_input_tokens": 117849
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 52584,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af328d4fb5a4ca81a",
+    "label": "refute-fit:web-research",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T05:27:12.940Z"
+    },
+    "requests": 34,
+    "usage": {
+     "input_tokens": 68,
+     "output_tokens": 68678,
+     "cache_read_input_tokens": 3596248,
+     "cache_creation_input_tokens": 159235
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 68,
+      "output_tokens": 68678,
+      "cache_read_input_tokens": 3596248,
+      "cache_creation_input_tokens": 159235
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 49814,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8ff36eb689cc377d",
+    "label": "gpt6-refute-fit:web-research",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 18,
+    "usage": {
+     "input_tokens": 36,
+     "output_tokens": 25573,
+     "cache_read_input_tokens": 811951,
+     "cache_creation_input_tokens": 571271
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 36,
+      "output_tokens": 25573,
+      "cache_read_input_tokens": 811951,
+      "cache_creation_input_tokens": 571271
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51379,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a451a995f1548c423",
+    "label": "refute-facts:token-efficiency",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 56518,
+     "cache_read_input_tokens": 664526,
+     "cache_creation_input_tokens": 133953
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 56518,
+      "cache_read_input_tokens": 664526,
+      "cache_creation_input_tokens": 133953
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 50689,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9b1e5cb097c791e4",
+    "label": "refute-fit:token-efficiency",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 39,
+    "usage": {
+     "input_tokens": 78,
+     "output_tokens": 70960,
+     "cache_read_input_tokens": 4284521,
+     "cache_creation_input_tokens": 178079
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 78,
+      "output_tokens": 70960,
+      "cache_read_input_tokens": 4284521,
+      "cache_creation_input_tokens": 178079
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 47916,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "abd03a1834e20748a",
+    "label": "gpt6-refute-fit:token-efficiency",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 15172,
+     "cache_read_input_tokens": 289964,
+     "cache_creation_input_tokens": 154665
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 15172,
+      "cache_read_input_tokens": 289964,
+      "cache_creation_input_tokens": 154665
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49557,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a6ea08f2f250e9766",
+    "label": "refute-facts:quality-evaluation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 54138,
+     "cache_read_input_tokens": 1024658,
+     "cache_creation_input_tokens": 149780
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 54138,
+      "cache_read_input_tokens": 1024658,
+      "cache_creation_input_tokens": 149780
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 53305,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afb76b57bb21d8584",
+    "label": "refute-fit:quality-evaluation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 35,
+    "usage": {
+     "input_tokens": 70,
+     "output_tokens": 115758,
+     "cache_read_input_tokens": 5388059,
+     "cache_creation_input_tokens": 211123
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 70,
+      "output_tokens": 115758,
+      "cache_read_input_tokens": 5388059,
+      "cache_creation_input_tokens": 211123
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50531,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae08b7e13ca25548f",
+    "label": "gpt6-refute-fit:quality-evaluation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 29295,
+     "cache_read_input_tokens": 499654,
+     "cache_creation_input_tokens": 130834
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 29295,
+      "cache_read_input_tokens": 499654,
+      "cache_creation_input_tokens": 130834
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 52114,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a3fce90257723f3b9",
+    "label": "refute-facts:scheduling-supervision",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 51452,
+     "cache_read_input_tokens": 998349,
+     "cache_creation_input_tokens": 100608
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 51452,
+      "cache_read_input_tokens": 998349,
+      "cache_creation_input_tokens": 100608
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51444,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae22e3998d47da438",
+    "label": "refute-fit:scheduling-supervision",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 41,
+    "usage": {
+     "input_tokens": 82,
+     "output_tokens": 93742,
+     "cache_read_input_tokens": 5235437,
+     "cache_creation_input_tokens": 185767
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 82,
+      "output_tokens": 93742,
+      "cache_read_input_tokens": 5235437,
+      "cache_creation_input_tokens": 185767
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48669,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac53cb5c377fd51b1",
+    "label": "gpt6-refute-fit:scheduling-supervision",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 30461,
+     "cache_read_input_tokens": 475924,
+     "cache_creation_input_tokens": 120313
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 30461,
+      "cache_read_input_tokens": 475924,
+      "cache_creation_input_tokens": 120313
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50267,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab718f13409c82f99",
+    "label": "refute-facts:ci-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 19,
+    "usage": {
+     "input_tokens": 38,
+     "output_tokens": 84814,
+     "cache_read_input_tokens": 2084968,
+     "cache_creation_input_tokens": 143003
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 38,
+      "output_tokens": 84814,
+      "cache_read_input_tokens": 2084968,
+      "cache_creation_input_tokens": 143003
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 53445,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a2f1546b68f13f848",
+    "label": "refute-fit:ci-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 43,
+    "usage": {
+     "input_tokens": 86,
+     "output_tokens": 128045,
+     "cache_read_input_tokens": 6364534,
+     "cache_creation_input_tokens": 206478
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 86,
+      "output_tokens": 128045,
+      "cache_read_input_tokens": 6364534,
+      "cache_creation_input_tokens": 206478
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50670,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa4f11daf55b654c6",
+    "label": "gpt6-refute-fit:ci-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 25163,
+     "cache_read_input_tokens": 479664,
+     "cache_creation_input_tokens": 122914
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 25163,
+      "cache_read_input_tokens": 479664,
+      "cache_creation_input_tokens": 122914
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 52238,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8d05d70bdb58b334",
+    "label": "refute-facts:recovery-portability",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 50413,
+     "cache_read_input_tokens": 502753,
+     "cache_creation_input_tokens": 97910
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 50413,
+      "cache_read_input_tokens": 502753,
+      "cache_creation_input_tokens": 97910
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52055,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad3dcd81cf3998d70",
+    "label": "refute-fit:recovery-portability",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 18,
+    "usage": {
+     "input_tokens": 36,
+     "output_tokens": 71472,
+     "cache_read_input_tokens": 1552088,
+     "cache_creation_input_tokens": 122946
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 36,
+      "output_tokens": 71472,
+      "cache_read_input_tokens": 1552088,
+      "cache_creation_input_tokens": 122946
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49282,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a1ffe8823c0e23851",
+    "label": "gpt6-refute-fit:recovery-portability",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 33719,
+     "cache_read_input_tokens": 488703,
+     "cache_creation_input_tokens": 130499
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 33719,
+      "cache_read_input_tokens": 488703,
+      "cache_creation_input_tokens": 130499
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50852,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad8be5e55dfd085ae",
+    "label": "refute-facts:hosting-services",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 80911,
+     "cache_read_input_tokens": 1027882,
+     "cache_creation_input_tokens": 160490
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 80911,
+      "cache_read_input_tokens": 1027882,
+      "cache_creation_input_tokens": 160490
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52823,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a992ba0fe873fade2",
+    "label": "refute-fit:hosting-services",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T06:26:11.481Z"
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 62,
+     "output_tokens": 55511,
+     "cache_read_input_tokens": 3038645,
+     "cache_creation_input_tokens": 125724
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 62,
+      "output_tokens": 55511,
+      "cache_read_input_tokens": 3038645,
+      "cache_creation_input_tokens": 125724
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50051,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a6b390837897e206c",
+    "label": "gpt6-refute-fit:hosting-services",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 29944,
+     "cache_read_input_tokens": 414487,
+     "cache_creation_input_tokens": 129880
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 29944,
+      "cache_read_input_tokens": 414487,
+      "cache_creation_input_tokens": 129880
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51623,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a1b89e560db1e3532",
+    "label": "refute-facts:observation-inference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T06:29:55.795Z"
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 56369,
+     "cache_read_input_tokens": 843216,
+     "cache_creation_input_tokens": 125204
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 56369,
+      "cache_read_input_tokens": 843216,
+      "cache_creation_input_tokens": 125204
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52668,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a76e85c722d6fc75a",
+    "label": "refute-fit:observation-inference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 21,
+    "usage": {
+     "input_tokens": 42,
+     "output_tokens": 111774,
+     "cache_read_input_tokens": 2586658,
+     "cache_creation_input_tokens": 174638
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 42,
+      "output_tokens": 111774,
+      "cache_read_input_tokens": 2586658,
+      "cache_creation_input_tokens": 174638
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49896,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8c17eb9a97a589a3",
+    "label": "gpt6-refute-fit:observation-inference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 16704,
+     "cache_read_input_tokens": 364187,
+     "cache_creation_input_tokens": 103883
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 16704,
+      "cache_read_input_tokens": 364187,
+      "cache_creation_input_tokens": 103883
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51463,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad8e31b54436f8a5e",
+    "label": "refute-facts:agent-sdks",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 17,
+    "usage": {
+     "input_tokens": 34,
+     "output_tokens": 74867,
+     "cache_read_input_tokens": 2668536,
+     "cache_creation_input_tokens": 229455
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 34,
+      "output_tokens": 74867,
+      "cache_read_input_tokens": 2668536,
+      "cache_creation_input_tokens": 229455
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52477,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a76d35ef2e85f5f5a",
+    "label": "refute-fit:agent-sdks",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T06:45:46.681Z"
+    },
+    "requests": 42,
+    "usage": {
+     "input_tokens": 84,
+     "output_tokens": 91569,
+     "cache_read_input_tokens": 5292846,
+     "cache_creation_input_tokens": 186243
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 84,
+      "output_tokens": 91569,
+      "cache_read_input_tokens": 5292846,
+      "cache_creation_input_tokens": 186243
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49704,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8a5e05f69342669d",
+    "label": "gpt6-refute-fit:agent-sdks",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 20066,
+     "cache_read_input_tokens": 375019,
+     "cache_creation_input_tokens": 109332
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 20066,
+      "cache_read_input_tokens": 375019,
+      "cache_creation_input_tokens": 109332
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51269,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa7a02de976241f10",
+    "label": "refute-facts:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 51223,
+     "cache_read_input_tokens": 606712,
+     "cache_creation_input_tokens": 106653
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 51223,
+      "cache_read_input_tokens": 606712,
+      "cache_creation_input_tokens": 106653
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51491,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a73b3517013461808",
+    "label": "gpt6-refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 15546,
+     "cache_read_input_tokens": 422531,
+     "cache_creation_input_tokens": 99332
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 15546,
+      "cache_read_input_tokens": 422531,
+      "cache_creation_input_tokens": 99332
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50344,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afa42db784080fedb",
+    "label": "refute-fit:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 46,
+    "usage": {
+     "input_tokens": 92,
+     "output_tokens": 109044,
+     "cache_read_input_tokens": 6211796,
+     "cache_creation_input_tokens": 211656
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 92,
+      "output_tokens": 109044,
+      "cache_read_input_tokens": 6211796,
+      "cache_creation_input_tokens": 211656
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 48664,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a926a6c069c56e048",
+    "label": "gpt6-refute-fit:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 18383,
+     "cache_read_input_tokens": 295883,
+     "cache_creation_input_tokens": 159384
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 18383,
+      "cache_read_input_tokens": 295883,
+      "cache_creation_input_tokens": 159384
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 50267,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9a3f08321db82597",
+    "label": "refute-facts:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 41695,
+     "cache_read_input_tokens": 622746,
+     "cache_creation_input_tokens": 121398
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 41695,
+      "cache_read_input_tokens": 622746,
+      "cache_creation_input_tokens": 121398
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 51437,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8b2856c351a3115e",
+    "label": "refute-fit:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 36,
+    "usage": {
+     "input_tokens": 72,
+     "output_tokens": 58683,
+     "cache_read_input_tokens": 3447170,
+     "cache_creation_input_tokens": 123465
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 72,
+      "output_tokens": 58683,
+      "cache_read_input_tokens": 3447170,
+      "cache_creation_input_tokens": 123465
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48976,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aceb1d6e52640b351",
+    "label": "refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 55,
+    "usage": {
+     "input_tokens": 110,
+     "output_tokens": 122094,
+     "cache_read_input_tokens": 7942123,
+     "cache_creation_input_tokens": 216581
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 110,
+      "output_tokens": 122094,
+      "cache_read_input_tokens": 7942123,
+      "cache_creation_input_tokens": 216581
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48716,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afe53906d59a69965",
+    "label": "gpt6-refute-fit:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 30932,
+     "cache_read_input_tokens": 712700,
+     "cache_creation_input_tokens": 75940
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 30932,
+      "cache_read_input_tokens": 712700,
+      "cache_creation_input_tokens": 75940
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50619,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a615aa07ef1d148ab",
+    "label": "refute-facts:identity-provenance",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T09:39:35.009Z"
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 51714,
+     "cache_read_input_tokens": 559484,
+     "cache_creation_input_tokens": 96376
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 51714,
+      "cache_read_input_tokens": 559484,
+      "cache_creation_input_tokens": 96376
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51236,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a61ab9cb25d4e87bb",
+    "label": "refute-facts:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 16,
+    "usage": {
+     "input_tokens": 32,
+     "output_tokens": 49414,
+     "cache_read_input_tokens": 1351710,
+     "cache_creation_input_tokens": 212641
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 32,
+      "output_tokens": 49414,
+      "cache_read_input_tokens": 1351710,
+      "cache_creation_input_tokens": 212641
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51750,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "afad4daba3015e06b",
+    "label": "refute-fit:identity-provenance",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T09:49:24.718Z"
+    },
+    "requests": 24,
+    "usage": {
+     "input_tokens": 48,
+     "output_tokens": 97398,
+     "cache_read_input_tokens": 2558674,
+     "cache_creation_input_tokens": 161871
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 48,
+      "output_tokens": 97398,
+      "cache_read_input_tokens": 2558674,
+      "cache_creation_input_tokens": 161871
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48697,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a780b07cdd4432872",
+    "label": "gpt6-refute-fit:identity-provenance",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 24533,
+     "cache_read_input_tokens": 382359,
+     "cache_creation_input_tokens": 112409
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 24533,
+      "cache_read_input_tokens": 382359,
+      "cache_creation_input_tokens": 112409
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50298,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aaf984ba7a7d8de1a",
+    "label": "refute-facts:market-data-reference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 6,
+     "capped": 6,
+     "first_capped_at": "2026-09-26T09:49:52.728Z"
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 64101,
+     "cache_read_input_tokens": 1540542,
+     "cache_creation_input_tokens": 145022
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 64101,
+      "cache_read_input_tokens": 1540542,
+      "cache_creation_input_tokens": 145022
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51475,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a340d2c11c5a72f36",
+    "label": "refute-fit:market-data-reference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T09:55:19.892Z"
+    },
+    "requests": 56,
+    "usage": {
+     "input_tokens": 112,
+     "output_tokens": 84131,
+     "cache_read_input_tokens": 7522974,
+     "cache_creation_input_tokens": 193776
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 112,
+      "output_tokens": 84131,
+      "cache_read_input_tokens": 7522974,
+      "cache_creation_input_tokens": 193776
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48702,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab59201260c5afa2a",
+    "label": "gpt6-refute-fit:market-data-reference",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 18696,
+     "cache_read_input_tokens": 428676,
+     "cache_creation_input_tokens": 100987
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 18696,
+      "cache_read_input_tokens": 428676,
+      "cache_creation_input_tokens": 100987
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50396,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a3c14524d51c9dcb1",
+    "label": "refute-facts:data-quality-orchestration",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 46369,
+     "cache_read_input_tokens": 752804,
+     "cache_creation_input_tokens": 78820
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 46369,
+      "cache_read_input_tokens": 752804,
+      "cache_creation_input_tokens": 78820
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 50815,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa81f70eb1d9c86db",
+    "label": "refute-fit:data-quality-orchestration",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max",
+     "low"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 29,
+    "usage": {
+     "input_tokens": 58,
+     "output_tokens": 50877,
+     "cache_read_input_tokens": 2741097,
+     "cache_creation_input_tokens": 124505
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 58,
+      "output_tokens": 50877,
+      "cache_read_input_tokens": 2741097,
+      "cache_creation_input_tokens": 124505
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48039,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a87da7ff40efe88f1",
+    "label": "gpt6-refute-fit:data-quality-orchestration",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 25095,
+     "cache_read_input_tokens": 382164,
+     "cache_creation_input_tokens": 112753
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 25095,
+      "cache_read_input_tokens": 382164,
+      "cache_creation_input_tokens": 112753
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49666,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aff5b7cfd49fd5dcb",
+    "label": "refute-facts:storage-compute",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T10:06:35.885Z"
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 68070,
+     "cache_read_input_tokens": 641425,
+     "cache_creation_input_tokens": 115826
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 68070,
+      "cache_read_input_tokens": 641425,
+      "cache_creation_input_tokens": 115826
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51081,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9d08d17f70751684",
+    "label": "refute-fit:storage-compute",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 34,
+    "usage": {
+     "input_tokens": 68,
+     "output_tokens": 72855,
+     "cache_read_input_tokens": 3534731,
+     "cache_creation_input_tokens": 136913
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 68,
+      "output_tokens": 72855,
+      "cache_read_input_tokens": 3534731,
+      "cache_creation_input_tokens": 136913
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48309,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a95be3a701baed93a",
+    "label": "gpt6-refute-fit:storage-compute",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 7010,
+     "cache_read_input_tokens": 498237,
+     "cache_creation_input_tokens": 102133
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 7010,
+      "cache_read_input_tokens": 498237,
+      "cache_creation_input_tokens": 102133
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49950,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac28fb9400efcf47b",
+    "label": "refute-facts:backtesting-engine",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 42519,
+     "cache_read_input_tokens": 912191,
+     "cache_creation_input_tokens": 82281
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 42519,
+      "cache_read_input_tokens": 912191,
+      "cache_creation_input_tokens": 82281
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51342,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a15e8340783c4dc2d",
+    "label": "refute-fit:backtesting-engine",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 23,
+    "usage": {
+     "input_tokens": 46,
+     "output_tokens": 62524,
+     "cache_read_input_tokens": 2158403,
+     "cache_creation_input_tokens": 120518
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 46,
+      "output_tokens": 62524,
+      "cache_read_input_tokens": 2158403,
+      "cache_creation_input_tokens": 120518
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48568,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac09eafa0f0ed1dda",
+    "label": "gpt6-refute-fit:backtesting-engine",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 21010,
+     "cache_read_input_tokens": 371574,
+     "cache_creation_input_tokens": 106973
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 21010,
+      "cache_read_input_tokens": 371574,
+      "cache_creation_input_tokens": 106973
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50219,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "adda06b8966f4398e",
+    "label": "refute-facts:research-factors-ml",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 75997,
+     "cache_read_input_tokens": 1679230,
+     "cache_creation_input_tokens": 206111
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 75997,
+      "cache_read_input_tokens": 1679230,
+      "cache_creation_input_tokens": 206111
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 50506,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a775652803bf0d3cd",
+    "label": "refute-fit:research-factors-ml",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:20:33.457Z"
+    },
+    "requests": 51,
+    "usage": {
+     "input_tokens": 102,
+     "output_tokens": 80862,
+     "cache_read_input_tokens": 5973473,
+     "cache_creation_input_tokens": 161427
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 102,
+      "output_tokens": 80862,
+      "cache_read_input_tokens": 5973473,
+      "cache_creation_input_tokens": 161427
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 47732,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aeec9551e8e81b23f",
+    "label": "gpt6-refute-fit:research-factors-ml",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 26618,
+     "cache_read_input_tokens": 488913,
+     "cache_creation_input_tokens": 155368
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 26618,
+      "cache_read_input_tokens": 488913,
+      "cache_creation_input_tokens": 155368
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49455,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab64046b157d402ce",
+    "label": "refute-facts:execution-broker",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 49380,
+     "cache_read_input_tokens": 758333,
+     "cache_creation_input_tokens": 103932
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 49380,
+      "cache_read_input_tokens": 758333,
+      "cache_creation_input_tokens": 103932
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51926,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab169d5c910346508",
+    "label": "refute-fit:execution-broker",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:22:30.414Z"
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 62,
+     "output_tokens": 81618,
+     "cache_read_input_tokens": 3156606,
+     "cache_creation_input_tokens": 144960
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 62,
+      "output_tokens": 81618,
+      "cache_read_input_tokens": 3156606,
+      "cache_creation_input_tokens": 144960
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49154,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aba6fb168e2592991",
+    "label": "gpt6-refute-fit:execution-broker",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 19063,
+     "cache_read_input_tokens": 363437,
+     "cache_creation_input_tokens": 103574
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 19063,
+      "cache_read_input_tokens": 363437,
+      "cache_creation_input_tokens": 103574
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50823,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad413cc15b995c235",
+    "label": "refute-facts:portfolio-risk",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 18,
+    "usage": {
+     "input_tokens": 36,
+     "output_tokens": 43903,
+     "cache_read_input_tokens": 1528291,
+     "cache_creation_input_tokens": 93669
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 36,
+      "output_tokens": 43903,
+      "cache_read_input_tokens": 1528291,
+      "cache_creation_input_tokens": 93669
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51597,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8e02226acc335f4c",
+    "label": "refute-fit:portfolio-risk",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 32,
+    "usage": {
+     "input_tokens": 64,
+     "output_tokens": 92089,
+     "cache_read_input_tokens": 3649090,
+     "cache_creation_input_tokens": 162245
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 64,
+      "output_tokens": 92089,
+      "cache_read_input_tokens": 3649090,
+      "cache_creation_input_tokens": 162245
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48823,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a83f95a64548c30a4",
+    "label": "gpt6-refute-fit:portfolio-risk",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 19103,
+     "cache_read_input_tokens": 570595,
+     "cache_creation_input_tokens": 58371
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 19103,
+      "cache_read_input_tokens": 570595,
+      "cache_creation_input_tokens": 58371
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50528,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a843e8f19800aa7de",
+    "label": "refute-facts:security-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 77549,
+     "cache_read_input_tokens": 948265,
+     "cache_creation_input_tokens": 150308
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 77549,
+      "cache_read_input_tokens": 948265,
+      "cache_creation_input_tokens": 150308
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 53299,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "add515d88a7d2b131",
+    "label": "refute-fit:security-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T10:33:21.786Z"
+    },
+    "requests": 52,
+    "usage": {
+     "input_tokens": 104,
+     "output_tokens": 84540,
+     "cache_read_input_tokens": 6211227,
+     "cache_creation_input_tokens": 162051
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 104,
+      "output_tokens": 84540,
+      "cache_read_input_tokens": 6211227,
+      "cache_creation_input_tokens": 162051
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50525,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a0d706c1dfbd6223f",
+    "label": "gpt6-refute-fit:security-supply-chain",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 19683,
+     "cache_read_input_tokens": 554254,
+     "cache_creation_input_tokens": 135975
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 19683,
+      "cache_read_input_tokens": 554254,
+      "cache_creation_input_tokens": 135975
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 52207,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a426d4c4736eb818a",
+    "label": "refute-facts:agents-models-workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 3,
+    "usage": {
+     "input_tokens": 6,
+     "output_tokens": 62601,
+     "cache_read_input_tokens": 262113,
+     "cache_creation_input_tokens": 199509
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 6,
+      "output_tokens": 62601,
+      "cache_read_input_tokens": 262113,
+      "cache_creation_input_tokens": 199509
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 50776,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "acd66708abe6c7bf0",
+    "label": "refute-fit:agents-models-workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T10:33:59.136Z"
+    },
+    "requests": 45,
+    "usage": {
+     "input_tokens": 90,
+     "output_tokens": 84126,
+     "cache_read_input_tokens": 5630904,
+     "cache_creation_input_tokens": 172930
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 90,
+      "output_tokens": 84126,
+      "cache_read_input_tokens": 5630904,
+      "cache_creation_input_tokens": 172930
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48002,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a43e57eec0a9a05d0",
+    "label": "gpt6-refute-fit:agents-models-workers",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 16852,
+     "cache_read_input_tokens": 764184,
+     "cache_creation_input_tokens": 107169
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 16852,
+      "cache_read_input_tokens": 764184,
+      "cache_creation_input_tokens": 107169
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 49833,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ac67ad3eb5231c2b6",
+    "label": "refute-facts:observability-hosting",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 48563,
+     "cache_read_input_tokens": 1204038,
+     "cache_creation_input_tokens": 106074
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 48563,
+      "cache_read_input_tokens": 1204038,
+      "cache_creation_input_tokens": 106074
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51412,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a21c724c3672c7581",
+    "label": "refute-fit:observability-hosting",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 44,
+    "usage": {
+     "input_tokens": 88,
+     "output_tokens": 88785,
+     "cache_read_input_tokens": 5703208,
+     "cache_creation_input_tokens": 182265
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 88,
+      "output_tokens": 88785,
+      "cache_read_input_tokens": 5703208,
+      "cache_creation_input_tokens": 182265
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48639,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aeedf86117e426f06",
+    "label": "gpt6-refute-fit:observability-hosting",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 18206,
+     "cache_read_input_tokens": 594210,
+     "cache_creation_input_tokens": 114010
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 18206,
+      "cache_read_input_tokens": 594210,
+      "cache_creation_input_tokens": 114010
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50353,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa53678ffe9d8cea9",
+    "label": "refute-facts:evaluation-experiments",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 15,
+    "usage": {
+     "input_tokens": 30,
+     "output_tokens": 80993,
+     "cache_read_input_tokens": 1525935,
+     "cache_creation_input_tokens": 277077
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 30,
+      "output_tokens": 80993,
+      "cache_read_input_tokens": 1525935,
+      "cache_creation_input_tokens": 277077
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51527,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a05ac7b20f53c8e82",
+    "label": "refute-fit:evaluation-experiments",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 62,
+     "output_tokens": 88572,
+     "cache_read_input_tokens": 3273101,
+     "cache_creation_input_tokens": 145918
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 62,
+      "output_tokens": 88572,
+      "cache_read_input_tokens": 3273101,
+      "cache_creation_input_tokens": 145918
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48752,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a434b57545ed82601",
+    "label": "gpt6-refute-fit:evaluation-experiments",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 21571,
+     "cache_read_input_tokens": 740722,
+     "cache_creation_input_tokens": 184752
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 21571,
+      "cache_read_input_tokens": 740722,
+      "cache_creation_input_tokens": 184752
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50487,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af567e0f6d436bc23",
+    "label": "critic",
+    "phase": "Critic",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:06:45.743Z"
+    },
+    "requests": 96,
+    "usage": {
+     "input_tokens": 192,
+     "output_tokens": 140195,
+     "cache_read_input_tokens": 18206424,
+     "cache_creation_input_tokens": 293908
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 192,
+      "output_tokens": 140195,
+      "cache_read_input_tokens": 18206424,
+      "cache_creation_input_tokens": 293908
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 58125,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aea96236ecef4bb7a",
+    "label": "discover:agents-models-workers:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 3,
+     "capped": 3,
+     "first_capped_at": "2026-09-26T11:35:12.113Z"
+    },
+    "requests": 48,
+    "usage": {
+     "input_tokens": 96,
+     "output_tokens": 111018,
+     "cache_read_input_tokens": 5367360,
+     "cache_creation_input_tokens": 205246
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 96,
+      "output_tokens": 111018,
+      "cache_read_input_tokens": 5367360,
+      "cache_creation_input_tokens": 205246
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 43314,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad9803b8cc154a63c",
+    "label": "gpt6-discover:agents-models-workers:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 16487,
+     "cache_read_input_tokens": 555615,
+     "cache_creation_input_tokens": 113408
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 16487,
+      "cache_read_input_tokens": 555615,
+      "cache_creation_input_tokens": 113408
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 44742,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae852f0d6dcff9e76",
+    "label": "discover:execution-broker:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:31:50.249Z"
+    },
+    "requests": 44,
+    "usage": {
+     "input_tokens": 88,
+     "output_tokens": 78971,
+     "cache_read_input_tokens": 4688892,
+     "cache_creation_input_tokens": 147137
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 88,
+      "output_tokens": 78971,
+      "cache_read_input_tokens": 4688892,
+      "cache_creation_input_tokens": 147137
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42951,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a817dfb84da4265b0",
+    "label": "discover:security-supply-chain:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:35:48.926Z"
+    },
+    "requests": 51,
+    "usage": {
+     "input_tokens": 102,
+     "output_tokens": 98837,
+     "cache_read_input_tokens": 5185104,
+     "cache_creation_input_tokens": 160442
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 102,
+      "output_tokens": 98837,
+      "cache_read_input_tokens": 5185104,
+      "cache_creation_input_tokens": 160442
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42643,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aeeb6aa5845c02989",
+    "label": "discover:durable-memory:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:33:56.473Z"
+    },
+    "requests": 54,
+    "usage": {
+     "input_tokens": 108,
+     "output_tokens": 88207,
+     "cache_read_input_tokens": 6388365,
+     "cache_creation_input_tokens": 171066
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 108,
+      "output_tokens": 88207,
+      "cache_read_input_tokens": 6388365,
+      "cache_creation_input_tokens": 171066
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42591,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a13aedcf50bb47fdb",
+    "label": "gpt6-discover:execution-broker:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 9,
+    "usage": {
+     "input_tokens": 18,
+     "output_tokens": 14838,
+     "cache_read_input_tokens": 444499,
+     "cache_creation_input_tokens": 91180
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 18,
+      "output_tokens": 14838,
+      "cache_read_input_tokens": 444499,
+      "cache_creation_input_tokens": 91180
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44364,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a29717b9fbda05ff6",
+    "label": "gpt6-discover:security-supply-chain:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 9822,
+     "cache_read_input_tokens": 347432,
+     "cache_creation_input_tokens": 72481
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 9822,
+      "cache_read_input_tokens": 347432,
+      "cache_creation_input_tokens": 72481
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44070,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a099c5333f505e3f3",
+    "label": "gpt6-discover:durable-memory:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 12241,
+     "cache_read_input_tokens": 366250,
+     "cache_creation_input_tokens": 78668
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 12241,
+      "cache_read_input_tokens": 366250,
+      "cache_creation_input_tokens": 78668
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44004,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a399f60f22dd565c0",
+    "label": "discover:instructions-skills:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 2,
+     "first_capped_at": "2026-09-26T11:47:23.015Z"
+    },
+    "requests": 74,
+    "usage": {
+     "input_tokens": 148,
+     "output_tokens": 112534,
+     "cache_read_input_tokens": 11280282,
+     "cache_creation_input_tokens": 233030
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 148,
+      "output_tokens": 112534,
+      "cache_read_input_tokens": 11280282,
+      "cache_creation_input_tokens": 233030
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42774,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a67d7ab86c069e23a",
+    "label": "gpt6-discover:instructions-skills:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 14037,
+     "cache_read_input_tokens": 367455,
+     "cache_creation_input_tokens": 81756
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 14037,
+      "cache_read_input_tokens": 367455,
+      "cache_creation_input_tokens": 81756
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44194,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aab60c622fd0fe3a3",
+    "label": "discover:quality-evaluation:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:49:01.145Z"
+    },
+    "requests": 64,
+    "usage": {
+     "input_tokens": 128,
+     "output_tokens": 104388,
+     "cache_read_input_tokens": 7816959,
+     "cache_creation_input_tokens": 186532
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 128,
+      "output_tokens": 104388,
+      "cache_read_input_tokens": 7816959,
+      "cache_creation_input_tokens": 186532
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42522,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8ee9d6a36815cdf3",
+    "label": "gpt6-discover:quality-evaluation:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 13978,
+     "cache_read_input_tokens": 308334,
+     "cache_creation_input_tokens": 76184
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 13978,
+      "cache_read_input_tokens": 308334,
+      "cache_creation_input_tokens": 76184
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 43949,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a70e89c05874576b7",
+    "label": "discover:observation-inference:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 36,
+    "usage": {
+     "input_tokens": 72,
+     "output_tokens": 82446,
+     "cache_read_input_tokens": 3928023,
+     "cache_creation_input_tokens": 139951
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 72,
+      "output_tokens": 82446,
+      "cache_read_input_tokens": 3928023,
+      "cache_creation_input_tokens": 139951
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42655,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ae2e04025dd3ac547",
+    "label": "gpt6-discover:observation-inference:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 18700,
+     "cache_read_input_tokens": 486407,
+     "cache_creation_input_tokens": 86085
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 18700,
+      "cache_read_input_tokens": 486407,
+      "cache_creation_input_tokens": 86085
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44068,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a30a8ca7792467299",
+    "label": "discover:research-factors-ml:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:51:07.715Z"
+    },
+    "requests": 65,
+    "usage": {
+     "input_tokens": 130,
+     "output_tokens": 123663,
+     "cache_read_input_tokens": 8739658,
+     "cache_creation_input_tokens": 225698
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 130,
+      "output_tokens": 123663,
+      "cache_read_input_tokens": 8739658,
+      "cache_creation_input_tokens": 225698
+     }
+    },
+    "first_request_cache_read": 17376,
+    "first_request_prompt_tokens": 42686,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a81cc167965d17aa5",
+    "label": "gpt6-discover:research-factors-ml:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 20949,
+     "cache_read_input_tokens": 310175,
+     "cache_creation_input_tokens": 80017
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 20949,
+      "cache_read_input_tokens": 310175,
+      "cache_creation_input_tokens": 80017
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 44113,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a7b4fa733780130ee",
+    "label": "refute-facts:execution-broker:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 52326,
+     "cache_read_input_tokens": 980315,
+     "cache_creation_input_tokens": 130167
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 52326,
+      "cache_read_input_tokens": 980315,
+      "cache_creation_input_tokens": 130167
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 53030,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a8451377f72a46128",
+    "label": "refute-fit:execution-broker:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 1,
+     "capped": 1,
+     "first_capped_at": "2026-09-26T11:55:57.115Z"
+    },
+    "requests": 43,
+    "usage": {
+     "input_tokens": 86,
+     "output_tokens": 69206,
+     "cache_read_input_tokens": 4594986,
+     "cache_creation_input_tokens": 159810
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 86,
+      "output_tokens": 69206,
+      "cache_read_input_tokens": 4594986,
+      "cache_creation_input_tokens": 159810
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 50258,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a58a3bb247f0dc646",
+    "label": "gpt6-refute-fit:execution-broker:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 14060,
+     "cache_read_input_tokens": 388123,
+     "cache_creation_input_tokens": 117840
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 14060,
+      "cache_read_input_tokens": 388123,
+      "cache_creation_input_tokens": 117840
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 51911,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a9f1d2d1c75afff72",
+    "label": "refute-facts:durable-memory:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 76279,
+     "cache_read_input_tokens": 1066653,
+     "cache_creation_input_tokens": 375159
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 76279,
+      "cache_read_input_tokens": 1066653,
+      "cache_creation_input_tokens": 375159
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 53002,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad64f86618b7b1906",
+    "label": "refute-fit:durable-memory:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 48,
+    "usage": {
+     "input_tokens": 96,
+     "output_tokens": 94055,
+     "cache_read_input_tokens": 6135623,
+     "cache_creation_input_tokens": 165597
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 96,
+      "output_tokens": 94055,
+      "cache_read_input_tokens": 6135623,
+      "cache_creation_input_tokens": 165597
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50230,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "affa01b2ac7dda742",
+    "label": "gpt6-refute-fit:durable-memory:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 28306,
+     "cache_read_input_tokens": 673415,
+     "cache_creation_input_tokens": 133145
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 28306,
+      "cache_read_input_tokens": 673415,
+      "cache_creation_input_tokens": 133145
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51930,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ad63b696893447ad2",
+    "label": "refute-facts:security-supply-chain:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 44291,
+     "cache_read_input_tokens": 1124889,
+     "cache_creation_input_tokens": 103525
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 44291,
+      "cache_read_input_tokens": 1124889,
+      "cache_creation_input_tokens": 103525
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 53511,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a13cc47a4e27713ec",
+    "label": "refute-fit:security-supply-chain:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 30,
+    "usage": {
+     "input_tokens": 60,
+     "output_tokens": 82673,
+     "cache_read_input_tokens": 3284517,
+     "cache_creation_input_tokens": 141082
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 60,
+      "output_tokens": 82673,
+      "cache_read_input_tokens": 3284517,
+      "cache_creation_input_tokens": 141082
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 50737,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af1b651a0e688fb39",
+    "label": "gpt6-refute-fit:security-supply-chain:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 11,
+    "usage": {
+     "input_tokens": 22,
+     "output_tokens": 22977,
+     "cache_read_input_tokens": 666109,
+     "cache_creation_input_tokens": 115054
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 22,
+      "output_tokens": 22977,
+      "cache_read_input_tokens": 666109,
+      "cache_creation_input_tokens": 115054
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 52385,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a997eed3a7696dd2f",
+    "label": "refute-facts:agents-models-workers:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 13,
+    "usage": {
+     "input_tokens": 26,
+     "output_tokens": 58361,
+     "cache_read_input_tokens": 1195198,
+     "cache_creation_input_tokens": 124390
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 26,
+      "output_tokens": 58361,
+      "cache_read_input_tokens": 1195198,
+      "cache_creation_input_tokens": 124390
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 54594,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a28ef457f7b108742",
+    "label": "refute-fit:agents-models-workers:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 59,
+    "usage": {
+     "input_tokens": 118,
+     "output_tokens": 120973,
+     "cache_read_input_tokens": 8665023,
+     "cache_creation_input_tokens": 230421
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 118,
+      "output_tokens": 120973,
+      "cache_read_input_tokens": 8665023,
+      "cache_creation_input_tokens": 230421
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 51820,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "af3b76419c794f0dd",
+    "label": "gpt6-refute-fit:agents-models-workers:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 17238,
+     "cache_read_input_tokens": 577819,
+     "cache_creation_input_tokens": 109908
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 17238,
+      "cache_read_input_tokens": 577819,
+      "cache_creation_input_tokens": 109908
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 53494,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a98f98007b001f561",
+    "label": "refute-facts:instructions-skills:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 18,
+    "usage": {
+     "input_tokens": 36,
+     "output_tokens": 84136,
+     "cache_read_input_tokens": 2000701,
+     "cache_creation_input_tokens": 134812
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 36,
+      "output_tokens": 84136,
+      "cache_read_input_tokens": 2000701,
+      "cache_creation_input_tokens": 134812
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 55003,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a5b33fc8bd0e2985b",
+    "label": "refute-fit:instructions-skills:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 53,
+    "usage": {
+     "input_tokens": 106,
+     "output_tokens": 80067,
+     "cache_read_input_tokens": 6995241,
+     "cache_creation_input_tokens": 187440
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 106,
+      "output_tokens": 80067,
+      "cache_read_input_tokens": 6995241,
+      "cache_creation_input_tokens": 187440
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 52230,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a7dcfec5525bc9eac",
+    "label": "gpt6-refute-fit:instructions-skills:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 12,
+    "usage": {
+     "input_tokens": 24,
+     "output_tokens": 22378,
+     "cache_read_input_tokens": 772331,
+     "cache_creation_input_tokens": 127398
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 24,
+      "output_tokens": 22378,
+      "cache_read_input_tokens": 772331,
+      "cache_creation_input_tokens": 127398
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 53853,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a398af259cfb1c488",
+    "label": "refute-facts:observation-inference:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 48447,
+     "cache_read_input_tokens": 490038,
+     "cache_creation_input_tokens": 93128
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 14,
+      "output_tokens": 48447,
+      "cache_read_input_tokens": 490038,
+      "cache_creation_input_tokens": 93128
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 52189,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a5e32ca9aca02894e",
+    "label": "refute-fit:observation-inference:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 20,
+    "usage": {
+     "input_tokens": 40,
+     "output_tokens": 64463,
+     "cache_read_input_tokens": 1845479,
+     "cache_creation_input_tokens": 111530
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 40,
+      "output_tokens": 64463,
+      "cache_read_input_tokens": 1845479,
+      "cache_creation_input_tokens": 111530
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 49417,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a80479f525577a89e",
+    "label": "gpt6-refute-fit:observation-inference:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 17229,
+     "cache_read_input_tokens": 424959,
+     "cache_creation_input_tokens": 103444
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 17229,
+      "cache_read_input_tokens": 424959,
+      "cache_creation_input_tokens": 103444
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 51118,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "aa3fe389aa614534f",
+    "label": "refute-facts:quality-evaluation:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 14,
+    "usage": {
+     "input_tokens": 28,
+     "output_tokens": 62316,
+     "cache_read_input_tokens": 1201906,
+     "cache_creation_input_tokens": 109401
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 28,
+      "output_tokens": 62316,
+      "cache_read_input_tokens": 1201906,
+      "cache_creation_input_tokens": 109401
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51725,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a019478b975be9e35",
+    "label": "refute-fit:quality-evaluation:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 47,
+    "usage": {
+     "input_tokens": 94,
+     "output_tokens": 97060,
+     "cache_read_input_tokens": 6198616,
+     "cache_creation_input_tokens": 195074
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 94,
+      "output_tokens": 97060,
+      "cache_read_input_tokens": 6198616,
+      "cache_creation_input_tokens": 195074
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48951,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a74883a2554fd15c9",
+    "label": "gpt6-refute-fit:quality-evaluation:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 26457,
+     "cache_read_input_tokens": 505170,
+     "cache_creation_input_tokens": 61195
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 26457,
+      "cache_read_input_tokens": 505170,
+      "cache_creation_input_tokens": 61195
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50659,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a773274f59fbde479",
+    "label": "refute-facts:research-factors-ml:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 8,
+    "usage": {
+     "input_tokens": 16,
+     "output_tokens": 51788,
+     "cache_read_input_tokens": 715237,
+     "cache_creation_input_tokens": 109013
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 16,
+      "output_tokens": 51788,
+      "cache_read_input_tokens": 715237,
+      "cache_creation_input_tokens": 109013
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 54740,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "ab9bd5afd8cdbb067",
+    "label": "refute-fit:research-factors-ml:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 47,
+    "usage": {
+     "input_tokens": 94,
+     "output_tokens": 105412,
+     "cache_read_input_tokens": 5931713,
+     "cache_creation_input_tokens": 188607
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 94,
+      "output_tokens": 105412,
+      "cache_read_input_tokens": 5931713,
+      "cache_creation_input_tokens": 188607
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 51966,
+    "complete": true,
+    "issues": []
+   },
+   {
+    "agent_id": "a126b070a921843c3",
+    "label": "gpt6-refute-fit:research-factors-ml:followup",
+    "phase": "Follow-up",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 10,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 17184,
+     "cache_read_input_tokens": 568769,
+     "cache_creation_input_tokens": 106503
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 17184,
+      "cache_read_input_tokens": 568769,
+      "cache_creation_input_tokens": 106503
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 53608,
+    "complete": true,
+    "issues": []
+   }
+  ],
+  "superseded_attempts": [
+   {
+    "agent_id": "a3554a07df252fd2a",
+    "label": "refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 48,
+    "usage": {
+     "input_tokens": 94,
+     "output_tokens": 78257,
+     "cache_read_input_tokens": 6801477,
+     "cache_creation_input_tokens": 198324
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 94,
+      "output_tokens": 78257,
+      "cache_read_input_tokens": 6801477,
+      "cache_creation_input_tokens": 198324
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48716,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-opus-5-5,<synthetic>"
+    ],
+    "superseded_by": "aceb1d6e52640b351"
+   },
+   {
+    "agent_id": "a9a017f41a9d9713d",
+    "label": "refute-facts:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 11,
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 44900,
+     "cache_read_input_tokens": 1011553,
+     "cache_creation_input_tokens": 135205
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 20,
+      "output_tokens": 44900,
+      "cache_read_input_tokens": 1011553,
+      "cache_creation_input_tokens": 135205
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51750,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-sonnet-5,<synthetic>"
+    ],
+    "superseded_by": "a61ab9cb25d4e87bb"
+   },
+   {
+    "agent_id": "a4e096d411f3bf814",
+    "label": "refute-fit:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 26,
+    "usage": {
+     "input_tokens": 50,
+     "output_tokens": 36209,
+     "cache_read_input_tokens": 2286475,
+     "cache_creation_input_tokens": 114798
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 50,
+      "output_tokens": 36209,
+      "cache_read_input_tokens": 2286475,
+      "cache_creation_input_tokens": 114798
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48976,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-opus-5-5,<synthetic>"
+    ],
+    "superseded_by": "a8b2856c351a3115e"
+   },
+   {
+    "agent_id": "a8046026e4cb5e735",
+    "label": "gpt6-refute-fit:secrets-credentials",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 6,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 23314,
+     "cache_read_input_tokens": 306542,
+     "cache_creation_input_tokens": 63006
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 10,
+      "output_tokens": 23314,
+      "cache_read_input_tokens": 306542,
+      "cache_creation_input_tokens": 63006
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50619,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-sonnet-5,<synthetic>"
+    ],
+    "superseded_by": "afe53906d59a69965"
+   },
+   {
+    "agent_id": "a20a9c0835bc271ab",
+    "label": "refute-facts:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 3,
+    "usage": {
+     "input_tokens": 4,
+     "output_tokens": 9596,
+     "cache_read_input_tokens": 72102,
+     "cache_creation_input_tokens": 37527
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 4,
+      "output_tokens": 9596,
+      "cache_read_input_tokens": 72102,
+      "cache_creation_input_tokens": 37527
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51437,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-sonnet-5,<synthetic>"
+    ],
+    "superseded_by": "a9a3f08321db82597"
+   },
+   {
+    "agent_id": "ab2de17128f269ad3",
+    "label": "refute-fit:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 12,
+     "output_tokens": 7055,
+     "cache_read_input_tokens": 326881,
+     "cache_creation_input_tokens": 56517
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 12,
+      "output_tokens": 7055,
+      "cache_read_input_tokens": 326881,
+      "cache_creation_input_tokens": 56517
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 17019,
+    "first_request_prompt_tokens": 48664,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-opus-5-5,<synthetic>"
+    ],
+    "superseded_by": "afa42db784080fedb"
+   },
+   {
+    "agent_id": "a748d5be9c7453409",
+    "label": "gpt6-refute-fit:git-github-automation",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 2,
+    "usage": {
+     "input_tokens": 2,
+     "output_tokens": 13148,
+     "cache_read_input_tokens": 20446,
+     "cache_creation_input_tokens": 29819
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 2,
+      "output_tokens": 13148,
+      "cache_read_input_tokens": 20446,
+      "cache_creation_input_tokens": 29819
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 20446,
+    "first_request_prompt_tokens": 50267,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-sonnet-5,<synthetic>"
+    ],
+    "superseded_by": "a926a6c069c56e048"
+   },
+   {
+    "agent_id": "ab9470309c1dacd7e",
+    "label": "refute-facts:identity-provenance",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5",
+     "<synthetic>"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 2,
+    "usage": {
+     "input_tokens": 2,
+     "output_tokens": 5393,
+     "cache_read_input_tokens": 20667,
+     "cache_creation_input_tokens": 30567
+    },
+    "usage_by_model": {
+     "claude-sonnet-5": {
+      "input_tokens": 2,
+      "output_tokens": 5393,
+      "cache_read_input_tokens": 20667,
+      "cache_creation_input_tokens": 30567
+     },
+     "<synthetic>": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+     }
+    },
+    "first_request_cache_read": 20667,
+    "first_request_prompt_tokens": 51236,
+    "complete": false,
+    "issues": [
+     "no result entry in journal",
+     "resolved model outside requested family: claude-sonnet-5,<synthetic>"
+    ],
+    "superseded_by": "a615aa07ef1d148ab"
+   }
+  ],
+  "by_resolved_model": {
+   "claude-opus-5-5": {
+    "children": 84,
+    "input_tokens": 7528,
+    "output_tokens": 7594754,
+    "cache_read_input_tokens": 468125763,
+    "cache_creation_input_tokens": 15375728
+   },
+   "claude-sonnet-5": {
+    "children": 125,
+    "input_tokens": 2208,
+    "output_tokens": 3948438,
+    "cache_read_input_tokens": 74707158,
+    "cache_creation_input_tokens": 16719155
+   },
+   "<synthetic>": {
+    "children": 8,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0
+   }
+  },
+  "effort_mismatches": [
+   {
+    "child": "discover:identity-provenance",
+    "efforts": [
+     "max",
+     "low"
+    ]
+   },
+   {
+    "child": "discover:data-quality-orchestration",
+    "efforts": [
+     "max",
+     "low"
+    ]
+   },
+   {
+    "child": "refute-fit:data-quality-orchestration",
+    "efforts": [
+     "max",
+     "low"
+    ]
+   }
+  ]
+ }
+}

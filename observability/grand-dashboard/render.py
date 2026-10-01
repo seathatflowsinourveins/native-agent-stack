@@ -41,7 +41,7 @@ def dashboard():
     panel(10,'Live service scrape health','timeseries',0,64,12,8,'up',source='ecosystem-prometheus')
     panel(11,'Live host memory usage','timeseries',12,64,12,8,'ecosystem_system_memory_usage_bytes',source='ecosystem-prometheus')
     panel(12,'Progress history · recorded checkpoints','logs',0,72,24,9,'{service_name="agent-stack-progress",record_kind=~"wave|lane|worker"}', options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
-    panel(14,'Native agent activity · sanitized telemetry','logs',0,81,24,9,'{service_name=~"Codex Desktop|codex-app-server|claude-code|codex-sdk-receipt"}',options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
+    panel(14,'Native agent activity · sanitized telemetry','logs',0,81,24,9,'{service_name=~"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt"}',options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
     panel(15,'Native workflow history · research pair','table',0,9,24,9,latest('workflow'),
           description='Read-only local Dagu history: up to 10 research-pair runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only this returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.',
           transformations=[{'id':'labelsToFields','options':{'mode':'columns'}},
@@ -55,7 +55,7 @@ def dashboard():
     for item in panels[1:]:
         if item['id'] != 15 and item['gridPos']['y'] >= 9:item['gridPos']['y']+=9
         item['gridPos']['y']+=2
-    return dict(uid='research-grand',title='Research grand dashboard',schemaVersion=39,version=5,editable=False,
+    return dict(uid='research-grand',title='Research grand dashboard',schemaVersion=39,version=6,editable=False,
                 timezone='browser',refresh='30s',time={'from':'now-6h','to':'now'},tags=['ecosystem','research'],panels=panels)
 
 

@@ -1,0 +1,17 @@
+observed_utc=2026-09-30T06:08:14Z
+pr head:              f5d8e150b79e0901fa18241c7f29bff889b87c14
+release/v3.8.52 tip:  a1a2dce1a64a4b123f80ec899fc88bb2aa34d1a4
+merge base:           a1a2dce1a64a4b123f80ec899fc88bb2aa34d1a4
+commits beyond base:  1
+subject:              feat(models): add GPT-6.1 Sol to Codex catalog and pricing
+   open-sse/config/providers/registry/codex/index.ts   |  9 +++++++++
+   open-sse/executors/codex/reasoningSuffix.ts         |  2 ++
+   src/lib/providers/codexFastTier.ts                  |  1 +
+   src/shared/constants/pricing/oauth-subscriptions.ts | 10 ++++++++++
+   tests/unit/codex-fast-tier.test.ts                  |  1 +
+   5 files changed, 23 insertions(+)
+stable patch-id, upstream commit:   14ec6648f50fc499d430f28d2af7840cd2d46055
+stable patch-id, our cherry-pick:   14ec6648f50fc499d430f28d2af7840cd2d46055
+candidate head (B3):                cf6748d04c1e0dd033fb6b6effa9bbaf5ed5466b
+running build head (B2):            ae5539a5623457a2e8bb7f5dddd3d0736a2ddeb7
+candidate commits over the release/v3.8.51 tip 2f42a9ac1: 4

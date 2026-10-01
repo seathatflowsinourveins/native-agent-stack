@@ -1,0 +1,30 @@
+{
+ "advisor_ok_without_iterations_version": {
+  "2.1.283": 79,
+  "2.1.284": 26
+ },
+ "multi_sum_of_message_splits_equals_combined": {
+  "False": 3,
+  "True": 3703
+ },
+ "multi_top_split_is": {
+  "top==first message split": 3343,
+  "top==sum(message splits) & top==first message split": 360,
+  "top==sum(message splits) & top==last message split & top==first message split": 3
+ },
+ "rows_by_iterations_key_and_version": {
+  "absent 2.1.281": 9284,
+  "absent 2.1.282": 18983,
+  "absent 2.1.283": 74647,
+  "absent 2.1.284": 41987,
+  "list 2.1.280": 14,
+  "list 2.1.281": 14417,
+  "list 2.1.282": 38083,
+  "list 2.1.283": 175093,
+  "list 2.1.284": 64352,
+  "null 2.1.281": 5,
+  "null 2.1.282": 9,
+  "null 2.1.283": 256,
+  "null 2.1.284": 47
+ }
+}

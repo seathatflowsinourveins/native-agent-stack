@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30 (it takes its two host paths as arguments; the returned outputs mask them as <scratch-relock> and <worktree>). It needs python3, tar and
+# sed, and is documentation of what ran, not a supported tool.
+# Negative controls of tests/test_openhands_lock_binding.py: the module must pass on the tree as it is, and fail on each single-defect copy of it. A copy is the worktree without .git; each defect is
+# one edit made with sed, the copy is used once and deleted. The first two defects are the mutations a cross-family review of the litellm relock used to show that no existing test noticed them:
+# a grant that names the receipt of the previous lock, and a pins.json digest that is not the lock's. usage: guard_controls.sh <scratch-relock> <worktree>
+set -u
+R=$1; W=$2; D=$R/mutants
+OH=blueprints/runtime-workers/openhands
+mkdir -p "$R/tmp"; rm -rf "$D"; mkdir -p "$D"
+copy() { mkdir -p "$D/$1"; (cd "$W" && tar --exclude=.git -cf - .) | tar -xf - -C "$D/$1"; }
+check() { (cd "$D/$1" && TMPDIR="$R/tmp" python3 -B -m unittest tests.test_openhands_lock_binding > "$D/$1.out" 2>&1; code=$?; grep -E "^(FAIL|ERROR):|^AssertionError|^Ran |^OK|^FAILED" "$D/$1.out" | cut -c1-230 | head -${2:-6}; echo "unittest exit: $code"); }
+copy clean; echo "== as it is (expect OK, exit 0)"; check clean
+copy stale-receipt
+sed -i 's#"evidence": "evidence/receipts/osv-openhands-litellm-relock-20260930.json"#"evidence": "evidence/receipts/osv-urllib3-next-20260930.json"#' "$D/stale-receipt/tests/test_osv_lockfile_coverage.py"
+echo "== the OpenHands grant names the receipt of the previous lock (expect FAILED, exit 1)"; check stale-receipt
+copy zero-pins
+sed -i 's#"requirements_sha256": "[0-9a-f]\{64\}"#"requirements_sha256": "0000000000000000000000000000000000000000000000000000000000000000"#' "$D/zero-pins/$OH/pins.json"
+echo "== pins.json records a digest that is not the lock's (expect FAILED, exit 1)"; check zero-pins
+copy other-lock
+sed -i 's#"evidence": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json"#"evidence": "evidence/receipts/osv-openhands-litellm-relock-20260930.json"#' "$D/other-lock/tests/test_osv_lockfile_coverage.py"
+echo "== the Lumibot grant names the OpenHands receipt, which records another lock (expect FAILED, exit 1)"; check other-lock
+copy digest-mutation
+n=$(grep -n '"evidence": "evidence/receipts/osv-openhands-litellm-relock-20260930.json"' "$D/digest-mutation/tests/test_osv_lockfile_coverage.py" | head -1 | cut -d: -f1)
+sed -i "$((n-1))s/\"sha256\": \"[0-9a-f]\{64\}\"/\"sha256\": \"0000000000000000000000000000000000000000000000000000000000000000\"/" "$D/digest-mutation/tests/test_osv_lockfile_coverage.py"
+echo "== the exit status of the section-M pipeline (unittest piped through tail) when the OpenHands grant pins the wrong digest (expect FAILED in the tail and pipeline exit 1)"
+bash -c 'set -o pipefail; cd "$1" && TMPDIR="$2" python3 -B -m unittest tests.test_osv_lockfile_coverage 2>&1 | tail -3' _ "$D/digest-mutation" "$R/tmp"; echo "pipeline exit: $?"
+copy bad-lock
+awk -v z=0000000000000000000000000000000000000000000000000000000000000000 '/^litellm==/ {inl=1; print; next} inl && /^[[:space:]]+--hash=sha256:/ {sub(/sha256:[0-9a-f]+/, "sha256:" z); print; next} {inl=0; print}' "$D/bad-lock/$OH/requirements.lock" > "$D/bad-lock/lock.new" && mv "$D/bad-lock/lock.new" "$D/bad-lock/$OH/requirements.lock"
+echo "== hash-check.py on a lock whose litellm hash lines are all not files of the release (expect the NO FILE lines and exit 1)"
+python3 "$W/$OH/evidence/relock-2026-09-30-litellm.hash-check.py.txt" "$D/bad-lock/$OH/requirements.lock" | grep -E "NO FILE|hash lines" | head -3; echo "hash-check exit: ${PIPESTATUS[0]}"
+echo "== install-check.sh on that lock (expect a failing runtime lock install and exit 1; uv accepts a file that matches ANY listed hash, so one wrong hash line would not fail it)"
+bash "$W/$OH/evidence/relock-2026-09-30-litellm.install-check.sh.txt" "$R" "$D/bad-lock" 2>&1 | grep -E "runtime lock install exit|uv pip check exit|done, status"; echo "install-check exit: ${PIPESTATUS[0]}"
+rm -rf "$D"

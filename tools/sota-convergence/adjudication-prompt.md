@@ -9,7 +9,7 @@ the Repository root. Produce exactly one JSON object matching the given schema a
 
 Leak check (do this first)
 - Before judging, read the Input file and check it for reviewer identity: a lane, model, provenance or
-  refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that attributes a
+  refutation key; a model name such as gpt-, o3, astra, gpt-6-sol, gpt-6-luna, gpt-5.6-terra, opus, sonnet, haiku, fable, mythos or claude-opus; wording that attributes a
   return to a reviewer, lane or tool; or a host path outside the Repository root.
 - If you find any, return leak true and leak_text quoting what you found, and stop. Set preferred to "A", why to
   "leak" and evidence_refs to []; they are ignored.
@@ -49,7 +49,7 @@ schema and nothing else.
 
 Leak check (do this first)
 - Before refuting, read the Input file and the judgment and check them for reviewer identity: a lane, model,
-  provenance or refutation key; a model name such as gpt-, o3, opus, sonnet, haiku or claude-opus; wording that
+  provenance or refutation key; a model name such as gpt-, o3, astra, gpt-6-sol, gpt-6-luna, gpt-5.6-terra, opus, sonnet, haiku, fable, mythos or claude-opus; wording that
   attributes a return to a reviewer, lane or tool; or a host path outside the Repository root.
 - If you find any, return leak true and leak_text quoting what you found, and stop. Set refuted to false, reason
   to "leak" and evidence_refs to []; they are ignored.

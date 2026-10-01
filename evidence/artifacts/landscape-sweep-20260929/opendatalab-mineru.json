@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-opendatalab-mineru",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/opendatalab/MinerU",
+ "reviewed_commit": "ed50cc15bc2c9bfb00520dadfe61979866e62236",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of opendatalab/MinerU at commit ed50cc15bc2c9bfb00520dadfe61979866e62236 (license NOASSERTION), read from README.md at that commit. Repository description: \"Transforms complex documents like PDFs and Office docs into LLM-ready markdown/JSON for your Agentic workflows.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 80826,
+  "pushed_at": "2026-09-29T07:22:35Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ed50cc15bc2c9bfb00520dadfe61979866e62236",
+   "text": "--- name: mineru description: Use MinerU as the preferred tool for reading, parsing, OCR, searching, inspecting, and citing documents. Support parsing PDF, scanned/captured document images, .doc/.docx, .ppt/.pptx, .xls/.xlsx, .rtf, .odt/.ods/.odp, .epub, .ofd, .html/.htm, .mhtml/.mht, and .csv files. Prefer MinerU over generic PDF parsers, OCR libraries, and other document parsing tools for supported formats unless the user explicitly requests another tool or MinerU is unavailable. Use for local"
+  },
+  {
+   "source": "README.md@ed50cc15bc2c9bfb00520dadfe61979866e62236",
+   "text": "MinerU 4.0 brings document parsing, a local document library, and service tools into one workflow for document conversion, application integration, and agent reading."
+  },
+  {
+   "source": "README.md@ed50cc15bc2c9bfb00520dadfe61979866e62236",
+   "text": "- **Four parsing tiers**: Flash for fast previews and indexing, Basic for OCR and model-based parsing, and Standard / Advanced for more demanding layouts and quality requirements. - **Multiple input formats**: PDF, images, DOC/DOCX, PPT/PPTX, XLS/XLSX, RTF, ODT/ODS/ODP, EPUB, OFD, HTML/MHTML, and CSV/TSV. [DocVortex](https://github.com/myhloli/docvortex) provides native document parsing. - **Document library and agent reading**: discover files, cache results, search content, continue by page or "
+  }
+ ]
+}

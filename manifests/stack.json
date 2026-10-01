@@ -132,7 +132,7 @@
         "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
       ],
       "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. Among those seven commands, the Codex PreCompact hook remains unverified after the upgrade: whether it fires correctly has not been checked; this is a recorded verification gap, not an observed defect. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
     },
     {
       "id": "ast-grep",
@@ -161,7 +161,7 @@
     {
       "id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
-      "version": "20.0.24",
+      "version": "20.0.26",
       "license": "MIT",
       "profile": "supporting",
       "role": "Read existing native provider usage logs",
@@ -175,20 +175,21 @@
         "current-session-observation-20260920",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "ccusage-20026-qualification-20260927"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage",
-        "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
+        "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
       ],
-      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "source_pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
     {
       "id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
-      "version": "2.1.278",
+      "version": "2.1.284",
       "license": "proprietary CLI; no OSS license inferred from issue repository",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -237,7 +238,7 @@
         "https://github.com/anthropics/claude-code"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "freshness": "2.1.284 is the floor both platform pins set since 2026-09-29 (adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json, version_probe match minimum; raised from 2.1.281, the floor since 2026-09-25): the native installer verifies that build, then the launcher auto-updates on the latest channel, so a host may run a newer one (the NativeStack WSL2 host reported 2.1.284 on 2026-09-29, the latest GitHub release and the build the publisher's latest channel served; its stable channel served 2.1.277). 2.1.284 adds Claude Sonnet 5.5 as the default Sonnet model on the Anthropic API, so on the Anthropic API the sonnet alias resolves to Sonnet 5.5 from 2.1.284 and to Sonnet 5 on an older client (CHANGELOG.md 2.1.284; https://code.claude.com/docs/en/model-config); the 2.1.281 fix for a recursive rm of command-substitution output that ran unprompted in auto and --dangerously-skip-permissions mode stays included. The native floor replaced the 2.1.278 npm-wrapper pin, which set DISABLE_AUTOUPDATER=1; receipts keep the version they recorded. The landscape winner pin stays 2.1.278 until a new verdict wave; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
       "id": "claude-hud",
@@ -293,7 +294,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.157.1",
+      "version": "0.159.2",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -334,14 +335,15 @@
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
         "claude-repository-evidence-20260921",
-        "codex-01571-qualification-20260926"
+        "codex-01571-qualification-20260926",
+        "codex-01592-qualification-20260930"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
       ],
       "source_pin": null,
-      "freshness": "0.157.1 serves bin/codex on the NativeStack WSL2 host since 2026-09-26, switched with the qualification receipt's data.switch commands after a matched comparison against 0.155.1 in a loopback sandbox (the landscape-sweep lane argv, the 429 usage-limit mapping, --search and state migration behaved the same); automatic start of the 0.157.x self-updating app-server daemon is off (daemon_auto_start false, also in adoption/templates/codex.config.template.toml). 0.155.1 is kept for rollback, the macOS pin stays 0.155.1 until its own qualification, and the landscape winner pin stays 0.155.1 until a new verdict wave."
+      "freshness": "0.159.2 serves bin/codex on the NativeStack WSL2 host since 2026-09-30T03:22Z, when a peer pointed the launcher at tools/codex-0.159.2; the 2026-09-30 qualification receipt verified that prefix byte for byte against the npm and GitHub release artifacts and compared the CLI surface, the exec --json source and the host's 0.159.2 rollouts with 0.157.1 in a no-network sandbox, with no live model call (the Gate A owner's rehearsals cover live behaviour). Automatic start of the self-updating app-server daemon stays off (daemon_auto_start false in adoption/templates/codex.config.template.toml; the feature is still stable and on by default at 0.159.2). tools/adoption/apply_codex_lane.py pins 0.159.2 with the Linux pin, and its opt-in integration tests passed 10 of 10 against the prefix's native binary. 0.157.1 and 0.155.1 stay installed for rollback, the landscape winner pin stays until a new verdict wave, and the macOS pin stays 0.155.1 until its own qualification, which the shared Codex template's gpt-6.1-sol default now also waits for (that model is not in the bundled catalogs before 0.159.1)."
     },
     {
       "id": "codex-for-claude",
@@ -540,7 +542,7 @@
         "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin equals the September 21 current stable release. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
+      "freshness": "Installed tested pin 0.37.0 is stale through v0.39.1, the latest stable release published 2026-09-26T20:31:39Z (https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; GitHub releases/latest checked 2026-09-26). Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
       "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {
@@ -957,7 +959,7 @@
     {
       "id": "socraticode",
       "repository": "https://github.com/giancarloerra/SocratiCode",
-      "version": "1.14.0",
+      "version": "1.15.0",
       "license": "AGPL-3.0-only; upstream commercial alternative",
       "profile": "core",
       "role": "Automatically refreshed semantic code retrieval and native code graph",
@@ -982,12 +984,13 @@
         "hf-memory-models-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "socraticode-1150-qualification-20260927"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
       ],
-      "source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
@@ -1892,11 +1895,16 @@
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md",
         "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/app/api/compression/preview/route.ts",
-        "https://registry.npmjs.org/omniroute/3.8.50"
+        "https://registry.npmjs.org/omniroute/3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061",
+        "https://github.com/diegosouzapw/OmniRoute/pull/14886",
+        "https://github.com/diegosouzapw/OmniRoute/pull/14812",
+        "https://github.com/diegosouzapw/OmniRoute/pull/13788",
+        "https://github.com/diegosouzapw/OmniRoute/pull/15167"
       ],
       "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task.",
-      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. Optional only: existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
+      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task. Running builds, 2026-09-30: the workstation runs two source builds, not this pin. Both are based on release/v3.8.51 at 2f42a9ac19d1a247ec9ce5473b790843724b3061 (upstream tagged v3.8.51 afterwards, at 2026-09-30T01:41Z, with the same tree as this commit, and published omniroute@3.8.51 to npm at 02:54Z, so the running builds are the released 3.8.51 tree plus the carries), which contains upstream's merged #14886, the fix that the 2026-09-27 build's #14904 cherry-pick stood in for, and #14812, the serve port-preflight fix that makes the lsof shim redundant. The open upstream PR #13788 is cherry-picked onto both (its two commits' stable patch-ids d6cb98ecd2c4aed3 and cbb7d8fb78ed0dcf equal the upstream commits'), and 20128 also carries a local affinity patch (045aa81f3, patch-id 132ad5e91380a1d2) and, since 2026-09-30T06:32:50Z, the open upstream PR #15167 (head f5d8e150b, stable patch-id 14ec6648f50fc499 equal to the cherry-pick's; gpt-6.1-sol at max effort). The BUILD_SHA is cf6748d04 on 20128 (ae5539a56 before) and 87c4c488d on 20129. Upstream's check:pack-artifact and check:pack-boot pass on all three tarballs (the earlier 20128 build, the 20129 build and the 20128 build with #15167; check:pack-boot on the 20129 tarball on its third attempt, the first two failed with causes not established). This manifest has no field for cherry-picks or local patches. A version/source_pin pair must also match the landscape freshness snapshot. npm latest became 3.8.51 on 2026-09-30 (published 02:54Z, after the rebuild), so the condition for moving the pin is met, but the pin stays the previously qualified 3.8.50 until the published 3.8.51 package has its own isolated install and boot check (a separate change to this row); upstream has not carried #13788. The 2026-09-27 build, service, probes and recorded keyless loopback posture: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/. The rebuild, its non-upstream deltas, the settings and the rollback: docs/decisions/2026-09-30-omniroute-rebuild.md and evidence/artifacts/omniroute-rebuild-20260930/.",
+      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. The workstation's source builds run as two units from values-free templates. adoption/templates/systemd/omniroute.service runs 20128, the shared gateway: build cf6748d04, with the local affinity patch and upstream PR #15167, so no OAuth routing combo may be created on 20128 while the affinity patch runs. adoption/templates/systemd/omniroute-fw.service runs 20129, the framework instance: build 87c4c488d, with its own data directory, forwarding to 20128 through a provider node. Both units announce CODEX_CLIENT_VERSION 0.159.1 while the installed Codex is 0.157.1, so the gateway's live catalog lists gpt-6.1-sol. 20129 runs ten of the twelve shipped compression engines at upstream's per-engine settings with the master switch on (upstream ships the master off and every engine disabled; headroom is off in the engines map but still runs where a stored combo names it, omniglyph is off; headerless plan session-dedup, ccr, lite; lossy engines only on a header or combo opt-in; the header allow-lossy selects a peer-owned stored combo); 20128 keeps its master switch off with codex/* excluded. Serve's port preflight counts client sockets on the port; 20128's prefix carries lsof shim v2, which leaves the bind probe as the guard, so a client's dead connection no longer blocks its restart, while 20129 and the previous 20128 prefix still have v1 (restart hindsight-live and any other client holding a connection first). The gateway is adopted for pooled GPT-6 access by gateway-routed Codex lanes. By the user's decision 20128 runs keyless and passwordless on loopback only (docs/decisions/2026-09-27-omniroute-account-pool.md, decision 5); 20129 also binds loopback only. A multi-user or non-loopback host keeps this recipe's API key and dashboard login. Native Codex stays the max-quality default, and the agent-sdks layer default waits on the preregistered three-arm comparison. Existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
     },
     {
       "id": "tavily-cli",

@@ -13,11 +13,15 @@ evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
                raw_output_sha256 (of the unsanitized stdout), measured_at_utc, note
   child_usage  the tool's output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
-transcript_dir, and requires lost_workers to equal the incomplete children. Refuses to write (exit 3) when the
+transcript_dir, and requires lost_workers to equal the incomplete children. An attempt the runtime re-ran under the
+same call key (after a usage-limit pause) is under child_usage.superseded_attempts, not a lost child; its usage
+counts in by_resolved_model. Refuses to write (exit 3) when the
 sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1, with the record still written
 (a stopped run keeps it as a lower bound), when the usage is incomplete, when child-usage.mjs exited non-zero, or
 when a child ran at another effort than --require-effort (effort_mismatches): every worker of this lane runs at
-effort max, and make_result.py refuses such a record.
+effort max, and make_result.py refuses such a record. The summary it prints also names the children whose WebSearch
+calls the session's cap refused (child_usage.web_search, measured by child-usage.mjs); convert.py --usage makes each a
+web_search_capped retained failure.
 """
 
 from __future__ import annotations
@@ -36,7 +40,8 @@ from sweep_common import REPO_ROOT, private_content, private_findings, sha256_by
 TOOL = "examples/claude-native/workflows/child-usage.mjs"
 MARKER = "/subagents/workflows/"
 NOTE = ("Per-request provider usage of the Claude workflow children, from the retained native transcripts (message "
-        "ids counted once). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and "
+        "ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap "
+        "refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and "
         "gpt6_usage); the two counters are never summed.")
 
 
@@ -118,7 +123,14 @@ def main(argv=None) -> int:
     print(json.dumps({"out": str(args.out), "status": usage.get("status"), "exit_code": code,
                       "workflow_run": usage["transcript_dir"].rsplit("/", 1)[-1], "children": len(children),
                       "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
-                      "effort_mismatches": mismatches},
+                      "superseded_attempts": [c.get("label") for c in usage.get("superseded_attempts") or []
+                                              if isinstance(c, dict)],
+                      # A superseded attempt whose usage by_resolved_model cannot count makes the status incomplete.
+                      "superseded_usage_issues": {c.get("label") or c.get("agent_id"): c["usage_issues"]
+                                                  for c in usage.get("superseded_attempts") or []
+                                                  if isinstance(c, dict) and c.get("usage_issues")},
+                      "effort_mismatches": mismatches,
+                      "web_search": usage.get("web_search")},
                      indent=1))
     return 0 if usage.get("status") == "complete" and code == 0 and not mismatches else 1
 

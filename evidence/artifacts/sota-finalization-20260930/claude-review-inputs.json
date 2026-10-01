@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "prompt_sha256": "ae187f20f4d97f895c61a8a590a5c0077025604f00e780b340fdef7f7c852039",
+  "preregistration_sha256": "5e4e4db6690d61c7bb7d6ad534265795a87129847aa2b480f0e3bf3b18477da3",
+  "inputs": [
+    {
+      "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "bytes": 9272,
+      "sha256": "f24f922b720ec899f4e422a0142c1dec9dee560cbafdf7e0f0f25a39c92cd652"
+    },
+    {
+      "path": "adoption/skills/lifecycle.md",
+      "bytes": 6808,
+      "sha256": "2af6341bac2444b8f6a55689e025e522a8340faa2c4b8be8881e2b89bd58f7ad"
+    },
+    {
+      "path": "adoption/skills/manifest.json",
+      "bytes": 50187,
+      "sha256": "6044ee66070ff128e0aa29d8439604920fc20b75a4ac6962e4804f9730fda50e"
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/manifest.json",
+      "bytes": 185060,
+      "sha256": "6b92a9bd8c91f75e2eac03e60372cb84b6d21d5fce01b2e1a8e2441e6fe74a3f"
+    },
+    {
+      "path": "catalogs/landscape/native-practice.json",
+      "bytes": 19759,
+      "sha256": "9b15860a6b24060eba318e712bee9e1f5e0d124d72a4fba15d6021c9645ab0d6"
+    },
+    {
+      "path": "adoption/templates/codex.AGENTS.template.md",
+      "bytes": 3822,
+      "sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d"
+    },
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "bytes": 12317,
+      "sha256": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb"
+    },
+    {
+      "path": "adoption/templates/codex.stack-worker.config.toml",
+      "bytes": 4573,
+      "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9"
+    },
+    {
+      "path": "tools/adoption/apply_codex_lane.py",
+      "bytes": 66168,
+      "sha256": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b"
+    },
+    {
+      "path": "tests/test_codex_worker_lane.py",
+      "bytes": 102992,
+      "sha256": "cbe4864af05db0809a5d7eb9e3a171a0e62510688bb6a3d1e64df7164746a75f"
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+      "bytes": 14536,
+      "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e"
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+      "bytes": 12094,
+      "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec"
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+      "bytes": 6327,
+      "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e"
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/README.md",
+      "bytes": 5499,
+      "sha256": "56a4263174d05b0cc8e183405f73dab187b1decf8b1290577492a8e728250e74"
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+      "bytes": 138745,
+      "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120"
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+      "bytes": 3474,
+      "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33"
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/operations.json",
+      "bytes": 16663,
+      "sha256": "5d3fff78473c1deb4f6da3a2d2574b8e6817e4e1b398ba48c845b5bbd69c812b"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/plan.json",
+      "bytes": 4009,
+      "sha256": "3dde5fa6158eeb003e3629a2f7d95cdd2b2fc3cd4beadd77e31b1b402416341d"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/source-review.json",
+      "bytes": 5312,
+      "sha256": "531cea77c0e0439e152c9b0d06f7b3dae7ab554794ed79f7bb1cffa033618c52"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/upstream-tests.json",
+      "bytes": 1710,
+      "sha256": "d4300c679ba959d2d6117d954c9906e82617e0d3c98608d2990f6206030e5e30"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+      "bytes": 7178,
+      "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/installed-skills.json",
+      "bytes": 13929,
+      "sha256": "6a97cccc2c4a4555913d28abfcaf119f52dccf82ac256dd9d7dcf051bfdbf943"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/allowed-tree-drift.json",
+      "bytes": 8516,
+      "sha256": "e0699d300b63a206b81ed90247ffa5e00febb3b566d01e36a4d3e6dad64130fb"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "bytes": 3464,
+      "sha256": "fb73c52c796ef25e7393b21f8a820cae42013de3eb9599d883b261256c8dd420"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/verification.json",
+      "bytes": 4524,
+      "sha256": "a761aaba8b156256b45472a3d4a0107f19318447c2c03d831851a72810385ddc"
+    }
+  ],
+  "changes_during_review": [
+    {
+      "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "before_sha256": "f24f922b720ec899f4e422a0142c1dec9dee560cbafdf7e0f0f25a39c92cd652",
+      "after_sha256": "3bbcd81a1eb0ccb8136b75b4b75baf46aabe31abb3db71f19b342972affb1287"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "before_sha256": "fb73c52c796ef25e7393b21f8a820cae42013de3eb9599d883b261256c8dd420",
+      "after_sha256": "2ba2a6b99861436a7e2c1e1b00ee6b26f7f787f95ee624ad7337208ae5b6e842"
+    }
+  ]
+}

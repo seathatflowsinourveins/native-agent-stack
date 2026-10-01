@@ -1,0 +1,28 @@
+isolated an old matcher in a lone bell group is replaced (dry run): exit 0, expected 0
+isolated a hand-requoted bell command is still found (quotes and backslashes ignored): exit 0, expected 0
+isolated a file with no bell group gets one: exit 0, expected 0
+isolated a file that already equals the overlay has nothing to do: exit 0, expected 0
+isolated an equal bell group is not 'nothing to do' while the overlay's own keys are missing: exit 0, expected 0
+isolated another hook in the bell group is refused, not lost: exit 1, expected nonzero
+isolated a bell hook with a key beyond type and command is refused: exit 1, expected nonzero
+isolated a matcher naming a type the overlay's does not is refused, not dropped, and the refusal names no matcher value: exit 1, expected nonzero
+isolated a bell group with a key beyond matcher and hooks is refused, not silently replaced: exit 1, expected nonzero
+isolated an absent matcher is refused: exit 1, expected nonzero
+isolated an old matcher with the overlay's own keys already present is replaced, not 'nothing to do': exit 0, expected 0
+isolated a current matcher on a bell hook with an extra key is refused, not reported as nothing to do: exit 1, expected nonzero
+isolated an existing different preferredNotifChannel is refused, not overwritten: exit 1, expected nonzero
+isolated two bell groups are refused: exit 1, expected nonzero
+isolated an unrelated Notification group is kept beside the new bell group: exit 0, expected 0
+isolated an unknown target is refused: exit 1, expected nonzero
+isolated an unknown flag is refused: exit 1, expected nonzero
+isolated the retired second-distro target is refused: exit 1, expected nonzero
+isolated a settings file saved by another writer after the read is refused, before any backup, and that save is kept: exit 1, expected nonzero
+isolated a save that lands while the backup is taken is refused, the backup holds it and nothing is installed: exit 1, expected nonzero
+isolated a save that lands after the backup was taken is refused, the backup equals the read and nothing is installed: exit 1, expected nonzero
+isolated an atomic save that replaces the file while the backup is being copied is refused, the backup equals the read and nothing is installed: exit 1, expected nonzero
+isolated a save at the rename itself is the documented residual, exit 0, with that save in neither the installed file nor the backup: exit 0, expected 0
+isolated --apply installs the merged copy after a backup equal to the original, keeps the mode, leaves no staging file: exit 0, expected 0
+isolated --apply keeps a file mode other than 0600 on the installed file and on its backup: exit 0, expected 0
+isolated --apply does not follow a symlink at the old fixed staging name: exit 0, expected 0
+isolated a symlinked settings file is refused, also with --apply, and the real file is untouched: exit 1, expected nonzero
+27 cases, 0 problems

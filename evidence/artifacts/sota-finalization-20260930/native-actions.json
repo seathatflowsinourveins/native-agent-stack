@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "kind": "native-host-skill-refresh",
+  "recorded_at_utc": "2026-09-30T06:52:00Z",
+  "source_scope": "27 selected foundation skills; no runtime catalog installation",
+  "sources": [
+    {
+      "name": "codebase-design",
+      "source": "mattpocock/skills",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/codebase-design",
+      "tree_sha": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a",
+      "skill_md_sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+      "skill_md_bytes": 6446,
+      "description_chars": 265,
+      "license": "MIT",
+      "change": "Only supporting DESIGN-IT-TWICE.md changes CONTEXT.md to GLOSSARY.md; SKILL.md unchanged.",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design"
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/improve-codebase-architecture",
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
+      "description_chars": 125,
+      "license": "MIT",
+      "change": "Optional CONTEXT.md references become GLOSSARY.md; disable-model-invocation remains true.",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture"
+    },
+    {
+      "name": "semgrep",
+      "source": "trailofbits/skills",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
+      "path": "plugins/static-analysis/skills/semgrep",
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
+      "description_chars": 707,
+      "license": "CC-BY-SA-4.0",
+      "change": "Explicit 20000000-byte target limit, override/zero-unlimited support and oversized-omission reporting. Pin-only installation; preserve license.",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep"
+    }
+  ],
+  "native_cli": {
+    "repository": "vercel-labs/skills",
+    "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+    "version": "1.7.0"
+  },
+  "attempts": [
+    {
+      "kind": "dry-run",
+      "command": "python3 tools/adoption/install_skills.py --only codebase-design --only improve-codebase-architecture --only semgrep --skills-bin <pinned-skills> --dry-run --json",
+      "exit_code": 0,
+      "stdout": "{\"dry_run\": true, \"ok\": true, \"skills\": {\"codebase-design\": \"planned\", \"improve-codebase-architecture\": \"planned\", \"semgrep\": \"planned\"}}"
+    },
+    {
+      "kind": "initial-install",
+      "exit_code": 1,
+      "stdout": "{\"dry_run\": false, \"ok\": false, \"skills\": {\"codebase-design\": \"error\", \"improve-codebase-architecture\": \"error\", \"semgrep\": \"error\"}}",
+      "failure": "Root updated identity fields but initially omitted matching URL changes. Supported installer fetched the old URL and rejected the hash mismatch; scoped native rollback removed Claude links while canonical copies/lock were retained for other agents. This was not an accepted install.",
+      "correction": "Update each URL to the already reviewed immutable repository/ref/path; rerun supported installer without weakening checks."
+    },
+    {
+      "kind": "repaired-install",
+      "exit_code": 0,
+      "stdout": "{\"dry_run\": false, \"ok\": true, \"skills\": {\"codebase-design\": \"installed\", \"improve-codebase-architecture\": \"installed\", \"semgrep\": \"installed\"}}"
+    },
+    {
+      "kind": "retired-native-removal",
+      "command": "skills remove resolving-merge-conflicts --global -y",
+      "exit_code": 0,
+      "returned_result": "Successfully removed 1 skill(s)",
+      "readback": {
+        "canonical_absent": true,
+        "claude_link_absent": true,
+        "codex_link_absent": true,
+        "lock_entry_absent": true
+      }
+    },
+    {
+      "kind": "scoped-native-settings-merge",
+      "command": "python3 tools/adoption/apply_claude_settings.py --template <private-retirement-fragment>",
+      "exit_code": 0,
+      "readback": {
+        "retired_listing": "off",
+        "foreign_settings_unchanged": true
+      },
+      "backup": "Native writer's original settings backup retained privately."
+    },
+    {
+      "kind": "native-status",
+      "command": "python3 scripts/skills_status.py --skills-bin <pinned-skills> --json",
+      "exit_code": 0,
+      "artifact": "installed-skills.json",
+      "result": "ok",
+      "selected_count": 27,
+      "exact_folder_trees": 26,
+      "allowed_existing_drift": "supply-chain-risk-auditor scripts/uv.lock",
+      "claude_listing_counts": {
+        "on": 19,
+        "name-only": 5,
+        "user-invocable-only": 3
+      },
+      "codex_enabled": 11
+    },
+    {
+      "kind": "per-blob-upstream-comparison",
+      "exit_code": 0,
+      "artifact": "allowed-tree-drift.json",
+      "matching_blobs": 12,
+      "total_blobs": 13,
+      "outside_allowed_set": [],
+      "claim": "Only scripts/uv.lock differs; substitution is in memory, not a host rewrite."
+    }
+  ],
+  "integration_checks": {
+    "initial_wrong_module": {
+      "exit_code": 1,
+      "error": "ModuleNotFoundError: No module named 'tests.test_runtime_worker_skills_manifest'"
+    },
+    "correct_module_initial": {
+      "exit_code": 1,
+      "tests": 66,
+      "failures": 5,
+      "correction": "Update derived merit-note pins, source counts and current README matrix after removal; preserve dated research text."
+    },
+    "final": {
+      "exit_code": 0,
+      "tests": 66,
+      "stdout": "Ran 66 tests in 0.081s\\n\\nOK",
+      "command": "python3 -m unittest tests.test_skills_manifest tests.test_runtime_worker_skills tests.test_apply_claude_settings -q",
+      "evidence_class": "repository integration tests"
+    }
+  },
+  "edit_attempts": [
+    {
+      "result": "failed before write",
+      "condition": "Initial patch hunks were out of file order; sorted hunks before retry."
+    },
+    {
+      "result": "failed before write",
+      "condition": "Full runtime file read was truncated; re-read with sufficient native output budget before constructing exact edits."
+    },
+    {
+      "result": "failed before write",
+      "condition": "One merit-note patch omitted the literal trailing comma; matched exact source line before retry."
+    }
+  ],
+  "limitations": [
+    "Metadata and tree checks do not demonstrate every skill's task quality or automatic invocation.",
+    "The 29 native model runs evaluate unchanged search-first and writing-for-agents sources, not these repinned architecture and Semgrep workflows.",
+    "Semgrep upstream hermetic tests remain a distinct evidence class; no real scan is claimed.",
+    "Retired skill's historical source pin is recoverable from the private pre-change manifest and dated public receipts."
+  ]
+}

@@ -1,0 +1,118 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "evaluation-experiments",
+ "title": "Evaluation and experiments",
+ "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+ "research_status": "on_requirement_change",
+ "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+ "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "foundation-agent-retrieval-bench",
+   "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "pin": "v0.2.1",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "inspect-ai",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "data-mlflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "pin": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+   "evidence_class": "source_review",
+   "platform_status": {
+    "linux-wsl2-x86_64": "not_established",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "data-river",
+   "repository": "https://github.com/online-ml/river",
+   "disposition": "conditional"
+  },
+  {
+   "name": "foundation-mteb",
+   "repository": "https://github.com/embeddings-benchmark/mteb",
+   "disposition": "conditional"
+  },
+  {
+   "name": "phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "disposition": "conditional"
+  },
+  {
+   "name": "promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "disposition": "conditional"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "lane claude prefers non-adopted promptfoo (https://github.com/promptfoo/promptfoo): requires Run the frozen 8-case pack blueprints/native-skill-practice/catalog-cases.json under two arms. Arm 1 is promptfoo 0.123.1 using only the credential-free echo exact-text-baseline provider from blueprints/nati",
+  "No retained evidence shows inspect-ai, mlflow, river, mteb or phoenix installed or executed. Every workflow for them is prospective or marked UNEXECUTED.",
+  "No retained matched comparison of promptfoo and inspect-ai exists. evidence/artifacts/claude-repository-evidence-20260921/results.json near line 5730 records its absence. The inspect-ai selection is not a measured win, and promptfoo's evidence comes from different tasks: a four-query embedding examp",
+  "No inspect-ai fixture exists under fixtures/, blueprints/ or tests/. The agent-evaluation comparison arm for c2 must be authored and frozen before it can run.",
+  "The c7 execution is recorded on Darwin arm64 (arb-trace2code receipt environment), not this PC. It evaluates file-level code retrieval (gin and click are 82 of the 101 samples), not financial-document retrieval, answer quality or net trading performance."
+ ],
+ "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/comet-ml/opik",
+   "https://github.com/confident-ai/deepeval",
+   "https://github.com/langfuse/langfuse"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/claude-code",
+  "arize-ai/phoenix",
+  "bytedance/deer-flow",
+  "comet-ml/opik",
+  "confident-ai/deepeval",
+  "dagster-io/dagster",
+  "dagucloud/dagu",
+  "diegosouzapw/omniroute",
+  "embeddings-benchmark/mteb",
+  "eyuansu62/agent-retrieval-bench",
+  "grafana/grafana",
+  "grafana/lok",
+  "langchain-ai/deepagents",
+  "langchain-ai/langgraph",
+  "langfuse/langfuse",
+  "microsoft/agent-framework",
+  "microsoft/skillop",
+  "mlflow/mlflow",
+  "online-ml/river",
+  "open-telemetry/opentelemetry-collector-contrib",
+  "openai/codex",
+  "openai/openai-agents-python",
+  "openhands/openhands",
+  "openhands/software-agent-sdk",
+  "prefecthq/prefec",
+  "prometheus/prometheus",
+  "promptfoo/promptfoo",
+  "restic/restic",
+  "tashfeenahmed/freellmap",
+  "temporalio/temporal",
+  "ukgovernmentbeis/inspect_a",
+  "vllm-project/vllm"
+ ],
+ "seeded_candidates_20260926": [
+  "inspect_ai: trading lane keeps 0.3.266 until the f1() change is released and qualified (e7, 2026-09-26)"
+ ]
+}
