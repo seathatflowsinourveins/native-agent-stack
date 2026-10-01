@@ -1,0 +1,4064 @@
+{
+  "schema_version": 1,
+  "source_path": "adoption/new-wsl-profile.json",
+  "profile_id": "new-wsl-clean-foundation",
+  "source_head": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "evidence_class": "source_review_recommendations",
+  "entries": [
+    {
+      "name": "Ubuntu 26.04.1 LTS",
+      "repository": "https://ubuntu.com/download/server",
+      "layer_id": "cross:wsl-distro",
+      "owner_layer_id": "cross:wsl-distro",
+      "pin": "26.04.1",
+      "component_id": null,
+      "source_selection_layer": "cross:wsl-distro",
+      "source_selection_name": "Ubuntu 26.04.1 LTS",
+      "status": "head-to-head-arm",
+      "stage": "os-provisional-comparison",
+      "position": 1,
+      "comparison_group": "wsl-os",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "Provisional symmetric OS arm: fresh-instance first boot, systemd user session, toolchain, WSL compatibility and native acceptance await the dual-image recipe owner. No distro creation or global WSL change is authorized by this source contract.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "ubuntu-26.04.1-wsl-amd64.wsl",
+        "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+        "source": "https://releases.ubuntu.com/26.04.1/SHA256SUMS",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_checksum_not_rehashed",
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/cross_wsl-distro.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": {
+        "tag": "26.04.1",
+        "source": "https://releases.ubuntu.com/26.04.1/",
+        "kind": "canonical_image_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Ubuntu 24.04.5 LTS",
+      "repository": "https://ubuntu.com/download/server",
+      "layer_id": "cross:wsl-distro",
+      "owner_layer_id": "cross:wsl-distro",
+      "pin": "24.04.5",
+      "component_id": null,
+      "source_selection_layer": "cross:wsl-distro",
+      "source_selection_name": "Ubuntu 24.04.5 LTS",
+      "status": "head-to-head-arm",
+      "stage": "os-provisional-comparison",
+      "position": 2,
+      "comparison_group": "wsl-os",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "Provisional symmetric OS arm: fresh-instance first boot, systemd user session, toolchain, WSL compatibility and native acceptance await the dual-image recipe owner. No distro creation or global WSL change is authorized by this source contract.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "ubuntu-24.04.5-wsl-amd64.wsl",
+        "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+        "source": "https://releases.ubuntu.com/24.04.5/SHA256SUMS",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_checksum_not_rehashed",
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/cross_wsl-distro.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": {
+        "tag": "24.04.5",
+        "source": "https://releases.ubuntu.com/24.04.5/",
+        "kind": "canonical_image_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "layer_id": "cross:wsl-distro",
+      "owner_layer_id": "cross:wsl-distro",
+      "pin": null,
+      "component_id": "systemd",
+      "source_selection_layer": "scheduling-supervision",
+      "source_selection_name": "systemd",
+      "status": "picked",
+      "stage": "os-provisional-comparison",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "A pin matching the destination installation is not verified.",
+        "No artifact checksum or native lock hash verified.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The destination systemd package comes from the chosen OS image; latest upstream 262 is not its version and is excluded from the pin."
+      ],
+      "artifact": null,
+      "checksum": {
+        "algorithm": null,
+        "value": null,
+        "source": null,
+        "kind": null
+      },
+      "install": {
+        "command": null,
+        "source": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README.md"
+      ],
+      "release": {
+        "tag": "v262",
+        "source": "https://github.com/systemd/systemd/releases/tag/v262",
+        "published_at": "2026-09-22T13:19:16Z"
+      },
+      "source_pin_kind": null
+    },
+    {
+      "name": "git",
+      "repository": "https://github.com/git/git",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": null,
+      "component_id": null,
+      "source_selection_layer": "git-github-automation",
+      "source_selection_name": "git",
+      "status": "picked",
+      "stage": "native-toolchain",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "A pin matching the destination installation is not verified.",
+        "No artifact checksum or native lock hash verified.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The source selection claims Git 2.56.0, but its tag/commit API verification failed. Git remains an OS prerequisite; no fabricated release or apt version pin."
+      ],
+      "artifact": null,
+      "checksum": {
+        "algorithm": null,
+        "value": null,
+        "source": null,
+        "kind": null
+      },
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/git-github-automation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": null,
+      "source_pin_kind": null
+    },
+    {
+      "name": "Node 24",
+      "repository": "https://github.com/nodejs/node",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "24.21.0",
+      "component_id": null,
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "Node 24",
+      "status": "picked",
+      "stage": "native-toolchain",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "node-v24.21.0-linux-x64.tar.xz",
+        "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+        "source": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_checksum_not_rehashed",
+      "install": {
+        "command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages",
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+        "scope": "Supported manifest-driven native adapter; profile parameter names the newly added manifest row. The source revision's installer/pin format is reused without modifying it."
+      },
+      "upstream_install": {
+        "command": "mise install node@24.21.0",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/cli/install.md",
+        "scope": "Reproduction route only; the minimal native bootstrap directly extracts the pinned official Node archive."
+      },
+      "acceptance": {
+        "command": "node hello-world.js",
+        "source": "https://github.com/nodejs/node/blob/v24.21.0/doc/api/synopsis.md",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "scope": "Use the unchanged upstream synopsis.md hello-world.js fixture and independently observe its HTTP response; neither was executed."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+        "https://github.com/nodejs/node/blob/v24.21.0/doc/api/synopsis.md",
+        "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt"
+      ],
+      "release": null,
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "uv",
+      "repository": "https://github.com/astral-sh/uv",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "0.12.17",
+      "component_id": null,
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "uv",
+      "status": "picked",
+      "stage": "native-toolchain",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "uv-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
+        "source": "https://api.github.com/repos/astral-sh/uv/releases/tags/0.12.17",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.17/uv-installer.sh | sh",
+        "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+        "scope": "Explicit version argument from the user's requirement and tagged uv download metadata; native --help verifies the install options. No interpreter was installed."
+      },
+      "acceptance": {
+        "command": "uv run --no-project --python 3.13.15 - <<'PY'\nprint(\"hello world!\")\nPY",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "scope": "Pin-specific adaptation of upstream's documented stdin hello-world example; not executed."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md"
+      ],
+      "release": null,
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "gh",
+      "repository": "https://github.com/cli/cli",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": "2.101.0",
+      "component_id": null,
+      "source_selection_layer": "git-github-automation",
+      "source_selection_name": "gh (GitHub CLI)",
+      "status": "picked",
+      "stage": "native-toolchain",
+      "position": 4,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "gh_2.101.0_linux_amd64.tar.gz",
+        "url": "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_linux_amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8",
+        "source": "https://api.github.com/repos/cli/cli/releases/tags/v2.101.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages",
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+        "scope": "Supported manifest-driven native adapter; profile parameter names the newly added manifest row. The source revision's installer/pin format is reused without modifying it."
+      },
+      "acceptance": {
+        "command": "gh api repos/{owner}/{repo}/releases",
+        "source": "https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/api/api.go#L143",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected gh 2.101.0 installed with authorized native authentication.",
+          "The intended public repository supplied by working-directory context or GH_REPO; confirm response identity/content independently."
+        ],
+        "scope": "Unchanged upstream read-only API example. The new-host example was not executed. Current-host public source lookups establish source metadata only and never sign-in/provisioning acceptance."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/git-github-automation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+        "https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "v2.101.0",
+        "source": "https://github.com/cli/cli/releases/tag/v2.101.0",
+        "published_at": "2026-09-15T14:24:34Z"
+      },
+      "source_pin_kind": "release_or_artifact_version",
+      "source_commit": "0cf1092493af067646fc5f3db9421c6a6ec9c938"
+    },
+    {
+      "name": "CPython 3.13",
+      "repository": "https://github.com/astral-sh/python-build-standalone",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "3.13.15",
+      "component_id": null,
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "CPython 3.13",
+      "status": "picked",
+      "stage": "native-toolchain",
+      "position": 5,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "cpython-3.13.15%2B20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "build": "20260901"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "8a689a077337bea6d1c4bc0b7df1d52fcaa28f5f67e50df8bf417c1e3f9d8874",
+        "source": "https://raw.githubusercontent.com/astral-sh/uv/0.12.17/crates/uv-python/download-metadata.json#cpython-3.13.15-linux-x86_64-gnu",
+        "kind": "artifact"
+      },
+      "integrity_observation": "uv_published_download_metadata_not_rehashed",
+      "install": {
+        "command": "uv python install 3.13.15 --no-bin",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md",
+        "scope": "Explicit version argument from the user's requirement and tagged uv download metadata; native --help verifies the install options. No interpreter was installed."
+      },
+      "acceptance": {
+        "command": "uv run --no-project --python 3.13.15 - <<'PY'\nprint(\"hello world!\")\nPY",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "scope": "Pin-specific adaptation of upstream's documented stdin hello-world example; not executed."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md",
+        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md"
+      ],
+      "release": null,
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Codex",
+      "repository": "https://github.com/openai/codex",
+      "layer_id": "native-clients",
+      "owner_layer_id": "native-clients",
+      "pin": "0.159.3",
+      "component_id": "codex",
+      "source_selection_layer": "native-clients",
+      "source_selection_name": "Codex",
+      "status": "picked",
+      "stage": "native-clients",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "codex-0.159.3.tgz",
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g @openai/codex@0.159.3",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.",
+        "execution_status": "UNRUN"
+      },
+      "acceptance": {
+        "command": "codex exec \"summarize the repository structure and list the top 5 risky areas\"",
+        "source": "https://developers.openai.com/codex/noninteractive",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected Codex CLI and its native platform dependency installed.",
+          "Existing authorized native sign-in and the intended repository context."
+        ],
+        "scope": "Official noninteractive example. No model request, result-quality assessment, account activation or destination-host execution occurred."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/native-clients.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/README.md",
+        "https://developers.openai.com/codex/noninteractive",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "rust-v0.159.3",
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z"
+      },
+      "source_pin_kind": "release_or_artifact_version",
+      "source_commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "artifact_scope": "Thin npm launcher package only (4,904 bytes); the platform dependency and complete native package are separate artifacts. The npm archive was downloaded and rehashed, not installed.",
+      "native_release_artifacts": [
+        {
+          "name": "codex-package-x86_64-unknown-linux-musl.tar.gz",
+          "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-package-x86_64-unknown-linux-musl.tar.gz",
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "3930f31ac5fca861ea3e444e2683f261190d96b63fba58e0a40a879174369cdf",
+            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3",
+            "kind": "artifact"
+          },
+          "integrity_observation": "published_digest_not_rehashed"
+        },
+        {
+          "name": "codex-x86_64-unknown-linux-musl.tar.gz",
+          "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-x86_64-unknown-linux-musl.tar.gz",
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "b48ca1b2d6b1bf42b944e02c3d937c898e24651916684cdc35fdedf31b291bcb",
+            "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3",
+            "kind": "artifact"
+          },
+          "integrity_observation": "published_digest_not_rehashed"
+        }
+      ]
+    },
+    {
+      "name": "Claude Code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "layer_id": "native-clients",
+      "owner_layer_id": "native-clients",
+      "pin": "2.1.284",
+      "component_id": "claude-code",
+      "source_selection_layer": "native-clients",
+      "source_selection_name": "Claude Code",
+      "status": "picked",
+      "stage": "native-clients",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "claude (linux-x64)",
+        "url": "https://downloads.claude.ai/claude-code-releases/2.1.284/linux-x64/claude"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f",
+        "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_manifest_digest_not_rehashed",
+      "install": {
+        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.284",
+        "source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
+        "execution_status": "UNRUN"
+      },
+      "acceptance": {
+        "command": "claude -p \"explain this function\"",
+        "source": "https://code.claude.com/docs/en/quickstart#essential-commands",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Installed host 2.1.287 help/version checks do not qualify selected 2.1.284; no model request occurred.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected Claude Code 2.1.284 installed.",
+          "Existing authorized native sign-in and actual function/project context sufficient to answer the example."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/native-clients.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://code.claude.com/docs/en/setup#install-a-specific-version",
+        "https://code.claude.com/docs/en/quickstart",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "2.1.284",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fclaude-code/2.1.284",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter",
+      "layer_id": "mcp-surfaces",
+      "owner_layer_id": "mcp-surfaces",
+      "pin": "0.14.1",
+      "component_id": "mcporter",
+      "source_selection_layer": "mcp-surfaces",
+      "source_selection_name": "mcporter",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "mcporter-0.14.1.tgz",
+        "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+        "source": "https://registry.npmjs.org/mcporter/0.14.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g mcporter@0.14.1",
+        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": "pnpm test",
+        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/mcp-surfaces.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+      ],
+      "release": {
+        "tag": "0.14.1",
+        "source": "https://registry.npmjs.org/mcporter/0.14.1",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "MCP Inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "layer_id": "mcp-surfaces",
+      "owner_layer_id": "mcp-surfaces",
+      "pin": "2.9.0",
+      "component_id": "mcp-inspector",
+      "source_selection_layer": "mcp-surfaces",
+      "source_selection_name": "MCP Inspector",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "inspector-2.9.0.tgz",
+        "url": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.9.0.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "0671ad3cc535b00cbfbd3a9aad7559a735ec471d72030f0e69b7add778f8ed09",
+        "source": "https://registry.npmjs.org/%40modelcontextprotocol%2Finspector/2.9.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npx @modelcontextprotocol/inspector@2.9.0 --cli",
+        "source": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": "npm run validate",
+        "source": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/mcp-surfaces.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+        "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md"
+      ],
+      "release": {
+        "tag": "2.9.0",
+        "source": "https://registry.npmjs.org/%40modelcontextprotocol%2Finspector/2.9.0",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "layer_id": "isolation",
+      "owner_layer_id": "isolation",
+      "pin": "0.0.77",
+      "component_id": "sandbox-runtime",
+      "source_selection_layer": "isolation",
+      "source_selection_name": "sandbox-runtime (srt)",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "sandbox-runtime-0.0.77.tgz",
+        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.77.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "cfc25049ae6b154f945ec7116725200f4153a9564752ffad2b1739a5e396b5b9",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.77",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": "srt echo \"hello world\"",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "evidence_class": "documented_upstream_example_not_executed"
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+      ],
+      "release": {
+        "tag": "0.0.77",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": "0.80.0",
+      "component_id": "worktrunk",
+      "source_selection_layer": "isolation",
+      "source_selection_name": "Worktrunk",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 4,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+        "source": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh | sh && wt config shell install",
+        "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "execution_status": "UNRUN",
+        "scope": "Exact versioned release-installer command including upstream wt config shell install. This writes shell integration when executed; no installer or shell mutation was run."
+      },
+      "acceptance": {
+        "command": "cargo test",
+        "source": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected upstream source checkout and Rust build/test dependencies."
+        ],
+        "scope": "README default cargo test unit suite only; shell integration has a separate feature-enabled suite requiring bash, zsh, fish, nushell, pwsh and jq. No shell integration was qualified. Installed host 0.79.0 does not qualify selected 0.80.0."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+        "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "v0.80.0",
+        "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Serena",
+      "repository": "https://github.com/oraios/serena",
+      "layer_id": "code-navigation",
+      "owner_layer_id": "code-navigation",
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "component_id": "serena",
+      "source_selection_layer": "code-navigation",
+      "source_selection_name": "Serena",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 5,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; a pin-matching upstream install remains required.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The reviewed quick start targets PyPI, while this row retains a Git commit. The exact supported commit-pinned install requires verification."
+      ],
+      "artifact": {
+        "name": "git source at c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "url": "https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "source": "https://api.github.com/repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+      ],
+      "release": null,
+      "source_pin_kind": "commit"
+    },
+    {
+      "name": "trafilatura",
+      "repository": "https://github.com/adbar/trafilatura",
+      "layer_id": "web-research",
+      "owner_layer_id": "web-research",
+      "pin": "2.2.0",
+      "component_id": null,
+      "source_selection_layer": "web-research",
+      "source_selection_name": "trafilatura",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 6,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The selected official installation URL could not be fetched in this session, and the tagged README did not establish the full install command. Do not infer one from the PyPI artifact."
+      ],
+      "artifact": {
+        "name": "trafilatura-2.2.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c3/01/af18878398102a5a5afa0811f4f8f2a8a94a60cc16e8e9cf54bc95f96808/trafilatura-2.2.0-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "ac43592a6201264dfc4f9c361cbe3eb3fea96e54437010a159d5e7365360ed98",
+        "source": "https://pypi.org/pypi/trafilatura/2.2.0/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://trafilatura.readthedocs.io/en/latest/installation.html"
+      ],
+      "release": {
+        "tag": "2.2.0",
+        "source": "https://pypi.org/pypi/trafilatura/2.2.0/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Playwright CLI",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "layer_id": "web-research",
+      "owner_layer_id": "web-research",
+      "pin": "0.1.21",
+      "component_id": "playwright-cli",
+      "source_selection_layer": "web-research",
+      "source_selection_name": "Playwright CLI",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 7,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "cli-0.1.21.tgz",
+        "url": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.21.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c",
+        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g @playwright/cli@0.1.21",
+        "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md"
+      ],
+      "release": {
+        "tag": "0.1.21",
+        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "20.0.26",
+      "component_id": "ccusage",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "ccusage",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 8,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "ccusage-20.0.26.tgz",
+        "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2",
+        "source": "https://registry.npmjs.org/ccusage/20.0.26",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+      ],
+      "release": {
+        "tag": "20.0.26",
+        "source": "https://registry.npmjs.org/ccusage/20.0.26",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Inspect AI",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "layer_id": "quality-evaluation",
+      "owner_layer_id": "quality-evaluation",
+      "pin": "0321960a92aa52390413ce011d67ffb5962a2b11",
+      "component_id": null,
+      "source_selection_layer": "quality-evaluation",
+      "source_selection_name": "Inspect AI",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 9,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked."
+      ],
+      "artifact": {
+        "name": "git source at 0321960a92aa52390413ce011d67ffb5962a2b11",
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/tree/0321960a92aa52390413ce011d67ffb5962a2b11"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "0321960a92aa52390413ce011d67ffb5962a2b11",
+        "source": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits/0321960a92aa52390413ce011d67ffb5962a2b11",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": "pip install -e \".[dev]\"",
+        "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md"
+      },
+      "acceptance": {
+        "command": "make test",
+        "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md"
+      ],
+      "release": null,
+      "source_pin_kind": "commit"
+    },
+    {
+      "name": "Harbor",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "layer_id": "quality-evaluation",
+      "owner_layer_id": "quality-evaluation",
+      "pin": "0.23.0",
+      "component_id": null,
+      "source_selection_layer": "quality-evaluation",
+      "source_selection_name": "Harbor (containerized agent E2E runner)",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 10,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 1e5c5c6db929a10a140d05e606882c671ae20729",
+        "url": "https://github.com/harbor-framework/harbor/tree/1e5c5c6db929a10a140d05e606882c671ae20729"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "1e5c5c6db929a10a140d05e606882c671ae20729",
+        "source": "https://api.github.com/repos/harbor-framework/harbor/commits/1e5c5c6db929a10a140d05e606882c671ae20729",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": "uv tool install harbor==0.23.0",
+        "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+      ],
+      "release": {
+        "tag": "v0.23.0",
+        "source": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+        "published_at": "2026-09-12T04:55:17Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "layer_id": "quality-evaluation",
+      "owner_layer_id": "quality-evaluation",
+      "pin": "0.123.1",
+      "component_id": "promptfoo",
+      "source_selection_layer": "quality-evaluation",
+      "source_selection_name": "Promptfoo",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 11,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "promptfoo-0.123.1.tgz",
+        "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f",
+        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g promptfoo@0.123.1",
+        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md"
+      ],
+      "release": {
+        "tag": "0.123.1",
+        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": "0.71.0",
+      "component_id": "difftastic",
+      "source_selection_layer": "git-github-automation",
+      "source_selection_name": "difftastic",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 12,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/Wilfred/difftastic/releases/download/0.71.0/difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "61aea5394a53c56f144637cf39b3a0c0dafa27769731745e5851ff276e6478da",
+        "source": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/git-github-automation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md"
+      ],
+      "release": {
+        "tag": "0.71.0",
+        "source": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+        "published_at": "2026-09-18T22:57:29Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "sem",
+      "repository": "https://github.com/Ataraxy-Labs/sem",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": "0.25.0",
+      "component_id": null,
+      "source_selection_layer": "git-github-automation",
+      "source_selection_name": "sem (lowest confidence; kept only if the structural-diff comparison shows a gain)",
+      "status": "head-to-head-arm",
+      "stage": "native-extensions",
+      "position": 13,
+      "comparison_group": "agent-structural-diff",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "sem-linux-x86_64.tar.gz",
+        "url": "https://github.com/Ataraxy-Labs/sem/releases/download/v0.25.0/sem-linux-x86_64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "7151f577f84eef16b32ab67bbf4336b1878de1f4d7a087583b0a08ee4e0fb4fd",
+        "source": "https://api.github.com/repos/Ataraxy-Labs/sem/releases/tags/v0.25.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/Ataraxy-Labs/sem/blob/4cfe1374f79631b01aca5746441d826738a15448/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/git-github-automation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/Ataraxy-Labs/sem/blob/4cfe1374f79631b01aca5746441d826738a15448/README.md"
+      ],
+      "release": {
+        "tag": "v0.25.0",
+        "source": "https://github.com/Ataraxy-Labs/sem/releases/tag/v0.25.0",
+        "published_at": "2026-09-13T17:47:03Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Claude Agent SDK",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "layer_id": "agent-sdks",
+      "owner_layer_id": "agent-sdks",
+      "pin": "0.2.163",
+      "component_id": null,
+      "source_selection_layer": "agent-sdks",
+      "source_selection_name": "Claude Agent SDK",
+      "status": "picked",
+      "stage": "sdk-source-review",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "claude_agent_sdk-0.2.163.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/9b/74/635d38e2ef813a2d1ba4ff7f3de736c35ee3bce9ebf4a5b7e89f3293604f/claude_agent_sdk-0.2.163.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "269821ad5acff5967522ff15f444b0598840fd9bdc45c645de569a5478061a53",
+        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "pip install claude-agent-sdk==0.2.163",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+      ],
+      "release": {
+        "tag": "0.2.163",
+        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Codex TypeScript SDK",
+      "repository": "https://github.com/openai/codex",
+      "layer_id": "agent-sdks",
+      "owner_layer_id": "agent-sdks",
+      "pin": "0.159.3",
+      "component_id": null,
+      "source_selection_layer": "agent-sdks",
+      "source_selection_name": "Codex TypeScript SDK",
+      "status": "picked",
+      "stage": "sdk-source-review",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "codex-sdk-0.159.3.tgz",
+        "url": "https://registry.npmjs.org/@openai/codex-sdk/-/codex-sdk-0.159.3.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "f10a967cab205ad7875bd2cd8c508ccc5ab9501ff900f9466378e1b0e14b0522",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install @openai/codex-sdk@0.159.3",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "PR #580's Python package gate is merged. This TypeScript 0.159.3 row remains an independent source-review recommendation; PR #580 did not qualify TypeScript SDK adoption, installation, sign-in, provider execution or new-host acceptance.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "0.159.3",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Codex Python SDK",
+      "repository": "https://github.com/openai/codex",
+      "layer_id": "agent-sdks",
+      "owner_layer_id": "agent-sdks",
+      "pin": "0.159.3",
+      "component_id": null,
+      "source_selection_layer": "agent-sdks",
+      "source_selection_name": "Codex Python SDK",
+      "status": "picked",
+      "stage": "sdk-source-review",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "openai_codex-0.159.3-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/6f/24/524be7ef0fb11e587a506514f4e9b70473a1b27ba745b1afc660ced25850/openai_codex-0.159.3-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
+        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "python -m pip install openai-codex==0.159.3",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
+        "pinning_source": "https://pip.pypa.io/en/stable/cli/pip_install/",
+        "package_source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "execution_status": "UNRUN",
+        "scope": "Upstream package installed using pip documented module invocation and exact version syntax; run in the owned Python environment, never the OS Python."
+      },
+      "acceptance": {
+        "command": "python - <<'PY'\nfrom openai_codex import Codex\n\nwith Codex() as codex:\n    thread = codex.thread_start()\n    result = thread.run(\"Explain this repository in three bullets.\")\n    print(result.final_response)\nPY",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md#quickstart",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Python environment with the selected SDK and its native CLI dependency installed.",
+          "Existing authorized native Codex authentication and the intended repository context."
+        ],
+        "scope": "The Python body is the unchanged upstream quickstart; the here-document is only its shell carrier. No SDK/provider/model execution or output-quality acceptance occurred."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "PR #580 merged at accepted main 85543efe5abcddb7b7cddb14e8774e83b6758616; this profile records the accepted SDK pin but has performed no SDK installation, sign-in, provider call or new-host acceptance.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "0.159.3",
+        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version",
+      "source_commit": "01fc69f4026735edfdf6789820549727a4867b11"
+    },
+    {
+      "name": "QMD",
+      "repository": "https://github.com/tobi/qmd",
+      "layer_id": "document-retrieval",
+      "owner_layer_id": "document-retrieval",
+      "pin": "2.8.3",
+      "component_id": "qmd",
+      "source_selection_layer": "document-retrieval",
+      "source_selection_name": "tobi/qmd",
+      "status": "picked",
+      "stage": "document-retrieval",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "qmd-2.8.3.tgz",
+        "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+        "source": "https://registry.npmjs.org/%40tobilu%2Fqmd/2.8.3",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g @tobilu/qmd@2.8.3",
+        "source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN"
+      },
+      "acceptance": {
+        "command": "qmd search \"authentication\" --json -n 10",
+        "source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected QMD 2.8.3 installed.",
+          "A populated isolated index with known authentication-related content; bind the example to that index using upstream --index <name>."
+        ],
+        "scope": "Unchanged README search example; search is BM25 and makes no semantic embedding/reranking acceptance claim. No index, model or GPU was provisioned, and the search was not run."
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/document-retrieval.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "2.8.3",
+        "source": "https://registry.npmjs.org/%40tobilu%2Fqmd/2.8.3",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "MinerU",
+      "repository": "https://github.com/opendatalab/mineru",
+      "layer_id": "document-retrieval",
+      "owner_layer_id": "document-retrieval",
+      "pin": "4.0.10",
+      "component_id": null,
+      "source_selection_layer": "document-retrieval",
+      "source_selection_name": "MinerU",
+      "status": "picked",
+      "stage": "document-retrieval",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The source install recipe uses a separate Python 3.12 environment and optional model/GPU extras; compatibility with the minimal CPython 3.13 lane is unqualified."
+      ],
+      "artifact": {
+        "name": "mineru-4.0.10-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/4a/77/47f2e123082a96b5126c3a200b1552ccd245b26c9677cd76bfd47f8dbb91/mineru-4.0.10-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "9731eb8afb9756bb2e3a8e3e6a69252786434602eeb4ff36f7e7a5f2aa8ac107",
+        "source": "https://pypi.org/pypi/mineru/4.0.10/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/opendatalab/mineru/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/document-retrieval.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/opendatalab/mineru/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md"
+      ],
+      "release": {
+        "tag": "4.0.10",
+        "source": "https://pypi.org/pypi/mineru/4.0.10/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "SocratiCode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "layer_id": "semantic-rag",
+      "owner_layer_id": "semantic-rag",
+      "pin": "1.15.0",
+      "component_id": "socraticode",
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "SocratiCode",
+      "status": "head-to-head-arm",
+      "stage": "code-retrieval-comparison",
+      "position": 1,
+      "comparison_group": "code-retrieval",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "Package pin is verified; Codex/Claude plugin pinning, Docker and embedding-provider configuration remain comparison prerequisites.",
+        "The source recommendation installs a native plugin. A pin-matching plugin install is unresolved; a global npm install is not established by the reviewed primary README."
+      ],
+      "artifact": {
+        "name": "socraticode-1.15.0.tgz",
+        "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
+        "source": "https://registry.npmjs.org/socraticode/1.15.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+      },
+      "acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+      ],
+      "release": {
+        "tag": "1.15.0",
+        "source": "https://registry.npmjs.org/socraticode/1.15.0",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "semble",
+      "repository": "https://github.com/MinishLab/semble",
+      "layer_id": "semantic-rag",
+      "owner_layer_id": "semantic-rag",
+      "pin": "0.6.1",
+      "component_id": null,
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "semble",
+      "status": "head-to-head-arm",
+      "stage": "code-retrieval-comparison",
+      "position": 2,
+      "comparison_group": "code-retrieval",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "semble-0.6.1-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/de/62/0287f43a8d6012fa9a4406d75bc6a6a1ee3d190732e8d7d9760122f77bc2/semble-0.6.1-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256",
+        "source": "https://pypi.org/pypi/semble/0.6.1/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "uv tool install semble==0.6.1 && semble install",
+        "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md"
+      ],
+      "release": {
+        "tag": "0.6.1",
+        "source": "https://pypi.org/pypi/semble/0.6.1/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "ColGREP",
+      "repository": "https://github.com/lightonai/next-plaid",
+      "layer_id": "semantic-rag",
+      "owner_layer_id": "semantic-rag",
+      "pin": "1.7.0",
+      "component_id": null,
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "ColGREP",
+      "status": "head-to-head-arm",
+      "stage": "code-retrieval-comparison",
+      "position": 3,
+      "comparison_group": "code-retrieval",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "colgrep-x86_64-unknown-linux-gnu.tar.xz",
+        "url": "https://github.com/lightonai/next-plaid/releases/download/v1.7.0/colgrep-x86_64-unknown-linux-gnu.tar.xz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "f1522e2dd43e5eab89668bdf6cfbe0996d1ada9aba75d9d8de1a2902cab2b022",
+        "source": "https://api.github.com/repos/lightonai/next-plaid/releases/tags/v1.7.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/lightonai/next-plaid/releases/download/v1.7.0/colgrep-installer.sh | sh",
+        "source": "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md"
+      ],
+      "release": {
+        "tag": "v1.7.0",
+        "source": "https://github.com/lightonai/next-plaid/releases/tag/v1.7.0",
+        "published_at": "2026-08-18T15:36:44Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "BM25",
+      "repository": null,
+      "layer_id": "semantic-rag",
+      "owner_layer_id": "semantic-rag",
+      "pin": null,
+      "component_id": null,
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "BM25",
+      "status": "head-to-head-arm",
+      "stage": "code-retrieval-comparison",
+      "position": 4,
+      "comparison_group": "code-retrieval",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No unique upstream implementation is selected for this comparison control; repository, release and install integrity remain undefined.",
+        "A pin matching the destination installation is not verified.",
+        "No artifact checksum or native lock hash verified.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "Select and freeze the lexical baseline implementation, tokenizer, corpus and query envelope; using QMD would be a use of document-retrieval, not a second QMD owner."
+      ],
+      "artifact": null,
+      "checksum": {
+        "algorithm": null,
+        "value": null,
+        "source": null,
+        "kind": null
+      },
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": null,
+      "source_pin_kind": null
+    },
+    {
+      "name": "ripgrep",
+      "repository": "https://github.com/BurntSushi/ripgrep",
+      "layer_id": "semantic-rag",
+      "owner_layer_id": "semantic-rag",
+      "pin": "15.2.0",
+      "component_id": null,
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "ripgrep",
+      "status": "head-to-head-arm",
+      "stage": "code-retrieval-comparison",
+      "position": 5,
+      "comparison_group": "code-retrieval",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c",
+        "source": "https://api.github.com/repos/BurntSushi/ripgrep/releases/tags/15.2.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "cargo install ripgrep --version 15.2.0",
+        "source": "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md"
+      },
+      "acceptance": {
+        "command": "cargo test --all",
+        "source": "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md",
+        "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md"
+      ],
+      "release": {
+        "tag": "15.2.0",
+        "source": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
+        "published_at": "2026-07-15T16:26:10Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "0.35.0",
+      "component_id": null,
+      "source_selection_layer": "semantic-rag",
+      "source_selection_name": "ollama",
+      "status": "head-to-head-arm",
+      "stage": "embedding-server-comparison",
+      "position": 1,
+      "comparison_group": "embedding-server",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "ollama-linux-amd64.tar.zst",
+        "url": "https://github.com/ollama/ollama/releases/download/v0.35.0/ollama-linux-amd64.tar.zst"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "1c114a6b220c5efca2ef2b1e5f01d1e535e26f6cd6d1678c8489325d2835e525",
+        "source": "https://api.github.com/repos/ollama/ollama/releases/tags/v0.35.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/README.md"
+      ],
+      "release": {
+        "tag": "v0.35.0",
+        "source": "https://github.com/ollama/ollama/releases/tag/v0.35.0",
+        "published_at": "2026-09-28T21:23:22Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "llama.cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "b11057",
+      "component_id": "llama-cpp",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "llama.cpp optional inference",
+      "status": "head-to-head-arm",
+      "stage": "embedding-server-comparison",
+      "position": 2,
+      "comparison_group": "embedding-server",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 59657a613ab0fa4ab327d6c790123dff30bfbd67",
+        "url": "https://github.com/ggml-org/llama.cpp/tree/59657a613ab0fa4ab327d6c790123dff30bfbd67"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+        "source": "https://api.github.com/repos/ggml-org/llama.cpp/commits/59657a613ab0fa4ab327d6c790123dff30bfbd67",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/README.md"
+      ],
+      "release": {
+        "tag": "b11057",
+        "source": "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+        "published_at": "2026-09-19T23:58:52Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Podman",
+      "repository": "https://github.com/podman-container-tools/podman",
+      "layer_id": "hosting-services",
+      "owner_layer_id": "hosting-services",
+      "pin": "6.1.3",
+      "component_id": null,
+      "source_selection_layer": "isolation",
+      "source_selection_name": "Podman (rootless)",
+      "status": "head-to-head-arm",
+      "stage": "container-engine-comparison",
+      "position": 1,
+      "comparison_group": "container-engine",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "Upstream 6.1.3 is source identity only. The published remote-client tarball is not the engine; Ubuntu 26.04.1/24.04.5 apt engine versions and integrity are unresolved."
+      ],
+      "artifact": {
+        "name": "git source at 85b994955e0b4e30fbce9c8351cab85676140ede",
+        "url": "https://github.com/podman-container-tools/podman/tree/85b994955e0b4e30fbce9c8351cab85676140ede"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "85b994955e0b4e30fbce9c8351cab85676140ede",
+        "source": "https://api.github.com/repos/podman-container-tools/podman/commits/85b994955e0b4e30fbce9c8351cab85676140ede",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/podman-container-tools/podman/blob/85b994955e0b4e30fbce9c8351cab85676140ede/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/podman-container-tools/podman/blob/85b994955e0b4e30fbce9c8351cab85676140ede/README.md"
+      ],
+      "release": {
+        "tag": "v6.1.3",
+        "source": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3",
+        "published_at": "2026-09-29T15:34:46Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Docker Engine",
+      "repository": "https://github.com/moby/moby",
+      "layer_id": "hosting-services",
+      "owner_layer_id": "hosting-services",
+      "pin": "docker-v29.8.2",
+      "component_id": null,
+      "source_selection_layer": "hosting-services",
+      "source_selection_name": "Docker Engine / Moby (engine arm B)",
+      "status": "head-to-head-arm",
+      "stage": "container-engine-comparison",
+      "position": 2,
+      "comparison_group": "container-engine",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The Moby docker-v29.8.2 tag is not a verified Docker CE apt package pin. Versioned Engine/rootless installation and checksum on each OS arm remain unresolved."
+      ],
+      "artifact": {
+        "name": "git source at 8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+        "url": "https://github.com/moby/moby/tree/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+        "source": "https://api.github.com/repos/moby/moby/commits/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/hosting-services.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md"
+      ],
+      "release": {
+        "tag": "docker-v29.8.2",
+        "source": "https://github.com/moby/moby/releases/tag/docker-v29.8.2",
+        "published_at": "2026-09-30T20:28:33Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "gVisor",
+      "repository": "https://github.com/google/gvisor",
+      "layer_id": "isolation",
+      "owner_layer_id": "isolation",
+      "pin": "release-20260928.0",
+      "component_id": null,
+      "source_selection_layer": "isolation",
+      "source_selection_name": "gVisor",
+      "status": "head-to-head-arm",
+      "stage": "isolation-comparison",
+      "position": 1,
+      "comparison_group": "container-boundary",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row."
+      ],
+      "artifact": {
+        "name": "git source at 6485c3fbdfe28172ced5d6aed49554cf494967db",
+        "url": "https://github.com/google/gvisor/tree/6485c3fbdfe28172ced5d6aed49554cf494967db"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "6485c3fbdfe28172ced5d6aed49554cf494967db",
+        "source": "https://api.github.com/repos/google/gvisor/commits/6485c3fbdfe28172ced5d6aed49554cf494967db",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/google/gvisor/blob/6485c3fbdfe28172ced5d6aed49554cf494967db/README.md"
+      },
+      "acceptance": {
+        "command": "docker run --runtime=runsc --rm hello-world",
+        "source": "https://gvisor.dev/docs/user_guide/quick_start/docker/",
+        "evidence_class": "documented_upstream_example_not_executed"
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/google/gvisor/blob/6485c3fbdfe28172ced5d6aed49554cf494967db/README.md",
+        "https://gvisor.dev/docs/user_guide/quick_start/docker/"
+      ],
+      "release": {
+        "tag": "release-20260928.0",
+        "source": "https://github.com/google/gvisor/releases/tag/release-20260928.0",
+        "published_at": "2026-09-30T17:45:43Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "boxlite",
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "layer_id": "isolation",
+      "owner_layer_id": "isolation",
+      "pin": "0.10.5",
+      "component_id": null,
+      "source_selection_layer": "isolation",
+      "source_selection_name": "boxlite",
+      "status": "head-to-head-arm",
+      "stage": "isolation-comparison",
+      "position": 2,
+      "comparison_group": "container-boundary",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "boxlite-0.10.5-cp313-cp313-manylinux_2_28_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/9c/ee/4771ad6efb4b0606ecf8b1b5d1b28649bd7f5043e0d456268a2981e2bf84/boxlite-0.10.5-cp313-cp313-manylinux_2_28_x86_64.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "2999a357db7da51ef19a0797a169f14a26a9431d1ad50a3f302982e26ad8ace8",
+        "source": "https://pypi.org/pypi/boxlite/0.10.5/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "pip install boxlite==0.10.5",
+        "source": "https://github.com/boxlite-ai/boxlite/blob/4fbf2aeded7520fe77bc724468c831a29684f2cb/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/boxlite-ai/boxlite/blob/4fbf2aeded7520fe77bc724468c831a29684f2cb/README.md"
+      ],
+      "release": {
+        "tag": "0.10.5",
+        "source": "https://pypi.org/pypi/boxlite/0.10.5/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "rootless container boundary",
+      "repository": null,
+      "layer_id": "isolation",
+      "owner_layer_id": "isolation",
+      "pin": null,
+      "component_id": null,
+      "source_selection_layer": "isolation",
+      "source_selection_name": "rootless container boundary",
+      "status": "head-to-head-arm",
+      "stage": "isolation-comparison",
+      "position": 3,
+      "comparison_group": "container-boundary",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No unique upstream implementation is selected for this comparison control; repository, release and install integrity remain undefined.",
+        "A pin matching the destination installation is not verified.",
+        "No artifact checksum or native lock hash verified.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "Depends on the hosting-services engine comparison result; this row does not install a second engine."
+      ],
+      "artifact": null,
+      "checksum": {
+        "algorithm": null,
+        "value": null,
+        "source": null,
+        "kind": null
+      },
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": null,
+      "source_pin_kind": null
+    },
+    {
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "layer_id": "durable-memory",
+      "owner_layer_id": "durable-memory",
+      "pin": "2.5.2",
+      "component_id": "ai-memory",
+      "source_selection_layer": "durable-memory",
+      "source_selection_name": "ai-memory",
+      "status": "head-to-head-arm",
+      "stage": "memory-comparison",
+      "position": 1,
+      "comparison_group": "durable-memory",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "ai-memory-linux-x86_64.tar.gz",
+        "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+        "source": "https://api.github.com/repos/akitaonrails/ai-memory/releases/tags/v2.5.2",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "mise use -g github:akitaonrails/ai-memory@2.5.2",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622",
+        "pinning_source": "https://mise.jdx.dev/dev-tools/backends/github.html",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "mise available and the selected owned global-tool scope explicitly chosen."
+        ],
+        "scope": "Upstream GitHub-backend example with the selected release version supplied using the documented @VERSION syntax. mise is optional and unprovisioned in this profile; this command does not add it to the default install."
+      },
+      "acceptance": {
+        "command": "cargo t",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/AGENTS.md#L225",
+        "alias_source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/.cargo/config.toml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected upstream source checkout, pinned Rust 1.95 and cargo-nextest."
+        ],
+        "scope": "Everyday source-test tier: cargo t aliases cargo nextest run for default workspace members. It excludes the full/slow tier and eval harness; it does not qualify a running daemon, model/backend, MCP connection or lifecycle hook. Installed host 2.4.2 does not qualify selected 2.5.2."
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/durable-memory.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "v2.5.2",
+        "source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+        "published_at": "2026-10-01T07:40:18Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "layer_id": "durable-memory",
+      "owner_layer_id": "durable-memory",
+      "pin": "0.10.2",
+      "component_id": null,
+      "source_selection_layer": "durable-memory",
+      "source_selection_name": "Hindsight",
+      "status": "head-to-head-arm",
+      "stage": "memory-comparison",
+      "position": 2,
+      "comparison_group": "durable-memory",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "hindsight_api-0.10.2-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/c4/73/0754e8f24233bc5e1e8723e82573c5e38ebc59baf9f0d12a8fc43b109936/hindsight_api-0.10.2-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "de4c85e3553671224c5a319f9dc5ca560ff5edd14505736c162404c2d0407e52",
+        "source": "https://pypi.org/pypi/hindsight-api/0.10.2/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "pip install hindsight-api==0.10.2",
+        "source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/durable-memory.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md"
+      ],
+      "release": {
+        "tag": "0.10.2",
+        "source": "https://pypi.org/pypi/hindsight-api/0.10.2/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "layer_id": "durable-memory",
+      "owner_layer_id": "durable-memory",
+      "pin": "0.9.29",
+      "component_id": null,
+      "source_selection_layer": "durable-memory",
+      "source_selection_name": "agentmemory (rohitg00)",
+      "status": "head-to-head-arm",
+      "stage": "memory-comparison",
+      "position": 3,
+      "comparison_group": "durable-memory",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "agentmemory-0.9.29.tgz",
+        "url": "https://registry.npmjs.org/@agentmemory/agentmemory/-/agentmemory-0.9.29.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "31376ec03d9dfccdc8f0a0bd357de9600c13d3a41a8351b310f0ea5a78f06774",
+        "source": "https://registry.npmjs.org/%40agentmemory%2Fagentmemory/0.9.29",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install -g @agentmemory/agentmemory@0.9.29",
+        "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/durable-memory.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md"
+      ],
+      "release": {
+        "tag": "0.9.29",
+        "source": "https://registry.npmjs.org/%40agentmemory%2Fagentmemory/0.9.29",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "deja-vu",
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "layer_id": "durable-memory",
+      "owner_layer_id": "durable-memory",
+      "pin": "0.21.4",
+      "component_id": null,
+      "source_selection_layer": "durable-memory",
+      "source_selection_name": "deja-vu",
+      "status": "head-to-head-arm",
+      "stage": "memory-comparison",
+      "position": 4,
+      "comparison_group": "durable-memory",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The Linux MCP bundle candidate is not verified as the native CLI installation artifact; only Git source identity is retained."
+      ],
+      "artifact": {
+        "name": "git source at bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+        "url": "https://github.com/vshulcz/deja-vu/tree/bb93e229a5e2c2ccd1fe4444479e7ea98d765600"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+        "source": "https://api.github.com/repos/vshulcz/deja-vu/commits/bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/vshulcz/deja-vu/blob/bb93e229a5e2c2ccd1fe4444479e7ea98d765600/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/durable-memory.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/vshulcz/deja-vu/blob/bb93e229a5e2c2ccd1fe4444479e7ea98d765600/README.md"
+      ],
+      "release": {
+        "tag": "v0.21.4",
+        "source": "https://github.com/vshulcz/deja-vu/releases/tag/v0.21.4",
+        "published_at": "2026-09-29T10:12:08Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "RTK",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.50.0",
+      "component_id": "rtk",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "rtk-ai/rtk",
+      "status": "head-to-head-arm",
+      "stage": "compression-comparison",
+      "position": 1,
+      "comparison_group": "compression",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "rtk-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+        "source": "https://api.github.com/repos/rtk-ai/rtk/releases/tags/v0.50.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
+        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106",
+        "pinning_source": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+        "execution_status": "UNRUN",
+        "scope": "Upstream Git install form with Cargo documented --tag and --locked. This builds the tagged source; the published binary archive checksum above does not identify the resulting local build.",
+        "prerequisites": [
+          "Supported Rust/Cargo toolchain and source build prerequisites."
+        ]
+      },
+      "acceptance": {
+        "command": "cargo test",
+        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/CONTRIBUTING.md#L258",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Selected upstream source checkout and its Rust build/test dependencies."
+        ],
+        "scope": "Upstream unit/snapshot tests from the selected source checkout only. The separately documented ignored integration tests, installed CLI/hook behavior and new-host acceptance are not covered."
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ],
+      "release": {
+        "tag": "v0.50.0",
+        "source": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+        "published_at": "2026-09-24T10:02:31Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "sqz",
+      "repository": "https://github.com/ojuschugh1/sqz",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "1.9.0",
+      "component_id": null,
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "sqz",
+      "status": "head-to-head-arm",
+      "stage": "compression-comparison",
+      "position": 2,
+      "comparison_group": "compression",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "sqz-v1.9.0-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/ojuschugh1/sqz/releases/download/v1.9.0/sqz-v1.9.0-x86_64-unknown-linux-musl.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "8e706174d84203cae40deef6bd21dc4d75f3ef656ae17b4e609f59292bc4b582",
+        "source": "https://api.github.com/repos/ojuschugh1/sqz/releases/tags/v1.9.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "cargo install sqz-cli --version 1.9.0",
+        "source": "https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md"
+      ],
+      "release": {
+        "tag": "v1.9.0",
+        "source": "https://github.com/ojuschugh1/sqz/releases/tag/v1.9.0",
+        "published_at": "2026-09-23T18:25:35Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.37.0",
+      "component_id": "headroom",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "Headroom",
+      "status": "head-to-head-arm",
+      "stage": "compression-comparison",
+      "position": 3,
+      "comparison_group": "compression",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
+        "source": "https://pypi.org/pypi/headroom-ai/0.37.0/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "uv tool install --python 3.13 \"headroom-ai[all]==0.37.0\"",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+      },
+      "acceptance": {
+        "command": "uv sync --extra dev && uv run pytest",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+      ],
+      "release": {
+        "tag": "0.37.0",
+        "source": "https://pypi.org/pypi/headroom-ai/0.37.0/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "no compression",
+      "repository": null,
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": null,
+      "component_id": null,
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "no compression",
+      "status": "head-to-head-arm",
+      "stage": "compression-comparison",
+      "position": 4,
+      "comparison_group": "compression",
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No unique upstream implementation is selected for this comparison control; repository, release and install integrity remain undefined.",
+        "A pin matching the destination installation is not verified.",
+        "No artifact checksum or native lock hash verified.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "Freeze native-client versions and comparison configuration proving the compression layer is absent; this control has no independent installer."
+      ],
+      "artifact": null,
+      "checksum": {
+        "algorithm": null,
+        "value": null,
+        "source": null,
+        "kind": null
+      },
+      "install": {
+        "command": null,
+        "source": null
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_comparison_arm",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+      ],
+      "release": null,
+      "source_pin_kind": null
+    },
+    {
+      "name": "OTel Collector Contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "0.162.0",
+      "component_id": "opentelemetry-collector-contrib",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "OTel Collector Contrib",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "otelcol-contrib_0.162.0_linux_amd64.deb",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.deb"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "0b2b37eeb83db8e19a5f9dfc60894d058c739384a226ac085e674561befaad44",
+        "source": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+      ],
+      "release": {
+        "tag": "v0.162.0",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "3.15.0",
+      "component_id": "prometheus",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "Prometheus",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "prometheus-3.15.0.linux-amd64.tar.gz",
+        "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+        "source": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.15.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md"
+      ],
+      "release": {
+        "tag": "v3.15.0",
+        "source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Loki",
+      "repository": "https://github.com/grafana/loki",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "3.7.8",
+      "component_id": "loki",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "Loki",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "loki-linux-amd64.zip",
+        "url": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61",
+        "source": "https://api.github.com/repos/grafana/loki/releases/tags/v3.7.8",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md"
+      ],
+      "release": {
+        "tag": "v3.7.8",
+        "source": "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "published_at": "2026-09-17T15:51:10Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "13.2.2",
+      "component_id": "grafana",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "Grafana",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 4,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The first Linux release asset was Enterprise, not the selected OSS native installation. Its digest is excluded; the correct OSS install artifact remains unverified."
+      ],
+      "artifact": {
+        "name": "git source at 3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+        "url": "https://github.com/grafana/grafana/tree/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+        "source": "https://api.github.com/repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+      ],
+      "release": {
+        "tag": "v13.2.2",
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "published_at": "2026-09-15T12:21:32Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "20.18.0",
+      "component_id": null,
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "Phoenix",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 5,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "PyPI arize-phoenix 20.18.0 is pinned, but the repository latest release is the Phoenix MCP package. A matching trace-sink release source and functional acceptance still need verification."
+      ],
+      "artifact": {
+        "name": "arize_phoenix-20.18.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/37/b3/a8bd3476dc80702ab4c5f811fe183484bca7c05dcbcace8693765223eec2/arize_phoenix-20.18.0-py3-none-any.whl"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "80e870887f6487d1d84b98562ee9bb729bb3bfa23b633af4ecf510f77be922a8",
+        "source": "https://pypi.org/pypi/arize-phoenix/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "pip install arize-phoenix==20.18.0",
+        "source": "https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md"
+      ],
+      "release": {
+        "tag": "20.18.0",
+        "source": "https://pypi.org/pypi/arize-phoenix/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "layer_id": "scheduling-supervision",
+      "owner_layer_id": "scheduling-supervision",
+      "pin": "2.16.6",
+      "component_id": "dagu",
+      "source_selection_layer": "scheduling-supervision",
+      "source_selection_name": "Dagu",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 6,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "dagu_2.16.6_linux_amd64.tar.gz",
+        "url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "acceptance": {
+        "command": "make test",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "evidence_class": "upstream_test_command_not_executed"
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+      ],
+      "release": {
+        "tag": "v2.16.6",
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "published_at": "2026-09-14T14:45:57Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "layer_id": "hosting-services",
+      "owner_layer_id": "hosting-services",
+      "pin": "5.5.1",
+      "component_id": null,
+      "source_selection_layer": "hosting-services",
+      "source_selection_name": "Docker Compose",
+      "status": "picked",
+      "stage": "optional-services",
+      "position": 7,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "docker-compose-linux-x86_64",
+        "url": "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-x86_64"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "db1889184726840f75c4f9c001048430d4f25b3be3cb084d3ddd762bc0aed576",
+        "source": "https://api.github.com/repos/docker/compose/releases/tags/v5.5.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_optional_service",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/hosting-services.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md"
+      ],
+      "release": {
+        "tag": "v5.5.1",
+        "source": "https://github.com/docker/compose/releases/tag/v5.5.1",
+        "published_at": "2026-09-03T15:53:28Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "mise",
+      "repository": "https://github.com/jdx/mise",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "2026.9.18",
+      "component_id": null,
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "mise",
+      "status": "picked",
+      "stage": "optional-reproduction",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The tagged guide documents MISE_VERSION, but its exact v-prefixed version invocation was not independently verified. Node's minimal native adapter does not depend on mise."
+      ],
+      "artifact": {
+        "name": "mise-v2026.9.18-linux-x64.tar.gz",
+        "url": "https://github.com/jdx/mise/releases/download/v2026.9.18/mise-v2026.9.18-linux-x64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84",
+        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+      ],
+      "release": null,
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Restic",
+      "repository": "https://github.com/restic/restic",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "0.19.1",
+      "component_id": "restic",
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "Restic",
+      "status": "picked",
+      "stage": "optional-reproduction",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "restic_0.19.1_linux_amd64.bz2",
+        "url": "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c",
+        "source": "https://api.github.com/repos/restic/restic/releases/tags/v0.19.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md"
+      ],
+      "release": {
+        "tag": "v0.19.1",
+        "source": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "chezmoi",
+      "repository": "https://github.com/twpayne/chezmoi",
+      "layer_id": "recovery-portability",
+      "owner_layer_id": "recovery-portability",
+      "pin": "2.73.0",
+      "component_id": null,
+      "source_selection_layer": "recovery-portability",
+      "source_selection_name": "chezmoi",
+      "status": "picked",
+      "stage": "optional-reproduction",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "chezmoi-linux-amd64",
+        "url": "https://github.com/twpayne/chezmoi/releases/download/v2.73.0/chezmoi-linux-amd64"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "4b42a0fb0dec69f37964c6701f89daa6bf6393aaeb92bbcbc8f3ee9f08a49bcd",
+        "source": "https://api.github.com/repos/twpayne/chezmoi/releases/tags/v2.73.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/README.md"
+      ],
+      "release": {
+        "tag": "v2.73.0",
+        "source": "https://github.com/twpayne/chezmoi/releases/tag/v2.73.0",
+        "published_at": "2026-09-28T19:52:37Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Trail of Bits skills",
+      "repository": "https://github.com/trailofbits/skills",
+      "layer_id": "instructions-skills",
+      "owner_layer_id": "instructions-skills",
+      "pin": "82fe8226252622fa807643bdca1710901198553a",
+      "component_id": null,
+      "source_selection_layer": "instructions-skills",
+      "source_selection_name": "Trail of Bits security skills (trailofbits/skills)",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 1,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 82fe8226252622fa807643bdca1710901198553a",
+        "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "82fe8226252622fa807643bdca1710901198553a",
+        "source": "https://api.github.com/repos/trailofbits/skills/commits/82fe8226252622fa807643bdca1710901198553a",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/instructions-skills.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md"
+      ],
+      "release": null,
+      "source_pin_kind": "commit"
+    },
+    {
+      "name": "Claude code-intelligence LSP plugins",
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "layer_id": "code-navigation",
+      "owner_layer_id": "code-navigation",
+      "pin": "ab024cdcfa7ca80be204acd4907656ba5a968589",
+      "component_id": null,
+      "source_selection_layer": "code-navigation",
+      "source_selection_name": "claude-plugins-official (code-intelligence LSP plugins)",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 2,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at ab024cdcfa7ca80be204acd4907656ba5a968589",
+        "url": "https://github.com/anthropics/claude-plugins-official/tree/ab024cdcfa7ca80be204acd4907656ba5a968589"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "ab024cdcfa7ca80be204acd4907656ba5a968589",
+        "source": "https://api.github.com/repos/anthropics/claude-plugins-official/commits/ab024cdcfa7ca80be204acd4907656ba5a968589",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/README.md"
+      ],
+      "release": null,
+      "source_pin_kind": "commit"
+    },
+    {
+      "name": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "1.30.1",
+      "component_id": "zizmor",
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "zizmor",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 3,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "zizmor-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/zizmorcore/zizmor/releases/download/v1.30.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a",
+        "source": "https://api.github.com/repos/zizmorcore/zizmor/releases/tags/v1.30.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md"
+      ],
+      "release": {
+        "tag": "v1.30.1",
+        "source": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "attest",
+      "repository": "https://github.com/actions/attest",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "4.2.2",
+      "component_id": null,
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "attest",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 4,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "url": "https://github.com/actions/attest/tree/1e69f48acb82d1966a394da916b4c1698aa569d6"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "source": "https://api.github.com/repos/actions/attest/commits/1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md"
+      ],
+      "release": {
+        "tag": "v4.2.2",
+        "source": "https://github.com/actions/attest/releases/tag/v4.2.2",
+        "published_at": "2026-08-04T20:36:29Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Syft",
+      "repository": "https://github.com/anchore/syft",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "1.52.0",
+      "component_id": "syft",
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "Syft",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 5,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "syft_1.52.0_linux_amd64.deb",
+        "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.deb"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "c8e13cd04f78b5cf90a70b2e45d2a4b7ec9aa0aa129d3001cd5d488103351b7f",
+        "source": "https://api.github.com/repos/anchore/syft/releases/tags/v1.52.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+      ],
+      "release": {
+        "tag": "v1.52.0",
+        "source": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "published_at": "2026-09-17T14:38:17Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Dependabot",
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "0.398.0",
+      "component_id": null,
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "Dependabot",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 6,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at a1750051287d1f3786081d3aa3e6e2b04a72edde",
+        "url": "https://github.com/dependabot/dependabot-core/tree/a1750051287d1f3786081d3aa3e6e2b04a72edde"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "a1750051287d1f3786081d3aa3e6e2b04a72edde",
+        "source": "https://api.github.com/repos/dependabot/dependabot-core/commits/a1750051287d1f3786081d3aa3e6e2b04a72edde",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/dependabot/dependabot-core/blob/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/dependabot/dependabot-core/blob/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md"
+      ],
+      "release": {
+        "tag": "v0.398.0",
+        "source": "https://github.com/dependabot/dependabot-core/releases/tag/v0.398.0",
+        "published_at": "2026-09-28T03:51:27Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "CodeQL upload-sarif",
+      "repository": "https://github.com/github/codeql-action",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "4.38.2",
+      "component_id": null,
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "codeql-sarif",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 7,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+        "url": "https://github.com/github/codeql-action/tree/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+        "source": "https://api.github.com/repos/github/codeql-action/commits/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/github/codeql-action/blob/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/github/codeql-action/blob/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2/README.md"
+      ],
+      "release": {
+        "tag": "v4.38.2",
+        "source": "https://github.com/github/codeql-action/releases/tag/v4.38.2",
+        "published_at": "2026-09-24T10:27:53Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "actionlint",
+      "repository": "https://github.com/kjanat/actionlint",
+      "layer_id": "ci-supply-chain",
+      "owner_layer_id": "ci-supply-chain",
+      "pin": "1.17.0",
+      "component_id": null,
+      "source_selection_layer": "ci-supply-chain",
+      "source_selection_name": "actionlint (kjanat)",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 8,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "actionlint_1.17.0_linux_amd64.tar.gz",
+        "url": "https://github.com/kjanat/actionlint/releases/download/v1.17.0/actionlint_1.17.0_linux_amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+        "source": "https://api.github.com/repos/kjanat/actionlint/releases/tags/v1.17.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/README.md"
+      ],
+      "release": {
+        "tag": "v1.17.0",
+        "source": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+        "published_at": "2026-09-13T16:07:47Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "betterleaks",
+      "repository": "https://github.com/betterleaks/betterleaks",
+      "layer_id": "secrets-credentials",
+      "owner_layer_id": "secrets-credentials",
+      "pin": "1.9.0",
+      "component_id": null,
+      "source_selection_layer": "secrets-credentials",
+      "source_selection_name": "betterleaks",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 9,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "betterleaks_1.9.0_linux_x64.tar.gz",
+        "url": "https://github.com/betterleaks/betterleaks/releases/download/v1.9.0/betterleaks_1.9.0_linux_x64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7",
+        "source": "https://api.github.com/repos/betterleaks/betterleaks/releases/tags/v1.9.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "go install github.com/betterleaks/betterleaks@v1.9.0",
+        "source": "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/secrets-credentials.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md"
+      ],
+      "release": {
+        "tag": "v1.9.0",
+        "source": "https://github.com/betterleaks/betterleaks/releases/tag/v1.9.0",
+        "published_at": "2026-09-29T20:08:06Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "TruffleHog",
+      "repository": "https://github.com/trufflesecurity/trufflehog",
+      "layer_id": "secrets-credentials",
+      "owner_layer_id": "secrets-credentials",
+      "pin": "3.97.9",
+      "component_id": null,
+      "source_selection_layer": "secrets-credentials",
+      "source_selection_name": "trufflehog",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 10,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The reviewed README documents a floating installer URL. The proposed tag-substituted script invocation was not independently verified and is excluded."
+      ],
+      "artifact": {
+        "name": "trufflehog_3.97.9_linux_amd64.tar.gz",
+        "url": "https://github.com/trufflesecurity/trufflehog/releases/download/v3.97.9/trufflehog_3.97.9_linux_amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "40377e6572495412fb9ba0bc21c9401f73b72f1d2afd11b9931bc4a5ed622866",
+        "source": "https://api.github.com/repos/trufflesecurity/trufflehog/releases/tags/v3.97.9",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": null,
+        "source": "https://github.com/trufflesecurity/trufflehog/blob/4dd8831c5f12599465d4d45c3c447b4018a34c85/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/secrets-credentials.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/trufflesecurity/trufflehog/blob/4dd8831c5f12599465d4d45c3c447b4018a34c85/README.md"
+      ],
+      "release": {
+        "tag": "v3.97.9",
+        "source": "https://github.com/trufflesecurity/trufflehog/releases/tag/v3.97.9",
+        "published_at": "2026-09-24T09:11:59Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "claude-code-action",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "layer_id": "git-github-automation",
+      "owner_layer_id": "git-github-automation",
+      "pin": "1.0.239",
+      "component_id": null,
+      "source_selection_layer": "git-github-automation",
+      "source_selection_name": "claude-code-action",
+      "status": "picked",
+      "stage": "user-decisions",
+      "position": 11,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": false,
+      "blocking_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "artifact": {
+        "name": "git source at 97c53473391bff1901034d4b454b5bac7ab7a029",
+        "url": "https://github.com/anthropics/claude-code-action/tree/97c53473391bff1901034d4b454b5bac7ab7a029"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "97c53473391bff1901034d4b454b5bac7ab7a029",
+        "source": "https://api.github.com/repos/anthropics/claude-code-action/commits/97c53473391bff1901034d4b454b5bac7ab7a029",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": null,
+        "source": "https://github.com/anthropics/claude-code-action/blob/97c53473391bff1901034d4b454b5bac7ab7a029/README.md"
+      },
+      "acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/git-github-automation.json",
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://github.com/anthropics/claude-code-action/blob/97c53473391bff1901034d4b454b5bac7ab7a029/README.md"
+      ],
+      "release": {
+        "tag": "v1.0.239",
+        "source": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.239",
+        "published_at": "2026-10-01T18:04:49Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    }
+  ],
+  "stage_order": [
+    "os-provisional-comparison",
+    "native-toolchain",
+    "native-clients",
+    "native-extensions",
+    "sdk-source-review",
+    "document-retrieval",
+    "code-retrieval-comparison",
+    "embedding-server-comparison",
+    "container-engine-comparison",
+    "isolation-comparison",
+    "memory-comparison",
+    "compression-comparison",
+    "optional-services",
+    "optional-reproduction",
+    "user-decisions",
+    "trading-owner-pending"
+  ],
+  "boundary": {
+    "meaning": "Source-review recommendations and isolated comparison arms, not merit winners or new-host acceptance.",
+    "new_host_acceptance_verified": false,
+    "primary_client": "Codex",
+    "accepted_codex_cli_pin": "0.159.3",
+    "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580",
+    "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites.",
+    "install_dispatch": "Do not iterate over entries. The existing bootstrap installs only the named native profile and its implicit toolchain; every optional row and comparison arm is excluded. Examples are not an authorization to install.",
+    "bootstrap": {
+      "command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages",
+      "reference": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+      "implicit_pins": {
+        "node": "24.21.0",
+        "uv": "0.12.17",
+        "gh": "2.101.0"
+      },
+      "dry_run": null,
+      "blocking_gaps": [
+        "The native bootstrap has no documented --dry-run option at this source revision; no installation was executed. Supported per-step dry runs are recorded separately."
+      ]
+    },
+    "position_semantics": "Stage and position are reproducible presentation/dependency order, not ranking or default precedence. Arms are provisioned only in isolated, preregistered comparisons.",
+    "comparison_dependencies": [
+      {
+        "before": "code-retrieval-comparison",
+        "after": "embedding-server-comparison",
+        "reason": "The one model server must support the selected code-RAG arm's embedding provider."
+      },
+      {
+        "before": "container-engine-comparison",
+        "after": "isolation-comparison",
+        "reason": "One engine owner in hosting-services; isolation owns only the boundary comparison."
+      }
+    ],
+    "owner_rule": "Each named tool/control appears once in its owning layer. Other layers retain uses, not duplicate installs or independent ownership.",
+    "layer_uses": [
+      {
+        "layer_id": "native-clients",
+        "uses": []
+      },
+      {
+        "layer_id": "agent-sdks",
+        "uses": [
+          "Claude Code and Codex (native-clients)"
+        ]
+      },
+      {
+        "layer_id": "instructions-skills",
+        "uses": []
+      },
+      {
+        "layer_id": "mcp-surfaces",
+        "uses": []
+      },
+      {
+        "layer_id": "workers",
+        "uses": [
+          "the native subagents of Claude Code and Codex (native-clients)",
+          "Worktrunk (git-github-automation)"
+        ]
+      },
+      {
+        "layer_id": "isolation",
+        "uses": [
+          "Worktrunk (git-github-automation)",
+          "the container engine (hosting-services)"
+        ]
+      },
+      {
+        "layer_id": "code-navigation",
+        "uses": []
+      },
+      {
+        "layer_id": "semantic-rag",
+        "uses": [
+          "the local model server for embeddings (observation-inference)"
+        ]
+      },
+      {
+        "layer_id": "document-retrieval",
+        "uses": []
+      },
+      {
+        "layer_id": "web-research",
+        "uses": []
+      },
+      {
+        "layer_id": "durable-memory",
+        "uses": [
+          "the local model server for Hindsight's local-model arm (observation-inference)"
+        ]
+      },
+      {
+        "layer_id": "token-efficiency",
+        "uses": []
+      },
+      {
+        "layer_id": "observation-inference",
+        "uses": []
+      },
+      {
+        "layer_id": "quality-evaluation",
+        "uses": []
+      },
+      {
+        "layer_id": "ci-supply-chain",
+        "uses": []
+      },
+      {
+        "layer_id": "scheduling-supervision",
+        "uses": [
+          "systemd user units (cross:wsl-distro)"
+        ]
+      },
+      {
+        "layer_id": "hosting-services",
+        "uses": []
+      },
+      {
+        "layer_id": "secrets-credentials",
+        "uses": []
+      },
+      {
+        "layer_id": "git-github-automation",
+        "uses": []
+      },
+      {
+        "layer_id": "recovery-portability",
+        "uses": []
+      },
+      {
+        "layer_id": "cross:wsl-distro",
+        "uses": []
+      }
+    ],
+    "runtime_ownership": "recovery-portability retains mise's reproduction ownership and owns the runtime entries. uv supplies CPython 3.13.15 and package/lock operations by the user's explicit requirement; the existing native bootstrap supplies the pinned Node archive. This retains one layer owner per executable and does not install mise by default.",
+    "operating_systems": {
+      "status": "symmetric_provisional_arms",
+      "arms": [
+        "Ubuntu 26.04.1 LTS",
+        "Ubuntu 24.04.5 LTS"
+      ],
+      "default_precedence": null,
+      "owner": "dual-image recipe owner",
+      "reason": "Published checksums do not decide WSL, systemd, toolchain or GPU acceptance; no distro creation/global WSL change."
+    },
+    "paid_services": {
+      "provisioning_status": "unprovisioned",
+      "reason": "No paid service, provider, account or deployment was selected/authorized by this source artifact; task-specific decisions and native sign-ins remain with their owners."
+    },
+    "trading": {
+      "layers": 12,
+      "provisioning_status": "pending_owner_report_after_2026-10-03",
+      "reason": "Foundation is used by trading through its named owners. No trading selection, registry or broker state changes; await the trading owner's report after October 3."
+    },
+    "reference_implementations": [
+      "manifests/stack.json",
+      "adoption/manifest.json",
+      "adoption/pins-linux-x86_64.json",
+      "adoption/bootstrap-linux.sh",
+      "scripts/adoption_status.py",
+      "scripts/build_ecosystem.py"
+    ],
+    "source_inputs": [
+      "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+      "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/"
+    ],
+    "other_owners": [
+      "generated handbook",
+      "dual-image recipe",
+      "U11",
+      "shared registries and selections"
+    ],
+    "evidence_limits": [
+      "Published artifact/checksum metadata, independent downloaded npm archive hashes and immutable source identity are distinct observations.",
+      "All functional acceptance commands are reviewed, not executed; version probes do not qualify them.",
+      "No head-to-head, model, provider, GPU or clean replacement WSL acceptance occurred.",
+      "Historical acceptance receipts retain their original host/input scope.",
+      "Install and functional/source-test commands remain UNRUN; the current host help/version probes and archive hashes qualify only those observations."
+    ],
+    "accepted_python_sdk_pin": "0.159.3",
+    "proposed_typescript_sdk_pin": "0.159.3",
+    "sdk_gate_status": "merged_at_2026-10-01T21:18:12Z",
+    "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "review_update": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+    "command_gap_semantics": "An empty blocking_gaps list means the recorded source fields are populated; it does not establish prerequisites, installation, functional execution, sign-in, merit selection or new-host acceptance."
+  }
+}

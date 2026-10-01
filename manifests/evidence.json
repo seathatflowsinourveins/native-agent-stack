@@ -4070,8 +4070,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d144b49f6fee591ada0f6338124ecd5c5b3f955c72f866793270d9599ac0d93e",
-      "bytes": 18075
+      "sha256": "d3102407adb302ab847c52afe31b538721eee69b4cf31be0ec68d2cac5d44361",
+      "bytes": 18532
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -4255,8 +4255,18 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "8dfe143fdfed9a80d5c3518cdd43ec009947b4854954999e7c1faef1f535a832",
-      "bytes": 19478
+      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
+      "bytes": 20102
+    },
+    {
+      "path": "adoption/new-wsl-profile.json",
+      "sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+      "bytes": 195818
+    },
+    {
+      "path": "adoption/new-wsl-profile.md",
+      "sha256": "c9ee10df153a4b8cb5636ea0f69296591795e6be1861d957d4cc4eadac18ae4a",
+      "bytes": 12564
     },
     {
       "path": "adoption/paired/README.md",
@@ -15700,6 +15710,11 @@
       "bytes": 20693
     },
     {
+      "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
+      "sha256": "0cbc8f65e6b09618208724fc118c0d9e13fd4326674650fb2699e2db9b8a6f7c",
+      "bytes": 25617
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15958,6 +15973,16 @@
       "path": "docs/new-workstation-runtime-profile-20260922.md",
       "sha256": "7f7d7b9c04d373419b665f7bf23a4cf503a8a1ef2635dd6a858304b0ada50576",
       "bytes": 17466
+    },
+    {
+      "path": "docs/new-wsl-handbook.json",
+      "sha256": "a3411297d8b33bd7363a9b99d659252585c5d7119b6586c7ce1b5c6cdb1ec687",
+      "bytes": 339709
+    },
+    {
+      "path": "docs/new-wsl-handbook.md",
+      "sha256": "5a443fa223aa356f8723f3c467cbc0a3bb1d23dd67481cb9989309eae8e4c5b7",
+      "bytes": 221312
     },
     {
       "path": "docs/next-host-stages.md",
@@ -35610,6 +35635,11 @@
       "bytes": 79538
     },
     {
+      "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "sha256": "f17c8aa64ae312720551a84b3ca4912cf2cc24cf9d86f867f18f3791150ddf77",
+      "bytes": 3315
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
       "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
       "bytes": 6213
@@ -35868,6 +35898,26 @@
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
       "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
       "bytes": 8224
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
+      "sha256": "9328a16072d7b54a0c5be6546bca2cf8a05b28de8cb8db95b25c85896673e47b",
+      "bytes": 1468
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/final-freeze.json",
+      "sha256": "c5cf2f1e7dd39cb74e552400ad9a6cd0a543264776f39a5da5ab80070aa44485",
+      "bytes": 3505
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+      "sha256": "3f040fe35e39c52358b213ef4fc0f5b62a1bd43680f21529b7ceed2af685541b",
+      "bytes": 152866
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+      "sha256": "cb3a796d1032739fccf1dedb96f92465bb7dd87f126feb2f5873bd02f8551d0f",
+      "bytes": 39169
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
@@ -46816,13 +46866,18 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "f7362a9e46a6750dd8d4f243ecf27d284d1911af0ea86e50fe711626d48cc01c",
-      "bytes": 88580
+      "sha256": "5017a00d36990b5e576fa17a5761e2ea2c6d879ea72252bb068baf7542b0447d",
+      "bytes": 89443
     },
     {
       "path": "scripts/build_ecosystem.py",
       "sha256": "97ac2b237e905d9806160d90ddfcf8f91fb38c83f78d05d1314e427616d210a8",
       "bytes": 87297
+    },
+    {
+      "path": "scripts/build_new_wsl_handbook.py",
+      "sha256": "f82e74111e4781881a01d43c243923b0cbf0ac3a6d7b07e18fba50585fa06d6c",
+      "bytes": 39270
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -46888,6 +46943,11 @@
       "path": "scripts/native_token_ci.py",
       "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
       "bytes": 114715
+    },
+    {
+      "path": "scripts/new_wsl_profile.py",
+      "sha256": "dc7f39df2d5d297b2e87c82ebfdbd15bf876d33cc1723da6f5d148c49954df23",
+      "bytes": 8385
     },
     {
       "path": "scripts/path_safety.py",
@@ -47718,6 +47778,16 @@
       "path": "tests/test_new_host_grand_list.py",
       "sha256": "8e24fa3326e9a4f3c5df3269eb81f8472a46963aa357609e2c8e9bff98057e0b",
       "bytes": 18369
+    },
+    {
+      "path": "tests/test_new_wsl_handbook.py",
+      "sha256": "eec812e2eb391f9518c67be56c70843bcd99bcc37185dbee70e5abf3d8ca1898",
+      "bytes": 34352
+    },
+    {
+      "path": "tests/test_new_wsl_profile.py",
+      "sha256": "c678f764383a0bca9fa3e0ccefee3c9da48378305d3ec4b2e938562fb49fda16",
+      "bytes": 7166
     },
     {
       "path": "tests/test_observability.py",

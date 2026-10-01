@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-handbook-profile-integration",
+  "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "evidence_class": "local_integration",
+  "generator_sha256": "f82e74111e4781881a01d43c243923b0cbf0ac3a6d7b07e18fba50585fa06d6c",
+  "profile_sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+  "outputs": {
+    "docs/new-wsl-handbook.json": "a3411297d8b33bd7363a9b99d659252585c5d7119b6586c7ce1b5c6cdb1ec687",
+    "docs/new-wsl-handbook.md": "5a443fa223aa356f8723f3c467cbc0a3bb1d23dd67481cb9989309eae8e4c5b7"
+  },
+  "inventory": {"layers": 37, "profile_entries": 69, "projected_tools": 73, "canonical_package_ids": 20},
+  "validation": [
+    {"scope": "prior package repair full handbook suite", "tests": 44, "native_exit_code": 0, "reused_for_unchanged_test_bodies": true},
+    {"command": "python3 -m unittest discover -s tests -p test_new_wsl_handbook.py -k package", "tests": 6, "native_exit_code": 0, "independent": true, "returned_output": "Ran 6 tests in 1.789s; OK"},
+    {"command": "python3 scripts/build_new_wsl_handbook.py --check", "native_exit_code": 0, "independent": true, "returned_status": "passed"},
+    {"scope": "independent exact sole-canonical-sibling unresolved-package public CLI probe", "public_cli_exit_code": 0, "assertion_exit_code": 0, "returned_output": "EXACT_PRIOR_SINGLE_SIBLING_COUNTEREXAMPLE_PASSED"},
+    {"command": "python3 -m unittest tests.test_new_wsl_profile.NewWslProfileCliTests.test_existing_public_generator_preserves_the_native_profile_pointer", "tests": 1, "native_exit_code": 0, "returned_output": "Ran 1 test in 3.341s; OK"},
+    {"command": "git diff --cached --check", "native_exit_code": 0}
+  ],
+  "failed_conditions_retained": [
+    {"condition": "repository-only identity merged distinct Python and TypeScript Codex checksums", "native_exit_code": 1, "correction": "derive separate canonical package identities from supported metadata URLs"},
+    {"condition": "explicit unsupported metadata URL coalesced with the sole canonical sibling", "native_exit_code": 1, "correction": "only a selection alias without its own profile entry may inherit a sole canonical package"}
+  ],
+  "independent_source_observation": {
+    "privacy_guards_unchanged": true,
+    "verdict_binding_unchanged": true,
+    "same_package_conflicts_preserved": true,
+    "blocker_union_preserved": true,
+    "prior_44_test_bodies_unchanged": true,
+    "unresolved_entry_separate_with_binding_gap": true
+  },
+  "requested_architecture_worker": {"model": "gpt-6-astra", "effort": "max", "trigger": "consequential architecture and failed bounded package-identity repair", "actual_backend": null},
+  "not_claimed": ["whole catalog convergence", "default acceptance from profile metadata", "unchanged upstream test acceptance", "provider execution", "GPU acceptance", "new WSL creation or boot acceptance"],
+  "sources": [
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/scripts/build_ecosystem.py",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
+    "adoption/new-wsl-profile.json",
+    "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
+  ]
+}
