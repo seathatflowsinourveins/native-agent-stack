@@ -88,8 +88,15 @@ offline-tested only, and C04's 422 remains paper-endpoint evidence.
   clock. As on 2026-09-25, the harness runs no clock preflight.
 - Pre-run conditions. The operator reports that account 2's mover ledger was
   finished and that no other account-2 writer ran. The run script refused on an
-  engine `STOP` file or a host load of 30 or more, and it used a fresh state root.
-  Nothing else about the host's other sessions was recorded.
+  engine `STOP` file or a host load of 30 or more. Its state root was new: it lies inside the run's output
+  directory, which the script refused to reuse. No order-throughput ladder session ran on the host (none was
+  scheduled). Account 1's regular-hours mover series was running; it checks the same `STOP` file and takes a
+  different account's writer lock. Nothing else about the host's other sessions was recorded.
+- Fault classes. Ambiguous or in-flight submission faults were not exercised; the frozen plan's four cases
+  cover a resting accept, two cancels and a definitive rejection only (as on 2026-09-25).
+- Observer inputs. The observer's `--after` value (2026-10-01T14:38:32Z) and its interpreter (the pinned
+  runtime) come from the coordinator's own command, recorded in the observation record; the retained stdout
+  does not echo them.
 
 **Independent observation, by a changed method.**
 `evidence/independent-observation-20261001t143832.json` records a listing made
@@ -215,7 +222,10 @@ names `receipt.json`, which held this run's receipt when the observation was
 made; its client-id prefix identifies the run, now retained as
 `receipt-20260925t182513.json`.
 
-**Second independent observation, by a separate session.**
+**Second independent observation, by a separate session.** Its retained stdout names
+`native-faults/receipt.json`, which was the 2026-09-25 receipt when it ran; the stdout is a byte-identical copy and
+stays unedited, and the receipt sha256 it records (31c112e3...) identifies today's `receipt-20260925t182513.json`.
+
 `evidence/observe-native-fault-20260925t184220z.stdout.json` (sha256
 19ce56c3...) is the retained stdout of
 `evidence/observe-native-fault-20260925t184220z.py` (sha256 6b9cf045...), run
@@ -562,10 +572,11 @@ written. No separate GET probe or fingerprint comparison was made. The harness's
 own preflight checked only that the market was open and the account flat with
 no open orders. The account's `ACTIVE` status, zero positions and zero open
 orders after the run come from the independent observation. Its run script
-refused on a `STOP` file and used a fresh state root (step 2; other state roots
-were not checked). The harness ran inside the regular session with a private
+refused on a `STOP` file and used a new state root inside its own output directory, which it refused to reuse
+(step 2; other state roots were not checked). The harness ran inside the regular session with a private
 `--out` and a retained exit code (step 3). The no-ladder condition rests on the
-operator's report that no other account-2 writer ran. Step 5 is that run's
+operator's report: no order-throughput ladder session ran on the host and no other account-2 writer ran,
+while account 1's mover series did run (same `STOP` file, a different account's writer lock). Step 5 is that run's
 receipt retention (`get_checks`, `harness` and `limits` in
 `evidence/run-20261001t143832.json`). Keep every account value private; none is
 committed.

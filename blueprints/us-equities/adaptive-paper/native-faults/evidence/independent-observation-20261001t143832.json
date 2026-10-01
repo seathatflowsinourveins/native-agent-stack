@@ -10,7 +10,7 @@
   "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
   "subject_gate": "native-fault-behaviour",
   "client_order_id_prefix": "nf-20261001t143832-835f9c-",
-  "listing_since": "the run's start, passed as the script's --after argument; the retained stdout does not echo the value",
+  "listing_since": "2026-10-01T14:38:32Z: the run's start truncated to the second, passed as the script's --after argument (the coordinator's own command; the retained stdout does not echo it)",
   "observed": {
     "gets": 7,
     "orders_listed_since_start": 1,
@@ -62,8 +62,8 @@
   "claim_boundary": "Confirms only the listed broker-side facts. Since the run's start there was one order with this prefix, c01 (SPY buy 1 limit 380.73 day, not extended hours), canceled with filled quantity 0. There was no broker order for the c04 client id (lookup 404) and no fill activity since the start. At observation time there were no open orders or positions, and the account status was ACTIVE. Only one order was listed since the start at all, below the listing's limit of 50, so no other order was written to the account in that window. The observation uses the same broker API and account and the engine's own credential loader. So it is independent of the harness and of the engine's transport and ledger code, not of the broker or the engine's credential loading, and it was run by the same session that started the run. It does not observe the HTTP statuses of the run's own requests (C04's 422 body, the C02 and C05 DELETE 204 answers), request ordering, the order-contract envelope or wire check, ledger contents, broker timestamps against the receipt window, the account's identity, cash or equity, or the engine's handling of a 422 cancel refusal, which C05 did not receive. It is not live-endpoint evidence and not a strategy result.",
   "retained": {
     "script": {
-      "path": null,
-      "kept": "private, not committed (the lane's observe-20261001.py)",
+      "path": "blueprints/us-equities/adaptive-paper/native-faults/evidence/observe-native-faults-20261001.py",
+      "kept": "committed byte-identical as observe-native-faults-20261001.py (it prints nothing private); the lane's private copy is observe-20261001.py",
       "sha256": "f118798f779c3dd322e6ee0d637ce23c034d66cb30a48846cc6d7297230da118",
       "bytes": 3273
     },
@@ -73,8 +73,8 @@
     },
     "stderr_sha256": "e032297e4c2b97481f8b8b3dfccba849062ba923dd837f6bfbe18fa8bcfa2a8c (112 bytes: the two notices of a non-terminal interactive bash, 'cannot set terminal process group' and 'no job control in this shell'; nothing from the script)",
     "argv_redacted": "<python> -B observe-20261001.py --engine <the frozen dca821cc clone> --env-file <the lane's second paper account's env file, through its pointer variable> --prefix nf-20261001t143832-835f9c- --after <the run's start>, per the script's usage line; the exact invocation was not retained",
-    "exit_code": "not retained; the stdout is the complete JSON object that the script prints as its last statement",
-    "runtime": "not recorded for this observation; the script imports alpaca-py and the clone's runner module",
+    "exit_code": 0,
+    "runtime": "the pinned runtime adaptive-paper-20260921 (Python 3.12.3, alpaca-py 0.44.0), the same interpreter as the harness (the coordinator's own command)",
     "note": "A new script, run once against this run's prefix. It prints only client-id suffixes, order fields, counts, the account status and HTTP outcomes. The stdout is a byte-identical copy of the private file. The retained files contain no credential, account id, balance or host path."
   }
 }

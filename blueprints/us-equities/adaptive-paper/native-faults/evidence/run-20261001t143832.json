@@ -123,7 +123,7 @@
     "stderr": {
       "sha256": "275384dfbdb43f634fd54d2483d566cb4ee55400654daaa52c7df55a4aa09167",
       "bytes": 208,
-      "content": "kept private and not characterized here"
+      "content": "three lines: two notices from the non-interactive `bash -ic` wrapper (no job control) and one alpaca-py trading-stream reconnect notice after a code-1000 close; no identifier"
     },
     "receipt_copy": "written to private output by --out, copied byte-identical into the tree",
     "run_state_markers_after_run": {
