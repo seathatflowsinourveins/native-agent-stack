@@ -689,5 +689,246 @@
     "other_observed_jobs": "OSV, dependency review, token report and Linux bootstrap passed; macOS queued at verifier observation.",
     "scope": "Canonical generated-byte repair only. Native profile/configuration and original provider operations unchanged. Original failed and successful evidence remain separate.",
     "usage": "unknown; no token savings attributed to the repair"
+  },
+  "final_native_ci_e537228f_20261001": {
+    "head": "e537228f1497dcd00d8fd37e8d1f19986d8f5aa3",
+    "evidence_class": "original native repository CI and integration returns; distinct from unchanged upstream tests",
+    "observed_at": "2026-10-01T02:53:47Z",
+    "linux": {
+      "run": 36802400597,
+      "job": 110179413847,
+      "native_summary": "Ran 8894 tests in 1323.409s",
+      "native_result": "OK (skipped=829)",
+      "original_log": {
+        "bytes": 253125,
+        "sha256": "22d11df7d8e52871b6c91e95fa3c633302e2341631581f130877a8693e6d6565"
+      },
+      "native_download_exit": 0
+    },
+    "macos": {
+      "run": 36802400527,
+      "job": 110179414392,
+      "conclusion": "success",
+      "full_suite_summary": "Ran 8894 tests in 1394.421s",
+      "full_suite_result": "OK (skipped=1148)",
+      "full_suite_native_exit": 0,
+      "adoption_gate_summary": "Ran 490 tests in 118.063s",
+      "adoption_gate_result": "OK (skipped=29)",
+      "original_full_suite": {
+        "bytes": 1652538,
+        "sha256": "593bc25edff4293f2d00ec2029dd57ddb7f1d9fc745209217439de4a56156591"
+      },
+      "original_job_log": {
+        "bytes": 222803,
+        "sha256": "a515313e8e6690500fb5a9ad9270ed0a102bbefdf77b6f7609291e60c85afcbd"
+      },
+      "native_download_exits": [
+        0,
+        0
+      ]
+    },
+    "macos_bootstraps": [
+      {
+        "job": 110179534639,
+        "conclusion": "success",
+        "native_download_exit": 0,
+        "original_log": {
+          "bytes": 138779,
+          "sha256": "26872aa76f49a3baec8a7c09ca0dd28a52522f193814f173eff1b43c9b7de706"
+        }
+      },
+      {
+        "job": 110179534686,
+        "conclusion": "success",
+        "native_download_exit": 0,
+        "original_log": {
+          "bytes": 166338,
+          "sha256": "f558dfd888d1308d409626e726e4ecf6c8b1e0bf991652d255f553dda4f8f751"
+        }
+      }
+    ],
+    "native_token_e2e": {
+      "run": 36802400516,
+      "job": 110179410327,
+      "commands": 259,
+      "checks": 82,
+      "pins": 16,
+      "failures": [],
+      "cleanup_confirmed": true,
+      "source_hashes_matching": 17,
+      "original_receipt": {
+        "bytes": 729568,
+        "sha256": "7c92a25b5ac8beda36d9c72d86c5de1fd78ac1793b84bde27d620c0b2225e149"
+      },
+      "original_job_log": {
+        "bytes": 63901,
+        "sha256": "77f2c6ae7604ebc483e2c3d6b0af52e0798fb35723e90eb46f0bfbcaaa1b5d05"
+      },
+      "native_download_exits": [
+        0,
+        0
+      ]
+    },
+    "betterleaks_comparison": {
+      "summary": "Ran 28 tests in 6.007s",
+      "result": "FAILED (failures=4)",
+      "job_conclusion": "success",
+      "scope": "Existing policy permits four comparison assertion differences; primary secret-scan passed. Not 28 passing comparison tests."
+    },
+    "prior_macos_scope_correction": {
+      "head": "f03fb80d0bc0c1da99611448e7780a483206fe29",
+      "run": 36792680414,
+      "artifact": 11133760984,
+      "adoption_gate": "Ran 489 tests in 107.768s; OK (skipped=29)",
+      "full_suite": "Ran 8816 tests in 1575.835s; OK (skipped=1125)",
+      "native_full_suite_exit": 0,
+      "native_download_exit": 0,
+      "original_full_suite_bytes": 1637336,
+      "original_full_suite_sha256": "a8602ff3e052e02d78056600ac673cc4a3b7d8ce483c043f66a83413cbcd4925",
+      "verification": "Pinned workflow separates both scopes; uploaded full-suite log lines9916/9918 supply counts, and original job independently reports full-suite exit0. Preserve historical 489-test summary with its adoption-gate scope."
+    },
+    "scope": "Native/provider acceptance retains its original source/head/date; no later client patch or shared-source reconciliation is relabeled as new execution.",
+    "usage": "unknown; native CI does not establish provider tokens saved"
+  },
+  "concurrent_main_c99a482e_reconciliation_20261001": {
+    "base": "46365ea812c3a680b19c8c8c9c3bb198bf3b38ab",
+    "main": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce",
+    "source_commits": [
+      "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+      "c99a482eec2d79baf515d8a7a1f94d542c1f09ce"
+    ],
+    "native_attempts": [
+      {
+        "command": "rtk proxy git fetch origin main",
+        "native_exit": 0
+      },
+      {
+        "command": "rtk proxy git merge-tree --write-tree HEAD origin/main",
+        "native_exit": 1
+      },
+      {
+        "command": "rtk proxy git merge --no-commit --no-ff origin/main",
+        "native_exit": 1
+      }
+    ],
+    "failed_patch_preflights": [
+      {
+        "stage": "JavaScript raw-template parsing",
+        "condition": "Literal Markdown backticks ended the template; no native command or file mutation started."
+      },
+      {
+        "stage": "multi-file apply_patch",
+        "patch_generation_native_exit": 0,
+        "captured_patch_characters": 180009,
+        "condition": "Expected registry context rejected; independent observation confirmed no files changed. Transport truncation and list reordering were possibilities, not proven causes."
+      },
+      {
+        "stage": "registry three-way guard",
+        "native_patch_generation_exit": 1,
+        "condition": "Shared origin/main advanced to3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a while MERGE_HEAD remained c99a482eec2d79baf515d8a7a1f94d542c1f09ce; a new test-file change correctly rejected the assumed conflict set before mutation.",
+        "verification": "Native rev-parse HEAD/MERGE_HEAD/origin/main and both-changed key comparison.",
+        "correction": "Freeze all parent blobs to immutable commit IDs. Capture the83152-character registry patch in17 validated5000-character pieces; apply only after complete length and consistent native digest checks."
+      }
+    ],
+    "bounded_repair": "Three separate apply_patch calls with payload guards and compact caught errors. Preserve working first-occurrence order; choose values by three-way receipt ID/file path semantics and remove two duplicated old terminal receipt rows.",
+    "conflicts": [
+      "docs/harness-defaults.md",
+      "manifests/evidence.json"
+    ],
+    "resolution": "Keep topic token records, all26 convergence records and main corrected terminal records. Retain both independent anti-pattern blocks and add the observed macOS count correction. Recompute only merged practice log and this live repair receipt hash/bytes. Preserve accepted terminal/trading sources and frozen artifacts.",
+    "astra_trigger": "Competing accepted changes in shared files; then a precondition failure unresolved after one bounded Sol repair.",
+    "astra_source_verdict": "17/17 native E2E source paths and selected pins unchanged by main delta. Working181 receipt rows179 unique IDs; only two terminal duplicates. First occurrence determines position, main determines terminal values. Expected179 receipts8782 files26 convergence records.",
+    "post_resolution_acceptance": "accepted source reconciliation: all six native validators/checks returned0 and17/17 resulting native source hashes match e537; independent Astra review accepted preserved records and frozen bytes",
+    "scope": "Source reconciliation only. Reuse original e537 native qualification if17 resulting inputs match; no fresh provider run claimed.",
+    "usage": "unknown; no savings attributed to reconciliation",
+    "native_checks": [
+      {
+        "command": "rtk proxy python3 scripts/validate.py",
+        "native_exit": 0,
+        "returned": {
+          "components": 69,
+          "hashed_files": 8782,
+          "profiles": 4,
+          "receipts": 179,
+          "status": "passed"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+        "native_exit": 0,
+        "valid_records": 26
+      },
+      {
+        "command": "rtk proxy git diff --check",
+        "native_exit": 0
+      },
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --check",
+        "native_exit": 0,
+        "returned": {
+          "rows": 32,
+          "status": "checked"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+        "native_exit": 0,
+        "returned": {
+          "status": "passed",
+          "layers": 32,
+          "winners": 66
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/build_ecosystem.py --check",
+        "native_exit": 0,
+        "returned": {
+          "bytes": 14396990,
+          "input_sha256": "aca31e50bd2d4c97e2fe72a489d690d8dd710f46a6adff0846f33c617a45439a",
+          "output_sha256": "2c464f3d370fe15e84d20e63a468af1434ae6801f635bf9653f3af880ad72259",
+          "status": "passed"
+        }
+      }
+    ],
+    "astra_acceptance": "PASS:179 receipts8782 files26 convergence records, unique IDs/paths; main2 terminal records and topic2 token records exact; all14 topic/four main anti-pattern changes preserved; frozen token artifacts untouched;17 native source paths match e537."
+  },
+  "later_installed_client_version_observation_20261001": {
+    "native_commands": [
+      {
+        "command": "rtk proxy claude --version",
+        "native_exit": 0,
+        "returned": "2.1.286 (Claude Code)"
+      },
+      {
+        "command": "rtk proxy codex --version",
+        "native_exit": 0,
+        "returned": "codex-cli 0.159.3"
+      }
+    ],
+    "scope": "Native clients advanced during concurrent work. These are version observations only; qualified Claude2.1.285/Codex0.159.2 provider operations remain dated and are not relabeled as executions of the later binaries.",
+    "codex_source_compatibility": {
+      "current_source": "openai/codex rust-v0.159.3 @01fc69f4026735edfdf6789820549727a4867b11",
+      "qualified_source": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "unchanged_core_hook_app_server_protocol_files": 2489,
+      "delta": "24 changed files concern version declaration and TUI account-security reminders; selected hooks/list, config/batchWrite and multi-agent V2 surfaces unchanged.",
+      "sources": [
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "https://github.com/openai/codex/compare/rust-v0.159.2...rust-v0.159.3",
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/app-server-protocol/src/protocol/common.rs#L879"
+      ],
+      "scope": "Native CLI help and exact upstream source compatibility only; no new provider run."
+    },
+    "claude_source_delta": {
+      "current_release_commit": "f5f60250a032caa72d1eb47f9ca5f29becc7066f",
+      "qualified_release_commit": "ec44ca97dc86c33d934c8d55b24959aabf076871",
+      "compatible_configuration": "Ultracode gate without effort condition, environment effort override and model precedence remain compatible in installed embedded source.",
+      "consequential_changes": [
+        "Stalled Workflow subagents restarting from original prompts",
+        "Missing foreground task tools",
+        "Duplicated worktree instruction loading"
+      ],
+      "source": "https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md#L32",
+      "acceptance": "Targeted fresh2.1.286 lifecycle probe required and underway; do not promote source/version observation into execution."
+    }
   }
 }

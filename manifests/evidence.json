@@ -918,7 +918,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1919,7 +1919,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -3180,7 +3180,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66\u2026'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
+      "claim": "On host nativestack-5975wx-20260925, ai-memory 2.4.1 was qualified against production 2.4.0 on 2026-09-25 and switched into production on 2026-09-26. The v2.4.1 asset ai-memory-linux-x86_64.tar.gz (16,026,020 bytes, sha256 15cafdc48eabc0305c164ccc8e884b260275f5a88b4f26e8456c2e42156375e4) matched the release body, the .sha256 sidecar and the GitHub API digest before extraction into a new tools/ai-memory-2.4.1 prefix (binary sha256 dec065a82478bec92a0c34323662af7e7ad616b222586356814b4875053aa8dd, 'ai-memory 2.4.1'). On separate restored copies of one online backup taken through the live 2.4.0 service (store V66), the 2.4.0 arm passed 26 of 26 checks and the 2.4.1 arm 28 of 28: /healthz 200, GET /mcp 405 with allow POST, 23 identical MCP tools with scope explicit, an unchanged known-page body, the write/query/read/delete round-trip, allowlist --check-capture, same-version and cross-version hook capture in both directions, and migration V66 -> V67 (67 rows) with 0 pages missing or changed and 0 observations missing; 2.4.0 then refused the V67 copy with rc 1 ('memory database schema is newer than this ai-memory build: the store has migration V67 (managed_run_session_link) applied, but this build only ships migrations through V66…'), and a fresh copy reopened under 2.4.0 at V66. Re-applying install-hooks with 2.4.1 changed only the binary path on 8 Claude and 7 Codex lines. In a private network namespace, 2.4.1 set keepalive on 65 of 65 accepted sockets and reclaimed all 60 vanished peers by t=75 s, while 2.4.0 held all 60 at t=100 s (#792). During qualification the production store schema (V66) and all pre-existing pages and observations were unchanged. An independent verifier reproduced these with its own code and agreed. The coordinator then performed the user-approved cutover: the service stopped at 2026-09-26T00:14:12Z; the quiescent store read V66 (66 rows), quick_check ok, 40 pages and 86,219 observations; an at-rest cold copy (378 files) fingerprint-matched it; bin/ai-memory was relinked to 2.4.1; install-hooks --apply changed only the binary path on 8 Claude and 7 Codex lines; the service started at 00:19:51Z and applied V67__managed_run_session_link; /healthz returned 200 with NRestarts 0; the fingerprint compare V66 -> V67 passed with 0 pages changed, 0 observations missing and 86,219 after; status --json reported 2.4.1; memory_status returned scope resolved_by explicit; the known page's body was unchanged; keepalive timers were on 2 of 2 established sockets; and a fresh headless claude -p session captured session-start, pre-tool-use, post-tool-use, stop and session-end. A read-only read-back at 2026-09-26T00:30:40Z found bin/ai-memory on tools/ai-memory-2.4.1, 8 Claude plus 7 Codex hook commands on 2.4.1 and the installed-versions record at 2.4.1.",
       "limitations": [
         "Pending, user-only: Codex skips changed hooks until they are trusted, so the 7 rewritten Codex ai-memory commands capture nothing through 2.4.1 until the user re-trusts them in Codex /hooks. Real Codex capture through 2.4.1 was not observed.",
         "V67 is forward-only: after it, 2.4.0 refuses the store with rc 1. Rollback is the coordinator's private at-rest cold V66 copy, a relink to the retained tools/ai-memory-2.4.0 prefix and the installer's .bak-1790381983/.bak-1790381984 hook files (or a re-run of install-hooks with 2.4.0, which leaves unrelated settings edits alone); writes made after the cold copy would be lost from the live store. The rollback was not exercised on production.",
@@ -3242,7 +3242,7 @@
       "component_ids": [
         "codex"
       ],
-      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You\u2019ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-26, Codex CLI 0.157.1 was installed beside 0.155.1 and qualified but not switched: bin/codex still names tools/codex-0.155.1, because the landscape-sweep GPT-6 lanes and other sessions use it. The npm wrapper @openai/codex@0.157.1 (4,904 bytes, sha256 813e2a944f4474b7e1826d9ce8bf696ad8d80c68f43f7a7067beec51fa8f5b73) and its platform package @openai/codex@0.157.1-linux-x64 (150,336,017 bytes, sha256 7f12677740f439fe4884c7031d9d703e571cecf5ea9fa3a05abd1bbccc2162a8) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations, whose SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.157.1, commit 36650394c5b38c2990ccf2a3457165ca3e9d9726; and the native binary in the platform package (sha256 3e2584f3...) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the API digest. The verified wrapper was installed into a new tools/codex-0.157.1 prefix whose files are byte-identical to both tarballs. In a bwrap sandbox with a private loopback-only network, a read-only root and a fresh scratch CODEX_HOME per case (no credential read, ~/.codex untouched), `codex --version` printed codex-cli 0.157.1 (baseline: 0.155.1), `codex exec --help` was byte-identical between the versions and `codex --help` differed only by the new --no-daemon flag. Against a loopback fake Responses provider set only through -c overrides, the landscape-sweep lane's argv (top-level --search, then exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" --output-schema -o --json, stdin /dev/null) behaved the same on both versions: a success turn emitted thread.started, turn.started, item.completed and turn.completed with usage input 11, cached 3, output 7 and reasoning 2, wrote the -o file, and sent reasoning effort max and a json_schema text format equal to the --output-schema file; a 429 usage_limit_reached answer ended with exit 1 and an error event plus a turn.failed event whose message says 'You’ve hit your usage limit. Try again later.', which the sweep's limit rule detects. With the fake provider marked as supporting standalone web search, `codex --search exec` sent external_web_access false to the search endpoint on both versions, the same as no flag, and only `codex exec -c web_search=\"live\"` sent true; 0.157.1 reported the literal-URL open as action open_page with results, where 0.155.1 reported it as other without results. A scratch CODEX_HOME that 0.157.1 had migrated (state_5.sqlite 55 to 57 migrations, thread_history_1.sqlite 6 to 7) still served a 0.155.1 exec turn. At the two tags, the exec --json event schema differs only by an optional web_search `results` field and exec/src/cli.rs is identical. A later probe in the same kind of sandbox (results/daemon.json) covered the background server that 0.157.0 starts for eligible interactive sessions: a plain interactive 0.157.1 launch copied its 391,126,382-byte package into CODEX_HOME/packages/app-server-daemon and started the app-server and its updater loop from that copy, and both outlived the TUI; a plain 0.155.1 launch while that server ran connected to it; `codex app-server daemon stop` stopped the server but not the updater loop, which SIGTERM ended; and --no-daemon, or `codex features disable daemon_auto_start`, prevented the copy and both processes, while 0.155.1 read the resulting config.toml in an exec turn and started its TUI with it. The switch commands therefore turn automatic start off before any interactive 0.157.1 launch, and the rollback stops such a server and its updater loop before relinking.",
       "limitations": [
         "Reviewed once: a review round of the refresh coordinator (Claude Opus and GPT-6 Astra reviewers) reported that the rollback relinked bin/codex only and the switch checked only for 0.155.1 processes, so a background server started by 0.157.x would outlive a rollback; this revision repairs it (daemon_probe.py, results/daemon.json, stage/daemon-source-checks.txt and corrected switch and rollback commands). The repair itself has not been re-reviewed, and the qualification and this receipt still come from one worker family (Claude Opus 5.5).",
         "Staged, not switched, and no live model call ran on 0.157.1: a live call would either copy the ChatGPT credential into an isolated CODEX_HOME (not allowed; docs/secret-storage.md) or run the newer binary against the shared ~/.codex while the sweep runs 0.155.1. GPT-6 turns through 0.157.1 are unmeasured until the coordinator's post-switch probe (results.json switch_commands_for_the_coordinator).",
@@ -3380,7 +3380,7 @@
       "component_ids": [
         "socraticode"
       ],
-      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green and 89,567 indexed chunks; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 \u2014 STALE, this server is v1.15.0' (last built 21:35:09.670Z), because a 1.14.0 server had built the stored graph at 21:35:09.670Z, before the 21:42:49Z cutover, and no 1.15.0 rebuild happened until 21:43:08.450Z.",
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-27, socraticode 1.15.0 (tag v1.15.0, commit f6191f076a42405f0d5508139f3a8b505cfef93a, released 2026-09-24T10:58:58Z) was qualified and switched into production after the user waived the recorded 7-day cooldown. The npm tarball https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz (1,053,928 bytes) had sha256 f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1, sha512 equal to npm dist.integrity sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ== and sha1 equal to dist.shasum 607f909997dcf40bd5722a08f2e7c0e4b90e8334 (read 2026-09-27T21:39:34Z); dist-tags.latest was 1.15.0, the package ships no npm-shrinkwrap.json and its dist/index.js reads no process.argv. The upstream suite passed at the tag: in a clean clone at f6191f07 with Node v24.21.0, npm ci exited 0 (425 packages), npm run test:unit exited 0 (103 files, 2,475 of 2,475 tests passed, 72.83 s), npm run check:release-versions exited 0 ('release manifests match 1.15.0'), npx biome check src/ tests/ exited 0 (175 files, no fixes), npx tsc --noEmit exited 0, and ci.yml's Qdrant-backed regressions with REQUIRE_QDRANT=1 against a disposable Qdrant 1.19.1 exited 0 (4 files, 12 of 12 tests, 28.16 s). Before the cutover, the staged tools/socraticode-1.15.0 prefix served native checks against the production external Qdrant and local embedding endpoint with the production launcher environment. Through mcporter 0.14.1 `call --output text`: codebase_health exited 0 (External Qdrant reachable, embedding endpoint reachable, model nvidia/Nemotron-3-Embed-1B-BF16 loaded); codebase_search exited 0 with stdout byte-identical to the 1.14.0 launcher's for the same query (sha256 e5cba74c163f13cece308f94eebc22640df677f51bda30d8fa557721d2bfbca7, 5 matches); codebase_status exited 0 (Status: green, 89,567 indexed chunks); codebase_graph_status exited 0 (Status: READY, 1,305 files, 441 edges, 'Built by: v1.15.0'). A headless Claude Code 2.1.283 session with --strict-mcp-config reported the server connected and completed codebase_status with is_error false. A Codex exec 0.157.1 run with an args override first failed the call with 'MCP tool call requires approval, but approval policy is never'; the rerun with default_tools_approval_mode=\"approve\" completed the mcp_tool_call with no error and returned Status: green, 89,567 chunks and 'Built by v1.14.0, this server is v1.15.0', because a 1.14.0 server had rebuilt the shared graph 30 s earlier. At 2026-09-27T21:42:49Z the coordinator repointed seven launchers and the bin/socraticode symlink together from tools/socraticode-1.14.0 to tools/socraticode-1.15.0, and restarted the mcporter daemon at 21:42:50Z. At read-back, claude mcp get and codex mcp get showed the 1.15.0 args; a production mcporter codebase_status at 21:43:01Z returned Status: green and 89,567 indexed chunks; codebase_graph_status at 21:43:00Z read 'Built by: v1.14.0 — STALE, this server is v1.15.0' (last built 21:35:09.670Z), because a 1.14.0 server had built the stored graph at 21:35:09.670Z, before the 21:42:49Z cutover, and no 1.15.0 rebuild happened until 21:43:08.450Z.",
       "limitations": [
         "Not every live session runs 1.15.0 yet, and nothing in the claim rests on that. At the cutover read-back 12 already-running 1.14.0 servers remained; at 2026-09-28T02:03:14Z a process listing still showed 2 processes on the 1.14.0 prefix, the MCP children of two long-running Claude Code sessions that each need their own /mcp reconnect. A codebase_graph_status read-back at about 02:07Z, served by one of those 1.14.0 servers, showed the stored graph still 'Built by: v1.15.0' (last built 2026-09-27T21:43:08.450Z). A 1.14.0 server that rebuilds the graph before its session reconnects would restart the flip-flop (data.all_sessions_on_1150).",
         "The pre-cutover checks ran from the staged 1.15.0 prefix against production services while 1.14.0 servers were still running, and shared their lock directory. The 1.15.0 server rebuilt the production code graph ('Built by: v1.15.0', last built 2026-09-27T21:34:21.531Z); a 1.14.0 server rebuilt it again at 21:35:09.670Z, as the post-cutover graph status shows. The decision record predicted this graph flip-flop from source (graph-inputs.ts:609); this is the first native observation of it on this host. No vector reindex was observed: the collection stayed green at 89,567 chunks throughout.",
@@ -3699,13 +3699,13 @@
         "omniroute",
         "claude-code"
       ],
-      "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 242 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (47 and 47 passes, each with eight end-to-end cases and six in-process latch tests, among them a SIGTERM at every line of the probe's resource lifecycle) and 14 mutants (seven per probe; each unmutated probe passes all six cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun gives the counts recorded in 2026-09-28), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at every line of the resource lifecycle, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock.",
+      "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 259 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (49 and 49 passes, each with eight end-to-end cases and eight in-process tests, among them a SIGTERM at each line a dry run reaches in the end-to-end cases) and 22 mutants (eleven per probe; each unmutated probe passes all eight cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun on the installed client shows the pattern recorded in 2026-09-28, no truecolor sequence without COLORTERM and no 256-colour sequence with it, with other exact counts), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at each line a dry run reaches, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock. After the merge of those repairs one more read followed, by one read-only Claude Opus agent (effort max, no shell) on the signal handling and shutdown code only, because the gateway pool's one usable account was at 83 of 100 points: 11 findings (3 medium, 8 low), each verified by a measurement or by reading before it was repaired in one round: the pty probes now end BY a latched signal instead of exiting 128 plus its number (a shell loop goes on after an exit 130 and stops after a death by SIGINT, measured), the sweep observes the spawn guard, the documents state the sweep's real coverage, an inherited SIG_IGN stays ignored, typing stops at a latched signal, and a third tmux control only the command-line check of the identity can fail.",
       "limitations": [
         "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). No live Windows Terminal or interactive Claude Code session was run: the reviewers and the verifiers read code, upstream sources and ran scripts, synthetic homes and private tmux servers; the bell, the tab icon and focus reports in Windows Terminal remain unobserved.",
         "One review family (GPT-6: gpt-6.1-sol in all three reads and cx/gpt-6-astra-ultra beside it in the re-check and the final read, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus). The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the graded findings of the three passes (23, 19 and 21) are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
         "Twelve findings of the first wave and two of the re-check were checked by the coordinator, not by a verifier (of the twelve: eight against the code or upstream source, three concerning the removed second-distro target, one convention). The removed target's code was not run before it was removed.",
-        "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Two further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; each repaired in one round); the last round's repairs were checked by controls, mutants, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
-        "Residuals of the final round: a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor.",
+        "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Three further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; a one-lens Claude Opus read after the merge: 11 findings; each repaired in one round); the last round's repairs were checked by controls, 22 mutant runs, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
+        "Residuals of the last round: the lines after the prompt is typed are not swept (110 of 160 lines with code are for the alert probe, 123 of 186 for the push probe); signals pending together run their handlers in ascending number, so the first signal wins only one dispatch apart; a kill by pid after the tmux identity check has a gap that pidfd_open would close; SIGHUP is covered in process only; the tmux probes install no signal handler; a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor, and the post-merge read is a single Claude Opus reader without a shell: it read code and documents and ran nothing.",
         "Some claims rest on source reading only and were not run: the remote-workspace branch of the PushNotification tool (installed client 2.1.285, `CLAUDE_CODE_REMOTE` or a thin-client session), Windows Terminal's parent order of profiles.defaults and fragment profiles (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`), and Tab.cpp's two-second indicator timer for a focused tab.",
         "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave, 11 after it, 22 after the re-check, and 36 before and 52 after the final read; other sessions may have used points in between."
       ],
@@ -3731,7 +3731,7 @@
         "The toast watch by release ancestry can miss a backport (release tags sit on servicing branches and report diverged); the decision record adds a direct probe of the tag's profiles.schema.json BellStyle enum (false on both tags, true on main, measured 2026-09-28).",
         "Agent view (claude agents, --bg) was not probed in this change; the pass criteria are in the decision record.",
         "Excluding idle_prompt also silences a question asked in prose and then left waiting.",
-        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the BEL counter of alert_probe.py now decodes UTF-8 and ignores C1 control characters like the pinned output engine; the probe exits 2 when its dialog never opened and 1 when its hooks-disabled control saw a BEL, cleans up after SIGINT, SIGTERM and SIGHUP (a handler only latches the first signal, the cleanups run to their end at explicit safe points and the exit status 128 plus the signal follows them; the design of the second review, signals deferred under a mask and a spawn flag, was replaced in the final read), and prints message lengths (the screen only with --show-screen); color_capture.py counts SGR sequences only, applies the pinned Windows Terminal parser's rules to its parameters (saturation at 65535, missing components as 0, byte bounds, the colon form's colour-space field) and counts a group it reads but does not apply apart (a native rerun gives the counts recorded here); check-terminal-profiles.py in the practice repository now accepts a bellSound only as exactly a measured file in C:\\Windows\\Media that exists; the sentence that tmux through 3.6 lacks synchronized output was false (tmux has a sync feature) and the bell icon clears after about 2 s on a focused tab. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
+        "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the BEL counter of alert_probe.py now decodes UTF-8 and ignores C1 control characters like the pinned output engine; the probe exits 2 when its dialog never opened and 1 when its hooks-disabled control saw a BEL, cleans up after SIGINT, SIGTERM and SIGHUP (a handler only latches the first signal, the cleanups run to their end at explicit safe points and the probe then ends BY the signal; the designs of the second review, signals deferred under a mask and a spawn flag, and of the final read, an exit status 128 plus the signal, were replaced), and prints message lengths (the screen only with --show-screen); color_capture.py counts SGR sequences only, applies the pinned Windows Terminal parser's rules to its parameters (saturation at 65535, missing components as 0, byte bounds, the colon form's colour-space field) and counts a group it reads but does not apply apart (a native rerun on the client of 2026-09-30 shows the same pattern with other exact counts); check-terminal-profiles.py in the practice repository now accepts a bellSound only as exactly a measured file in C:\\Windows\\Media that exists; the sentence that tmux through 3.6 lacks synchronized output was false (tmux has a sync feature) and the bell icon clears after about 2 s on a focused tab. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/terminal-experience-20260928.json"
     },
@@ -6592,7 +6592,7 @@
       "bytes": 126
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/a\u00e9\u00e9.md",
+      "path": "blueprints/convergence-practice/wsl-retrieval/seed/corpus/primary/notes/aéé.md",
       "sha256": "cb36cd06858449475efbfaddaedfd78d20a2b7b4f30993bca02cd1cb360e0cb3",
       "bytes": 111
     },
@@ -10983,8 +10983,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
-      "sha256": "bdea9283cabf8a3202f01359109d463a78cb2735a199e0f93baf05486152d31a",
-      "bytes": 21164
+      "sha256": "a74574de8726cae6aef8caed2f041c13acbd13832a916e1d7c4a8527b7944e03",
+      "bytes": 21829
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
@@ -11003,13 +11003,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "cea19e941f514591c410b28d71909b8f240678074f7c5627b1609ccc74d03e38",
-      "bytes": 25821
+      "sha256": "c3966d55a867612e50fe3cd0d841060b3d8944ae77ad39fb4a050bc0def0bba2",
+      "bytes": 37314
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
-      "sha256": "7b7837cd6866ef36271887edf261c0ab1862e04b49ff2dcbb2e3e74262fa6e23",
-      "bytes": 17640
+      "sha256": "5a4e4a1aa7bd58e6b906604e2ab1c635cbf0417613b5c94546e6e2af968bb86e",
+      "bytes": 19095
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
@@ -11128,8 +11128,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
-      "sha256": "03f9107e40feaaefc6e896db3e20d246139f8ef8b02e1a7d7da79199e62bb7f5",
-      "bytes": 61848
+      "sha256": "aaa2e70202e011993c6827cda808155ef7737d752073245ceded55fd8b1eb5d7",
+      "bytes": 65768
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
@@ -11298,13 +11298,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4",
-      "bytes": 150357
+      "sha256": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+      "bytes": 153832
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357",
-      "bytes": 83006
+      "sha256": "f43def730273be28dbb2b4a791dff31ca7e3f661735eb45e35ebccb75c4d0285",
+      "bytes": 88369
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -11323,8 +11323,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "f0fb64b0a3700f9fa7e2b14910c035dec66addf17e4bd12467b10d4f07e1e180",
-      "bytes": 6969
+      "sha256": "c9b6f5f8f39fe6595fa13c054420e1e96633038e895495f9a4a5d6b5da0ab93a",
+      "bytes": 7076
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -11338,8 +11338,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9",
-      "bytes": 83300
+      "sha256": "8d1222f7b8e90cf2af0cd6efb88eb70704cf900c480a097e86576a8382435b16",
+      "bytes": 92936
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -15178,8 +15178,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "60e21f4454518f204456c9f51f0725d00046ba21cb733972f26472535072af31",
-      "bytes": 87432
+      "sha256": "f9655a49295793d60bffdb9a24d22b1a6793e1354ffe08d0f3c6e02154fcd7ad",
+      "bytes": 92921
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -15363,8 +15363,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "8e14c23fca4368b5d0e4ff161626b1ea5749c2ae2d85ad115fe7f0c45e3a261f",
-      "bytes": 112522
+      "sha256": "0a5bc0c11b01d3b324e12d74c867d31313f14a15ee0ab21118e8824d181d5d6d",
+      "bytes": 116606
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34858,8 +34858,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
-      "sha256": "ace1b931ad80021a9659f2e0606ed15fab2b433f6f5cdb75a96021b487658e42",
-      "bytes": 11032
+      "sha256": "3b118cb3c6a5ffa294f27e591b47da5d2da2eb38effb5bbcdb7a46fd2691d49a",
+      "bytes": 11349
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/concurrent_writer_harness.py",
@@ -34873,8 +34873,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
-      "sha256": "0ee33b0ab4be010b0bf9159da774255b40402336a822abc14b00ef7a28cd2d7f",
-      "bytes": 42364
+      "sha256": "43039c7e5055964843352ec60d38cc63145316a7c1dbcfb018de59ac223662e1",
+      "bytes": 48806
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
@@ -34958,8 +34958,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
-      "sha256": "759a6f30fb23484a41557312939fd89687ebdc5332c8fedde89eb99c8e2deabb",
-      "bytes": 12796
+      "sha256": "6f56032a39ec0c42435f1ed4a247ce96fac5dab7a9153a4b33f4f1e4a60f2e0e",
+      "bytes": 14752
     },
     {
       "path": "evidence/artifacts/observability-dashboard.png",
@@ -41813,13 +41813,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/README.md",
-      "sha256": "868fedf1c3da37f055a6d8647af9def9225124841adabfe4ad6da26c577de401",
-      "bytes": 7456
+      "sha256": "e951e486088e0118c4417e4f1d02ffe2b55400841aae2be441324e8fd514d3e0",
+      "bytes": 8982
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
-      "sha256": "0299ebbac984528183def73914ec636af37953727876976a159e7bcf72fbc08b",
-      "bytes": 38744
+      "sha256": "ecc12d3e13e67d2144b528d559f08f41f4b78b7493557e4e37882477e5b2c764",
+      "bytes": 45186
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
@@ -41833,8 +41833,8 @@
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
-      "sha256": "f5defeb45046d3268b4358d774139ff7d86f6a649c88ae18b26023373e3493db",
-      "bytes": 6808
+      "sha256": "ce312445627fa1005960ae504ccfe3c28ff032f41e6dadc3033f6d7e1ecf77fc",
+      "bytes": 8900
     },
     {
       "path": "evidence/artifacts/terminal-experience-20260928/validate_fragment.py",
@@ -41858,8 +41858,8 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
-      "sha256": "5d1e2a91b2ff0dddff364909f7b4ec21cf017b03cba4f1dcfd37ca87d0f5939b",
-      "bytes": 9697
+      "sha256": "b28b34c57453bf321aa32130e4d8bcf3413922ce9edad56e4e01e6e65f3ef3ba",
+      "bytes": 11979
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_final_prompts.py",
@@ -41952,6 +41952,11 @@
       "bytes": 756
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/post-merge-read.json",
+      "sha256": "f5a3a9acadeaa9a77c831d081279409cd69c3aa571ec81c77fd3f93f51f31679",
+      "bytes": 7724
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/prompts_sha256.txt",
       "sha256": "884d4fc460afa2b7a6d62db41fb1b773b16f4dc9ea87aff9232447ef39809e0d",
       "bytes": 849
@@ -41983,12 +41988,12 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/alert_probe_selftest.txt",
-      "sha256": "4508ae6b2e14d6e34c8db7ff5c780fd9877101d281c0961852f4eae1531b5566",
-      "bytes": 4835
+      "sha256": "6c7dce708bf2e22b941776014475956e65d9cd74099092ebf0372e20d1149147",
+      "bytes": 5417
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/codex_tui_strict_check.txt",
-      "sha256": "20256f043411a03d93024af671b02c02f9708facd5c9004f09fbb46b2306912c",
+      "sha256": "0fe9d235c8c2aaf4209ca4179cc29218fc7afcf7258477fc1b3a48a4d5dd0428",
       "bytes": 1417
     },
     {
@@ -41998,7 +42003,7 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/color_capture.txt",
-      "sha256": "c13429c5f467b74f3d5c041600483eda2c07c8459148b903e1095d657fee89d6",
+      "sha256": "2f9c6a617425475a6b3dafbe9f0b1dccd2dd1d606a6dead6bef64c6d67d95003",
       "bytes": 318
     },
     {
@@ -42007,9 +42012,14 @@
       "bytes": 31
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/environment.txt",
+      "sha256": "60c59684c98a5ff763ef5501ffae5a49b2832805dccc6349d4d7e84683bcca94",
+      "bytes": 87
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/exit_codes.txt",
-      "sha256": "d8d815860fc5b7e9125e1c3e0f64560fdfaf571ed2f3f20215ad0a6dd6aab438",
-      "bytes": 2277
+      "sha256": "f5ae410d9877bf1bb8cbcdf0c364fb8a7951bf7415e242c8459bd2b03818cc47",
+      "bytes": 2622
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/landscape_refresh_selftest.txt",
@@ -42052,6 +42062,11 @@
       "bytes": 4300
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/notification_types_scan_2.1.286.json",
+      "sha256": "189aa69dbaa06bf62b34474d173f13fa618b78a5e64ea8fff99e873fe8ee7ccf",
+      "bytes": 4300
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/overlay_noop_check.txt",
       "sha256": "376e04bcb7871f6123c5189ead72210932af975850a96806fa334964d0ae193b",
       "bytes": 534
@@ -42078,18 +42093,18 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_alert.txt",
-      "sha256": "fb7c6ee520cf0369bd1ddef57d32193736f880aba02d5fed1cecc26f9bcca48a",
-      "bytes": 671
+      "sha256": "5bc22c3a72b62e3cf9a7f62854c125d1a56dec8cae8cfc7c37f97c7dc4c1a172",
+      "bytes": 1020
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/pty_probe_mutants_push.txt",
-      "sha256": "fdb7cdb42ac969970abe688cd10e361b5fb64c2fb831af0c9ff0fff2d577ea80",
-      "bytes": 663
+      "sha256": "393c260dc05a1bf58d31a5d4dfb10374264d7f8fff5fe75c10fbf2389f313bab",
+      "bytes": 1008
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/push_notification_probe_selftest.txt",
-      "sha256": "3b919eb1bba64c5966d80dde80f8a7b66e5a47da813f8ab8a789c11c218ad524",
-      "bytes": 4849
+      "sha256": "28c33004f324f5a26dce31ac63aee0250963416ea1091412dbe5797948a4550b",
+      "bytes": 5431
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/replace_bell_group_controls.txt",
@@ -42103,12 +42118,12 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scan_reader_mutants.txt",
-      "sha256": "65326735296d2a723fce6bc0915060fbaaa369c45c3d0f7eeaf8d67bf1fe8ed7",
+      "sha256": "09a8a0a27ea832ca77ce09f39e64c60e8472e0a05ee68882d41816566e1a5135",
       "bytes": 2824
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/scrub_placeholder_probe.txt",
-      "sha256": "f5d5b4e7cb8bf4345ab25b566843145b3aaac3f39e71c8f8363ab8f9e0c9f2d2",
+      "sha256": "6f37ce37903e60e95eef4b09249a613172cd44cc4e5840a012d91f4a4941336c",
       "bytes": 5716
     },
     {
@@ -42117,14 +42132,34 @@
       "bytes": 1362
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/shell_loop_control.txt",
+      "sha256": "fd4c05c85371174fd98f5ca152954ad74cd0b4fc62b10bad9cce792084b0286f",
+      "bytes": 252
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/signal_order_probe.txt",
+      "sha256": "f39776a4d9f93babd14e36cccb82fc4d214e50b999424c4ce244072d5fd90475",
+      "bytes": 298
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe.txt",
       "sha256": "f66422aef1845a2f80bd0943cf815ace8dec09accd1a0387b6e2236192c122b4",
       "bytes": 484
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_bell_probe_selftest.txt",
-      "sha256": "ac339b9a2e4e06b6a6a74ef6f18f9d9d9446ea32505ef44ed4d309f16807ee78",
-      "bytes": 305
+      "sha256": "de0eabd3a559de8b1b1eddc8718ba200c9e7404530f7ddc131fdab8dcc80ec74",
+      "bytes": 515
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_identity_mutant_bell.txt",
+      "sha256": "92917d93eda823384de22bfa3e800c5d94f44ff3c68b4d6b22d314b0245bc3e6",
+      "bytes": 336
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_identity_mutant_sync.txt",
+      "sha256": "b0af07b70470386fff3107d27783f0673c167c5e41e137fe179f8882f9e71c4f",
+      "bytes": 272
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_sync_probe.txt",
@@ -42133,13 +42168,13 @@
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/tmux_sync_probe_selftest.txt",
-      "sha256": "f6dfb138e3ba789c3c722657e6a5f13b00226fe87e7a109840ee1d02866d542d",
-      "bytes": 274
+      "sha256": "b6c68ddcd146a3a6cd9cb4065d8896a26e2b3f871b605c1f95928477115be3cf",
+      "bytes": 484
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/unit_tests.txt",
-      "sha256": "42a5c07a92a8cdb98294b07ae070e9ee944e490f83ed90936c7204f584aae7dd",
-      "bytes": 959
+      "sha256": "2ad64fa82f7c6dbaa822f21c11934baa774fb0a4a4b47c6fbdaac4fc61363716",
+      "bytes": 976
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/results.json",
@@ -42152,14 +42187,29 @@
       "bytes": 1897
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+      "sha256": "fd5ee47cfd1533b89171dc8ec3d1643252f54aa088518e5ca4424bf91c91cce1",
+      "bytes": 2714
+    },
+    {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+      "sha256": "519a9ce1164dfa92e7a9f89bea89af748fbb6c23a8adcc53188bceb98c56a5cf",
+      "bytes": 1562
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/stage_review_lane.py",
       "sha256": "f921b25c18e7ae24004133c8d5b29f8d1979c68543ff2fa3a2a086ef535cd3d9",
       "bytes": 2523
     },
     {
+      "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_identity_mutant.py",
+      "sha256": "5ba3fc0c481c4c1b00e28b747bb064e3627c89b8c635d180639cfd173b934fcd",
+      "bytes": 2528
+    },
+    {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
-      "sha256": "46cd411c71433334d466066db918f8155168045461c86c794ecacdac5a0f9be1",
-      "bytes": 10680
+      "sha256": "b4bb1d85e5e37d116aca343c523b6a0cf81c1475f83e5ea106f7e1103e6658ee",
+      "bytes": 12636
     },
     {
       "path": "evidence/artifacts/terminal-lane-cross-family-review-20260930/verification.json",
@@ -42788,8 +42838,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
-      "sha256": "304e97f286d3275e103a44f1d272132b87e82efa43807c0a637c528976fd5caa",
-      "bytes": 31028
+      "sha256": "278ff1ed79edf0dbed2e3c0dcccb7f27eed68e2e5e2bbe8deadc99569ae22545",
+      "bytes": 42231
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
@@ -44653,8 +44703,8 @@
     },
     {
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
-      "sha256": "2e8d8fce49379b90aa58ffd3766a8131fecbf94c48d065b088e5b79da568e735",
-      "bytes": 29236
+      "sha256": "488ae5c39ea978e7bc4ddf0daaf1bd789e95a352f6d89d618bca9cbbd2c4e138",
+      "bytes": 34401
     },
     {
       "path": "evidence/receipts/current-session-observation-20260920.json",
@@ -45123,8 +45173,8 @@
     },
     {
       "path": "evidence/receipts/terminal-experience-20260928.json",
-      "sha256": "57a97939558aad8e2ddb796f886c672ac4305ffd19e59b01e9f266d2373414ca",
-      "bytes": 17559
+      "sha256": "673e4ef078687c36adfe6b20658856d2ac4ce1dd5b9f894ccc0e57d0c253c96e",
+      "bytes": 17631
     },
     {
       "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
@@ -46202,6 +46252,11 @@
       "bytes": 25425
     },
     {
+      "path": "tests/test_adaptive_paper_fees.py",
+      "sha256": "9a181eb3d2e20ff34ac6551022bf252d51688ab3014162ca696a37b45bdc5221",
+      "bytes": 78129
+    },
+    {
       "path": "tests/test_adaptive_paper_financing.py",
       "sha256": "8d9f1f21f9d53c9ed120281409bdcb97b8c9ddacc615d0cdfa392cfcf111fa90",
       "bytes": 8708
@@ -46228,8 +46283,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_mover_native.py",
-      "sha256": "2c176fb4e25827fe6b5c0a7ef1277769cd402bf33b28a31ed5c2c7a6da8c3220",
-      "bytes": 54865
+      "sha256": "2cf17ed5dd956d18b973fcdcf0ea1412dee8eec7040d29fa1d2e28781b7c16fa",
+      "bytes": 55169
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
@@ -46263,8 +46318,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "e4914d1755fb70c23688cb118dc482ea95c15e57ebb3a081813f8083a385b396",
-      "bytes": 106024
+      "sha256": "7d75e7ae89dc048cd62628fcfd666ff18eaf3daedbed836b0a451ddaf7a45f87",
+      "bytes": 106177
     },
     {
       "path": "tests/test_adjudicate.py",

@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import signal
@@ -145,11 +146,38 @@ class MoverController(Controller):
 def mover_reconcile(ledger, snapshot, baseline_cash):
     """runner.reconcile over the ledger's own orders plus every foreign order that is
     not terminal (which still fails as external_order_detected). Positions and cash are
-    compared unchanged; the mover's baseline is the trial's own starting cash."""
+    compared unchanged, after runner.reconcile records the snapshot's FEE activities; the
+    mover's baseline is recomputed from checkpoint cash after booking its fees."""
     owned = {i.client_id for i in ledger.intents()}
     orders = [o for o in snapshot.get("orders", [])
               if o.get("client_order_id") in owned or o.get("status") not in FOREIGN_TERMINAL_STATUSES]
     return reconcile(ledger, {**snapshot, "orders": orders}, baseline_cash)
+
+
+def fee_window_start(metadata):
+    """The mover lineage's saved checkpoint window, reused by paper and recover.
+    Checkpoint fees are booked before baseline is recomputed; the fixed formatted cutoff
+    then lists later fees once by id. Legacy trials without fee_window_start retain
+    current_trial_started_at, including the account-2 residual's 2026-09-29T20:25:19Z.
+    A present invalid checkpoint window is refused rather than falling back."""
+    value = (metadata.get("fee_window_start", metadata.get("current_trial_started_at"))
+             if isinstance(metadata, dict) else None)
+    if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+        raise SafetyError("trial_metadata_lacks_baseline_time")
+    return datetime.fromtimestamp(value, timezone.utc)
+
+
+def fee_receipt(rows):
+    """The FEE activities one command recorded (Ledger.fees rows): count, total and per
+    sub-type count and total. Never an activity id."""
+    by_type = {}
+    for row in rows:
+        entry = by_type.setdefault(row["sub_type"], [0, Decimal(0)])
+        entry[0] += 1
+        entry[1] += row["net_amount"]
+    return {"count": len(rows), "total_usd": text(sum((row["net_amount"] for row in rows), Decimal(0))),
+            "sub_types": {sub_type: {"count": count, "total_usd": text(total)}
+                          for sub_type, (count, total) in sorted(by_type.items())}}
 
 
 def scope_recovery_adoption(port, ledger):
@@ -459,11 +487,15 @@ def plan_receipt(plan):
 
 
 def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, prefixes, preflight=None,
-                  extra=None):
+                  extra=None, fees_recorded=()):
     """The trial receipt. Per symbol: scan fields, intended notional and caps, orders
     (client ids, hashed broker refs, submit/accept/fill times and prices), exit reason
-    and realized P&L; totals; start/end reconciliation. No account id or balance."""
+    and realized P&L; totals; start/end reconciliation; the FEE activities recorded in the
+    run (``fees_recorded``, Ledger.fees rows; count, total and sub-types only). The ledger's
+    realized delta is the per-symbol P&L plus those fees. No account id or balance."""
     after = ledger.accounting()
+    fees_recorded = list(fees_recorded)
+    fee_total = sum((row["net_amount"] for row in fees_recorded), Decimal(0))
     intents = {intent.client_id: intent for intent in ledger.intents()}
     pnl = pnl_by_symbol(intents.values(), prefixes)
     recovery_prefix = f"rec-{plan.trial_id}-"
@@ -492,7 +524,9 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
               "realized_pnl_usd": text(sum(per_symbol, Decimal(0))) if all_flat else None,
               "ledger_realized_pnl_delta_usd": text(realized_delta),
               "ledger_cash_delta_usd": text(after.cash_delta_usd - ledger_before.cash_delta_usd),
-              "pnl_consistent": bool(all_flat and abs(sum(per_symbol, Decimal(0)) - realized_delta) <= Decimal("0.01")),
+              "fees_recorded_usd": text(fee_total),
+              "pnl_consistent": bool(all_flat and abs(sum(per_symbol, Decimal(0)) + fee_total - realized_delta)
+                                     <= Decimal("0.01")),
               "native_fill_events": outcome.get("native_fill_events", 0),
               "native_rejections": outcome.get("native_rejections", 0)}
     receipt = {
@@ -508,6 +542,7 @@ def build_receipt(*, plan, outcome, config_sha256, scan, ledger, ledger_before, 
         "reconciliation": {"start": {"flat_account_and_no_open_orders": True,
                                      "checked_by": "runner.validate_preflight and the native adapter's startup snapshot"},
                            "end": outcome.get("reconciliation"), "recovery": outcome.get("recovery")},
+        "fees_recorded": fee_receipt(fees_recorded),
         "ledger_risk": {"lifetime_realized_pnl_usd": text(after.realized_pnl_usd),
                         "lifetime_gross_loss_usd": text(after.gross_loss_usd), "drawdown_usd": text(after.drawdown_usd),
                         "halted_reason": after.halted_reason},
@@ -620,7 +655,8 @@ def command_paper(args):
     LAST_EVIDENCE_CLASS = "PAPER"
     if not TRIAL_ID.fullmatch(args.trial):
         raise ValueError("invalid_trial_id")
-    from transport import AlpacaPaperTransport, TransportError, halt_statuses_supported, nasdaq_halt_seed, preflight
+    from transport import (AlpacaPaperTransport, TransportError, halt_statuses_supported, nasdaq_halt_seed,
+                           preflight, fee_checkpoint)
     config, limits, settings = load_mover_config(args.config)
     config_sha = _sha256(args.config.read_bytes())
     try:
@@ -701,6 +737,19 @@ def command_paper(args):
                         raise SafetyError("preflight_budget_inconsistent")
                 if ledger.positions() or ledger.unresolved():
                     raise SafetyError("next_trial_requires_recovery")
+                # Keep the receipt's accounting baseline before every fee recorded in
+                # this invocation; sizing and cash baseline use accounting AFTER booking.
+                receipt_before = ledger.accounting()
+                known_fees = {row["activity_id"] for row in ledger.fees()}
+                def admit_checkpoint_read(kind, **_):
+                    if ledger.request_budget(time.time(), "read"):
+                        raise SafetyError("fee_checkpoint_budget_exhausted")
+                window_start = (previous.get("fee_window_start", previous["started_at"])
+                                if previous is not None else time.time())
+                checkpoint = fee_checkpoint(key, secret, after=fee_window_start({"fee_window_start": window_start}),
+                                            before_request=admit_checkpoint_read, request_observer=responses.append)
+                ledger.record_fees(checkpoint["fees"], time.time())
+                now = time.time()  # trial must start after its checkpoint's reserved GETs
                 scan = load_scan(raw, settings, now=now)  # freshness again, at trial start
                 before = ledger.accounting()
                 equity = limits.capital_usd + before.realized_pnl_usd
@@ -714,25 +763,27 @@ def command_paper(args):
                 plan = build_plan(settings, limits, scan, session_plan, trial_id=args.trial, evidence_class="PAPER",
                                   t0=now, equity=equity, engine_leverage_multiple=multiple)
                 ledger.begin_next_trial(now, args.trial)
-            except SafetyError as exc:
+            except (SafetyError, TransportError) as exc:
                 return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                    config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
-            baseline = Decimal(observation["account"]["cash"]) - before.cash_delta_usd
+            baseline = Decimal(checkpoint["account"]["cash"]) - before.cash_delta_usd
             # The engine's next_trial_cash_mismatch quantity, kept as an observation: the
             # baseline is per trial, so activity between mover trials (e.g. another lane on
             # a shared account) is recorded here instead of refusing the trial.
             inter_trial = (None if previous is None or previous.get("baseline_cash") is None else
-                           Decimal(observation["account"]["cash"])
+                           Decimal(checkpoint["account"]["cash"])
                            - (Decimal(previous["baseline_cash"]) + before.cash_delta_usd))
             history = list((previous or {}).get("history", []))
             metadata = {"lane": "mover", "protocol": PROTOCOL_ID, "trial_id": args.trial, "config_sha256": config_sha,
                         "scan_sha256": scan_sha, "symbols": list(plan.symbol_names()),
                         "shared_account_override": bool(args.allow_shared_account),
                         "started_at": (previous or {}).get("started_at", now), "current_trial_started_at": now,
+                        "fee_window_start": window_start,
                         "baseline_cash": format(baseline, "f"), "phase": "starting",
                         "inter_trial_cash_change_usd": None if inter_trial is None else format(inter_trial, "f"),
                         "lane_state": session_state_after(session_plan, equity_end=equity), "history": history}
             save(metadata_path, metadata)
+            fee_window = fee_window_start(metadata)
             controller_close, market_open = _controller_session(close, now, session_policy)
             controller = MoverController(ledger, controller_close, market_open=market_open,
                                          max_entry_notional_usd=settings.max_entry_notional_usd)
@@ -757,6 +808,8 @@ def command_paper(args):
                     required_quote_symbols=list(settings.benchmarks),
                     # As runner.main: from the lane's first trial, so reconcile sees every owned intent.
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
+                    # The fixed checkpoint window, shared by every trial of this lineage.
+                    fee_history_start=fee_window,
                     extended_hours_allowed=session_policy["extended_hours"],
                     include_margin=limits.leverage is not None))
 
@@ -789,10 +842,11 @@ def command_paper(args):
 
             outcome = asyncio.run(execute())
             receipt = build_receipt(plan=plan, outcome=outcome, config_sha256=config_sha, scan=scan, ledger=ledger,
-                                    ledger_before=before, prefixes=prefixes, preflight=summary,
+                                    ledger_before=receipt_before, prefixes=prefixes, preflight=summary,
                                     extra={"shared_account_override": bool(args.allow_shared_account),
                                            "inter_trial_cash_changed": (None if inter_trial is None else
-                                                                        abs(inter_trial) > Decimal("0.01"))})
+                                                                        abs(inter_trial) > Decimal("0.01"))},
+                                    fees_recorded=[row for row in ledger.fees() if row["activity_id"] not in known_fees])
             phase, exit_code = trial_phase_and_exit_code(receipt)
             after = ledger.accounting()
             equity_end = limits.capital_usd + after.realized_pnl_usd
@@ -850,6 +904,9 @@ def command_recover(args):
             controller_close, market_open = _controller_session(close, time.time(), session_policy)
             controller = MoverController(ledger, controller_close, market_open=market_open,
                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+            # Reuse the checkpoint window; legacy residuals keep their original trial window.
+            fee_window = fee_window_start(metadata)
+            known_fees = {row["activity_id"] for row in ledger.fees()}
             # #215: only the benchmark quotes gate the recovery transport; each owned
             # symbol's freshness gates its own exit (recovery.recover).
             controller.port = controller.bind(AlpacaPaperTransport(
@@ -859,10 +916,13 @@ def command_recover(args):
                 request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                 feed=config["feed"], required_quote_symbols=list(settings.benchmarks),
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
+                fee_history_start=fee_window,
                 extended_hours_allowed=session_policy["extended_hours"], include_margin=include_margin))
             result = asyncio.run(recover_mover(controller, metadata, trial_config))
             result.update(kind="mover_recovery_receipt", protocol=PROTOCOL_ID, evidence_class="PAPER",
-                          trial_id=metadata["trial_id"])
+                          trial_id=metadata["trial_id"],
+                          fees_recorded=fee_receipt([row for row in ledger.fees()
+                                                     if row["activity_id"] not in known_fees]))
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata.update(phase=phase, status=result["status"], recovered_at=time.time())
             save(metadata_path, metadata)

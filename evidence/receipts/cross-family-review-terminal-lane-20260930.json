@@ -7,18 +7,18 @@
     "omniroute",
     "claude-code"
   ],
-  "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 242 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (47 and 47 passes, each with eight end-to-end cases and six in-process latch tests, among them a SIGTERM at every line of the probe's resource lifecycle) and 14 mutants (seven per probe; each unmutated probe passes all six cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun gives the counts recorded in 2026-09-28), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at every line of the resource lifecycle, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock.",
+  "claim": "On 2026-09-30 nine read-only jobs of the packaged Codex lane reviewed the four merged pull requests of the terminal lane (#484 tab titles and alert probes, #498 login-shell contract, #510 repository-carried defaults, #519 the model's own push notification): model gpt-6.1-sol at effort max through the local OmniRoute gateway, Codex CLI 0.159.2, every job exit 0. They returned 46 findings (3 high, 34 medium, 9 low; 41 with a command the reviewer ran). An independent Claude verifier (Opus, effort max, read-only) graded 23 of them (17 confirmed, 4 partly, 2 refuted); 11 are duplicates of a graded finding, 12 were checked by the coordinator against the code or the upstream source. 39 findings led to a repair, 2 were refuted (the client runs identical command hooks once; a terminal's permission notification is timed by inactivity, the fixed-delay timer being the Agent SDK path), 3 concern a code path that no longer exists (the second-distro target) and 2 duplicates of one convention were kept (the host id in receipts). Each repair has a check that fails without it: 259 unit tests in the five affected modules, 27 controls and 15 mutants (and the unmutated script) for the settings-swap tool, 11 reader mutants, selftests of the two pty probes (49 and 49 passes, each with eight end-to-end cases and eight in-process tests, among them a SIGTERM at each line a dry run reaches in the end-to-end cases) and 22 mutants (eleven per probe; each unmutated probe passes all eight cases) showing that each guard's removal fails exactly its cases, the colour counter (28 cases; a native rerun on the installed client shows the pattern recorded in 2026-09-28, no truecolor sequence without COLORTERM and no 256-colour sequence with it, with other exact counts), the login-shell controls (11 homes) and the practice repository's profile check (29 cases); the scrub probe and the PATH digest were rerun natively (19 real-home names unchanged; 13 entries). The first wave used 24.47M input tokens (95.0% cache reads) and 0.36M output tokens in 71 minutes of wall clock and four points of the gateway pool's hundred. One bounded re-check of the repairs followed (three jobs of the same model, one of cx/gpt-6-astra-ultra, all exit 0): 33 findings (1 high, 24 medium, 8 low), 12 duplicates, 2 coordinator checks and 19 graded by Claude verifiers (16 confirmed, 3 partly, none refuted); every one was repaired in a fifth round, which found that several first repairs were incomplete or wrong (a false recovery claim in the settings-swap tool, signal handling that still left the client behind, controls that could not fail, two claims with no recorded rerun). The re-check used 17.47M input tokens (96.0% cache reads) and 0.18M output tokens in 46 minutes of wall clock. A final read of the re-check's repairs followed (three jobs of gpt-6.1-sol and three of cx/gpt-6-astra-ultra, effort max, all exit 0): 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran), 16 duplicates and 21 graded by Claude verifiers (17 confirmed, 4 partly, none refuted); all 37 were repaired in one round: the probes' signal handling was rebuilt around a latch and is tested by a signal at each line a dry run reaches, the tmux probes verify their server is gone by its identity before removing the socket, the scan's and the landscape comparison's readers were completed, the colour counter follows the pinned terminal parser, and the documentation says what each check proves. The final read used 26.26M input tokens (95.7% cache reads) and 0.33M output tokens in 50 minutes of wall clock. After the merge of those repairs one more read followed, by one read-only Claude Opus agent (effort max, no shell) on the signal handling and shutdown code only, because the gateway pool's one usable account was at 83 of 100 points: 11 findings (3 medium, 8 low), each verified by a measurement or by reading before it was repaired in one round: the pty probes now end BY a latched signal instead of exiting 128 plus its number (a shell loop goes on after an exit 130 and stops after a death by SIGINT, measured), the sweep observes the spawn guard, the documents state the sweep's real coverage, an inherited SIG_IGN stays ignored, typing stops at a latched signal, and a third tmux control only the command-line check of the identity can fail.",
   "limitations": [
     "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). No live Windows Terminal or interactive Claude Code session was run: the reviewers and the verifiers read code, upstream sources and ran scripts, synthetic homes and private tmux servers; the bell, the tab icon and focus reports in Windows Terminal remain unobserved.",
     "One review family (GPT-6: gpt-6.1-sol in all three reads and cx/gpt-6-astra-ultra beside it in the re-check and the final read, effort max: the gateway may clamp the outbound effort for a model its registry does not know, which was not observable) and one verifier family (Claude Opus). The jobs did not see each other's findings, and the verifiers saw the reviewers' evidence, so the graded findings of the three passes (23, 19 and 21) are not blind grades. Findings the reviewers did not raise are not covered: this is a sample of what a second family finds, not an audit.",
     "Twelve findings of the first wave and two of the re-check were checked by the coordinator, not by a verifier (of the twelve: eight against the code or upstream source, three concerning the removed second-distro target, one convention). The removed target's code was not run before it was removed.",
-    "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Two further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; each repaired in one round); the last round's repairs were checked by controls, mutants, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
-    "Residuals of the final round: a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor.",
+    "The repairs were made and checked by the coordinator (a Sonnet 5.5 session). Three further reads followed the first round of repairs (a re-check: 33 findings; a final read: 37 findings; a one-lens Claude Opus read after the merge: 11 findings; each repaired in one round); the last round's repairs were checked by controls, 22 mutant runs, a signal sweep and native reruns and were not read again by a reviewer when this receipt was recorded, and their residuals are listed in the decision record. The recorded values in the four older receipts come from the earlier versions of the scripts (their hashes are in those receipts) and each of them now carries a correction limitation.",
+    "Residuals of the last round: the lines after the prompt is typed are not swept (110 of 160 lines with code are for the alert probe, 123 of 186 for the push probe); signals pending together run their handlers in ascending number, so the first signal wins only one dispatch apart; a kill by pid after the tmux identity check has a gap that pidfd_open would close; SIGHUP is covered in process only; the tmux probes install no signal handler; a save between the settings-swap tool's last comparison and the rename is still lost and is in neither file; the scan cannot resolve a minified name by scope or see a later `.push` (stated, not triggered by the three release binaries); the login-shell scripts' nonce and answer lines are not authenticated against a startup file that replays the `-c` string (they guard against accidental output, not a hostile startup file); the second model of the re-check and of the final read is a second GPT-6 model, not another vendor, and the post-merge read is a single Claude Opus reader without a shell: it read code and documents and ran nothing.",
     "Some claims rest on source reading only and were not run: the remote-workspace branch of the PushNotification tool (installed client 2.1.285, `CLAUDE_CODE_REMOTE` or a thin-client session), Windows Terminal's parent order of profiles.defaults and fragment profiles (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`), and Tab.cpp's two-second indicator timer for a focused tab.",
     "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave, 11 after it, 22 after the re-check, and 36 before and 52 after the final read; other sessions may have used points in between."
   ],
   "evidence_class": "independent observation: a second model family (gpt-6.1-sol through the packaged Codex lane on the local OmniRoute gateway) reviewed merged changes; Claude verifiers and the coordinator graded the findings; the repairs are checked by scripts run on this host",
-  "recorded_at_utc": "2026-09-30T17:26:16Z",
+  "recorded_at_utc": "2026-10-01T00:09:56Z",
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
     "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
@@ -333,6 +333,25 @@
         "review.json": "174be98b715fb4a5c0229822b51d142bf54fc4d2919455d0aa413ddf2c1a0531"
       }
     },
+    "post_merge_read": {
+      "reviewer": "one evidence-reviewer agent (Claude Opus, effort max), read-only, no shell",
+      "base": "origin/main 29458b43, which contains pull request #552",
+      "subagent_tokens": 236557,
+      "tool_uses": 27,
+      "duration_seconds": 1220,
+      "findings": {
+        "total": 11,
+        "by_reviewer_severity": {
+          "medium": 3,
+          "low": 8
+        },
+        "by_disposition": {
+          "repaired": 10,
+          "documented": 1
+        }
+      },
+      "gateway_pool_points_used": 0
+    },
     "findings": {
       "total": 46,
       "by_reviewer_severity": {
@@ -372,7 +391,7 @@
       "review.json": "174be98b715fb4a5c0229822b51d142bf54fc4d2919455d0aa413ddf2c1a0531"
     },
     "repair_checks": {
-      "all_30_commands_exit_0": true,
+      "all_35_commands_exit_0": true,
       "unit_tests": {
         "modules": [
           "test_adoption_status",
@@ -381,7 +400,7 @@
           "test_render_config",
           "test_apply_claude_settings"
         ],
-        "ran": 242,
+        "ran": 259,
         "result": "OK (skipped=1)"
       },
       "notification_type_scan_per_release": {
@@ -389,19 +408,29 @@
           "catalog_spread_name_length": 3,
           "array_assignments_found": 1,
           "base_size": 15,
-          "matcher_values": 17
+          "matcher_values": 17,
+          "retained_from_the_earlier_record_pass": true
         },
         "2.1.284": {
           "catalog_spread_name_length": 3,
           "array_assignments_found": 1,
           "base_size": 15,
-          "matcher_values": 17
+          "matcher_values": 17,
+          "retained_from_the_earlier_record_pass": false
         },
         "2.1.285": {
           "catalog_spread_name_length": 3,
           "array_assignments_found": 1,
           "base_size": 15,
-          "matcher_values": 17
+          "matcher_values": 17,
+          "retained_from_the_earlier_record_pass": false
+        },
+        "2.1.286": {
+          "catalog_spread_name_length": 3,
+          "array_assignments_found": 1,
+          "base_size": 15,
+          "matcher_values": 17,
+          "retained_from_the_earlier_record_pass": false
         }
       },
       "scan_reader_mutants": "11 mutants, 0 problems",
@@ -416,32 +445,60 @@
       "tmux_sync_probe": {
         "mode_2026_pairs_with_terminal_features_sync": 3,
         "without": 0,
-        "selftest_shutdown_failure_controls": 2
+        "selftest_shutdown_failure_controls": 3
       },
       "pty_probes_selftests": {
-        "push_notification_probe_passes": 47,
-        "alert_probe_passes": 47,
+        "push_notification_probe_passes": 49,
+        "alert_probe_passes": 49,
         "end_to_end_cases_in_each": 8,
-        "in_process_latch_tests_in_each": 6,
-        "sweep_of_a_signal_at_every_line_of_the_resource_lifecycle": {
+        "in_process_tests_in_each": 8,
+        "sweep_of_a_signal_at_each_line_a_dry_run_reaches": {
           "push": {
-            "lines_swept": 120,
-            "client_running_at": 14
+            "lines_swept": 123,
+            "lines_with_code": 186,
+            "lines_up_to_the_spawn_guard": 50,
+            "client_running_at": 17
           },
           "alert": {
-            "lines_swept": 107,
+            "lines_swept": 110,
+            "lines_with_code": 160,
+            "lines_up_to_the_spawn_guard": 45,
             "client_running_at": 15
           }
         },
+        "probe_ends_by_the_signal": true,
         "stand_in_clients_with_a_blocked_signal": 0
       },
       "pty_probe_mutants": {
-        "alert_probe": "8 runs (the unmutated probe and 7 mutants), 0 problems",
-        "push_notification_probe": "8 runs (the unmutated probe and 7 mutants), 0 problems"
+        "alert_probe": "12 runs (the unmutated probe and 11 mutants), 0 problems",
+        "push_notification_probe": "12 runs (the unmutated probe and 11 mutants), 0 problems"
+      },
+      "post_merge_measurements": {
+        "shell_loop_control": "a bash loop went on after an exit 130 and stopped after a death by SIGINT",
+        "signal_order_probe": "handlers of signals pending together ran in ascending signal number",
+        "tmux_identity_mutant": "the unmutated selftest passes and the mutant without the command-line clause is caught (bell and sync)"
       },
       "colour_counter": {
         "selftest": "28 cases, 0 problems",
-        "native_rerun_matches_the_2026_09_28_counts": true
+        "native_rerun": {
+          "client": "2.1.286",
+          "without_colorterm": {
+            "truecolor": 0,
+            "colour_256": 35
+          },
+          "with_colorterm_truecolor": {
+            "truecolor": 39,
+            "colour_256": 0
+          },
+          "same_pattern_as_2026_09_28": true,
+          "exact_counts_equal_2026_09_28": false
+        }
+      },
+      "environment": {
+        "python": "Python 3.13.15",
+        "tmux": "tmux 3.4",
+        "claude_on_path": "2.1.286 (Claude Code)",
+        "base_commit": "29458b4342422c979ad3b9bc62532ea6f05073c1"
       },
       "login_shell": {
         "controls": "11 homes as expected",
@@ -462,8 +519,8 @@
           "variable_stock_home": 27,
           "variable_real_hand_off_file": 26
         },
-        "real_tmp_top_level_entries_of_no_counted_kind_new_during_the_run": 2,
-        "client": "2.1.285 (Claude Code)"
+        "real_tmp_top_level_entries_of_no_counted_kind_new_during_the_run": 1,
+        "client": "2.1.286 (Claude Code)"
       },
       "codex_strict_check": {
         "selftest": "5 checks",
@@ -494,8 +551,11 @@
       "merge_partials.py": "fadeda230050101f04154f0524f007b7716bec22d46cbcbfd8df493e36effd6d",
       "record_sanitizer.py": "bd1a1556ca56c662257aa24591a78d6c3858f16ea53e2b13f6e330dc014b820d",
       "sanitize_results.py": "d246468fcdc7cf0e5ff5ef2176285c0bf540b516ef1d750000c492b9bc8c241a",
+      "shell_loop_control.py": "fd5ee47cfd1533b89171dc8ec3d1643252f54aa088518e5ca4424bf91c91cce1",
+      "signal_order_probe.py": "519a9ce1164dfa92e7a9f89bea89af748fbb6c23a8adcc53188bceb98c56a5cf",
       "stage_review_lane.py": "f921b25c18e7ae24004133c8d5b29f8d1979c68543ff2fa3a2a086ef535cd3d9",
-      "tmux_sync_probe.py": "46cd411c71433334d466066db918f8155168045461c86c794ecacdac5a0f9be1"
+      "tmux_identity_mutant.py": "5ba3fc0c481c4c1b00e28b747bb064e3627c89b8c635d180639cfd173b934fcd",
+      "tmux_sync_probe.py": "b4bb1d85e5e37d116aca343c523b6a0cf81c1475f83e5ea106f7e1103e6658ee"
     },
     "record_files_sha256": {
       "results.json": "2627ad7cf6dd0a60c998e7741b9db45512dd928a6f2a7cd1ae3e6c9658ee5cac",
@@ -511,15 +571,17 @@
       "final-findings.json": "acbe022b9db62c2901f7584f983eaed51600df2a9b9e4f1dc1881ce3598e970e",
       "final_prompts_sha256.txt": "9591a7273ff9f2688e8d0e5c1edb145442afd477754169d2a69153b390dd6f1b",
       "final_dispositions.json": "d1a46e7738ba652a719d49d3530f526f7d27e001342069999141045a5fce6902",
-      "final_units.json": "c511dbe6785857c9699bf12e67e59c89706ad0b1efde866612c8519ea882c160"
+      "final_units.json": "c511dbe6785857c9699bf12e67e59c89706ad0b1efde866612c8519ea882c160",
+      "post-merge-read.json": "f5a3a9acadeaa9a77c831d081279409cd69c3aa571ec81c77fd3f93f51f31679"
     },
     "recorded_outputs_sha256": {
-      "alert_probe_selftest.txt": "4508ae6b2e14d6e34c8db7ff5c780fd9877101d281c0961852f4eae1531b5566",
-      "codex_tui_strict_check.txt": "20256f043411a03d93024af671b02c02f9708facd5c9004f09fbb46b2306912c",
+      "alert_probe_selftest.txt": "6c7dce708bf2e22b941776014475956e65d9cd74099092ebf0372e20d1149147",
+      "codex_tui_strict_check.txt": "0fe9d235c8c2aaf4209ca4179cc29218fc7afcf7258477fc1b3a48a4d5dd0428",
       "codex_tui_strict_check_selftest.txt": "3b6b2c35d2a7aa383fc07cc9a019e52a07e25f39ff5291811f134fab6b585ca4",
-      "color_capture.txt": "c13429c5f467b74f3d5c041600483eda2c07c8459148b903e1095d657fee89d6",
+      "color_capture.txt": "2f9c6a617425475a6b3dafbe9f0b1dccd2dd1d606a6dead6bef64c6d67d95003",
       "color_capture_selftest.txt": "ccf6e9224a86d18de3cf2d504c0e51c3970f84338a2aafd983da04931fac304b",
-      "exit_codes.txt": "d8d815860fc5b7e9125e1c3e0f64560fdfaf571ed2f3f20215ad0a6dd6aab438",
+      "environment.txt": "60c59684c98a5ff763ef5501ffae5a49b2832805dccc6349d4d7e84683bcca94",
+      "exit_codes.txt": "f5ae410d9877bf1bb8cbcdf0c364fb8a7951bf7415e242c8459bd2b03818cc47",
       "landscape_refresh_selftest.txt": "fa31bbe14275d77ce308d35d2ce5639ca3b9fba84c48894af03c2935f6b15119",
       "login_path_digest.txt": "77adba676507e0aa894087002bfc6bdc9a44528340a97644953e70afcf4eafd7",
       "login_path_digest_selftest.txt": "bde9dd2162074409e52b3021263f8c621f841929ef6cdc60b922aae43add0c0c",
@@ -528,24 +590,29 @@
       "notification_types_scan_2.1.283.json": "c37c559072efa00f89505e46e3858ee4020641c031c40ba5244ba6622652120b",
       "notification_types_scan_2.1.284.json": "476226619608eb0e586531b2e8b5267e94d627aada106d5d7d6b030fd6a8badc",
       "notification_types_scan_2.1.285.json": "70da716ac09b5067d39744bbd461851d3c23aa8a222e97f1f046ed579a861835",
+      "notification_types_scan_2.1.286.json": "189aa69dbaa06bf62b34474d173f13fa618b78a5e64ea8fff99e873fe8ee7ccf",
       "overlay_noop_check.txt": "376e04bcb7871f6123c5189ead72210932af975850a96806fa334964d0ae193b",
       "practice_check_terminal_profiles.txt": "a5d6a4547ccf677f1b65d2b289c80304fad79e3ca7048262cb711c9b74cbbdb0",
       "practice_check_terminal_profiles_controls.txt": "b2fbc1a686b60621c6724d3974efcc16bba717dea8575367e0b8312fbc9bf806",
       "practice_doctor_login_shell_path.txt": "d19c1a236ae3a20c35578aee5391594efee1ff00b5099cf0747cf473bc7baeeb",
       "practice_repository_commits.txt": "b3172446dda54bc54afeca61b0cc8f614de34c681e6403c3a0912c20063a84cd",
-      "pty_probe_mutants_alert.txt": "fb7c6ee520cf0369bd1ddef57d32193736f880aba02d5fed1cecc26f9bcca48a",
-      "pty_probe_mutants_push.txt": "fdb7cdb42ac969970abe688cd10e361b5fb64c2fb831af0c9ff0fff2d577ea80",
-      "push_notification_probe_selftest.txt": "3b919eb1bba64c5966d80dde80f8a7b66e5a47da813f8ab8a789c11c218ad524",
+      "pty_probe_mutants_alert.txt": "5bc22c3a72b62e3cf9a7f62854c125d1a56dec8cae8cfc7c37f97c7dc4c1a172",
+      "pty_probe_mutants_push.txt": "393c260dc05a1bf58d31a5d4dfb10374264d7f8fff5fe75c10fbf2389f313bab",
+      "push_notification_probe_selftest.txt": "28c33004f324f5a26dce31ac63aee0250963416ea1091412dbe5797948a4550b",
       "replace_bell_group_controls.txt": "235d3cea35df6ba4679e2406f0ea800d9f954ac9d886478d1bf41fe1347527f1",
       "replace_bell_group_mutants.txt": "308138d176b7b791da1ef0c82e5802dcccb1cb5c1b833c56f9a21444bd819de8",
-      "scan_reader_mutants.txt": "65326735296d2a723fce6bc0915060fbaaa369c45c3d0f7eeaf8d67bf1fe8ed7",
-      "scrub_placeholder_probe.txt": "f5d5b4e7cb8bf4345ab25b566843145b3aaac3f39e71c8f8363ab8f9e0c9f2d2",
+      "scan_reader_mutants.txt": "09a8a0a27ea832ca77ce09f39e64c60e8472e0a05ee68882d41816566e1a5135",
+      "scrub_placeholder_probe.txt": "6f37ce37903e60e95eef4b09249a613172cd44cc4e5840a012d91f4a4941336c",
       "scrub_placeholder_probe_selftest.txt": "9754b24b5328869b9aed58cdcc3253ca022c8ea0872d557a91513554c2c261d8",
+      "shell_loop_control.txt": "fd4c05c85371174fd98f5ca152954ad74cd0b4fc62b10bad9cce792084b0286f",
+      "signal_order_probe.txt": "f39776a4d9f93babd14e36cccb82fc4d214e50b999424c4ce244072d5fd90475",
       "tmux_bell_probe.txt": "f66422aef1845a2f80bd0943cf815ace8dec09accd1a0387b6e2236192c122b4",
-      "tmux_bell_probe_selftest.txt": "ac339b9a2e4e06b6a6a74ef6f18f9d9d9446ea32505ef44ed4d309f16807ee78",
+      "tmux_bell_probe_selftest.txt": "de0eabd3a559de8b1b1eddc8718ba200c9e7404530f7ddc131fdab8dcc80ec74",
+      "tmux_identity_mutant_bell.txt": "92917d93eda823384de22bfa3e800c5d94f44ff3c68b4d6b22d314b0245bc3e6",
+      "tmux_identity_mutant_sync.txt": "b0af07b70470386fff3107d27783f0673c167c5e41e137fe179f8882f9e71c4f",
       "tmux_sync_probe.txt": "224e7a72c24285d17b44f7e867adf2f18eb1d475a776b972173d84427f1de654",
-      "tmux_sync_probe_selftest.txt": "f6dfb138e3ba789c3c722657e6a5f13b00226fe87e7a109840ee1d02866d542d",
-      "unit_tests.txt": "42a5c07a92a8cdb98294b07ae070e9ee944e490f83ed90936c7204f584aae7dd"
+      "tmux_sync_probe_selftest.txt": "b6c68ddcd146a3a6cd9cb4065d8896a26e2b3f871b605c1f95928477115be3cf",
+      "unit_tests.txt": "2ad64fa82f7c6dbaa822f21c11934baa774fb0a4a4b47c6fbdaac4fc61363716"
     },
     "commands": [
       "python3 -B stage_review_lane.py <checkout> <host file> <work dir> cx/gpt-6.1-sol 8 http://127.0.0.1:20128/v1",
@@ -556,7 +623,9 @@
       "python3 -B build_recheck_record.py <consolidated.json> ... --journals <journal.jsonl> ... --out <artifact directory>",
       "python3 -B build_final_prompts.py <checkout at the merged main> <out> (three lenses, each run on cx/gpt-6.1-sol and on cx/gpt-6-astra-ultra), codex_call.sh start|wait|result, python3 -B merge_partials.py, python3 -B make_final_briefs.py <consolidated.json> <units.json> <out> <checkout>; Workflow (agentType stack-verifier, model opus, effort max) over the briefs; python3 -B build_final_record.py <consolidated.json> --journals <journal.jsonl> --out <artifact directory>; python3 -B check_receipt_hashes.py <checkout> <receipt id>",
       "python3 -B make_verify_briefs.py; Workflow (agentType stack-verifier, model opus, effort max) over the briefs; python3 -B build_findings_record.py",
-      "the 30 commands of recorded/exit_codes.txt (the two signal-case mutant runs are timing-sensitive: they were run after the others with none of this session's other commands running, the two probes in parallel; other sessions' jobs were on the host)"
+      "the installed releases at the time (2.1.284, 2.1.285, 2.1.286; the 2.1.283 binary was pruned from the host, its scan is retained from the earlier record pass and is not listed in exit_codes.txt): python3 -B notification_types_scan.py <release binary> <checkout>; python3 -B scan_reader_mutants.py <checkout> <the three installed release binaries>",
+      "the 35 commands of recorded/exit_codes.txt (the two signal-case mutant runs are timing-sensitive: they were run with none of this session's other commands running, the two probes in parallel, and their output was moved into recorded/; other sessions' jobs were on the host)",
+      "one evidence-reviewer agent (Claude Opus, effort max, read-only) over the signal and shutdown code; python3 -B shell_loop_control.py; python3 -B signal_order_probe.py; python3 -B tmux_identity_mutant.py <checkout> bell|sync"
     ],
     "upstream_sources": "docs/decisions/2026-09-28-terminal-experience.md (Update 2026-09-30)"
   }
