@@ -4005,8 +4005,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "48948e05387c020d4765da068e358f4d3e2d753efce97852c81feded64d1aaca",
-      "bytes": 54125
+      "sha256": "42327b8373ad0d9d41e79458b917dc2858f4bb26485336b835fbd07dab3fd901",
+      "bytes": 54160
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -4239,6 +4239,11 @@
       "bytes": 4458
     },
     {
+      "path": "adoption/templates/decision-routing.md",
+      "sha256": "217ef8f17ffe258876268c244381555710b544ce8fc6589ed03932a6de32137f",
+      "bytes": 606
+    },
+    {
       "path": "adoption/templates/project.codex.config.template.toml",
       "sha256": "cf8adbabcd3db19ed32f53d9868e98bbb3b774cb6d1a7f2ab3e709a930ae227e",
       "bytes": 2701
@@ -4285,8 +4290,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "604cf8a27efd6ef1f7e8ce8c6859c6274048dba42f10b74d9c9f965b19396977",
-      "bytes": 26507
+      "sha256": "af2e9b2451443af8d7b71be1827c4bfb8261d675216e63542d24a341ca7032c1",
+      "bytes": 31028
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -15305,6 +15310,11 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
+      "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
+      "bytes": 8312
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15436,8 +15446,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5fe2b39c0dbe963dff7e79f6eb2a64d5462b482b6fdfd77968302db36edca5fe",
-      "bytes": 109687
+      "sha256": "f113311a82e24cd0e3308cf5ebaacce81a135fa636ee108094b241e706c0e52e",
+      "bytes": 110665
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -46115,6 +46125,11 @@
       "bytes": 2827
     },
     {
+      "path": "tests/test_bootstrap_full_profile.py",
+      "sha256": "3f6446d2fdaaa63924a25ed841d8fcd36899146ca71b667f5e5ba0792497038a",
+      "bytes": 41101
+    },
+    {
       "path": "tests/test_bootstrap_integrity_drivers.py",
       "sha256": "5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a",
       "bytes": 14613
@@ -46433,6 +46448,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_managed_block.py",
+      "sha256": "65191a29f502605e296fdd924c38f889ea6bda4c239674fd1b5f14352a2c9bdc",
+      "bytes": 28016
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -46898,6 +46918,11 @@
       "path": "tools/adoption/install_skills.py",
       "sha256": "407ffb4c470cbb06b70e518159e40530424511c2d8189b1c8bdf5a0421e8115e",
       "bytes": 40516
+    },
+    {
+      "path": "tools/adoption/managed_block.py",
+      "sha256": "73c4d9ffaed0c7c17f1cc4d573c2cd0337a8907ed2361c60c26fbff36bd5106e",
+      "bytes": 21251
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
