@@ -19,13 +19,13 @@ from core import driver
 from core import formulas as FM
 from core import identity, plan
 from core.calendar import year_of
-from core.canon import dumps, sha256_bytes, sha256_file
+from core.canon import dumps, sha256_bytes
 from core.coverage_rule import (checked_thresholds, fetch_margin, identity_limited, item_rule, probe_decision,
                                 rule_sha256, year_decision)
 from core.fills import fill_at
 from core.params import FETCH, SAMPLING, T
 from core.records import MERGER_TYPES
-from core.store import SealError, Store
+from core.store import Store, checked_run_identity, recover_seal
 from pinned.sessions_io_copy import official_price
 
 PART1_RANGE = ("2016-01-04", "2020-12-31")
@@ -464,33 +464,32 @@ def dry_run_requests(cal, sessions: list, symbols: list) -> list:
     return out
 
 
-def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root, fetch_date: str,
+def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root, utc_start: str, run_identity: dict,
             clock=driver.utc_now, progress: dict | None = None) -> dict:
     """freeze_preconditions: the native dry run through core/driver.py and the transport, sealed, re-read from the
     seal and counted (counts only; run.py dry-run writes the output with its run-log line). progress, when given,
     receives the snapshot sha256 as soon as it is sealed, so a run that fails afterwards still logs it (review round
-    12, F3)."""
+    12, F3).
+
+    A snapshot already sealed under <snapshot_root>/dry-run (a run that failed or was killed after its seal) is
+    adopted without fetching only through core.store.recover_seal (review round 18, R5, and its repair): its seal
+    record verifies the ledger and pages (G-H), and its binding names the running study tree, protocol and runtime
+    lock (run_identity; H1, so a tree whose fetch plumbing never ran cannot take another tree's seal), the sessions,
+    the symbols and the request plan. utc_start, the fetch start, is bound beside that identity and read back from
+    the seal into the output (fetch_utc_start), never matched (M1): a retry on a later UTC day adopts the seal."""
     reqs = dry_run_requests(cal, sessions, symbols)     # refuses before any fetch (review round 11, C1)
-    store, sha = Store(), None
+    if not isinstance(utc_start, str) or not utc_start:
+        raise ValueError("the dry run needs its fetch start (utc_start)")
     root = Path(snapshot_root) / "dry-run"
-    # core.holdout.collect's recover-if-matching pattern (803bc351): validate before adopting a seal or fetching.
-    seal_identity = {"sessions": list(sessions), "symbols": list(symbols), "fetch_date": fetch_date,
-                "requests": sorted(plan.record(r) for r in reqs)}
-    if (root / "ledger.jsonl").exists():
-        sha = sha256_file(root / "ledger.jsonl")
-        try:
-            store = Store.read(root, sha)
-        except (OSError, ValueError, KeyError, EOFError) as exc:
-            raise SealError("dry-run snapshot is invalid or partially written") from exc
-        if store.binding != {"identity": seal_identity}:
-            raise SealError("dry-run snapshot binding differs from the requested dry run")
-        if store.request_records() != seal_identity["requests"] or set(store.state) != set(store.req):
-            raise SealError("dry-run snapshot is partially written: requests or completion stamps differ")
-    elif (root / "pages").exists():
-        raise SealError("dry-run snapshot is partially written: cannot overwrite or fetch it again")
-    if sha is None:
-        driver.stage_fetch(lambda st: reqs, transports, store, fetch_date, clock=clock)
-        sha = store.write(root, binding={"identity": seal_identity})
+    seal_identity = {**checked_run_identity(run_identity), "sessions": list(sessions), "symbols": list(symbols),
+                     "requests": sorted(plan.record(r) for r in reqs)}
+    recovered = recover_seal(root, seal_identity, "dry-run", extra=("utc_start",))
+    if recovered is None:
+        store = Store()
+        driver.stage_fetch(lambda st: reqs, transports, store, utc_start[:10], clock=clock)
+        sha = store.write(root, binding={"identity": seal_identity, "utc_start": utc_start}, seal_record=True)
+    else:
+        sha = recovered[1]
     if progress is not None:
         progress["dry-run"] = sha
     return dry_run_output(snapshot_root, sha, sessions, symbols)
@@ -498,9 +497,12 @@ def dry_run(cal, sessions: list, symbols: list, transports: dict, snapshot_root,
 
 def dry_run_output(snapshot_root, sha: str, sessions: list, symbols: list) -> dict:
     """The dry-run output from its sealed snapshot alone (review round 15, N02 / R14-open-2: run.py dry-run
-    recomputes it to adopt an output that a hard kill left with no run-log line)."""
+    recomputes it to adopt an output that a hard kill left with no run-log line). fetch_utc_start is the fetch start
+    the seal's binding holds (review round 18 repair, M1), provenance metadata rather than market data; None for a
+    seal without one."""
     sealed = Store.read(Path(snapshot_root) / "dry-run", sha)
-    return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha, "sessions": list(sessions),
+    return {"kind": "mover_v3_dry_run_output", "snapshot_sha256": sha,
+            "fetch_utc_start": (sealed.binding or {}).get("utc_start"), "sessions": list(sessions),
             "symbols_count": len(symbols), "counts": dry_run_counts(sealed),
             "incomplete_by_kind": sealed.incomplete_by_kind(), "measured": dry_run_measured(sealed)}
 

@@ -203,8 +203,10 @@ def cmd_dry_run(a) -> int:
     tr = transports(ctx["protocol"])                     # the pinned rate limit, before any fetch (C2)
     start, status, digest, out, progress = clock(), "failed", None, None, {}
     try:
-        out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start[:10], clock=clock,
-                                 progress=progress)
+        # review round 18 repair (H1, M1): the seal binds this tree, protocol and runtime lock, and keeps the fetch
+        # start beside them, read back (never matched) when a later run adopts the seal
+        out = count_only.dry_run(cal, sessions, symbols, tr, a.snapshot_root, start, runner.seal_run_identity(ctx),
+                                 clock=clock, progress=progress)
         out.update({"study_tree": ctx["tree"], "code_revision": ctx["commit"]})
         digest = atomic_write_results(out_path, out)
         status = "complete"
@@ -274,7 +276,8 @@ def cmd_transport_check(a) -> int:
         # review round 15, N02 (R14-open-2): each live sample is sealed under live_root before the check is computed
         # from the seals, and a sample sealed by a killed run is read, never drawn again
         res = transport_check.reproduction_check(ST.planner(spec), store, tr, changed, "fetch", seed=seed,
-                                                 holdout_stores=hstores, live_root=live_root, clock=clock)
+                                                 holdout_stores=hstores, live_root=live_root, clock=clock,
+                                                 run_identity=runner.seal_run_identity(ctx))
         res.update(meta)
         digest = atomic_write_results(out_path, res)
         status = "complete"
