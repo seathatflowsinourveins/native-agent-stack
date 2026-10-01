@@ -1,0 +1,957 @@
+{
+  "adapter_errors": [],
+  "average_invariant_mismatches": [],
+  "callback_faults": [],
+  "config_sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+  "error_reason": null,
+  "error_type": null,
+  "events": [
+    {
+      "applied": [],
+      "expired_on_arrival": [],
+      "halted": [],
+      "sha256": "49d91e362b551176e4c02e1ff32c5e870c6badd65b562b8526237f792ce2be80",
+      "status": "seeded",
+      "type": "halt_seed"
+    },
+    {
+      "ask": "3.11",
+      "at": 1790713174.5435848,
+      "client_id": "mvr-ext-20260929-3-0000001",
+      "limit_price": "3.12",
+      "qty": 100,
+      "symbol": "BKYI",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "ask": "40.36",
+      "at": 1790713174.5435848,
+      "client_id": "mvr-ext-20260929-3-0000002",
+      "limit_price": "40.56",
+      "qty": 24,
+      "symbol": "BEX",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-3-0000001",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-ext-20260929-3-0000002",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "BEX",
+      "type": "intent"
+    },
+    {
+      "at": 1790713199.7093956,
+      "reason": "entries_not_enabled",
+      "symbol": "IOVA",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790713199.7093956,
+      "reason": "entries_not_enabled",
+      "symbol": "NCPL",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790713199.7093956,
+      "reason": "entries_not_enabled",
+      "symbol": "SSTI",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790713274.7337663,
+      "reason": "controller_stop",
+      "type": "mover_force"
+    },
+    {
+      "at": 1790713274.7337663,
+      "reason": "controller_stop",
+      "symbol": "BKYI",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790713274.7337663,
+      "reason": "controller_stop",
+      "symbol": "BEX",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790713275.4921901,
+      "bid": "3.12",
+      "client_id": "mvr-ext-20260929-3-0000003",
+      "limit_price": "3.11",
+      "qty": 100,
+      "reason": "controller_stop",
+      "symbol": "BKYI",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-3-0000003",
+      "reason": "controller_stop",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "at": 1790713283.042564,
+      "bid": "40.2",
+      "client_id": "mvr-ext-20260929-3-0000004",
+      "limit_price": "40.00",
+      "qty": 24,
+      "reason": "controller_stop",
+      "symbol": "BEX",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-3-0000004",
+      "reason": "controller_stop",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "BEX",
+      "type": "intent"
+    }
+  ],
+  "evidence_class": "PAPER",
+  "execution_stats": {
+    "activity_executions_booked": 0,
+    "activity_fill_reconciliations": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "executions_booked": 6,
+    "fill_events_missing_execution_fields": 0,
+    "open_fill_gaps_at_stop": 0,
+    "startup_fill_reports": 0
+  },
+  "exit_parameters": {
+    "rule": "X2",
+    "x1_flatten_at_et": "15:58",
+    "x2_hold_seconds": 3600,
+    "x3_trail_fraction": "0.85",
+    "x4_stop_fraction": "0.85",
+    "x4_target_fraction": "1.50"
+  },
+  "exit_rule": "X2",
+  "flat": true,
+  "force_at": "2026-09-29T20:21:14.733766+00:00",
+  "force_reason": "controller_stop",
+  "foreign_terminal_orders_ignored": 0,
+  "halts": {
+    "halted_now": [],
+    "last_status": {},
+    "seed": {
+      "applied": [],
+      "bytes": 61047,
+      "expired_on_arrival": [],
+      "expiry": {},
+      "fetched_at_ns": 1790713166452477418,
+      "halted": [],
+      "items": 42,
+      "sha256": "49d91e362b551176e4c02e1ff32c5e870c6badd65b562b8526237f792ce2be80",
+      "source": "nasdaq_trade_halts_rss",
+      "status": "seeded",
+      "symbols": [
+        "BEX",
+        "BKYI",
+        "IOVA",
+        "NCPL",
+        "SPY",
+        "SSTI"
+      ],
+      "url": "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
+    },
+    "seeded_only": {},
+    "status_messages": 0
+  },
+  "handoff_to_recovery": null,
+  "inter_trial_cash_changed": false,
+  "kind": "mover_trial_receipt",
+  "ledger_risk": {
+    "drawdown_usd": "19.1100",
+    "halted_reason": null,
+    "lifetime_gross_loss_usd": "113.0600",
+    "lifetime_realized_pnl_usd": "-19.1100"
+  },
+  "limitations": [
+    "Alpaca paper fills are simulated by the broker from quotes; they are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
+    "Exits are marketable limit sells re-priced every exit timeout; stops never rest at the broker, and a gap or halt can fill below the protocol's stop level or leave a sell unfilled until the flatten or recovery.",
+    "One paper session is not a strategy evaluation; the historical study, not this receipt, decides the rule and exit."
+  ],
+  "native": {
+    "dropped_quotes": {
+      "by_reason": {},
+      "by_symbol": {}
+    },
+    "elapsed_seconds": 125.63559000811074,
+    "engine": "NautilusTrader LiveNode 2.0.0rc5",
+    "native_fill_events": 6,
+    "native_quotes": 330,
+    "native_rejections": 0,
+    "orders_submitted": 4,
+    "requests": {
+      "read": 16,
+      "submit": 4
+    },
+    "session_policy": {
+      "extended_hours": true,
+      "overnight_holds": false
+    }
+  },
+  "native_assertions": {
+    "fill_events_carry_execution_fields": true,
+    "no_fill_gap_open_at_stop": true,
+    "overturn_signals": []
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 6,
+    "capital_available": true,
+    "clock": {
+      "is_open": false,
+      "next_close_ns": 1790798400000000000,
+      "next_open_ns": 1790775000000000000,
+      "received_at_ns": 1790713163185686964,
+      "timestamp_ns": 1790713163178422044
+    },
+    "config_sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "1000",
+          "x-ratelimit-remaining": "999",
+          "x-ratelimit-reset": "1790713163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713164"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713164"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790713164"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790713165"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790713165"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790713165"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790713166"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790713163"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713170"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713173"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713174"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713175"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713175"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713175"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713202"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713233"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713233"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713274"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713275"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713275"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713285"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713290"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713291"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713292"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713292"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-29T20:19:23.408765+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "promotion_gate": "not_supplied",
+    "quote_count": 6,
+    "quote_errors": {},
+    "scan_sha256": "1c99588aa6c539794e476c6a1d2b1d0f69045c6ecf260a046e11292cfc8d8c41",
+    "untradable_scan_symbols": []
+  },
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": {
+    "end": {
+      "cash_delta_usd": "-19.11",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "recovery": null,
+    "start": {
+      "checked_by": "runner.validate_preflight and the native adapter's startup snapshot",
+      "flat_account_and_no_open_orders": true
+    }
+  },
+  "rule": "10:00|G20|V1000000|any",
+  "scan": {
+    "age_seconds_at_trial_start": 51.754,
+    "regime_inputs": {
+      "spy_prev_close": "765.61",
+      "spy_rv20": "0.006973347",
+      "spy_rv20_median252": "0.008009177",
+      "spy_sma20": "763.9335"
+    },
+    "scan_time": "2026-09-29T20:18:32+00:00",
+    "session_date": "2026-09-29",
+    "symbols": 5
+  },
+  "scan_sha256": "1c99588aa6c539794e476c6a1d2b1d0f69045c6ecf260a046e11292cfc8d8c41",
+  "schema_version": 1,
+  "section": "paper_e2e",
+  "session": {
+    "drawdown_factor": "1",
+    "drawdown_fraction": "0.003260",
+    "equity_peak_usd": "4991.09",
+    "number": 6,
+    "pause_sessions_remaining_after": 0,
+    "paused": false,
+    "reason": null,
+    "rung": "4"
+  },
+  "shared_account_override": false,
+  "sizing": {
+    "appreciation_allowance": "2",
+    "engine_leverage_multiple": "1",
+    "entry_limit_cap_bps": "50",
+    "exit_headroom_factor": "10",
+    "exit_limit_cap_bps": "50",
+    "gross_budget_usd": "4974.82",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "leverage_L": "4",
+    "max_entry_notional_usd": "1000",
+    "regime_factor": "1",
+    "regime_source": "scan_inputs_recomputed",
+    "sizing_equity_source": "config capital_usd plus the mover ledger's realized P&L",
+    "sizing_equity_usd": "4974.8200"
+  },
+  "status": "passed",
+  "symbols": [
+    {
+      "closed_at": "2026-09-29T20:21:15.960647+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T20:19:34.575888+00:00",
+        "average_fill_price": "3.110000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-ext-20260929-3-0000001",
+        "detail": null,
+        "filled_qty": "100",
+        "fills": [
+          {
+            "at": "2026-09-29T20:19:34.866894+00:00",
+            "price": "3.1100",
+            "qty": "18"
+          },
+          {
+            "at": "2026-09-29T20:19:35.206949+00:00",
+            "price": "3.1100",
+            "qty": "71"
+          },
+          {
+            "at": "2026-09-29T20:19:35.489944+00:00",
+            "price": "3.1100",
+            "qty": "11"
+          }
+        ],
+        "ledger_filled_qty": "100",
+        "ledger_status": "filled",
+        "limit_price": "3.12",
+        "pre_wire_refusal": false,
+        "qty": "100",
+        "reason": "entry",
+        "reference_price": "3.11",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T20:19:34.543585+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "controller_stop",
+      "exit_triggered_at": "2026-09-29T20:21:14.733766+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T20:21:15.521618+00:00",
+          "average_fill_price": "3.120000",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-ext-20260929-3-0000003",
+          "detail": null,
+          "filled_qty": "100",
+          "fills": [
+            {
+              "at": "2026-09-29T20:21:15.924965+00:00",
+              "price": "3.1200",
+              "qty": "100"
+            }
+          ],
+          "ledger_filled_qty": "100",
+          "ledger_status": "filled",
+          "limit_price": "3.11",
+          "pre_wire_refusal": false,
+          "qty": "100",
+          "reason": "controller_stop",
+          "reference_price": "3.12",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T20:21:15.492190+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "100",
+        "buy_notional_usd": "311.00",
+        "flat": true,
+        "realized_pnl_usd": "1.0000",
+        "sell_notional_usd": "312.00",
+        "sold_qty": "100"
+      },
+      "first_fill_at": "2026-09-29T20:19:34.866894+00:00",
+      "last_wait_reason": null,
+      "rank": 1,
+      "realized_pnl_usd": "1.0000",
+      "recovery_exits": [],
+      "running_high": "3.12",
+      "scan": {
+        "dollar_volume_at_t": "304188917.485447109",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "140.476190476",
+        "news_before_t": null,
+        "price_at_t": "4.04"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "3041889.17",
+          "entry_bar_10pct": null,
+          "gross_remaining": "4974.82",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "1",
+        "entry_notional_usd": "994.96",
+        "entry_order_notional_usd": "312.00",
+        "entry_qty_binding": "max_order_qty",
+        "intended_notional_usd": "994.96",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "994.96"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "BKYI"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "entries_not_enabled",
+      "rank": 2,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "182715618.866034985",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "25.022747953",
+        "news_before_t": null,
+        "price_at_t": "13.74"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "1827156.18",
+          "entry_bar_10pct": null,
+          "gross_remaining": "3979.86",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "1000.00",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3979.85"
+      },
+      "skip_reason": "entries_not_enabled",
+      "state": "skipped",
+      "symbol": "IOVA"
+    },
+    {
+      "closed_at": "2026-09-29T20:21:27.076338+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T20:19:34.621602+00:00",
+        "average_fill_price": "40.360000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-ext-20260929-3-0000002",
+        "detail": null,
+        "filled_qty": "24",
+        "fills": [
+          {
+            "at": "2026-09-29T20:19:34.779673+00:00",
+            "price": "40.3600",
+            "qty": "24"
+          }
+        ],
+        "ledger_filled_qty": "24",
+        "ledger_status": "filled",
+        "limit_price": "40.56",
+        "pre_wire_refusal": false,
+        "qty": "24",
+        "reason": "entry",
+        "reference_price": "40.36",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T20:19:34.543585+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "controller_stop",
+      "exit_triggered_at": "2026-09-29T20:21:14.733766+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T20:21:24.759171+00:00",
+          "average_fill_price": "40.200000",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-ext-20260929-3-0000004",
+          "detail": null,
+          "filled_qty": "24",
+          "fills": [
+            {
+              "at": "2026-09-29T20:21:24.888427+00:00",
+              "price": "40.2000",
+              "qty": "24"
+            }
+          ],
+          "ledger_filled_qty": "24",
+          "ledger_status": "filled",
+          "limit_price": "40.00",
+          "pre_wire_refusal": false,
+          "qty": "24",
+          "reason": "controller_stop",
+          "reference_price": "40.2",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T20:21:23.042564+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "24",
+        "buy_notional_usd": "968.64",
+        "flat": true,
+        "realized_pnl_usd": "-3.8400",
+        "sell_notional_usd": "964.8",
+        "sold_qty": "24"
+      },
+      "first_fill_at": "2026-09-29T20:19:34.779673+00:00",
+      "last_wait_reason": null,
+      "rank": 3,
+      "realized_pnl_usd": "-3.8400",
+      "recovery_exits": [],
+      "running_high": "40.3600",
+      "scan": {
+        "dollar_volume_at_t": "72661338.76464197",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "21.502119927",
+        "news_before_t": null,
+        "price_at_t": "40.12"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "726613.38",
+          "entry_bar_10pct": null,
+          "gross_remaining": "2979.86",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "4",
+        "entry_notional_usd": "1000.00",
+        "entry_order_notional_usd": "973.44",
+        "entry_qty_binding": "notional",
+        "intended_notional_usd": "1000.00",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3979.85"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "BEX"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "entries_not_enabled",
+      "rank": 4,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "41574325.902643003",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "27.694444444",
+        "news_before_t": null,
+        "price_at_t": "1.3791"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "415743.25",
+          "entry_bar_10pct": null,
+          "gross_remaining": "1979.86",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "994.96",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "994.96"
+      },
+      "skip_reason": "entries_not_enabled",
+      "state": "skipped",
+      "symbol": "NCPL"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "entries_not_enabled",
+      "rank": 5,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "22929048.685220994",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "51.645338208",
+        "news_before_t": null,
+        "price_at_t": "8.295"
+      },
+      "sizing": {
+        "binding": "gross_remaining",
+        "caps_usd": {
+          "dollar_volume_1pct": "229290.48",
+          "entry_bar_10pct": null,
+          "gross_remaining": "984.90",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "984.90",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3979.85"
+      },
+      "skip_reason": "entries_not_enabled",
+      "state": "skipped",
+      "symbol": "SSTI"
+    }
+  ],
+  "timing": {
+    "entry_deadline": "2026-09-29T20:19:53.754307+00:00",
+    "entry_timeout_seconds": 60.0,
+    "exit_order_timeout_seconds": 10.0,
+    "hard_flatten_at": "2026-09-29T21:27:23.754307+00:00",
+    "sell_window_end": "2026-09-29T21:29:23.754307+00:00",
+    "trial_start": "2026-09-29T20:19:23.754307+00:00",
+    "x1_flatten_at": null,
+    "x2_hold_seconds": 3600.0
+  },
+  "totals": {
+    "buy_notional_usd": "1279.64",
+    "entries_filled": 2,
+    "entries_submitted": 2,
+    "exit_orders_submitted": 2,
+    "ledger_cash_delta_usd": "-2.84",
+    "ledger_realized_pnl_delta_usd": "-2.8400",
+    "native_fill_events": 6,
+    "native_rejections": 0,
+    "pnl_consistent": true,
+    "realized_pnl_usd": "-2.8400",
+    "sell_notional_usd": "1276.80",
+    "symbols": 5
+  },
+  "trial_id": "ext-20260929-3",
+  "unsellable_positions": []
+}

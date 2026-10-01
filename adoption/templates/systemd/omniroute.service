@@ -26,7 +26,8 @@
 # EMBED_WS_PROXY_HOST, LIVE_WS_PORT and EMBED_WS_PROXY_PORT out of it too: this unit does not set them, and the two
 # WebSocket listeners (20132 and 20131) bind 127.0.0.1 only while the two host variables are unset
 # (src/server/ws/liveServer.ts L58 and L712-713; src/lib/services/embedWsProxy.ts L241). List the manager's
-# variable names with `systemctl --user show-environment | cut -d= -f1`.
+# variable names with `systemctl --user show-environment | cut -d= -f1`. Run that in your own terminal: the agent
+# command guard refuses it, because it prints every value the manager holds.
 #
 # The environment file is:
 #   mode 0600 inside the 0700 data directory;

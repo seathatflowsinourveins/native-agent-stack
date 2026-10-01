@@ -269,6 +269,149 @@ the ecosystem launcher. A failed step exits 6
 after the others have run. A host installed from a release tag keeps the per-step commands until
 that release carries the flag.
 
+## Refresh only native instruction blocks
+
+Added after `v2026.09.26.2`. Use an exact reviewed source commit in a separate
+source clone, as [bootstrap's newer-step rule](bootstrap.md) permits. Keep the
+runtime installation checkout at its release pin. For example, with `NAS_SOURCE`
+pointing to that source clone and `NAS_SOURCE_SHA` set to the accepted full SHA:
+
+The full-block commands below are for files this catalog manages. A personal
+file beginning `Generated from config/directives` belongs to its separate
+producer. These commands refuse
+that generated output; use the minimal source handoff below.
+
+```sh
+(
+  set -eu
+  test -n "$NAS_SOURCE_SHA"
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  git -C "$NAS_SOURCE" fetch origin main
+  git -C "$NAS_SOURCE" checkout --detach "$NAS_SOURCE_SHA"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+Review the printed diffs, then recheck the exact clean source before writing:
+
+```sh
+(
+  set -eu
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" claude-md
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" codex-md \
+    --codex-home "${CODEX_HOME:-$HOME/.codex}"
+)
+```
+
+These file-only operations
+preserve text outside their owned markers, file modes and backups. Damaged
+markers, detectable unmanaged copies and a nonblank Codex `AGENTS.override.md`
+refuse rather than duplicate or shadow the rules. Select the intended Codex home
+explicitly when this host has multiple clients. No client executable/version,
+configuration, profile, role, authentication or service is changed by this helper.
+The command establishes synchronized files; native client consumption remains
+the host owner's separate readback/acceptance step.
+
+### Minimal routing handoff for an existing instruction source
+
+Added after `v2026.09.26.2`. The [three-line fragment](templates/decision-routing.md)
+contains only the current bounded-discovery and maintained-decision paragraph,
+between its own markers. It includes no model, effort, role, profile or RTK pack.
+From the same exact clean source checkout:
+
+```sh
+(
+  set -eu
+  test -z "$(git -C "$NAS_SOURCE" status --porcelain)"
+  test "$(git -C "$NAS_SOURCE" rev-parse HEAD)" = "$NAS_SOURCE_SHA"
+  python3 "$NAS_SOURCE/tools/adoption/managed_block.py" decision-md --print
+)
+```
+
+`--print` reads only the canonical source template and fragment. For the Mac
+handoff, give this fragment to the `agent-ecosystem` producer owner. That owner
+integrates it once in its owned `config/directives/shared.md`, renders through
+its own `agent-ecosystem/scripts/directives.py`, and reviews the resulting instruction diff.
+Do not append another full defaults/RTK pack to generated personal files or
+change the producer's source from this cloud task. The owner retains its source
+revision, local rules, imports, profiles, hook trust and installation receipt.
+
+For an instruction source you already own, the helper can preview only
+this paragraph. It prints the target's SHA-256:
+
+```sh
+python3 "$NAS_SOURCE/tools/adoption/managed_block.py" --dry-run decision-md \
+  --target "$OWNED_INSTRUCTION_SOURCE"
+```
+
+Apply the reviewed fragment through the source owner's own guarded workflow.
+`decision-md` exports or previews; it never writes a target, backup or temporary
+file. A hash check followed by replacement cannot provide atomic protection
+against a different writer, so this helper does not offer that write path.
+
+The preview requires an existing nonblank source and proposes keeping every byte
+outside its small block, including line endings, inline RTK and trailing blanks.
+It refuses a generated output, damaged/repeated markers, conflicting
+unmanaged routing text, symlink, nonregular or non-UTF-8 target. A single exact
+current paragraph, including a wrapped paragraph, is already current. Standalone
+native personal files can preview with
+`--client claude` or `--client codex --codex-home PATH` instead of `--target`;
+Codex still refuses a nonblank `AGENTS.override.md`. A later full-pack operation
+refuses a narrow block rather than duplicating its rule.
+When `CLAUDE_CONFIG_DIR` is set, either Claude operation requires an explicit
+`--target` rather than guessing the intended user-memory location.
+The full-profile bootstrap passes `$HOME/.claude/CLAUDE.md` explicitly, consistent
+with its other profile/settings steps; a custom store needs its own native
+scope/readback qualification.
+
+### Installed ecosystem-catalog producer
+
+The installed `ecosystem-catalog/SKILL.md`, `ecosystem-catalog/scripts/catalog.py`
+and `ecosystem-catalog/data/registry.json`
+is generated by a separate repository, not by `native-agent-stack` or QMD.
+The [Mac owner's provenance handoff](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5926166036)
+and follow-up identify `seathatflowsinourveins/agent-ecosystem`, with that owner's
+clean source revision `753777ac8163332a3570888680893821439ee4ab`. Preserve that
+source-owner boundary; a registry `catalog_revision` is a content hash, not a
+Git checkout revision.
+
+That producer owns `catalog/registry.json`, host records in `manifest.json`,
+runtime evidence in `acceptance.json`, and its generated skill data. Its
+`agent-ecosystem/scripts/catalog_refresh.py --apply` is a broad managed-file install, not a
+registry-only sync. It also preserves existing decisions/import pins, so a
+metadata refresh alone does not retire VelaNext or turn older ai-memory and
+SocratiCode selections into current Mac deployment facts. Do not hand-edit or
+replace the generated consumer, invent selective flags, or copy around the
+producer's receipt hashes.
+
+The producer owner must reconcile its current source imports and retired-host
+routing, preserve historical evidence and measured/blind promotion gates, then
+use or add a tested receipt-aware selective synchronization path there. A
+source render/check is separate from installing the resulting registry. No
+selective installed-registry command is supplied by this repository.
+
+For an adopted catalog QMD index, verify its selected collection roots point to
+this source revision first. Follow [catalog retrieval](../docs/catalog-retrieval.md)
+for a path-only relocation that preserves masks, contexts, models and unrelated
+collections; `update` alone does not move an old root. Then:
+
+```sh
+qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status
+qmd --index native-agent-stack-catalog embed   # only if this adopted index already carries vectors
+```
+
+A source/text/index refresh is not a runtime re-pin or promotion. Retain reported
+host deployment facts separately from installer pins, historical experiments and
+open measured/blind convergence gates. Do not run a broad bootstrap solely to
+refresh instructions on a host whose verified production versions differ from
+its older installation pins.
+
 ## Start a new repository
 
 Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the

@@ -32,7 +32,13 @@ The [September 28 mover research refresh](research-20260928-movers.md) records
 historical extreme-mover data sources, the factor evidence for pre-positioning
 versus post-detection continuation, and the layer changes since the September 26
 convergence. No recorded selection changed. The paper series frozen that day
-waits on a rejected (HTTP 401) paper key.
+did not start: its stored paper key was rejected (HTTP 401). New paper keys
+cleared the same evening. The September 29 series on the two paper accounts are
+recorded, mechanics-only, in the
+[pre-market](../../blueprints/us-equities/adaptive-paper/trials/pre-20260929/README.md),
+[regular-hours](../../blueprints/us-equities/adaptive-paper/trials/rth-20260929/README.md) and
+[after-hours](../../blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md)
+receipts.
 
 The [September 24 mover v3 sweep](mover-v3-sweep-20260924.json) records the
 catalog actions behind the [mover v3 research plan](../../blueprints/us-equities/mover-v3/README.md):

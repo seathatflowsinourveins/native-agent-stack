@@ -17,10 +17,16 @@ export const meta = {
 //   sweep_id  lane name, e.g. 'landscape-sweep-20260926'; returned as `sweep` ('<sweep_id>-smoke' when test)
 //   T         the frozen, dated templates {common, discover, facts, fit, critic, followup}; the run's prompts_sha256
 //             is sha256(json.dumps(T, sort_keys=True, ensure_ascii=False)), written to W/prompts_sha256.txt
-//   schemas   {discover, votes, critic}: the strict return schemas (skills_used included)
-//   layers    [{layer_id, catalog}] in sweep order; the first-round GPT-6 prompts W/prompts/gpt6-discover-<id>.txt
-//             are already written
+//   schemas   {discover, votes, critic}: the strict return schemas (skills_used included), plus 'discover-skills'
+//             for a skills run
+//   layers    [{layer_id, catalog, modality?}] in sweep order; the first-round GPT-6 prompts
+//             W/prompts/gpt6-discover-<id>.txt are already written. modality 'skills' marks a skills-* layer
+//             (build_inputs.py --modality skills); a run is all repository layers or all skills layers.
 //   test      optional; true returns after the first round (the one-layer smoke run)
+// The skills modality runs the same rounds, labels and survival rule. build_args.py resolves its templates into T
+// (discover and critic are the skills templates, facts and fit end in the skills refuter text); here a skills layer's
+// discovery returns schemas['discover-skills'], and a merged skill proposal carries its skill_ref as repository, the
+// identity the votes, convert.py and the ledger compare.
 // Returns {sweep, first, critic, followups, lost_first, lost_followups} ({sweep, first, lost_first} for a smoke run).
 // A round that returned nothing is kept as {layer_id, catalog, round, lost: true} in first or followups, so
 // convert.py can record it as a retained failure of that layer.
@@ -31,6 +37,8 @@ const A = args
 const MAX_PROPOSALS = 8
 const MAX_FOLLOWUPS = 8
 const TEMPLATE_KEYS = ['common', 'discover', 'facts', 'fit', 'critic', 'followup']
+// The skill fields a refuter reads besides the verdict fields (schemas/discover-skills.json).
+const SKILL_FIELDS = ['source_id', 'lifecycle_task', 'pin', 'skill_md_sha256', 'license', 'description_chars', 'model_invocable', 'codex_implicit', 'replaces']
 const WRAP_SCHEMA = { type: 'object', additionalProperties: false, required: ['result_json'], properties: { result_json: { type: 'string' } } }
 const LABEL_RANK = { targeted_candidate: 0, keep_but_compare: 1, not_adopted: 2 }
 // Layer ids become GPT-6 job ids (codex_job.py JOB_ID, at most 128 characters with their prefix and suffix).
@@ -53,10 +61,16 @@ else {
   if (!A.schemas || ['discover', 'votes', 'critic'].some((k) => !A.schemas[k] || typeof A.schemas[k] !== 'object')) issues.push('schemas must hold discover, votes and critic')
   const ids = Array.isArray(A.layers) ? A.layers.map((L) => (L && nonblank(L.layer_id) && LAYER_ID.test(L.layer_id) && nonblank(L.catalog) ? L.layer_id : null)) : []
   if (!ids.length || ids.includes(null) || new Set(ids).size !== ids.length) issues.push('layers must be a nonempty list of distinct {layer_id, catalog}, each layer_id matching ' + LAYER_ID.source)
+  // One modality per run (build_args.py stages it so): the one completeness critic covers one kind of layer.
+  const modes = new Set((Array.isArray(A.layers) ? A.layers : []).map((L) => (L && L.modality !== undefined ? L.modality : 'repository')))
+  if ([...modes].some((m) => m !== 'repository' && m !== 'skills')) issues.push("a layer's modality must be absent or 'skills'")
+  else if (modes.size > 1) issues.push('layers must be all repository layers or all skills layers (one modality per run)')
+  else if (modes.has('skills') && (!A.schemas || !A.schemas['discover-skills'] || typeof A.schemas['discover-skills'] !== 'object')) issues.push("a skills run needs schemas['discover-skills']")
 }
 if (issues.length) { for (const i of issues) log('argument issue: ' + i); return { status: 'incomplete', argument_issues: issues } }
 const T = A.T
 const S = A.S
+const isSkills = (L) => L.modality === 'skills'
 
 // One pass over <<NAME>> placeholders; a function replacement, so '$&' or '<<X>>' inside a value is never expanded.
 function fill(template, values) {
@@ -95,18 +109,19 @@ function wrapperPrompt(job, steps, promptFile, schema) {
 
 async function gpt6Discover(L, suffix, fu, phaseName) {
   const job = `gpt6-discover-${L.layer_id}${suffix}`
+  const schema = isSkills(L) ? 'discover-skills' : 'discover'
   let steps, promptFile
   if (fu) {
     promptFile = `${S}/prompts/${job}.txt`
     const fuFile = `${S}/gpt6/fu-${L.layer_id}.json`
     steps = `1. Use the Write tool to create ${fuFile} with exactly this content:\n${JSON.stringify(fu)}\n` +
       `2. Run: python3 ${shq(`${S}/make_prompt.py`)} discover ${shq(inputPath(L.layer_id))} - ${shq(fuFile)} > ${shq(promptFile)}\n` +
-      `Prompt file: ${promptFile} ; schema: discover`
+      `Prompt file: ${promptFile} ; schema: ${schema}`
   } else {
     promptFile = `${S}/prompts/gpt6-discover-${L.layer_id}.txt`
-    steps = `Prompt file: ${promptFile} ; schema: discover (no preparation step).`
+    steps = `Prompt file: ${promptFile} ; schema: ${schema} (no preparation step).`
   }
-  const r = await agent(wrapperPrompt(job, steps, promptFile, 'discover'),
+  const r = await agent(wrapperPrompt(job, steps, promptFile, schema),
     { label: `gpt6-discover:${L.layer_id}${suffix ? ':followup' : ''}`, phase: phaseName, model: 'sonnet', effort: 'max', schema: WRAP_SCHEMA })
   return parseWrapped(r)
 }
@@ -136,12 +151,14 @@ function parseWrapped(r) {
 
 // Merge both families' proposals by canonical repository; two-family proposals first, then by label. The full
 // per-family returns stay in claude_discover / gpt6_discover, so a merged row keeps only the first family's fields.
-function mergeProposals(claudeD, gptD) {
+// A skill proposal is merged by its skill_ref (owner/repo@name, lowercased by slug) and the merged row carries that
+// skill_ref as its repository: the identity every later step (refuters' votes, convert.py, the ledger) compares.
+function mergeProposals(claudeD, gptD, skills) {
   const bySlug = new Map()
   const add = (p, fam) => {
-    const k = slug(p.repository)
+    const k = slug(skills ? p.skill_ref : p.repository)
     if (!k) return
-    if (!bySlug.has(k)) bySlug.set(k, { ...p, families: [fam] })
+    if (!bySlug.has(k)) bySlug.set(k, skills ? { ...p, repository: p.skill_ref, families: [fam] } : { ...p, families: [fam] })
     else { const e = bySlug.get(k); if (!e.families.includes(fam)) e.families.push(fam) }
   }
   for (const p of (claudeD && claudeD.proposed) || []) add(p, 'claude')
@@ -151,29 +168,31 @@ function mergeProposals(claudeD, gptD) {
   return { kept: all.slice(0, MAX_PROPOSALS), dropped: all.slice(MAX_PROPOSALS).map((p) => ({ repository: p.repository, families: p.families, proposed_label: p.proposed_label })) }
 }
 
-function forRefuters(kept) {
-  return kept.map((p) => ({ repository: p.repository, proposed_label: p.proposed_label, demonstrated_gap: p.demonstrated_gap,
+function forRefuters(kept, skills) {
+  const skillFields = (p) => (skills ? Object.fromEntries(SKILL_FIELDS.map((k) => [k, p[k] === undefined ? null : p[k]])) : {})
+  return kept.map((p) => ({ repository: p.repository, ...skillFields(p), proposed_label: p.proposed_label, demonstrated_gap: p.demonstrated_gap,
     comparison_that_would_overturn: p.comparison_that_would_overturn, evidence: p.evidence, upstream_now: p.upstream_now, proposed_by: p.families }))
 }
 
 async function runLayer(L, fu, phaseD, phaseR) {
   const suffix = fu ? '-followup' : ''
   const lsuf = fu ? ':followup' : ''
+  const skills = isSkills(L)
   const [cd, gd] = await parallel([
-    () => agent(claudeDiscoverPrompt(L, fu), { label: `discover:${L.layer_id}${lsuf}`, phase: phaseD, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.discover }),
+    () => agent(claudeDiscoverPrompt(L, fu), { label: `discover:${L.layer_id}${lsuf}`, phase: phaseD, model: 'opus', effort: 'max', agentType: WORKER, schema: skills ? A.schemas['discover-skills'] : A.schemas.discover }),
     () => gpt6Discover(L, suffix, fu, phaseD),
   ])
-  const { kept, dropped } = mergeProposals(cd, gd && gd.output)
+  const { kept, dropped } = mergeProposals(cd, gd && gd.output, skills)
   if (dropped.length) log(`${L.layer_id}${lsuf}: ${dropped.length} proposal(s) beyond the cap of ${MAX_PROPOSALS} dropped: ${dropped.map((d) => d.repository).join(', ')}`)
   let facts = null, fitC = null, fitG = null
   if (kept.length) {
-    const props = JSON.stringify(forRefuters(kept), null, 1)
+    const props = JSON.stringify(forRefuters(kept, skills), null, 1)
     ;[facts, fitC, fitG] = await parallel([
       () => agent(T.common + '\n\n' + fill(T.facts, { LAYER_ID: L.layer_id, REQUIREMENT: `see ${inputPath(L.layer_id)} (Read tool)`, PROPOSALS: props }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
         { label: `refute-facts:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
       () => agent(T.common + '\n\n' + fill(T.fit, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, PROPOSALS: props, LAYER_ID: L.layer_id }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
         { label: `refute-fit:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
-      () => gpt6Fit(L, suffix, forRefuters(kept), phaseR),
+      () => gpt6Fit(L, suffix, forRefuters(kept, skills), phaseR),
     ])
   }
   return { layer_id: L.layer_id, catalog: L.catalog, round: fu ? 'followup' : 'first', followup_reason: fu || null,

@@ -787,6 +787,142 @@ This section is the record of what stands, what does not, and why; the sections 
 3. **Canary proof harness (branch `claude/key-canary-20260929`, not merged).** Two review rounds and one repair round: the second GPT-6 review still found false-zero paths (evidence reused after a failed rerun, a failed scan retry leaving an older pass authoritative, missing or partial captures, an unenforced restart gate, undecoded compression framings, SQLite WAL and extensionless databases, filename and symlink coverage, exclusions wider than the protected paths, malformed Loki pages, sampling that drops other consumers' hits). A harness whose zero can be produced by a broken scan is worse than none, so no proof claim is made. Next step: a much smaller tool for exactly the acceptance the user set (a per-consumer canary and a zero-hit grep with positive controls over the named sinks) with one classifier that refuses unless every required check has a fresh result bound to the run.
 4. **Restart acceptance.** The procedure is "Restart check" in `docs/secret-storage.md`; the R0 baseline receipt exists. The restart is the user's action, after 20:00 ET and with the trading lane's confirmation.
 5. **Codex profile hardening** (`ignore_default_excludes = false`, shell snapshots off) is not done; it is measured (Codex 0.157.1: credential-named variables reach the shell tool by default).
-6. **OmniRoute** returns decrypted provider credentials to an unauthenticated loopback caller on `GET /api/providers/client` and `GET /api/settings` when `requireLogin=false` (source-read by the gateway lane at builds `5fc47d970` and `c3fa5a15e`, not executed). The real fix belongs to the gateway lane; the guard rule is part of item 2 and only covers Claude's Bash tool.
+6. **OmniRoute** returns decrypted provider credentials to an unauthenticated loopback caller on `GET /api/providers/client` and `GET /api/settings` when `requireLogin=false` (source-read by the gateway lane at builds `5fc47d970` and `c3fa5a15e`, not executed). The real fix belongs to the gateway lane; the guard rule is part of item 2 and only covers Claude's Bash tool. Superseded on 2026-09-30 by "OmniRoute management API (decision, 2026-09-30)" below: `/api/settings` returns settings secrets rather than provider connections, the anonymous surface is much wider than these two routes, and containers on this host reach it.
 
 **Selections that stand, with the comparison that would overturn each.** Store of record: the `0600` files (overturn: a keychain or sealed store that needs no unlock and survives the restart, measured on both workstations). Injector: built from cited reference designs (dotenvx `278101db`, actions/runner `15231bed`, buildkite/agent `3345ee60`, varlock `1b880652`, ironrun `b611c7ce`) after mise v2026.9.16 and agentself v0.2.4 failed the same measured requirements (Part 4). Effort: the launcher flag, not an environment variable or a saved level (overturn conditions in `2026-09-29-max-default-effort.md`). Proof tooling: none accepted yet (item 3).
+
+## OmniRoute management API (decision, 2026-09-30)
+
+**Finding.** Source reads only; no request was sent to either gateway. Four independent checks confirmed it: three claim-verification slices and one control-coverage review. Both gateways run upstream `release/v3.8.51` at `2f42a9ac1` plus local carries. The carries touch none of the files cited here, whose blobs are identical to upstream, so every citation below is `diegosouzapw/OmniRoute@2f42a9ac1`.
+
+With `requireLogin=false`, the management policy admits an anonymous `auth-disabled` subject on every management path that is not always-protected (`src/server/authz/policies/management.ts:261-266`; `src/shared/utils/apiAuth.ts:472`). On those paths `requireManagementAuth` returns no error (`src/lib/api/requireManagementAuth.ts:59-61`). An anonymous loopback caller then gets:
+
+- **Reads:**
+  - `GET /api/providers/client` returns every connection with its decrypted `apiKey`, `accessToken`, `refreshToken` and `idToken`, and with unsanitized `providerSpecificData` (`src/app/api/providers/client/route.ts:5-15`; `src/lib/db/providers/lazyConnectionView.ts:149,177-189`).
+  - `GET /api/settings` returns every stored non-internal setting (keys starting with `_` are skipped, `settings.ts:287`) except the password and two session keys. That includes the decrypted `oidcClientSecret`, and `skillsmpApiKey`, `cliproxyapi_api_key`, `qdrantApiKey`, `quotaStore.redisUrl` and `deepHealthToken` whenever they are set (`src/app/api/settings/route.ts:230-289`; `src/lib/db/settings.ts:154,287,295-297`).
+  - `GET /api/settings/cache-config` returns the semantic-cache embedding API key and the Redis URL (`src/app/api/settings/cache-config/route.ts:50-51,86,109`). Upstream open issue #14484 reports the same echo.
+  - `POST /api/sync/tokens` followed by `GET /api/sync/bundle` returns the whole decrypted credential bundle (`src/app/api/sync/tokens/route.ts:28-29,77-79`; `src/lib/sync/bundle.ts:68-89,112-127`).
+  - `GET /api/cli-tools/keys` returns the raw OmniRoute keys.
+  - `GET /api/oauth/cursor/auto-import` returns the host's Cursor OAuth tokens (`src/app/api/oauth/cursor/auto-import/route.ts:15,22-25`).
+  - Several `cli-tools/*-settings` readers return whole client configurations: `claude-settings` returns `~/.claude/settings.json` including `env` (`src/app/api/cli-tools/claude-settings/route.ts:56,66`) and `codex-settings` the raw `config.toml` text (`codex-settings/route.ts:120,171`); `omp-settings` returns an API key (`omp-settings/route.ts:91`). Not every reader does: `cline-settings` returns five selected fields (`cline-settings/route.ts:77-83`).
+  - The `providerSpecificData` keys `cookie`, `cookies`, `access_token`, `clientSecret` and `token` pass even upstream's own sanitizer for `/api/providers` (`src/lib/providers/requestDefaults.ts:327-371`).
+- **Writes:**
+  - `POST /api/keys`, `POST /api/keys/[id]/regenerate`, `POST /api/cli/tokens` and `POST /api/relay/tokens` mint credentials, manage-scope ones included, and return them.
+  - `PATCH /api/providers/[id]` can set a provider's `baseUrl`. The gateway then sends that provider's stored credential to the new host (`open-sse/executors/base.ts:417-418`; upstream's own comment at `:428-430` names the keyless case).
+  - With login off, `POST /api/settings/require-login` stores a password hash of the caller's choosing, which locks the operator out (`src/app/api/settings/require-login/route.ts:92,125-127`).
+
+**Correction to item 6.** `/api/settings` returns settings secrets, not provider connections; the provider credentials are on `/api/providers/client`. The builds item 6 cites, `5fc47d970` and `c3fa5a15e`, resolve neither locally nor upstream, so the finding is re-confirmed at `2f42a9ac1`.
+
+**Who can reach the API:**
+
+- **Same-uid processes.** This includes:
+  - Claude's Bash tool.
+  - Codex shells: the host Codex configuration runs `sandbox_mode = "danger-full-access"`.
+  - Windows processes. With mirrored networking they reach WSL's `localhost`: on this host `wslinfo --networking-mode` prints `mirrored` (<https://learn.microsoft.com/en-us/windows/wsl/networking>). Through `\\wsl$` they also read distribution files as the default user (<https://learn.microsoft.com/en-us/windows/wsl/file-permissions>).
+
+  Every such process can already read the gateway's data directory: the store, `server.env` and the CLI token salt. No HTTP control changes what they can reach.
+- **Containers.** Rootless Docker on this host runs with `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, set in the user unit `docker.service` at line 33. Upstream's default in `dockerd-rootless.sh` is `true` (moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`). So every container whose network routes through the rootless daemon's RootlessKit network, and that has no separate isolation, reaches host-loopback ports as `10.0.2.2` ([OpenHands isolation record](2026-09-28-openhands-resolver-isolation.md)); a container with network mode `none`, such as the OpenHands grader, does not. On 2026-09-30 the Harbor benchmark lane reported reproducing this with a canary listener on another loopback port; that is a peer report, and this record retains no receipt of it. A container that runs model-written or third-party code is an untrusted local process, which meets the overturn condition of the keyless posture in [the account-pool record](2026-09-27-omniroute-account-pool.md), decision 5.
+- **Agent browsers.** The browsers this ecosystem runs are agent tools, not a person's desktop browser: agent-browser 0.38.1 (vercel-labs/agent-browser, `manifests/stack.json` row `agent-browser`), and playwright-cli 0.1.21 on Playwright 1.64.0-alpha and playwright-test 1.63.0 (microsoft/playwright-cli, microsoft/playwright; rows `playwright-cli` and `playwright-test`), which drive Chrome for Testing from the Playwright cache on this host. They run as same-uid processes, but a page they load is third-party code, and under WSL's mirrored networking that page can address the gateway at `localhost`.
+  - Measured on 2026-09-30 (receipt `agent-browser-lna-20260930`): Chrome for Testing 153.0.8010.12, launched by agent-browser 0.38.1, by Playwright 1.63.0 and directly, refused fetch, image and iframe requests from a page placed in the public address space to a loopback listener, with no permission grant, in all six launch configurations; with the override off, or with Local Network Access disabled, the same requests arrived. A public third-party page opened by these agent browsers therefore cannot send a request to the gateway, so agent browsing of public pages stays within the same-uid boundary.
+  - Not covered by that measurement: main-frame navigations and popups (Chromium's Local Network Access does not gate them), pages in the private address space, a tool or user that grants the permission, a launch that disables `LocalNetworkAccessChecks`, other Chromium versions, and the manifest pin playwright-cli 0.1.21 on Playwright 1.64.0-alpha, which was not found installed.
+  - Upstream's origin validator rejects cross-site and DNS-rebinding origins, but only for dashboard-session subjects (`src/server/authz/pipeline.ts:418-421`; `src/server/origin/publicOrigin.ts:177-179,243-245`).
+
+**Options compared:**
+
+- **(a) Upstream's control, `requireLogin=true`.**
+  - It is the only control that closes the whole management surface for every caller.
+  - It needs a stored password, `INITIAL_PASSWORD` or OIDC. Without one, a loopback caller can still write `requireLogin: false` (`src/shared/utils/apiAuth.ts:474-478,511-515`; `src/app/api/settings/require-login/route.ts:90-122`), and the dashboard login needs a stored hash.
+  - The user ruled out a login or password on 2026-09-28 ("passwordless ... use the env key if needed"). The same instruction said to close container exposure without one.
+- **(b) A local redaction carry.**
+  - It removes direct reads on the patched routes only, and cannot close the writes above for a loopback caller.
+  - The surface spans about fifteen routes, in files upstream edits weekly: `routeGuard.ts` three times and `settings/route.ts` once in the week to 2026-09-29.
+  - For same-uid callers it adds nothing beyond accident prevention.
+- **(c) A command-guard rule.** Accident prevention for Claude's Bash tool only.
+- **(d) A documented posture.** It states the boundary and its residuals.
+- **An origin-validator carry.** Upstream's validator would be widened to anonymous subjects on unsafe methods, with a Host check added on reads. It is a small carry built from in-repo references. It closes browser writes, plus rebinding reads from older browsers and from navigations, but does nothing for containers or same-uid callers.
+
+**Decision.** (d) plus (c), with one load-bearing rule and no gateway change now.
+
+1. **Trust boundary.** The anonymous management API is accepted only while every process that can reach host loopback is a same-uid process the user runs, and every workload that runs model-written or third-party code is either stopped or has verified isolation (rule 2). An exposed untrusted workload invalidates the boundary at once, whether or not it could adopt isolation later: it is stopped until it is isolated. Within the boundary, the reads and writes above are same-uid residuals, like the data directory itself.
+2. **Container rule (load-bearing).**
+   - A container that runs model-written or third-party code must have no route to `10.0.2.2`, nor to any other host address that reaches the gateway ports.
+   - If it needs a model, it reaches the gateway only through a proxy that passes the client API and refuses `/api/*`.
+   - References: the OpenHands lane's O1 (a Docker `internal: true` network plus a proxy; [isolation record](2026-09-28-openhands-resolver-isolation.md)), and Harbor v0.23.0's own egress control (`[environment] network_mode = "allowlist"`: a sidecar proxy plus nftables with an allowlist of public hosts; harbor-framework/harbor@v0.23.0 `src/harbor/environments/docker/docker.py`). The Harbor benchmark lane reported applying it on 2026-09-30; that is a peer report without a retained receipt here, and the lane's own records carry its acceptance.
+   - Daemon-wide `DISABLE_HOST_LOOPBACK=true` is not chosen, for the isolation record's reasons: it cuts off the proxy and the memory services, and binding the gateway elsewhere would expose it beyond loopback.
+   - Each container lane applies the rule to its own workloads.
+3. **Guard rule (planned in K4; not yet built, accepted or installed).** Once K4 is built, accepted and installed after window W, Claude's command guard refuses:
+   - a command that sends a request under `/api/` to the gateway ports (`20128`, `20129`) on `127.0.0.1`, `localhost`, `[::1]`, `10.0.2.2` or `host.docker.internal`, except an allowlist of read-only paths the repository documents. The allowlist is derived so that the documented-command replay stays at 0 newly blocked;
+   - the matching `omniroute api ...` and `omniroute sync ...` CLI forms.
+
+   It will also treat both live data directories, `~/.local/share/omniroute` and `~/.local/share/omniroute-fw`, as credential stores. Until then the installed guard covers neither (`scripts/hooks/secret_path_guard.py`, `HOME_CREDENTIAL_STORE`).
+4. **No gateway change now.** Neither carry is applied, and the gateway operator keeps the current settings. Any gateway apply stays on the Gate A owner's timing.
+5. **Operator hygiene after window W, at the gateway operator's discretion.**
+   - Take a metadata-only inventory of the OmniRoute keys, `oma_` tokens, sync tokens and relay tokens created while management was anonymous.
+   - Use the OmniRoute CLI on the host, not `curl` from an agent shell: `GET /api/keys` shows the first 8 and last 4 characters of each key.
+   - Revoke any the operator does not recognise.
+
+**Verification.**
+- For the container rule: a canary listener on a host loopback port (never a gateway port) must record no connection from a task container that tries `10.0.2.2` and the host's other addresses on that port, observed on the listener side, because a transparent egress proxy may accept a TCP connection before it enforces its policy; the proxy's refusal of `/api/*` is checked against a throwaway upstream, never a live gateway; and a model call through the proxy must succeed.
+- Never verify with an HTTP request to `/api/*` of a live gateway. The OpenHands probe P0 (`blueprints/runtime-workers/openhands/e2e/netprobe.py:90-94`) sends one to `/api/settings`; it should become a TCP-only probe or target a throwaway instance.
+- For the guard rule: K4's oracle phase `routes` and the documented-command replay.
+
+**Residual exposure:**
+- Every same-uid process, including Windows processes of the user's account, holds full administrative control of both gateways and every stored provider credential.
+- The agent browsers' Local Network Access was measured for public-address-space pages only; main-frame navigations, private-address-space pages and permission grants are not covered.
+- Until the container rule is verified for a workload, that workload must not run model-written or third-party code.
+
+**Overturn:**
+- A workload that runs model-written or third-party code found without verified isolation: it is stopped at once. If it cannot be isolated, `requireLogin=true` with a password is the only close; that reverses the user's 2026-09-28 direction, so it is the user's decision.
+- Upstream ships a non-interactive management credential that an anonymous loopback caller cannot disable, for example key-only management with the bootstrap write closed: adopt it.
+- An agent-browser, Playwright or Chromium change, a launch that disables `LocalNetworkAccessChecks` or grants the loopback permission, or a measured request from an untrusted page (including a navigation or a private-address-space page) reaching a loopback listener: re-measure, and if a request reaches the listener, apply the origin-validator carry, which closes rebinding reads and cross-site writes for every browser.
+- A gateway port bound beyond loopback, a second OS user on the host, or a gateway reachable from the LAN: the posture no longer holds.
+
+## Codex shell snapshots that recorded the messaging token (done, 2026-09-30)
+
+On 2026-09-29 the sink inventory found 19 files under `~/.codex/shell_snapshots` that each declared `CLAUDE_CODE_MESSAGING_TOKEN`. The scan read names only. Codex writes the exported environment of the process that launched it into these files (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at `rust-v0.157.1`).
+
+At 2026-09-30T03:00Z a names-only rescan walked `~/.codex`, `~/.local/state`, `~/.local/share`, `~/code`, `/tmp` and `/var/tmp`, without following symlinked directories and skipping `node_modules`, `.git`, `__pycache__`, `.venv`, `venv`, `site-packages` and Claude's own `shell-snapshots`; directories or files it could not read were skipped without a count. It found 222 `shell_snapshots` directories holding 12 files it could read.
+- Only 2 of those files still declared the variable, both in `~/.codex/shell_snapshots`, with modification times of 2026-09-27T02:19Z and 04:45Z (an earlier scan of that one directory printed both). No open descriptor to either was observed among the processes whose descriptors were readable.
+- The other 17 were already gone. Codex's own three-day snapshot retention is the likely remover (`codex-rs/core/src/shell_snapshot.rs:105` at `rust-v0.157.1`), but the removal was not observed.
+
+After an announcement to the live peers, the enumerated path list was compared byte for byte (`cmp`) with the two literal paths, and the two files were deleted by their literal paths at 03:02:25Z.
+- A rescan found 0 files declaring the variable among the files it could read.
+- A names-only listing of `~/.codex` taken before and after showed exactly those two entries removed.
+- No file content was printed.
+
+Where to act next:
+- Codex's `shell_snapshot` feature is on by default (`codex-rs/features/src/lib.rs:1008-1011` at `rust-v0.157.1`).
+- The host's base configuration and its OmniRoute profile turn it off, and so does the packaged GPT-6 lane home.
+- A Codex home whose configuration leaves it unset still writes snapshots. Item 5 above (Codex profile hardening) covers the repository templates after window W.
+
+Overturn: any new snapshot file with a credential-named `declare -x` line. That moves the Codex profile change ahead of window W, subject to the Gate A owner.
+
+## Status update (2026-09-30)
+
+- **Guard tightening** (item 1, PR #511, not merged).
+  - Head `dc33b48a`; guard sha256 `a70a056f`, equal to its `SHA256SUMS` pin.
+  - The third GPT-6 verification ran at the pre-repair head. It found one blocking regression, a procps personality selector passing the clustered `ps` loosening. It also found one high finding, inherited from the installed guard: four store-path patterns backtracked and timed out the hook at 10 s.
+  - One repair round followed:
+    - it removed the `ps` loosening;
+    - every command is also read as the installed guard reads it, and is refused when either reading refuses;
+    - the four patterns became linear scans.
+  - A fourth verification found no command the installed guard refuses that the new guard allows.
+  - Its two remaining findings go to the next guard change, because only one repair round is allowed:
+    - a descriptor-deduplication case that the installed guard also allows;
+    - a documentation note.
+  - Receipt: `guard-k3-verification-20260930`.
+  - The merge and the host reinstall wait for the Gate A owner to close window W, because the frozen check `hooks.carriers_match_repo` compares the installed hooks with main.
+- **K4** (item 2). These counts are status reports from the lane's review records, which are not retained in this repository; each PR carries its own receipt. The build contract had its first independent review, by GPT-6: 1 blocking and 6 high findings. The largest were a delimiter-suffix gap in the interpreter here-document form, a second loosening the amendments had not authorised, and an unbounded gateway matrix. Version 2 is being written with one gateway matrix, one loosening and an independent reference recognizer for the tests.
+- **Canary proof tool** (item 3). Draft 2 of the contract took one Opus review round (4 blocking findings, fixed). A GPT-6 review then found 7 more blocking false-clean paths:
+  - sink bytes reaching the coordinator's memory;
+  - a pass still standing after a failed retry;
+  - an unstable file set;
+  - a Git metadata gap;
+  - a gzip-plus-BOM gap;
+  - SQLite schema text;
+  - SQLite URI parsing.
+
+  Draft 3 is being written with a two-process boundary and a stable-file-set rule.
+- **Claude OAuth token for headless runs.**
+  - A credential window stores the token from `claude setup-token` in the kernel keyring as `claude-oauth-token` (transport only; a kernel restart erases it). Commands receive it through `kernel_keyring.py exec claude-oauth-token CLAUDE_CODE_OAUTH_TOKEN -- <command>`.
+  - Its variable is not yet a secret name in the guard, so K4 adds it and an inventory entry. `set_credential.py` can then persist it.
