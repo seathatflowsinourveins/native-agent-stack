@@ -1,5 +1,13 @@
 # DeepAgents persisted research-worker trial
 
+Event export now uses native
+[LangChain serialization](https://github.com/langchain-ai/langchain/blob/04ac76c07ec173a44e3e57de54861d0b637e3299/libs/core/langchain_core/load/dump.py),
+which replaces registered secrets with references. The
+[post-trial check](../../evidence/artifacts/native-runtime-role-resolution-20260930/secret-aware-serialization.json)
+retains the CodeQL finding and native redaction/checkpoint acceptance.
+Original model runs remain bound to archived executed sources; this fix is
+not a new provider run. Private conversation/tool text stays private.
+
 This candidate exercises a research worker with task-selected skills, one explicit
 specialist and native SQLite continuation. Retain native Codex/Claude coordination,
 the accepted Codex worker and Dagu. Installation and offline checks do not qualify

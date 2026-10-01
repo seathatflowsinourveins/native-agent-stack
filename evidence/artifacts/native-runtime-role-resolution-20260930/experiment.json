@@ -88,6 +88,10 @@
     {
       "url": "https://github.com/BerriAI/litellm/tree/cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
       "revision": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc"
+    },
+    {
+      "url": "https://github.com/langchain-ai/langchain/blob/04ac76c07ec173a44e3e57de54861d0b637e3299/libs/core/langchain_core/load/dump.py",
+      "revision": "04ac76c07ec173a44e3e57de54861d0b637e3299"
     }
   ],
   "discovery_provenance": [
@@ -722,7 +726,7 @@
       "artifacts": [
         {
           "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
-          "sha256": "776ad19174cdc3acba56aaa80ebdb49598a59295400cd211700f481622964bc7"
+          "sha256": "f5ed23084343adf453c10532b5196637139d80f030247b4145e8750e8b11ec96"
         }
       ],
       "usage": {
@@ -788,7 +792,7 @@
     "This record verifies declared consistency and artifact hashes, not underlying model quality or a universal framework ranking.",
     "Predeclared original/repaired plans are separate frozen conditions; repaired prompt/cap changes prevent a baseline savings comparison.",
     "One expected upstream test xfail retained. All installation/OSV parser failures and source/config corrections remain in linked original-output artifacts and receipt anti-patterns.",
-    "Publication-only whitespace/noqa cleanup has identical ASTs. Exact pre-cleanup executed worker/oracle/LLM sources remain in executed-source/, mapped by execution-source-bindings.json; no new model run is claimed for the cleaned files."
+    "Exact executed sources remain archived. Initial whitespace/comment cleanup had identical ASTs; current worker subsequently adopts native secret-aware serialization, source/offline/checkpoint tested after a CodeQL finding without another provider run."
   ],
   "decision_and_scope": {
     "decision": "trial",

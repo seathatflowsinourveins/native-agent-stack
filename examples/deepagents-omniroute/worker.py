@@ -3,7 +3,6 @@
 
 import argparse
 import importlib.metadata
-import json
 import os
 from pathlib import Path
 
@@ -17,6 +16,7 @@ from deepagents import (
 )
 from deepagents.backends import FilesystemBackend
 from langchain.agents.middleware import ToolCallLimitMiddleware
+from langchain_core.load import dumps
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite import SqliteSaver
 
@@ -24,16 +24,9 @@ BASE_URL = "http://127.0.0.1:20128/v1"
 MODEL = "cx/gpt-6.1-sol-max"
 
 
-def serialize(value):
-    if hasattr(value, "model_dump"):
-        return value.model_dump(mode="json")
-    if isinstance(value, Path):
-        return str(value)
-    raise TypeError(f"Unsupported native event type: {type(value).__name__}")
-
-
 def emit(event, native):
-    print(json.dumps({"event": event, "native": native}, default=serialize), flush=True)
+    # Native Serializable.to_json replaces registered secrets with references.
+    print(dumps({"event": event, "native": native}), flush=True)
 
 
 def chat_model(api_key_env, base_url):

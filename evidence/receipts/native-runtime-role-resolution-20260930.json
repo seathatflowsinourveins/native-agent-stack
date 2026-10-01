@@ -14,7 +14,7 @@
     "Complete provider billing/backend identity and whole-task token savings remain unknown; cached/reasoning counters are subsets.",
     "Native Claude Opus/Max peer timed out180s exit124 without a verdict; later peer turns reached account usage limits. Completed earlier reviews are preserved; no new acknowledgement/approval is claimed.",
     "Original full output stays private with exact hashes; public excerpts replace private paths and omit raw conversations, marker values, credentials and flow identifiers.",
-    "Exact executed sources are archived; publication removes only redundant comments/blank lines with identical ASTs. No model rerun is claimed for the cleaned current source."
+    "Exact executed sources are archived. Initial whitespace/comment cleanup had identical ASTs; the current worker subsequently adopts native secret-aware serialization after CodeQL, verified by native fixture and fresh saved-state checks. No new provider run is claimed."
   ],
   "evidence_class": "native_proven_and_local_integration_with_source_review",
   "recorded_at_utc": "2026-10-01T00:52:25Z",
@@ -33,7 +33,8 @@
       "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
       "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
       "evidence/artifacts/native-runtime-role-resolution-20260930/root-verification.json",
-      "evidence/artifacts/native-runtime-role-resolution-20260930/execution-source-bindings.json"
+      "evidence/artifacts/native-runtime-role-resolution-20260930/execution-source-bindings.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/secret-aware-serialization.json"
     ],
     "completed_reviews": {
       "architecture": "Astra/Max source-level role and native configuration acceptance, including source-supported SDK persistence repair.",
