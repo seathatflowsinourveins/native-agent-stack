@@ -1528,7 +1528,13 @@ bindings and their consumers are indexed too. Runner inspection expands only
 the started command and reuses the base reading's outer segments. Permanent
 tests retain all three review generators, require their real hook responses
 within one second, and keep K4's named rows and helper measurements below
-0.5 seconds of processor time, including CI. The mutation gate counts only
+0.5 seconds of processor time on the workstation. Other hosts, CI included,
+scale that bound by their time for a fixed guard-independent workload
+(the standard library's shlex lexer) relative to the workstation's, never
+below 1: the hosted macOS runner is about 2.8 times slower. Each helper's
+growth from 25,000 to 100,000 characters must also fit an exponent under 1.5
+(1 is linear, 2 quadratic) over the minimum of up to three rounds, the
+criterion of the child-usage linearity checks. The mutation gate counts only
 assertion failures from its named permanent tests, with passing unmutated
 controls. Shared-budget thresholds come from isolated stage measurements;
 each stage must fit alone and only their combined work exceeds the threshold.

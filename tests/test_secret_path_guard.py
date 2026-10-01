@@ -4401,14 +4401,36 @@ K4_CHARGE_FIXTURES = dict(K4_HELPER_FIXTURES, **{
     'k4_gateway_reason': K4_HELPER_FIXTURES['k4_gateway_code'],
     'read_command': k4_code_f('pass'),
 })
-K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, also in CI.
+K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, on the workstation; other hosts scale it by k4_host_factor().
+# Host speed (2026-10-01): the processor-time bounds scale by this host's time for a guard-independent reference, the standard
+# library's pure-Python shlex lexer over a fixed text (minimum of five runs), relative to the workstation's 0.0355 s, and never below 1
+# (a reference-machine ratio, the way SPEC CPU reports speed against its reference machine). The hosted macOS runner measured row
+# T-STORE-PRINTF at 0.550 s and k4_runner_commands' whole check at 0.562 s where the workstation measures 0.197 s, so a fixed 0.5 s
+# judged the runner, not the guard; a quadratic regression still grows 16 times per 4 times input and fails on any host.
+K4_REFERENCE_TEXT = " ".join(f"word{i % 97} 'quoted {i % 13}' \"dq $X{i % 7}\"" for i in range(6000))
+K4_REFERENCE_SECONDS = 0.0355
+
+
+def k4_host_scale(reference_seconds: float) -> float:
+    return max(1.0, reference_seconds / K4_REFERENCE_SECONDS)
+
+
+def k4_host_factor() -> float:
+    best = math.inf
+    for _ in range(5):
+        cpu = time.process_time()
+        shlex.split(K4_REFERENCE_TEXT)
+        best = min(best, time.process_time() - cpu)
+    return k4_host_scale(best)
+
+
 # Helper scaling criterion (2026-10-01), the pattern of examples/claude-native/workflows/test-child-usage.mjs (#556): the growth
 # exponent from 25k to 100k characters (a 4 times range), ln((t100k + 5 ms) / (t25k + 5 ms)) / ln 4, stays under 1.5 (1 is linear,
 # 2 is quadratic). It replaces one sample per size with "100k under 8 times 25k", which failed linear helpers on a CI runner at
 # margins of 1 to 6 % (k4_shell_literals 0.1058 against 0.0998, k4_store_text 0.1408 against 0.1397). Up to three rounds take the
 # elementwise minimum per size (the least-disturbed run, as Python's timeit documentation advises for repeats), so one pause cannot
 # fail a linear helper while a quadratic one fails every round. Below about 4.4 ms at 25k a quadratic helper passes the exponent;
-# K4_LINEAR_SECONDS bounds it there.
+# the host-scaled K4_LINEAR_SECONDS bounds it there.
 K4_GROWTH_NOISE_SECONDS = 0.005
 K4_GROWTH_EXPONENT = 1.5
 
@@ -4876,8 +4898,10 @@ class K4GuardTests(unittest.TestCase):
 
     def test_k4_timing(self):
         # Section 9.6: each named row in a fresh Python child (-B), median of
-        # three process_time spans below 0.5 s, including CI. Wall deadlines
-        # remain separate in the real hook-process test.
+        # three process_time spans below 0.5 s on the workstation, scaled by the
+        # host factor elsewhere. Wall deadlines remain separate in the real
+        # hook-process test.
+        bound = K4_LINEAR_SECONDS * k4_host_factor()
         runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name, str(HOOK)],
                                      capture_output=True, text=True, timeout=180) for name in sorted(K4_TIMING)}
         for name, (build, expected) in sorted(K4_TIMING.items()):
@@ -4887,7 +4911,7 @@ class K4GuardTests(unittest.TestCase):
                 verdict, cpu, length = json.loads(done.stdout)
                 self.assertLess(length, 199_000)
                 self.assertEqual(verdict, expected)
-                self.assertLess(cpu, K4_LINEAR_SECONDS)
+                self.assertLess(cpu, bound)
         # T-CODE-NONOUTPUT's instrumentation: every environment occurrence is visited, and output context is read once a token (a list
         # built in one pass), so deepening the nesting four times with twice the occurrences stays linear, not depth x tokens.
         guard.start_work()
@@ -4912,7 +4936,7 @@ class K4GuardTests(unittest.TestCase):
         self.assert_shared_stages([
             lambda n=n: guard.k4_tail_reason(f"cat <<'E{n}'\ntext\nE{n}\ntrue {n}") for n in range(6)], 'texts')
         # Per-helper generators at about 25k, 50k and 100k characters: the helper is reached with the generated text (instrumented), each
-        # size finishes under K4_LINEAR_SECONDS through check() and inside the helper, and the helper's growth exponent from 25k to 100k
+        # size finishes under the host-scaled bound through check() and inside the helper, and the helper's growth exponent from 25k to 100k
         # stays under K4_GROWTH_EXPONENT (a quadratic scan's is 2), over the elementwise minimum of up to three rounds.
         # k4_charge is an O(1) counter update with no scan. k4_word_charge's
         # linear sum is exercised by its own supplementary generator.
@@ -4949,8 +4973,8 @@ class K4GuardTests(unittest.TestCase):
                     if k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT:
                         break
                 for size in texts:
-                    self.assertLess(helper_totals[size], K4_LINEAR_SECONDS)
-                    self.assertLess(totals[size], K4_LINEAR_SECONDS)
+                    self.assertLess(helper_totals[size], bound)
+                    self.assertLess(totals[size], bound)
                 # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
                 self.assertLess(k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]), K4_GROWTH_EXPONENT, helper_totals)
 
@@ -4961,6 +4985,12 @@ class K4GuardTests(unittest.TestCase):
             self.assertLess(k4_growth_exponent(small, large), K4_GROWTH_EXPONENT)
         for small in (0.0045, 0.01, 0.05, 0.2):
             self.assertGreater(k4_growth_exponent(small, 16 * small), K4_GROWTH_EXPONENT)
+        # The host factor: never below 1, so a faster host keeps the workstation's bound, and proportional on a slower one (the
+        # macOS runner's 2.8 times); this host's own factor is finite and at least 1.
+        self.assertEqual(k4_host_scale(K4_REFERENCE_SECONDS / 3), 1.0)
+        self.assertAlmostEqual(k4_host_scale(K4_REFERENCE_SECONDS * 2.8), 2.8)
+        factor = k4_host_factor()
+        self.assertTrue(1.0 <= factor < math.inf, factor)
 
     def test_k4_hook_process_and_hints(self):
         # Section 9.7: the real hook, launched as `python3 -B scripts/hooks/secret_path_guard.py` with a JSON payload on stdin (the payload
