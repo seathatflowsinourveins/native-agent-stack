@@ -99,10 +99,10 @@ of the 119 winner acceptance classes overstated, 13 commands that were only vers
 it could not settle; this revision corrects them. 55 of the 119 entries changed (32 classes, 48 commands and 31
 cited sources); the lane owners re-cited their winners to the files that record the runs; 13 `none_recorded`
 entries got their check to run back; restic is cited to its off-host receipt in four rows; and three rows that had
-no winner gained six. The edition now has 125 winner entries: 70 `upstream_example_or_native_operation`, 24
-`local_integration_check`, 14 `structural_validation`, 1 `independent_observation` and 16 `none_recorded`, 13 of
-which name the check to run. Row classes: 13 `local_integration_check`, 11 `none_recorded`, 7
-`structural_validation`, 5 `upstream_example_or_native_operation` and 1 `independent_observation`. The six policy
+no winner gained six. The edition now has 125 winner entries: 72 `upstream_example_or_native_operation`, 24
+`local_integration_check`, 14 `structural_validation`, 1 `independent_observation` and 14 `none_recorded`, 11 of
+which name the check to run. Row classes: 13 `local_integration_check`, 10 `none_recorded`, 7
+`structural_validation`, 6 `upstream_example_or_native_operation` and 1 `independent_observation`. The six policy
 classes have no defined order, so the build enforces what can be enforced:
 when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
 one that at least one winner's acceptance carries, and where the winners carry several, the edition records the
@@ -206,8 +206,8 @@ Write a new edition, or update this one in the change that causes it, when any o
    disappears, so re-read those rows.
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
 4. **A pending source lands.** PR #575, #578 or #535 merges: the build hashes the landed file and labels it as
-   landed after this edition's base. PR #569, #570, #358 and #573 have landed, and `cross:wsl-distro` was
-   re-rated when #569 did.
+   landed after this edition's base. PR #569, #570, #358 and #573 have landed: their citations are plain
+   `source_path` entries now, and `cross:wsl-distro` was re-rated when #569 did.
 5. **A lane owner changes a verdict or its wording** for one of its rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a

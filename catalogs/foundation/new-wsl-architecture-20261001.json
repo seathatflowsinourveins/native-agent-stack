@@ -44,11 +44,11 @@
       {"source_path": "adoption/bootstrap.md"},
       {"source_path": "catalogs/us-equities/runtime-target.json"},
       {"source_path": "catalogs/saturation/ledger.json"},
-      {"pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "11a30bea"}},
-      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-      {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
-      {"pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "b05d8fd7"}},
-      {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "b05d8fd7"}},
+      {"source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
+      {"source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+      {"source_path": "catalogs/us-equities/convergence-20260926.json"},
+      {"source_path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"},
+      {"source_path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json"},
       {"pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md", "pull_request": 575, "commit": "51cb79ba"}},
       {"pending_source": {"path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json", "pull_request": 575, "commit": "51cb79ba"}}
     ]
@@ -360,7 +360,7 @@
       "reasons": [
         {"text": "Serena is the layer winner for exact symbols and references; ast-grep, codebase-memory-mcp and jCodeMunch are conditional lanes, and a known-source read with rg comes first.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The token-efficiency profile carries Serena; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes until each has a reviewed pin on both platforms.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
+        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
         {"text": "jcodemunch-mcp's acceptance is the native receipt of 2026-09-20, which ran version 1.108.319 (the stack pin).", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict confirmed, 0 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/code-navigation.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
@@ -377,7 +377,7 @@
         "Record a find_referencing_symbols receipt with argv, exit code, returned span and reference set."
       ],
       "gates": [
-        {"text": "Four of the six SubagentStart carrier blocks name jCodeMunch tools, while no adoption profile installs jcodemunch-mcp, it has no Linux pin and no script registers it: after stage 2 alone the carrier names a server that is not there. Give it a Linux pin and an install step, or stop the carrier naming it.", "kind": "lane", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "11a30bea"}}
+        {"text": "Four of the six SubagentStart carrier blocks name jCodeMunch tools, while no adoption profile installs jcodemunch-mcp, it has no Linux pin and no script registers it: after stage 2 alone the carrier names a server that is not there. Give it a Linux pin and an install step, or stop the carrier naming it.", "kind": "lane", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
       ],
       "owner_lane": "foundation",
       "notes": "Serena's pin is a development commit (upstream declares 2.0.0.dev0); the commit is its identity."
@@ -477,7 +477,7 @@
           "pin": "1.19.1",
           "pin_source": "manifests/stack.json:727",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "curl --fail --silent --show-error http://127.0.0.1:16333/healthz (the new host file moves the port)", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
+          "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
         },
         {
@@ -589,7 +589,7 @@
         "Install the hooks for claude-code and codex against the new URL, then record a write and read-back receipt."
       ],
       "gates": [
-        {"text": "Hindsight 0.10.2, the memory lane's fit target, enters only through this layer's comparison. The production program reports stale and paused pages and a held cold seed for it on the current host; its receipts are not published, and a new distribution fixes neither a provider-route timeout nor an adapter's semantics.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "b05d8fd7"}},
+        {"text": "Hindsight 0.10.2, the memory lane's fit target, enters only through this layer's comparison. The production program reports stale and paused pages and a held cold seed for it on the current host; its receipts are not published, and a new distribution fixes neither a provider-route timeout nor an adapter's semantics.", "kind": "lane", "source_path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"},
         {"text": "The operator decision on the 2026-09-23 live-store isolation breach on the workstation (rewrite or collect the live wiki history, compact the database again) is open; the new distribution starts with a fresh store.", "kind": "user_side", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/README.md"}
       ],
       "owner_lane": "foundation",
@@ -734,10 +734,10 @@
       },
       "reasons": [
         {"text": "The token-efficiency adoption profile (14 pinned components) was accepted as the selection on 2026-09-30 in #540; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) the run established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1; context-mode a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack 1.301 [1.176, 1.411], p at most 0.0006); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does (1.045 [0.93, 1.20]).", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-        {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced. The Harbor run's headroom arm ran headroom-ai 0.39.1 with the all extra (receipt run.tools_under_test), while the profile pin and the recipes row are headroom 0.37.0, so the headroom measurements (0.867 tokens, 0.983 cost) are for 0.39.1 and apply to the pinned 0.37.0 only by extrapolation; rtk 0.50.0 and context-mode 1.0.169 match their pins.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
+        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) the run established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1; context-mode a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack 1.301 [1.176, 1.411], p at most 0.0006); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does (1.045 [0.93, 1.20]).", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+        {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced. The Harbor run's headroom arm ran headroom-ai 0.39.1 with the all extra (receipt run.tools_under_test), while the profile pin and the recipes row are headroom 0.37.0, so the headroom measurements (0.867 tokens, 0.983 cost) are for 0.39.1 and apply to the pinned 0.37.0 only by extrapolation; rtk 0.50.0 and context-mode 1.0.169 match their pins.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
         {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
@@ -790,7 +790,7 @@
           "pin": "v0.23.0",
           "pin_source": "blueprints/runtime-workers/openhands/pins.json:62",
           "install": {"command": "uv tool install harbor==0.23.0", "kind": "upstream_documented", "url": "https://github.com/harbor-framework/harbor"},
-          "acceptance": {"command": "the 288-trial Harbor v0.23.0 run (36 SWE-bench Verified tasks, 8 arms, graded by Harbor's verifier, preregistered; receipt blocks run, schedule, results and reproduction, where the preregistered analysis re-run reproduces the stored results byte for byte)", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
+          "acceptance": {"command": "the 288-trial Harbor v0.23.0 run (36 SWE-bench Verified tasks, 8 arms, graded by Harbor's verifier, preregistered; receipt blocks run, schedule, results and reproduction, where the preregistered analysis re-run reproduces the stored results byte for byte)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
           "upstream_currency": {"latest_release": "v0.23.0 (2026-09-12)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/harbor-framework/harbor/releases"}
         }
       ],
@@ -804,9 +804,9 @@
         "missing": "c1: the layer record cites a superseded receipt, its candidate dispositions disagree with the verdict, and the Inspect AI and MLflow entries predate the gap-wave2 receipts; c2: seven of eight unclaimed manifest components carry no omission reason and the sweep candidates are not in the record; c3: no representative comparison of semantic advice on fresh, independently labelled cases, no lifecycle receipt from the new WSL host, and the Harbor pilot that forces subagent use has not run; c4: every layer-level review records open gaps; c5: no current closure record."
       },
       "reasons": [
-        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-        {"text": "The forced-subagent pilot is NOT RUN: the receipt's subagent_scan shows 0 delegation calls in 308 stream logs and 308 client transcripts and no subagents directory, so Harbor's per-subagent attribution is untested.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
-        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "587fd8eb"}},
+        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+        {"text": "The forced-subagent pilot is NOT RUN: the receipt's subagent_scan shows 0 delegation calls in 308 stream logs and 308 client transcripts and no subagents directory, so Harbor's per-subagent attribution is untested.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
+        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
         {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
         {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
         {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"},
@@ -829,7 +829,7 @@
       "gates": [
         {"text": "The native Claude OAuth token for Harbor runs is minted by the user with `claude setup-token`.", "kind": "user_side", "source_path": "docs/decisions/2026-09-29-key-management.md"},
         {"text": "The Gate A Harbor pilot (forced subagent use) runs before any Harbor result supports a multi-agent claim.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"},
-        {"text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.", "kind": "lane", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "11a30bea"}}
+        {"text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.", "kind": "lane", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
       ],
       "owner_lane": "foundation: Gate A",
       "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner."
@@ -937,7 +937,7 @@
         {"text": "Dagu gives workflow run history, cancel and checkpointed step retry; the systemd user manager gives deadlines, control-group kill and descendant cleanup.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "systemd is the Ubuntu 24.04 distribution package; the stack pins the package version and cites upstream v255 source for semantics only.", "source_path": "manifests/stack.json"},
         {"text": "Dagu 2.16.6 failed its preregistered SIGKILL recovery case: without a scheduler, all retries within the 150 s bound were refused; it recovered (about 182 s) only in a post-hoc variant with a scheduler started after the kill, labelled a deviation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
-        {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "b05d8fd7"}},
+        {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "source_path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json", "pull_request": 575, "commit": "51cb79ba"}},
         {"text": "systemd's acceptance is the historical host's user journal and manager record of the 2026-09-29 extended-hours paper series; the new-distro recipe's systemd checks are documented and not run, so they stay in the new-host steps (first boot F1 to F3), not in the acceptance.", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
       ],
@@ -1429,15 +1429,15 @@
       "reasons": [
         {"text": "runtime-target.json selects alpaca-py 0.44.0 for ingestion; EdgarTools, exchange-calendars and DuckDB come from the layer's current choice.", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "The live provider evidence is five authenticated Alpaca market-data requests on 2026-09-20; the rest is native operation and local integration from 2026-09-19 to 2026-09-26.", "source_path": "blueprints/us-equities/authenticated-data/native-receipt.json"},
-        {"text": "The 2026-09-26 convergence record keeps Databento and Sharadar as targeted candidates and pandas_market_calendars and sec-api-python as keep_but_compare.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"text": "The 2026-09-26 convergence record keeps Databento and Sharadar as targeted candidates and pandas_market_calendars and sec-api-python as keep_but_compare.", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 3 corrections to the layer records). It names 5 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/market-data-reference.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
         {"name": "Databento", "verdict": "conditional, source review; a targeted candidate on 2026-09-26", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Massive Python client", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "Sharadar SEP/SF1", "verdict": "a targeted candidate on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
-        {"name": "pandas_market_calendars", "verdict": "keep_but_compare on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}}
+        {"name": "Sharadar SEP/SF1", "verdict": "a targeted candidate on 2026-09-26", "source_path": "catalogs/us-equities/convergence-20260926.json"},
+        {"name": "pandas_market_calendars", "verdict": "keep_but_compare on 2026-09-26", "source_path": "catalogs/us-equities/convergence-20260926.json"}
       ],
       "new_host_steps": [
         "Provide CPython 3.13.15 for the research SDK lock (no step installs it; Ubuntu 24.04's python3 is 3.12) and a separate environment per recipe.",
@@ -1696,7 +1696,7 @@
       "reasons": [
         {"text": "The current choice is native Codex and Claude for bounded research and review, Dagu and systemd for local command workflows, one OpenTelemetry Collector with Prometheus, Loki and Grafana, and Restic; pandera 0.33.1, the verdict's data-check winner, has no stack pin.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "Dagu's selection, recipe and failed preregistered SIGKILL case are shared with the foundation row scheduling-supervision.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
-        {"text": "The 2026-09-26 convergence record keeps Temporal, DBOS, Pueue, Dagster and Great Expectations as keep_but_compare.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"text": "The 2026-09-26 convergence record keeps Temporal, DBOS, Pueue, Dagster and Great Expectations as keep_but_compare.", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"text": "systemd's acceptance is the historical host's user journal and manager record of the 2026-09-29 extended-hours paper series; the new-distro recipe's systemd checks (documented, not run) stay in the new-host steps of row scheduling-supervision.", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 5 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/data-quality-orchestration.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
@@ -1705,7 +1705,7 @@
         {"name": "pandera 0.33.1", "verdict": "the verdict's data-check winner, installed only by the data recipe; no stack pin", "source_path": "blueprints/us-equities/data/README.md"},
         {"name": "Temporal", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Modal", "verdict": "unqualified; the client needs a user login", "source_path": "catalogs/landscape/us-equities.json"},
-        {"name": "DBOS, Pueue, Dagster and Great Expectations", "verdict": "keep_but_compare on 2026-09-26", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}}
+        {"name": "DBOS, Pueue, Dagster and Great Expectations", "verdict": "keep_but_compare on 2026-09-26", "source_path": "catalogs/us-equities/convergence-20260926.json"}
       ],
       "new_host_steps": [
         "These install with the foundation rows native-clients, scheduling-supervision, observation-inference and recovery-portability; pandera installs only in the data recipe's promotion-gate environment.",
@@ -1822,17 +1822,17 @@
       },
       "reasons": [
         {"text": "NautilusTrader 2.0.0rc5 is the user-selected destination engine; LEAN stays the retained historical comparison engine; the Alpaca path is a separate boundary.", "source_path": "catalogs/us-equities/runtime-target.json"},
-        {"text": "ml4t-backtest 0.1.12 passed the same-input SPY one_zero trial under the v1 contract on 2026-09-26; its consequence for the layer is not recorded.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"text": "ml4t-backtest 0.1.12 passed the same-input SPY one_zero trial under the v1 contract on 2026-09-26; its consequence for the layer is not recorded.", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"text": "SPY/LEAN parity is established for the historical one_zero case only (136 checks, 0 failed); realistic liquidity and rc5 native broker adapter acceptance remain open.", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "The acceptance plan's status line for the frozen SPY comparison ('Planned, not executed', as of September 21, 2026) predates the rc5 one_zero replay that spy-parity/verdict-v2.json records and is stale; the superseding note is in the trading lane's pull request.", "source_path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md"},
-        {"text": "In the 2026-09-26 convergence record at PR #358's head, the NautilusTrader winner is cross_family_disputed: both GPT-6 votes refute its earns_it rationale as circular and accept only provisional retention, so comparative merit stays unproven.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"text": "In the 2026-09-26 convergence record at PR #358's head, the NautilusTrader winner is cross_family_disputed: both GPT-6 votes refute its earns_it rationale as circular and accept only provisional retention, so comparative merit stays unproven.", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"text": "The research state marks the layer comparison_required.", "source_path": "catalogs/landscape/research-state.json"},
         {"text": "NautilusTrader 2.0.0rc5 also has a native-operation record: the unchanged EURUSD quickstart, run twice in isolation; this row labels the engine by the SPY parity verdict, which is the evidence for its role here.", "source_path": "evidence/receipts/native-nautilus-v2-20260920.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 3 corrections to the layer records). It names 4 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/backtesting-engine.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
-        {"name": "ml4t-backtest 0.1.12", "verdict": "a same-input one_zero pass under the v1 contract; no recorded consequence", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"name": "ml4t-backtest 0.1.12", "verdict": "a same-input one_zero pass under the v1 contract; no recorded consequence", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"name": "Lumibot", "verdict": "conditional, with empty evidence references", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "LEAN Alpaca brokerage", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "vectorbt", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"}
@@ -1844,7 +1844,7 @@
         "Replay the retained SPY/LEAN parity case and compare with the frozen oracle; record the host receipt."
       ],
       "gates": [
-        {"text": "The comparative merit of NautilusTrader stays disputed until the trading lane's comparison runs; retention is provisional.", "kind": "lane", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}}
+        {"text": "The comparative merit of NautilusTrader stays disputed until the trading lane's comparison runs; retention is provisional.", "kind": "lane", "source_path": "catalogs/us-equities/convergence-20260926.json"}
       ],
       "owner_lane": "trading",
       "notes": "Owner's verdict: selection of record, open, distance 4 (the other run graded c1 and c4 partial). Blocking item: c3. Five of six SPY parity cases have no mapping yet: costs_and_rounding_stress blocks one_stress, margin_and_adaptive_state blocks two_zero, adaptive_stress and over_limit, and both block two_stress (spy-parity/mapping-manifest-v2.json); one_zero passed on 2026-09-23. The layer entry's \"parity BLOCKED\" text is stale and gets a dated superseding note. Cross-family (PR #358 at b0eb7a11): GPT-6 accepts provisional retention and disputes comparative merit."
@@ -1975,7 +1975,7 @@
           "pin": "1.2.9",
           "pin_source": "manifests/stack.json:1493",
           "install": {"command": "uv venv --python \"$PYTHON\" \"$WAVE_DIR/venv\"; uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock", "kind": "repo_recipe", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
-          "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\"", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/README.md"},
+          "acceptance": {"command": "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\"", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/research-evaluation/receipt.json"},
           "upstream_currency": {"latest_release": "v1.4.10 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/skfolio/skfolio/releases"}
         }
       ],
@@ -2181,7 +2181,7 @@
           "pin": "1.19.1",
           "pin_source": "manifests/stack.json:727",
           "install": {"command": "official v1.19.1 archive qdrant-x86_64-unknown-linux-musl.tar.gz, verified against SHA-256 70a40529e2ebe0a2787d574d3a2e28437cfe94f26f24fa419f6ac57b4ae817c9", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "curl --fail --silent --show-error http://127.0.0.1:16333/healthz (the new host file moves the port)", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
+          "acceptance": {"command": "GET / on the running Qdrant server: it answered with version 1.19.1 at commit 6ab21ca, the catalog pin (host receipt, stage use, result pass)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--qdrant--use--20260925.json"},
           "upstream_currency": {"latest_release": "v1.19.1 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/qdrant/qdrant/releases"}
         },
         {
@@ -2215,10 +2215,10 @@
       "reasons": [
         {"text": "The 2026-09-22 verdict keeps native Codex with its SDK, ai-memory and SocratiCode for research workers, and the current choice adds QMD BM25, Serena, Qdrant, Context Mode and RTK; the verdict's pins (CLI 0.155.1, ai-memory 2.3.1, SocratiCode 1.14.0) are older than the stack pins carried here.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "The research state asks for held-out finance, document and code relevance judgments comparing fidelity, abstention and total task cost.", "source_path": "catalogs/landscape/research-state.json"},
-        {"text": "In the 2026-09-26 convergence record at PR #358's head, the votes allow only provisional retention of ai-memory and SocratiCode: operational receipts do not establish comparative superiority.", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}},
+        {"text": "In the 2026-09-26 convergence record at PR #358's head, the votes allow only provisional retention of ai-memory and SocratiCode: operational receipts do not establish comparative superiority.", "source_path": "catalogs/us-equities/convergence-20260926.json"},
         {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 3 corrections to the layer records). It names 4 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "pending_source": {"path": "evidence/artifacts/new-wsl-layer-reviews-20261001/agents-models-workers.json", "pull_request": 575, "commit": "51cb79ba"}}
       ],
-      "evidence_class": "none_recorded",
+      "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
         {"name": "Mem0", "verdict": "overlap", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "Hindsight", "verdict": "conditional, source review", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2227,10 +2227,11 @@
       ],
       "new_host_steps": [
         "These install with the foundation rows native-clients, durable-memory, code-navigation, document-retrieval, semantic-rag and token-efficiency; nothing extra for this layer.",
-        "Decide QMD BM25 against hybrid on the recorded retrieval-quality evidence, then build the held-out relevance judgments before any comparison run."
+        "Decide QMD BM25 against hybrid on the recorded retrieval-quality evidence, then build the held-out relevance judgments before any comparison run.",
+        "Check Qdrant's health endpoint on the new host file's port: `curl --fail --silent --show-error http://127.0.0.1:<port>/healthz`."
       ],
       "gates": [
-        {"text": "GPT-6 disputes the earns_it label of ai-memory and SocratiCode (PR #358); retention is provisional until the held-out comparison runs.", "kind": "lane", "pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "6d0fbf5c"}}
+        {"text": "GPT-6 disputes the earns_it label of ai-memory and SocratiCode (PR #358); retention is provisional until the held-out comparison runs.", "kind": "lane", "source_path": "catalogs/us-equities/convergence-20260926.json"}
       ],
       "owner_lane": "trading",
       "notes": "Owner's verdict: selection of record, open, distance 5. This row follows the foundation memory and retrieval rows, whose closure governs. Blocking item: c3, a preregistered held-out financial, document and code retrieval comparison with abstention. The layer entry's pins (ai-memory 2.3.1, SocratiCode 1.14.0, CLI 0.155.1) lag the stack pins shown."
@@ -2440,8 +2441,8 @@
       ],
       "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Ubuntu 26.04.1 LTS", "verdict": "queued as a bounded comparison unit before any switch", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "11a30bea"}},
-        {"name": "Path B: `wsl --import` and a manual user", "verdict": "fallback only after the first launch shows that cloud-init did not provision", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "11a30bea"}}
+        {"name": "Ubuntu 26.04.1 LTS", "verdict": "queued as a bounded comparison unit before any switch", "source_path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md"},
+        {"name": "Path B: `wsl --import` and a manual user", "verdict": "fallback only after the first launch shows that cloud-init did not provision", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
       ],
       "new_host_steps": [
         "Stage 1 on Windows (W1 to W6 of the recipe): preflight with no Ubuntu Pro cloud-init files; download ubuntu-24.04.5-wsl-amd64.wsl and verify its sha256 against both publications; render %USERPROFILE%\\.cloud-init\\<Name>.user-data from adoption/templates/wsl/cloud-init.user-data.template; `wsl.exe --install --from-file <image> --name <Name> --location <dir> --no-launch`; first launch with standard input at end of file; confirm cloud-init reports disabled by its marker file.",
@@ -2504,7 +2505,7 @@
       ],
       "gates": [
         {"text": "The runtime-worker roster qualification lands with PR #535; its candidates stay unaccepted until then.", "kind": "lane", "pending_source": {"path": "blueprints/runtime-workers/README.md", "pull_request": 535, "commit": "1195e212"}},
-        {"text": "AgentRelay and Relaycast have no catalog layer: they enter only once a layer or a cross row with its own decision record names them. The production program reports that automatic Codex PTY submission through AgentRelay is held on the current host; its receipts are not published.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "b05d8fd7"}}
+        {"text": "AgentRelay and Relaycast have no catalog layer: they enter only once a layer or a cross row with its own decision record names them. The production program reports that automatic Codex PTY submission through AgentRelay is held on the current host; its receipts are not published.", "kind": "lane", "source_path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"}
       ],
       "owner_lane": "foundation",
       "notes": "AgentRelay and Relaycast commits were confirmed upstream on 2026-10-01 (release commits for v13.0.0 and v8.14.0); a pin of record needs a repository record and its own qualification."
