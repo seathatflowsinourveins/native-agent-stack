@@ -82,9 +82,24 @@ under Coordination).
 The Sonnet wrappers only run three commands and return the raw result. `convert.py` checks each copy against the
 file Codex wrote.
 
-GPT-6 always runs at effort max, never ultra. Ultra lets Codex delegate to sub-agents, which breaks the one-model
-lane. The GPT-6 model is a per-run choice (`build_args.py --gpt6-model`, default `gpt-6-astra`). It is recorded in
-`staged.json`, in each job directory and in every GPT-6 vote.
+The harness default stays max. A lane may stage `codex.effort: "ultra"` in `staged.json`; the lane stager chooses
+per the current GPT worker standard. Blind or isolated review lanes must stay at max, because ultra auto-delegates
+in multi-agent v2 (openai/codex `rust-v0.159.2`, `codex-rs/core/src/session/multi_agents.rs:77-103`).
+Ultra resolves each root request to the model catalog's `multi_agent_reasoning_effort`, else max for an
+ultra-capable model (`codex-rs/protocol/src/openai_models/reasoning_effort.rs:12-35`,
+`codex-rs/core/src/client.rs:863-872`): Astra and Sol 6.1 send xhigh (`codex-rs/models-manager/models.json:22,196`).
+The runner validates effort against that pin's catalog, including namespaced aliases, and records staged `effort`
+and resolved `request_effort` in `inputs.json` and `result`; changing effort reruns a completed job.
+Ultra usage is `primary_thread_only`, even when delegation items do not appear; any collab/sub-agent item also
+marks that status on other lanes. The counts remain available but do not establish complete delegated usage
+(`codex-rs/exec/src/lib.rs:1636-1638`, `codex-rs/exec/src/event_processor_with_jsonl_output.rs:509-511,533-535`).
+The model remains a per-run choice (`build_args.py --gpt6-model`,
+default `gpt-6-astra`), recorded in `staged.json`, in each job directory and in every GPT-6 vote.
+If staged settings change between binding inputs and launching the detached runner, the attempt is refused with
+exit 2, failure kind `inputs_changed`, including invalid restaging; `exit`, `done` and `failure.json` record it.
+Initial invalid settings are refused before any job state changes; a refusal against a running job leaves its
+owned state intact. Other terminal refusals, including LIMIT, quota, missing Codex and missing gateway key, write
+failure receipts. Start it again to bind valid new settings.
 
 The templates tell each role which pinned skills to use (search-first and iterative-retrieval for discovery;
 supply-chain-risk-auditor and fp-check for refutation, which takes evidence before any verdict, plus layer-specific
@@ -139,7 +154,7 @@ Isolation limits:
 - The runner works in `<work-dir>/empty`. It holds only `.claude/settings.json`, which context-mode reads and Codex does not, so no Codex project layer applies there. A host system config (`/etc/codex/config.toml`) would apply, so keep it absent on sweep hosts.
 
 How the runner uses it:
-- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`.
+- `codex_job.py` sets `CODEX_HOME` to that home, drops `--ignore-user-config` and adds `-p stack-worker`: `codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" ...`. Staged effort and search settings override these defaults and the profile.
 - The key comes from `$OMNIROUTE_API_KEY` in the harness's environment. For a keyless loopback gateway, upstream's non-interactive setup with no login or API key, the staged placeholder `local-loopback` fills an unset variable; Codex's `env_key` only needs the variable to exist. `--omniroute-require-key` stages no placeholder, so a job without the variable ends with exit 6 before codex starts.
 - `--quota-stop-percent` is refused with this provider: the quota probe reads the native login, not the gateway's pool.
 - A job's `inputs.json` records the provider, so a gateway run never reuses a native job's result. It also records any provider headers, so a job finished under other headers is rerun, not reused.
@@ -424,7 +439,11 @@ new run from the latest retained record, and say so when no record exists yet.
 
 ## Coordination
 
-- **Live web search (2026-09-26).** Every GPT-6 job runs with `-c web_search="live"`. `--search` before `exec`
+- **Web search.** GPT-6 jobs default to `-c web_search="live"`; `staged.json` `codex.web_search` can choose
+  `disabled`, `cached`, `indexed` or `live` (openai/codex `rust-v0.159.2`,
+  `codex-rs/protocol/src/config_types.rs:371-382`). The chosen mode is bound to inputs and recorded in `result`,
+  so changing it reruns a completed job; an absent mode in older inputs means live. A gateway lane can stage
+  `disabled` when its route rejects live search. Historical qualification (2026-09-26): `--search` before `exec`
   (the form this harness used through its first run) and passing no flag both send `external_web_access: false`, so
   search reads a cached index; only `web_search="live"` sends true. The evidence is the #332 qualification artifacts
   `evidence/artifacts/sota-refresh-20260926/codex/results/websearch-*.json`, cases W1 to W3. The 2026-09-26 run's
@@ -461,16 +480,55 @@ new run from the latest retained record, and say so when no record exists yet.
   Workflow runs, and stop it when it appears. Do not sign in again (provider state is shared).
   Record the stopped run as the recipe says. A failed job runs again at its next `start`; its failed
   attempt moves unchanged to `gpt6/<job>/attempts/<n>/` and stays in `result` and `gpt6_usage`. A finished job
-  returns "already done" only for the same inputs (prompt and schema sha256, model, effort), so a resumed Workflow
+  returns "already done" only with exit 0, a `turn.completed` event, a non-empty `-o` output file and the same inputs
+  (prompt and schema sha256, model, effort, web search mode), so a resumed Workflow
   whose regenerated prompt differs gets a fresh GPT-6 vote, never a cached one for another claim.
+- **Completion and recovery.** Exit 0 without a completed turn and non-empty output becomes harness exit 126,
+  failure kind `incomplete`, with `result.status: "failed"`; the next start reruns it and retains the failed attempt.
+  Legacy false successes are rejected by the same rule in both `wait` and `result` and archived unchanged. Successful output uses
+  `result.status: "done"`. Codex only emits `turn.completed` for a completed turn and can write an empty final
+  message or fail to write it (openai/codex `rust-v0.159.2`,
+  `codex-rs/exec/src/event_processor_with_jsonl_output.rs:525-536,631-635`,
+  `codex-rs/exec/src/event_processor.rs:31-46`).
+  Native jobs use Codex's built-in OpenAI provider and its retry/idle defaults
+  (`codex-rs/model-provider-info/src/lib.rs:63-65,492-510,532-551`). Both lanes retain the default-on connection
+  retry feature (`codex-rs/features/src/lib.rs:1292-1297`), so Codex rides out a connection outage shorter than the
+  idle budget; a longer one is stopped by the watchdog and retried once, budget permitting.
+  Reconnect `error` JSONL events are not progress: connection retries emit them between sleeps of 5 to 60 seconds
+  (`codex-rs/core/src/responses_retry.rs:18-19,71-96`,
+  `codex-rs/exec/src/event_processor_with_jsonl_output.rs:447-458`). Configurable `codex.idle_timeout_s` defaults to
+  1800 seconds, nearly four times the coordinator's observed 473 seconds of healthy silence on 2026-09-30;
+  `codex.timeout_s` defaults to 4000 seconds for non-ultra lanes. An unqueued job fits the wrapper's 4320-second
+  wait: even counting a default quota probe plus backstop (30 + 30), version check (60) and both grace periods
+  (10 + 10) separately yields 4140 seconds. The deadline actually includes the version check and every probe.
+  Ad-hoc research lanes may stage a larger total budget and need a caller that waits that long.
+  When effort is ultra, absent settings default to `idle_timeout_s: 4200` and `timeout_s: 14400`; explicitly staged
+  values remain in force. An ultra idle timeout of 3600 seconds or less is refused before initial state changes,
+  because the upstream default multi-agent wait cap is 3600 seconds (`codex-rs/core/src/config/mod.rs:257`,
+  `codex-rs/core/src/tools/handlers/multi_agents_v2/wait.rs:53-64`). A lane-local override of that upstream cap
+  needs a correspondingly larger idle budget. The sweep wrapper cannot wait for the ultra total default.
+  Idle expiry stops the process group with exit 125 and retries once. Capacity failures retry at most twice, with
+  exponential backoff and jitter (30 seconds base, 120 seconds cap); a backoff or retry starts only with at least
+  300 seconds remaining after the delay. Otherwise the original failure stays terminal. The total budget covers
+  the version check, every quota probe, all attempts and backoff. When the deadline follows `turn.completed`,
+  the runner waits up to `kill_grace_s` for a clean exit before stopping the group, because exec shuts down before
+  writing `-o` (`codex-rs/exec/src/lib.rs:1318-1321`,
+  `codex-rs/exec/src/event_processor_with_jsonl_output.rs:631-636`).
+  Stopping a group whose members have all exited is complete on macOS although `killpg` reports EPERM there
+  (apple-oss-distributions/xnu `xnu-12377.121.6` `bsd/kern/kern_sig.c` `killpg1` skips zombies and returns EPERM when
+  nothing was signalled, where Linux signals a zombie silently): the runner treats ESRCH and EPERM alike, which the
+  2026-09-30 macOS full-suite job on this branch had reported as exit 2 "refused" for every watchdog test whose group
+  died at TERM.
+  Usage-limit and HTTP-429 handling take precedence.
 - **Quota gate (optional).** `build_args.py --quota-stop-percent 95` writes `codex.quota_stop_percent` into
-  `staged.json`; without it the gate is off. With it, each job, after it gets its slot and before codex starts,
+  `staged.json`; without it the gate is off. With it, each job, after it gets its slot and before every attempt,
   runs the staged `codex_quota.py --json --gate 95`. That reads the account's usage snapshot through the native
   `codex app-server` method `account/rateLimits/read` (no model turn, no transcript, no credential file) and
   reports the gate when a window's `used_percent` reaches the percent, `rateLimitReachedType` is set or
   `ordinaryUsageAllowed` is false. The job then ends with exit 3 before codex starts, and `<W>/LIMIT` (when absent)
   and the job's `stderr.txt` name the reason, the used percent and the reset time: stop and tell the user, as for
-  a usage limit. Every probe is kept in `gpt6/<job>/quota.json`, and `result` summarizes it as `quota`. A probe that
+  a usage limit. Every probe is kept in its attempt's `quota.json` (earlier attempts under `attempts/<n>/`), and
+  `result` summarizes the current one as `quota`. A probe that
   fails (no snapshot within `codex.quota_timeout_s`, default 30 s, an error answer or a missing script) is recorded
   there and never blocks the job; the usage-limit rule above still catches a real limit. A running sweep keeps the
   runtime it was staged with, so a work directory staged before this gate existed has no gate.

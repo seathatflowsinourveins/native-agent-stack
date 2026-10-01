@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import contextlib
 import copy
+import errno
 import hashlib
 import importlib.util
 import io
@@ -20,6 +21,7 @@ import re
 import shlex
 import shutil
 import stat
+import signal
 import subprocess
 import sys
 import tempfile
@@ -633,6 +635,12 @@ if sys.argv[1:] == ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the quot
             print(json.dumps({{"id": msg["id"], key: quota.get(key)}}), flush=True)
     sys.exit(0)
 config = json.load(open(os.environ["FAKE_CODEX_CONFIG"]))
+if config.get("attempts"):
+    counter = config["attempt_counter"]
+    attempt = int(open(counter).read()) if os.path.exists(counter) else 0
+    with open(counter, "w") as out:
+        out.write(str(attempt + 1))
+    config.update(config["attempts"][min(attempt, len(config["attempts"]) - 1)])
 stdin, null = os.fstat(0), os.stat(os.devnull)
 record = {{"argv": sys.argv[1:], "cwd": os.getcwd(), "stdin_devnull": (stdin.st_ino, stdin.st_dev) == (null.st_ino, null.st_dev),
           "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG"),
@@ -647,13 +655,29 @@ if config.get("stubborn"):
 if config.get("log"):
     with open(config["log"], "a") as log:
         log.write("start %.6f\\n" % time.time())
+for tick in config.get("ticks", []):
+    time.sleep(tick.get("delay_s", 0))
+    if "event" in tick:
+        print(json.dumps(tick["event"]), flush=True)
+    if "raw" in tick:
+        sys.stdout.write(tick["raw"])
+        sys.stdout.flush()
+    if "stderr" in tick:
+        sys.stderr.write(tick["stderr"])
+        sys.stderr.flush()
 time.sleep(config.get("sleep", 0))
-if config.get("last") is not None:
-    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
-        json.dump(config["last"], out, indent=2)
 for event in config.get("events", []):
     print(json.dumps(event))
 sys.stdout.flush()
+# Upstream exec emits completion, shuts down, then writes -o (rust-v0.159.2,
+# codex-rs/exec/src/lib.rs:1318-1321; event_processor_with_jsonl_output.rs:631-636).
+time.sleep(config.get("output_delay_s", 0))
+if config.get("last") is not None:
+    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
+        json.dump(config["last"], out, indent=2)
+if "last_text" in config:
+    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
+        out.write(config["last_text"])
 sys.stderr.write(config.get("stderr", ""))
 if config.get("record"):
     with open(config["record"], "w") as out:
@@ -1082,6 +1106,10 @@ class RunnerCase(unittest.TestCase):
 
     def fake(self, **config):
         config.setdefault("record", str(self.bin / "record.json"))
+        if config.get("attempts"):
+            counter = self.bin / "attempt-counter"
+            counter.unlink(missing_ok=True)
+            config["attempt_counter"] = str(counter)
         write_json(self.config_path, config)
 
     def call(self, *args, shell="bash"):
@@ -1094,7 +1122,12 @@ class RunnerCase(unittest.TestCase):
         self.assertEqual(started.stdout.strip(), f"started {name}")
         waited = self.call("wait", name, "20", shell=shell)
         self.assertTrue(waited.stdout.startswith("done exit="), waited.stdout + waited.stderr)
-        return json.loads(self.call("result", name, shell=shell).stdout)
+        result = json.loads(self.call("result", name, shell=shell).stdout)
+        if result.get("exit") == codex_job.EXIT_REFUSED:  # a started job is never refused: retain the runner's reason
+            directory = self.work / "gpt6" / name
+            self.fail(f"the runner refused {name}: {codex_job.read(directory / 'stderr.txt')!r} "
+                      f"{codex_job.read(directory / 'failure.json')!r}")
+        return result
 
     def record(self):
         return json.loads((self.bin / "record.json").read_text())
@@ -1103,6 +1136,58 @@ class RunnerCase(unittest.TestCase):
 LAST = {"repository": "https://github.com/ggml-org/llama.cpp", "latest_release": "b1", "stars_known": 1}
 COMPLETED = {"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 80, "output_tokens": 7,
                                                  "reasoning_output_tokens": 3}}
+
+
+class ProcessGroupStopTests(unittest.TestCase):
+    """Darwin's killpg skips zombies and reports EPERM when a still-existing group has nothing else to signal
+    (apple-oss-distributions/xnu xnu-12377.121.6, bsd/kern/kern_sig.c, killpg1); Linux signals a zombie silently. The
+    2026-09-30 macOS full-suite job on this branch failed every watchdog test whose group died at TERM with exit 2
+    "refused" (the uncaught PermissionError from the SIGKILL after the grace period). Synthetic fixture: os.killpg is
+    patched to answer EPERM once the group holds only exited members; the macOS job on the fixed head is the real
+    observation."""
+
+    def child(self) -> subprocess.Popen:
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"], start_new_session=True,
+                                   stdin=subprocess.DEVNULL)
+        self.addCleanup(lambda: (process.kill(), process.wait()) if process.poll() is None else None)
+        return process
+
+    @staticmethod
+    def darwin_killpg(real):
+        def killpg(pgid, signum):
+            if signum == signal.SIGTERM:
+                return real(pgid, signum)
+            raise PermissionError(errno.EPERM, "Operation not permitted")  # signal 0 or SIGKILL: only zombies left
+        return killpg
+
+    def test_stop_group_completes_when_darwin_reports_eperm_for_the_dead_group(self):
+        process = self.child()
+        with mock.patch.object(codex_job.os, "killpg", side_effect=self.darwin_killpg(os.killpg)):
+            codex_job.stop_group(process, 0.1)
+        self.assertEqual(process.returncode, -signal.SIGTERM)
+
+    def test_stop_group_still_kills_a_group_that_survives_term(self):
+        process = self.child()
+        real = os.killpg
+        calls = []
+
+        def killpg(pgid, signum):
+            calls.append(signum)
+            if signum == signal.SIGTERM:
+                return None  # a member ignores TERM: the group stays alive until KILL
+            return real(pgid, signum)
+        with mock.patch.object(codex_job.os, "killpg", side_effect=killpg):
+            codex_job.stop_group(process, 0.2)
+        self.assertEqual((process.returncode, calls[0], calls[-1]), (-signal.SIGKILL, signal.SIGTERM, signal.SIGKILL))
+
+    def test_group_alive_treats_esrch_and_darwin_eperm_as_stopped(self):
+        for error in (ProcessLookupError(errno.ESRCH, "No such process"),
+                      PermissionError(errno.EPERM, "Operation not permitted")):
+            with self.subTest(error=type(error).__name__), \
+                    mock.patch.object(codex_job.os, "killpg", side_effect=error):
+                self.assertFalse(codex_job.group_alive(2 ** 22 + 1))
+        with mock.patch.object(codex_job.os, "killpg", return_value=None):
+            self.assertTrue(codex_job.group_alive(2 ** 22 + 1))
 
 
 class OmniRouteLaneRunnerTests(RunnerCase):
@@ -1123,7 +1208,8 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
         self.assertEqual(self.record()["argv"], [
-            "exec", "-p", "stack-worker", "--skip-git-repo-check", "-s", "read-only",
+            "exec", "-p", "stack-worker",
+            "--skip-git-repo-check", "-s", "read-only",
             "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])
@@ -1132,11 +1218,25 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         self.assertEqual((result["status"], result["exit"], result["model"]), ("done", 0, "cx/gpt-6-astra"))
         self.assertEqual(json.loads((directory / "inputs.json").read_text())["provider"], "omniroute")
 
+    def test_lane_overrides_profile_effort_and_web_search_from_staged_settings(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())
+        staged["codex"].update(model="cx/gpt-6.1-sol", effort="ultra", web_search="disabled")
+        write_json(self.work / "staged.json", staged)
+        self.env["OMNIROUTE_API_KEY"] = "fixture-not-a-key"
+        result = self.job("worker", last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["effort"], result["web_search"]), (0, "ultra", "disabled"))
+        for override in ('model_reasoning_effort="ultra"', 'web_search="disabled"'):
+            self.assertIn(override, self.record()["argv"])
+        self.assertNotIn("features.unbounded_connection_retries=false", self.record()["argv"])
+        self.assertEqual(result["inputs"]["effort"], "ultra")
+
     def test_lane_without_its_key_never_starts_codex(self):
         self.lane()
         self.env.pop("OMNIROUTE_API_KEY", None)
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
         self.assertEqual(result["exit"], codex_job.EXIT_NO_KEY)
+        self.assertEqual(result["failure"]["kind"], "no_key")
         self.assertIn("OMNIROUTE_API_KEY is not set", result["stderr_tail"])
         self.assertFalse((self.bin / "record.json").exists())  # the fake codex never ran
 
@@ -1238,6 +1338,243 @@ class OmniRouteLaneRunnerTests(RunnerCase):
 
 
 class RunnerTests(RunnerCase):
+    def bound_job(self, name="snapshot"):
+        directory = self.work / "gpt6" / name
+        directory.mkdir(parents=True, exist_ok=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6-astra"))
+        return directory
+
+    def test_invalid_restage_through_start_and_run_records_inputs_changed(self):
+        for command in ("start", "run"):
+            with self.subTest(command=command):
+                directory = self.bound_job(command)
+                bound = (directory / "inputs.json").read_bytes()
+                self.settings({"effort": "invalid"})
+                self.fake(last=LAST, events=[COMPLETED])
+                args = (command, command, self.prompt, self.schema) if command == "start" else (command, command)
+                refused = self.call(*args)
+                self.assertEqual(refused.returncode, 2, refused.stdout + refused.stderr)
+                self.assertFalse((self.bin / "record.json").exists())
+                self.assertEqual((directory / "inputs.json").read_bytes(), bound)
+                self.assertEqual((directory / "exit").read_text().strip(), "2")
+                self.assertTrue((directory / "done").exists())
+                result = json.loads(self.call("result", command).stdout)
+                self.assertEqual((result["status"], result["failure"]["kind"]), ("failed", "inputs_changed"))
+                self.assertEqual(self.call("wait", command, "0").stdout.strip(), "done exit=2")
+
+    def test_start_records_invalid_restage_in_its_detached_runner(self):
+        self.fake(last=LAST, events=[COMPLETED])
+
+        def launch(argv, **kwargs):
+            # Restaging between start's binding and the child reading settings is deterministic here.
+            self.settings({"effort": "invalid"})
+            inherited = os.dup(kwargs["pass_fds"][0])
+            with mock.patch.dict(os.environ, {**kwargs["env"], "SWEEP_JOB_LOCK_FD": str(inherited)}):
+                self.assertEqual(codex_job.run(self.work, "start-race"), 2)
+            return mock.Mock()
+
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch):
+            self.assertEqual(codex_job.start(self.work, "start-race", str(self.prompt), str(self.schema)), 0)
+        self.assertFalse((self.bin / "record.json").exists())
+        directory = self.work / "gpt6" / "start-race"
+        self.assertTrue((directory / "done").exists())
+        self.assertEqual((directory / "exit").read_text().strip(), "2")
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "inputs_changed")
+
+    def test_ultra_defaults_and_idle_refusal_precede_state_changes(self):
+        write_json(self.work / "staged.json", {"codex": {"model": "gpt-6.1-sol", "effort": "ultra"}})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"], config["request_effort"]),
+                         (4200, 14400, "xhigh"))
+        self.settings({"effort": "ultra", "idle_timeout_s": 4800, "timeout_s": 18000})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (4800, 18000))
+        for idle in (1, 1800, 3599, 3600):
+            with self.subTest(idle=idle):
+                self.settings({"effort": "ultra", "idle_timeout_s": idle})
+                refused = self.call("start", "ultra-refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("above 3600 s", refused.stderr)
+                self.assertFalse((self.work / "gpt6").exists())
+
+    def test_catalog_request_effort_mapping_and_primary_thread_usage(self):
+        self.assertEqual(set(codex_job.MODEL_MULTI_AGENT_EFFORTS), set(codex_job.MODEL_EFFORTS))
+        for model, expected in (("gpt-6-astra", "xhigh"), ("cx/gpt-6.1-sol-extra", "xhigh"),
+                                ("gpt-6-sol", "max"), ("gpt-daybreak-blue-latest", "max")):
+            with self.subTest(model=model):
+                self.assertEqual(codex_job.job_inputs(b"p", b"s", model, effort="ultra")["request_effort"], expected)
+        collab = {"type": "item.completed", "item": {"type": "collab_tool_call", "tool": "spawn_agent"}}
+        result = self.job("delegated-max", last=LAST, events=[collab, COMPLETED])
+        self.assertEqual((result["usage"], result["usage_status"]), (COMPLETED["usage"], "primary_thread_only"))
+        self.prompt.write_text("Another claim.")
+        self.fake(last=LAST, events=[COMPLETED])
+        self.assertEqual(self.call("start", "delegated-max", self.prompt, self.schema).returncode, 0)
+        self.assertEqual(self.call("wait", "delegated-max", "20").stdout.strip(), "done exit=0")
+        result = json.loads(self.call("result", "delegated-max").stdout)
+        self.assertEqual(result["usage_status"], "reported")
+        self.assertEqual(result["attempts"][0]["usage_status"], "primary_thread_only")
+
+    def test_completion_grace_allows_final_output_after_the_deadline(self):
+        self.settings({"timeout_s": 0.3, "idle_timeout_s": 10, "kill_grace_s": 0.8})
+        result = self.job("completed-grace", events=[COMPLETED], output_delay_s=0.5, last=LAST)
+        self.assertEqual((result["status"], result["exit"]), ("done", 0))
+        self.assertEqual(json.loads(result["output_text"]), LAST)
+        self.assertIsNone(result["failure"])
+
+    def test_completion_grace_is_bounded(self):
+        self.settings({"timeout_s": 0.3, "idle_timeout_s": 10, "kill_grace_s": 0.1})
+        result = self.job("completed-stuck", events=[COMPLETED], output_delay_s=60, last=LAST)
+        self.assertEqual((result["exit"], result["failure"]["kind"]), (124, "timeout"))
+
+    def test_refusal_paths_write_terminal_failure_receipts(self):
+        bad_schema = self.bin / "bad-schema.json"
+        bad_schema.write_text("not JSON")
+        large_prompt = self.bin / "large.txt"
+        large_prompt.write_text("x" * (codex_job.MAX_PROMPT_BYTES + 1))
+        for name, prompt, schema in (("bad-schema", self.prompt, bad_schema),
+                                     ("large-prompt", large_prompt, self.schema)):
+            with self.subTest(name=name):
+                self.assertEqual(self.call("start", name, prompt, schema).returncode, 2)
+                directory = self.work / "gpt6" / name
+                self.assertTrue((directory / "done").exists())
+                failure = json.loads((directory / "failure.json").read_text())
+                self.assertEqual((failure["kind"], failure["exit"]), ("refused", 2))
+        directory = self.bound_job("slot-limit")
+        (self.work / "LIMIT").write_text("quota reached\n")
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job, "acquire_slot", return_value=(None, None)):
+            self.assertEqual(codex_job.run(self.work, "slot-limit"), 3)
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "limit")
+        self.assertTrue((directory / "done").exists())
+
+    def test_supervisor_launch_refusal_writes_terminal_failure_receipt(self):
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=OSError("launch refused")):
+            self.assertEqual(codex_job.start(self.work, "launch-refused", str(self.prompt), str(self.schema)), 2)
+        directory = self.work / "gpt6" / "launch-refused"
+        self.assertTrue((directory / "done").exists())
+        self.assertEqual((directory / "exit").read_text().strip(), "2")
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "refused")
+
+    def test_zero_exit_requires_a_completed_turn_and_nonempty_output(self):
+        cases = [("no-evidence", {}), ("no-turn", {"last": LAST}), ("no-output", {"events": [COMPLETED]}),
+                 ("empty-output", {"events": [COMPLETED], "last_text": ""}),
+                 ("blank-output", {"events": [COMPLETED], "last_text": " \n"})]
+        for name, config in cases:
+            with self.subTest(name=name):
+                result = self.job(name, **config)
+                self.assertEqual((result["status"], result["exit"]), ("failed", 126))
+                self.assertEqual(result["failure"]["kind"], "incomplete")
+                self.assertFalse(result["failure"]["retryable"])
+                self.assertFalse(result["limit_marker"])
+                recovered = self.job(name, last=LAST, events=[COMPLETED])
+                self.assertEqual((recovered["status"], recovered["exit"]), ("done", 0))
+                self.assertEqual(recovered["attempts"][0]["exit"], 126)
+                self.assertEqual(recovered["attempts"][0]["failure"]["kind"], "incomplete")
+
+    def test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs(self):
+        for name, config in (("no-turn", {"last": LAST}), ("no-output", {"events": [COMPLETED]}),
+                             ("empty-output", {"events": [COMPLETED], "last_text": ""})):
+            with self.subTest(name=name):
+                self.job(name, **config)
+                directory = self.work / "gpt6" / name
+                (directory / "exit").write_text("0\n", encoding="utf-8")
+                (directory / "failure.json").unlink(missing_ok=True)
+                before = json.loads(self.call("result", name).stdout)
+                self.assertEqual((before["status"], before["exit"], before["failure"]["kind"]),
+                                 ("failed", 126, "incomplete"))
+                self.assertEqual(self.call("wait", name, "0").stdout.strip(), "done exit=126")
+                recovered = self.job(name, last=LAST, events=[COMPLETED])
+                self.assertEqual(recovered["exit"], 0)
+                self.assertEqual(recovered["attempts"][0]["failure"]["kind"], "incomplete")
+                # Historical files stay unchanged even when their summary rejects the old success claim.
+                self.assertEqual((directory / "attempts" / "1" / "exit").read_text(), "0\n")
+
+    def test_nonzero_exit_is_a_failure_even_with_completed_turn_and_output(self):
+        result = self.job("failed-turn", exit=1, last=LAST, events=[COMPLETED])
+        self.assertEqual((result["status"], result["exit"], result["failure"]["kind"]), ("failed", 1, "exit"))
+
+    def test_effort_is_staged_bound_to_inputs_and_recorded_for_the_attempt(self):
+        self.settings({"model": "gpt-6.1-sol"})
+        first = self.job("worker", last=LAST, events=[COMPLETED])
+        self.assertEqual(first["effort"], "max")
+        self.assertEqual((first["request_effort"], first["inputs"]["request_effort"]), ("max", "max"))
+        self.settings({"model": "gpt-6.1-sol", "effort": "ultra"})
+        self.fake(last=LAST, events=[COMPLETED])
+        started = self.call("start", "worker", self.prompt, self.schema)
+        self.assertIn("inputs changed", started.stdout)
+        self.assertIn("started worker", started.stdout)
+        self.assertTrue(self.call("wait", "worker", "20").stdout.startswith("done exit=0"))
+        result = json.loads(self.call("result", "worker").stdout)
+        self.assertIn('model_reasoning_effort="ultra"', self.record()["argv"])
+        self.assertEqual((result["effort"], result["inputs"]["effort"]), ("ultra", "ultra"))
+        self.assertEqual((result["request_effort"], result["inputs"]["request_effort"]), ("xhigh", "xhigh"))
+        self.assertEqual((result["usage"], result["usage_status"]), (COMPLETED["usage"], "primary_thread_only"))
+        self.assertEqual(result["attempts"][0]["inputs"]["effort"], "max")
+        self.assertEqual(self.call("start", "worker", self.prompt, self.schema).stdout.strip(), "already done: worker")
+        self.settings({"model": "gpt-6.1-sol", "effort": "max"})
+        self.assertEqual(json.loads(self.call("result", "worker").stdout)["effort"], "ultra")
+
+    def test_a_model_outside_the_catalog_takes_every_effort_but_ultra(self):
+        # Codex sends a non-ultra effort unchanged for fallback metadata; ultra alone would resolve to medium.
+        self.settings({"model": "unknown-model", "effort": "max"})
+        result = self.job("outside", last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["effort"]), (0, "max"))
+        self.assertIn('model_reasoning_effort="max"', self.record()["argv"])
+
+    def test_settings_changed_between_binding_and_launch_are_refused(self):
+        directory = self.work / "gpt6" / "snapshot"
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6.1-sol"))
+        self.settings({"model": "gpt-6.1-sol", "effort": "ultra", "web_search": "disabled"})
+        self.fake(last=LAST, events=[COMPLETED])
+        launched = self.call("run", "snapshot")
+        self.assertEqual(launched.returncode, 2)
+        self.assertFalse((self.bin / "record.json").exists())  # no Codex invocation under a different identity
+        result = json.loads(self.call("result", "snapshot").stdout)
+        self.assertEqual((result["status"], result["failure"]["kind"]), ("failed", "inputs_changed"))
+        self.assertEqual((result["effort"], result["web_search"]), ("max", "live"))
+
+    def test_unsupported_effort_and_web_search_are_refused_before_state_changes(self):
+        cases = [("gpt-6.1-sol", "unknown"), ("gpt-6.1-sol", "none"), ("gpt-6.1-sol", "minimal"),
+                 ("gpt-6.1-sol", "persistent"), ("gpt-6.1-sol", None), ("gpt-6.1-sol", True),
+                 ("gpt-6-luna", "ultra"), ("cx/gpt-6-luna", "ultra"), ("gpt-5.5", "max"),
+                 ("codex-auto-review", "ultra"), ("unknown-model", "ultra"), ("cx/unknown-model", "ultra")]
+        for model, effort in cases:
+            with self.subTest(model=model, effort=effort):
+                self.settings({"model": model, "effort": effort})
+                refused = self.call("start", "refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("codex.effort", refused.stderr)
+                self.assertFalse((self.work / "gpt6" / "refused").exists())
+        for mode in ("unknown", None, True):
+            with self.subTest(web_search=mode):
+                self.settings({"web_search": mode})
+                refused = self.call("start", "refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("codex.web_search", refused.stderr)
+                self.assertFalse((self.work / "gpt6" / "refused").exists())
+
+    def test_web_search_modes_are_staged_bound_and_recorded(self):
+        first = self.job("search", last=LAST, events=[COMPLETED])
+        self.assertEqual(first["web_search"], "live")
+        for mode in ("disabled", "cached", "indexed", "live"):
+            with self.subTest(mode=mode):
+                self.settings({"web_search": mode})
+                self.fake(last=LAST, events=[COMPLETED])
+                self.assertIn("started search", self.call("start", "search", self.prompt, self.schema).stdout)
+                self.assertTrue(self.call("wait", "search", "20").stdout.startswith("done exit=0"))
+                result = json.loads(self.call("result", "search").stdout)
+                self.assertEqual(result["web_search"], mode)
+                self.assertIn(f'web_search="{mode}"', self.record()["argv"])
+        self.settings({"web_search": "disabled"})
+        self.assertEqual(json.loads(self.call("result", "search").stdout)["web_search"], "live")
+
     def test_codex_command_line_stdin_and_directory(self):
         result = self.job("gpt6-probe", last=LAST, events=[{"type": "thread.started", "thread_id": "fixture"}, COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
@@ -1281,8 +1618,9 @@ class RunnerTests(RunnerCase):
         refused = self.call("start", "gpt6-fit-beta", self.prompt, self.schema)
         self.assertEqual(refused.returncode, 3)
         self.assertIn("LIMIT marker present; refusing to start gpt6-fit-beta", refused.stdout)
-        self.assertEqual(self.call("wait", "gpt6-fit-beta", "5").stdout.strip(), "done exit=none (the job is not running)")
-        self.assertEqual(json.loads(self.call("result", "gpt6-fit-beta").stdout)["status"], "not_running")
+        self.assertEqual(self.call("wait", "gpt6-fit-beta", "5").stdout.strip(), "done exit=3")
+        refused_result = json.loads(self.call("result", "gpt6-fit-beta").stdout)
+        self.assertEqual((refused_result["status"], refused_result["failure"]["kind"]), ("failed", "limit"))
 
     def test_usage_limit_in_json_error_events_sets_the_marker(self):
         # codex exec --json prints fatal errors on stdout as `error` and `turn.failed` events (rust-v0.155.1).
@@ -1371,7 +1709,7 @@ class RunnerTests(RunnerCase):
         refused = self.call("start", "gpt6-fit-alpha", self.prompt, self.schema)
         self.assertEqual(refused.returncode, 3)
         stale = json.loads(self.call("result", "gpt6-fit-alpha").stdout)
-        self.assertEqual((stale["status"], stale["exit"], stale["output_text"]), ("not_running", None, None))
+        self.assertEqual((stale["status"], stale["exit"], stale["output_text"]), ("failed", 3, None))
         self.assertEqual([a["exit"] for a in stale["attempts"]], [0, 0])
         (self.work / "LIMIT").unlink()
         self.settings({"model": "gpt-6-sol"})  # a different model is a different claim too
@@ -1380,7 +1718,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(log.read_text().count("start"), 3)
 
     def test_a_running_job_is_not_started_twice(self):
-        self.fake(last=LAST, sleep=2)
+        self.fake(last=LAST, sleep=2, events=[COMPLETED])
         self.assertEqual(self.call("start", "gpt6-slow", self.prompt, self.schema).returncode, 0)
         again = self.call("start", "gpt6-slow", self.prompt, self.schema)
         self.assertEqual(again.stdout.strip(), "already running: gpt6-slow")
@@ -1395,7 +1733,7 @@ class RunnerTests(RunnerCase):
     def test_slots_bound_concurrent_codex_processes(self):
         self.settings({"slots": 1})
         log = self.bin / "slots.log"
-        self.fake(last=LAST, sleep=0.6, log=str(log))
+        self.fake(last=LAST, sleep=0.6, log=str(log), events=[COMPLETED])
         for name in ("gpt6-a", "gpt6-b"):
             self.assertEqual(self.call("start", name, self.prompt, self.schema).returncode, 0)
         for name in ("gpt6-a", "gpt6-b"):
@@ -1440,6 +1778,7 @@ class RunnerTests(RunnerCase):
         done = run(["bash", HARNESS / "codex_call.sh", "--work-dir", self.work, "start", "gpt6-x", self.prompt,
                     self.schema], env=env)
         self.assertEqual(done.returncode, 127)
+        self.assertEqual(json.loads(self.call("result", "gpt6-x").stdout)["failure"]["kind"], "no_codex")
         self.assertIn("codex is not on PATH", done.stdout)
         self.assertEqual(self.call("wait", "gpt6-x", "5").stdout.strip(), "done exit=127")
         self.assertEqual(self.call("start", "../escape", self.prompt, self.schema).returncode, 2)
@@ -1523,6 +1862,288 @@ def quota_answer(used, reached=None):
             "rateLimitResetCredits": {"availableCount": 1, "credits": None}, "accountId": "acct-fixture"}
 
 
+
+class RecoveryRunnerTests(RunnerCase):
+    CAPACITY = "Selected model is at capacity. Please try a different model."
+
+    def setUp(self):
+        super().setUp()
+        self.settings({"idle_timeout_s": 0.6, "timeout_s": 400, "kill_grace_s": 0.1,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.03})
+
+    def capacity_events(self):
+        return [{"type": "error", "message": self.CAPACITY},
+                {"type": "turn.failed", "error": {"message": self.CAPACITY}}]
+
+    def simulated_run(self, name, *, limit_during_backoff=False, quota_probe=None, version_delay_s=0,
+                      retry_probe_delay_s=0, backoff_overrun_s=0):
+        """Exercise real supervisor/watchdog deadlines with a virtual clock and no model process."""
+        directory = self.work / "gpt6" / name
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6-astra"))
+        clock, starts = [0.0], []
+
+        class Process:
+            pid = 987654
+
+            def __init__(proc, argv, **kwargs):
+                starts.append(argv)
+                proc.returncode = 1 if len(starts) == 1 else None
+                if len(starts) == 1:
+                    kwargs["stdout"].write(("\n".join(json.dumps(e) for e in self.capacity_events()) + "\n").encode())
+                    kwargs["stdout"].flush()
+
+            def poll(proc):
+                return proc.returncode
+
+            def wait(proc, timeout=None):
+                if proc.returncode is not None:
+                    return proc.returncode
+                clock[0] += timeout
+                raise subprocess.TimeoutExpired("fixture", timeout)
+
+        def sleep(seconds):
+            clock[0] += seconds + backoff_overrun_s
+            if limit_during_backoff:
+                (self.work / "LIMIT").write_text("another job reached quota\n")
+
+        def version(codex):
+            clock[0] += version_delay_s
+            return "codex-cli fixture"
+
+        def probe(base, directory, config):
+            if len(starts) == 1:
+                clock[0] += retry_probe_delay_s
+            return quota_probe(base, directory, config) if quota_probe else None
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.subprocess, "Popen", Process), \
+                mock.patch.object(codex_job, "codex_version", side_effect=version), \
+                mock.patch.object(codex_job, "quota_gate", side_effect=probe), \
+                mock.patch.object(codex_job.time, "monotonic", side_effect=lambda: clock[0]), \
+                mock.patch.object(codex_job.time, "sleep", side_effect=sleep), \
+                mock.patch.object(codex_job, "stop_group"):
+            code = codex_job.run(self.work, name)
+        return code, codex_job.result(self.work, name), starts, clock[0]
+
+    def test_second_attempt_hits_the_shared_deadline(self):
+        self.settings({"timeout_s": 301, "idle_timeout_s": 1000, "kill_grace_s": 0.1,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        code, result, starts, elapsed = self.simulated_run("shared-deadline")
+        self.assertEqual((code, len(starts), elapsed), (124, 2, 301))
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["capacity"])
+        self.assertEqual(result["failure"]["kind"], "timeout")
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_version_check_spends_the_shared_budget(self):
+        self.settings({"timeout_s": 400, "idle_timeout_s": 1000, "capacity_backoff_s": 0.02,
+                       "capacity_backoff_max_s": 0.02})
+        code, result, starts, elapsed = self.simulated_run("version-budget", version_delay_s=101)
+        self.assertEqual((code, len(starts), elapsed), (1, 1, 101))
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_retry_probe_spending_the_reserve_keeps_original_failure(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        for delay in (101, 401):
+            with self.subTest(probe_delay=delay):
+                code, result, starts, _ = self.simulated_run(f"probe-reserve-{delay}", retry_probe_delay_s=delay)
+                self.assertEqual((code, len(starts), result["failure"]["kind"]), (1, 1, "capacity"))
+                self.assertTrue(result["failure"]["retryable"])
+                self.assertFalse(result["failure"]["retrying"])
+
+    def test_backoff_oversleep_spending_the_reserve_keeps_original_failure(self):
+        self.settings({"timeout_s": 301, "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        code, result, starts, _ = self.simulated_run("oversleep", backoff_overrun_s=2)
+        self.assertEqual((code, len(starts), result["attempts"]), (1, 1, []))
+        self.assertEqual(result["failure"]["kind"], "capacity")
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_limit_during_backoff_records_a_refused_retry(self):
+        code, result, starts, _ = self.simulated_run("backoff-limit", limit_during_backoff=True)
+        self.assertEqual((code, len(starts), result["exit"]), (3, 1, 3))
+        self.assertEqual(result["failure"]["kind"], "limit")
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "capacity")
+        directory = self.work / "gpt6" / "backoff-limit"
+        self.assertEqual((directory / "exit").read_text().strip(), "3")
+        self.assertTrue((directory / "done").exists())
+
+    def test_every_attempt_gets_its_own_quota_probe_and_a_retry_can_be_gated(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = []
+
+        def probe(base, directory, config):
+            probes.append(len(probes) + 1)
+            gated = len(probes) == 2
+            write_json(directory / "quota.json", {"status": "gate" if gated else "ok", "probe": len(probes)})
+            return "retry quota reached" if gated else None
+
+        code, result, starts, _ = self.simulated_run("retry-quota", quota_probe=probe)
+        self.assertEqual((code, len(starts), probes), (3, 1, [1, 2]))
+        self.assertEqual(result["failure"]["kind"], "quota")
+        directory = self.work / "gpt6" / "retry-quota"
+        self.assertEqual(json.loads((directory / "attempts" / "1" / "quota.json").read_text()),
+                         {"status": "ok", "probe": 1})
+        self.assertEqual(json.loads((directory / "quota.json").read_text()), {"status": "gate", "probe": 2})
+
+    def test_real_quota_probe_runs_before_both_attempts(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = self.bin / "probes.log"
+        result = self.job("probe-twice", quota={"log": str(probes), "result": quota_answer(10)},
+                          attempts=[{"exit": 1, "events": self.capacity_events()},
+                                    {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual((result["exit"], probes.read_text().count("probe")), (0, 2))
+        self.assertEqual(result["quota"]["status"], "ok")
+        kept = self.work / "gpt6" / "probe-twice" / "attempts" / "1" / "quota.json"
+        self.assertEqual(json.loads(kept.read_text())["status"], "ok")
+
+    def test_limit_created_during_retry_probe_prevents_another_attempt(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = []
+
+        def probe(base, directory, config):
+            probes.append(1)
+            if len(probes) == 2:
+                (base / "LIMIT").write_text("another job reached quota\n")
+
+        code, result, starts, _ = self.simulated_run("limit-probe", quota_probe=probe)
+        self.assertEqual((code, len(starts), result["failure"]["kind"]), (3, 1, "limit"))
+
+    def test_backoff_longer_than_remaining_budget_preserves_original_failure(self):
+        self.settings({"timeout_s": 30, "capacity_backoff_s": 60, "capacity_backoff_max_s": 60})
+        result = self.job("too-long", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+        self.assertEqual(result["failure"]["kind"], "capacity")
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertIsNone(result["failure"]["delay_s"])
+
+    def test_retry_floor_prevents_backoff_with_less_than_300_seconds_after_delay(self):
+        self.settings({"timeout_s": 300.1, "capacity_backoff_s": 1, "capacity_backoff_max_s": 1})
+        result = self.job("retry-floor", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_terminal_stderr_capacity_error_is_retryable(self):
+        result = self.job("stderr-capacity", attempts=[{"exit": 1, "stderr": "ERROR: " + self.CAPACITY + "\n"},
+                                                      {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "capacity")
+
+    def test_capacity_retries_once_for_duplicate_error_reports_and_retains_the_failure(self):
+        result = self.job("recover", attempts=[{"exit": 1, "events": self.capacity_events()},
+                                              {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        kept = self.work / "gpt6" / "recover" / "attempts" / "1"
+        self.assertEqual(json.loads((kept / "failure.json").read_text())["kind"], "capacity")
+        self.assertIn(self.CAPACITY, (kept / "events.jsonl").read_text())
+        self.assertEqual((kept / "inputs.json").read_bytes(), (kept.parent.parent / "inputs.json").read_bytes())
+        self.assertEqual((result["attempts"][0]["exit"], result["attempts"][0]["usage"]), (1, None))
+        self.assertEqual(json.loads(result["output_text"]), LAST)
+
+    def test_capacity_retry_budget_and_backoff_cap(self):
+        result = self.job("capacity", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["limit_marker"]), (1, False))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "3")
+        self.assertEqual([a["exit"] for a in result["attempts"]], [1, 1])
+        delays = [a["failure"]["delay_s"] for a in result["attempts"]]
+        self.assertTrue(0.02 * 0.9 <= delays[0] <= 0.02 * 1.1)
+        self.assertEqual(delays[1], 0.03)
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertTrue(all(a["usage_status"] == "unavailable" for a in result["attempts"]))
+
+    def test_limits_take_precedence_over_capacity(self):
+        for message in (LIMIT_TEXT, "exceeded retry limit, last status: 429 Too Many Requests"):
+            with self.subTest(message=message):
+                (self.work / "LIMIT").unlink(missing_ok=True)
+                result = self.job("limited", attempts=[{"exit": 1, "events":
+                    self.capacity_events() + [{"type": "error", "message": message}]}])
+                self.assertEqual((result["exit"], result["limit_marker"]), (3, True))
+                self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_quoted_capacity_and_stderr_trace_are_not_retryable(self):
+        result = self.job("quoted", exit=1,
+                          events=[{"type": "item.completed", "item": {"type": "web_search", "text": self.CAPACITY}}],
+                          stderr="2026-09-30 TRACE tool: " + self.CAPACITY + "\n")
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertFalse(result["failure"]["retryable"])
+
+    def test_idle_stops_the_group_retries_once_and_retains_both_failures(self):
+        pid_files = [self.bin / f"stubborn-{i}.pid" for i in (1, 2)]
+        result = self.job("silent", attempts=[{"sleep": 60, "stubborn": str(p)} for p in pid_files])
+        self.assertEqual(result["exit"], 125)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["idle"])
+        self.assertEqual(result["failure"]["kind"], "idle")
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertFalse(result["limit_marker"])
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline and any(process_alive(int(p.read_text())) for p in pid_files):
+            time.sleep(0.1)
+        self.assertTrue(all(not process_alive(int(p.read_text())) for p in pid_files))
+
+    def test_stderr_and_incomplete_json_are_not_progress(self):
+        ticks = [{"delay_s": 0.05, "raw": '{"type":"item.started"}', "stderr": "diagnostic\n"}] * 40
+        result = self.job("partial", attempts=[{"sleep": 60, "ticks": ticks}])
+        self.assertEqual(result["exit"], 125)
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+
+    def test_reconnect_error_events_are_not_progress(self):
+        ticks = [{"delay_s": 0.05, "event": {"type": "error", "message": "Reconnecting... 1/5"}}] * 40
+        result = self.job("reconnect", attempts=[{"sleep": 60, "ticks": ticks}])
+        self.assertEqual((result["exit"], result["failure"]["kind"]), (125, "idle"))
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+        directory = self.work / "gpt6" / "reconnect"
+        for path in (directory, directory / "attempts" / "1"):
+            self.assertLess(len(codex_job.events(path)), len(ticks))  # stopped while reconnects were still arriving
+        self.assertFalse(result["limit_marker"])
+
+    def test_default_budgets_clear_observed_healthy_silence_and_research_duration(self):
+        write_json(self.work / "staged.json", {"codex": {}})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (1800, 4000))
+        self.assertLess(config["timeout_s"] + config["quota_timeout_s"] + codex_job.QUOTA_BACKSTOP_S
+                        + 60 + 2 * config["kill_grace_s"], 8 * 540)
+        self.settings({"idle_timeout_s": 600, "timeout_s": 4000})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (600, 4000))
+
+    def test_new_complete_events_keep_the_job_alive(self):
+        ticks = [{"delay_s": 0.1, "event": {"type": "item.updated", "item": {"id": "1", "type": "web_search"}}}] * 12
+        result = self.job("progress", ticks=ticks, last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["attempts"]), (0, []))
+
+    def test_idle_failure_can_recover(self):
+        result = self.job("idle-recover", attempts=[{"sleep": 60}, {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "idle")
+
+    def test_total_timeout_remains_terminal(self):
+        self.settings({"timeout_s": 0.7, "idle_timeout_s": 5, "kill_grace_s": 0.1})
+        result = self.job("total-timeout", attempts=[{"sleep": 60}])
+        self.assertEqual((result["exit"], result["attempts"]), (124, []))
+        self.assertEqual(result["failure"]["kind"], "timeout")
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_watchdog_policy_requires_finite_positive_durations_and_bounded_retries(self):
+        for key, value in (("idle_timeout_s", 0), ("idle_timeout_s", float("nan")),
+                           ("capacity_backoff_s", float("inf")), ("capacity_max_retries", -1),
+                           ("capacity_max_retries", 11)):
+            self.settings({key: value})
+            with self.subTest(key=key, value=value), self.assertRaises(codex_job.UsageError):
+                codex_job.settings(self.work)
+
+
 class QuotaGateTests(RunnerCase):
     def test_the_gate_is_off_by_default(self):
         probes = self.bin / "probes.log"
@@ -1557,6 +2178,7 @@ class QuotaGateTests(RunnerCase):
         self.assertEqual((result["exit"], result["limit"], result["limit_marker"], result["started"]),
                          (3, False, True, None))
         self.assertFalse((self.bin / "record.json").exists())  # codex exec never started
+        self.assertEqual(result["failure"]["kind"], "quota")
         limit = (self.work / "LIMIT").read_text()
         self.assertTrue(limit.startswith("quota gate: primary window 96% used >= 95% (window 10080 min, resets "
                                          "2026-10-03T01:28Z); codex.quota_stop_percent 95; checked "), limit)
@@ -1647,7 +2269,7 @@ class ShellTests(RunnerCase):
     def test_staged_copy_needs_no_work_dir_argument(self):
         work = stage_work(self, ("alpha",))
         self.assertEqual(build(work).returncode, 0)
-        self.fake(last=LAST)
+        self.fake(last=LAST, events=[COMPLETED])
         write_json(work / "staged.json", {**json.loads((work / "staged.json").read_text()),
                                           "codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05}})
         env = dict(self.env, SWEEP_WORK_DIR=str(self.work))  # ignored: the staged copy uses its own directory
