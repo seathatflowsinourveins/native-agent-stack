@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30 (it takes its one host path as an argument; the returned outputs mask it as <sdk-main>). It needs git and network access
+# (https://github.com/OpenHands/software-agent-sdk), and is documentation of what ran, not a supported tool.
+# What upstream's default branch says about litellm now: whether it has moved past the pinned archive's litellm==1.93.0. A blobless, depth-1 fetch of refs/heads/main.
+# usage: sdk_main.sh <sdk-main>
+set -u
+D=$1
+rm -rf "$D"; mkdir -p "$D"; cd "$D" || exit 2
+git init -q . && git remote add origin https://github.com/OpenHands/software-agent-sdk.git && git config remote.origin.promisor true && git config remote.origin.partialclonefilter blob:none
+git fetch -q --depth 1 --filter=blob:none origin refs/heads/main
+echo "main: $(git rev-parse FETCH_HEAD), committed $(git log -1 --format=%cI FETCH_HEAD)"
+echo "--- pyproject.toml lines that name litellm"
+git show FETCH_HEAD:pyproject.toml | grep -n -i litellm | cut -c1-200
+echo "--- the uv.lock entry of litellm"
+git show FETCH_HEAD:uv.lock | grep -n -A1 '^name = "litellm"' | head -3

@@ -9162,6 +9162,106 @@
       "bytes": 33599
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.builder.sh.txt",
+      "sha256": "dfa60a294304516396c1b59a6639307663262240f0176f52eea0cbdb2a4b9905",
+      "bytes": 11602
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.guard-controls.sh.txt",
+      "sha256": "9caa503c059046c8fec305d56a06369b78a9f417d5f5cf2a3243b2ecf5023b7b",
+      "bytes": 4154
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.hash-check.py.txt",
+      "sha256": "40762ced5a4e11f0e671c44db2bfa9f0f7510cc9f376fe6ec7394a1af2fdefee",
+      "bytes": 2114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.install-check.sh.txt",
+      "sha256": "d9f556a4a9353f94b96f6ac6c306c3fa1ad6a1aad389d34add4e7857917e45aa",
+      "bytes": 2583
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-advisories.py.txt",
+      "sha256": "6f9a74f3397f73ab2ba2430e1a0cefbb9b347afe4c7ae2bbc1ae9c14019c1f0b",
+      "bytes": 2898
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.frozen.txt",
+      "sha256": "38fc33d9163ec68d95273d69164cf750739ed4388d1ceeec0e0d001dee15290c",
+      "bytes": 1815
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.ordinary.txt",
+      "sha256": "12e1416360272d39db051c51c52e669039d135973c124a7fe9658eb1a32cf798",
+      "bytes": 14276
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.frozen.txt",
+      "sha256": "c2a019dd8ee02aa51149bd0db875393053117fad21a4637fcc7b2528ba8fc29c",
+      "bytes": 1815
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.ordinary.txt",
+      "sha256": "6ddd8d8b91e3de5e471d0b42e74cf05ed581e1feeadc1cc895f6262f9731e643",
+      "bytes": 15168
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-scan-step.sh.txt",
+      "sha256": "01ad4df005730573b5081885eac38cc6ba8c90594d8fdc155cc9bd9edb884ea1",
+      "bytes": 2693
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.proxy-refs.py.txt",
+      "sha256": "352ffe324e8e63be0897e69aa9276b4451ee55f7cfafec1bcde46a45fbf1be70",
+      "bytes": 2942
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.relock.sh.txt",
+      "sha256": "0dc391ac8a1f1bcfad75935cec7e0bb19db0f1baeab9e1553107439514977683",
+      "bytes": 5000
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-opus.md",
+      "sha256": "b6058a888eae46fcfbf3256a2a841da0fe9efd59245a8f2b6fef411e2ba8c1a7",
+      "bytes": 9849
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G1.json",
+      "sha256": "507ce45842947b7d8ea8dd316f66b027f0b89b453f67669e66b62a19d6e9e06b",
+      "bytes": 24447
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G1.prompt.txt",
+      "sha256": "75cc34d1ed5612747163f834e0243cad78781ac8dce18fa32911a505a5621c18",
+      "bytes": 9440
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G2.json",
+      "sha256": "fcc74dc4f371d4cf4e4a63f5180ea1e1d29300e538deb976133abc7e0f4c1489",
+      "bytes": 17134
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.review-sol-G2.prompt.txt",
+      "sha256": "d0d1546e80a463d948fbbf02cdd93be77f71494bb31c26a20c0acfa2b3b2c074",
+      "bytes": 10551
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.sdk-main.sh.txt",
+      "sha256": "b3af03bf64d01baa443933421ade915b9cea7ba87ea413d8850d5dc55dca39f5",
+      "bytes": 1139
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt",
+      "sha256": "e59c03a49f4144033f0937bdc8f13baf8d0c0eb87fee7bd7340c35491d651338",
+      "bytes": 54710
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.upstream-diff.sh.txt",
+      "sha256": "655267ebac5b64588ec5cbeeac5914dd663a11e77da10afe145a1a77ef7669d9",
+      "bytes": 1962
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-1.md",
       "sha256": "bba0c3b7206114773f7db45eb5ca20134ea6e87f153fa769a5d0345476e574b3",
       "bytes": 5767
@@ -9428,8 +9528,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "7b4cf9ff895a1993615bb5f4fc5232702411c4b3b87d94deed8897137c3a8ba0",
-      "bytes": 72118
+      "sha256": "cf4c5b7b5e8d100ba2ff2a2332fd8a40270a1a236743109e91016c377753da3e",
+      "bytes": 77830
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -42593,8 +42693,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
-      "sha256": "82958006af277f69d28f9c69f9c7e8cba03502dee18bc087e99382de3ff5b48f",
-      "bytes": 17044
+      "sha256": "1aa0e7e205c40a8ce4ef866c79985362350aea92583cf390952fb450b59e47ad",
+      "bytes": 22187
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
@@ -44842,6 +44942,11 @@
       "bytes": 21768
     },
     {
+      "path": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+      "sha256": "e18158c75d091557ea6a9a7acd9554b5332bed4f4457efb945e6cbdae60f9153",
+      "bytes": 37224
+    },
+    {
       "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
       "sha256": "44682cd5fe1a556a06fee4d797ea2eae2bff55ff69dda8570abbf61aeb6051c4",
       "bytes": 30986
@@ -46627,6 +46732,11 @@
       "bytes": 23194
     },
     {
+      "path": "tests/test_openhands_lock_binding.py",
+      "sha256": "60ff8e66e308d623ea229578dc2ec66559ef91118bd237feccbca86fecf21b8f",
+      "bytes": 3206
+    },
+    {
       "path": "tests/test_order_contract.py",
       "sha256": "073ddb554b4459573b23c539ffefd91523fff73bdb2f70e017be61e0deedcffb",
       "bytes": 8947
@@ -46638,8 +46748,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "3e617fd767f97051f843337aa6508a6ea6fbf64bb67e1e8d08e4ec6372c51071",
-      "bytes": 46293
+      "sha256": "31780dc60ea10f55597dbc984628fa22019a0a0c3cc63727f2a684fff2ea383e",
+      "bytes": 46337
     },
     {
       "path": "tests/test_path_safety.py",

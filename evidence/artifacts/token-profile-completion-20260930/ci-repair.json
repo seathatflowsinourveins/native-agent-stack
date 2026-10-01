@@ -375,5 +375,121 @@
     "error": "send_message queued completed evidence on an idle verifier without triggering a turn.",
     "correction": "Observed completed agent status and resumed with followup_task; independent native source replay returned accepted bounded verdict.",
     "source": "Installed collaboration tool contract: send_message does not trigger a turn; followup_task does."
+  },
+  "final_f03fb80d_validation": {
+    "head": "f03fb80d0bc0c1da99611448e7780a483206fe29",
+    "evidence_class": "original native GitHub job logs; exact source revision",
+    "linux": {
+      "run": 36792737973,
+      "job": 110150153401,
+      "conclusion": "success",
+      "native_log_download_exit": 0,
+      "summary": "Ran 8816 tests in 1341.209s",
+      "result": "OK (skipped=806)",
+      "original_bytes": 400576,
+      "original_sha256": "33b9f2dbe7e540b9f0fa54b2b1a1e91e6b60b2f41c124400970d9e1b01c43062"
+    },
+    "macos": {
+      "run": 36792680414,
+      "job": 110148966624,
+      "conclusion": "success",
+      "native_log_download_exit": 0,
+      "summary": "Ran 489 tests in 107.768s",
+      "result": "OK (skipped=29)",
+      "original_bytes": 340584,
+      "original_sha256": "61e7b4e7c850b268ccfef3602f5662eeaeaf33bf03df74b422014a2074e5bb0e"
+    },
+    "scope": "Prior-head acceptance before the later main reconciliation. No new provider or model run is inferred."
+  },
+  "shared_main_reconciliation_20261001": {
+    "main": "74cc5468691ada09674f325ebb2cddbdfe4ad68c",
+    "source_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/562",
+    "merge_tree_native_exit": 1,
+    "merge_native_exit": 1,
+    "conflict_paths": [
+      "manifests/evidence.json",
+      "tests/test_osv_lockfile_coverage.py"
+    ],
+    "returned_conflicts": [
+      "CONFLICT (content): Merge conflict in manifests/evidence.json",
+      "CONFLICT (content): Merge conflict in tests/test_osv_lockfile_coverage.py"
+    ],
+    "lock_comparison": {
+      "native_git_show_exit": 0,
+      "bytes": 106257,
+      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+      "byte_identical_to_main": true
+    },
+    "pins_comparison": {
+      "native_git_show_exit": 0,
+      "bytes": 4460,
+      "sha256": "36f9ab6c1b901621d685b6721b789dcbcc3cc0ce4526f9c997772c371cf24464",
+      "byte_identical_to_main": true
+    },
+    "resolution": "Preserve both lanes and all receipts. Use the exact main security gate and its canonical receipt; retain this branch independent changed-wheel native proof. Recompute only metadata for combined live files.",
+    "canonical_security_receipt": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+    "independent_native_proof": "evidence/artifacts/token-profile-completion-20260930/openhands-litellm-native-proof.json",
+    "usage": "Unknown for merge/reconciliation; not converted to token savings.",
+    "scope": "Source and evidence reconciliation only. The installed token profile, native clients and completed provider operations are not rerun.",
+    "local_returns": [
+      {
+        "command": "rtk proxy python3 scripts/validate.py",
+        "native_exit": 0,
+        "components": 69,
+        "hashed_files": 8751,
+        "profiles": 4,
+        "receipts": 179,
+        "status": "passed"
+      },
+      {
+        "command": "rtk proxy python3 scripts/validate_convergence.py --all-recorded",
+        "native_exit": 0,
+        "records": 26,
+        "scope": "Declared evidence consistency only."
+      },
+      {
+        "command": "rtk proxy python3 -m unittest tests.test_osv_lockfile_coverage",
+        "native_exit": 0,
+        "summary": "Ran 38 tests in 0.218s",
+        "result": "OK"
+      },
+      {
+        "command": "rtk proxy python3 -m unittest tests.test_openhands_lock_binding",
+        "native_exit": 0,
+        "summary": "Ran 3 tests in 0.001s",
+        "result": "OK"
+      }
+    ],
+    "independent_source_verification": {
+      "role": "Astra/max independent source verifier",
+      "trigger": "Competing primary evidence receipt pointers after main independently adopted the identical security lock.",
+      "verdict": "accepted",
+      "main_reference": "74cc5468691ada09674f325ebb2cddbdfe4ad68c",
+      "native_git_show_exits": 0,
+      "gate_lock_pins_policy_byte_identical_to_main": true,
+      "native_ci_source_hashes_matching": 17,
+      "prior_receipt_registrations_preserved": 179,
+      "existing_live_hashes_reconciled": [
+        "blueprints/runtime-workers/openhands/research.md",
+        "tests/test_osv_lockfile_coverage.py",
+        "evidence/artifacts/token-profile-completion-20260930/ci-repair.json"
+      ],
+      "independent_receipt_proof_and_frozen_evaluation": "byte-identical",
+      "final_f03_log_hashes_and_sizes": "matched retained originals",
+      "archive_lookup_correction": {
+        "failed_native_exit": 128,
+        "corrected_native_exit": 0,
+        "path": "Exact mistaken path was not returned in the verifier summary; no source file changed.",
+        "usage": "unknown"
+      },
+      "scope": "Source-only acceptance. Tests and providers were not rerun by the verifier. Coordinator staged both resolved paths after the verifier index observation."
+    },
+    "generated_guide": {
+      "command": "rtk proxy python3 scripts/build_ecosystem.py --write",
+      "native_exit": 0,
+      "bytes": 14373722,
+      "sha256": "fea86fc88b79cb12467774ecf1eb0134d7d3a9d8e3b733786bde962f02de84fd",
+      "result": "byte-identical to prior qualified generated guide; ignored artifact"
+    }
   }
 }
