@@ -2,7 +2,7 @@
  "schema_version": 1,
  "kind": "layer-closure-assessment-run-variance",
  "catalog": "us-equities",
- "note": "Layers whose assessor and refuter ran more than once because the workflow was resumed after a sign-in. The artifact's assessments use the last complete refuted result per layer. Statuses only; the other runs' texts are not retained here.",
+ "note": "Layers with two complete refuted results because the workflow was resumed after a sign-in (the refuter ran twice in each; the assessor ran twice in four of them). The artifact's assessments use the last complete refuted result per layer. Statuses only; the other runs' texts are not retained here.",
  "layers_with_more_than_one_run": 6,
  "layers_with_a_differing_item": 2,
  "layers": [

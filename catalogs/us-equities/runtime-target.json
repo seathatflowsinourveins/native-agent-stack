@@ -95,7 +95,7 @@
           "path": "pre-trade risk: account-scoped checks",
           "reported_against": "2.0.0rc4; the fail-open branch is at crates/risk/src/engine/mod.rs:1218-1234 at tag v2.0.0rc5",
           "effect": "For a broker-routed SMART instrument the account registered under venue IB is not found, so every account-scoped pre-trade check (max_notional_per_order, free balance, cumulative notional) is skipped with only a debug log.",
-          "upstream_fix": "Closed 2026-09-25T11:03:11Z by develop commit ed6fc8bf47fd37dda97d63b9b2df160719ee2bac ('Apply pre-trade risk to the destination execution account'), which is in no release (latest release v2.0.0rc5, read 2026-10-01); PR #5041 also lists it as covered."
+          "upstream_fix": "Closed 2026-09-25T11:03:11Z by develop commit ed6fc8bf47fd37dda97d63b9b2df160719ee2bac ('Apply pre-trade risk to the destination execution account'), which is in no release (the newest release is the prerelease v2.0.0rc5; GitHub's releases/latest is v1.231.0; read 2026-10-01); PR #5041 also lists it as covered."
         }
       ],
       "rc5_reclassified_reports": [
@@ -206,9 +206,9 @@
     {
       "id": "separate-paper-adapters",
       "status": "bounded_alpaca_paper_smoke_passed_ibkr_1231_python_paper_passed_rc5_pending",
-      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders remain blocked by nautilus_trader#4983 (open). Continuous operation, native in-flight broker faults (see broker-state-failures), Elite 1000/min throughput (200/min measured; see adaptive_practice native_paper_capacity) and IBKR reconnect/restart reconciliation remain separate.",
+      "scope": "Alpaca1SPY long-flat trial passed with2actual writes, -0.08USD cash-matched gross PnL, no positions/open orders, and completed-trial recovery with0additional writes. Five unchanged upstream read-only tests passed. IBKR: a bounded 2026-09-23 paper run through NautilusTrader 1.231.0's Python IB adapter passed (accept, cancel, fill, flatten; net -2.08 USD; flat), which is not rc5 destination acceptance; rc5 stock orders are unqualified: nautilus_trader#4983 is reclassified as a stale v1.227.0 report (rc5_reclassified_reports), and the open rc5 obstacles are #5007, #5057 and #5060 (rc5_blockers), as of 2026-10-01. Continuous operation, native in-flight broker faults (see broker-state-failures), Elite 1000/min throughput (200/min measured; see adaptive_practice native_paper_capacity) and IBKR reconnect/restart reconciliation remain separate.",
       "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json",
-      "rc5_blocker": "https://github.com/nautechsystems/nautilus_trader/issues/4983"
+      "rc5_blocker": "superseded 2026-10-01: see this file's IBKR entry, rc5_blockers (#5007, #5057, #5060 open; #4946 fixed on develop in no release) and rc5_reclassified_reports (#4983); fix candidate PR #5041 (open)"
     }
   ],
   "limitations": [
