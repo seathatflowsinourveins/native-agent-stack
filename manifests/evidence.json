@@ -3778,8 +3778,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "97c35ece0b41e0ad3b06bc48857aa5c1eb0119862f35603920c33a7ea0244637",
-      "bytes": 10394
+      "sha256": "9add1c49f022a1dfa1ef3538db4a182378ec9cd4ec7d1ef8e70d5237d6f55f61",
+      "bytes": 11059
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -34031,6 +34031,11 @@
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
       "sha256": "47ec4560beb7adf1007c89e1b7c87275e6ea12532a3b1f69055115b0e60bdc96",
       "bytes": 4784
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/publication-checks.json",
+      "sha256": "690cb0f57c743993067ee447b9535da66cbe46430d1a9dbb6526da914e3328ae",
+      "bytes": 1652
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/root-verification.json",
