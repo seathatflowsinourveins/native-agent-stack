@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "guard-k4-verification-20261001",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "The command guard change K4 (scripts/hooks/secret_path_guard.py, sha256 d4d4bef271df8973cca7f6e7fa6f70be717bec7a909f35e3b0eeea4ce67d65a4, 275,593 bytes) adds runner-command reading, bounded interpreter reading and OmniRoute management-route, manager-environment, store, ps and canary rules on top of the K3 guard (sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51, PR #511). On 2026-10-01 the coordinator replayed 1,490 documented repository commands through K4 against K3 and against the installed guard (sha256 f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244): 0 newly blocked, 0 loosened and 0 reason changed against each. The acceptance oracle found 0 adjusted and 0 reason mismatches over 338 cases, and a scan of 16,174 distinct lines and blocks from 9,245 tracked files found 0 newly blocked and 0 loosened against K3. The repair worker's mutation gate killed 461 of 461 mutants by failures of named permanent tests. A read-only GPT-6 re-check of the one repair round found every finding of the GPT-6 verification and the Opus review fixed, apart from stale metadata in an untracked handoff, and no input that K3 refuses and K4 allows outside the contract's form F across 8,602 differential inputs. Through a real hook process the verification's two timeout generators answered in 0.20 and 0.22 s. The re-check found five further items, recorded as residuals.",
+  "limitations": [
+    "Local integration on one host plus read-only cross-family reviews, not a proof: the checks compare text heuristics on finite corpora (the repository's tables, fenced commands, tracked files, generated mutations and the reviewers' differential inputs), and a review that finds nothing does not show that nothing exists.",
+    "Evidence classes differ: the replay, the oracle, the corpus scan, the gitleaks ancestry scan and the targeted suites were run by the coordinator on the final head; the mutation gate and the differential counts come from the repair worker's and the re-check's recorded output, not from a coordinator rerun.",
+    "The targeted suites' one failure is by design: test_host_profile_copy_is_verbatim compares the installed host copy with the repository file, and the host copy stays the installed guard until K3 and K4 are merged and reinstalled after the Gate A window closes.",
+    "test_k4_timing compares one CPU-time sample per size: in a whole-suite run under host load its k4_shell_words ratio check failed once (0.091 s against the 0.08 s bound that the 0.01 s floor sets), and three isolated runs passed. A noisy runner can fail it the same way.",
+    "Residuals carried to the next guard change: two gateway forms that K3 and K4 both allow, a Request passed to urlopen by keyword after its body (urlopen(data=b\"x\", url=r)) and an augmented member assignment (r.full_url += \"/x\"); two false refusals K4 introduced, an incomplete computed argv item (subprocess.run([\"printenv\" + \"-safe\"]) refuses environment_dump) and a command -v lookup read as an assignment before a keyring store (keyring_store_literal); and a generated 193,560-character urllib command whose urlopen calls reuse one Request, which the re-check measured at about 1.9 s through the real hook, below the 10 s hook timeout and above the 1 s target.",
+    "Commit identity: the re-check reviewed commit 58dde8ef. Its history was then rewritten so a helper-name tuple no longer reads as a gitleaks generic-api-key match (one test line reordered in four commits) and rebased with K3 onto main; the guard bytes are unchanged (the sha256 above)."
+  ],
+  "evidence_class": "local integration (documented-command replay, acceptance oracle, tracked-file scan, gitleaks ancestry scan and the targeted unit suites on this host, run by the coordinator), the repair worker's recorded mutation gate, and read-only cross-family reviews: a GPT-6 (gpt-6-astra, effort max) verification and re-check and an Opus review",
+  "recorded_at_utc": "2026-10-01T03:30:00Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the repository checkout at the K4 head before this receipt's commit"
+  },
+  "data": {
+    "guard_sha256": "d4d4bef271df8973cca7f6e7fa6f70be717bec7a909f35e3b0eeea4ce67d65a4",
+    "guard_bytes": 275593,
+    "k3_guard_sha256": "a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51",
+    "installed_guard_sha256": "f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244",
+    "verified_head": "81d6a9ccf5f336a0f0d38975bfc6f3ba4164dffa",
+    "rechecked_commit": "58dde8ef7421977b5375e268645ea0c8b6afeb4c",
+    "gates": {
+      "documented_command_replay_vs_k3": "replayed 1490 distinct documented commands (1758 lines); newly blocked: 0; loosened: 0; reason changed: 0",
+      "documented_command_replay_vs_installed": "replayed 1490 distinct documented commands (1758 lines); newly blocked: 0; loosened: 0; reason changed: 0",
+      "acceptance_oracle": "base: 65 cases, 0 adjusted and 0 reason mismatches; injector: 109 cases, 0 and 0; routes: 85 cases, 3 raw, 0 adjusted, 0 reason; heredoc: 79 cases, 5 raw, 0 adjusted, 0 reason",
+      "tracked_file_scan_vs_k3": "16174 distinct lines and blocks from 9245 tracked files; blocked by base: 39; by working tree: 39; newly blocked: 0; LOOSENED: 0",
+      "gitleaks_branch_ancestry": "tests.test_gitleaks_config.GitleaksBranchAncestryHistoryTests: Ran 1 test, OK",
+      "targeted_suites": "Ran 405 tests in 263.223s; FAILED (failures=1, skipped=6): test_host_profile_copy_is_verbatim, by design",
+      "mutation_gate_worker": "461/461 killed by named permanent tests; true survivors: none",
+      "validate": "{\"components\": 69, \"hashed_files\": 8647, \"profiles\": 4, \"receipts\": 179, \"status\": \"passed\"} with this receipt registered"
+    },
+    "real_hook_timing_seconds": {
+      "note": "reported by the re-check: inert command strings passed to the hook process as the PreToolUse payload; limit 10 s",
+      "assignment_chain_12000": 0.217,
+      "js_regex_lookahead_6000": 0.203,
+      "request_assignments_1600": 0.191,
+      "urllib_request_reuse_193560_chars_residual": [1.846, 1.925, 1.853]
+    },
+    "reviews": [
+      {"round": "verification", "reviewer": "GPT-6 gpt-6-astra, effort max, read-only", "result": "2 blocking hook-timeout generators, 11 high incomplete tightenings, mediums including a false refusal of urlopen(req, timeout=5), lows"},
+      {"round": "build review", "reviewer": "Opus, read-only", "result": "2 blocking (mutation kills counted from temporary witnesses; runner parser-vocabulary test missing), 1 high (runner path expanded twice, failing test_k4_timing), mediums and lows"},
+      {"round": "one repair round", "reviewer": "GPT-6 runtime worker gpt-6-astra, effort max", "result": "every finding repaired with BLOCKED and control rows, witnesses moved into permanent tests, 461 of 461 mutants killed by named permanent tests"},
+      {"round": "re-check of the repair", "reviewer": "GPT-6 gpt-6-astra, effort max, read-only", "result": "every finding of both reviews fixed except an untracked handoff's metadata; no K3-refused to K4-allowed transition outside form F over 8,602 inputs; five residuals"}
+    ]
+  },
+  "provenance": {
+    "commands": [
+      "python3 -B guard_diff_corpus.py <K3 guard copy> <checkout guard> <checkout>",
+      "python3 -B guard_diff_corpus.py <installed guard copy> <checkout guard> <checkout>",
+      "python3 -B k4_run.py --base <K3 guard copy> oracle <checkout guard>",
+      "python3 -B k4_run.py --base <K3 guard copy> corpus_fp <checkout> <K3 head> 6",
+      "python3 -B -m unittest tests.test_gitleaks_config.GitleaksBranchAncestryHistoryTests",
+      "python3 -B -m unittest tests.test_secret_path_guard tests.test_credential_status tests.test_credential_tools tests.test_credential_run tests.test_credential_boot_receipt tests.test_install_claude_profile tests.test_adoption_docs_consistency tests.test_gitleaks_config",
+      "python3 scripts/validate.py",
+      "codex exec -p stack-worker -s read-only -m gpt-6-astra -c model_reasoning_effort=max -o final.md - < prompt.txt"
+    ],
+    "withheld": "the harness, the worker's mutation traces and the review files live in the key-management lane's private state directory; the published values are copied from their outputs",
+    "decision_record": "the K4 section and its residuals in docs/secret-storage.md, and docs/decisions/2026-09-29-key-management.md"
+  }
+}
