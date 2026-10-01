@@ -418,20 +418,24 @@ class WorkerSentenceTests(unittest.TestCase):
 
 
 class RuleSourceCitationTests(unittest.TestCase):
-    """A repository line range that a rule's source cites holds what the source says it holds. Unit F1 (#557) moved the
-    Codex AGENTS template's six RTK exceptions from lines 41-46 to 49-54 (docs/decisions/2026-09-30-rule-text-every-
-    layer.md, "Stale line citation"), which the exact_shapes source still cited."""
+    """The passage a rule's source cites holds what the source says it holds. The exact_shapes source cites the Codex
+    AGENTS template's six RTK exceptions by their marker, not by line: the rule text above them moved them from lines
+    41-46 to 49-54 (unit F1, #557; docs/decisions/2026-09-30-rule-text-every-layer.md, "Stale line citation") and to
+    50-55 a day later (#568), so a line range there goes stale with each edit of that text."""
 
-    def test_the_exact_shapes_source_cites_the_templates_six_exceptions(self):
+    def test_the_exact_shapes_source_cites_the_templates_six_exceptions_by_marker(self):
         module = roles(self)
         [source] = [source for rule, _roles, source, _check in module.RULES if rule == "exact_shapes"]
-        match = re.search(r"adoption/templates/codex\.AGENTS\.template\.md:(\d+)-(\d+)", source)
-        self.assertTrue(match, source)
-        lines = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8").splitlines()
-        cited = lines[int(match[1]) - 1:int(match[2])]
+        self.assertIn("adoption/templates/codex.AGENTS.template.md, the six exceptions after its rtk-exceptions marker",
+                      source)
+        self.assertIsNone(re.search(r"codex\.AGENTS\.template\.md:\d", source), source)
+        text = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8")
+        self.assertEqual(text.count(module.EXCEPTIONS_MARKER), 1)
+        block = text.split(module.EXCEPTIONS_MARKER, 1)[1].split(module.END_MARKER, 1)[0]
+        bullets = [line for line in block.splitlines() if line.startswith("- ")]
         commands = ("`git show REV:path`", "`diff`", "`git branch`", "`git log`", "`jq`", "`find`")
-        self.assertEqual(len(cited), len(commands), cited)
-        for command, line in zip(commands, cited):
+        self.assertEqual(len(bullets), len(commands), bullets)
+        for command, line in zip(commands, bullets):
             with self.subTest(command=command):
                 self.assertTrue(line.startswith("- " + command), line)
 

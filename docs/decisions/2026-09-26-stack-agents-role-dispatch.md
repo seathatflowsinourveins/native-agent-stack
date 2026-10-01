@@ -340,10 +340,12 @@ take the sentence in one follow-up after this change and F4 merge, so that the t
 **Decided by:** workflow unit F4 of the 2026-09-30 SOTA-defaults wave (coordinator session `native-agent-stack-c5`),
 branch `claude/sota-defaults-f4-20260930`, based on `origin/main@e45328d3`, checked against codex-cli 0.157.1 and
 Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges in one batch with the Gate A owner.
-Round 2 (2026-10-01) rebased it onto `origin/main@28cfb359`, after units D4 (#542, the Codex 0.159.2 pin and the
-Sol-primary routing), A4 (#540, the task-model routing record), F2 (#547, the research-first sentences), F1 (#557)
-and F3 (#553). It restated the builder's model, the roles' sentences and two citations against them, and was
-checked against codex-cli 0.159.2.
+Round 2 (2026-10-01) rebased it onto `origin/main@5597f9fa`, after units D4 (#542, the Codex 0.159.2 pin and the
+Sol-primary routing), A4 (#540, the task-model routing record), F2 (#547, the research-first sentences), F1 (#557),
+F3 (#553) and #568. It restated the builder's model, the roles' sentences and two citations against them, and was
+checked against codex-cli 0.159.2. `exact_shapes` now cites the Codex AGENTS template's six exceptions by their
+`rtk-exceptions` marker rather than by line. F1's rule text moved them from lines 41-46 to 49-54, and #568 moved them
+to 50-55 a day later.
 
 ### Context
 

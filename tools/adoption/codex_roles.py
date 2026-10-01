@@ -430,7 +430,8 @@ RULES = (
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
     ("exact_shapes", ROLES,
-     "adoption/templates/codex.AGENTS.template.md:49-54 (six exceptions, jq included) and "
+     "adoption/templates/codex.AGENTS.template.md, the six exceptions after its rtk-exceptions marker (jq included; "
+     "cited by marker because the rule text above them moves their lines) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),
     ("no_web_rule", ("stack-verifier", "evidence-reviewer", "semantic-evidence-reviewer"),
