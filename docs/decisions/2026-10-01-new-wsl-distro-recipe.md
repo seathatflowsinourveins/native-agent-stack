@@ -1,4 +1,4 @@
-# Decision: a new WSL distribution from Canonical's Ubuntu 24.04.5 image, provisioned by cloud-init (2026-10-01)
+# Decision: provisional Ubuntu 26.04.1 and 24.04.5 WSL image arms, provisioned by cloud-init (2026-10-01)
 
 **Decided by:** coordinator session `native-agent-stack-c5` (decisions 1 to 5 below), on the research unit's findings of
 2026-10-01. Unit W2 of that wave wrote the recipe, the templates and the test, and re-read the sources the same day.
@@ -15,14 +15,12 @@ host (Evidence classes).
 pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/` (`cloud-init.user-data.template`,
 `host.new-distro.json.template`, `first-boot-checklist.md`, `stage1-receipt.example.json`); `tests/test_wsl_new_distro_recipe.py`.
 
-**Status:** selected by source review; not a completed adoption until a host run and the queued comparison. The scoped
-convergence experiment record
-[`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`](../../blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json)
-states this: `status: planned`, decision `trial`, no observation and no usage claim, with the research unit's usage
-unknown and the follow-up's two research passes' usage given as text. Its next test starts with the rehearsal (R1). It
-names the 26.04.1 comparison (queued, not run) and path B (documented, not run) as the alternatives, and
-`python3 scripts/validate_convergence.py` accepts it (exit 0). It pins the recipe, the templates and the test by
-SHA-256, so a change to any of them needs a re-pin.
+**Status:** accepted W-IMG recipe parameterization only. Ubuntu 26.04.1 trial and 24.04.5 fallback are
+symmetric provisional arms with no merit precedence. Both new-host acceptance runs remain unrun. The scoped
+[experiment](../../blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json) keeps `status: planned`,
+decision `trial`, no qualification runs and no usage comparison. Its next test preregisters both R1 rehearsals. The
+preserved signature/image inspections are artifact evidence; local consistency checks and synthetic receipt examples
+do not qualify a distribution. Recipe, templates, this decision and tests are pinned by SHA-256 in that experiment.
 
 ## Context
 
@@ -48,7 +46,7 @@ SHA-256, so a change to any of them needs a re-pin.
   `ConnectionTargetManager::UpdateUid`, is absent from `src/windows/common/Redirector.h` at tags 2.7.13 and 2.7.14 and
   present at 2.9.8 and 3.0.1 (research packet, answer 3). W7 terminates `<Name>` once after the first launch and probes
   a file's owner; updating WSL stays the keys lane's decision.
-- **Selected image.** `ubuntu-24.04.5-wsl-amd64.wsl` (sha256 `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e`)
+- **Historical 24.04.5 image artifact check.** `ubuntu-24.04.5-wsl-amd64.wsl` (sha256 `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e`)
   is 388,975,696 bytes and published twice:
   - in `https://releases.ubuntu.com/24.04.5/SHA256SUMS` (Last-Modified 2026-09-15 19:11:11 GMT; the same line is in
     `noble/SHA256SUMS`, with `SHA256SUMS.gpg` beside it);
@@ -226,13 +224,65 @@ SHA-256, so a change to any of them needs a re-pin.
     carries `843938DF228D22F7B3742BC0D94AA3F0EFE21092`. The repository's 2026-09-21 precedent verified Ubuntu's signed
     sums with the same key (`docs/portable-userspace-install-20260921.md`).
 
+## W-IMG preregistration and preserved primary evidence (2026-10-01)
+
+The north-star action is a recoverable second WSL distribution for native engineering. The accepted unit extends the
+existing upstream-command recipe, templates and tests at `798ac445`; it creates no installer or architecture. The
+coordinator applied the maintained ECC `search-first` guidance in quick mode and the TDD skill at the already-agreed
+public recipe/template/experiment seams. No new dependency or skill installation is needed.
+
+| Provisional arm | Actual release URL | Exact image SHA-256 | Catalog entry at `8bc98bc33b246fe66710eec9eaa1b24c323da987` |
+| --- | --- | --- | --- |
+| 26.04.1 trial | https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl | `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104` | `Ubuntu-26.04` (also `Ubuntu`) |
+| 24.04.5 fallback | https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl | `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e` | `Ubuntu-24.04` |
+
+Both arms use the same R1 preregistered criteria table and native probes in the recipe, on separate throwaway names
+under the same host kernel, driver, settings, checkout, user-data and bootstrap profile. R1 keeps its initial run
+through F3, then extends successful rehearsals through F9 for the existing toolkit and the bounded comparison probes.
+The default-user systemd manager and bus are checked from the workstation's second-instance session. GPU visibility
+uses Microsoft's/NVIDIA's native WSL guidance; toolkit runtime checks use the accepted bootstrap and official Node
+24.21.0 pin. A version/startup probe or visible GPU does not establish full-stack, CUDA workload or model acceptance.
+Both arms have no merit precedence, and both new-host acceptance runs remain unrun.
+
+**Preserved facts, reused rather than rerun.** The coordinator verified both signed sums with `gpgv`, exit 0, using key
+`843938DF228D22F7B3742BC0D94AA3F0EFE21092`. The retained logs are each release's `native-signed-sums.stdout` and
+`native-signed-sums.stderr`, beside its `SHA256SUMS` and `SHA256SUMS.gpg`. A whole 26.04.1 image was streamed through
+`curl | tee` to SHA-256 and tar inspection, exit 0. `image-stream.sha256` matches the exact pin above;
+`native-image-inspection.stdout` contains the files and dpkg status. No 26.04.1 image size was observed. The earlier
+24.04.5 stream, 388,975,696 bytes, and all earlier P1/P2/P3 receipts below retain their historical artifact scope.
+
+The inspected 26.04.1 packages are cloud-init 26.1-0ubuntu3~26.04.1, systemd 259.5-0ubuntu3.4, Python interpreter
+3.14.4-1ubuntu0.1, sudo-rs 0.2.13-0ubuntu1 and wsl-setup 0.6.3ubuntu~26.04.1. Correction: the earlier Python 3.14.3
+statement was the `python3` metapackage (3.14.3-0ubuntu2); the retained dpkg `python3.14`, `python3.14-minimal` and
+`libpython3.14-stdlib` stanzas prove interpreter 3.14.4-1ubuntu0.1. System Python 3.14 is not toolkit CPython 3.13
+migration acceptance; uv selects and installs managed 3.13 separately. Installed uv 0.12.17 `run --help` exited 0
+and lists `--no-project` and `--python`; no managed interpreter run was performed for this unit.
+
+The retained `wsl-setup` and `wait-for-cloud-init` image extracts match tag `0.6.3`, upstream commit
+`73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8`. `wsl-setup:155-156` calls `ubuntu-insights.sh`. Its consent path preserves
+existing Linux/Windows settings; `ubuntu-insights.sh:15-19` asks only on terminal stdin (`-t 0`). W5 uses NUL stdin.
+No recipe command invents consent or writes the Windows-wide consent registry. Neither source inspection nor the
+workstation's P2 schema check qualifies a new image; W5 must record the selected packaged version and its own schema.
+Canonical's cloud-init WSL guide explicitly assumes 24.04/22.04 and does not qualify 26.04.
+
+**Prior failed preparation attempt.** The preceding native Claude worker returned the actual weekly-limit message,
+process exit 1, and made no changes. Its native returned usage is preserved in the experiment's usage rule, without
+summing cache subsets, estimating missing totals or treating unknown retries as zero. This is a recipe-preparation
+failure, not a failed first boot of either image. No provider, GPU, import or first-boot run is claimed by this unit.
+
+**Completeness critic.** Both signed sums, exact selected-image bytes/hash, packaged schema versus host schema,
+second-instance systemd user behavior, Windows GPU visibility, separate uv CPython 3.13 and Node 24 startup now have
+explicit symmetric criteria. Preserve the old export guard for failed rehearsals and W6. The remaining gap is native
+new-host execution of both arms, plus separate full-stack/GPU-workload/model acceptance. Debian, alternate creation
+routes and containers remain the earlier sweep candidates; this bounded unit adds none. The lifecycle-task skills
+sweep receives only a future execution gap, since the accepted lifecycle/TDD/search guidance covers parameterization.
+
 ## Alternatives
 
-1. **Image.** Ubuntu 26.04.1 LTS. `resolute` `SHA256SUMS` (2026-08-27) publishes
-   `ubuntu-26.04.1-wsl-amd64.wsl` as `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104`, and
-   `DistributionInfo.json` maps both `Ubuntu` (WSL's default) and `Ubuntu-26.04` to it. It brings `python3` 3.14.3, uutils
-   coreutils for `sha256sum`, `realpath` and `mktemp`, `sudo-rs` beside `sudo`, and ships `bubblewrap` and `libatomic1`.
-   The repository has no evidence for it. Other alternatives:
+1. **Images.** The former queued Ubuntu 26.04.1 alternative now shares the parameterized recipe with the historical
+   24.04.5 fallback. Both are provisional; source/signature/image facts are observed, new-host compatibility is
+   unrun. The earlier `python3` 3.14.3 statement described its metapackage, not the 3.14.4 interpreter (correction in W-IMG preregistration).
+   Other alternatives:
    - `wsl --install Ubuntu-24.04` from the online catalog installs the same bytes. At 2.7.13 it does check the download
      against the catalog entry's `Sha256` (`WslInstall.cpp:36-50`, `:315`), while `--install --from-file` checks no
      hash (`WslClient.cpp:500-537`); this record first had that backwards (completeness critic, item 8). The online path
@@ -293,23 +343,25 @@ SHA-256, so a change to any of them needs a re-pin.
 
 ## Decision
 
-1. **Image.** Ubuntu 24.04.5 LTS from Canonical's `.wsl` file, pinned by its sha256 and checked against both publications
-   before install (W2). The repository has evidence for 24.04, and the bootstrap covers its `python3` 3.12. 26.04.1 LTS
-   is queued as a bounded comparison unit before any switch: the bootstrap under `python3` 3.14, uutils coreutils and
-   `sudo-rs`.
+1. **Images.** Explicitly select `<RELEASE>` as 26.04.1 trial or 24.04.5 fallback. Both are symmetric provisional
+   arms with no merit precedence. P1 verifies both signed sums; W2 controls each release-to-file-to-SHA-to-catalog
+   pairing, downloads the selected release URL and hashes the actual whole image. W4 and W6 use the same selected
+   filename. Historical 24.04 receipts keep their original evidence class and scope; they do not accept either arm
+   on a new host.
 2. **Creation path.**
    - **Path A.** Render `%USERPROFILE%\.cloud-init\<Name>.user-data` from the template (W3). The user is `<WSL_USER>`,
      uid 1000, in groups `adm, cdrom, sudo, dip, plugdev`, with `sudo: "ALL=(ALL) NOPASSWD:ALL"`, a locked password and
      `[user] default` appended to `/etc/wsl.conf`. Then run
-     `wsl --install --from-file <dir>\ubuntu-24.04.5-wsl-amd64.wsl --name <Name> --location Z:\WSL\<Name> --no-launch` (W4),
+     `wsl --install --from-file <dir>\ubuntu-<RELEASE>-wsl-amd64.wsl --name <Name> --location Z:\WSL\<Name> --no-launch` (W4),
      then a first launch with standard input at end of file (W5).
-   - **Rehearsal first (R1).** The page runs once on a throwaway name and folder through F3, with W5's schema check, W7's
-     probe and F2's idle observation recorded in the receipt's `rehearsal` block. R1 then terminates and unregisters
-     only that name, after W6's export rule when the rehearsal failed. Only then does the page run for the real
-     `<Name>`.
+   - **Rehearsals first (R1).** Each release runs on its own throwaway name and folder through F3, recording W5's schema,
+     W7's probe and F2's idle observation. Successful rehearsals extend through F9 and the same preregistered comparison
+     probes; per-arm results enter `comparison_arms`. R1 terminates and unregisters only its own name, after W6's export
+     rule when a rehearsal failed. Both comparison records precede the real explicitly selected `<Name>`.
    - **Pre-checks (P1 to P3)**, in the workstation distribution before W1. P1 verifies `SHA256SUMS` with `gpgv`
-     against the installed archive keyring (key `843938DF228D22F7B3742BC0D94AA3F0EFE21092`) and prints the image's
-     signed line. P2 runs `cloud-init schema -c` on the render and prints its SHA-256, which W3's file must match. P3
+     for both releases against the installed archive keyring (key `843938DF228D22F7B3742BC0D94AA3F0EFE21092`) and prints
+     both signed image lines. P2 runs the workstation's `cloud-init schema -c` on the selected-image render and prints its
+     SHA-256, which W3's file must match; this does not qualify the selected image's schema, which W5 checks itself. P3
      records the current boot's `hv_storvsc` kernel journal count, without the registration line, as a baseline and
      prints the newest error line's kernel time beside `/proc/uptime`. An error line less than one hour old stops the
      run (microsoft/WSL#41482); the threshold is this recipe's choice, not an upstream figure.
@@ -373,9 +425,11 @@ SHA-256, so a change to any of them needs a re-pin.
 
 ## Overturn condition
 
-1. **Image.** Switch to 26.04.1 when its bounded comparison passes the same recipe and stage 2. Re-pin when Canonical
-   publishes a newer 24.04 point release and `DistributionInfo.json` maps `Ubuntu-24.04` to it. A sha256 mismatch in W2
-   stops every run until the hash is re-verified against both publications.
+1. **Images.** Select within the measured host scope only after both arms have complete, identically scoped R1
+   comparison records for first boot, the systemd user manager from a second instance, WSL GPU visibility,
+   uv-managed CPython 3.13 and the pinned Node 24. Preserve failures and skips; missing evidence is not a win.
+   Trial/fallback names confer no merit precedence. Re-pin a release only after Canonical's signed sums and the
+   pinned Microsoft catalog agree. A W2 mismatch stops the run with nothing installed.
 2. **Creation path.** Revisit in two cases:
    - a host run with a correct user-data file still shows the W5 markers;
    - a WSL release changes when the first-run command runs (`WslCoreInstance.cpp:204`) or what a failure leaves
@@ -403,6 +457,13 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 
 | Step | Shell | Command | Proof |
 | --- | --- | --- | --- |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'stat -c "%U %F" "/run/user/$(id -u)" "/run/user/$(id -u)/bus"'` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec test -c /dev/dxg` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'node --version'` | R1: record the returned exit and output required by the recipe |
 | R1 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
 | R1 | powershell | `wsl.exe --list --quiet` | read first: the throwaway name is listed, and it is not the real `<Name>` |
 | R1 | powershell | `wsl.exe --terminate '<Name>'` | the throwaway distribution stopped; no other distribution stops |
@@ -418,11 +479,14 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | R1 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Length` | the export's size in bytes, recorded in `rehearsal` |
 | R1 | powershell | `wsl.exe --unregister '<Name>'` | the throwaway distribution removed, nothing else |
 | R1 | powershell | `wsl.exe --list --verbose` | the throwaway name absent; the starred line equals W1's |
+| P1 | sh | `for RELEASE in 26.04.1 24.04.5; do` | both signed-sums arms, each in an empty temporary directory |
 | P1 | sh | `SUMS_DIR="$(mktemp -d)"` | an empty temporary directory, also `gpgv`'s home |
-| P1 | sh | `curl -fsSL -o "$SUMS_DIR/SHA256SUMS" https://releases.ubuntu.com/24.04.5/SHA256SUMS` | exit 0 |
-| P1 | sh | `curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg` | exit 0 |
+| P1 | sh | `curl -fsSL -o "$SUMS_DIR/SHA256SUMS" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS" \|\| exit 1` | P1: record the returned exit and output required by the recipe |
+| P1 | sh | `curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg" \|\| exit 1` | P1: record the returned exit and output required by the recipe |
 | P1 | sh | `gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" "$SUMS_DIR/SHA256SUMS"` | exit 0 and `Good signature` by `843938DF228D22F7B3742BC0D94AA3F0EFE21092`; `BAD signature` or a missing key stops the run |
-| P1 | sh | `grep ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$' "$SUMS_DIR/SHA256SUMS"` | the signed line, carrying the hash W2 pins |
+| P1 | sh | `if [ "$?" -ne 0 ]; then exit 1; fi` | P1: record the returned exit and output required by the recipe |
+| P1 | sh | `grep -F " *ubuntu-$RELEASE-wsl-amd64.wsl" "$SUMS_DIR/SHA256SUMS" \|\| exit 1` | each release's exact signed image line from the controlled pins |
+| P1 | sh | `done` | P1: record the returned exit and output required by the recipe |
 | P2 | sh | `RENDER_DIR="$(mktemp -d)"` | an empty temporary directory |
 | P2 | sh | `python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding="utf-8").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > "$RENDER_DIR/<Name>.user-data"` | the bytes W3 writes, rendered in the workstation |
 | P2 | sh | `cloud-init --version` | the workstation's cloud-init version, recorded |
@@ -444,14 +508,24 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\s*\[', '^\s*instanceIdleTimeout\s*=', '^\s*vmIdleTimeout\s*=' -ErrorAction SilentlyContinue` | a read only: the section headers and the two idle keys, or nothing; recorded as `idle_keys` |
 | W1 | powershell | `Get-PSDrive -Name Z \| Select-Object -Property Name, Used, Free` | `Free` recorded |
 | W2 | powershell | `$ProgressPreference = 'SilentlyContinue'` | no progress rendering during the download |
-| W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'` | 388,975,696 bytes saved |
-| W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\WSL\downloads\SHA256SUMS'` | the checksum list saved |
-| W2 | powershell | `$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'` | the pinned value |
-| W2 | powershell | `$Published = (Select-String -LiteralPath 'Z:\WSL\downloads\SHA256SUMS' -Pattern ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$').Line.Split(' ')[0]` | Canonical's value |
-| W2 | powershell | `$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content \| ConvertFrom-Json).ModernDistributions.Ubuntu \| Where-Object Name -eq 'Ubuntu-24.04'` | Microsoft's entry at the pinned commit |
-| W2 | powershell | `$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl').Hash.ToLowerInvariant()` | the computed value |
-| W2 | powershell | `"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)"` | one hash three times and the 24.04.5 URL |
-| W2 | powershell | `if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected) { throw 'sha256 mismatch: do not install' }` | no `throw` |
+| W2 | powershell | `$Release = '<RELEASE>'` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `switch ($Release) {` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }` | the exact selected release hash and catalog entry; neither arm has merit precedence |
+| W2 | powershell | `'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }` | the exact selected release hash and catalog entry; neither arm has merit precedence |
+| W2 | powershell | `default { throw 'unsupported release: do not download or install' }` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `}` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$Image = "ubuntu-$Release-wsl-amd64.wsl"` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$ImagePath = "Z:\WSL\downloads\$Image"` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$ImageUrl = "https://releases.ubuntu.com/$Release/$Image"` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$SumsPath = "Z:\WSL\downloads\$Release-SHA256SUMS"` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri "https://releases.ubuntu.com/$Release/SHA256SUMS" -OutFile $SumsPath` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content \| ConvertFrom-Json).ModernDistributions.Ubuntu \| Where-Object Name -eq $CatalogName` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()` | W2: record the returned exit and output required by the recipe |
+| W2 | powershell | `"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)"` | the selected release's exact hash three times and its pinned release URL |
+| W2 | powershell | `if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }` | no throw: whole-image, signed-publication, catalog hash and URL match |
+| W2 | powershell | `(Get-Item -LiteralPath $ImagePath).Length` | actual selected-image byte count for this host run; source size of 26.04.1 is unknown |
 | W3 | powershell | `New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')` | the folder exists |
 | W3 | powershell | `$Text = [System.IO.File]::ReadAllText('<checkout>\adoption\templates\wsl\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')` | the template rendered in memory |
 | W3 | powershell | `[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data'), $Text)` | UTF-8 without a byte order mark |
@@ -460,7 +534,7 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | W3 | powershell | `(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data')).Hash.ToLowerInvariant()` | equal to P2's `sha256sum` value |
 | W3 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data') -SimpleMatch -Pattern '${'` | no output |
 | W4 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
-| W4 | powershell | `wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch` | `Installing: ...`, then `Distribution successfully installed. ...` |
+| W4 | powershell | `wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch` | W4: record the returned exit and output required by the recipe |
 | W4 | powershell | `$LASTEXITCODE` | `0` |
 | W4 | powershell | `wsl.exe --list --verbose` | `<Name>` `Stopped`, version 2; the starred line unchanged |
 | W5 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
@@ -468,6 +542,7 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | W5 | powershell | `$LASTEXITCODE` | `0`; nonzero with the markers means W6 |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -un` | `<WSL_USER>` |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -u` | `1000` |
+| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init --version` | selected-image packaged cloud-init version; not the P2 workstation version |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --long` | `status: disabled` and `boot_status_code: disabled-by-marker-file`; proves the marker, not the run |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json` | `"datasource": "DataSourceWSL"` and `"errors": []`: the run completed without errors |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json` | each of the four stages `finished` with empty `errors`; `recoverable_errors` recorded |
@@ -486,7 +561,7 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | W6 | powershell | `(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Hash.ToLowerInvariant()` | the export's SHA-256, recorded in `failed_attempt_export` |
 | W6 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length` | the export's size in bytes, recorded in `failed_attempt_export` |
 | W6 | powershell | `wsl.exe --unregister '<Name>'` | `<Name>` removed, nothing else |
-| W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2` | exit 0 |
+| W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2` | W6: record the returned exit and output required by the recipe |
 | W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | `done` or `error` when cloud-init ran, `disabled` by `disabled-by-generator` when it found no datasource; recorded (open question 1) |
 | W6 | sh | `id -u '<WSL_USER>' \|\| useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'` | uid 1000 exists |
 | W6 | sh | `printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user` | the drop-in written |
@@ -558,10 +633,11 @@ Each one stays open until a host run records the observation named here.
    `wsl.exe --list --running` itself counts as a client is not verified.
 3. **binfmt after terminate.** Whether binfmt registrations survive `wsl --terminate <Name>` (`protectBinfmt`). Record
    `ls /proc/sys/fs/binfmt_misc` before and after a terminate.
-4. **Subordinate ids from `useradd`.** Whether `useradd` allocated subordinate ids on 24.04.5. cloud-init 26.1 creates
+4. **Subordinate ids from `useradd`.** Whether `useradd` allocated subordinate ids on the selected release. cloud-init 26.1 creates
    users with `useradd` (`cloudinit/distros/__init__.py:683` at tag 26.1). useradd(8) says it allocates `SUB_UID_COUNT`
    ids when `/etc/subuid` exists, and the image ships both; F5 records which tool wrote the range.
-5. **The 26.04.1 comparison.** The bounded unit of Alternatives 1.
+5. **Both image comparisons.** The preregistered R1 criteria cover 26.04.1 trial and 24.04.5 fallback with no merit
+   precedence. Both new-host runs remain unrun; the older 24.04.5 receipts do not settle this question.
 6. **File ownership after a terminate (microsoft/WSL#40941).** Whether `wsl --terminate <Name>` clears the 0:0 owner of
    files Windows creates after the first-run setup. The fix's pull request says the state "only recovers after a distro
    termination", the issue's reproduction says it lasts "until the next wsl --shutdown", and no one has observed a
@@ -833,3 +909,17 @@ URL and file:line and is quoted here as it quotes them, and by the unit where no
 - By the unit: the pinned raw files of MicrosoftDocs/WSL (HTTP 200 for build-custom-distro, basic-commands,
   use-custom-distro, systemd and wsl-config), `adoption/bootstrap-linux.sh:175-178` on this branch, and
   `/usr/include/scsi/scsi.h:59-60` (libc6-dev) for the SCSI command codes.
+
+Primary sources reused for W-IMG parameterization (2026-10-01):
+
+- https://releases.ubuntu.com/26.04.1/SHA256SUMS and https://releases.ubuntu.com/26.04.1/SHA256SUMS.gpg;
+  both releases' preserved native signature checks above, with no new download for this unit.
+- https://documentation.ubuntu.com/release-notes/26.04/ and the Microsoft creation docs pinned above support creation,
+  not full-stack compatibility. https://ubuntu.com/wsl/docs/stable/howto/cloud-init/ is explicitly a 24.04/22.04 guide.
+- https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/wsl-setup and
+  https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/ubuntu-insights.sh, tag `0.6.3`.
+- https://learn.microsoft.com/en-us/windows/wsl/tutorials/gpu-compute and
+  https://docs.nvidia.com/cuda/wsl-user-guide/index.html (preserved CUDA on WSL 13.4 guide): native GPU visibility only;
+  `nvidia-smi` has limited WSL features and can be invoked at `/usr/lib/wsl/lib/nvidia-smi`.
+- Existing `adoption/bootstrap.md`'s Python 3.13 prerequisite and `adoption/pins-linux-x86_64.json`'s official Node
+  24.21.0 tarball pin; native uv `run --help` observation recorded above. No replacement installer was written.

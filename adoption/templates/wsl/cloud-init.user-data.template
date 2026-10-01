@@ -1,5 +1,5 @@
 #cloud-config
-# User-data for a new Ubuntu 24.04.5 WSL instance: adoption/platforms/linux-wsl2-new-distro.md, step W3, renders this
+# User-data for either provisional Ubuntu 26.04.1 or 24.04.5 WSL image: adoption/platforms/linux-wsl2-new-distro.md, step W3, renders this
 # file to %USERPROFILE%\.cloud-init\<Name>.user-data, where <Name> is the --name of the install, before the instance
 # first boots. The cloud-init WSL datasource reads that file at the first boot; the image's /usr/lib/wsl/wsl-setup then
 # waits for cloud-init, reuses this user (the first one with uid 1000 or more), keeps the [user] default written below
@@ -8,6 +8,7 @@
 # Keys follow Canonical's "Automatic setup of Ubuntu on WSL with cloud-init" example and the cloud-init WSL datasource
 # "Default user" example. The groups are the ones the image's wsl-setup gives a user it creates interactively. uid 1000
 # matches defaultUid in the image's /etc/wsl-distribution.conf. The password stays locked; sudo needs none.
+# P2 checks the workstation schema; W5 must validate the selected image's own schema. New-host acceptance is unrun.
 users:
 - name: ${WSL_USER}
   uid: 1000

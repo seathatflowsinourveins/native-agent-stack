@@ -1,23 +1,41 @@
 {
   "schema_version": 1,
+  "artifact_class": "synthetic_fixture",
   "id": "wsl-new-distro-stage1-<host>-<YYYYMMDD>",
   "kind": "native_cli_e2e",
   "component_ids": [
     "systemd"
   ],
-  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's zero count; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, and F1-F3 printed running, Linger yes and a user-owned bus socket.>",
+  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's baseline and storage age; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, and F1-F3 printed running, Linger yes and a user-owned bus socket.>",
   "limitations": [
     "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
     "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
     "Sanitized: Windows and Linux user names, home and profile paths and the checkout path are replaced by placeholders; the raw transcript stays private on the host.",
     "jcodemunch_registration records F11's state only: a registration is not evidence that a session or subagent uses jCodeMunch.",
-    "The rehearsal block records a separate run on a throwaway name, removed by R1; its observations sit beside this run's, not in place of them."
+    "The rehearsal block records a separate run on a throwaway name, removed by R1; its observations sit beside this run's, not in place of them.",
+    "Synthetic fixture only: placeholders and unrun comparison arms are not upstream tests, new-host acceptance or fresh model/GPU runs."
   ],
   "recorded_at_utc": "<YYYY-MM-DDTHH:MM:SSZ>",
   "recipe": {
     "path": "adoption/platforms/linux-wsl2-new-distro.md",
     "catalog_revision": "<F7: git rev-parse HEAD of the new clone>",
     "creation_path": "<A (cloud-init) or B (import and manual user)>"
+  },
+  "supported_images": {
+    "26.04.1": {
+      "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+      "catalog_name": "Ubuntu-26.04",
+      "bytes": null
+    },
+    "24.04.5": {
+      "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+      "catalog_name": "Ubuntu-24.04",
+      "bytes": 388975696
+    }
   },
   "rehearsal": {
     "name": "<R1: the throwaway name, never the real <Name> or the workstation's>",
@@ -34,8 +52,8 @@
     }
   },
   "pre_checks": {
-    "signed_sums": "<P1: gpgv's exit code, its using RSA key and Good signature lines, and the signed SHA256SUMS line of the image>",
-    "user_data_schema": "<P2: cloud-init --version, the Valid schema line and its exit code, and the render's sha256sum, equal to W3's>"
+    "signed_sums": "<P1: both releases' gpgv exits, RSA key/Good signature lines and exact signed image hashes>",
+    "user_data_schema": "<P2: workstation cloud-init version/schema exit and render hash equal to W3; selected image qualification is W5>"
   },
   "storage_errors": {
     "baseline": "<P3: the hv_storvsc count without the registration line, before anything is installed>",
@@ -54,17 +72,19 @@
     "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>"
   },
   "image": {
-    "file": "ubuntu-24.04.5-wsl-amd64.wsl",
-    "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
-    "bytes": 388975696,
-    "sha256_published": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+    "release": "<RELEASE>",
+    "file": "ubuntu-<RELEASE>-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/<RELEASE>/ubuntu-<RELEASE>-wsl-amd64.wsl",
+    "bytes": "<W2: Get-Item Length of this host's selected image; 26.04.1 source size is unknown>",
+    "sha256_published": "<W2: exact selected-release sha256 from supported_images and Canonical's signed sums>",
     "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256>",
     "sha256_computed": "<W2: Get-FileHash .Hash in lower case>"
   },
   "first_launch": {
     "user_prompt_marker": "<true when the W5 output contains 'Create a default Unix user account:'>",
     "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
-    "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>"
+    "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>",
+    "cloud_init_version": "<W5: selected image cloud-init --version and its exit>"
   },
   "ownership_probe": "<W7: the stat -c %u:%g output for the file created from Windows after the terminate; 1000:1000 passes>",
   "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
@@ -76,6 +96,48 @@
     "bytes": "<W6: the Get-Item line's Length; null on path A>"
   },
   "steps": [
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c \"%U %F\" \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec test -c /dev/dxg",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'node --version'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<R1: returned output required by the selected recipe proof>"
+    },
     {
       "step": "R1",
       "cmd": "$env:WSL_UTF8 = '1'",
@@ -168,21 +230,27 @@
     },
     {
       "step": "P1",
+      "cmd": "for RELEASE in 26.04.1 24.04.5; do",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
       "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
     {
       "step": "P1",
-      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" https://releases.ubuntu.com/24.04.5/SHA256SUMS",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
     },
     {
       "step": "P1",
-      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
     },
     {
       "step": "P1",
@@ -192,9 +260,21 @@
     },
     {
       "step": "P1",
-      "cmd": "grep ' \\*ubuntu-24\\.04\\.5-wsl-amd64\\.wsl$' \"$SUMS_DIR/SHA256SUMS\"",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep -F \" *ubuntu-$RELEASE-wsl-amd64.wsl\" \"$SUMS_DIR/SHA256SUMS\" || exit 1",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "P1",
+      "cmd": "done",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<P1: returned output required by the selected recipe proof>"
     },
     {
       "step": "P2",
@@ -324,51 +404,111 @@
     },
     {
       "step": "W2",
-      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl'",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "$Release = '<RELEASE>'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
-      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\\WSL\\downloads\\SHA256SUMS'",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "switch ($Release) {",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
-      "cmd": "$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
-      "cmd": "$Published = (Select-String -LiteralPath 'Z:\\WSL\\downloads\\SHA256SUMS' -Pattern ' \\*ubuntu-24\\.04\\.5-wsl-amd64\\.wsl$').Line.Split(' ')[0]",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
-      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq 'Ubuntu-24.04'",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "default { throw 'unsupported release: do not download or install' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
-      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl').Hash.ToLowerInvariant()",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "}",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Image = \"ubuntu-$Release-wsl-amd64.wsl\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImagePath = \"Z:\\WSL\\downloads\\$Image\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImageUrl = \"https://releases.ubuntu.com/$Release/$Image\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$SumsPath = \"Z:\\WSL\\downloads\\$Release-SHA256SUMS\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W2",
       "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
       "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "output_excerpt": "<W2: selected-release computed/published/listed exact hashes and release URL>"
     },
     {
       "step": "W2",
-      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected) { throw 'sha256 mismatch: do not install' }",
-      "exit": "<exit code>",
-      "output_excerpt": "<sanitized output>"
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
+    },
+    {
+      "step": "W2",
+      "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W2: returned output required by the selected recipe proof>"
     },
     {
       "step": "W3",
@@ -420,9 +560,9 @@
     },
     {
       "step": "W4",
-      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
-      "exit": 0,
-      "output_excerpt": "<sanitized output>"
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\\WSL\\<Name>' --no-launch",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W4: returned output required by the selected recipe proof>"
     },
     {
       "step": "W4",
@@ -465,6 +605,12 @@
       "cmd": "wsl.exe -d '<Name>' --exec id -u",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init --version",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: returned output required by the selected recipe proof>"
     },
     {
       "step": "W5",
@@ -576,9 +722,9 @@
     },
     {
       "step": "W6",
-      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-24.04.5-wsl-amd64.wsl' --version 2",
-      "exit": "<path B only: exit code; null on path A>",
-      "output_excerpt": "<path B only: sanitized output; null on path A>"
+      "cmd": "wsl.exe --import '<Name>' 'Z:\\WSL\\<Name>' 'Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W6: returned output required by the selected recipe proof>"
     },
     {
       "step": "W6",
@@ -892,5 +1038,25 @@
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     }
-  ]
+  ],
+  "comparison_arms": {
+    "26.04.1": {
+      "status": "unrun",
+      "name": "<R1: this release's separate throwaway name>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1 running>",
+      "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
+      "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
+      "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
+      "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
+    },
+    "24.04.5": {
+      "status": "unrun",
+      "name": "<R1: this release's separate throwaway name>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1 running>",
+      "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
+      "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
+      "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
+      "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
+    }
+  }
 }

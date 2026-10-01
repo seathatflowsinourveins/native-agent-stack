@@ -4299,6 +4299,11 @@
       "bytes": 43700
     },
     {
+      "path": "adoption/platforms/linux-wsl2-new-distro.md",
+      "sha256": "53028b56ed6d199ca9a943ce28b87b6eeb13e5d1b210389aa876feb75b604fe5",
+      "bytes": 56815
+    },
+    {
       "path": "adoption/platforms/linux-wsl2.md",
       "sha256": "52513428d4b10ab40e0dbeb05373514ceae1e79f1d81a79afdc52868f58c743c",
       "bytes": 24767
@@ -4402,6 +4407,21 @@
       "path": "adoption/templates/systemd/token-report-refresh.service",
       "sha256": "47e88b71600dcb50f05f22ec70361a5fdb8338d207165008760715656502c0f8",
       "bytes": 9260
+    },
+    {
+      "path": "adoption/templates/wsl/cloud-init.user-data.template",
+      "sha256": "5bc2ecf8dbac015698b842204e204f1d13df899bb94ad15f68232381b2ca8e63",
+      "bytes": 1270
+    },
+    {
+      "path": "adoption/templates/wsl/first-boot-checklist.md",
+      "sha256": "4c3913da54820a1e526f76bce0d3f0c4b1002943b4ec043052f8562d5867af1a",
+      "bytes": 7179
+    },
+    {
+      "path": "adoption/templates/wsl/stage1-receipt.example.json",
+      "sha256": "17a2de88c8af4fd25407c4470d4e364925fae94b4bfc682764a49f5e3f352df4",
+      "bytes": 41872
     },
     {
       "path": "adoption/tools/README.md",
@@ -6466,8 +6486,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "d8bb8c5edcc19e9d143e6edf4368e0b156732803fc26edc04219310e21fad73d",
-      "bytes": 15659
+      "sha256": "8a34f3ee5ea0c8d043c231b3dbe72b961c6e4e269d7e2b660d0f21ff348f166f",
+      "bytes": 19725
     },
     {
       "path": "blueprints/convergence-practice/wsl-restore/README.md",
@@ -15698,6 +15718,11 @@
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
       "sha256": "d47647fd237f8a78920f1fc62e6780a9515a864acaa7be02cbc87385b4baffab",
       "bytes": 20693
+    },
+    {
+      "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
+      "sha256": "18e350dc9543ccece9a6bc3b76afa2a55392d81b3c3879480535e3f26fa72bfd",
+      "bytes": 95559
     },
     {
       "path": "docs/direct-results.md",
@@ -35610,6 +35635,11 @@
       "bytes": 79538
     },
     {
+      "path": "evidence/artifacts/new-wsl-dual-image-20261001/receipt.json",
+      "sha256": "e735d4c1b1f0a86075cda9b05f4613dadd8b2b361b97fedb4d2a6e44fdf394ba",
+      "bytes": 3398
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
       "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
       "bytes": 6213
@@ -48048,6 +48078,11 @@
       "path": "tests/test_wsl_native_tools.py",
       "sha256": "020530918ede07f057d28a8c4234d3ed1e0c0f4cb886f5fee1f772beaed7787f",
       "bytes": 12555
+    },
+    {
+      "path": "tests/test_wsl_new_distro_recipe.py",
+      "sha256": "8ce2d60601a25e946dba7d9a2995d09d6473bd3af27225fefd9b0706c1ad377d",
+      "bytes": 104050
     },
     {
       "path": "tests/test_wsl_restore.py",

@@ -14,7 +14,7 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
 - every command line in the recipe's ``powershell`` and ``sh`` code blocks is a row of the decision
   record's command table under the same step and shell, once per occurrence, and the table lists
   nothing else;
-- the image sha256 is one value in the recipe, the record and the stage-1 receipt example, and the
+- the two release-to-sha256 pairs match the primary sources in the recipe, record and synthetic receipt example, and the
   receipt example carries the payload keys scripts/validate.py compares with a ``receipts[]`` row;
 - no recipe command shuts WSL down, updates it, edits .wslconfig, changes the default distribution,
   or terminates, unregisters or manages any distribution but ``<Name>`` (decision 4), and the one
@@ -83,8 +83,24 @@ HOST_EXAMPLE = ROOT / "adoption/hosts/example.json"
 STACK = ROOT / "manifests/stack.json"
 BOOTSTRAP = ROOT / "adoption/bootstrap.md"
 
-IMAGE = "ubuntu-24.04.5-wsl-amd64.wsl"
+IMAGE = "ubuntu-<RELEASE>-wsl-amd64.wsl"
 IMAGE_BYTES = 388975696
+RELEASE_PINS = {
+    "26.04.1": {
+        "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+        "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+        "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+        "catalog_name": "Ubuntu-26.04",
+        "bytes": None,
+    },
+    "24.04.5": {
+        "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+        "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+        "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+        "catalog_name": "Ubuntu-24.04",
+        "bytes": IMAGE_BYTES,
+    },
+}
 PLACEHOLDER = "${WSL_USER}"
 # Loopback ports the workstation distribution already uses: the four in adoption/hosts/example.json, the gateway,
 # memory and the 2026-09-25 relocations named in adoption/platforms/linux-wsl2.md ("Listeners and ports"), and every
@@ -111,15 +127,15 @@ BASIC_COMMANDS_TITLE = '"Basic commands for WSL"'
 # The 2026-10-01 follow-up (the completeness critic's pre-stage-1 checks). R1 rehearses and removes a throwaway
 # distribution, P1 to P3 are sh pre-checks in the workstation distribution, W7 terminates once and probes ownership.
 EXPERIMENT = ROOT / "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
-SUMS_URL = "https://releases.ubuntu.com/24.04.5/SHA256SUMS"
+SUMS_URL = "https://releases.ubuntu.com/$RELEASE/SHA256SUMS"
 CD_IMAGE_SIGNER = "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
 P1_COMMANDS = [
     'SUMS_DIR="$(mktemp -d)"',
-    f'curl -fsSL -o "$SUMS_DIR/SHA256SUMS" {SUMS_URL}',
-    f'curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" {SUMS_URL}.gpg',
+    f'curl -fsSL -o "$SUMS_DIR/SHA256SUMS" "{SUMS_URL}" || exit 1',
+    f'curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" "{SUMS_URL}.gpg" || exit 1',
     'gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" '
     '"$SUMS_DIR/SHA256SUMS"',
-    "grep ' \\*ubuntu-24\\.04\\.5-wsl-amd64\\.wsl$' \"$SUMS_DIR/SHA256SUMS\"",
+    'grep -F " *ubuntu-$RELEASE-wsl-amd64.wsl" "$SUMS_DIR/SHA256SUMS" || exit 1',
 ]
 P2_RENDER = ("python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\")"
              ".read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template "
@@ -298,23 +314,38 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
 
 
 def sha256_errors(recipe: str, record: str, receipt: dict, checklist: str) -> list[str]:
+    """Require the exact primary-source release pairs, not merely membership in a set of two hashes."""
     errors = []
-    recipe_values = set(SHA256_RE.findall(recipe))
-    if len(recipe_values) != 1:
-        return [f"the recipe names {len(recipe_values)} distinct sha256 values, expected exactly one (the image's)"]
-    (expected,) = recipe_values
-    record_values = {value for line in record.splitlines() if IMAGE in line for value in SHA256_RE.findall(line)}
-    if not record_values:
-        errors.append(f"the record names no sha256 on a line that names {IMAGE}")
-    elif record_values != {expected}:
-        errors.append(f"the record's {IMAGE} sha256 {sorted(record_values)} differs from the recipe's {expected}")
-    if set(SHA256_RE.findall(checklist)) != {expected}:
-        errors.append("the checklist's W2 sha256 differs from the recipe's")
+    expected_values = {pin["sha256"] for pin in RELEASE_PINS.values()}
+    for name, text in (("recipe", recipe), ("checklist", checklist)):
+        if set(SHA256_RE.findall(text)) != expected_values:
+            errors.append(f"the {name} does not name exactly the two primary-source image hashes")
+    for release, pin in RELEASE_PINS.items():
+        for name, text in (("recipe", recipe), ("record", record), ("checklist", checklist)):
+            values = {value for line in text.splitlines() if pin["file"] in line for value in SHA256_RE.findall(line)}
+            if values != {pin["sha256"]}:
+                errors.append(f"the {name}'s {release} file-to-sha256 pairing differs from its primary-source pin")
+    arms = re.findall(r"^\s*'([^']+)' \{ \$Expected = '([0-9a-f]{64})'; \$CatalogName = '([^']+)' \}$",
+                      section(recipe, "W2"), re.M)
+    expected_arms = {(release, pin["sha256"], pin["catalog_name"]) for release, pin in RELEASE_PINS.items()}
+    if len(arms) != 2 or set(arms) != expected_arms:
+        errors.append("W2 does not control the two release-to-hash-to-catalog mappings")
+    w2 = section(recipe, "W2")
+    for needed in ("default { throw 'unsupported release: do not download or install' }",
+                   "$Actual -ne $Expected", "$Published -ne $Expected", "$Listed.Amd64Url.Sha256 -ne $Expected",
+                   "$Listed.Amd64Url.Url -ne $ImageUrl", "throw 'sha256 mismatch: do not install'",
+                   "(Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()"):
+        if needed not in w2:
+            errors.append(f"W2 lacks its selected-image verification: {needed}")
+    if receipt.get("supported_images") != RELEASE_PINS:
+        errors.append("the synthetic receipt's controlled release pins or observed sizes differ from the primary sources")
     image = receipt.get("image", {}) if isinstance(receipt, dict) else {}
-    if image.get("file") != IMAGE or image.get("bytes") != IMAGE_BYTES:
-        errors.append("the receipt example's image is not the recipe's file and size")
-    if image.get("sha256_published") != expected:
-        errors.append("the receipt example's sha256_published differs from the recipe's")
+    if image.get("release") != "<RELEASE>" or image.get("file") != IMAGE or image.get("url") != (
+            "https://releases.ubuntu.com/<RELEASE>/" + IMAGE):
+        errors.append("the synthetic receipt does not name the selected release's file and URL")
+    for key in ("bytes", "sha256_published"):
+        if not is_placeholder(image.get(key), "<W2"):
+            errors.append(f"the synthetic receipt's selected-image {key} must be filled from the actual W2 run")
     return errors
 
 
@@ -619,6 +650,9 @@ def signed_sums_errors(recipe: str, record: str, checklist: str, receipt: dict) 
     if {shell for shell, _ in commands} != {"sh"}:
         errors.append("P1 is not an sh step of the workstation distribution")
     lines = [command for _, command in commands]
+    for needed in ("for RELEASE in 26.04.1 24.04.5; do", 'if [ "$?" -ne 0 ]; then exit 1; fi', "done"):
+        if needed not in lines:
+            errors.append(f"P1 lacks both-arm signature verification: {needed}")
     missing = [line for line in P1_COMMANDS if line not in lines]
     errors += [f"P1 lacks `{line}`" for line in missing]
     if not missing and [lines.index(line) for line in P1_COMMANDS] != sorted(lines.index(line) for line in P1_COMMANDS):
@@ -847,7 +881,7 @@ def rehearsal_errors(recipe: str, record: str, checklist: str, receipt: dict, ex
     errors += [f"R1's text does not name {needed}" for needed in
                ("throwaway", "through F3", "`cloud-init schema --system`", "W7", "F2", "only its own distribution",
                 "W6's export rule", "`rehearsal`", "P3's baseline and W5's second count") if needed not in r1]
-    blocks = step_blocks(recipe, "R1")
+    blocks = [block for block in step_blocks(recipe, "R1") if UNREGISTER in block]
     passed = [block for block in blocks if not any("--export" in command for command in block)]
     failed = [block for block in blocks if any("--export" in command for command in block)]
     if len(passed) != 1 or len(failed) != 1:
@@ -959,20 +993,34 @@ class CommandTableTests(unittest.TestCase):
 
 
 class ImageHashTests(unittest.TestCase):
-    def test_the_recipe_record_receipt_example_and_checklist_name_one_image_sha256(self):
+    def test_the_recipe_record_receipt_example_and_checklist_pin_both_image_sha256_pairs(self):
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         self.assertEqual(sha256_errors(read(RECIPE), read(RECORD), receipt, read(CHECKLIST)), [])
 
     def test_the_check_rejects_a_drifted_hash(self):
         recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
         receipt = json.loads(read(RECEIPT_EXAMPLE))
-        (expected,) = set(SHA256_RE.findall(recipe))
         other = "0" * 64
-        self.assertTrue(sha256_errors(recipe, record.replace(expected, other), receipt, checklist))
-        self.assertTrue(sha256_errors(recipe.replace(expected, other, 1), record, receipt, checklist))
+        for release, pin in RELEASE_PINS.items():
+            expected = pin["sha256"]
+            with self.subTest(release=release):
+                self.assertTrue(sha256_errors(recipe, record.replace(expected, other), receipt, checklist))
+                self.assertTrue(sha256_errors(recipe.replace(expected, other, 1), record, receipt, checklist))
+                self.assertTrue(sha256_errors(recipe, record, receipt, checklist.replace(expected, other)))
+                pins = {key: dict(value) for key, value in receipt["supported_images"].items()}
+                pins[release]["sha256"] = other
+                self.assertTrue(sha256_errors(recipe, record, dict(receipt, supported_images=pins), checklist))
         self.assertTrue(sha256_errors(recipe, record, dict(receipt, image=dict(receipt["image"], sha256_published=other)),
                                       checklist))
-        self.assertTrue(sha256_errors(recipe, record, receipt, checklist.replace(expected, other)))
+        trial, fallback = (RELEASE_PINS[release]["sha256"] for release in ("26.04.1", "24.04.5"))
+        swapped = recipe.replace(trial, "SWAP").replace(fallback, trial).replace("SWAP", fallback)
+        self.assertTrue(sha256_errors(swapped, record, receipt, checklist))
+        pins = {key: dict(value) for key, value in receipt["supported_images"].items()}
+        pins["26.04.1"]["bytes"] = IMAGE_BYTES
+        self.assertTrue(sha256_errors(recipe, record, dict(receipt, supported_images=pins), checklist))
+        self.assertTrue(sha256_errors(recipe + "\n" + other, record, receipt, checklist))
+        self.assertTrue(sha256_errors(recipe.replace("$Actual -ne $Expected", "$Actual -eq $Expected"), record,
+                                      receipt, checklist))
 
 
 class ReceiptExampleTests(unittest.TestCase):
@@ -1250,6 +1298,10 @@ class SignedSumsTests(FollowUpCase):
         later = "### W5. "
         import_key = "gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0xD94AA3F0EFE21092\n"
         self.assert_mutants_fail(signed_sums_errors, {
+            "missing trial arm": (recipe.replace("for RELEASE in 26.04.1 24.04.5; do", "for RELEASE in 24.04.5; do"),
+                                  record, checklist, receipt),
+            "signature failure continues": (recipe.replace('if [ "$?" -ne 0 ]; then exit 1; fi\n', ""), record,
+                                             checklist, receipt),
             "keyserver import": (recipe.replace(p1, p1.replace(gpgv, import_key + gpgv)), record, checklist, receipt),
             "the operator's GnuPG home": (recipe.replace(gpgv, gpgv.replace('--homedir "$SUMS_DIR" ', "")), record,
                                           checklist, receipt),
@@ -1486,6 +1538,51 @@ class RehearsalTests(unittest.TestCase):
             with self.subTest(mutant=name):
                 self.assertNotEqual(mutant, (recipe, record, checklist, receipt, experiment))
                 self.assertTrue(rehearsal_errors(*mutant))
+
+
+class DualImageParameterizationTests(unittest.TestCase):
+    """Public recipe artifacts, checked against the two signed primary-source pins; no host execution."""
+
+    def test_both_releases_are_pinned_and_install_the_selected_file(self):
+        recipe = read(RECIPE)
+        self.assertEqual(set(SHA256_RE.findall(recipe)), {pin["sha256"] for pin in RELEASE_PINS.values()})
+        for release, pin in RELEASE_PINS.items():
+            with self.subTest(release=release):
+                self.assertIn(f"'{release}' {{ $Expected = '{pin['sha256']}'; $CatalogName = '{pin['catalog_name']}' }}",
+                              section(recipe, "W2"))
+        self.assertIn("default { throw 'unsupported release: do not download or install' }", section(recipe, "W2"))
+        for step in ("W4", "W6"):
+            self.assertIn("Z:\\WSL\\downloads\\ubuntu-<RELEASE>-wsl-amd64.wsl", section(recipe, step))
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        self.assertEqual(receipt.get("supported_images"), RELEASE_PINS)
+
+    def test_preregistered_rehearsals_cover_both_images_without_claiming_acceptance(self):
+        recipe, receipt = read(RECIPE), json.loads(read(RECEIPT_EXAMPLE))
+        criteria = {"first_boot", "systemd_user_from_second_instance", "wsl_gpu", "uv_cpython_3_13", "node_24"}
+        arms = receipt.get("comparison_arms", {})
+        self.assertEqual(set(arms), set(RELEASE_PINS))
+        for release, arm in arms.items():
+            with self.subTest(release=release):
+                self.assertEqual(arm["status"], "unrun")
+                self.assertEqual(set(arm) - {"status", "name"}, criteria)
+                self.assertTrue(all(is_placeholder(arm[key], "<R1") for key in criteria))
+        r1 = section(recipe, "R1")
+        for criterion in criteria:
+            self.assertIn(f"`{criterion}`", r1)
+        for command in ("systemctl --user is-system-running --wait", "test -c /dev/dxg",
+                        "/usr/lib/wsl/lib/nvidia-smi", "uv run --no-project --python 3.13 python --version",
+                        "node --version"):
+            self.assertTrue(any(command in line for _, line in step_commands(recipe, "R1")), command)
+        self.assertIn("no merit precedence", prose(r1))
+        self.assertIn("from the workstation's second-instance session", prose(r1))
+        self.assertIn("host check is not image qualification", prose(section(recipe, "P2")))
+        self.assertIn("wsl.exe -d '<Name>' -u root --exec cloud-init --version",
+                      [line for _, line in step_commands(recipe, "W5")])
+        experiment = json.loads(read(EXPERIMENT))
+        self.assertEqual(experiment["status"], "planned")
+        self.assertEqual(experiment["observations"], [])
+        self.assertEqual(experiment["decision_and_scope"]["qualification_run_ids"], [])
+        self.assertIn("no merit precedence", experiment["predeclared_metrics"]["quality_rule"])
 
 
 if __name__ == "__main__":

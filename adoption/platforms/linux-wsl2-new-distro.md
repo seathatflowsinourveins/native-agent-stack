@@ -6,12 +6,12 @@ holds the decisions, their alternatives, the command table and every source. Sta
 executed these steps; the first one that does starts with the rehearsal of R1 and records the stage-1 receipt described
 at the end.
 
-This page creates a second WSL 2 distribution on the existing Windows host from Canonical's published
-`ubuntu-24.04.5-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
+This page creates a second WSL 2 distribution on the existing Windows host from the selected Canonical image,
+`ubuntu-<RELEASE>-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
 and the user bus before stage 2, the repository's bootstrap. The workstation's distribution keeps running, stays the
 default and is never shut down.
 
-The page runs twice on a host: first as a rehearsal on a throwaway name, which R1 then removes, and then for the real
+The page rehearses both image arms on separate throwaway names, which R1 then removes, before running for the real
 `<Name>` ([Rehearsal first](#rehearsal-first)). Each run starts with P1 to P3, `sh` checks in the workstation's
 distribution that change nothing on the host; it shares the kernel and already has Ubuntu's keyring and cloud-init.
 Stage 1 (W1 to W7) runs on the
@@ -27,8 +27,15 @@ shell instead, as their sections say.
 
 ## Names and inputs
 
+Canonical's [26.04 release notes](https://documentation.ubuntu.com/release-notes/26.04/) and Microsoft's
+[creation commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) support the distribution and creation
+route. Microsoft's command documentation is pinned in the decision record at `MicrosoftDocs/WSL`
+`7b28cc1ee9b8ff672ada5e1c6c326d3573d703e5`, `WSL/basic-commands.md` and `WSL/build-custom-distro.md`.
+These sources do not establish full-stack compatibility for either arm.
+
 | Placeholder | Meaning | Rule |
 | --- | --- | --- |
+| `<RELEASE>` | `26.04.1` trial or `24.04.5` fallback | choose explicitly for each run; both are symmetric provisional arms, with no merit precedence; use the same release in W2, W4 and W6 |
 | `<Name>` | the new distribution's name (`--name`) and the user-data file's name | letters, digits, `.`, `_`, `-`; not already registered (W1); a throwaway name for the rehearsal (R1) |
 | `<WSL_USER>` | the Linux user cloud-init creates | `^[a-z_][a-z0-9_-]*$`, the rule of the image's `/usr/lib/wsl/wsl-setup` |
 | `Z:\WSL\<Name>` | the install location (`--location`); WSL puts `ext4.vhdx` there | must not exist yet (W1) |
@@ -36,6 +43,14 @@ shell instead, as their sections say.
 | `<checkout>` | the Windows path of a checkout of `origin/main` holding these templates | from a WSL session: `wslpath -w .` in the checkout |
 | `<host>` | the host value file `adoption/hosts/<host>.json` | `^[A-Za-z0-9][A-Za-z0-9_.-]*$`, the bootstrap's `--host` rule |
 | `<id>` | the adoption profile stage 2 installs | a `profiles[].id` of `adoption/manifest.json` |
+
+The controlled release pins below come from Canonical's signed sums and Microsoft's catalog at
+`8bc98bc33b246fe66710eec9eaa1b24c323da987`. Trial/fallback names describe the two arms; neither has new-host acceptance.
+
+| Release | Image file | Catalog entry | SHA-256 | Observed download bytes |
+| --- | --- | --- | --- | --- |
+| 26.04.1 | `ubuntu-26.04.1-wsl-amd64.wsl` | `Ubuntu-26.04` | `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104` | unknown; the preserved stream did not measure size |
+| 24.04.5 | `ubuntu-24.04.5-wsl-amd64.wsl` | `Ubuntu-24.04` | `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e` | 388,975,696; historical artifact check |
 
 ## Host-wide rules
 
@@ -74,7 +89,42 @@ block. Every
 host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and unregisters only that literal
 name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
 
-After the rehearsal's F3, read the list first and remove the throwaway distribution. When every proof held, no export is
+Rehearse both `26.04.1` trial and `24.04.5` fallback on separate throwaway names, with the same checkout, user-data,
+profile, Windows driver and host-wide settings. Both are symmetric provisional arms with no merit precedence.
+Before removal, extend each successful run through F9 using the existing bootstrap and its native recipes, then run
+the comparison probes below from the workstation's second-instance session (the PowerShell block is launched through
+the same Windows-side route as W1). Each `wsl.exe -d` targets that arm's literal throwaway `<Name>` and its default user.
+F1 to F3 and the probes test first boot and the user manager from a second instance; they do not assume the 24.04.5
+historical receipts are acceptance on this new host.
+
+The following criteria are preregistered for both arms. Preserve a failed or skipped criterion with its returned
+output; neither a missing comparison nor a host version check qualifies an arm. Both arms' new-host acceptance is unrun.
+
+| Criterion | Same required observation for each arm | Primary source or accepted recipe |
+| --- | --- | --- |
+| `first_boot` | W5 exits 0 without the user/OOBE failure markers; default uid 1000, retained cloud-init results, the selected image's own schema check and F1 `running` | W5, cloud-init tag 26.1; Microsoft creation docs pinned above; each image's inspected `wsl-setup` |
+| `systemd_user_from_second_instance` | F2 records linger and idle behavior; F3 and the second-instance probes show a user-owned directory/socket and user manager `running` | F1 to F3; Microsoft systemd guide at the pinned revision; systemd v255 references in the decision record; 259 execution remains unrun |
+| `wsl_gpu` | `/dev/dxg` is a character device and native `nvidia-smi` exits 0 with the Windows-provided GPU visible on the same driver; record limited WSL features and any failure | [Microsoft GPU guide](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gpu-compute), [NVIDIA WSL guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html); no Linux driver installation |
+| `uv_cpython_3_13` | The bootstrap's uv runs a separate managed CPython 3.13 and prints `Python 3.13.x`, exit 0; the system Python version is recorded separately | F9 and `adoption/bootstrap.md`'s `uv run --no-project --python 3.13` prerequisite command; installed uv 0.12.17 `run --help` confirms both selectors |
+| `node_24` | The bootstrap's selected Node starts and prints `v24.21.0`, exit 0; retain any loader/package failure | F4, F9 and `adoption/pins-linux-x86_64.json`'s official Node 24.21.0 tarball |
+
+```powershell
+wsl.exe -d '<Name>' --exec bash -lc 'stat -c "%U %F" "/run/user/$(id -u)" "/run/user/$(id -u)/bus"'
+wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait
+wsl.exe -d '<Name>' --exec test -c /dev/dxg
+wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi
+wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'
+wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'
+wsl.exe -d '<Name>' --exec bash -lc 'node --version'
+```
+
+Record these per-arm observations in `comparison_arms` alongside each rehearsal's schema, ownership, storage and idle
+observations. The inspected 26.04.1 system interpreter is Python 3.14.4-1ubuntu0.1 (its `python3` metapackage is
+3.14.3-0ubuntu2); it is not the toolkit's CPython 3.13 migration acceptance. uv selects 3.13 separately.
+GPU visibility and interpreter/version startup are bounded criteria; the full stack, GPU workloads and model behavior
+still require their own native acceptance. Compare every criterion before selecting either image within the host's scope.
+
+After F3 and the preregistered comparisons, read the list first and remove the throwaway distribution. When every proof held, no export is
 needed:
 
 ```powershell
@@ -106,7 +156,7 @@ Proof: the first `--list --quiet` names the throwaway distribution; the last `--
 its starred line is still W1's. A failed rehearsal's export goes into the `rehearsal` block with its SHA-256 and size,
 and the real run waits until the failure is understood. The rehearsal's private transcript and its user-data file under
 `%USERPROFILE%\.cloud-init` stay; record whether WSL's Start-menu entry and terminal profile for the throwaway name
-outlive `--unregister`. Then run the page again from P1 for the real `<Name>`, without R1.
+outlive `--unregister`. After both arms have complete comparison records, run the page again from P1 for the explicitly selected real `<Name>`, without R1.
 
 ## Pre-checks in the workstation distribution
 
@@ -124,25 +174,34 @@ the workstation's Ubuntu installs, from the `ubuntu-keyring` package, and `gpgv`
 an empty temporary directory, which is also `gpgv`'s home, so no GnuPG home of the user is read or written.
 
 ```sh
+for RELEASE in 26.04.1 24.04.5; do
 SUMS_DIR="$(mktemp -d)"
-curl -fsSL -o "$SUMS_DIR/SHA256SUMS" https://releases.ubuntu.com/24.04.5/SHA256SUMS
-curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS" || exit 1
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg" || exit 1
 gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" "$SUMS_DIR/SHA256SUMS"
-grep ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$' "$SUMS_DIR/SHA256SUMS"
+if [ "$?" -ne 0 ]; then exit 1; fi
+grep -F " *ubuntu-$RELEASE-wsl-amd64.wsl" "$SUMS_DIR/SHA256SUMS" || exit 1
+done
 ```
 
 Proof: both downloads exit 0; `gpgv` exits 0 and prints `using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092` and
-`Good signature from "Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>"`; `grep` prints
-`bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl`, the hash W2 pins. A
+`Good signature from "Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>"` for each release; `grep` prints
+each image's signed line with its exact hash from the release table. Both signed sums must pass, including the arm not
+selected for this run. The coordinator's preserved checks already passed for both (decision record, Evidence classes);
+reuse matching evidence for this authoring unit. A
 `BAD signature`, a missing key or any other nonzero exit stops the run with nothing installed.
 
 ### P2. The user-data schema
 
 Added after `v2026.09.26.2`: this renders `adoption/templates/wsl/cloud-init.user-data.template` with `<WSL_USER>`
 before any boot and validates it with cloud-init's own schema check. The render is F8's `string.Template` program, which
-writes the same bytes as W3's literal replace (W3 says why). Run it from the root of the checkout that `<checkout>` names.
-The workstation's cloud-init checks against its own version's schema, which `cloud-init --version` records; the image
-runs 26.1.
+writes the same bytes as W3's literal replace (W3 says why). Run it from the root of the checkout that `<checkout>` names,
+for the selected image's user-data. The workstation's cloud-init checks against its own version's schema, which
+`cloud-init --version` records. This host check is not image qualification. The inspected 26.04.1 image packages
+cloud-init 26.1-0ubuntu3~26.04.1; the historical 24.04.5 image packages 26.1-0ubuntu1~24.04.1. W5 records the selected
+image's version and validates the provisioned user-data with its own `cloud-init schema --system` on path A. Canonical's
+[cloud-init WSL guide](https://ubuntu.com/wsl/docs/stable/howto/cloud-init/) assumes 24.04 or 22.04; it does not qualify
+26.04. Both arms' new-host schema acceptance remains unrun.
 
 ```sh
 RENDER_DIR="$(mktemp -d)"
@@ -230,14 +289,15 @@ Proof, recorded in the receipt's `host` block:
   default 60000 ms) is the VM's. Without `instanceIdleTimeout=-1`, `<Name>` and its user services stop about
   `instanceIdleTimeout` after the last client exits (15 seconds by default), and issue reports say linger does not
   prevent it; F2 observes it. Changing either key is the user's decision, outside this page.
-- `Free` on `Z:` is recorded. The image unpacks to about 1.3 GB before stage 2 adds its tools.
+- `Free` on `Z:` is recorded. The historical 24.04.5 image unpacked to about 1.3 GB; no 26.04.1 size was observed. Stage 2 adds its tools.
 
 Stop on any other result.
 
 ### W2. Download and verify the image
 
 The expected sha256 is published twice, by Canonical next to the image and by Microsoft's WSL distribution catalog.
-This block reads the catalog at the commit of 2026-09-14 (#41465), whose `Ubuntu-24.04` entry is this image. It is the
+This block reads the catalog at the commit of 2026-09-14 (#41465), choosing `Ubuntu-26.04` or `Ubuntu-24.04` for the selected
+release. It is the
 only hash check before W4 installs the file: at WSL 2.7.13, `wsl --install --from-file` checks no hash
 (`WslClient.cpp:500-537`). The online `wsl --install Ubuntu-24.04` does compare its download with the catalog entry's
 `Sha256` (`WslInstall.cpp:36-50`, `:315`), but it reads the catalog from WSL's `master` branch at install time; this
@@ -245,18 +305,29 @@ page installs a pinned file whose hash the operator sees, and P1 has tied that h
 
 ```powershell
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'
-Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\WSL\downloads\SHA256SUMS'
-$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'
-$Published = (Select-String -LiteralPath 'Z:\WSL\downloads\SHA256SUMS' -Pattern ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$').Line.Split(' ')[0]
-$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq 'Ubuntu-24.04'
-$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl').Hash.ToLowerInvariant()
+$Release = '<RELEASE>'
+switch ($Release) {
+    '26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }
+    '24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }
+    default { throw 'unsupported release: do not download or install' }
+}
+$Image = "ubuntu-$Release-wsl-amd64.wsl"
+$ImagePath = "Z:\WSL\downloads\$Image"
+$ImageUrl = "https://releases.ubuntu.com/$Release/$Image"
+$SumsPath = "Z:\WSL\downloads\$Release-SHA256SUMS"
+Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath
+Invoke-WebRequest -UseBasicParsing -Uri "https://releases.ubuntu.com/$Release/SHA256SUMS" -OutFile $SumsPath
+$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]
+$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName
+$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()
 "computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)"
-if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected) { throw 'sha256 mismatch: do not install' }
+if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }
+(Get-Item -LiteralPath $ImagePath).Length
 ```
 
-Proof: the printed line shows one hash three times, `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e`, and
-the URL `https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl`; the file is 388,975,696 bytes. A `throw`
+Proof: the printed line shows the selected release's exact hash three times and its actual release URL from the pinned
+catalog, as listed in the release table. `Get-FileHash` hashes the entire downloaded image. Record `Length` as this run's
+actual image size; the 26.04.1 source stream's size is unknown, while 24.04.5's historical stream measured 388,975,696 bytes. A `throw`
 stops stage 1 with nothing installed. Record `.Hash` only: `Get-FileHash` also prints the file's path.
 
 ### W3. Render the user-data before any boot
@@ -285,12 +356,12 @@ the last command prints nothing. The file holds no secret: the user's password s
 
 ```powershell
 $env:WSL_UTF8 = '1'
-wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch
+wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch
 $LASTEXITCODE
 wsl.exe --list --verbose
 ```
 
-Proof: the output is `Installing: Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl`, then
+Proof: the output is `Installing: Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl` with the selected release filled in, then
 `Distribution successfully installed. It can be launched via 'wsl.exe -d <Name>'`; `$LASTEXITCODE` prints `0`;
 `--list --verbose` shows `<Name>` as `Stopped` at version 2 with the starred line unchanged. `--install --from-file`
 registers the distribution with its first-run setup enabled and `--no-launch` boots nothing, so cloud-init has not run yet.
@@ -311,6 +382,7 @@ cmd.exe /d /c "wsl.exe -d <Name> < NUL"
 $LASTEXITCODE
 wsl.exe -d '<Name>' --exec id -un
 wsl.exe -d '<Name>' --exec id -u
+wsl.exe -d '<Name>' -u root --exec cloud-init --version
 wsl.exe -d '<Name>' -u root --exec cloud-init status --long
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
@@ -324,9 +396,16 @@ wsl.exe --list --verbose
 Proof (path A, cloud-init provisioned the instance):
 
 - The launch prints `Provisioning the new WSL instance <Name>` and `This might take a while...`, and `$LASTEXITCODE`
-  prints `0`. The image's `wsl-setup` prints both lines, not WSL: lines 117-118 at its version 0.5.10~24.04.2, Launchpad
+  prints `0`. The image's `wsl-setup` prints both lines, not WSL: for the historical 24.04.5 image, lines 117-118 at its version 0.5.10~24.04.2, Launchpad
   tag `import/0.5.10_24.04.2`, commit `74bfc89113bc7d46a4d9feb1e69cd6951fbc6908`.
+- For 26.04.1, the inspected image packages `wsl-setup` 0.6.3ubuntu~26.04.1, matched to upstream tag `0.6.3`, commit
+  `73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8` (`wsl-setup:122-123,155-156` and `ubuntu-insights.sh:15-19,114-142`).
+  Its Insights script preserves existing native Linux/Windows consent; it prompts only when stdin is a terminal
+  (`-t 0`). W5's NUL input takes its native noninteractive path. No command here invents consent or writes a global
+  consent registry value. This source review is not first-boot acceptance.
 - `id -un` prints `<WSL_USER>` and `id -u` prints `1000`.
+- `cloud-init --version` records the selected image's packaged version before its own schema check; P2 recorded only
+  the workstation's version.
 - `cloud-init status --long` prints `status: disabled` and `boot_status_code: disabled-by-marker-file`. This line proves
   only that the marker is in place, because cloud-init 26.1 reports `disabled` once `/etc/cloud/cloud-init.disabled`
   exists, whatever its run did (`cloudinit/cmd/status.py:284-286` and `:385-386`).
@@ -395,7 +474,7 @@ if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
 (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Hash.ToLowerInvariant()
 (Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length
 wsl.exe --unregister '<Name>'
-wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2
+wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2
 wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long
 ```
 
@@ -530,7 +609,8 @@ sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzi
 dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap
 ```
 
-Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages, which the image lacks.
+Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages. The historical
+24.04.5 image lacked them; do not assume the selected 26.04.1 image has the same package gaps.
 
 ### F5. Subordinate ids
 
@@ -714,6 +794,9 @@ transcript and the F outputs:
   - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
   - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
     W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
+  - the selected release and actual image size, with the two fixed `supported_images` pins and both `comparison_arms`.
+    The checked-in example is a synthetic fixture with unrun comparison arms; fill actual results from the native logs
+    and replace the synthetic fixture labels in a contributed receipt only with the operations it actually observed.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
   `limitations` and its `path`. Its claim quotes only that run's output. Follow
@@ -729,11 +812,11 @@ Kept open in the record, each with the observation that would settle it:
   and issue reports say linger alone does not (F2 records it; whether `wsl.exe --list --running` counts as a client is
   not verified);
 - whether binfmt registrations survive `wsl --terminate` (WSL's `protectBinfmt`);
-- whether `useradd` allocated the subordinate ids on 24.04.5 (F5 records it);
+- whether `useradd` allocated the subordinate ids on the selected release (F5 records it);
 - whether a terminate clears the 0:0 file owner of microsoft/WSL#40941 (W7 records it);
 - whether `hv_storvsc` errors break a first launch on this kernel (microsoft/WSL#41482; P3 records a baseline and
   stops on an error line less than one hour old, and W5 counts again after the first launch);
-- the bounded comparison against Ubuntu 26.04.1 LTS, WSL's current default `Ubuntu`.
+- the symmetric preregistered comparison of Ubuntu 26.04.1 trial and 24.04.5 fallback; both remain provisional and unrun.
 
 ## Boundaries
 
