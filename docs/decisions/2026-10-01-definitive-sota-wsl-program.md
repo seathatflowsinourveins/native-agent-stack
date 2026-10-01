@@ -104,6 +104,18 @@ coordinator's. One is the user's and carries a default until it is answered.
    challenger without the comparison either. The architecture edition labels its winners column as the source
    host's selection of record. Overturn: the user restores the provisional install of the recorded selection as the
    default.
+   How a result reaches the landscape catalog (read from the tooling on 2026-10-01): a verdict wave can name only
+   an adopted candidate as a layer's winner, and a lane's return has no "undetermined" form. Adopted means a
+   `candidates[]` entry of the row with a disposition of `selected` or `conditional`
+   (`tools/sota-convergence/lane_packets.py` `build_candidate`; `scripts/landscape.py` `lane_winner_components`);
+   that field is maintained by hand, outside the sealed wave, and a repository that reaches a packet only from the
+   manifest as a newcomer is never adopted. A comparison's result therefore enters `catalogs/landscape/` in two
+   steps: a candidate entry with an adopted disposition that cites the executed comparison, then a new verdict
+   wave. A re-record alone can only re-affirm an adopted candidate, so none is run to claim that a challenger
+   lost. The verdict fields of the sealed 2026-09-22 wave (`winners`, `alternatives`, `open_gaps`) are not edited
+   by hand: a dated `limitations` entry on the row carries what changed since, as on the durable-memory row, and
+   a sweep input dates those fields and joins the gap-wave ledgers onto them
+   (`tools/sota-convergence/landscape-sweep/build_inputs.py`).
 
 ## Phases
 

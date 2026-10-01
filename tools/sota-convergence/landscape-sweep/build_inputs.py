@@ -20,6 +20,15 @@ an empty previous_sweep and no baseline, and the summary line names the sweep it
 --seeds is an optional JSON object {"<layer_id>": ["candidate or note", ...]}: candidates other sessions asked this
 sweep to assess, shown to the discovery workers as seeded_candidates. An unknown layer id is an error.
 
+winners, alternatives and open_gaps are copied from the row's sealed verdict, which only a new verdict wave re-records
+(tools/sota-convergence/README.md, "Record verdicts"), so an input dates them: verdict_checked_at is the row's
+checked_at, verdict_note says which fields are sealed and where the current pin is (components_vs_upstream), and
+open_gaps_followup joins the gap-wave owner ledgers (catalogs/landscape/gap-wave*--*.json, the ledgers
+lane_packets.gap_receipts_index reads) onto the gaps shown: per gap, each distinct status a ledger recorded with its
+receipts that exist in this checkout, the waves and the ledger ids. A ledger entry joins only when its index and text
+equal the sealed open gap's; the summary line counts the ledger entries joined, those that match no sealed gap and
+those for gaps beyond the five shown.
+
 previous_sweep holds that sweep's survived and refuted repositories. A proposal it refuted only because a vote did
 not return (saturation_ledger.py refuted_by_absence: no returned vote refutes it) is listed under not_adjudicated
 instead, with not_adjudicated_note, so the next discovery round does not read it as refuted on merit.
@@ -60,6 +69,16 @@ REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSI
 NOT_ADJUDICATED_NOTE = ("refuted in that sweep only because a vote did not return (a missing vote counts as refuted); "
                         "no returned vote refuted these, so they were not refuted on merit")
 COMPONENT_FIELDS = ("id", "repository", "pin", "upstream", "pin_behind_upstream", "pin_comparison")
+# How many of a row's open gaps an input shows, and the length each is cut to.
+GAPS_SHOWN, GAP_CLIP = 5, 300
+# The gap-wave owner ledgers (tools/sota-convergence/lane_packets.py GAP_LEDGER_GLOB): per layer, each open gap of the
+# sealed verdict by index and text, with the status and the receipts a later wave recorded for it.
+GAP_LEDGER_GLOB = "catalogs/landscape/gap-wave*--*.json"
+VERDICT_NOTE = ("winners, alternatives and open_gaps are this layer's sealed verdict as of verdict_checked_at; a "
+                "verdict is not rewritten between verdict waves, so a pin or a gap in them can be out of date. "
+                "components_vs_upstream[].pin is the pin the stack installs today. open_gaps_followup lists, by "
+                "open_gaps index, what a later gap wave recorded for that gap (status, receipts, waves, ledgers); "
+                "a gap without an entry has no follow-up on record.")
 # The skills modality's catalog, its layers' catalog name and its source kinds.
 SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
@@ -119,6 +138,57 @@ def previous_by_layer(previous_sweep: dict | None, absent=None) -> dict:
     return previous
 
 
+def gap_ledger_entries(repo: Path) -> tuple[list, int]:
+    """Every gap entry of the gap-wave owner ledgers under ``repo``, in ledger path order, and the ledger count:
+    {catalog, layer_id, index, text, status, receipts, waves, ledger}. receipts keeps the paths that are files in this
+    checkout (lane_packets.gap_receipts_index applies the same rule)."""
+    entries, ledgers = [], sorted(repo.glob(GAP_LEDGER_GLOB))
+    for ledger_path in ledgers:
+        ledger = load_json(ledger_path)
+        waves = ledger.get("wave")
+        waves = [waves] if isinstance(waves, str) else [wave for wave in waves or [] if isinstance(wave, str)]
+        for layer in ledger.get("layers") or []:
+            for gap in layer.get("gaps") or []:
+                receipts = [receipt.get("path") for receipt in gap.get("receipts") or [] if isinstance(receipt, dict)]
+                entries.append({
+                    "catalog": layer.get("catalog"), "layer_id": layer.get("layer_id"), "index": gap.get("index"),
+                    "text": gap.get("text"), "status": gap.get("status"),
+                    "receipts": [path for path in receipts if isinstance(path, str) and (repo / path).is_file()],
+                    "waves": waves, "ledger": ledger.get("id") or ledger_path.stem})
+    return entries, len(ledgers)
+
+
+def join_gap_followups(catalogs: dict, entries: list) -> tuple[dict, dict]:
+    """(catalog, layer_id) -> the follow-up entries of that layer's shown open gaps, by index then ledger order, and
+    the counts {joined, dropped, beyond} of ledger entries. An entry joins when the layer's sealed open_gaps[index]
+    equals its text; ledgers that record the same status and receipts for a gap share one entry (waves and ledgers
+    name them all). dropped counts the entries that match no sealed open gap (an unknown layer, another index or
+    another text), beyond those that match a gap past the GAPS_SHOWN an input shows."""
+    gaps = {(catalog, layer["layer_id"]): layer.get("open_gaps") or []
+            for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]}
+    followups, counts = {}, {"joined": 0, "dropped": 0, "beyond": 0}
+    for entry in entries:
+        key, index = (entry["catalog"], entry["layer_id"]), entry["index"]
+        sealed = gaps.get(key)
+        if (sealed is None or not isinstance(index, int) or isinstance(index, bool) or not 0 <= index < len(sealed)
+                or sealed[index] != entry["text"]):
+            counts["dropped"] += 1
+        elif index >= GAPS_SHOWN:
+            counts["beyond"] += 1
+        else:
+            counts["joined"] += 1
+            rows = followups.setdefault(key, [])
+            same = next((row for row in rows if (row["index"], row["status"], row["receipts"])
+                         == (index, entry["status"], entry["receipts"])), None)
+            if same is None:
+                rows.append({"index": index, "status": entry["status"], "receipts": entry["receipts"],
+                             "waves": list(entry["waves"]), "ledgers": [entry["ledger"]]})
+            else:  # two ledgers record the same status and receipts for this gap: one entry names both
+                same["waves"] += [wave for wave in entry["waves"] if wave not in same["waves"]]
+                same["ledgers"].append(entry["ledger"])
+    return {key: sorted(rows, key=lambda row: row["index"]) for key, rows in followups.items()}, counts
+
+
 def check_seeds(seeds, layer_ids) -> dict:
     if seeds is None:
         return {}
@@ -132,10 +202,12 @@ def check_seeds(seeds, layer_ids) -> dict:
 
 
 def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshness: dict, baseline: dict | None,
-                       ledger: dict, seeds=None, absent=None) -> list[dict]:
+                       ledger: dict, seeds=None, absent=None, followups=None) -> list[dict]:
     """One input object per landscape layer, in catalog order; raises on a layer missing from the frozen scope.
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
-    refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted."""
+    refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted.
+    ``followups`` is join_gap_followups' first value; without it every open_gaps_followup is empty."""
+    followups = followups or {}
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
     previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
@@ -172,7 +244,10 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
                                  for alt in layer.get("alternatives") or []],
                 "upstream_checked_at": freshness.get("checked_at"),
                 "components_vs_upstream": components,
-                "open_gaps": [gap[:300] for gap in (layer.get("open_gaps") or [])[:5]],
+                "open_gaps": [gap[:GAP_CLIP] for gap in (layer.get("open_gaps") or [])[:GAPS_SHOWN]],
+                "open_gaps_followup": followups.get((catalog, layer_id), []),
+                "verdict_checked_at": layer.get("checked_at"),
+                "verdict_note": VERDICT_NOTE,
                 "overturn_when": (layer.get("overturn_when") or "")[:600],
                 "previous_sweep": previous.get((catalog, layer_id), {}),
                 "known_repositories": sorted(known),
@@ -367,12 +442,14 @@ def main(argv=None) -> int:
         documents = {}
         target_of = led.ref_resolver(lambda path: documents[path] if path in documents
                                      else documents.setdefault(path, led.load_json(repo, path)))
+        gap_entries, gap_ledgers = gap_ledger_entries(repo)
+        followups, gap_counts = join_gap_followups(catalogs, gap_entries)
         inputs = build_layer_inputs(
             catalogs, load_json(repo / "catalogs" / "landscape" / "research-state.json"),
             load_json(args.scope or work / "scope.json"), load_json(args.freshness_manifest),
             load_json(baseline_path) if baseline_path else None, ledger,
             load_json(args.seeds) if args.seeds else None,
-            absent=lambda entry: led.refuted_by_absence(entry, target_of))
+            absent=lambda entry: led.refuted_by_absence(entry, target_of), followups=followups)
     except (ValueError, OSError, KeyError) as error:
         print(f"build_inputs.py: {error}", file=sys.stderr)
         return 2
@@ -387,7 +464,9 @@ def main(argv=None) -> int:
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
           f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "
           f"baseline {baseline_path.name if baseline_path else 'none'}; seeds for "
-          f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s)")
+          f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s); "
+          f"gap follow-ups: {gap_counts['joined']} joined from {gap_ledgers} ledger(s), {gap_counts['dropped']} dropped "
+          f"(no sealed open gap with that index and text), {gap_counts['beyond']} for gaps beyond the {GAPS_SHOWN} shown")
     return 0
 
 

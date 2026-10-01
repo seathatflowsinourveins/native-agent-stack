@@ -17,7 +17,7 @@ the merged manifest, stay with the lane owners.
 
 | File | Runs | Role |
 | --- | --- | --- |
-| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest and optional seeds. |
+| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest, the gap-wave ledgers and optional seeds. |
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
@@ -757,6 +757,18 @@ The deliberate changes:
   - Known-repository slugs are no longer cut by `rstrip(".git")`, which had shortened, for example, `qdrant/qdrant`
     to `qdrant/qdran` in 30 of 32 layers.
   - The previous sweep is the last completed one of the run's modality (repository or skills).
+  - A repository-layer input dates its sealed fields (2026-10-01). `winners`, `alternatives` and `open_gaps` are
+    copied from the row's verdict, which only a new verdict wave re-records, so weeks later a pin or a gap in them
+    can be out of date: an audit of 32 frozen inputs on 2026-10-01 found 14 winner pins behind the stack and gap
+    texts that later receipts had already answered. Three fields say so, and none of the existing ones changes:
+    `verdict_checked_at` is the row's `checked_at`; `verdict_note` names the sealed fields and says that
+    `components_vs_upstream[].pin` is the pin the stack installs today; `open_gaps_followup` joins the gap-wave
+    owner ledgers (`catalogs/landscape/gap-wave*--*.json`, the ledgers `lane_packets.gap_receipts_index` reads) onto
+    the gaps shown. Each follow-up entry gives the gap's index, the ledger's status, its receipts that exist in the
+    checkout, and the waves and ledgers that recorded it; two ledgers with the same status and receipts share one
+    entry. A ledger entry joins only when its index and text equal the sealed open gap's. The summary line counts
+    the ledger entries joined, those that match no sealed gap and those for gaps beyond the five shown. What the
+    ledgers do not record, such as a comparison run after the last gap wave, still reaches a sweep through `--seeds`.
 - **Placeholder filling.** Placeholders are filled in one pass, with no `$&` expansion. Merged rows drop
   `by_family`.
 - **`convert.py` additions.**

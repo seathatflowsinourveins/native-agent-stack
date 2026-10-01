@@ -39,9 +39,9 @@ us-equities rows the last, which is the basis of that assessment's synthesis. Th
 this edition's base. Seven pull requests carried sources that were not on main at that base. Five have merged
 since: the new-distribution recipe (PR #569, merged as `ad7d645b`), the Harbor E2E receipt (PR #570, `000aae77`),
 the trading convergence record (PR #358, `326dc84b`), the program record with the foundation assessment
-(PR #573, `25098f8a`) and the trading lane's verdict record (PR #578, `65a7b030`). Two are open: the Codex lane's
-layer reviews and crosswalk (PR #575, head `51cb79ba`) and the runtime-workers blueprint README (PR #535, head
-`1195e212`).
+(PR #573, `25098f8a`), the trading lane's verdict record (PR #578, `65a7b030`) and the Codex lane's layer reviews
+and crosswalk (PR #575, merged as `75c83d80` at head `9451c562`). One is open: the runtime-workers blueprint README
+(PR #535, head `1195e212`).
 
 ## Alternatives
 
@@ -124,10 +124,17 @@ of the 119 winner acceptance classes overstated, 13 commands that were only vers
 it could not settle; this revision corrects them. 55 of the 119 entries changed (32 classes, 48 commands and 31
 cited sources); the lane owners re-cited their winners to the files that record the runs; 13 `none_recorded`
 entries got their check to run back; restic is cited to its off-host receipt in four rows; and three rows that had
-no winner gained six; the merit update added five verdict winners. The edition now has 130 winner entries: 73
-`upstream_example_or_native_operation`, 24 `local_integration_check`, 14 `structural_validation`, 1
-`independent_observation` and 18 `none_recorded`, 15 of which name the check to run. Row classes: 13
-`none_recorded`, 12 `local_integration_check`, 6 `upstream_example_or_native_operation`, 5
+no winner gained six; the merit update added five verdict winners. Four of those five were then corrected the
+same day: the trading lane owner had rated DVC, pandera, MLflow and Inspect AI `none_recorded` from the
+assessment's "source review only" without a search of the gap-wave receipts, an audit by the Codex lane named
+committed 2026-09-23 receipts for each, and the owner and this edition's author re-read them
+(`evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json`,
+`us-equities__data-quality-orchestration/5-duckdb-gate-input.json` and
+`us-equities__evaluation-experiments/1-five-package-installs.json`). The lesson is the invariant's other side: a
+`none_recorded` is a claim too, and it needs the same search of the receipts as a stronger class. The edition now
+has 130 winner entries: 76 `upstream_example_or_native_operation`, 25 `local_integration_check`, 14
+`structural_validation`, 1 `independent_observation` and 14 `none_recorded`, 11 of which name the check to run.
+Row classes: 10 `none_recorded`, 13 `local_integration_check`, 6 `upstream_example_or_native_operation`, 7
 `structural_validation` and 1 `independent_observation`. The six policy
 classes have no defined order, so the build enforces what can be enforced:
 when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
@@ -204,7 +211,7 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
 - The acceptance review of 2026-10-01 read one hop from each cited file (a receipt or artifact the cited file
   links directly) and no further, and it rated part of its corrections below high confidence: by entry, 10 of
   the 32 medium, 9 medium-high and 3 low.
-- Item 4 for the layer rows: the Codex lane's cross-family review of all 32 layers (PR #575 at `51cb79ba`,
+- Item 4 for the layer rows: the Codex lane's cross-family review of all 32 layers (PR #575, merged as `75c83d80`,
   gpt-6.1-sol) was performed on 2026-10-01 and names remaining gaps in every layer. Each foundation and
   us-equities row cites its review; the item cells keep the closure assessment's reading until the layer records
   are re-recorded. Those reviews select different component sets from this edition's winners in 20 of the 32
@@ -236,8 +243,8 @@ Write a new edition, or update this one in the change that causes it, when any o
    in the Linux pins file or runtime-target.json is caught by the line-bounds check only when the line
    disappears, so re-read those rows.
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
-4. **A pending source lands.** PR #575 or #535 merges: the build hashes the landed file and labels it as
-   landed after this edition's base. PR #569, #570, #358, #573 and #578 have landed: their citations are plain
+4. **A pending source lands.** PR #535 merges: the build hashes the landed file and labels it as landed after
+   this edition's base. PR #569, #570, #358, #573, #578 and #575 have landed: their citations are plain
    `source_path` entries now, and `cross:wsl-distro` was re-rated when #569 did.
 5. **A lane owner changes a verdict or its wording** for one of its rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
@@ -260,7 +267,7 @@ Write a new edition, or update this one in the change that causes it, when any o
 - PR #570 (merged as `000aae77`): `evidence/receipts/harbor-e2e-token-tools-20260930.json`
 - PR #573 (merged as `25098f8a`): `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
   `evidence/artifacts/layer-closure-assessment-20261001/`
-- PR #575 at `51cb79ba`: `evidence/artifacts/new-wsl-layer-reviews-20261001/` (the 32 layer reviews and the
+- PR #575 (merged as `75c83d80`): `evidence/artifacts/new-wsl-layer-reviews-20261001/` (the 32 layer reviews and the
   selection-gap follow-up),
   `catalogs/foundation/new-wsl-layer-crosswalk-20261001.json`
 - Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js

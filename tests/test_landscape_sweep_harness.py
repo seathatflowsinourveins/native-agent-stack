@@ -483,6 +483,84 @@ class BuildInputsTests(unittest.TestCase):
         layers = json.loads((self.work / "layers.json").read_text())
         self.assertEqual([(x["catalog"], x["layer_id"]) for x in layers], [("foundation", "alpha"), ("us-equities", "beta")])
 
+    def test_inputs_date_the_sealed_verdict_fields_and_join_the_gap_ledgers(self):
+        # winners, alternatives and open_gaps are a row's sealed verdict (tools/sota-convergence/README.md, the
+        # grandfathered wave): a sweep reads them weeks later. The gap-wave ledgers record, by open_gaps index and
+        # text, what later receipts did to each gap (lane_packets.gap_receipts_index reads the same ledgers).
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0].update({"checked_at": "2026-09-22", "open_gaps": ["g" * 400, "second gap", "third gap"]})
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        receipt = "evidence/artifacts/gap-wave2-20260923/alpha/0-run.json"
+        write_json(self.repo / receipt, {"id": "0-run"})
+        first, both = "gap-wave2-20260923--owner-a", "gap-wave2-20260923+gap-wave3-20260923--owner-b"
+        write_json(self.repo / f"catalogs/landscape/{first}.json", {
+            "id": first, "wave": "gap-wave2-20260923", "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "g" * 400, "status": "advanced",
+                     "receipts": [{"path": receipt, "credit": "advanced"}]},
+                    {"index": 1, "text": "a text the sealed row does not carry", "status": "settled", "receipts": []},
+                    {"index": 2, "text": "third gap", "status": "not_run"}]},
+                {"catalog": "foundation", "layer_id": "no-such-layer", "gaps": [
+                    {"index": 0, "text": "x", "status": "settled"}]}]})
+        write_json(self.repo / f"catalogs/landscape/{both}.json", {
+            "id": both, "wave": ["gap-wave2-20260923", "gap-wave3-20260923"], "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "g" * 400, "status": "settled",
+                     "receipts": [{"path": receipt, "credit": "settled"},
+                                  {"path": "evidence/artifacts/not-in-this-checkout.json", "credit": "settled"}]}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        beta = json.loads((self.work / "inputs/beta.json").read_text())
+        self.assertEqual(alpha["verdict_checked_at"], "2026-09-22")
+        self.assertEqual(alpha["open_gaps_followup"], [
+            {"index": 0, "status": "settled", "receipts": [receipt],
+             "waves": ["gap-wave2-20260923", "gap-wave3-20260923"], "ledgers": [both]},
+            {"index": 0, "status": "advanced", "receipts": [receipt], "waves": ["gap-wave2-20260923"],
+             "ledgers": [first]},
+            {"index": 2, "status": "not_run", "receipts": [], "waves": ["gap-wave2-20260923"], "ledgers": [first]}])
+        # open_gaps itself stays the list of clipped strings the templates read.
+        self.assertEqual([len(gap) for gap in alpha["open_gaps"]], [300, 10, 9])
+        for field in ("verdict_checked_at", "components_vs_upstream", "open_gaps_followup"):
+            self.assertIn(field, alpha["verdict_note"])
+        self.assertEqual(alpha["verdict_note"], beta["verdict_note"])
+        self.assertEqual((beta["verdict_checked_at"], beta["open_gaps_followup"]), (None, []))
+        # No silent caps: the entry whose text the sealed row does not carry and the unknown layer's entry are counted.
+        self.assertIn("gap follow-ups: 3 joined from 2 ledger(s), 2 dropped", done.stdout)
+
+    def test_two_ledgers_that_record_the_same_followup_share_one_entry(self):
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0]["open_gaps"] = ["only gap"]
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        first, both = "gap-wave2-20260923--owner-a", "gap-wave2-20260923+gap-wave3-20260923--owner-a"
+        for name, wave in ((first, "gap-wave2-20260923"), (both, ["gap-wave2-20260923", "gap-wave3-20260923"])):
+            write_json(self.repo / f"catalogs/landscape/{name}.json", {"id": name, "wave": wave, "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "only gap", "status": "advanced", "receipts": []}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(alpha["open_gaps_followup"], [
+            {"index": 0, "status": "advanced", "receipts": [],
+             "waves": ["gap-wave2-20260923", "gap-wave3-20260923"], "ledgers": [both, first]}])
+        self.assertIn("gap follow-ups: 2 joined from 2 ledger(s), 0 dropped", done.stdout)
+
+    def test_a_gap_beyond_the_five_shown_gets_no_followup(self):
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0]["open_gaps"] = [f"gap {number}" for number in range(7)]
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        write_json(self.repo / "catalogs/landscape/gap-wave2-20260923--owner-a.json", {
+            "id": "gap-wave2-20260923--owner-a", "wave": "gap-wave2-20260923", "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 4, "text": "gap 4", "status": "advanced"},
+                    {"index": 6, "text": "gap 6", "status": "settled"}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(len(alpha["open_gaps"]), 5)
+        self.assertEqual([entry["index"] for entry in alpha["open_gaps_followup"]], [4])
+        self.assertIn("gap follow-ups: 1 joined from 1 ledger(s), 0 dropped", done.stdout)
+
     def test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated(self):
         # o/r: facts and the Claude fit refuter returned not refuted, the GPT-6 fit vote never returned. o/m: facts
         # refuted it on merit.
