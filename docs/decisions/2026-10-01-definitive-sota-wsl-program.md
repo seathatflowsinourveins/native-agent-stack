@@ -6,16 +6,19 @@ install); the us-equities table follows when its assessment completes.
 ## Decision
 
 The definitive runtime is a new WSL 2 distro, imported from an official upstream image and bootstrapped from this
-repository at a final revision, in which each layer's selected repositories are installed cleanly with their
-upstream-supported commands by an LLM-native session. Gate A's token-adoption E2E re-aims at the new distro (the
+repository at a recorded revision (decision 4), in which each layer's selected repositories are installed cleanly with
+their upstream-supported commands by an LLM-native session. Gate A's token-adoption E2E re-aims at the new distro (the
 user's decision of 2026-10-01 03:33Z): the measurement host is the new distro, which collects its own evidence; the
 current workstation distro's Gate A freeze is lifted and keeps whatever the production program runs there. The
 production program's composition (Codex 0.159.3, AgentRelay 13.0.0, Relaycast 8.14.0, Hindsight 0.10.2 with the 0.8.0
-coding integration, NautilusTrader 2.0.0rc5) is a candidate composition for the new distro, not a selection: each
-component enters through its layer's closure (durable-memory is `comparison_required`, with ai-memory the selection
-of record and Hindsight a fit target with recorded holds; Codex 0.159.3 is unqualified against the 0.159.2 pin of
-record). Each of the 32 catalog layers is finalized before its repositories are installed there, and every install
-leaves a per-layer receipt registered through the hot-file protocol (`docs/lanes.md`).
+coding integration, NautilusTrader 2.0.0rc5) is a candidate composition for the new distro, not a selection. A
+component with a catalog layer enters through that layer's closure: durable-memory is `comparison_required`, with
+ai-memory the selection of record and Hindsight a fit target whose holds the production program reports and has not
+published here yet; Codex 0.159.3 is unqualified against the 0.159.2 pin of record. AgentRelay and Relaycast have no
+catalog layer, so they enter only once a layer or a cross row with its own decision record names them. An install on
+the new distro counts as final only for a layer whose selection is final; until then it is a provisional install
+under decision 3. Every install leaves a per-layer receipt registered through the hot-file protocol
+(`docs/lanes.md`).
 
 ## Source of the decision
 
@@ -59,26 +62,37 @@ coordinator's. One is the user's and carries a default until it is answered.
    exception applies at once: scheduling-supervision is treated as `comparison_required`, because its selected Dagu
    2.16.6 failed the preregistered 150 s SIGKILL case that Temporal passed
    (`evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json`:
-   "under the preregistered protocol and 150 s bound Dagu sigkill is false").
+   "under the preregistered protocol and 150 s bound Dagu sigkill is false"). The Temporal arm ran the native
+   development server, which `catalogs/us-equities/hosting-source-review.json:60` calls developer evidence only, so
+   the exception reopens the comparison and selects nothing.
 2. **What "frozen" means in item 2 (the user's decision; the default applies until answered).** Default: a candidate
    and source set recorded at a named revision, with a disposition or an omission reason for every proposal of the
-   2026-09-23, 09-26 and 09-29 sweeps and the failed access listed. A saturation candidate (the policy of
-   `catalogs/saturation/ledger.json`: 3 clean sweeps at least 7 days apart) is an input to closure and not a
-   precondition: `scripts/saturation_ledger.py:28-31` says "A saturation candidate is only an input to closure", and
-   `recipes/saturation-sweep.md:179-180` leaves the closure reference to the landscape owners once a layer is a
-   candidate. Six assessments read item 2 as requiring the candidate; under that reading no layer closes for at
-   least 14 days. Overturn: the user asks for the stricter reading.
+   2026-09-23, 09-26 and 09-29 sweeps and the failed access listed. The default rests on item 2's own wording, which
+   asks for a recorded frozen set and not for a number of sweeps. Neither repository source settles whether a
+   saturation candidate (the policy of `catalogs/saturation/ledger.json`: 3 clean sweeps at least 7 days apart) must
+   come first. `scripts/saturation_ledger.py:28-31` says "A saturation candidate is only an input to closure", which
+   makes a candidate insufficient and is silent on whether one is necessary. `recipes/saturation-sweep.md:179-180`
+   says "When a layer reaches `saturation_candidate`, the landscape owners decide whether to add `closure_refs`", an
+   ordering the stricter reading rests on. Six assessments take the stricter reading; under it no layer closes for
+   at least 14 days. Overturn: the user asks for the stricter reading.
 3. **Where a comparison runs.** A preregistered comparison runs on the current distro or another named host and
    carries that host's evidence class. Only the lifecycle check is collected on the new distro, as the install
    receipt. A comparison that can only run on the target host is a provisional install there: preregistered,
    receipted, behind the exported checkpoint of "Baseline, checkpoint and rollback on the new distro", and rolled
    back or left uninstalled when it misses its metric. recovery-portability, the one `new_host_required` layer, is
-   such an install by definition. A layer with neither a finished comparison nor a provisional install stays
-   uninstalled, and its row says so. This answers the first finding of the independent review below.
+   such an install by definition. The stage-2 bootstrap is itself a provisional install: an adoption profile
+   installs the selections of record of layers that are not final, so each of its components stays provisional until
+   its layer closes, and a selection that changes at closure is replaced through the layer's lifecycle steps
+   (`adoption/lifecycle.md`) or by a rebuild from the checkpoint. A layer with neither a finished comparison nor a
+   provisional install stays uninstalled, and its row of the install manifest says so. This answers the first finding
+   of the Codex lane's review below. Overturn: the user wants no install on the new distro before a layer is final;
+   stage 2 then waits for units U1 to U7.
 4. **Which revision stage 2 installs.** `origin/main` at a recorded commit, as an interim: the pinned release
    `v2026.09.26.2` carries codex 0.155.1 and claude-code 2.1.281 in `adoption/pins-linux-x86_64.json`, behind the pins
-   of record (0.159.2 and the 2.1.284 floor). A new release tag is cut at the final revision after the merge train
-   lands, and each receipt names the commit it installed from.
+   of record (0.159.2 and the 2.1.284 floor), and `adoption/bootstrap-linux.sh:186-199` refuses
+   `--configure-full-profile` unless the checkout's HEAD equals `origin/main`. A new release tag is cut after the
+   merge train lands, and each receipt names the commit it installed from. Overturn: a release tag at the pins of
+   record exists and the bootstrap accepts it.
 
 ## Phases
 
@@ -87,7 +101,7 @@ coordinator's. One is the user's and carries a default until it is answered.
 | 0 | Merge train (the freeze-list and lane PRs); the per-layer closure assessments start in parallel | eight required checks and the owner's script check per merge | the coordinator for the train; lane owners for their PRs |
 | 1 | Per-layer closure assessment (read-only, source-cited, refuted, synthesized) for the 20 foundation and 12 us-equities layers; bounded comparisons with frozen inputs where item 3 is unmet; closure records | the criterion above, with a second independent review | foundation lane (coordinator); trading lane keeps the trading decisions and records |
 | 2 | WSL import recipe (upstream image, `wsl --import` or `--install --from-file`, first boot, systemd, user services, terminal profile) researched from Microsoft and Canonical sources and recorded under `adoption/` | source-cited recipe; no host change before the last Gate A window closes | foundation lane; WSL package version stays with the keys lane |
-| 3 | Import the distro (the stage-1 recipe); capture the pre-install baseline; bootstrap from a final revision (`adoption/bootstrap-linux.sh --profile <id> --configure-full-profile --host <host>`); install each layer whose selection is final (items 1, 2, 4 and 5 of the criterion, with the preregistered comparisons of item 3 done) with upstream commands, collecting the target-host lifecycle checks of item 3 as the install receipt; native sign-ins on the destination; a recoverable checkpoint before stage 2 and an owned rollback | the baseline capture, `scripts/adoption_status.py --login-shell --client-wiring --pinned-versions`, `scripts/skills_status.py`, the layer receipts, `scripts/validate.py` | the LLM-native session on the new distro, under the coordinator |
+| 3 | Import the distro (the stage-1 recipe); capture the pre-install baseline; bootstrap from the revision of decision 4 (`adoption/bootstrap-linux.sh --profile <id> --configure-full-profile --host <host>`); install each layer's selection of record with upstream commands, as final where the selection is final (items 1, 2, 4 and 5 of the criterion, with the preregistered comparisons of item 3 done) and otherwise as a provisional install under decision 3, collecting the target-host lifecycle checks of item 3 as the install receipt; native sign-ins on the destination; a recoverable checkpoint before stage 2 and an owned rollback | the baseline capture, `scripts/adoption_status.py --login-shell --client-wiring --pinned-versions`, `scripts/skills_status.py`, the layer receipts, `scripts/validate.py` | the LLM-native session on the new distro, under the coordinator |
 | 3b | Gate A re-aimed on the new distro: the harness pilot, the re-aim amendment, the windows, the report | the Gate A owner's gates (the preregistration, the opening rules of the Claude and Codex families, the announcement of at least six hours) | Gate A owner |
 | 4 | Complex projects and system building on the new runtime (general engineering) | the convergence loop of `docs/convergence-architecture.md` per project | the foundation lane and each project's owner |
 | 5 | The trading north star on the new runtime | the north star's own gates (`catalogs/us-equities/runtime-target.json`) | trading lane |
@@ -152,27 +166,36 @@ pins, the Dagu comparison, the workers arms and the three manifest lines named u
 
 Result: no foundation layer is final for install. Item 1 is met in 9 layers and partial in 11. Item 2 is partial in
 all 20. Item 3 is partial in 12 and unmet in 8. Item 4 is unmet in 17 and partial in 3. Item 5 is partial in 19 and
-unmet in durable-memory. Columns 1 to 5 are the criterion's items. "Blocking item first" is the assessment's
-statement of the gap to close first, not the only gap. The verdict follows two rules: "closed" only when all five
-items hold, otherwise the selection of record stays open with its gaps named.
+unmet in durable-memory. Columns 1 to 5 are the criterion's items. "Blocking item first" is the synthesis's pick of
+the gap to close first from each corrected assessment; it is not the only gap and not a field of the artifact. The
+verdict follows two rules: "closed" only when all five items hold, otherwise the selection of record stays open with
+its gaps named.
+
+Run-to-run variance. The workflow was resumed after a sign-in and ran seven layers a second time before it was
+stopped; the table uses the first complete result per layer. In five of the seven the second result differs in one
+or two cells (`foundation-run-variance.json` in the artifact folder): code-navigation (item 1 met, item 4 partial),
+document-retrieval (item 1 partial, item 3 partial), durable-memory (item 1 partial), isolation (item 3 partial)
+and semantic-rag (item 3 unmet). No difference makes a layer final for install: item 2 is partial and item 5 is
+not met in every result. The item counts above are therefore one reading, and the border between met and partial
+or between partial and unmet moves by a cell or two per layer between runs. Unit U6's reviews settle the cells.
 
 | Layer | Status of record | Catalog label | 1 | 2 | 3 | 4 | 5 | Install command recorded | Pin is latest | Blocking item first | Verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | native-clients | on_requirement_change | retain | met | partial | partial | unmet | partial | partial | no | item 2: ten sweep proposals are not folded into the layer record, and four contested campaign proposals are not adjudicated | selection of record, open |
 | instructions-skills | on_requirement_change | adjust | partial | partial | partial | partial | partial | partial | yes | item 1: the verdict stands at stale pins (ECC `dd6ee538` against `c70874fa`), and skills-ref is unclassified | selection of record, open |
-| workers | comparison_required | keep_but_compare | met | partial | unmet | unmet | partial | partial | no | item 3: the preregistered arms (`catalogs/landscape/foundation.json:938-951`) never ran | comparison required |
+| workers | comparison_required | keep_but_compare | met | partial | unmet | unmet | partial | partial | no | item 3: of the six preregistered arms (`catalogs/landscape/foundation.json:938-951`) only the executed baseline ran | comparison required |
 | isolation | on_requirement_change | retain | met | partial | unmet | partial | partial | partial | no | item 2: no disposition for boxlite, microsandbox, brig, OpenSandbox, Lima and nsjail; the bubblewrap omission is open | selection of record, open |
 | code-navigation | on_requirement_change | retain | partial | partial | partial | unmet | partial | yes | no | item 1: no public receipt for Serena's `find_referencing_symbols` | selection of record, open |
 | document-retrieval | comparison_required | keep_but_compare | met | partial | unmet | unmet | partial | partial | yes | item 3: the sealed-corpus retrieval comparison and the layout and OCR comparison never ran | comparison required |
 | semantic-rag | on_requirement_change | keep_but_compare | partial | partial | partial | unmet | partial | yes | no | item 1: winner pins 1.14.0 and 0.25.0 against installed 1.15.0 and 0.30.0 | selection of record, open; label to reconcile |
 | durable-memory | comparison_required | keep_but_compare | met | partial | unmet | unmet | unmet | yes | no | item 3: the preregistered comparison on a host named in a new amendment; an operator decision on the live-store isolation breach is open | comparison required |
 | web-research | on_requirement_change | retain | partial | partial | unmet | unmet | partial | partial | no | item 1: the selection predates the 2026-09-26 free-native-lanes decision | selection of record, open |
-| token-efficiency | comparison_required | keep_but_compare | partial | partial | unmet | unmet | partial | yes | no | item 3: a repeated, counterbalanced matched comparison at equal correctness (the re-aimed Gate A E2E) | comparison required; the install profile is provisional |
+| token-efficiency | comparison_required | keep_but_compare | partial | partial | unmet | unmet | partial | yes | no | item 3: a repeated, counterbalanced matched comparison at equal correctness (`catalogs/landscape/foundation.json:2737-2750`); the re-aimed Gate A E2E counts only if its arms cover that protocol's | comparison required; the install profile is provisional |
 | quality-evaluation | comparison_required | retain | partial | partial | partial | unmet | partial | partial | yes | item 3: a comparison on fresh, independently labelled cases | comparison required; label to reconcile |
 | ci-supply-chain | on_requirement_change | retain | met | partial | partial | partial | partial | partial | yes | item 2: the candidate set is not re-recorded (the tools in use, the 09-26 and 09-29 survivors, the 09-30 verdicts) | selection of record, open |
 | scheduling-supervision | on_requirement_change | keep_but_compare | met | partial | partial | unmet | partial | partial | no | item 3: Dagu 2.16.6 failed the preregistered 150 s SIGKILL case, which Temporal passed | reopen candidate; treated as comparison required |
 | hosting-services | on_requirement_change | retain | partial | partial | partial | unmet | partial | partial | no | item 1: Next.js winner 16.3.5 against lock 16.3.6, both behind a High-severity fix in 16.3.8 (assessor read) | selection of record, open |
-| recovery-portability | new_host_required | keep_but_compare | partial | partial | unmet | unmet | partial | partial | no | item 1: the uv winner is `unpinned`, which the receipt recorder refuses (`scripts/host_receipts.py:882-886`) | new host required |
+| recovery-portability | new_host_required | keep_but_compare | partial | partial | unmet | unmet | partial | partial | no | item 1: the uv winner is `unpinned`, which the receipt recorder refuses (`scripts/host_receipts.py:882-886`) | new host required; label to reconcile |
 | observation-inference | on_requirement_change | keep_but_compare | met | partial | partial | unmet | partial | partial | no | item 2: the 09-26 survivors have no disposition, and eight proposals lack the fit vote | selection of record, open; label to reconcile |
 | agent-sdks | on_requirement_change | retain | partial | partial | unmet | unmet | partial | partial | no | item 1: the Python SDK half rests on a private prompt and sealed receipts | selection of record, open |
 | mcp-surfaces | on_requirement_change | retain | met | partial | partial | unmet | partial | yes | no | item 2: no consolidated candidate set at the served pins | selection of record, open |
@@ -201,14 +224,14 @@ and U9 run beside U3 to U7 and finish before U10.
 
 | Unit | Layers | Action | Acceptance | Where | Proposed owner |
 | --- | --- | --- | --- | --- | --- |
-| U1 Program decisions | 20 | The four decisions of "Program decisions on the criterion" | this record; `python3 scripts/validate.py` | source only | coordinator; decision 2 the user |
+| U1 Program decisions | 20 | The four decisions of "Program decisions on the criterion" | this record, with an overturn condition per decision; `python3 scripts/validate.py` | source only | coordinator; decision 2 the user |
 | U2 Pin-currency triage | 15 with a selected pin behind its latest release | Per pin: a dated hold with a reason, or a move after qualification, once per shared component; Next.js first | every behind pin has a hold or a qualification receipt | holds source only; moves on the current host | foundation; memory lane; trading lane for its recipes |
-| U3 Campaign verdicts | 12 citing the private list; 8 with a proposal decided by a missing vote | Publish the 2026-09-30 campaign verdicts as a sanitized receipt at a main commit, or drop the citations; rerun the missing discovery and fit votes | every cited status resolves to a committed file; no proposal is decided by a missing vote | source only (model calls on the gateway pool) | foundation |
+| U3 Campaign verdicts | 12 citing the private list; 8 with a proposal decided by a missing vote (ci-supply-chain, document-retrieval, durable-memory, observation-inference, recovery-portability, semantic-rag, token-efficiency, web-research, recomputed from `catalogs/saturation/ledger.json` by this record's reviewer) | Publish the 2026-09-30 campaign verdicts as a sanitized receipt at a main commit, or drop the citations; rerun the missing discovery and fit votes | every cited status resolves to a committed file; no proposal is decided by a missing vote | source only (model calls on the gateway pool) | foundation |
 | U4 Re-record pass (items 1 and 2) | 20 | One `tools/sota-convergence/record_verdicts.py` pass per layer: winners at the U2 pins, alternatives, the frozen candidate set with dispositions, failed access, the six label reconciliations | `scripts/host_receipts.py` accepts each installed version without `--allow-unbound-version`; a check fails on a proposal without a disposition | source only | foundation; `manifests/stack.json` edits through the hot-file protocol |
 | U5 Preregistered comparisons | the 5 `comparison_required` layers and scheduling-supervision | Run the frozen arms; keep failures and complete usage | the preregistered metric, independently reviewed | the current distro or a named host; a provisional install on the new distro where only the target host can run it | Gate A (workers, token-efficiency); memory lane (durable-memory); foundation (document-retrieval, quality-evaluation, scheduling-supervision) |
 | U6 Second independent review (item 4) | 20, and the 12 us-equities layers | One cross-family source review per layer over the U4 and U5 output, listing the target-host checks as declared install-receipt items | no unresolved material gap except the declared install checks | source only | the Codex catalog lane, which took this unit on 2026-10-01 |
 | U7 Stage-1 closure record (item 5) | 20 | A dated record per layer: bound pins, residual risks, untested boundaries, reopening triggers, pending install checks; registered in `closure_refs` | the landscape checks pass; the layer is final for install | source only | foundation (landscape owners) |
-| U8 Profile and pin coverage | 16 | Add the selections to the adoption profiles and `adoption/pins-linux-x86_64.json`; script the prose-only installs; provision CPython 3.13.15, procps and the sandbox prerequisites | each profile bootstraps on the hosted runner without `--allow-unpinned`; `scripts/adoption_status.py` is clean | source only | foundation; trading lane for the research-runtime profile |
+| U8 Profile and pin coverage | 16 | Add the selections to the adoption profiles and `adoption/pins-linux-x86_64.json`; script the prose-only installs; provision CPython 3.13.15, procps and the sandbox prerequisites; fix the `orx` and `openresearch` id mismatch; give `jcodemunch-mcp` a Linux pin or stop the carrier naming it | each profile bootstraps on the hosted runner without `--allow-unpinned`; `scripts/adoption_status.py` is clean | source only | foundation; trading lane for the research-runtime profile |
 | U9 Port and unit map for the shared virtual machine | durable-memory, quality-evaluation, scheduling-supervision, observation-inference, semantic-rag | Assign the ports and the systemd user units that two distros on one network namespace need | a committed map; on the new distro no port conflict, and the units survive a restart | decided now; verified on the new distro | foundation; memory lane |
 | U10 Install receipts (the host part of item 3) | 20 | Bootstrap from the decision-4 revision; native sign-ins and the 0600 store; lifecycle stages through `scripts/host_receipts.py` with negative controls; append to the U7 record | receipts bind to the winner pins and pass the host checks; an independent receipt review; the layer is closed | the new distro | the LLM-native session there, under the coordinator; lane owners for their layers |
 
@@ -224,7 +247,7 @@ above both recorded pins.
 | codex CLI | 0.159.2 | rust-v0.159.3 | native-clients, agent-sdks |
 | openai-codex and openai-codex-cli-bin | 0.154.0 | 0.159.3 | agent-sdks |
 | worktrunk | 0.79.0 | v0.80.0 | workers, isolation, git-github-automation |
-| sandbox-runtime | 0.0.77 | v0.0.78 | isolation |
+| sandbox-runtime | 0.0.77 | v0.0.78 (one assessor read) | isolation |
 | jcodemunch-mcp | 1.108.319 | v1.108.320 | code-navigation |
 | SocratiCode | 1.15.0 | v1.16.0 | semantic-rag |
 | huggingface_hub | 1.32.0 | v2.0.0 (a major release) | semantic-rag |
@@ -240,8 +263,9 @@ above both recorded pins.
 | gh | 2.101.0 | v2.102.0 | git-github-automation |
 
 Verdict-record pins also lag where the installed pin is current: rtk 0.49.0 and ccusage 20.0.24 (token-efficiency),
-markitdown 0.1.7 (document-retrieval), vLLM 0.25.0 (semantic-rag), mcporter 0.13.13 and Inspector 2.7.0
-(mcp-surfaces), Prometheus 3.14.0 (observation-inference) and ECC `dd6ee538` (instructions-skills).
+markitdown 0.1.7 (document-retrieval), vLLM 0.25.0 (semantic-rag), mcporter 0.13.13 (mcp-surfaces), Prometheus 3.14.0
+(observation-inference) and ECC `dd6ee538` (instructions-skills). Inspector's verdict pin 2.7.0 lags too, and its
+served 2.8.0 is itself behind.
 
 ### Install readiness
 
@@ -251,19 +275,22 @@ host: a port held by another distro on the shared network namespace, a profile t
 `--allow-unpinned`, components outside every profile, a hand-written marketplace file. The artifact lists the missing
 new-host steps per layer (6 to 11 each). The synthesis groups them by kind: no upstream command recorded, a recipe
 outside every profile, a native sign-in or user step, a service or port decision on the shared virtual machine, and
-drift between a pin and its recipe. These lists feed U8, U9 and the install manifest's new-host steps. One step
-found outside the assessment joins them: no script runs the per-project jCodeMunch registration that the
-SubagentStart carrier relies on (PR #548's review, 2026-10-01); it becomes a recorded step of the new-distro recipe.
+drift between a pin and its recipe. These lists feed U8, U9 and the install manifest's new-host steps. One gap
+found outside the assessment joins them: no script runs the per-project jCodeMunch registration, and no adoption
+profile installs `jcodemunch-mcp` (it has no Linux pin; only a manual line of `adoption/bootstrap.md` installs it),
+although four of the six SubagentStart carrier blocks name its tools (PR #548's review and PR #569's follow-up,
+2026-10-01). The registration is a recorded step of the new-distro recipe; the install belongs to U8.
 
 ### Contradictions the re-record pass resolves
 
 - The foundation manifest's selection text differs from the landscape winners. token-efficiency:
-  `catalogs/foundation/manifest.json:104` names jCodeMunch and omits ccusage, while the winners are rtk, headroom and
-  ccusage. ci-supply-chain: `:122` names seven tools against three winners. native-clients: `:23` records the user's
-  2026-09-27 adoption of the OmniRoute gateway, which no landscape verdict selects.
+  `catalogs/foundation/manifest.json:104` names jCodeMunch and Context Mode and omits ccusage, while the winners are
+  rtk, headroom and ccusage. ci-supply-chain: `:122` names seven tools against three winners. native-clients: `:23`
+  records the user's 2026-09-27 adoption of the OmniRoute gateway, which no landscape verdict selects.
 - Seven layers select a practice with no repository pin: instructions-skills, code-navigation, web-research,
   quality-evaluation, recovery-portability, mcp-surfaces and secrets-credentials.
-- Three winners are unpinned in the record: uv, gh and actions/attest.
+- Five winners are unpinned in the record (`catalogs/landscape/foundation.json:421,444,3224,4045,5085`): the TypeSafe
+  and OpenAI skills of instructions-skills, actions/attest, uv and gh. The receipt recorder refuses each of them.
 - Upstream signals on selected components, as the assessors read them: gitleaks is feature complete and takes
   security patches only; Context Hub has had no default-branch commit since 2026-07-01.
 - Evidence outside the repository: twelve assessments cite the host-private campaign list, and the native-clients
@@ -272,9 +299,9 @@ SubagentStart carrier relies on (PR #548's review, 2026-10-01); it becomes a rec
 ### us-equities, 12 layers
 
 The assessment reads `4d11709c`, an earlier head of PR #358, because that pull request carries the trading lane's
-current records. Ten layers are assessed and refuted; observability-hosting is assessed and not yet refuted;
-security-supply-chain is not assessed. The trading lane owner keeps the decisions, the verdict wording and the
-closure records, and the table lands here after the owner's read.
+current records. All 12 layers are assessed and refuted, and none is final for install: no layer meets item 4 or
+item 5 in any run. The trading lane owner keeps the decisions, the verdict wording and the closure records, and the
+table and its artifact land here after the owner's read.
 
 ## Gate A re-aim (decided by the user, 2026-10-01 03:33Z)
 
@@ -349,9 +376,11 @@ troubleshooting page says the pull error `lchown <FILE>: invalid argument` "occu
 entries in `/etc/subuid` or `/etc/subgid` is not sufficient. The number of entries required vary across images.
 However, 65,536 entries are sufficient for most images"
 (https://docs.docker.com/engine/security/rootless/troubleshoot/, fetched 2026-10-01). The current workstation has run
-with 262,144 since the 2026-09-29 Harbor run, whose matplotlib SWE-bench images needed more than 65,536; that fact is
-in the harness unit's private handoff and not in the published receipt
-(`evidence/receipts/harbor-e2e-token-tools-20260930.json`, PR #570). On the new distro the range is widened only when
+with 262,144 since the 2026-09-29 Harbor run: the images of six matplotlib SWE-bench tasks failed to pull with that
+error at 65,536 and pulled after the widening. The Gate A owner published the observation on 2026-10-01 in
+`evidence/receipts/harbor-e2e-token-tools-20260930.json` (block
+`host_prerequisite_observations.rootless_docker_subordinate_ids`), which is on PR #570's branch and not on main yet.
+It is the workstation's value for one image set, not a default. On the new distro the range is widened only when
 that error appears, by the harness unit's owner (Gate A), who records the image, the error and the range chosen. An
 earlier text of this record stated 262,144 as a requirement; the independent review's third finding removed it.
 
@@ -394,16 +423,33 @@ output is not in this repository, so they are recorded as relayed, each with the
 | --- | --- | --- |
 | The selection and install cycle: the 13 `comparison_required` layers and the `new_host_required` layer cannot pass a host comparison before they are installed | A defect of the staged rule as first written | Decision 3 of "Program decisions on the criterion" |
 | The Hindsight stale and paused pages, its held cold seed and AgentRelay's held automatic Codex PTY submission belong in the manifest rows; a new distro fixes neither a provider-route timeout nor an adapter's semantics | The Codex lane's own host observations; its receipts are not published yet | Gates on the durable-memory row and the cross rows of the install manifest, cited once the receipts are on that lane's branch |
-| The record required 262,144 subordinate ids while the recipe proves 65,536 | Docker's two pages, fetched 2026-10-01, and the published Harbor receipt | "Subordinate ids"; the requirement is withdrawn |
+| The record required 262,144 subordinate ids while the recipe proves 65,536 | Docker's two pages, fetched 2026-10-01, and the Harbor receipt on PR #570's branch | "Subordinate ids"; the requirement is withdrawn |
 
 The same lane took the second independent review of item 4 for all 32 layers (unit U6), the crosswalk from the
 guide's ten themes to the 32 layers, and sanitized receipts for what it qualified on the current host.
+
+A second reviewer (the repository's evidence-reviewer role, Claude Opus 5.5 at effort max, so the same model family
+as the assessors) read the sections added on 2026-10-01 against the artifact and the cited sources. It found no high
+finding, 5 medium and 12 low. The 200 cells of the foundation table from "Layer" to "Pin is latest" matched the
+artifact and the two catalog files, and the counts of the result paragraph were recomputed. All 17 findings are
+repaired in this text: the provisional status of the stage-2 bootstrap, what the two saturation sources do and do
+not say, five unpinned winners instead of three, the workers baseline arm, the receipt citation for the subordinate
+ids, and twelve smaller corrections. Three counts rest on the synthesis alone and were not recomputed: the 16 layers
+of the profile-coverage pattern, the seven practice layers, and the 14 layers whose verdict pin differs from the
+installed pin (the reviewer reproduces that one as 12 version mismatches plus 2 unpinned winners). A cross-family
+read of this record is queued for the gateway pool's next reset.
 
 ## Open decisions for the user
 
 - The harness for the re-aimed Gate A E2E: R (recommended), A or N ("Harness for the re-aimed E2E").
 - The meaning of "frozen" in item 2 (decision 2; the default applies until answered).
 - Running stage 1 of the new distro and the two native sign-ins (the recipe of PR #569).
+- Whether stage 2 may run on the new distro before the layers are final (decision 3; the default is yes, as a
+  provisional install).
+- The live ai-memory store's isolation breach of 2026-09-23 on the current workstation: whether to rewrite or collect
+  the live wiki history and to compact the database again
+  (`evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/README.md:20-48`). The new distro starts with a
+  fresh store.
 - Routing the default-home Codex terminals through the gateway while the native weekly allowance matters for the
   Codex arms.
 
@@ -412,5 +458,5 @@ guide's ten themes to the 32 layers, and sanitized receipts for what it qualifie
 This program record is superseded if the user moves the Gate A measurement back to the current distro, if the WSL
 recipe research shows that a new distro cannot be built without a host WSL package change that the keys lane has not
 qualified, or if the pilot shows that neither Harbor's saved logs nor native OpenTelemetry carry per-subagent tool
-calls. Decision 2 is overturned by the user's choice of the stricter reading of item 2, and decision 1 by the
-re-record pass's result for each of the six layers.
+calls. Decision 1 is overturned layer by layer by the re-record pass's result for each of the six layers.
+Decisions 2, 3 and 4 state their overturn conditions where they are made.

@@ -10,6 +10,7 @@ Per-layer assessments of the catalog layers against the closure criterion of
 | --- | --- |
 | `foundation.json` | The 20 foundation layers at repository revision `3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a`, `as_of` 2026-10-01T03:50Z. Per layer: `corrected` (the assessor's return as corrected by the refuter: selected components with pins and pin sources, alternatives, evidence class, upstream currency, the five closure items each with a status and its evidence, install readiness with the missing new-host steps, the next unit), `corrections` (the refuter's corrections, 8 to 18 per layer), `verdict` (`corrected` for all 20) and `runs`. |
 | `foundation-synthesis.md` | One reviewer's synthesis of the 20 assessments: ranking, cross-layer patterns, program units, pins behind their latest release, install-readiness gaps and contradictions. |
+| `foundation-run-variance.json` | The item statuses of the seven layers that ran twice (the workflow was resumed after a sign-in). Five of them differ in one or two items between the two runs; none becomes final for install in either. |
 
 The us-equities layers follow in the same form when their assessment is complete.
 
@@ -25,6 +26,10 @@ the statements it marks "(checked)". The file holds the first complete refuted r
 - Model-authored source review of the repository at the named revision. It is not acceptance evidence, it is not a
   second independent review in the sense of item 4 (assessor, refuter and synthesis are one model family), and it
   certifies nothing about a new host.
+- The item statuses are one assessor and refuter pair's judgment per layer. Where a second run exists, the border
+  between met and partial, or between partial and unmet, moved in five of seven layers
+  (`foundation-run-variance.json`). Treat a single cell as good to about one step; the conclusion that no layer is
+  final for install holds in every run.
 - The upstream "latest release" values are the assessors' reads of release pages on 2026-10-01. Most rest on one
   read that the refuter did not repeat, and the coordinator did not fetch them again.
 - Citations of `<host-private campaign list 2026-09-30>` point to a record that this repository does not hold, so
@@ -32,6 +37,7 @@ the statements it marks "(checked)". The file holds the first complete refuted r
   as a sanitized receipt or drops the citations.
 - Line numbers refer to the named revision and drift afterwards; several assessments report drifted line references
   themselves.
+- `as_of` is the workflow's launch stamp. The assessments' own `checked_at` times run later, to about 05:31Z.
 - Usage: the workflow was interrupted by a sign-in and resumed, and the resumed segment ran agents again that had
   already returned. The last segment recorded 3,612,716 tokens across 20 agents; the first segment's total was not
   retained, so the complete usage is unknown.
