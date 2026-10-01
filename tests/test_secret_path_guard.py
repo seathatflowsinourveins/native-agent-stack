@@ -8,6 +8,7 @@ hook for a security boundary.
 import io
 import itertools
 import json
+import math
 import os
 from pathlib import Path
 import random
@@ -4401,6 +4402,19 @@ K4_CHARGE_FIXTURES = dict(K4_HELPER_FIXTURES, **{
     'read_command': k4_code_f('pass'),
 })
 K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, also in CI.
+# Helper scaling criterion (2026-10-01), the pattern of examples/claude-native/workflows/test-child-usage.mjs (#556): the growth
+# exponent from 25k to 100k characters (a 4 times range), ln((t100k + 5 ms) / (t25k + 5 ms)) / ln 4, stays under 1.5 (1 is linear,
+# 2 is quadratic). It replaces one sample per size with "100k under 8 times 25k", which failed linear helpers on a CI runner at
+# margins of 1 to 6 % (k4_shell_literals 0.1058 against 0.0998, k4_store_text 0.1408 against 0.1397). Up to three rounds take the
+# elementwise minimum per size (the least-disturbed run, as Python's timeit documentation advises for repeats), so one pause cannot
+# fail a linear helper while a quadratic one fails every round. Below about 4.4 ms at 25k a quadratic helper passes the exponent;
+# K4_LINEAR_SECONDS bounds it there.
+K4_GROWTH_NOISE_SECONDS = 0.005
+K4_GROWTH_EXPONENT = 1.5
+
+
+def k4_growth_exponent(small: float, large: float, ratio: float = 4.0) -> float:
+    return math.log((large + K4_GROWTH_NOISE_SECONDS) / (small + K4_GROWTH_NOISE_SECONDS)) / math.log(ratio)
 # The acceptance/mutation driver injects the actual scratch adapter module.
 # Its behavioral assertions live here; no scratch callback counts as a kill.
 K4_ACCEPTANCE_ADAPTER = None
@@ -4898,8 +4912,8 @@ class K4GuardTests(unittest.TestCase):
         self.assert_shared_stages([
             lambda n=n: guard.k4_tail_reason(f"cat <<'E{n}'\ntext\nE{n}\ntrue {n}") for n in range(6)], 'texts')
         # Per-helper generators at about 25k, 50k and 100k characters: the helper is reached with the generated text (instrumented), each
-        # size finishes under K4_LINEAR_SECONDS through check() and inside the helper, and 100k costs less than eight times 25k (a quadratic
-        # scan costs sixteen).
+        # size finishes under K4_LINEAR_SECONDS through check() and inside the helper, and the helper's growth exponent from 25k to 100k
+        # stays under K4_GROWTH_EXPONENT (a quadratic scan's is 2), over the elementwise minimum of up to three rounds.
         # k4_charge is an O(1) counter update with no scan. k4_word_charge's
         # linear sum is exercised by its own supplementary generator.
         scanners = ({name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))}
@@ -4908,32 +4922,45 @@ class K4GuardTests(unittest.TestCase):
         self.assertEqual(sorted(scanners - set(K4_SCALING)), [])
         for name, generator in sorted(K4_SCALING.items()):
             with self.subTest(helper=name):
+                texts = {size: generator(size) for size in (25_000, 50_000, 100_000)}
                 totals, helper_totals = {}, {}
-                for size in (25_000, 50_000, 100_000):
-                    text = generator(size)
-                    self.assertLess(len(text), 199_000)
-                    original, inside = getattr(guard, name), []
+                for _round in range(3):
+                    for size, text in texts.items():
+                        self.assertLess(len(text), 199_000)
+                        original, inside = getattr(guard, name), []
 
-                    def timed(*args, _original=original, **kwargs):
-                        cpu = time.process_time()
-                        try:
-                            return _original(*args, **kwargs)
-                        finally:
-                            inside.append(time.process_time() - cpu)
+                        def timed(*args, _original=original, _inside=inside, **kwargs):
+                            cpu = time.process_time()
+                            try:
+                                return _original(*args, **kwargs)
+                            finally:
+                                _inside.append(time.process_time() - cpu)
 
-                    with mock.patch.object(guard, name, timed):
-                        cpu = time.process_time()
-                        try:
-                            guard.check(text)
-                        except guard.WorkBudgetExceeded:
-                            pass
-                        totals[size] = time.process_time() - cpu
-                    self.assertTrue(inside, f"{name} not reached at {size}")
-                    helper_totals[size] = sum(inside)
+                        with mock.patch.object(guard, name, timed):
+                            cpu = time.process_time()
+                            try:
+                                guard.check(text)
+                            except guard.WorkBudgetExceeded:
+                                pass
+                            total = time.process_time() - cpu
+                        self.assertTrue(inside, f"{name} not reached at {size}")
+                        helper_totals[size] = min(helper_totals.get(size, math.inf), sum(inside))
+                        totals[size] = min(totals.get(size, math.inf), total)
+                    if k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT:
+                        break
+                for size in texts:
                     self.assertLess(helper_totals[size], K4_LINEAR_SECONDS)
                     self.assertLess(totals[size], K4_LINEAR_SECONDS)
                 # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
-                self.assertLess(helper_totals[100_000], 8 * max(helper_totals[25_000], 0.01))
+                self.assertLess(k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]), K4_GROWTH_EXPONENT, helper_totals)
+
+    def test_k4_growth_criterion_controls(self):
+        # The two CI samples that failed the single-ratio check (linear helpers) fit an exponent under the bound; a helper that is
+        # quadratic by construction (16 times the time for 4 times the input) does not, from 4.5 ms at 25k upward.
+        for small, large in ((0.0998 / 8, 0.1058), (0.1397 / 8, 0.1408)):
+            self.assertLess(k4_growth_exponent(small, large), K4_GROWTH_EXPONENT)
+        for small in (0.0045, 0.01, 0.05, 0.2):
+            self.assertGreater(k4_growth_exponent(small, 16 * small), K4_GROWTH_EXPONENT)
 
     def test_k4_hook_process_and_hints(self):
         # Section 9.7: the real hook, launched as `python3 -B scripts/hooks/secret_path_guard.py` with a JSON payload on stdin (the payload
