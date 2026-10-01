@@ -9,6 +9,14 @@ This record changes nothing on a host. No `wsl.exe` command, import, `.wslconfig
 pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/` (`cloud-init.user-data.template`,
 `host.new-distro.json.template`, `first-boot-checklist.md`, `stage1-receipt.example.json`); `tests/test_wsl_new_distro_recipe.py`.
 
+**Status:** selected by source review; not a completed adoption until a host run and the queued comparison. The scoped
+convergence experiment record
+[`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`](../../blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json)
+states this: `status: planned`, decision `trial`, no observation and no usage claim, with the research unit's usage
+unknown. It names the 26.04.1 comparison (queued, not run) and path B (documented, not run) as the alternatives, and
+`python3 scripts/validate_convergence.py` accepts it (exit 0). It pins the recipe, the templates and the test by
+SHA-256, so a change to any of them needs a re-pin.
+
 ## Context
 
 - **The goal.** The user asked for the definitive WSL distribution for this practice, set up without prompts in the
