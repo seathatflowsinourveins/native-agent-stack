@@ -48,7 +48,23 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # 2026-09-28: the common Skills paragraph drops verification-before-completion, which the skills trial removed under
 # its conflict rule (docs/decisions/2026-09-25-skills-trial-and-usage.md, 2026-09-28 removal addendum); the refutation
 # rule "evidence before any verdict" stays as plain text. Previous value: 11fcd52312b9…0107.
-PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f25edd07f14b"
+# 2026-09-30: the skills modality (docs/decisions/2026-09-30-skills-sweep-modality.md) adds discover_skills,
+# critic_skills and modality_skills to templates.json and ends facts and fit in <<MODALITY>>. build_args.fill_build
+# resolves the modality at build time, so a repository run's frozen templates, and this value, are unchanged.
+# Later on 2026-09-30, after unit F3 (#553) pinned skill-creator, which the skills templates name for its paired
+# with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
+# Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
+PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
+# The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
+# and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
+# the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
+# 7798ad98a5d3…ec25, named a flattened owner/repo@name list. 2026-09-30 review repair: a true-valued
+# disable-model-invocation is true/yes/on/1 in any letter case (Claude Code), Codex's allow_implicit_invocation counts
+# only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
+# CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
+# Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
+# 2c2efbaed4d9…63d3.
+PROMPTS_SHA256_SKILLS_CURRENT = "a76ee858fe65b998dc974f8fe9cdac9562bdf14abe6f73dcd7d1778c9f95b460"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -95,8 +111,8 @@ def temp_dir(case: unittest.TestCase) -> Path:
     return path
 
 
-def filled_templates(run_date="2026-10-26", count=2, skills_date="2026-09-25"):
-    return build_args.fill_build(build_args.load_templates(), run_date, count, skills_date)
+def filled_templates(run_date="2026-10-26", count=2, skills_date="2026-09-25", modality="repository"):
+    return build_args.fill_build(build_args.load_templates(), run_date, count, skills_date, modality)
 
 
 # --------------------------------------------------------------------------- synthetic sweep data
@@ -256,6 +272,13 @@ class TemplateTests(unittest.TestCase):
         frozen = filled_templates("2026-09-26", 32, "2026-09-25")
         self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)
 
+    def test_filled_skills_templates_match_the_current_skills_prompts_sha256(self):
+        frozen = filled_templates("2026-09-26", 32, "2026-09-25", "skills")
+        self.assertEqual(sorted(frozen), sorted(make_prompt.RUNTIME_PLACEHOLDERS))
+        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_SKILLS_CURRENT)
+        with self.assertRaisesRegex(ValueError, "modality"):
+            filled_templates(modality="papers")
+
     def test_templates_never_refute_on_license_and_name_the_maintenance_rule(self):
         templates = json.loads((HARNESS / "templates.json").read_text())
         common, fit = templates["common"], templates["fit"]
@@ -297,6 +320,10 @@ class TemplateTests(unittest.TestCase):
             self.assertEqual(set(make_prompt.PLACEHOLDER.findall(text)), make_prompt.RUNTIME_PLACEHOLDERS[key], key)
         self.assertIn("Date: 2026-10-26.", frozen["common"])
         self.assertIn("a 2-layer saturation sweep", frozen["critic"])
+        skills = filled_templates(modality="skills")
+        for key, text in skills.items():
+            self.assertEqual(set(make_prompt.PLACEHOLDER.findall(text)), make_prompt.RUNTIME_PLACEHOLDERS[key], key)
+        self.assertIn("a 2-layer skills sweep", skills["critic"])
 
     def test_skills_named_by_the_templates_are_pinned_kept_or_trial_skills(self):
         manifest = json.loads((ROOT / build_args.SKILLS_MANIFEST).read_text(encoding="utf-8"))
@@ -314,9 +341,14 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue(any("fp-check is not pinned" in p for p in build_args.skills_problems(templates, unpinned)))
         extra = dict(templates, common=templates["common"] + " Also use tdd.")
         self.assertTrue(any("missing from TEMPLATE_SKILLS" in p for p in build_args.skills_problems(extra, manifest)))
+        # Every template is scanned, not only common: the skills modality's templates reach workers too.
+        for key in ("discover_skills", "critic_skills", "modality_skills", "facts"):
+            extra = dict(templates, **{key: templates[key] + " Also use tdd."})
+            self.assertTrue(any("missing from TEMPLATE_SKILLS" in p and key in p
+                                for p in build_args.skills_problems(extra, manifest)), key)
 
     def test_worker_schemas_are_strict_and_require_skills_used(self):
-        for name in ("discover", "votes"):
+        for name in ("discover", "discover-skills", "votes"):
             schema = json.loads((HARNESS / "schemas" / f"{name}.json").read_text(encoding="utf-8"))
             self.assertFalse(schema["additionalProperties"])
             self.assertIn("skills_used", schema["required"])

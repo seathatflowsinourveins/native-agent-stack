@@ -6,11 +6,16 @@
                   [--seeds seeds.json] [--repo-root .]
 
 Reads the frozen scope (`saturation_ledger.py --scope`, default <work-dir>/scope.json), catalogs/landscape/
-{foundation,us-equities}.json and research-state.json, the saturation ledger's last completed sweep, a baseline
-manifest (default: that sweep's manifest_ref) whose candidates count as known, and a catalog-freshness manifest
+{foundation,us-equities}.json and research-state.json, the saturation ledger's last completed repository sweep, a
+baseline manifest (default: that sweep's manifest_ref) whose candidates count as known, and a catalog-freshness manifest
 (build_manifest.py over extract_layers.py + github_freshness.py output with an empty lanes record, or the
 catalog-freshness workflow's artifact) for each winner's pin against upstream. Writes <work-dir>/inputs/<layer_id>.json
 and <work-dir>/layers.json ([{catalog, layer_id, title, input}] in catalog order).
+
+Each modality keeps its own history: a ledger sweep's modality is named by its layers' catalogs (repository for
+foundation and us-equities, skills for skills; sweep_modality), and a run reads previous_sweep, and a repository run
+its default baseline, from the last completed sweep of its own modality only. A modality with no completed sweep gets
+an empty previous_sweep and no baseline, and the summary line names the sweep it read ("previous ... sweep none").
 
 --seeds is an optional JSON object {"<layer_id>": ["candidate or note", ...]}: candidates other sessions asked this
 sweep to assess, shown to the discovery workers as seeded_candidates. An unknown layer id is an error.
@@ -18,13 +23,32 @@ sweep to assess, shown to the discovery workers as seeded_candidates. An unknown
 previous_sweep holds that sweep's survived and refuted repositories. A proposal it refuted only because a vote did
 not return (saturation_ledger.py refuted_by_absence: no returned vote refutes it) is listed under not_adjudicated
 instead, with not_adjudicated_note, so the next discovery round does not read it as refuted on merit.
+
+The skills modality (README.md, Skills modality) builds the skills-* layers of catalogs/landscape/skills-lifecycle.json
+instead, one per lifecycle task, keyed by skill (owner/repo@name) rather than repository:
+
+  build_inputs.py --skills-scope [--repo-root .] > W/scope.json
+  build_inputs.py --work-dir W --modality skills [--scope W/scope.json] [--seeds seeds.json] [--repo-root .]
+
+--skills-scope prints the frozen scope in saturation_ledger.py --scope's format for the skills catalog (whose --scope
+covers research-state.json's layers only): each task's requirement_sha256 (saturation_ledger.skills_requirement_sha256:
+the sha256 of the canonical JSON of its lifecycle_task, requirement and overturn_when) under "skills/<layer_id>", and
+the platform-profile hash, both with the ledger's own functions. A skills layer input carries modality "skills", the
+task, the installed skills' adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins
+(and a stale source's maintenance record), and known_skills (the manifest's installed skills by repository, and its
+excluded skills by the manifest's own source text, each comma-separated name kept whole). The task's text, its open
+gaps and the installed skills' gap fields are passed whole, never cut. No freshness manifest is read. A run covers
+one modality.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -32,9 +56,29 @@ sys.path.insert(0, str(HERE))
 from sweep_common import MANIFEST_SECTION, REPO_ROOT, ledger_module, load_json, slug, work_dir, write_json  # noqa: E402
 
 CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities.json"))
+REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSITORY_MODALITY)
 NOT_ADJUDICATED_NOTE = ("refuted in that sweep only because a vote did not return (a missing vote counts as refuted); "
                         "no returned vote refuted these, so they were not refuted on merit")
 COMPONENT_FIELDS = ("id", "repository", "pin", "upstream", "pin_behind_upstream", "pin_comparison")
+# The skills modality's catalog, its layers' catalog name and its source kinds.
+SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"
+SKILLS_MANIFEST = "adoption/skills/manifest.json"
+SKILLS = "skills"
+SOURCE_KINDS = ("github-skills-repo", "registry", "awesome-list")
+SOURCE_FIELDS = ("source_id", "kind", "url", "pin")
+# A source's optional maintenance record: the common block's maintenance rule applied when the catalog was checked
+# (status stale: archived, or no default-branch commit in the 90 days before checked_at), with the API fact.
+MAINTENANCE_FIELDS = ("status", "checked_at", "evidence")
+MAINTENANCE_STATUSES = ("stale",)
+# A skills layer's frozen requirement: these fields of its task (saturation_ledger.SKILLS_REQUIREMENT_FIELDS, whose
+# skills_requirement_sha256 computes the hash).
+SKILLS_REQUIREMENT_FIELDS = ("lifecycle_task", "requirement", "overturn_when")
+# What a skills layer input shows of each installed skill's adoption/skills/manifest.json row.
+INSTALLED_FIELDS = ("name", "source", "ref", "path", "skill_md_sha256", "description_chars", "status",
+                    "upstream_disable_model_invocation", "claude_listing", "codex_enabled", "gap")
+TASK_FIELDS = ("layer_id", "lifecycle_task", "requirement", "installed", "source_ids", "open_gaps", "overturn_when")
+HEX40 = re.compile(r"[0-9a-f]{40}")
+DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
@@ -42,9 +86,37 @@ def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
     return {row.get("layer"): row for row in ((manifest or {}).get(section) or []) if isinstance(row, dict)}
 
 
-def last_completed(ledger: dict) -> dict | None:
-    completed = [sweep for sweep in ledger.get("sweeps") or [] if sweep.get("status") == "completed"]
+def sweep_modality(sweep: dict) -> str | None:
+    """The modality a ledger sweep ran, named by its layers' catalogs: "repository" when they are all foundation or
+    us-equities layers, "skills" when they are all skills layers. None for a sweep with no layer or with layers of
+    both, which neither modality's history takes (a run covers one modality)."""
+    catalogs = {layer.get("catalog") for layer in (sweep or {}).get("layers") or [] if isinstance(layer, dict)}
+    if catalogs and catalogs <= {catalog for catalog, _ in CATALOG_FILES}:
+        return REPOSITORY
+    return SKILLS if catalogs == {SKILLS} else None
+
+
+def last_completed(ledger: dict, modality: str) -> dict | None:
+    """The ledger's last completed sweep of that modality (sweep_modality). A repository run never reads a skills
+    sweep, nor a skills run a repository sweep, whichever ran last."""
+    completed = [sweep for sweep in ledger.get("sweeps") or [] if isinstance(sweep, dict)
+                 and sweep.get("status") == "completed" and sweep_modality(sweep) == modality]
     return completed[-1] if completed else None
+
+
+def previous_by_layer(previous_sweep: dict | None, absent=None) -> dict:
+    """(catalog, layer_id) -> that sweep's survived, refuted and not_adjudicated entries (see build_layer_inputs)."""
+    previous = {}
+    for layer in (previous_sweep or {}).get("layers") or []:
+        refuted = [entry for entry in layer.get("refuted") or []]
+        not_adjudicated = [entry["repo"] for entry in refuted if absent is not None and absent(entry)]
+        previous[(layer.get("catalog"), layer.get("layer_id"))] = {
+            "sweep_id": previous_sweep.get("sweep_id"),
+            "survived": [entry["repo"] for entry in layer.get("survived") or []],
+            "refuted": [entry["repo"] for entry in refuted if entry["repo"] not in not_adjudicated],
+            **({"not_adjudicated": not_adjudicated, "not_adjudicated_note": NOT_ADJUDICATED_NOTE}
+               if not_adjudicated else {})}
+    return previous
 
 
 def check_seeds(seeds, layer_ids) -> dict:
@@ -65,17 +137,7 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
     refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted."""
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
-    previous_sweep = last_completed(ledger)
-    previous = {}
-    for layer in (previous_sweep or {}).get("layers") or []:
-        refuted = [entry for entry in layer.get("refuted") or []]
-        not_adjudicated = [entry["repo"] for entry in refuted if absent is not None and absent(entry)]
-        previous[(layer.get("catalog"), layer.get("layer_id"))] = {
-            "sweep_id": previous_sweep.get("sweep_id"),
-            "survived": [entry["repo"] for entry in layer.get("survived") or []],
-            "refuted": [entry["repo"] for entry in refuted if entry["repo"] not in not_adjudicated],
-            **({"not_adjudicated": not_adjudicated, "not_adjudicated_note": NOT_ADJUDICATED_NOTE}
-               if not_adjudicated else {})}
+    previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
     duplicates = sorted({layer_id for layer_id in all_ids if all_ids.count(layer_id) > 1})
     if duplicates:
@@ -124,23 +186,182 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     return out
 
 
+# --------------------------------------------------------------------------- the skills modality
+
+
+def check_skills_catalog(catalog: dict, manifest: dict) -> list[str]:
+    """Problems of catalogs/landscape/skills-lifecycle.json against the pinned skills manifest."""
+    problems = []
+    if catalog.get("kind") != "skills-lifecycle" or catalog.get("schema_version") != 1:
+        problems.append("skills catalog: kind must be skills-lifecycle with schema_version 1")
+    source_ids = []
+    for position, source in enumerate(catalog.get("sources") or []):
+        label = f"sources[{position}] {source.get('source_id') if isinstance(source, dict) else source!r}"
+        if not isinstance(source, dict) or set(source) - {"maintenance"} != set(SOURCE_FIELDS):
+            problems.append(f"skills catalog {label}: needs exactly source_id, kind, url and pin (and optionally "
+                            "maintenance)")
+            continue
+        source_ids.append(source["source_id"])
+        if source["kind"] not in SOURCE_KINDS:
+            problems.append(f"skills catalog {label}: kind {source['kind']!r} is not one of {list(SOURCE_KINDS)}")
+        if not HEX40.fullmatch(str(source["pin"])):
+            problems.append(f"skills catalog {label}: pin must be a 40-hex commit")
+        record = source.get("maintenance")
+        if "maintenance" in source and not (
+                isinstance(record, dict) and sorted(record) == sorted(MAINTENANCE_FIELDS)
+                and record["status"] in MAINTENANCE_STATUSES and valid_date(record["checked_at"])
+                and isinstance(record["evidence"], str) and record["evidence"].strip()):
+            problems.append(f"skills catalog {label}: maintenance must be {{status: one of "
+                            f"{list(MAINTENANCE_STATUSES)}, checked_at: YYYY-MM-DD, evidence: the API fact}}")
+    repeated = sorted({sid for sid in source_ids if source_ids.count(sid) > 1})
+    if repeated:
+        problems.append(f"skills catalog: source ids repeat: {repeated}")
+    pinned = {entry.get("name") for entry in manifest.get("skills") or [] if isinstance(entry, dict)}
+    layer_ids = []
+    for position, task in enumerate(catalog.get("tasks") or []):
+        if not isinstance(task, dict) or sorted(task) != sorted(TASK_FIELDS):
+            problems.append(f"skills catalog tasks[{position}]: needs exactly {list(TASK_FIELDS)}")
+            continue
+        layer_id = task["layer_id"]
+        layer_ids.append(layer_id)
+        if layer_id != f"skills-{task['lifecycle_task']}":
+            problems.append(f"skills catalog tasks[{position}]: layer_id {layer_id} is not skills-<lifecycle_task>")
+        unpinned = sorted(set(task["installed"]) - pinned)
+        if unpinned:
+            problems.append(f"skills catalog {layer_id}: installed names skills {SKILLS_MANIFEST} does not pin: "
+                            f"{unpinned}")
+        unknown = sorted(set(task["source_ids"]) - set(source_ids))
+        if unknown:
+            problems.append(f"skills catalog {layer_id}: unknown source ids {unknown}")
+    repeated = sorted({layer_id for layer_id in layer_ids if layer_ids.count(layer_id) > 1})
+    if repeated:
+        problems.append(f"skills catalog: layer ids repeat: {repeated}")
+    if not layer_ids:
+        problems.append("skills catalog: no tasks")
+    return problems
+
+
+def valid_date(value) -> bool:
+    try:
+        date.fromisoformat(str(value))
+    except ValueError:
+        return False
+    return bool(DATE.fullmatch(str(value)))
+
+
+def skills_scope(catalog: dict, adoption: dict, led) -> dict:
+    """The frozen scope of the skills layers in saturation_ledger.py --scope's format, with the ledger's functions
+    (the requirement hash is saturation_ledger.skills_requirement_sha256, which --report and --append recompute)."""
+    return {"platform_profiles_sha256": led.platform_profiles_sha256(adoption),
+            "requirement_sha256": {f"{SKILLS}/{task['layer_id']}": led.skills_requirement_sha256(task)
+                                   for task in catalog["tasks"]}}
+
+
+def excluded_names(value) -> list[str]:
+    """The skill names of one adoption/skills/manifest.json excluded entry. The committed manifest states them as one
+    comma-separated string ("systematic-debugging, test-driven-development"); a list is taken item by item. Each name,
+    or phrase ("reddit-automation and vendor-specific packs"), is stripped and kept whole."""
+    items = value if isinstance(value, list) else str(value or "").split(",")
+    return [name for name in (str(item).strip() for item in items) if name]
+
+
+def known_skills(manifest: dict) -> dict:
+    """The manifest's installed skills by source repository and its excluded skills by the manifest's own source text.
+    An excluded entry can name several repositories and phrases ("openai/skills, anthropics/skills"; "the figma and
+    notion skills"), so no owner/repo@name pair is inferred from it: the words stay as the manifest states them."""
+    installed, excluded = {}, {}
+    for entry in manifest.get("skills") or []:
+        if isinstance(entry, dict) and entry.get("name"):
+            installed.setdefault(str(entry.get("source")), set()).add(str(entry["name"]))
+    for entry in manifest.get("excluded") or []:
+        if isinstance(entry, dict):
+            excluded.setdefault(str(entry.get("source")), set()).update(excluded_names(entry.get("skills")))
+    return {"installed": {source: sorted(names) for source, names in sorted(installed.items())},
+            "excluded": {source: sorted(names) for source, names in sorted(excluded.items())}}
+
+
+def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict, seeds=None, absent=None) -> list:
+    """One input object per skills-* layer, in catalog order (the skills modality; see the module docstring)."""
+    problems = check_skills_catalog(catalog, manifest)
+    if problems:
+        raise ValueError("; ".join(problems))
+    tasks = catalog["tasks"]
+    seeds = check_seeds(seeds, [task["layer_id"] for task in tasks])
+    previous = previous_by_layer(last_completed(ledger, SKILLS), absent)
+    pinned = {entry["name"]: entry for entry in manifest.get("skills") or [] if isinstance(entry, dict)}
+    sources = {source["source_id"]: source for source in catalog["sources"]}
+    known = known_skills(manifest)
+    out, missing = [], []
+    for task in tasks:
+        layer_id = task["layer_id"]
+        requirement = (scope.get("requirement_sha256") or {}).get(f"{SKILLS}/{layer_id}")
+        if not requirement:
+            missing.append(f"{SKILLS}/{layer_id}")
+        out.append({
+            "catalog": SKILLS, "layer_id": layer_id, "title": f"Skills: {task['lifecycle_task']}", "modality": SKILLS,
+            "lifecycle_task": task["lifecycle_task"], "requirement": task["requirement"],
+            "requirement_sha256": requirement, "platform_profiles_sha256": scope.get("platform_profiles_sha256"),
+            # Whole text: the catalog and the manifest are this repository's reviewed files, and a cut gap or overturn
+            # condition would hide part of the requirement from the workers (repository layers keep their caps).
+            "installed": [{field: pinned[name][field] for field in INSTALLED_FIELDS if field in pinned[name]}
+                          for name in task["installed"]],
+            "sources": [dict(sources[source_id]) for source_id in task["source_ids"]],
+            "open_gaps": list(task.get("open_gaps") or []),
+            "overturn_when": task.get("overturn_when") or "",
+            "skills_catalog_checked_at": catalog.get("checked_at"),
+            "skills_manifest_checked_at": manifest.get("checked_at"),
+            "previous_sweep": previous.get((SKILLS, layer_id), {}),
+            "known_skills": known,
+            "seeded_candidates": list(seeds.get(layer_id, [])),
+        })
+    if missing:
+        raise ValueError(f"the frozen scope has no requirement_sha256 for {missing}; freeze it with "
+                         "build_inputs.py --skills-scope")
+    if not scope.get("platform_profiles_sha256"):
+        raise ValueError("the frozen scope has no platform_profiles_sha256")
+    return out
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--work-dir", default=os.environ.get("SWEEP_WORK_DIR"))
-    parser.add_argument("--freshness-manifest", type=Path, required=True)
+    parser.add_argument("--freshness-manifest", type=Path, help="required for repository layers")
     parser.add_argument("--scope", type=Path, help="default <work-dir>/scope.json")
     parser.add_argument("--baseline-manifest", type=Path,
-                        help="default: manifest_ref of the saturation ledger's last completed sweep")
+                        help="default: manifest_ref of the saturation ledger's last completed repository sweep")
     parser.add_argument("--seeds", type=Path)
+    parser.add_argument("--modality", choices=("repository", SKILLS), default="repository",
+                        help=f"repository: the landscape catalogs' layers (default); skills: the skills-* layers of "
+                             f"{SKILLS_CATALOG}")
+    parser.add_argument("--skills-scope", action="store_true",
+                        help="print the skills layers' frozen scope (saturation_ledger.py --scope's format) and exit")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
+    if args.skills_scope:
+        try:
+            repo = args.repo_root.resolve()
+            scope = skills_scope(load_json(repo / SKILLS_CATALOG), load_json(repo / "adoption" / "manifest.json"),
+                                 ledger_module(REPO_ROOT))
+        except (ValueError, OSError, KeyError, TypeError) as error:
+            print(f"build_inputs.py: {error}", file=sys.stderr)
+            return 2
+        print(json.dumps(scope, indent=1, sort_keys=True))
+        return 0
+    if args.modality == SKILLS:
+        if args.freshness_manifest or args.baseline_manifest:
+            parser.error("--freshness-manifest and --baseline-manifest describe repository layers; the skills "
+                         "modality reads its pins from the skills catalog")
+        return skills_main(args)
+    if args.freshness_manifest is None:
+        parser.error("--freshness-manifest is required for repository layers")
     try:
         work = work_dir(args.work_dir)
         repo = args.repo_root.resolve()
         ledger = load_json(repo / "catalogs" / "saturation" / "ledger.json")
+        previous_sweep = last_completed(ledger, REPOSITORY)  # a skills sweep is neither history nor baseline
         baseline_path = args.baseline_manifest
-        if baseline_path is None and last_completed(ledger) and last_completed(ledger).get("manifest_ref"):
-            baseline_path = repo / last_completed(ledger)["manifest_ref"]
+        if baseline_path is None and previous_sweep and previous_sweep.get("manifest_ref"):
+            baseline_path = repo / previous_sweep["manifest_ref"]
         catalogs = {catalog: load_json(repo / "catalogs" / "landscape" / name) for catalog, name in CATALOG_FILES}
         led = ledger_module(REPO_ROOT)  # the ledger's rules from this checkout, applied to --repo-root's files
         documents = {}
@@ -164,7 +385,40 @@ def main(argv=None) -> int:
                        "title": layer_input["title"], "input": str(path)})
     write_json(work / "layers.json", layers)
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
+          f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "
           f"baseline {baseline_path.name if baseline_path else 'none'}; seeds for "
+          f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s)")
+    return 0
+
+
+def skills_main(args) -> int:
+    """build_inputs.py --modality skills: the skills-* layer inputs and layers.json (rows carry modality)."""
+    try:
+        work = work_dir(args.work_dir)
+        repo = args.repo_root.resolve()
+        ledger = load_json(repo / "catalogs" / "saturation" / "ledger.json")
+        led = ledger_module(REPO_ROOT)
+        documents = {}
+        target_of = led.ref_resolver(lambda path: documents[path] if path in documents
+                                     else documents.setdefault(path, led.load_json(repo, path)))
+        inputs = build_skills_inputs(
+            load_json(repo / SKILLS_CATALOG), load_json(repo / SKILLS_MANIFEST),
+            load_json(args.scope or work / "scope.json"), ledger, load_json(args.seeds) if args.seeds else None,
+            absent=lambda entry: led.refuted_by_absence(entry, target_of))
+    except (ValueError, OSError, KeyError, TypeError) as error:
+        print(f"build_inputs.py: {error}", file=sys.stderr)
+        return 2
+    (work / "inputs").mkdir(exist_ok=True)
+    layers = []
+    for layer_input in inputs:
+        path = work / "inputs" / f"{layer_input['layer_id']}.json"
+        write_json(path, layer_input)
+        layers.append({"catalog": layer_input["catalog"], "layer_id": layer_input["layer_id"],
+                       "title": layer_input["title"], "input": str(path), "modality": SKILLS})
+    write_json(work / "layers.json", layers)
+    previous_sweep = last_completed(ledger, SKILLS)  # a repository sweep is never a skills run's history
+    print(f"{len(layers)} skills layers from {SKILLS_CATALOG}; previous skills sweep "
+          f"{(previous_sweep or {}).get('sweep_id') or 'none'}; seeds for "
           f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s)")
     return 0
 

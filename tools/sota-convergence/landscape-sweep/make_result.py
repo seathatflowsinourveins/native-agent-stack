@@ -25,6 +25,23 @@ whose retained failures (returns.json failures/<layer>) lack their retained_fail
 failures are checked per worker and per layer, as convert.py records them: a <role>:<layer>[:followup] worker's in
 that layer's round, the completeness critic's in every layer of the record, so one layer's failure never covers
 another layer. Paths are repository-relative and must exist.
+A skills layer (catalog skills) completes only when each survivor's source review binds it to what the refuters
+judged: the review file's reviewed_commit is the adjudicated pin of the survivor's proposal in the returns, its
+observed pin_lookup is ok, its observed skill_md_sha256 is the proposal's (never null), and it records the skill
+folder's tree hash (skill_folder_tree_sha). A stopped entry in --reviews (source_reviews.py prints one for a skill
+survivor it refused: no pin, an unreadable or moved pin, a null hash, no valid copy) stops that layer: the record is
+refused, and the run is either reviewed again once the cause is resolved or recorded with status stopped.
+
+  make_result.py --decision-record RESULT.json [--repo-root .] [--force]
+
+writes docs/decisions/<date>-skills-landscape-sweep.md for a skills sweep's RESULT.json (every layer a skills-*
+layer of catalogs/landscape/skills-lifecycle.json): the survivors per lifecycle task with their labels, the installed
+skill each would replace, invocation flags and source reviews; every refuted proposal with the reasoning of the votes
+that refuted it; the completeness critic's findings (the manifest's critic); the reopened layers; the lost workers
+(RESULT.json lost_workers), whose layers are reported as incomplete rather than refuted; and the overturn conditions
+(each task's overturn_when and each survivor's comparison_that_would_overturn). It reads the returns and
+manifest RESULT.json names, under --repo-root, and edits no manifest: adoption/skills/manifest.json changes only
+through its own trial and decision records. An existing record is kept unless --force.
 """
 
 from __future__ import annotations
@@ -34,15 +51,21 @@ import json
 import os
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import REPO_ROOT, canon, deviation_rounds, load_json, pointer_token  # noqa: E402
+from sweep_common import (REPO_ROOT, canon, deviation_rounds, ledger_module, load_json, pointer_token,  # noqa: E402
+                          private_content, private_findings, slug)
 
 PLACEHOLDER = "@RETURNS@"
-HEX64 = re.compile(r"[0-9a-f]{64}")
+HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
+SKILLS = "skills"  # the catalog of a skills-* layer (build_inputs.SKILLS)
 REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
+SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"  # build_inputs.SKILLS_CATALOG
+DECISION_RECORD = "docs/decisions/{date}-skills-landscape-sweep.md"
+REFUTER_NAMES = (("facts", "facts refuter"), ("claude", "Claude fit refuter"), ("gpt6", "GPT-6 fit refuter"))
 
 
 def substitute(value, returns_ref: str):
@@ -128,9 +151,47 @@ def check_usage(usage: dict, usage_ref: str, returns: dict | None = None, layer_
     return child_usage
 
 
+def skill_review_problem(entry: dict, layer_id: str, returns: dict | None, load_review) -> str | None:
+    """Why a skills survivor's source review does not bind it to what the refuters judged, or None. The adjudicated
+    pin and skill_md_sha256 are the survivor's proposal's in the returns (proposal_of, in its facts vote's round), not
+    the review's own account; load_review(path) reads the review file."""
+    if returns is None or load_review is None:
+        return "the returns and the review file are needed to check the review against the adjudicated pin"
+    led = ledger_module(REPO_ROOT)  # the checkout's JSON-pointer rules, as write_decision_record resolves refs
+    pointer = str((entry.get("facts") or {}).get("ref", "")).partition("#")[2]
+    try:
+        facts = led.resolve_pointer(returns, pointer)
+    except (led.LedgerError, KeyError, IndexError, TypeError, ValueError) as error:
+        return f"its facts vote {pointer!r} is not in the returns ({error})"
+    proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round") if isinstance(facts, dict) else None)
+    pin, judged = proposal.get("pin"), proposal.get("skill_md_sha256")
+    if not (isinstance(pin, str) and HEX40.fullmatch(pin)):
+        return f"its proposal in the returns names no adjudicated pin ({pin!r})"
+    if judged is None:
+        return ("the survivor's skill_md_sha256 is null in the returns, so nothing ties its review to the SKILL.md "
+                "bytes the refuters judged")
+    try:
+        review = load_review(entry["source_review"])
+    except (OSError, ValueError) as error:
+        return f"its review {entry['source_review']} cannot be read ({error})"
+    observed = (review.get("observed") if isinstance(review, dict) else None) or {}
+    if review.get("reviewed_commit") != pin:
+        return f"it was reviewed at {review.get('reviewed_commit')!r}, not the adjudicated pin {pin}"
+    if observed.get("pin_lookup") != "ok":
+        return f"its review's pin_lookup is {observed.get('pin_lookup')!r}, not ok"
+    if observed.get("skill_md_sha256") != judged:
+        return (f"its review read SKILL.md bytes with skill_md_sha256 {observed.get('skill_md_sha256')!r}, not the "
+                f"judged {judged}")
+    if not HEX40.fullmatch(str(observed.get("skill_folder_tree_sha") or "")):
+        return "its review records no skill_folder_tree_sha (the skill folder's tree hash at the pin)"
+    return None
+
+
 def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sweep_id: str, lane: str,
                  returns_ref: str, usage_ref: str, manifest_ref: str, prompts_sha256: str, reopen=None,
-                 notes=(), returns: dict | None = None) -> dict:
+                 notes=(), returns: dict | None = None, load_review=None) -> dict:
+    """The RESULT.json (see the module docstring). load_review(path) reads a review file by its repository path; a
+    skills layer's survivors need it (skill_review_problem)."""
     child_usage = check_usage(usage, usage_ref, returns, [layer.get("layer_id") for layer in layers])
     transcript_dir = str(child_usage.get("transcript_dir") or "")
     run = transcript_dir.rstrip("/").rsplit("/", 1)[-1]
@@ -147,14 +208,24 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     if unknown:
         raise ValueError(f"--reopen names layers this sweep did not cover: {unknown}")
     failures = (returns or {}).get("failures") or {}
-    out_layers, missing, unreopened = [], [], []
+    out_layers, missing, unreopened, stopped, unbound = [], [], [], [], []
     for layer in substitute(layers, returns_ref):
         for entry in layer.get("survived") or []:
             matches = [r for r in by_repo.get(review_key(entry["repo"]), []) if layer["layer_id"] in r.get("layers", [])]
-            if not matches:
-                missing.append(f"{layer['layer_id']}: {entry['repo']}")
+            written = [r for r in matches if r.get("path")]
+            if not written:
+                halted = [r for r in matches if r.get("status") == "stopped"]
+                if halted:
+                    stopped += [f"{layer['layer_id']}: {entry['repo']} at pin {r.get('pin')} (pin_lookup "
+                                f"{r.get('pin_lookup')}): {r.get('reason')}" for r in halted]
+                else:
+                    missing.append(f"{layer['layer_id']}: {entry['repo']}")
                 continue
-            entry["source_review"] = f"{base}/{matches[0]['path']}"
+            entry["source_review"] = f"{base}/{written[0]['path']}"
+            if layer.get("catalog") == SKILLS:
+                problem = skill_review_problem(entry, layer["layer_id"], returns, load_review)
+                if problem:
+                    unbound.append(f"{layer['layer_id']}: {entry['repo']}: {problem}")
         entries = list(layer.get("reopen") or [])
         entries += [item for item in reopen.get(layer["layer_id"], []) if item not in entries]
         layer["reopen"] = entries
@@ -164,8 +235,15 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
                 for item in entries):
             unreopened.append(layer["layer_id"])
         out_layers.append(layer)
+    if stopped:
+        raise ValueError(f"layers stopped: a skill survivor has no source review ({'; '.join(stopped)}). A stopped layer "
+                         "cannot complete a RESULT.json: rerun source_reviews.py once the cause is resolved, or record "
+                         "the run with status stopped (recipes/saturation-sweep.md section 4)")
     if missing:
         raise ValueError(f"survivors without a source review in --reviews: {missing}")
+    if unbound:
+        raise ValueError(f"skill survivors whose source review is not at their adjudicated pin and judged bytes: "
+                         f"{'; '.join(unbound)}")
     if unreopened:
         raise ValueError(f"layers with retained failures but no retained_failure reopen entry (a failed lane never "
                          f"counts as clean; use convert.py's layers.json): {unreopened}")
@@ -182,22 +260,201 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     return result
 
 
+# --------------------------------------------------------------------------- the skills decision record
+
+
+def one_line(value, limit: int = 600) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text if len(text) <= limit else text[:limit - 3].rstrip() + "..."
+
+
+def proposal_of(returns: dict, layer_id: str, repository: str, round_name) -> dict:
+    """The proposal row convert.py merged for `repository` in that round: the Claude researcher's return first, then
+    the GPT-6 researcher's (sweep.js mergeProposals keeps the first family's fields), matched as slug() matches."""
+    raw = ((returns.get("raw") or {}).get(layer_id) or {}).get(round_name or "first") or {}
+    candidates = [*((raw.get("claude_discover") or {}).get("proposed") or []),
+                  *(((raw.get("gpt6_discover") or {}).get("output") or {}).get("proposed") or [])]
+    key = slug(repository)
+    return next((p for p in candidates if isinstance(p, dict) and slug(p.get("skill_ref") or p.get("repository")) == key),
+                {})
+
+
+def refutations(facts: dict, fit: dict) -> list[str]:
+    """'<refuter>: <reasoning>' for every vote that refuted a proposal; a vote that did not return says so."""
+    votes = [("facts", facts), ("claude", (fit or {}).get("claude") or {}), ("gpt6", (fit or {}).get("gpt6") or {})]
+    names = dict(REFUTER_NAMES)
+    return [f"{names[role]}: " + ("the vote did not return (counted as refuted)" if vote.get("missing")
+                                  else one_line(vote.get("reasoning"), 400))
+            for role, vote in votes if vote.get("refuted") is not False]
+
+
+def decision_record(result: dict, returns: dict, manifest: dict, catalog: dict, resolve) -> tuple[str, str]:
+    """(repository-relative path, Markdown) of the decision record of a skills sweep's RESULT.json. `resolve(ref)`
+    returns the object a <file>#<pointer> ref of the record names."""
+    layers = result.get("layers") or []
+    others = [f"{layer.get('layer_id')} ({layer.get('catalog')})" for layer in layers if layer.get("catalog") != "skills"]
+    if not layers or others:
+        raise ValueError(f"--decision-record takes a skills sweep's RESULT.json (every layer's catalog skills): "
+                         f"{others or 'no layers'}")
+    tasks = {task.get("layer_id"): task for task in catalog.get("tasks") or [] if isinstance(task, dict)}
+    unknown = [layer["layer_id"] for layer in layers if layer.get("layer_id") not in tasks]
+    if unknown:
+        raise ValueError(f"layers not in {SKILLS_CATALOG}: {unknown}")
+    run_date = str(result.get("date") or "")
+    date.fromisoformat(run_date)
+    sweep_id = result.get("sweep_id")
+    ids = [layer["layer_id"] for layer in layers]
+    # Workers that never returned (the usage record's incomplete children): a layer that lost one has an incomplete
+    # result, which the record must not present as a refutation. The critic belongs to every layer.
+    lost = [str(label) for label in result.get("lost_workers") or []]
+    lost_by_layer, lost_unmapped = deviation_rounds([{"child": label} for label in lost], ids)
+    lines = [f"# Decision: skills landscape sweep {sweep_id} ({run_date})", "", "## Context", "",
+             f"`{sweep_id}` ran the landscape sweep's skills modality over {len(layers)} lifecycle task(s) of "
+             f"`{SKILLS_CATALOG}` ({', '.join(ids)}): workflow run `{result.get('workflow_run')}`, lane "
+             f"`{result.get('lane')}`. For each task a Claude and a GPT-6 researcher proposed skills (owner/repo@name). "
+             "A proposal survived only when the facts refuter and both fit refuters (Claude and GPT-6) voted not "
+             "refuted, and a vote that did not return counts as refuted. Survival means the proposal withstood fact and "
+             "fit checks: no skill was installed, invoked or benchmarked.", "",
+             "This record was written by `tools/sota-convergence/landscape-sweep/make_result.py --decision-record` from "
+             "the sweep's RESULT.json. The sweep edits no manifest: `adoption/skills/manifest.json` changes only "
+             "through its own trial and decision records, and a surviving targeted_candidate earns a bounded paired "
+             "trial, not an install.", "", "Completeness critic:", ""]
+    critic = manifest.get("critic")
+    if not isinstance(critic, dict):
+        lines.append("- The completeness critic did not return (a retained failure of every layer).")
+    else:
+        lines += [f"- {one_line(item)}" for item in critic.get("general") or []]
+        flagged = [item for item in critic.get("followup_layers") or [] if isinstance(item, dict)]
+        lines += [f"- Flagged `{item.get('layer_id')}` for a follow-up round: {one_line(item.get('reason'))} (search "
+                  f"directions: {one_line('; '.join(item.get('search_directions') or []))})" for item in flagged]
+        if not flagged:
+            lines.append("- It flagged no layer for a follow-up round.")
+    reopened = [(layer["layer_id"], entry) for layer in layers for entry in layer.get("reopen") or []]
+    lines += ["", "Reopened layers (each reopen entry resets the layer's clean count):", ""]
+    lines += [f"- `{layer_id}`: {entry.get('trigger')} (`{entry.get('ref')}`)" for layer_id, entry in reopened] \
+        or ["- None."]
+    lines += ["", "Lost workers (they never returned, so their layers' results are incomplete, not refutations):", ""]
+    lines += [f"- `{label}`" for label in lost] or ["- None."]
+    if lost_unmapped:
+        unmapped = ", ".join("`" + str(item["child"]) + "`" for item in lost_unmapped)
+        lines.append(f"- Of these, {unmapped} name no layer of this record.")
+    alternatives, decisions, overturns, reviews = [], [], [], []
+    for layer in layers:
+        layer_id, task = layer["layer_id"], tasks[layer["layer_id"]]
+        heading = f"### `{layer_id}` ({task.get('lifecycle_task')})"
+        refuted = []
+        for entry in layer.get("refuted") or []:
+            facts, fit = resolve(entry["facts"]["ref"]), resolve(entry["fit"]["ref"])
+            proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round"))
+            refuted.append(f"- `{entry['repo']}` ({proposal.get('proposed_label', 'label not retained')}): "
+                           + "; ".join(refutations(facts, fit)))
+        if refuted:
+            alternatives += [heading, "", *refuted, ""]
+            if layer.get("votes_note"):
+                alternatives += [f"Note: {one_line(layer['votes_note'], 1200)}", ""]
+        survivors = []
+        overturns.append(f"- `{layer_id}`: {one_line(task.get('overturn_when'), 1200)}")
+        for entry in layer.get("survived") or []:
+            facts = resolve(entry["facts"]["ref"])
+            proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round"))
+            replaces = proposal.get("replaces")
+            survivors.append(
+                f"- `{entry['repo']}`: {proposal.get('proposed_label', 'label not retained')}; "
+                + (f"replaces {replaces}" if replaces else "complements the installed skills")
+                + f"; model_invocable {str(proposal.get('model_invocable')).lower()}, codex_implicit "
+                  f"{str(proposal.get('codex_implicit')).lower()}; pin `{proposal.get('pin')}`; source review "
+                  f"`{entry.get('source_review')}`. Gap: {one_line(proposal.get('demonstrated_gap'))}")
+            overturns.append(f"  - `{entry['repo']}`: {one_line(proposal.get('comparison_that_would_overturn'), 1200)}")
+            if entry.get("source_review"):
+                reviews.append(f"- Source review of `{entry['repo']}`: `{entry['source_review']}`")
+        lost_here = [f"`{item['child']}`" for _, item in lost_by_layer.get(layer_id, [])]
+        if survivors:
+            outcome = survivors
+        elif lost_here:
+            outcome = [f"- No proposal survived, and the layer lost workers ({', '.join(lost_here)}): its result is "
+                       "incomplete, not a refutation, and its reopen entries keep it from counting as clean."]
+        elif layer.get("refuted"):
+            outcome = [f"- No proposal survived: the refuters refuted all {len(layer['refuted'])} (see Alternatives)."]
+        else:
+            outcome = ["- No proposal was made."]
+        if survivors and lost_here:
+            outcome.append(f"- The layer also lost workers ({', '.join(lost_here)}); its reopen entries record them.")
+        decisions += [heading, "", *outcome, ""]
+    lines += ["", "## Alternatives", "", "Refuted proposals per lifecycle task, with the votes that refuted them:", ""]
+    lines += alternatives or ["No proposal was refuted.", ""]
+    lines += ["## Decision", "", "Survivors per lifecycle task:", "", *decisions]
+    lines += ["## Overturn condition", "", "Each task's overturn condition (the skills catalog's overturn_when), and "
+              "each survivor's comparison_that_would_overturn:", "", *overturns, ""]
+    catalog_note = f" (checked_at {catalog.get('checked_at')})" if catalog.get("checked_at") else ""
+    lines += ["## Sources", "",
+              f"- Returns: `{result.get('returns_ref')}`",
+              f"- Usage: `{result.get('usage_ref')}`",
+              f"- Manifest, with the completeness critic: `{result.get('manifest_ref')}`",
+              f"- Skills catalog: `{SKILLS_CATALOG}`{catalog_note}",
+              f"- Prompts: prompts_sha256 `{result.get('prompts_sha256')}`", *reviews, ""]
+    return DECISION_RECORD.format(date=run_date), "\n".join(lines)
+
+
+def write_decision_record(result_path: Path, repo: Path, force: bool) -> int:
+    led = ledger_module(REPO_ROOT)  # the checkout's ledger rules: safe repository paths and JSON pointers
+    documents = {}
+
+    def resolve(ref):
+        path, _, pointer = str(ref).partition("#")
+        if path not in documents:
+            documents[path] = led.load_json(repo, path)
+        return led.resolve_pointer(documents[path], pointer)
+
+    try:
+        result = load_json(result_path)
+        for field in ("returns_ref", "manifest_ref"):
+            if not isinstance(result.get(field), str):
+                raise ValueError(f"{result_path.name} has no {field}")
+        relative, text = decision_record(result, resolve(result["returns_ref"]), resolve(result["manifest_ref"]),
+                                         led.load_json(repo, SKILLS_CATALOG), resolve)
+        findings = private_findings(text, private_content(REPO_ROOT))
+        if findings:
+            raise ValueError(f"the record matches private-content patterns ({sorted({kind for _, kind in findings})}); "
+                             "redact the returns first")
+        path = repo / relative
+        if path.exists() and not force:
+            raise ValueError(f"{relative} exists; pass --force to replace it")
+    except (ValueError, OSError, KeyError, TypeError, led.LedgerError) as error:
+        print(f"make_result.py: {error}", file=sys.stderr)
+        return 2
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    print(relative)
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--layers", type=Path, required=True)
-    parser.add_argument("--reviews", type=Path, required=True, help="source_reviews.py stdout ([] when nothing survived)")
-    parser.add_argument("--sweep-id", required=True)
+    parser.add_argument("--layers", type=Path)
+    parser.add_argument("--reviews", type=Path, help="source_reviews.py stdout ([] when nothing survived)")
+    parser.add_argument("--sweep-id")
     parser.add_argument("--lane", help="default: --sweep-id")
-    parser.add_argument("--returns-ref", required=True)
-    parser.add_argument("--usage-ref", required=True)
-    parser.add_argument("--manifest-ref", required=True)
+    parser.add_argument("--returns-ref")
+    parser.add_argument("--usage-ref")
+    parser.add_argument("--manifest-ref")
     parser.add_argument("--prompts-sha256")
     parser.add_argument("--work-dir", default=os.environ.get("SWEEP_WORK_DIR"))
     parser.add_argument("--reopen", type=Path)
     parser.add_argument("--note", action="append", default=[])
+    parser.add_argument("--decision-record", type=Path, metavar="RESULT.json",
+                        help="write docs/decisions/<date>-skills-landscape-sweep.md for a skills sweep's RESULT.json")
+    parser.add_argument("--force", action="store_true", help="with --decision-record: replace an existing record")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
     repo = args.repo_root.resolve()
+    if args.decision_record is not None:
+        return write_decision_record(args.decision_record, repo, args.force)
+    missing = [flag for flag, value in (("--layers", args.layers), ("--reviews", args.reviews),
+                                        ("--sweep-id", args.sweep_id), ("--returns-ref", args.returns_ref),
+                                        ("--usage-ref", args.usage_ref), ("--manifest-ref", args.manifest_ref))
+               if value is None]
+    if missing:
+        parser.error(f"the following arguments are required: {', '.join(missing)}")
     try:
         for ref in (args.returns_ref, args.usage_ref, args.manifest_ref):
             if ref.startswith("/") or ".." in Path(ref).parts or not (repo / ref).is_file():
@@ -212,7 +469,8 @@ def main(argv=None) -> int:
                               sweep_id=args.sweep_id, lane=args.lane or args.sweep_id, returns_ref=args.returns_ref,
                               usage_ref=args.usage_ref, manifest_ref=args.manifest_ref, prompts_sha256=digest,
                               reopen=load_json(args.reopen) if args.reopen else None, notes=args.note,
-                              returns=load_json(repo / args.returns_ref))
+                              returns=load_json(repo / args.returns_ref),
+                              load_review=lambda path: load_json(repo / path))
     except (ValueError, OSError, KeyError) as error:
         print(f"make_result.py: {error}", file=sys.stderr)
         return 2

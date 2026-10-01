@@ -17,16 +17,17 @@ the merged manifest, stay with the lane owners.
 
 | File | Runs | Role |
 | --- | --- | --- |
-| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep, a baseline manifest, a freshness manifest and optional seeds. |
+| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest and optional seeds. |
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
 | `codex_quota.py` | staged | A copy of the checkout's `scripts/codex_quota.py`, the account quota probe the runner's optional quota gate runs. |
 | `make_prompt.py` | staged | Composes a GPT-6 prompt from the frozen templates. |
-| `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>` and `<<SKILLS_CHECKED_AT>>` open, and the strict return schemas. `probe.json` is for the one-call lane probe. |
+| `templates.json`, `schemas/` | staged | The prompts, with `<<DATE>>`, `<<LAYER_COUNT>>`, `<<SKILLS_CHECKED_AT>>` and `<<MODALITY>>` open, and the strict return schemas (`discover-skills.json` for the skills modality). `probe.json` is for the one-call lane probe. |
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
 | `convert.py` | checkout | Converts the run record into `returns.json`, `lanes.json`, `layers.json` and `survivors.json`. |
 | `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api`; the public Hugging Face Hub API for a model repository). |
+| `skill_md.mjs`, `skills-yaml.pin.json` | checkout | The pinned skills CLI's own `SKILL.md` parse (its `parseSkillMd`, ported line by line) with the `yaml` install the pin names by version, npm integrity and file sha256; `source_reviews.py` runs it for every `SKILL.md` copy of a skill survivor (Skills modality). |
 | `make_result.py` | checkout | Assembles `RESULT.json` for `saturation_ledger.py --append`. |
 | `sweep_common.py` | checkout | Helpers shared by the checkout-run tools. |
 | `seeds-20260926.json` | checkout | The seeds the 2026-09-26 run gave its workers. It is a record, and an example of the `--seeds` format. |
@@ -103,7 +104,9 @@ failure receipts. Start it again to bind valid new settings.
 
 The templates tell each role which pinned skills to use (search-first and iterative-retrieval for discovery;
 supply-chain-risk-auditor and fp-check for refutation, which takes evidence before any verdict, plus layer-specific
-skills).
+skills). skill-creator is named too, for Claude Code only: a worker reads how its paired with-skill/without-skill
+benchmark sets up a comparison it names, and never runs it. Codex ships a different skill of that name, and the
+manifest keeps the pinned copy off there.
 Each worker reports the skills it used in `skills_used`, and `returns.json` totals them in `skills_usage`.
 
 `build_args.py` refuses to stage a run when the templates name a skill that `adoption/skills/manifest.json` does not
@@ -422,6 +425,163 @@ Read these fields of `convert.py`'s summary before appending:
   as `{lost: true}` too. `convert.py` refuses a return whose follow-up rounds do not match the critic's requests,
   so no round can go missing silently.
 
+## Skills modality
+
+The second discovery modality sweeps skills per lifecycle task instead of repositories per landscape layer. A skill is
+one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survival rule, retained failures and
+`--layers`/`--smoke`/`--due-report` selection are the same. The design and its overturn condition are in
+[the decision record](../../../docs/decisions/2026-09-30-skills-sweep-modality.md).
+
+- **Inputs.** [`catalogs/landscape/skills-lifecycle.json`](../../../catalogs/landscape/skills-lifecycle.json) has 13
+  lifecycle tasks, `skills-research` to `skills-mcp-build`. Each task has its requirement, the installed skills of
+  `adoption/skills/manifest.json` that serve it, its pinned sources (GitHub skill repositories, the skills.sh
+  registry and a curated list), its open gaps and its overturn condition. `build_inputs.py --modality skills` writes
+  one input per task. The input carries the installed skills' manifest pins and invocation flags, the task's
+  sources, `known_skills` (the manifest's installed skills by repository, and its excluded skills by source with each
+  comma-separated name kept whole, as the manifest states them) and any seeds. The task's text, its open gaps and the
+  installed skills' `gap` fields pass whole, never cut. It reads no freshness manifest.
+- **Stale sources.** A source that failed the common block's maintenance rule when the catalog was checked (archived,
+  or no default-branch commit in the 90 days before, from `gh api .../commits?since=`) carries a `maintenance`
+  record: `status` stale, `checked_at` and the API fact as `evidence`. On 2026-09-30 only `openai-skills` did (no `main`
+  commit since 2026-06-24). It stays listed for its four installed skills, whose tasks name it as an open gap, and
+  `discover_skills` labels its skills `not_adopted` unless a maintained fork or replacement is found.
+- **Scope.** `saturation_ledger.py --scope` covers only the layers of `research-state.json`. So
+  `build_inputs.py --skills-scope` prints the skills layers' frozen scope in the same format, computed with the
+  ledger's own functions (`skills_requirement_sha256`, which `--report` and `--append` recompute). Each hash covers the
+  task's `lifecycle_task`, `requirement` and `overturn_when`.
+- **Templates and schema.** `build_args.py` resolves the modality at build time:
+  - A skills run's `discover` and `critic` are `discover_skills` and `critic_skills`.
+  - Its `facts` and `fit` end in `modality_skills`, through the `<<MODALITY>>` placeholder.
+  - A repository run fills `<<MODALITY>>` with nothing, so the modality leaves its frozen templates unchanged. Its
+    `prompts_sha256` moved once, when common's Skills paragraph gained skill-creator after unit F3 (#553) pinned it.
+    The tests pin both runs' values.
+  - Skills discovery returns `schemas/discover-skills.json`: the identity fields (`skill_ref`, `source_id`,
+    `lifecycle_task`, `pin`, `skill_md_sha256`, `license`, `source`), the fit fields (`description_chars`,
+    `model_invocable`, `codex_implicit`, `replaces`) and the verdict fields.
+  - Its `comparison_that_would_overturn` must name skill-creator's paired benchmark or a promptfoo config.
+  - `model_invocable` is false when the SKILL.md sets a true-valued `disable-model-invocation` (true, yes, on or 1
+    in any letter case; [Claude Code skills](https://code.claude.com/docs/en/skills), frontmatter reference), or when
+    its `agents/openai.yaml` sets `policy.allow_implicit_invocation` to a plain `false`
+    ([Codex skills](https://developers.openai.com/codex/skills)). Codex rust-v0.157.1 reads that file with serde_yaml
+    0.9.34 and ignores the whole file when it cannot, so a quoted `"false"` or a `no` leaves implicit invocation on.
+  - A skill that writes `CLAUDE.md` or `AGENTS.md` on its own initiative conflicts with the canonical instructions;
+    editing them when asked is the `skills-agent-docs` task's requirement.
+- **Identity.** `sweep.js` merges both families' skill proposals by `skill_ref` and carries it as the merged row's
+  `repository`. The refuters vote on it, and `convert.py`, `make_result.py` and the ledger compare it unchanged.
+- **Source reviews.** `convert.py` writes each skill survivor's adjudicated `pin` and `skill_md_sha256` into
+  `survivors.json`, and `source_reviews.py` reviews the SKILL.md at that pin and at no other commit. It finds the
+  SKILL.md as the pinned skills CLI does for `npx skills@1.7.0 add owner/repo --skill <name>`, following
+  vercel-labs/skills v1.7.0 `discoverSkills` (`src/skills.ts` at `7407f389`; README "Skill Discovery"):
+  - each candidate `SKILL.md` is validated first, by the CLI's own code. `skill_md.mjs` runs vercel-labs/skills
+    v1.7.0's `parseSkillMd`, `parseFrontmatter`, `sanitizeMetadata` and `getSkillDisplayName` (`src/skills.ts` lines
+    80-133 and 331-333, `src/frontmatter.ts`, `src/sanitize.ts` lines 18-65 at `7407f389`, ported line by line) with
+    the `yaml` package that `skills-yaml.pin.json` pins: 2.9.0, the version and npm integrity of the CLI's lockfile.
+    It installs nothing and runs only the installed files whose sha256 the pin lists, after checking the install's
+    `package-lock.json` integrity. Install it with the pin's command; the directory comes from `--skills-yaml`, then
+    `LANDSCAPE_SWEEP_SKILLS_YAML`, then the pin's default under HOME. CI's `validate` job
+    (`.github/workflows/validate.yml`) installs it before the suite, as it does the tree-sitter-bash pin, and
+    `tests/test_landscape_sweep_skills.py` fails an Actions job without it (the macOS and weekly freshness jobs are
+    recorded gaps, where the reader tests skip). A copy the CLI skips (no `name` or
+    `description`, one that is not a string, a YAML parse error) is recorded in `observed.skipped_skill_md` with the
+    warning the CLI prints, so it never claims the name. `observed.skill_md_reader` records the package, its
+    integrity and the pin file's sha256;
+  - what stays unverified, and stops the survivor when that copy's verdict decides which copy the CLI takes: every
+    copy when node or a verified install is missing; a copy whose frontmatter holds a line break other than LF or
+    CRLF (the `yaml` package and the CLI's pattern break lines only there, while libyaml, which Codex's serde_yaml
+    uses, also breaks at a lone CR, U+0085, U+2028 and U+2029); and a copy whose bytes are not the regular-file blob
+    the tree lists (a symlink, content gh does not return, other bytes);
+  - symlinks: the CLI walks a search location through a symlink at or above it (`readdir` follows it,
+    `dist/cli.mjs` lines 1339-1370) and skips a symlinked skill folder inside one (its directory entry is not a
+    directory, `src/skills.ts` lines 284-298), while the git tree lists a symlink as one blob and nothing below it.
+    A search location at or below a symlink, a folder whose `SKILL.md` is a symlink with skill folders below it (the
+    CLI walks below it only when the link's target is not a file), and `.claude-plugin` manifests behind a symlink or
+    without verified bytes leave what the CLI finds there unknown: reached before the pick is decided, such a
+    location stops the survivor; after it, it cannot change the pick, since the CLI keeps the first skill of a name;
+  - the bytes read are the blobs'. The CLI reads its clone's checkout, where `.gitattributes` can change them
+    (`filter=lfs`, eol and text normalization, `working-tree-encoding`), and the review does not read `.gitattributes`;
+  - npm resolves the CLI's `yaml` dependency (`^2.8.3`) when the CLI is installed, so an install made on 2026-09-30
+    runs yaml 2.9.1, as does this host's install from the manifest. On that day yaml 2.9.0 and 2.9.1 gave the same
+    verdict, name, description and warning for all 2,455 `SKILL.md` files of the catalog's GitHub sources at their
+    pins and for 139 edge cases, and the reader agreed with the CLI's own `parseSkillMd` (sliced from the published
+    `dist/cli.mjs`) and with `skills add <fixture> --list` run end to end
+    ([receipt](../../../evidence/artifacts/skills-md-reader-20260930/README.md));
+  - a candidate whose name, as the CLI matches `--skill` against it (`getSkillDisplayName`: the name as
+    `sanitizeMetadata` records it, or the folder's name when that is empty), names another skill is not a copy
+    either (`filterSkills`); a `SKILL.md` gh cannot read at the pin stops the survivor, since the CLI reads it from
+    its clone;
+  - a valid root `SKILL.md` is the repository's only skill;
+  - otherwise the root's child folders, then `skills/`, `skills/.curated`, `.experimental`, `.system` and 30 agent
+    folders (`.agents/skills`, `.claude/skills`, …), each three levels deep, where a `SKILL.md` shadows the folders
+    below it, then the skill folders a `.claude-plugin` manifest declares; and only when none of these holds a valid
+    skill, every folder up to five levels deep;
+  - the first location that holds a valid folder named `<name>` decides, so an invalid earlier copy loses to a valid
+    later one, and translations under `docs/<lang>/skills/` and agent copies under `.kiro/skills/` never displace
+    `skills/<name>`. On 2026-09-30 the location order matched `npx skills@1.7.0 add <repo> --list` exactly on six
+    sources, and all 28 skills the manifest pinned before unit F3 (#553) resolve to their manifest `path` (F3's six
+    re-pins and its skill-creator were not rechecked).
+
+  The review records the skill folder's git tree id at the pin as `observed.skill_folder_tree_sha`: the id the CLI's
+  lock records as `skillFolderHash` (`src/blob.ts` `getSkillFolderHashFromTree`), checked against the bytes read (the
+  SKILL.md and `agents/openai.yaml` are the blobs the tree lists, and each folder down to them hashes to its listed
+  id), so it freezes `agents/openai.yaml` as well as the SKILL.md. It records Codex's reading of that file as
+  `observed.codex_implicit`. A file that is not UTF-8, or holds a character libyaml refuses (outside its printable
+  set, unsafe-libyaml 0.2.11 `src/reader.rs` lines 381-395) or a line break other than LF and CRLF, is unverified
+  before any reader runs. Otherwise, with PyYAML installed its composer (libyaml's `CSafeLoader` when present, the
+  C library serde_yaml's unsafe-libyaml is translated from) reads the file and serde_yaml 0.9.34's rules decide (a
+  plain `true`/`false` spelling only; anchors and aliases followed; a second document refused); without PyYAML only
+  the plain block-mapping subset is read, and anything else (a flow mapping, an anchor or alias, a tag, a second
+  document, a block scalar, a double-quoted scalar anywhere in the file with an escape libyaml does not define, such
+  as `"C:\skills"`) gives `codex_implicit: null` with `observed.unverified_reason`. Type errors in the file's other
+  fields, which also make Codex ignore it, are not checked. `disable_model_invocation` applies Claude Code's
+  documented boolean rule to the value as the `yaml` package types it; Claude Code's own frontmatter parser is not
+  checked. One skill judged at two pins gets one review per pin. A skill survivor gets no review, and a stopped
+  entry (`status: stopped`, `pin`, `pin_lookup`, `reason`) in the printed list instead (exit 1), when:
+  - it names no pin, or a pin that is not a 40-hex commit, or gh cannot read the pin or reads it as another commit
+    (`pin_lookup: failed`);
+  - its `skill_md_sha256` is null;
+  - no valid copy is found, or two valid copies share the first location that holds one (the CLI's pick follows
+    directory order), or a copy without a verdict (above) decides the pick, or the git tree is truncated;
+  - the SKILL.md's sha256 differs from the adjudicated one, or the tree does not cover the bytes read.
+
+  `make_result.py` refuses a `RESULT.json` while any survivor lacks its review, and a stopped entry stops its layer.
+  For a skills layer it also checks each review file against the survivor's proposal in the returns: the
+  `reviewed_commit` must be the adjudicated pin, `pin_lookup` ok, `skill_md_sha256` the judged one (never null), and
+  `skill_folder_tree_sha` present. Resolve the cause and rerun `source_reviews.py`, or record the run as stopped
+  (recipe section 4).
+- **One modality per run.** A run covers repository layers only or skills layers only, because one completeness
+  critic covers the whole run. Stage a skills run in its own work directory. Each modality keeps its own history:
+  `build_inputs.py` takes `previous_sweep`, and a repository run its default baseline manifest, from the last
+  completed sweep of the run's own modality (the ledger names a sweep's modality by its layers' catalogs), so a
+  skills sweep never empties a repository run's history or becomes its baseline. A modality with no completed sweep
+  gets an empty history, and the summary line says `previous ... sweep none`.
+
+```sh
+# Once per host: the yaml install skill_md.mjs verifies (the command and directory of skills-yaml.pin.json).
+npm install --prefix "$HOME/.local/share/codex-ecosystem/tools/skills-yaml-2.9.0" --ignore-scripts --no-audit \
+  --no-fund --save-exact yaml@2.9.0
+python3 $H/build_inputs.py --skills-scope > "$W/scope.json"
+python3 $H/build_inputs.py --work-dir "$W" --modality skills
+python3 $H/build_args.py --work-dir "$W" --sweep-id "landscape-sweep-skills-$STAMP" --date "$DATE" --smoke skills-research
+# Smoke, full run (--due-report "$W/report.json" from step 1, or --layers skills-research,skills-debug,...), usage,
+# convert, manifest, source reviews, RESULT.json, --append and --check as in "Run it"; then:
+python3 $H/make_result.py --decision-record "$W/RESULT.json"
+```
+
+- **Outputs.** The run produces the same `returns.json`, `layers.json` (catalog `skills`) and `survivors.json`, one
+  source review per skill survivor and pin, and `RESULT.json`. `make_result.py --decision-record` then writes
+  `docs/decisions/<date>-skills-landscape-sweep.md`. The record lists the survivors per task, each refuted proposal
+  with its refuting votes' reasoning, the critic's findings, the reopened layers, the lost workers (a layer that lost
+  one reads as incomplete, never as refuted) and the overturn conditions. The sweep edits no manifest.
+- **Ledger.** `scripts/saturation_ledger.py --report` lists each task as a `skills/skills-<task>` layer after the
+  `research-state.json` layers (research status `-`), so `build_args.py --due-report` selects the due skills layers of
+  a skills work directory, and `--append` records a skills `RESULT.json` like a repository one. A skills layer has no
+  manifest section: its survivors bind to their retained votes and source reviews, not to a manifest row, and a
+  changed task requirement is a current `requirement_changed` trigger citing the skills catalog.
+  `catalogs/saturation/ledger.schema.json` lists `skills` in its layer `catalog` enum beside `foundation` and
+  `us-equities`, so a skills record validates against the schema as well as `--check`. `build_manifest.py` has no
+  skills section: its docstring (`build_manifest.py:1301-1303`) puts a lane layer that is not a foundation or trading
+  row in `lane_groupings`. No skills run has exercised that path yet.
+
 ## Cost reference
 
 No measured cost is quoted here. The 2026-09-26 one-layer smoke (run `wf_1753e674-5dc`, prototype harness) was
@@ -596,7 +756,7 @@ The deliberate changes:
   - Trading pins are included.
   - Known-repository slugs are no longer cut by `rstrip(".git")`, which had shortened, for example, `qdrant/qdrant`
     to `qdrant/qdran` in 30 of 32 layers.
-  - The previous sweep is the last completed one.
+  - The previous sweep is the last completed one of the run's modality (repository or skills).
 - **Placeholder filling.** Placeholders are filled in one pass, with no `$&` expansion. Merged rows drop
   `by_family`.
 - **`convert.py` additions.**
