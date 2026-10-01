@@ -1,0 +1,3 @@
+bell, unmutated: exit 0 | ['selftest: 9 checks, 0 problems'] | control lines ['PASS shutdown-failure control']
+bell, command-line clause removed: exit 1 | ['selftest: 9 checks, 1 problems'] | control lines ['FAIL shutdown-failure control']
+the unmutated selftest passes: True; the mutant is caught by the shutdown-failure control: True

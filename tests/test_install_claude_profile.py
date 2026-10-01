@@ -11,6 +11,7 @@ import io
 import json
 import os
 import re
+import shutil
 import string
 import subprocess
 import sys
@@ -292,6 +293,110 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
             for spelling in (command, "rtk " + command):
                 with self.subTest(allowed=spelling):
                     self.assertFalse(any(self.bash_rule_matches(rule, spelling) for rule in rules))
+
+    # skills@1.7.0 (vercel-labs/skills@7407f389) src/cli.ts L336-402: the spellings that write installed skills are
+    # add/a/i/install (L355-358), remove/rm/r (L381-383), check/update/upgrade (one runUpdate, L398-400) and the two
+    # experimental_* commands (L350, L388). find/search/f/s, list/ls, init, use (a temporary copy) and --version do not.
+    SKILLS_CLI_WRITERS = ("add", "a", "i", "install", "remove", "rm", "r", "check", "update", "upgrade")
+    # In `npx *skills@* <word> *` the `*` after `@` can also span a find query, so the versioned form leaves out the
+    # one-letter aliases, which are common query words.
+    SKILLS_CLI_VERSIONED_WRITERS = ("add", "install", "remove", "rm", "check", "update", "upgrade")
+    # Without arguments these three update every installed skill, and a trailing ` *` after another `*` needs an
+    # argument (permissions page, "Wildcard patterns"), so their rules with a leading or middle `*` end in `<word>*`.
+    SKILLS_CLI_BARE_WRITERS = ("check", "update", "upgrade")
+
+    def skills_cli_rules(self) -> list[str]:
+        def tail(word: str) -> str:
+            return word + ("*" if word in self.SKILLS_CLI_BARE_WRITERS else " *")
+        rules = []
+        for word in self.SKILLS_CLI_WRITERS:
+            rules += [f"Bash(skills {tail(word)})", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
+        rules += [f"Bash(npx *skills@* {tail(word)})" for word in self.SKILLS_CLI_VERSIONED_WRITERS]
+        return rules + ["Bash(skills experimental_*)", "Bash(npx *skills experimental_*)",
+                        "Bash(npx *skills@* experimental_*)", "Bash(*bin/skills experimental_*)"]
+
+    def test_a_session_cannot_install_or_remove_skills_through_the_skills_cli(self):
+        # adoption/skills/lifecycle.md: a session never installs a skill ad hoc; installation goes only through
+        # tools/adoption/install_skills.py, whose own `add` and rollback `remove` run as subprocesses that Bash rules
+        # do not see (https://code.claude.com/docs/en/permissions, "What a Bash rule doesn't match"). The pinned
+        # find-skills body tells the model to run `npx skills add ... -g -y` and `npx skills update`
+        # (vercel-labs/skills@7407f389 skills/find-skills/SKILL.md L28-29, L90, L100). Raised by the Gate A owner's
+        # review of PR #553 (#381: an install during a run changes the measured skill catalog).
+        deny = self.settings()["permissions"]["deny"]
+        for rule in self.skills_cli_rules() + ["Edit(~/.agents/**)"]:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+        rules = [rule for rule in deny if rule.startswith("Bash(")]
+
+        def denied(command: str) -> bool:
+            # Deny rules apply when any subcommand matches, and match past any leading variable assignment
+            # (permissions page, "Compound commands" and "Wrappers").
+            parts = re.split(r"\s*(?:&&|\|\||;|\|)\s*", command)
+            parts = [re.sub(r"^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+", "", part) for part in parts]
+            return any(self.bash_rule_matches(rule, part) for rule in rules for part in parts)
+
+        tool = "/opt/eco/tools/skills-1.7.0/bin/skills"
+        blocked = (
+            "npx skills add owner/repo@skill -g -y", "npx skills add vercel-labs/agent-skills@react-best-practices",
+            "npx skills update", "npx skills remove name -g -y", "npx -y skills@1.7.0 add owner/repo@skill -g -y",
+            "npx --yes skills@latest install owner/repo", "npx skills@1.7.0 remove name -g -y",
+            "skills add owner/repo@skill -g -y", "skills a owner/repo", "skills i owner/repo",
+            "skills install owner/repo", "skills remove name -g -y", "skills rm name", "skills r name",
+            "skills check", "skills update -g", "skills upgrade", "skills experimental_install",
+            "skills experimental_sync", f"{tool} add https://github.com/owner/repo/tree/0123abc/skills/x -g -y",
+            f"{tool} remove name -g -y", "./node_modules/.bin/skills add owner/repo",
+            "npx skills check", "npx -y skills@1.7.0 update", f"{tool} update", f"{tool} check -g",
+            "npx skills experimental_install", "DISABLE_TELEMETRY=1 skills remove name -g -y",
+            "cd /var/tmp/scratch && npx skills add owner/repo@skill -g -y")
+        allowed = (
+            "npx skills find react performance", "npx skills find", "npx skills find pr review --owner vercel-labs",
+            "npx -y skills@1.7.0 find changelog", "skills find typescript", "skills search testing",
+            "skills f testing", "skills s testing", f"{tool} find testing", f"{tool} list -g --json",
+            "skills list -g --json", "skills ls", "skills --version", "skills init my-skill",
+            "npx skills init my-xyz-skill", "skills use owner/repo@skill",
+            f"python3 tools/adoption/install_skills.py --skills-bin {tool} --json",
+            "python3 scripts/skills_status.py --json", "git commit -m 'lifecycle: deny skills add in sessions'",
+            "grep -rn 'npx skills add' adoption/skills")
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertTrue(denied(command))
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertFalse(denied(command))
+
+    @unittest.skipUnless(shutil.which("node") and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode security module "
+                         "(a checkout's build/security.js or the plugin's hooks/security.bundle.mjs)")
+    def test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path(self):
+        # Context Mode (mksglu/context-mode 1.0.169, src/security.ts: evaluateCommandDenyOnly, matchesAnyPattern,
+        # globToRegex) checks ctx_execute / ctx_batch_execute commands and the shell calls embedded in code against
+        # the same user deny rules, but with a plain ^glob$ regex: a trailing " *" does not match the bare command
+        # and a leading assignment is not stripped. The three bare-form writer verbs therefore end in "<word>*", so a
+        # bare `skills update` is denied on both paths; the short aliases keep " *" because `skills init` is
+        # legitimate (the Gate A owner's decision on #553, 2026-09-30). The leading-assignment gap remains there.
+        deny = [rule for rule in self.settings()["permissions"]["deny"] if rule.startswith("Bash(")]
+        script = (
+            "const [url, rulesJson, commandsJson] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const policies = [{deny: JSON.parse(rulesJson)}];\n"
+            "const out = {};\n"
+            "for (const c of JSON.parse(commandsJson)) out[c] = m.evaluateCommandDenyOnly(c, policies, false).decision;\n"
+            "console.log(JSON.stringify(out));\n")
+        blocked = ("skills update", "skills check", "skills upgrade", "skills update -g", "skills add owner/repo -g -y",
+                   "npx skills update", "npx skills add owner/repo@skill -g -y", "npx -y skills@1.7.0 check")
+        allowed = ("skills find x", "skills init my-skill", "skills list -g --json", "npx skills find pr review")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = subprocess.run([shutil.which("node"), "--input-type=module", "-e", script, url, json.dumps(deny),
+                               json.dumps(list(blocked + allowed))], capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        decisions = json.loads(done.stdout)
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertEqual(decisions[command], "deny")
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertNotEqual(decisions[command], "deny")
 
     def test_the_bash_ceiling_and_the_status_line_refresh(self):
         settings = self.settings()
@@ -1208,6 +1313,21 @@ class PortableTopRuleTests(unittest.TestCase):
         padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
         self.assertEqual(len(self.errors(padded)), 1)
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
+
+
+class McpStartupTimeoutTemplateTests(unittest.TestCase):
+    """MCP_TIMEOUT is Claude Code's MCP server startup timeout, default 30000 ms
+    (https://code.claude.com/docs/en/env-vars); a server's own `timeout` field bounds tool
+    execution only (https://code.claude.com/docs/en/mcp), and `claude mcp add --help` on 2.1.285
+    and 2.1.286 has no startup option. The Codex template gives serena 60 s and socraticode 120 s
+    (startup_timeout_sec), so the one global value matches the slowest of them
+    (docs/decisions/2026-09-30-mcp-startup-timeout.md)."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_the_template_env_sets_the_mcp_startup_timeout(self):
+        env = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))["env"]
+        self.assertEqual(env.get("MCP_TIMEOUT"), "120000")
 
 
 if __name__ == "__main__":

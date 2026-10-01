@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "preregistered_native_skill_edit_followups",
+  "frozen_at_utc": "2026-09-30 06:19:41 UTC",
+  "original_preregistration": "preregistered-cases.json",
+  "reason": "The original read-only proposals do not exercise the description's actual file-modification branch. Retain their two observed Codex activation misses and inspect two new native edits to disposable instruction files.",
+  "sources": [
+    {
+      "url": "https://developers.openai.com/blog/eval-skills",
+      "use": "Define success first; trace + outcome checks; explicit, implicit and adjacent negative; minimum ten focused prompts."
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md",
+      "use": "Same-prompt with/without-skill baseline and difficult near-miss trigger cases."
+    },
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    }
+  ],
+  "client_controls": {
+    "codex_version": "0.159.2",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "ultra",
+    "native_scope": "Owned disposable directory outside the repository; native workspace-write sandbox and --skip-git-repo-check. Other native skills, clients and global configuration preserved."
+  },
+  "cases": [
+    {
+      "id": "f03_w02_actual_agents",
+      "skill": "writing-for-agents",
+      "kind": "implicit_positive_actual_edit",
+      "clients": [
+        "codex"
+      ],
+      "should_activate": true,
+      "disposable_workspace": true,
+      "fixture_target": "AGENTS.md",
+      "fixture_before": "Always read docs/testing.md and docs/release.md. Follow docs/testing.md for testing; when you change executable code, run the tests in package.json. Before shipping a release, review docs/release.md and run its release checks. Be thorough. Follow docs/testing.md.\n",
+      "prompt": "Edit the existing AGENTS.md file in this disposable workspace. Replace its paragraph with instructions that keep the code-testing and release-preparation duties, remove unnecessary always-loaded material, and make each reference conditional on its relevant branch. Write the replacement into AGENTS.md and return one sentence explaining the change. Make changes only to AGENTS.md.",
+      "outcome_checks": [
+        "Executable-code changes condition reading docs/testing.md and running current package.json tests.",
+        "Release preparation conditions reading docs/release.md and completing its release checks.",
+        "Each document reference appears once in the replacement paragraph.",
+        "The vague standalone 'Be thorough' instruction is removed.",
+        "No commands absent from the supplied task are invented."
+      ],
+      "activation_check": "Successful full writing-for-agents SKILL.md read must be observed in the native trace; inspect the actual instruction-file diff independently.",
+      "changes_from_original": [
+        "Actual edit replaces the read-only proposal contract.",
+        "Working directory is an owned disposable workspace.",
+        "Sandbox changes from read-only to workspace-write.",
+        "Grade the file content, not the chat explanation."
+      ]
+    },
+    {
+      "id": "f04_w04_actual_claude",
+      "skill": "writing-for-agents",
+      "kind": "contextual_positive_actual_edit",
+      "clients": [
+        "codex"
+      ],
+      "should_activate": true,
+      "disposable_workspace": true,
+      "fixture_target": "CLAUDE.md",
+      "fixture_before": "Read docs/migration.md for every task.\n",
+      "prompt": "Edit the existing CLAUDE.md file in this disposable workspace. Write one line that tells an agent when to read docs/migration.md. That document covers exactly two distinct cases: adding a new migration and changing the migration runner. The line should name both triggers and the reference once. Write the line into CLAUDE.md and return one sentence explaining the change. Make changes only to CLAUDE.md.",
+      "outcome_checks": [
+        "The line names adding a new migration and changing the migration runner as separate triggers.",
+        "docs/migration.md occurs exactly once.",
+        "Reading the document is conditional on those triggers.",
+        "The output is one instruction line."
+      ],
+      "activation_check": "Successful full writing-for-agents SKILL.md read must be observed in the native trace; inspect the actual instruction-file diff independently.",
+      "changes_from_original": [
+        "Actual edit replaces the read-only proposal contract.",
+        "Destination changes from an AGENTS.md proposal to a CLAUDE.md file, another explicitly supported description branch.",
+        "Working directory is an owned disposable workspace.",
+        "Sandbox changes from read-only to workspace-write.",
+        "Grade the file content, not the chat explanation."
+      ]
+    }
+  ],
+  "baseline": {
+    "case_id": null
+  },
+  "limitations": [
+    "These two actual-edit conditions are separate from the original prompt set; original misses remain.",
+    "Fixture text is locally constructed from the frozen prompts and is a synthetic integration fixture, not unchanged upstream test data.",
+    "No actual repository instruction file or global client state is intentionally edited.",
+    "Native client startup may retain its normal private runtime metadata; this is distinct from model-issued file edits."
+  ]
+}

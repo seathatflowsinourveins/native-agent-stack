@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
+import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -154,26 +156,35 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
         base = json.loads(ADOPTION_MANIFEST.read_text())
         runtime = copy.deepcopy(self.manifest)
         reused = [s for s in runtime["skills"] if "reuse_ref" in s]
-        double, restating = reused[0], reused[1]
+        double, restating, bare_skill = reused[0], reused[1], reused[2]
         runtime["excluded"].append({"name": double["name"], "source": double["source"],
                                     "adoption_ref": double["reuse_ref"], "reason": "r", "overturn": "o"})
         restating["codex_enabled"] = True
-        bare = next(e for e in runtime["excluded"] if e.get("adoption_ref") and e is not runtime["excluded"][-1])
-        del bare["overturn"]
+        # The runtime manifest has no adoption_ref exclusion of its own since main promoted security-audit
+        # (2026-09-30), so the bare exclusion is built here: one reused skill claimed only by an exclusion
+        # without an overturn condition.
+        runtime["skills"].remove(bare_skill)
+        bare = {"name": bare_skill["name"], "source": bare_skill["source"], "adoption_ref": ADOPTION_REF,
+                "reason": "r"}
+        runtime["excluded"].append(bare)
         problems = adoption_contract_problems(runtime, base)
         self.assertIn(f"{double['name']}: reused, excluded", problems)
         self.assertIn(f"{restating['name']}: reused entry restates main's codex_enabled", problems)
         self.assertIn(f"{bare['name']}: exclusion lacks overturn", problems)
 
-    def test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it(self):
-        exclusion = next(e for e in self.manifest["excluded"] if e.get("name") == "security-audit")
-        for cited in ("#448", "8315274f", "M5c", "/security-review"):
-            self.assertIn(cited, exclusion["reason"] + " " + exclusion["overturn"], cited)
+    def test_security_audit_is_reused_since_main_promoted_it(self):
+        # Main promoted security-audit on 2026-09-30 (listing on, Codex enabled;
+        # docs/decisions/2026-09-30-skills-llm-native-listing.md), which met the #448 exclusion's overturn:
+        # the exclusion became a reuse_ref entry with its own scenarios and roles.
+        self.assertFalse([e for e in self.manifest["excluded"] if e.get("name") == "security-audit"])
+        entry = next((s for s in self.skills if s["name"] == "security-audit"), None)
+        self.assertIsNotNone(entry, "main promoted security-audit: the runtime must reuse it")
+        self.assertEqual(entry.get("reuse_ref"), ADOPTION_REF)
+        self.assertEqual((entry["scenarios"], entry["roles"]), (["security"], ["coding", "orchestration"]))
         gate = {s["name"]: s for s in json.loads(ADOPTION_MANIFEST.read_text())["skills"]}["security-audit"]
-        # Review trigger: any change to main's gate fails here. A promotion (Codex on or listing on)
-        # overturns the exclusion into a reuse_ref; any other change needs a new review.
-        self.assertEqual((gate["codex_enabled"], gate["claude_listing"]), (False, "name-only"),
-                         "main changed security-audit's gate: review the exclusion (a promotion overturns it)")
+        # Review trigger: a later change to main's gate fails here; a demotion needs a new review of the reuse.
+        self.assertEqual((gate["codex_enabled"], gate["claude_listing"]), (True, "on"),
+                         "main changed security-audit's gate again: review the reuse")
 
     def test_verification_before_completion_stays_excluded_until_main_readmits_it(self):
         name = "verification-before-completion"
@@ -205,12 +216,24 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
              if "reuse_ref" in s and base[s["name"]].get("codex_enabled") is False]
             + [s["name"] for s in self.skills if "reuse_ref" not in s and s.get("codex_enabled") is False])
         self.assertTrue(expected)  # non-vacuous: main keeps some reused skills off for Codex
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
-             "--manifest", str(DIRECTORY / "manifest.json"), "--print-codex-config"],
-            capture_output=True, text=True, check=False, timeout=60)
+        command = [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+                   "--manifest", str(DIRECTORY / "manifest.json"), "--print-codex-config"]
+        # Each table names the project's installed SKILL.md (a name rule would also hide Codex's bundled
+        # skill-creator), so this project-scoped manifest prints only with --project-dir.
+        refused = subprocess.run(command, capture_output=True, text=True, check=False, timeout=60)
+        self.assertEqual(refused.returncode, 1, refused.stdout + refused.stderr)
+        self.assertIn("--project-dir", refused.stderr)
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory).resolve()
+            result = subprocess.run([*command, "--project-dir", str(project)],
+                                    capture_output=True, text=True, check=False, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(sorted(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout)), expected)
+        tables = tomllib.loads(result.stdout).get("skills", {}).get("config", [])
+        names = [Path(table.get("path", "")).parent.name for table in tables]
+        self.assertEqual(sorted(names), expected)
+        self.assertEqual(tables, [{"path": str(project / ".agents" / "skills" / name / "SKILL.md"), "enabled": False}
+                                  for name in names])
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
 
     def test_openhands_inventory_has_a_decision_for_every_skill(self):
         inventory = self.manifest["openhands_inventory"]
