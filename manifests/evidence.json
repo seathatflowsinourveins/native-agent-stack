@@ -3904,8 +3904,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "41a8c93655c16b7a0301f3e82223f3652cb7858453ca1cdd4cdeeae4916b14b2",
-      "bytes": 17989
+      "sha256": "d144b49f6fee591ada0f6338124ecd5c5b3f955c72f866793270d9599ac0d93e",
+      "bytes": 18075
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -4069,8 +4069,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "107de7d06fa4927ebc461cef699832ee32582528803042475563cf6f5351c30c",
-      "bytes": 19367
+      "sha256": "8dfe143fdfed9a80d5c3518cdd43ec009947b4854954999e7c1faef1f535a832",
+      "bytes": 19478
     },
     {
       "path": "adoption/paired/README.md",
@@ -14385,8 +14385,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "a2aeb15f17ed443af6d849b2a3dc3517182a15cb9685c54ce5428be69fa4cc63",
-      "bytes": 287241
+      "sha256": "815405acffe546d358bf318805eff1d7d995f0ddfb66685e0b8338d9e809c33c",
+      "bytes": 287293
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -15320,8 +15320,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "181edb35fc27dea1f7e8ed8e51a80f18f304caa2913e8e1136d850be75c5b514",
-      "bytes": 18181
+      "sha256": "8a9ce14b2985ffcee351a9d01f8834808e44d8dc046334be0e78bce52e141b37",
+      "bytes": 18233
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -15435,8 +15435,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "d587f68f48036dbe80ee6980382d19e80711c71c9a26aa62aca5059a25a76a33",
-      "bytes": 37773
+      "sha256": "5a4372ba22c74509a3990241234194e6ecdafb2e44e80b4a153585f1da04899e",
+      "bytes": 37966
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -45590,8 +45590,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "bb7900085b833be89f68ddc92dbf17ba580688514c09956b486c973343e09f33",
-      "bytes": 145441
+      "sha256": "e0db3aff5a7fcde5c25f2dd06f0a2bcb70fbd2339ac6eab2554a8b897ca31cc0",
+      "bytes": 146852
     },
     {
       "path": "tests/test_adoption_version_probes.py",
