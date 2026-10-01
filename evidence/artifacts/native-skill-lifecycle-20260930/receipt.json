@@ -1,0 +1,1115 @@
+{
+  "schema_version": 1,
+  "kind": "native_skill_lifecycle_receipt",
+  "checked_at": "2026-09-30",
+  "scope": "current-host-selected-skill-lifecycle-20260930",
+  "evidence_classes": [
+    "native_cli_execution",
+    "model_task_execution",
+    "offline_artifact_check"
+  ],
+  "sources": [
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "revision": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+    },
+    {
+      "url": "https://github.com/vercel-labs/skills/tree/7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    }
+  ],
+  "installation": {
+    "command": "rtk python3 tools/adoption/install_skills.py --skills-bin <isolated-skills-bin> --json",
+    "exit_code": 0,
+    "returned_output_excerpt": {
+      "dry_run": false,
+      "ok": true,
+      "skills": {
+        "search-first": "installed",
+        "diagnosing-bugs": "installed",
+        "tdd": "installed"
+      }
+    },
+    "unchanged_skills_reused": 25
+  },
+  "post_installation_status": {
+    "exit_code": 0,
+    "stdout_sha256": "c9023d260c7932e944bb798c6312c21b0764f5bd882332d78b2bacd4fe704a40",
+    "returned_output": {
+      "budget": {
+        "claude_on_cap": 8000,
+        "claude_on_description_chars": {
+          "computed": 7184,
+          "manifest": 7184,
+          "matches_manifest": true
+        },
+        "claude_within_cap": true,
+        "codex_default_budget_chars": 8000,
+        "codex_enabled_description_chars": {
+          "computed": 3016,
+          "manifest": 3016,
+          "matches_manifest": true
+        },
+        "codex_within_cap": true
+      },
+      "claude_settings": {
+        "state": "ok"
+      },
+      "cli_version": {
+        "exit_code": 0,
+        "invoked": true,
+        "matches_manifest": true,
+        "output": "1.7.0"
+      },
+      "codex_config": {
+        "state": "ok"
+      },
+      "extra_skills": [],
+      "folder_trees": {
+        "drift": [
+          "supply-chain-risk-auditor"
+        ],
+        "missing": [],
+        "ok": 27,
+        "runtime_artifacts": [],
+        "unreadable": []
+      },
+      "lock": {
+        "source": "default",
+        "state": "ok",
+        "version": 3,
+        "version_matches": true
+      },
+      "result": "ok",
+      "schema_version": 1,
+      "skills": [
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "name-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "typesafe-ai",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "gh-fix-ci",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "security-best-practices",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "absolute",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "name-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "iterative-retrieval",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "absolute",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "name-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "search-first",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "diagnosing-bugs",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "tdd",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "codebase-design",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "resolving-merge-conflicts",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "user-invocable-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "grill-me",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "user-invocable-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "improve-codebase-architecture",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "security-threat-model",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "gh-address-comments",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "semgrep",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "codeql",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "drift"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "supply-chain-risk-auditor",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "agentic-actions-auditor",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "property-based-testing",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "modern-python",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "sarif-parsing",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "fp-check",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "mcp-builder",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "frontend-design",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "name-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "agent-browser",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "user-invocable-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "find-skills",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "variant-analysis",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "on",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": false,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "writing-for-agents",
+          "pass": true
+        },
+        {
+          "canonical": {
+            "state": "ok"
+          },
+          "claude_link": {
+            "kind": "relative",
+            "state": "ok"
+          },
+          "claude_listing": {
+            "actual": "name-only",
+            "state": "ok"
+          },
+          "codex_disable": {
+            "disable_entry_present": true,
+            "state": "ok"
+          },
+          "folder_tree": {
+            "state": "ok"
+          },
+          "lock": {
+            "state": "ok"
+          },
+          "name": "security-audit",
+          "pass": true
+        }
+      ],
+      "unlocked_folders": []
+    }
+  },
+  "disposable_lifecycle": {
+    "initial_install": {
+      "exit_code": 0,
+      "returned_output": {
+        "dry_run": false,
+        "ok": true,
+        "skills": {
+          "search-first": "installed"
+        }
+      }
+    },
+    "first_removal": {
+      "exit_code": 0,
+      "returned_output_excerpt": "Successfully removed 1 skill(s)",
+      "observed_project_canonical_exists": false,
+      "observed_project_lock_skills": []
+    },
+    "recovery_install": {
+      "exit_code": 0,
+      "returned_output": {
+        "dry_run": false,
+        "ok": true,
+        "skills": {
+          "search-first": "installed"
+        }
+      }
+    },
+    "recovery_checks": [
+      {
+        "operation": "tools/adoption/install_skills.py",
+        "exit_code": 0,
+        "returned_output": {
+          "dry_run": false,
+          "ok": true,
+          "skills": {
+            "search-first": "ok"
+          }
+        }
+      },
+      {
+        "operation": "list",
+        "exit_code": 0,
+        "returned_output": [
+          {
+            "name": "search-first",
+            "scope": "project",
+            "source": "affaan-m/ECC",
+            "agents": [
+              "Codex",
+              "GitHub Copilot",
+              "OpenCode"
+            ]
+          }
+        ]
+      }
+    ],
+    "final_removal": {
+      "exit_code": 0,
+      "returned_output_excerpt": "Successfully removed 1 skill(s)"
+    },
+    "cleanup": {
+      "owned_project_exists": false,
+      "global_search_first_exists": true
+    }
+  },
+  "supporting_file_verification": {
+    "exit_code": 0,
+    "stdout_sha256": "53ded6a0f22e4ed9a885151deeb6231689425f7490f6f6b1488f96ab65d1c1de",
+    "returned_output": {
+      "schema": "tree_drift_check/2",
+      "result": "pass",
+      "exit": 0,
+      "allowed_differences": [
+        "scripts/uv.lock"
+      ],
+      "method": {
+        "script": "tree_drift_check.py",
+        "script_sha256": "17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b",
+        "module": "scripts/skills_status.py",
+        "module_sha256": "cf4661668c5299a3160fe6369c1365534466bb726a5dc1d490c9031f8e98639a",
+        "functions": [
+          "_git_blob_sha",
+          "git_tree_sha",
+          "load_manifest",
+          "check_folder_tree",
+          "check_canonical",
+          "check_lock_entry"
+        ],
+        "runtime_artifact_dirs": [
+          ".mypy_cache",
+          ".pytest_cache",
+          ".ruff_cache",
+          ".venv",
+          "__pycache__",
+          "node_modules"
+        ],
+        "python": "3.13.15",
+        "gh_version": "gh version 2.101.0 (2026-09-15)"
+      },
+      "manifest": {
+        "skill": "supply-chain-risk-auditor",
+        "source": "trailofbits/skills",
+        "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+        "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+        "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b"
+      },
+      "comparison": {
+        "upstream_blobs": 13,
+        "local_blobs": 13,
+        "matching": 12,
+        "differing": [
+          {
+            "path": "scripts/uv.lock",
+            "local_mode": "100644",
+            "local_blob": "ab864a16ac3b38bf469205ee65831b6737b4c867",
+            "upstream_mode": "100644",
+            "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84"
+          }
+        ],
+        "missing": [],
+        "extra": [],
+        "outside_allowed_set": []
+      },
+      "substitution": {
+        "in_memory": true,
+        "blobs": [
+          {
+            "path": "scripts/uv.lock",
+            "upstream_blob": "2fb44882a94a99013d613493e38bb372dfbbdd84",
+            "fetched_bytes": 337,
+            "fetched_blob_sha_verified": true
+          }
+        ],
+        "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b",
+        "subtrees": {
+          "agents": "c1d1a4abef046ea0d98453c1933007c7459b71d7",
+          "assets": "b1735ba734fcf7e7898e1e79941fde53ccfa651c",
+          "scripts": "eaedb5d0840e7b155657478dd547e66abec537d1"
+        },
+        "equals_manifest_tree_sha": true,
+        "equals_upstream_folder_row": true,
+        "subtrees_equal_upstream_rows": {
+          "agents": true,
+          "assets": true,
+          "scripts": true
+        }
+      },
+      "runs": [
+        {
+          "argv": [
+            "gh",
+            "--version"
+          ],
+          "started_utc": "2026-09-30T04:34:44Z",
+          "exit": 0,
+          "finished_utc": "2026-09-30T04:34:44Z",
+          "stdout_bytes": 81,
+          "stdout_sha256": "67fa67f4744161d2a5e279ae6395705c1bc33d44ce3130e9330b0165f3607bec",
+          "stderr_bytes": 0
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/trailofbits/skills/git/trees/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae?recursive=1"
+          ],
+          "started_utc": "2026-09-30T04:34:44Z",
+          "exit": 0,
+          "finished_utc": "2026-09-30T04:34:45Z",
+          "stdout_bytes": 566463,
+          "stdout_sha256": "1b533474133a0b86c16b286e16fcff5928e2de1dee9700cda11bd7079b686134",
+          "stderr_bytes": 0
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/trailofbits/skills/git/blobs/2fb44882a94a99013d613493e38bb372dfbbdd84"
+          ],
+          "started_utc": "2026-09-30T04:34:45Z",
+          "exit": 0,
+          "finished_utc": "2026-09-30T04:34:45Z",
+          "stdout_bytes": 751,
+          "stdout_sha256": "dd89b0e1d808722c70adc29bab6d25079058ecc49547bce5c30026cf85656ab5",
+          "stderr_bytes": 0
+        }
+      ]
+    }
+  },
+  "native_codex_activation": [
+    {
+      "id": "explicit-search-first",
+      "jsonl_sha256": "404d6ad8c2e0163690a1bf715a5aa1ac9e7b35aafca9793ebec4e635dfb3d345",
+      "final_sha256": "fb7d578068163cc4eb055a98077449defd33a43ba586b5b55c84c5f4cae2c06d",
+      "completed_skill_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk proxy cat <home>/.codex/RTK.md <home>/.agents/skills/search-first/SKILL.md <home>/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md'",
+          "exit_code": 0,
+          "output_truncated": false
+        }
+      ],
+      "returned_usage": {
+        "input_tokens": 174343,
+        "cached_input_tokens": 132864,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1269,
+        "reasoning_output_tokens": 65
+      },
+      "returned_final": "Recommend **Python’s built-in `tomllib`** for parsing TOML on Python 3.13. It is maintained in CPython, supports TOML 1.0, and needs no additional dependency. Its APIs are `tomllib.load()` for binary files and `tomllib.loads()` for strings. [Primary source: CPython v3.13.15 documentation source](https://github.com/python/cpython/blob/v3.13.15/Doc/library/tomllib.rst).\n\nFollowing search-first’s inline workflow, I checked local tooling, repository usage, available MCP/skills, PyPI, and upstream sources. **Adopt as-is**: `tomllib` fits ordinary parsing; [Tomli](https://pypi.org/project/tomli/) is worth considering if you specifically need TOML 1.1.\n\nVerified a successful parse on installed Python 3.13.15. No files edited or packages installed.",
+      "turn_completed": true,
+      "errors": [],
+      "process_exit_code": 0
+    },
+    {
+      "id": "implicit-agent-writing",
+      "jsonl_sha256": "d3f35838e35920f538b2cab9ba0f9ac4141c408e78bc1c8459d4d0cdcc4c4078",
+      "final_sha256": "cc707bafb3ee6d1602bb89aa8eea29cb9a3792482041192704733beb3865c493",
+      "completed_skill_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk proxy cat <home>/.agents/skills/writing-for-agents/SKILL.md <home>/.codex/RTK.md'",
+          "exit_code": 0,
+          "output_truncated": false
+        }
+      ],
+      "returned_usage": {
+        "input_tokens": 43999,
+        "cached_input_tokens": 20352,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 244,
+        "reasoning_output_tokens": 0
+      },
+      "returned_final": "The rule is explicit but indiscriminate: it loads unrelated context and repeats tests without a reason or useful stopping criterion.\n\nSuggested replacement:\n\n> For each change, read the documentation relevant to the affected behavior and run the required checks plus targeted tests. Broaden or repeat testing when failures, changed inputs, or unresolved risks justify it.\n\nLoad supporting references when a specific task condition makes them relevant—for example, deployment guidance before changing deployment configuration. Give each reference pointer a clear trigger and load only the needed sections. Keep universally required instructions inline; disclose specialized guidance on demand, following the [writing-for-agents skill](<home>/.agents/skills/writing-for-agents/SKILL.md).\n\nNo files were edited.",
+      "turn_completed": true,
+      "errors": [],
+      "process_exit_code": 0
+    },
+    {
+      "id": "adjacent-negative",
+      "jsonl_sha256": "d0faa3800b53982c1c517dd2941dc8e999f51d34e8f494181e32bbe9d59b2614",
+      "final_sha256": "6d67a445d1e5c7d98997d412fd71e5eb9a450b2c5f6e206d8511fe1b9009ec90",
+      "completed_skill_read_commands": [],
+      "returned_usage": {
+        "input_tokens": 20528,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 11,
+        "reasoning_output_tokens": 0
+      },
+      "returned_final": "The cat sat on the mat.",
+      "turn_completed": true,
+      "errors": [],
+      "process_exit_code": 0
+    }
+  ],
+  "native_claude_inventory": {
+    "exit_code": 0,
+    "num_turns": 0,
+    "is_error": false,
+    "total_cost_usd": 0,
+    "returned_usage": {
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "selected_lines": [
+      "  diagnosing-bugs                userSettings      ~60          -     0×  never",
+      "  tdd                            userSettings      ~50          -     0×  never",
+      "  writing-for-agents             userSettings      ~40      55.9m     2×  1 day",
+      "  search-first                   userSettings     < 20          -    90×  today"
+    ]
+  },
+  "local_integration_tests": {
+    "command": "rtk python3 -m unittest tests.test_skills_manifest tests.test_skills_status tests.test_install_skills tests.test_codex_worker_lane tests.test_codex_agents tests.test_install_claude_profile tests.test_runtime_worker_skills",
+    "initial_attempt": {
+      "exit_code": 1,
+      "failures": 3,
+      "errors": 1,
+      "returned_failure_excerpt": "diagnosing-bugs: reuse_ref differs from the adoption pin in ['url', 'ref', 'tree_sha', 'skill_md_sha256']",
+      "correction": "Aligned three downstream runtime-worker reuse_ref entries and recomputed its catalog budget."
+    },
+    "final_attempt": {
+      "exit_code": 0,
+      "signal": null,
+      "output": "Ran 279 tests in 45.224s\nOK (skipped=11)"
+    }
+  },
+  "global_user_instruction_rollout": {
+    "command": "rtk python3 tools/adoption/apply_codex_lane.py",
+    "mode": "dry-run",
+    "exit_code": 2,
+    "returned_output_excerpt": "[fail] codex version: codex-cli 0.159.2 (pin 0.157.1)",
+    "active_codex_processes_observed": 12,
+    "applied": false,
+    "scope": "Portable template change prepared; repository instruction is in effect for the observed fresh Codex probes. Existing global user instructions preserved."
+  },
+  "limitations": [
+    "Representative single-run activation checks, not a broad quality benchmark.",
+    "Codex activation does not establish Claude activation.",
+    "No before/after efficiency or superiority claim.",
+    "Other selected skill sources and other hosts retain their prior evidence; core source review is not a complete ecosystem freshness audit.",
+    "Global portable user-instruction activation is distinct from this repository instruction change.",
+    "Claude inventory is a native zero-turn command, not a new model task or implicit activation benchmark.",
+    "Initial local integration failures are retained separately from the three successful model cases."
+  ]
+}

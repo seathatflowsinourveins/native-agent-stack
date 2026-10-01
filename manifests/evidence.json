@@ -3969,8 +3969,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "aa3933d31606c78f0dada00b2c4dc46ebbaf40ea4e7f21eef52587525bf77285",
-      "bytes": 58940
+      "sha256": "346cbb6c3d1bf2f54271c4d0ee55faeb39ea9d26d4a3ce8c99aded8994f28b0e",
+      "bytes": 59743
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4159,8 +4159,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "d1a76acad46578d314529b1ab57fce987b4382c6eca95e78cc9f576230a62d72",
-      "bytes": 50612
+      "sha256": "e7ebe9e577a955411ff935d34b06e8342da5966bac284ab5cb347079fdcdad57",
+      "bytes": 56371
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "c325471f288d870c452c2d9a38ef3fff6d6c06e4af0fffbadba493a4100d99bc",
-      "bytes": 11403
+      "sha256": "6bb8428e632d1a4bc498fcbfc2d9c1b08a6b5a5198a85dbd2c4ba4d4f945df4a",
+      "bytes": 12854
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -4179,8 +4179,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "5d1533613591eece15720deba6eedadf6b50220faa5ab3c1693419cd2a4c0a38",
-      "bytes": 13389
+      "sha256": "87aed5466cb8cb4bf14227e763dbe9f9a7f270f5cbedfb407bc5d39ea9912679",
+      "bytes": 14510
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -9410,8 +9410,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "4a367abac888f8ac75da50b0cc3b37fe98f112630c1f98195f32b9f68130efac",
-      "bytes": 44212
+      "sha256": "b11d264ee2db92432e7e437672a1851306b2ba146464b879ca9637ca90e9e64f",
+      "bytes": 44742
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -9420,13 +9420,13 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
-      "bytes": 186305
+      "sha256": "a67adbcde01e3d156a31ef67af1bad6278f7ec57f1274dfd955ca3aaab80b817",
+      "bytes": 185976
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
-      "sha256": "e5aa7711fd73817f95c63188ebea90728cbf64da0b21ef48179be47e4ea67c8a",
-      "bytes": 15834
+      "sha256": "804e30d507f9ee7d73a5a8a78e2c48274c2ab09e45f4bbff1c14c6ee69c3a2f3",
+      "bytes": 19776
     },
     {
       "path": "blueprints/runtime-workers/skills/validation.json",
@@ -14930,8 +14930,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "bcd6f0c663474919a04e1cf765e4eb86770e7f2869bfbf7fa9a7bbe1b3ff4181",
-      "bytes": 122680
+      "sha256": "2495d6c30a2022a0030e2439c73b19097fb3e0ca1f7dace6fdced0bcef762374",
+      "bytes": 142144
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -34219,6 +34219,66 @@
       "bytes": 110896
     },
     {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/README.md",
+      "sha256": "56a4263174d05b0cc8e183405f73dab187b1decf8b1290577492a8e728250e74",
+      "bytes": 5499
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/edit-followup-preregistration.json",
+      "sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe",
+      "bytes": 5770
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/followup-preregistration.json",
+      "sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7",
+      "bytes": 4351
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/operations.json",
+      "sha256": "5d3fff78473c1deb4f6da3a2d2574b8e6817e4e1b398ba48c845b5bbd69c812b",
+      "bytes": 16663
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json",
+      "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "bytes": 14401
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/preregistration.md",
+      "sha256": "4ea694af8008e43b78b9c691d21927bc4eeebccd14ab6aea96296d6f55282e4b",
+      "bytes": 2423
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+      "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120",
+      "bytes": 138745
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+      "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33",
+      "bytes": 3474
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/probes.json",
+      "sha256": "16549c1eb5865d53f3efa15fc98087a96e3a22d9539f044d255e0c51e4ff36c8",
+      "bytes": 1870
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/publication-checks.json",
+      "sha256": "767d9f550c0ddf8d3852fea8c402f5fd488a985d5ac8f8b485128331d81ecfbc",
+      "bytes": 3046
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+      "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571",
+      "bytes": 31330
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+      "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2",
+      "bytes": 2466
+    },
+    {
       "path": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt",
       "sha256": "0669f843035324a6a4578fdc56189f794187442efefc35e5d8125e043828da6a",
       "bytes": 96
@@ -38947,6 +39007,11 @@
       "path": "evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py",
       "sha256": "80acc8adb0ecb751a1cd331cd6012161fbd2d841f05fa9f30caa941974f51954",
       "bytes": 8119
+    },
+    {
+      "path": "evidence/artifacts/skills-pin-verification-20260930/pin-verification.json",
+      "sha256": "ea5768d80df8d6ac432f2660e9a49e1144b44c79cb91006fa6ab92a8ead607e7",
+      "bytes": 17035
     },
     {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
@@ -45335,8 +45400,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "cf4661668c5299a3160fe6369c1365534466bb726a5dc1d490c9031f8e98639a",
-      "bytes": 30559
+      "sha256": "9d97dfb8f47f4418cca925762b90355865bab37f70d7898a9149372480511646",
+      "bytes": 39053
     },
     {
       "path": "scripts/trading_gates.py",
@@ -45950,13 +46015,13 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "539b65969dfaaf83f76a948f512a8ec9dd9dee84b0c507da81dbe89d5689f180",
-      "bytes": 75695
+      "sha256": "09a0adcdc056a73147e42a2dc98a8e3053d2c2c87e62d5bf08d9147406caa690",
+      "bytes": 84628
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "92bdc33349f868dcc49f8f5d0c0c27212632e1fa6e4107c566617bab442a383e",
-      "bytes": 88411
+      "sha256": "b46aa4330b8692e2684273c16c28708a0f4faa6b854cbce1882d819896842b4a",
+      "bytes": 93000
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -46255,8 +46320,8 @@
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
-      "sha256": "e021cb1b2e615c35de09a4029dc5c0f21d49a31f5c3c72109c40d1f9acfcd25f",
-      "bytes": 22707
+      "sha256": "7580739e21895c57be3fef8e7c9209e751c9ef90f975f3293cdb7f0efcde4b26",
+      "bytes": 24392
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -46305,18 +46370,18 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "33bc6dda5401e94ba2336d3276443fa81a474aa473abba053bafe95bd39da323",
-      "bytes": 249127
+      "sha256": "29840312b7f1e4d65420a8f115952fc6becf5ddae28897ccaa9ca837068bfc76",
+      "bytes": 249439
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "711f14f03fa9a8950f582ef98e1fdc8f78a539b0475901b8b7c699322770126d",
-      "bytes": 10490
+      "sha256": "6d8213db7c3fa34528e60c4f5b3aa5821e7644bcfb4b6cfd13018348b4abe63a",
+      "bytes": 17566
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "fe4b919e0756ba6b3f7fc93200804a6522765c6b50e0a7d31175d5fbde9bbcc8",
-      "bytes": 50494
+      "sha256": "3009eebc36d64d6303206b7c92ab63d5d4f1e570de7f2e8b10f711322f19f0af",
+      "bytes": 64111
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -46470,8 +46535,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "ecbe9fc92cae18922f87f617fb075fdfb7620fce39180e4fb905dbb9d1235121",
-      "bytes": 37886
+      "sha256": "407ffb4c470cbb06b70e518159e40530424511c2d8189b1c8bdf5a0421e8115e",
+      "bytes": 40516
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
