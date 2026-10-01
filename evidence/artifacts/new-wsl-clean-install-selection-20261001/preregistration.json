@@ -1,0 +1,116 @@
+{
+ "recorded_at": "2026-10-01T17:35:24Z",
+ "purpose": "clean-install selection for the new WSL, chosen on repository evidence; comparisons on the new WSL confirm it",
+ "criteria_sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+ "judge_prompt_sha256": "5b190230982c3e113d5299d412ef6e74251b52fa3b66649235dcbc33ec64168c",
+ "critic_prompt_sha256": "e7a01ed699ecec2d232eb1da16df4a6f1191d58987040f1e770b9445494eb58f",
+ "packets": [
+  {
+   "layer_id": "native-clients",
+   "sha256": "0aedec39b04f2375b30db38ce8d77bd76f625c2b878f915c054203e1c0d715d2",
+   "candidates": 9
+  },
+  {
+   "layer_id": "instructions-skills",
+   "sha256": "118055de6e7a04ad572145ffa3f654be27b31416e4399de13670984b03f485ec",
+   "candidates": 14
+  },
+  {
+   "layer_id": "workers",
+   "sha256": "4f6e5929cd70f1fd624c85d616abeed9a8c0ae608c67a743e302a6205c053838",
+   "candidates": 12
+  },
+  {
+   "layer_id": "isolation",
+   "sha256": "4ae0a5d51404e19f95b30b72c5976175eecf00af65d8fd739f57d682fc7ca3ec",
+   "candidates": 9
+  },
+  {
+   "layer_id": "code-navigation",
+   "sha256": "9934b28412e6752c929b25ba9afbb70090f1c839a32b30e8b384feccfb5ebe97",
+   "candidates": 10
+  },
+  {
+   "layer_id": "document-retrieval",
+   "sha256": "0ccd6e65221db806ecc6e07a3dc016284f0e484533a3de19191b0fd671e4df80",
+   "candidates": 9
+  },
+  {
+   "layer_id": "semantic-rag",
+   "sha256": "65a3213557f690e0c6f5256aac0af9986b2e820f67c0dfaf353e87d7af7d4b31",
+   "candidates": 12
+  },
+  {
+   "layer_id": "durable-memory",
+   "sha256": "aea053f2127902cec7b40eea4af4ac984f95f5dfe8b0ddb4efae39ecbc60788e",
+   "candidates": 17
+  },
+  {
+   "layer_id": "web-research",
+   "sha256": "b01cd87fc7a5e1ca953d51817a961d6bd9c1dca851614a064ce5de2bd88fdf4d",
+   "candidates": 10
+  },
+  {
+   "layer_id": "token-efficiency",
+   "sha256": "43a3633490d4fff01b7f3e54d04db836994b3165e97fae232eeae9df72c380ce",
+   "candidates": 11
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "sha256": "41da5176a287882e8e4c94a46bf480bddcb63be221ee37a74f7773dada5de621",
+   "candidates": 10
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "sha256": "dc62fdbbebd6ed1ab837663ee00407a78031f86c8f302f6fcc1139ab1744505c",
+   "candidates": 12
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "sha256": "ac99886247cc740aa430c3cce120baca6870014e708afcc918fb298fb261d91c",
+   "candidates": 8
+  },
+  {
+   "layer_id": "hosting-services",
+   "sha256": "b29f00bedfdf507e1cc23efbe7da62fd77e6ffde5c2314a8ec03ef0b45fcb3b7",
+   "candidates": 12
+  },
+  {
+   "layer_id": "recovery-portability",
+   "sha256": "0d340b28ded7706364595b6a0a728bc684a9d3d80462494e6d3cd3541328f70a",
+   "candidates": 7
+  },
+  {
+   "layer_id": "observation-inference",
+   "sha256": "e27c440fe06873ae1e2518545d7a953f99c5d89dfe68663e7263926808e9dc4a",
+   "candidates": 14
+  },
+  {
+   "layer_id": "agent-sdks",
+   "sha256": "eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519",
+   "candidates": 7
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "sha256": "bb9dca361316244a07c0446c97b60704167004c92feaf7a1f2ddaa241a9764eb",
+   "candidates": 6
+  },
+  {
+   "layer_id": "secrets-credentials",
+   "sha256": "d0442f0fc7d1d1998e0afbaf88e73bac1b3520af5808aa632ee4eebae8b52509",
+   "candidates": 6
+  },
+  {
+   "layer_id": "git-github-automation",
+   "sha256": "06cac7adef34c68e6130cfda8736b7ac188b06bd51cf0d6ed55341ef512c619e",
+   "candidates": 9
+  },
+  {
+   "layer_id": "cross:wsl-distro",
+   "sha256": "c72c180258d461978669df0170bc72e43eb89f306028da2ec4d9ecfe71a8d840",
+   "candidates": 5
+  }
+ ],
+ "dispatch": "stack-researcher, opus, effort max; 11 judges in 3 groups, 1 critic per group",
+ "excluded_evidence": "the project's own host receipts and records; only comparisons where every named arm ran are in the packets"
+}

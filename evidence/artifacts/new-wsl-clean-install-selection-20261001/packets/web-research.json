@@ -1,0 +1,60 @@
+{
+ "layer_id": "web-research",
+ "title": "Web research",
+ "requirement": "Retrieve attributable primary sources and interact with chosen pages through bounded native commands without another standing research-agent stack.",
+ "a_deciding_comparison_would_measure": "Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Cua Driver",
+   "repository": "https://github.com/trycua/cua"
+  },
+  {
+   "key": "C02",
+   "name": "OpenResearch",
+   "repository": "https://github.com/alphaXiv/OpenResearch"
+  },
+  {
+   "key": "C03",
+   "name": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli"
+  },
+  {
+   "key": "C04",
+   "name": "exa-mcp-server",
+   "repository": "https://github.com/exa-labs/exa-mcp-server"
+  },
+  {
+   "key": "C05",
+   "name": "Crawl4AI",
+   "repository": "https://github.com/unclecode/crawl4ai"
+  },
+  {
+   "key": "C06",
+   "name": "agent-browser",
+   "repository": "https://github.com/vercel-labs/agent-browser"
+  },
+  {
+   "key": "C07",
+   "name": "trafilatura",
+   "repository": "https://github.com/adbar/trafilatura"
+  },
+  {
+   "key": "C08",
+   "name": "Browser Use",
+   "repository": "https://github.com/browser-use/browser-use"
+  },
+  {
+   "key": "C09",
+   "name": "Firecrawl MCP",
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server"
+  },
+  {
+   "key": "C10",
+   "name": "Tavily CLI",
+   "repository": "https://github.com/tavily-ai/tavily-cli"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

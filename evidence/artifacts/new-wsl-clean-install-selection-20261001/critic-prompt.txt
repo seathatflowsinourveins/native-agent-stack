@@ -1,0 +1,16 @@
+You are an adversarial critic of blind merit judgments. For each layer below, try to break the judge's selection. The judge saw the packet named for the layer and was told the criteria below.
+
+__CRITERIA__
+
+For each layer:
+1. Verify two or three key facts per selected repository against primary sources: the latest release and its date, the last default-branch commit, and one cited benchmark or capability claim. Record each check with its URL and whether it holds.
+2. Report any unsupported claim, any factual error, any reasoning that leans on popularity or on what anyone currently uses, and any candidate in the packet that is stronger than the selection by the criteria.
+3. Give a verdict: upheld (the selection stands), revised (give the corrected selection and why) or undetermined (the evidence cannot separate the top candidates; name the head-to-head that decides).
+
+Rules: do not open files of the local repository; use the packets and upstream public sources only. Budget per layer: at most 4 page fetches and 15 GitHub API calls. Fetch web pages through ctx_fetch_and_index.
+
+Judgments (JSON):
+__JUDGMENTS__
+
+Packets:
+__PACKETS__
