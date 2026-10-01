@@ -1,0 +1,46 @@
+# Layer closure assessment, 2026-10-01
+
+Per-layer assessments of the catalog layers against the closure criterion of
+`catalogs/landscape/research-state.json` (`saturation.close_only_when`, five items), made for the program record
+`docs/decisions/2026-10-01-definitive-sota-wsl-program.md`.
+
+## Files
+
+| File | Content |
+| --- | --- |
+| `foundation.json` | The 20 foundation layers at repository revision `3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a`, `as_of` 2026-10-01T03:50Z. Per layer: `corrected` (the assessor's return as corrected by the refuter: selected components with pins and pin sources, alternatives, evidence class, upstream currency, the five closure items each with a status and its evidence, install readiness with the missing new-host steps, the next unit), `corrections` (the refuter's corrections, 8 to 18 per layer), `verdict` (`corrected` for all 20) and `runs`. |
+| `foundation-synthesis.md` | One reviewer's synthesis of the 20 assessments: ranking, cross-layer patterns, program units, pins behind their latest release, install-readiness gaps and contradictions. |
+
+The us-equities layers follow in the same form when their assessment is complete.
+
+## How it was produced
+
+A workflow ran one read-only assessor per layer (the `stack-researcher` role, Claude Opus 5.5, effort max) and then
+one adversarial refuter per layer (the `evidence-reviewer` role, Claude Opus 5.5, effort max) against the original
+source. A third agent of the reviewer role wrote the synthesis from the 20 corrected assessments and spot-checked
+the statements it marks "(checked)". The file holds the first complete refuted result per layer.
+
+## Evidence class and limits
+
+- Model-authored source review of the repository at the named revision. It is not acceptance evidence, it is not a
+  second independent review in the sense of item 4 (assessor, refuter and synthesis are one model family), and it
+  certifies nothing about a new host.
+- The upstream "latest release" values are the assessors' reads of release pages on 2026-10-01. Most rest on one
+  read that the refuter did not repeat, and the coordinator did not fetch them again.
+- Citations of `<host-private campaign list 2026-09-30>` point to a record that this repository does not hold, so
+  the statements resting on them are not recoverable from here. The program record's unit U3 publishes that record
+  as a sanitized receipt or drops the citations.
+- Line numbers refer to the named revision and drift afterwards; several assessments report drifted line references
+  themselves.
+- Usage: the workflow was interrupted by a sign-in and resumed, and the resumed segment ran agents again that had
+  already returned. The last segment recorded 3,612,716 tokens across 20 agents; the first segment's total was not
+  retained, so the complete usage is unknown.
+
+## Sanitization
+
+The assessors' absolute paths were replaced by placeholders before this copy was written: `<worktree>` for the
+read-only worktree at the named revision, `<checkout>` for the main checkout, `<host-private campaign list
+2026-09-30>` and `<host-private state>` for paths under the host's private state folder. Repository-relative paths,
+the published host id of the receipts under `evidence/hosts/` and loopback addresses are unchanged. A scan of the
+written files for scratch paths, home paths, private-state paths, session identifiers, e-mail addresses,
+non-loopback addresses and Windows paths found none.
