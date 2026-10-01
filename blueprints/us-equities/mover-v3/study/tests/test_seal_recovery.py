@@ -258,6 +258,19 @@ class DryRunSealRecovery(RecoveryChecks, unittest.TestCase):
             self.replace_page_and_digests(Path(tmp) / "dry-run")
             self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp), "ledger sha256 differs")
 
+    def test_a_resealed_page_replacement_refuses(self):
+        """G-H, the per-page comparison: the GPT review's experiment with the seal record's ledger_sha256 also rewritten
+        to the edited ledger's (reseal). The ledger then reads under the record and the page matches its edited ledger
+        digests, so only the page sha256s the seal record holds refuse it. At 5a1d4b0e no test covered that comparison:
+        emptying page_sha256s in core.store.seal_record_of passed the whole suite."""
+        with tempfile.TemporaryDirectory() as tmp:
+            self.run_dry(tmp)
+            directory = Path(tmp) / "dry-run"
+            self.replace_page_and_digests(directory)
+            reseal(directory)
+            self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
+                                          "^dry-run: the snapshot differs from its seal record")
+
     def test_a_resealed_request_change_refuses(self):
         """G-M: a persisted request altered under the expected binding, with the seal record resealed, is refused by
         the comparison of the ledger's request records with the requests its binding names."""
@@ -450,6 +463,18 @@ class LiveSampleSealRecovery(RecoveryChecks, unittest.TestCase):
                 self.assert_refuses_unchanged(
                     tmp, self.market, lambda: self.seal_samples(tmp),
                     f"^live sample {re.escape(repr(label))}: the snapshot's requests or completion stamps differ")
+
+    def test_a_resealed_page_replacement_refuses(self):
+        """G-H, the per-page comparison for each label, as the dry run's: a page replaced with its ledger digests and
+        the seal record's ledger_sha256 resealed is refused only by the page sha256s the seal record holds."""
+        for label in self.sources:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as tmp:
+                self.seal_samples(tmp)
+                self.replace_page_and_digests(Path(tmp) / label)
+                reseal(Path(tmp) / label)
+                self.assert_refuses_unchanged(
+                    tmp, self.market, lambda: self.seal_samples(tmp),
+                    f"^live sample {re.escape(repr(label))}: the snapshot differs from its seal record")
 
     def test_a_resealed_live_page_cannot_turn_a_failing_check_into_a_pass(self):
         """G-H, the GPT review's experiment end to end: the sealed live sample differs from its source, so the check
