@@ -1553,6 +1553,17 @@ producers, assignments from an earlier tool call, `busctl`/`gdbus`/`launchctl`
 writes, hidden/encoded/non-covered gateway URLs and other ports, relocated
 credential trees (including unresolved XDG default expressions), non-Bash tools
 and same-uid access remain limits. None grants an exception to a base refusal.
+The read-only re-check of the repair round (2026-10-01) left five residuals for
+the next guard change. Two gateway forms are allowed, as K3 allows them: a
+`Request` passed to `urlopen` by keyword after the body (`urlopen(data=b"x",
+url=r)`) and an augmented member assignment (`r.full_url += "/x"`). Two K4
+refusals are false: an incomplete computed argv item (`subprocess.run(["printenv"
++ "-safe"])` refuses `environment_dump`) and a `command -v`/`-V` lookup read as
+an assignment (`command -v export K=demo; ...` before a store refuses
+`keyring_store_literal`). A generated 193,560-character urllib command whose
+`urlopen` calls all reuse one `Request` takes about 1.9 s in the real hook on
+the workstation, below the hook timeout but above the 1 s target, because each
+URL occurrence revisits every consumer.
 The hook is not a security boundary, does not inspect arbitrary script files or
 MCP tool calls and never reads credentials or contacts a gateway while checking.
 
