@@ -12780,8 +12780,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-      "sha256": "54260beb15a60b88d176926deea6329f0ff94a0bc8f67f70634ee6d4aa8063bf",
-      "bytes": 21865
+      "sha256": "5e2132f41e30d97bacd269359496492c9853f940316c36c7b6d93295bf5a8a74",
+      "bytes": 23023
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/equity-replay/README.md",
@@ -15175,8 +15175,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "a1c69546d898dfcd8790efa573f13d7b5cc797e3ef6b3ee5a1e0c0a4856064af",
-      "bytes": 16411
+      "sha256": "839b52bccd9d42138e87188465c5c518f84aa6b5cd806f6c1180b4f1426ff6de",
+      "bytes": 21568
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -32320,8 +32320,8 @@
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
-      "sha256": "6a7ea176983a1b4097a39e5755d9dbb45cec876d185228bd6d99b559d3f1390c",
-      "bytes": 5114
+      "sha256": "5338d0ff9423033a896cec7d2f759b37de9baaef680b1ba827d24bc20d986afe",
+      "bytes": 6050
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation-run-variance.json",
@@ -32337,6 +32337,21 @@
       "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
       "sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22",
       "bytes": 615461
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-run-variance.json",
+      "sha256": "8e33d0cb417723f45ed1564c292757c1a8ee9308f78b779485e877812ce53b7d",
+      "bytes": 2693
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
+      "sha256": "6b0bc2a886989e96433c86f188c2dcae68d372c37c5d6649c23f1e9352d1ead1",
+      "bytes": 73573
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities.json",
+      "sha256": "340ae10c0fbaeac0beacdf928f2ec986a5e2703b5ae8b0a55a3491678f168470",
+      "bytes": 363123
     },
     {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
