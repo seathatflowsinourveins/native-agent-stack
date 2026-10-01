@@ -37,7 +37,7 @@ us-equities rows the last, which is the basis of that assessment's synthesis. Th
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json`, `catalogs/foundation/manifest.json`) are unchanged between `3361b342` and
 this edition's base. Four sources are not on main yet: the new-distribution recipe (PR #569, head `344a69ff`),
-the Harbor E2E receipt (PR #570, head `87c74d5d`), the trading convergence record (PR #358, head `b0eb7a11`) and
+the Harbor E2E receipt (PR #570, head `ee06ded7`), the trading convergence record (PR #358, head `b0eb7a11`) and
 the program record with the foundation assessment (PR #573, head `5adcc3a4`).
 
 ## Alternatives
@@ -100,14 +100,18 @@ classes, closure states, install kinds and gate kinds; `closed` if and only if a
 non-empty `missing` for every open row; `no_selection` if and only if there are no winners. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
-**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 20
-`selection_of_record_open`, 14 `comparison_required`, 1 `no_selection`, 1 `provisional`, 1
+**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 19
+`selection_of_record_open`, 13 `comparison_required`, 3 `no_selection`, 1 `provisional`, 1
 `new_host_required`. Every assessed row has at least one closure item unmet or partial, and no review item
 (c4) is met. The twelve us-equities rows follow the trading closure assessment: their winners are the components
 the layer's current choice names that have a pin of record (runtime-target.json for the engine, the brokers
 and the adaptive paper engine; stack pins for profile components), while the 2026-09-22 verdict winners
 without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow, Grype) stay alternatives.
-Every trading row is marked `provisional_wording` in its notes for the
+The trading lane owner's verdicts of 2026-10-01 call every trading layer "selection of record, open" and
+two of them (research-factors-ml and security-supply-chain) open with no selection of record for the layer itself.
+On the page's six values that reads: `no_selection` for those two, whose current-choice components become
+alternatives; `comparison_required` where the research state asks for a comparison; `selection_of_record_open`
+for the rest. Every trading row is marked `provisional_wording` in its notes for the
 trading lane owner. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
 Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
 41 entries and 39 exits filled). The cross row for the distribution is `no_selection` on main: its image,
@@ -168,7 +172,7 @@ Write a new edition, or update this one in the change that causes it, when any o
 - `scripts/host_receipts.py` (a receipt binds only to a version that matches a winner pin)
 - PR #569 at `344a69ff`: `adoption/platforms/linux-wsl2-new-distro.md`,
   `docs/decisions/2026-10-01-new-wsl-distro-recipe.md`, `adoption/templates/wsl/`
-- PR #570 at `87c74d5d`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
+- PR #570 at `ee06ded7`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
 - PR #573 at `5adcc3a4`: `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
   `evidence/artifacts/layer-closure-assessment-20261001/`
 - Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js

@@ -44,7 +44,7 @@
       {"source_path": "catalogs/us-equities/runtime-target.json"},
       {"source_path": "catalogs/saturation/ledger.json"},
       {"pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
-      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
       {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
       {"pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
       {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "5adcc3a4"}}
@@ -352,7 +352,7 @@
       "reasons": [
         {"text": "Serena is the layer winner for exact symbols and references; ast-grep, codebase-memory-mcp and jCodeMunch are conditional lanes, and a known-source read with rg comes first.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The token-efficiency profile carries Serena; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes until each has a reviewed pin on both platforms.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}}
+        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -720,9 +720,10 @@
       },
       "reasons": [
         {"text": "The token-efficiency adoption profile (14 pinned components) was accepted as the selection on 2026-09-30 in #540; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
-        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
-        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "On the layer protocol's own metric (complete provider tokens per accepted task; the paired ratio against the lean base on the tasks both arms solved, 95% percentile bootstrap): headroom 0.867 [0.775, 0.971] on 27 tasks, rtk 0.955 [0.847, 1.078] on 26, context-mode 1.181 [1.027, 1.341] on 25, serena 0.984 [0.819, 1.153] on 24, jcodemunch 1.407 [1.144, 1.72] on 24 and the full stack 1.105 [0.94, 1.303] on 23. Headroom saves tokens but not cost in short tasks, context-mode and jCodeMunch cost more tokens, and rtk is inconclusive. The figures were recomputed by script from the per-trial rows and are not independently reproduced.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
         {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"}
       ],
       "evidence_class": "local_integration_check",
@@ -740,7 +741,7 @@
         "Run the Gate A multi-agent adoption E2E on the new distribution before any savings claim."
       ],
       "gates": [
-        {"text": "Savings stay 'not shown' until the multi-agent adoption E2E (the #381 Gate A plan) runs on the new distribution; that E2E is this verdict's overturn comparison.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"}
+        {"text": "Savings stay 'not shown' until the multi-agent adoption E2E (the #381 Gate A plan) runs on the new distribution. That E2E tests the accepted profile against a lean base in the multi-agent regime; it does not cover the layer's per-tool protocol. The Harbor E2E covers four of that protocol's five arms in the short single-session regime, and the Repomix outline arm and the multi-agent regime are open.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"}
       ],
       "owner_lane": "foundation: Gate A",
       "notes": "PROVISIONAL AND CONTESTED: the 14-component profile stays the install default, savings are not shown, and Harbor measured context-mode as costlier on short single-session tasks. Harbor figures are cited from PR #570; its receipt path is evidence/receipts/harbor-e2e-token-tools-20260930.json."
@@ -774,7 +775,7 @@
           "pin": "v0.23.0",
           "pin_source": "blueprints/runtime-workers/openhands/pins.json:62",
           "install": {"command": "uv tool install harbor==0.23.0", "kind": "upstream_documented", "url": "https://github.com/harbor-framework/harbor"},
-          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
           "upstream_currency": {"latest_release": "v0.23.0 (2026-09-12)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/harbor-framework/harbor/releases"}
         }
       ],
@@ -788,8 +789,8 @@
         "missing": "c1: the layer record cites a superseded receipt, its candidate dispositions disagree with the verdict, and the Inspect AI and MLflow entries predate the gap-wave2 receipts; c2: seven of eight unclaimed manifest components carry no omission reason and the sweep candidates are not in the record; c3: no representative comparison of semantic advice on fresh, independently labelled cases, no lifecycle receipt from the new WSL host, and the Harbor pilot that forces subagent use has not run; c4: every layer-level review records open gaps; c5: no current closure record."
       },
       "reasons": [
-        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
-        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks failed to pull at 65,536 with `lchown <path>: invalid argument` and pulled at 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
+        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks failed to pull at 65,536 with `lchown <path>: invalid argument` and pulled at 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "ee06ded7"}},
         {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
         {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
         {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"}
@@ -1684,36 +1685,8 @@
       "layer_id": "research-factors-ml",
       "catalog": "us-equities",
       "title": "Research, factors and ML",
-      "winners": [
-        {
-          "component_id": "nautilus-trader",
-          "repository": "https://github.com/nautechsystems/nautilus_trader",
-          "pin": "2.0.0rc5",
-          "pin_source": "catalogs/us-equities/runtime-target.json:26",
-          "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
-          "acceptance": {"command": "the retained SPY/LEAN parity replay of the acceptance plan (gate spy-lean-parity, one_zero case)", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md"},
-          "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
-        },
-        {
-          "component_id": "alpaca-py",
-          "repository": "https://github.com/alpacahq/alpaca-py",
-          "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
-          "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
-          "acceptance": {"command": "python3 -m unittest tests.test_order_contract -v", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/order-contract/README.md"},
-          "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
-        },
-        {
-          "component_id": "lean",
-          "repository": "https://github.com/QuantConnect/Lean",
-          "pin": "985ef30 with documented dependency remediation",
-          "pin_source": "manifests/stack.json:1368",
-          "install": {"command": "git clone https://github.com/QuantConnect/Lean.git \"$LEAN_SOURCE\" at the pinned commit, built with the verified .NET 10 SDK 10.0.401", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine/README.md"},
-          "acceptance": {"command": "\"$DOTNET_ROOT/dotnet\" QuantConnect.Lean.Launcher.dll (from Launcher/bin/Debug, with Launcher/config.json unchanged)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/engine/README.md"},
-          "upstream_currency": {"latest_release": "GitHub releases stop at v2.4.0.1 (2017-08-08); the default branch is 24 commits ahead of the pinned commit", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/QuantConnect/Lean/releases"}
-        }
-      ],
-      "verdict": "comparison_required",
+      "winners": [],
+      "verdict": "no_selection",
       "closure": {
         "c1": "partial",
         "c2": "partial",
@@ -1729,6 +1702,7 @@
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
+        {"name": "NautilusTrader 2.0.0rc5, LEAN and alpaca-py", "verdict": "the layer's current choice: the engine destination, the retained comparison engine and the Alpaca path, which rows backtesting-engine and execution-broker carry; none is a research, factor or ML component", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"name": "skfolio 1.2.9 and EdgarTools 5.58.0", "verdict": "the 2026-09-22 verdict winners, outside the current choice; reconciliation pending", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "LEAN Alpaca brokerage", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "vectorbt", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
@@ -1740,7 +1714,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "provisional_wording: the trading lane owner's verdict of 2026-10-01 is open with no selection of record for the layer itself; a selection, or an explicit scope-out, comes first in the layer's re-record. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "backtesting-engine",
@@ -1866,7 +1840,7 @@
         {"text": "Each broker keeps its own boundary: IBKR through the Nautilus native IBKR adapter with a signed-in TWS or IB Gateway (local acceptance on rc5 not established), Alpaca through alpaca-py with a separately qualified deterministic paper lifecycle (one SPY roundtrip filled, flat, cash reconciled, recovery completed, no duplicate writes).", "source_path": "catalogs/us-equities/runtime-target.json"},
         {"text": "Paper results, counted only as fills and passed trials: the 2026-09-29 regular-session Alpaca series passed 5 of 6 trials (one failed on a ledger halt) with 23 entries and 23 exits filled; it is not a frozen gate run.", "source_path": "blueprints/us-equities/adaptive-paper/trials/rth-20260929/receipt.json"},
         {"text": "The 2026-09-29 pre-market series passed 3 of 3 trials (9 entries and 9 exits filled), and the extended-hours series passed 3 of 4 (one needs attention with a residual open; 9 entries and 7 exits filled).", "source_path": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/receipt.json"},
-        {"text": "The adaptive paper engine is NautilusTrader 2.0.0rc5's LiveNode with a custom Alpaca adapter and alpaca-py 0.44.0; its fee activities are booked in ledger cash since the #559 merge.", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/559"}
+        {"text": "The adaptive paper engine is NautilusTrader 2.0.0rc5's LiveNode with a custom Alpaca adapter and alpaca-py 0.44.0; its fee activities are booked in ledger cash since the #559 merge. The 2026-09-29 paper series ran at engine revision b528bb55; no series receipt exists yet at the merged revision.", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/559"}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -1881,7 +1855,7 @@
         "IBKR: start TWS or IB Gateway with a native paper sign-in (paper socket 7497 or 4002) only after the upstream gates below clear."
       ],
       "gates": [
-        {"text": "nautilus_trader #4983 (open, read 2026-10-01): the rc5 Rust IB adapter's execution venue IB never matches the SMART instrument venue, so stock orders fail.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/issues/4983"},
+        {"text": "nautilus_trader #4983 is open upstream (read 2026-10-01), and runtime-target.json lists it as an rc5 blocker; the trading lane is reconciling that entry with its own source review, and the rc5 IBKR path stays unqualified either way.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/issues/4983"},
         {"text": "nautilus_trader PR #5041 (open, read 2026-10-01) ports the Interactive Brokers adapter onto ibapi 4.2.0.", "kind": "upstream", "url": "https://github.com/nautechsystems/nautilus_trader/pull/5041"},
         {"text": "The IB Gateway or TWS paper sign-in is the user's own native action, as are the paper account and market-data permissions.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
@@ -2289,27 +2263,8 @@
       "layer_id": "security-supply-chain",
       "catalog": "us-equities",
       "title": "Security and supply chain",
-      "winners": [
-        {
-          "component_id": "syft",
-          "repository": "https://github.com/anchore/syft",
-          "pin": "1.52.0",
-          "pin_source": "manifests/stack.json:1396",
-          "install": {"command": "gh release download v1.52.0 --repo anchore/syft (the linux_amd64 archive and its checksums); verify, then tar --no-same-owner -xzf into a versioned prefix", "kind": "repo_recipe", "source_path": "blueprints/us-equities/supply-chain/README.md"},
-          "acceptance": {"command": "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk (inside the recipe's read-only bubblewrap)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/supply-chain/README.md"},
-          "upstream_currency": {"latest_release": "v1.52.0 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/anchore/syft/releases"}
-        },
-        {
-          "component_id": "gitleaks",
-          "repository": "https://github.com/gitleaks/gitleaks",
-          "pin": "8.30.1",
-          "pin_source": "manifests/stack.json:491",
-          "install": {"command": "curl -fsSLO \"$base/gitleaks_8.30.1_linux_x64.tar.gz\"; curl -fsSLO \"$base/gitleaks_8.30.1_checksums.txt\"; sha256sum --check --ignore-missing gitleaks_8.30.1_checksums.txt; tar -xzf gitleaks_8.30.1_linux_x64.tar.gz -C \"$ECO_INSTALL_ROOT/tools/gitleaks-8.30.1\" gitleaks", "kind": "repo_recipe", "source_path": "docs/secret-storage.md"},
-          "acceptance": {"command": "the pre-commit hook passes a clean staged file (exit 0) and fails a planted, generated AWS-style key (exit 1)", "evidence_class": "local_integration_check", "source_path": "docs/acceptance-evidence-policy.md"},
-          "upstream_currency": {"latest_release": "v8.30.1 (2026-03-21)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gitleaks/gitleaks/releases"}
-        }
-      ],
-      "verdict": "selection_of_record_open",
+      "winners": [],
+      "verdict": "no_selection",
       "closure": {"c1": "partial", "c2": "partial", "c3": "partial", "c4": "unmet", "c5": "unmet", "missing": "c1: no selection of record covers this layer (runtime-target.json has no security entry), and the verdict's own reopening trigger fired on 2026-09-23 without a re-run, so the Grype, Syft and gitleaks winner set is formally open; c2: no newcomer search ran for the 2026-09-22 set, and Trivy and four of the five GPT-6 omissions have no disposition in the layer entry; c3: Grype has no target-host receipt, the challenger arms that fired the trigger were not followed by a re-judged comparison, and no gitleaks comparison against Betterleaks exists for this layer; c4: the latest review returned needs_changes and its corrections are not applied; c5: no closure record."},
       "reasons": [
         {"text": "The verdict retains Grype, Syft and gitleaks; Grype 0.119.0 has no pin of record in the stack, so it is not carried as a winner here.", "source_path": "catalogs/landscape/us-equities.json"},
@@ -2317,6 +2272,7 @@
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
+        {"name": "Syft 1.52.0 and gitleaks 8.30.1", "verdict": "the layer's current choice at the stack pins that the foundation rows ci-supply-chain and secrets-credentials carry; not a selection of record for this layer", "source_path": "manifests/stack.json"},
         {"name": "Grype 0.119.0", "verdict": "a verdict winner without a pin of record", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "cosign", "verdict": "conditional", "source_path": "catalogs/landscape/us-equities.json"},
         {"name": "OpenBao", "verdict": "unqualified", "source_path": "catalogs/landscape/us-equities.json"}
@@ -2326,7 +2282,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
+      "notes": "provisional_wording: the trading lane owner's verdict of 2026-10-01 is open with no selection of record (runtime-target.json has no entry for this layer), and the layer's own re-run trigger has fired. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "cross:wsl-distro",
