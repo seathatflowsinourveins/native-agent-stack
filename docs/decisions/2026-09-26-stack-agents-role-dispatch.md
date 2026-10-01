@@ -340,6 +340,10 @@ take the sentence in one follow-up after this change and F4 merge, so that the t
 **Decided by:** workflow unit F4 of the 2026-09-30 SOTA-defaults wave (coordinator session `native-agent-stack-c5`),
 branch `claude/sota-defaults-f4-20260930`, based on `origin/main@e45328d3`, checked against codex-cli 0.157.1 and
 Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges in one batch with the Gate A owner.
+Round 2 (2026-10-01) rebased it onto `origin/main@28cfb359`, after units D4 (#542, the Codex 0.159.2 pin and the
+Sol-primary routing), A4 (#540, the task-model routing record), F2 (#547, the research-first sentences), F1 (#557)
+and F3 (#553). It restated the builder's model, the roles' sentences and two citations against them, and was
+checked against codex-cli 0.159.2.
 
 ### Context
 
@@ -421,6 +425,14 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
   rows) and `:544-545` (`ROLE_FILES`, `ROLES`), and `tests/test_codex_worker_lane.py:1001` (an apply leaves exactly
   the two files) pin the pair as the frozen E2E's carriers, outside this unit's paths, and a default install would
   change every arm's `spawn_agent` text. The flip list is below.
+- **The builder at `gpt-6-astra`, as round 1 bound it.** Replaced in round 2. The Sol-primary routing record runs
+  primary workers at Sol/Max and keeps Astra for judgment roles and per-task escalation, which no file binds
+  (`docs/decisions/2026-09-30-task-model-routing.md`, rows "Complex-workflow coordination" and "Escalation to a single
+  consequential judgment": "Instruction only"). A bound Astra builder could never run Sol.
+- **The builder at `gpt-6.1-sol`.** Rejected. It would be a GPT-6.1 binding that no Sol row of the routing record
+  cites and that D4 does not make, which `tests/test_task_model_routing.py` refuses. It would also fix the model
+  against D4's per-task Astra substitution. `${CODEX_MODEL}` cannot stand in: role files are copied byte for byte under
+  their `SHA256SUMS`, never rendered.
 - **The examples as the canonical source.** Not done: `examples/codex-native/README.md:8-11,13-16,28-31` describes them
   as project-scoped copies that inherit the session's model. They keep their dated text and stay project examples.
 - **`jcodemunch` at user scope, as the unit brief listed.** Not done. The overturn condition of the
@@ -439,6 +451,9 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
 - Worker roles: install them by default once the Gate A window closes and its owner applies the flip list. Remove a
   worker role if a recorded Codex child run shows that its text changes neither dispatch nor lane use against the
   project example of the same name.
+- Builder model: give `isolated-builder` a model of its own only when the Sol-primary routing record moves primary
+  workers off the coordinator's `CODEX_MODEL`, and restate `model_pin`, the routing record's rows and this addendum
+  together. Revisit sooner if a Codex release lets a role's model yield to the spawn's.
 - codebase-memory: remove the entry if a week of retained transcripts shows its tools uncalled while its server
   instruction loads into every session (the 2026-09-25 jCodeMunch measure), or if no platform pins file installs it
   by the next release.
@@ -466,6 +481,20 @@ Installing the worker roles by default needs changes outside this unit's paths: 
   nothing answered there; that limit of `tools/adoption/install_claude_profile.py` predates this change. The pinned
   codex-cli 0.157.1 dry run with `--worker-roles` on a scratch Codex home reported `codex doctor config.load: startup
   warnings 0 -> 0 with the role files (0 agent role warnings)` for all five files.
+- Round 2, local integration on the same host, 2026-10-01, at the lane's pin codex-cli 0.159.2. The host's default
+  `codex` is a later build, which the pin check refuses, so the run named the pinned build, beside `node` in a scratch
+  folder. The scratch Codex home's `config.toml` came from `tools/adoption/codex_home.py`, from the user template
+  rendered with `adoption/hosts/example.json` and this run's ecosystem root, with the source host's trust state left
+  out. A dry run with `--worker-roles` reported `codex doctor config.load: startup warnings 0 -> 0 with the role
+  files (0 agent role warnings)` for all five files, the model-less builder included, and `result: rehearsal
+  passed`. The same dry run without the flag passed with the two carriers. Neither run wrote to the scratch Codex
+  home or a run record. Both printed `--apply` lines end with the two `--expect-*-sha256` hashes that
+  `adoption/bootstrap-linux.sh:1000-1001` parses; its expression matched both. Two earlier attempts failed on their
+  run conditions, not on a role file. The pinned build's own folder holds no `node`, so its npm wrapper exited 127
+  in the rehearsal. A `config.toml` holding only a `[features]` table failed the `-p stack-worker` checks ("in
+  `mcp_servers.serena`"), though doctor still reported 0 role warnings for the five files. Usage: no model call.
+- Round 2 tests: `tests/test_task_model_routing.py` passed on the rebased tree before any round-2 edit (10 tests),
+  so no worker role, the applier or `tools/adoption/codex_roles.py` binds GPT-6.1 or `${CODEX_MODEL}`.
 
 ### Sources
 
