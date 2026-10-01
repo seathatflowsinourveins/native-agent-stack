@@ -169,6 +169,18 @@
     {
       "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
       "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/deepagents-omniroute/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/cli-constraints.txt",
+      "parser": "requirements.txt"
     }
   ],
   "covered_by_lockfile": [
@@ -207,6 +219,14 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    },
+    {
+      "path": "examples/deepagents-omniroute/requirements.in",
+      "lockfile": "examples/deepagents-omniroute/requirements.lock"
+    },
+    {
+      "path": "examples/openhands-native-capabilities/requirements.in",
+      "lockfile": "examples/openhands-native-capabilities/requirements.lock"
     }
   ],
   "excluded": [
