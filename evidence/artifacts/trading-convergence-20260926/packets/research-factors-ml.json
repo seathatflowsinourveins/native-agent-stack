@@ -1,0 +1,598 @@
+{
+ "layer_id": "research-factors-ml",
+ "proposal": {
+  "layer_id": "research-factors-ml",
+  "proposal": "add_candidates",
+  "summary": "Both current winners still earn their specific roles on verified evidence, but merit-not-incumbency review finds their pins verifiably stale in ways that matter for this layer's own \"deterministic numeric risk\" requirement. skfolio (pinned 1.2.9) is 6 releases behind live upstream v1.4.0 (independently confirmed via gh api release list, correcting the researcher packet's \"two releases\" undercount): v1.3.1/1.3.2/1.3.3/1.3.4 are risk-measure bug fixes (plotting crash, sample-weight preservation, VaR tail-size consistency, EVaR numerical stability), read directly from each release body today. A PR (#81) already native-execution-qualified 1.3.0 on 2026-09-23 (Sharpe/weights reproduced to reported precision) but manifests/stack.json still pins 1.2.9 -- the qualification was never promoted. edgartools (pinned v5.58.0) is 2 releases behind v5.59.1 (also correcting the packet's miscount), and v5.59.1 fixes a total-failure bug where 13F holdings always returned None. Separately, a 2026-09-23 internal sweep for this exact layer -- reconfirmed live today via gh api -- already found two adversarially-verified, currently-active candidates (LightGBM, RD-Agent) closing a real gap this layer's own open_gaps admit is uncovered (no factor-IC tool, no automated factor/model-research loop, no GBDT engine despite known dependents Qlib/ML4T using one). That same sweep already refuted the packet's own framing of AlphaGen (stronger grounds: unlicensed, dormant since Dec 2024, China-only data) and downgraded Kronos (overlaps two already-catalogued forecasting baselines). All candidates here are research/evaluation tooling only; paper orders remain confined to the deterministic adaptive-paper engine.",
+  "winner_status": [
+   {
+    "component_id": "skfolio",
+    "status": "earns_it",
+    "note": "Still the best-evidenced WalkForward/portfolio-optimization library for this role; no verified alternative beats it (Riskfolio-Lib is a legitimate but untested head-to-head, see challengers). Independently confirmed today via gh api that upstream shipped v1.3.0..v1.4.0 (6 releases) since the 1.2.9 pin, correcting the researcher packet's own undercount of 'two releases'. Read the actual release bodies: v1.3.1 fixes a plotting crash (PR #330), v1.3.2 fixes sample-weight preservation across multi-period updates (PR #338), v1.3.3 fixes value_at_risk consistency at integer tail sizes (PR #343), v1.3.4 fixes EVaR numerical stability via log-sum-exp (PR #359) -- risk-measure correctness fixes, not cosmetic, directly inside this layer's own 'deterministic numeric risk' requirement. evidence/artifacts/sota-refresh-20260923/pins-runtime/skfolio.json (native_proven, read directly) shows a merged PR (#81, merged 2026-09-23) already reran the WalkForward acceptance on 1.3.0 and reproduced the 1.2.9 receipt's Sharpe/weights to reported precision, yet manifests/stack.json still pins 1.2.9 today -- the qualification was never promoted to the tracked pin. Action: bump the pin to >=1.3.4 (ideally 1.4.0) and extend the same reproduction, since the skipped point releases are risk-measure bug fixes."
+   },
+   {
+    "component_id": "data-edgartools",
+    "status": "earns_it",
+    "note": "Still the best-evidenced SEC-filing acquisition/parsing SDK; FinanceToolkit was checked for this exact role on 2026-09-23 and found to demonstrate no gap over it. Independently confirmed today via gh api release list that only v5.59.0 and v5.59.1 postdate the v5.58.0 pin (v5.57.0 predates it, correcting the researcher packet's claim of 'three releases past the pin' to the actual two). v5.59.1's release body fixes edgar_read() returning no 13F holdings section for any filing (GH #1337, a total-failure bug, not an edge case) and a 10-K Item 7 breadcrumb mis-open regression introduced in 5.59.0. Any catalyst/filing research reusing this pin for 13F-derived signals is currently affected. Action: bump the pin to 5.59.1 and re-run the existing acquisition/parsing fixture before relying on 13F output."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "LightGBM (lightgbm-org/LightGBM)",
+    "url": "https://github.com/lightgbm-org/LightGBM",
+    "why_better": "Closes a real, verified gap: this layer's own known dependents (microsoft/qlib -- confirmed today by reading its pyproject.toml, which lists 'lightgbm' as a direct dependency -- and stefan-jansen/machine-learning-for-trading) use LightGBM as their central tabular-ML model for factor-based return prediction, yet no gradient-boosted-tree engine is itself a tracked component; scikit-learn's tree ensembles are not what those known repos' own benchmark results use. A 2026-09-23 internal sweep for this exact layer ran two independent adversarial-verification lenses and both survived (non-refuted, high confidence); re-confirmed live today via gh api MIT, 18,814 stars, pushed 2026-09-25 (yesterday), latest release v4.7.0 (2026-07-18); microsoft/LightGBM now redirects to lightgbm-org/LightGBM, confirming the March-2026 org move the sweep flagged.",
+    "evidence_level": "source_review",
+    "trial_plan": "Using the already-frozen WalkForward folds from blueprints/us-equities/research-evaluation/ (same purge/embargo inputs as the skfolio acceptance), fit LightGBM's LGBMRegressor against scikit-learn's HistGradientBoostingRegressor on an identical factor panel and forward-return target on the same folds. Compare development-fold IC/rank-IC, training wall-clock at this panel's actual scale, and reserved-segment Sharpe net of costs. Pass criterion to adopt: LightGBM must beat HistGradientBoostingRegressor's IC/Sharpe outside noise at comparable wall-clock; parity or a scikit-learn win means keep scikit-learn and drop the new dependency.",
+    "paper_lane_impact": "none -- a research/model-selection step upstream of any strategy; models stay in research per this layer's own scope, so this cannot move engines run, paper acts passed or paper fills.",
+    "sources": [
+     "https://github.com/lightgbm-org/LightGBM (gh api repos/lightgbm-org/LightGBM, reconfirmed 2026-09-26: MIT, pushed_at 2026-09-25T04:09:17Z, 18814 stars, archived false)",
+     "https://github.com/lightgbm-org/LightGBM/releases/tag/v4.7.0 (reconfirmed 2026-09-26)",
+     "gh api repos/microsoft/qlib/contents/pyproject.toml (reconfirmed 2026-09-26: dependency list contains 'lightgbm')",
+     "evidence/artifacts/landscape-sweep-20260923/lightgbm-org-lightgbm.json (local checkout, 2026-09-23 two-lens adversarial verification)",
+     "catalogs/sota-convergence/manifest-20260923.json trading[research-factors-ml].candidates (local checkout)"
+    ]
+   },
+   {
+    "name": "RD-Agent (microsoft/RD-Agent)",
+    "url": "https://github.com/microsoft/RD-Agent",
+    "why_better": "None of this layer's tracked candidates automate the factor+model research loop itself; a human still designs factors/models manually on top of Qlib. RD-Agent(Q) is Microsoft's own actively developed agentic layer performing exactly that, with a self-reported (unverified on this project's data) ~2x annualized-return improvement using >70% fewer factors, presented at NeurIPS 2025. A 2026-09-23 internal sweep ran two-lens adversarial verification and both survived (non-refuted); re-confirmed live today: MIT, 14,758 stars, pushed 2026-09-23, latest release v1.0.0 (2026-09-23, mature -- 12 prior 0.6-0.8 releases preceded it).",
+    "evidence_level": "source_review",
+    "trial_plan": "On this project's own point-in-time equity universe and purged/embargoed folds, run RD-Agent(Q)'s automated factor+model co-evolution for a fixed wall-clock/compute budget against a human-run Qlib LGBModel baseline. Critical correction the internal review already flagged (citing feedback.py:17-20,110): RD-Agent's own feedback loop scores the test segment's IC/ARR during evolution, so that segment is not a real holdout -- reserve a further final segment the loop never scores at all, and score both the evolved output and the human baseline on it exactly once, after evolution finishes: IC, realized Sharpe net of costs, factor count. Pass criterion: beat the human baseline net of its own compute cost on that untouched segment, or reproduce a return/factor-count advantage near its published claim on this project's actual panel. Note its default templates hard-code cn/csi300 (GH issue #1366) -- expect real retargeting work before any comparison is meaningful.",
+    "paper_lane_impact": "none directly -- an automated research loop upstream of any order; could over time increase qualified signals reaching a future paper strategy, but moves no current paper-lane counter by itself.",
+    "sources": [
+     "https://github.com/microsoft/RD-Agent (gh api repos/microsoft/RD-Agent, reconfirmed 2026-09-26: MIT, pushed_at 2026-09-23T11:05:33Z, 14758 stars, archived false)",
+     "https://github.com/microsoft/RD-Agent/releases/tag/v1.0.0 (reconfirmed 2026-09-26)",
+     "evidence/artifacts/landscape-sweep-20260923/microsoft-rd-agent.json (local checkout, 2026-09-23 two-lens adversarial verification, lens 1 cites feedback.py:17-20,110 and GH issue #1366)"
+    ]
+   },
+   {
+    "name": "alphalens-reloaded (stefan-jansen/alphalens-reloaded)",
+    "url": "https://github.com/stefan-jansen/alphalens-reloaded",
+    "why_better": "Fills an explicitly open gap this layer's own open_gaps list names: no factor-IC/quantile-return/turnover tear-sheet tooling exists in this catalog, the standard complement to skfolio's portfolio-construction role. It is the maintained continuation of quantopian/alphalens, which is confirmed stale (pushed 2024-02-12, >2.5 years). Caveat, not a strength: it is itself only marginally maintained -- pushed 2025-12-15 (~9.4 months ago, inside the 12-month rule but slowing), last PyPI upload 0.4.6 on 2025-06-02 (>15 months), and the 2026-09-23 internal sweep already flagged it 'unmaintained_signal' for a stale default-branch head. No fresher alternative for this specific niche was found.",
+    "evidence_level": "metadata",
+    "trial_plan": "Run its factor tear-sheet/IC function against the same frozen factor panel and reserved segment already scored in blueprints/us-equities/research-evaluation/receipt.json (e.g. the momentum20 diagnostic), under the pinned Python/pandas/numpy already in that venv. Cross-check its printed IC against a hand-computed Spearman rank correlation on the identical folds. Pass criterion: installs and runs without error under the current pins and its IC matches the manual computation within floating-point tolerance. If it errors under the current pins (a real risk given its slowing cadence) or its IC diverges, treat the gap as still open rather than adopting it as-is.",
+    "paper_lane_impact": "none -- a research/evaluation diagnostic (factor IC), not order generation or fills.",
+    "sources": [
+     "https://github.com/stefan-jansen/alphalens-reloaded (pushed_at 2025-12-15, Apache-2.0)",
+     "https://pypi.org/pypi/alphalens-reloaded/json (0.4.6 uploaded 2025-06-02T02:15:14Z)",
+     "https://github.com/quantopian/alphalens (pushed_at 2024-02-12, confirming the original is stale)",
+     "catalogs/sota-convergence/manifest-20260923.json trading[research-factors-ml].entries[alphalens-reloaded] (local checkout: review_status 'unmaintained_signal', 2026-09-23)"
+    ]
+   },
+   {
+    "name": "Riskfolio-Lib (dcajasn/Riskfolio-Lib)",
+    "url": "https://github.com/dcajasn/Riskfolio-Lib",
+    "why_better": "No verified performance advantage over skfolio exists yet -- stating that plainly rather than overclaiming. What is verified: it is an already-catalog-pinned (repository-index.md:142, engines-strategies.json commit 632a9e48fbaf2b9f8e83864a492332364b6ed32c), actively maintained (pushed 2026-09-24, 2 days before this research), BSD-3-Clause, non-archived direct competitor for skfolio's own portfolio-optimization/risk-parity role -- and it is the exact comparison this layer's own overturn_when clause calls for ('Compare alternatives on the same frozen inputs and failure contract'), never executed despite skfolio being pinned since before 2026-09-19. Listed because the comparison is overdue and verifiably available, not because it has been shown to win.",
+    "evidence_level": "metadata",
+    "trial_plan": "On the identical frozen SPY/QQQ/IWM inputs and WalkForward split already used in blueprints/us-equities/research-evaluation/receipt.json, fit Riskfolio-Lib's HRP and mean-risk optimizers alongside skfolio's HierarchicalRiskParity/MeanRisk on the same development and reserved folds. Compare reserved-segment annualized Sharpe/weights and wall-clock. Also check whether Riskfolio-Lib has any purge/embargo-aware cross-validation splitter, since skfolio's own WalkForward purge/embargo currently defaults to zero (a recorded open gap) -- lacking one would itself favor skfolio even with its default unconfigured. Pass criterion to promote: match or beat skfolio's reserved-fold Sharpe within noise AND not regress the purge/embargo fix once it lands. Until run, it stays a documented, available comparison.",
+    "paper_lane_impact": "none -- a portfolio-construction research comparison, not itself an order or fill.",
+    "sources": [
+     "https://github.com/dcajasn/Riskfolio-Lib (BSD-3-Clause, 4516 stars, pushed_at 2026-09-24, archived false)",
+     "https://pypi.org/pypi/Riskfolio-Lib/json (7.3.0 uploaded 2026-05-31T07:11:19Z; ships via PyPI tags only, empty GitHub releases array confirmed)",
+     "catalogs/us-equities/repository-index.md:142 (local checkout: 'Beyond stars' / engines-strategies alternative)",
+     "catalogs/us-equities/engines-strategies.json (local checkout: id riskfolio-lib, decision 'alternative', pinned commit 632a9e48fbaf2b9f8e83864a492332364b6ed32c)"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Qlib (Microsoft)",
+    "reason": "off-requirement -- does not resolve this layer's core blocker (no point-in-time, licensed US-equity universe); its core dependency (LightGBM) and research-loop layer (RD-Agent(Q)) are proposed separately above instead. Already tracked as 'conditional'/source_review in this exact catalog (not_individually_reviewed as of 2026-09-23). Packaged release is stale by the 12-month rule (latest tag/PyPI v0.9.7, 2025-08-15, >13 months) even though source commits are current (pushed 2026-09-22) -- judge maintenance by commit activity, not the release tag, but that alone does not clear its core blocker."
+   },
+   {
+    "name": "PyPortfolioOpt",
+    "reason": "off-requirement / metadata only -- lacks the WalkForward/purge-embargo cross-validation machinery this layer's chronological-evaluation requirement is built on; no executed comparison shows any advantage over skfolio. Note for the record: GitHub now resolves it under a transferred org, PyPortfolio/PyPortfolioOpt (formerly robertmartin8/PyPortfolioOpt) -- any future pin should cite the new canonical URL."
+   },
+   {
+    "name": "tsfresh",
+    "reason": "metadata only -- fits the layer's named 'feature-extraction' open gap in principle, but unlike LightGBM/RD-Agent it has not been source-reviewed or adversarially checked for this layer; only repo-freshness stats and two awesome-list citations support it."
+   },
+   {
+    "name": "statsmodels",
+    "reason": "off-requirement as a standalone candidate -- a foundational, already-current (pushed 2026-09-26) transitive dependency of other candidates here (skfolio, alphalens-reloaded, Riskfolio-Lib), not itself a competing solution for either winner's role."
+   },
+   {
+    "name": "mlfinlab (Hudson & Thames)",
+    "reason": "unmaintained (confirmed live via gh api today: pushed_at 2023-10-02, ~36 months stale) + license (NOASSERTION, no SPDX-detected license) + no live PyPI distribution (pypi.org/pypi/mlfinlab/json returns 404 as of today). Historically influential reference material; not installable as-is."
+   },
+   {
+    "name": "AlphaGen (ICT-FinD-Lab/alphagen)",
+    "reason": "refuted on stronger grounds than 'missing license' alone: a 2026-09-23 internal adversarial review (high confidence) found it definitively unlicensed (GitHub /license endpoint 404, no LICENSE file at all), effectively dormant since 2024-12-18 despite a 2026-06-04 push determined to be a citation-only edit, and its pipeline hard-codes REG_CN/csi300/baostock (China A-share data only, no US-equity path); its KDD 2023 paper tested only China A-shares with custom operators. Functionally superseded for this layer's purpose by the RD-Agent(Q) challenger above, whose fin_factor covers the same automated-alpha-mining gap on an actively released (v1.0.0, 2026-09-23), MIT-licensed codebase."
+   },
+   {
+    "name": "Kronos (shiyu-coder/Kronos)",
+    "reason": "downgraded on more specific, more recent evidence than the researcher packet's framing: this exact candidate was already source-reviewed for this exact layer on 2026-09-23 (two-lens adversarial check, both non-refuted) and found to overlap two forecasting baselines this catalog already carries as 'conditional' for the same role -- amazon-science/chronos-forecasting and google-research/timesfm -- without closing a distinct gap. Also unmaintained by this task's release-currency standard: no GitHub Release object has ever existed, last push 2026-04-13 (~5.4 months before this research). Its AAAI 2026 acceptance and large self-reported gains are real and worth re-checking only if the two existing baselines are ever shown deficient."
+   },
+   {
+    "name": "AlphaForge (DulyHao/AlphaForge)",
+    "reason": "unmaintained (confirmed live via gh api today: pushed_at 2024-09-01, ~25 months stale) + no license (license field null). A genuine AAAI 2025 peer-reviewed result with working code, worth reading as a reference implementation to reimplement from, not to install."
+   },
+   {
+    "name": "deepdow (jankrepl/deepdow)",
+    "reason": "unmaintained (pushed 2024-01-24, ~20 months stale, no GitHub Release objects); the source awesome-list itself calls it dormant since 2024-01."
+   },
+   {
+    "name": "Spectre (Heerozh/spectre)",
+    "reason": "unmaintained (confirmed live via gh api today: pushed_at 2025-04-15, ~17 months stale; only tagged release v0.4-beta from 2020-01-13, ~6.7 years old) + license (GPL-3.0 copyleft, inconsistent with this stack's permissive-license default elsewhere in this layer)."
+   },
+   {
+    "name": "FactorMiner (arXiv:2602.14670)",
+    "reason": "off-requirement today, not a rejection of the direction -- no installable code repository exists (none found as of 2026-09-26), so it cannot be installed, executed, or source-reviewed at the code level. A genuine 2026-dated, beyond-awesome-list find worth tracking for a future code release."
+   },
+   {
+    "name": "FinanceToolkit (JerBouma/FinanceToolkit)",
+    "reason": "already checked for this exact layer on 2026-09-23 (two-lens adversarial review, both non-refuted) and found to demonstrate no gap: its fundamentals-ratio functionality overlaps the edgartools winner, and its data-source entitlements are unverified. Confirmed still active (pushed 2026-09-10, MIT) but not a distinct addition."
+   },
+   {
+    "name": "machine-learning-for-trading (stefan-jansen)",
+    "reason": "already checked for this exact layer on 2026-09-23 and found to demonstrate no gap: it is reference code for a book (3rd edition), not a runtime or library to depend on. Confirmed active (pushed 2026-09-22, MIT) but out of scope as a component."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "skfolio repo identity, license, archived status",
+   "claim": "Repo exists at github.com/skfolio/skfolio; BSD-3-Clause; not archived.",
+   "verdict": "supported",
+   "note": "gh api repos/skfolio/skfolio returns license.spdx_id=BSD-3-Clause, archived=false, confirmed live. PyPI JSON for 1.4.0 also ships the full BSD 3-Clause license text.",
+   "sources": [
+    "https://api.github.com/repos/skfolio/skfolio",
+    "https://pypi.org/pypi/skfolio/json"
+   ]
+  },
+  {
+   "name": "skfolio maintenance snapshot (stars/issues/pushed)",
+   "claim": "\"not archived, 2,435 stars, 44 open issues, pushed 2026-09-26\" -- actively maintained upstream.",
+   "verdict": "supported",
+   "note": "Live gh api call returns stargazers_count=2435, open_issues_count=44, pushed_at=2026-09-26T14:35:38Z -- exact match on every number.",
+   "sources": [
+    "https://api.github.com/repos/skfolio/skfolio"
+   ]
+  },
+  {
+   "name": "skfolio v1.3.0 GeodesicShrinkageCovariance (PR #259 / commit 89a8edd)",
+   "claim": "v1.3.0 (2026-09-20) adds a GeodesicShrinkageCovariance estimator via PR #259, commit 89a8edd.",
+   "verdict": "supported",
+   "note": "Release v1.3.0 body (published_at 2026-09-20T10:12:14Z) reads verbatim 'Add GeodesicShrinkageCovariance estimator (#259, 89a8eddd...)'. PR #259 confirms merged_at=2026-09-20T10:05:11Z, merge_commit_sha=89a8eddd34a0192b9c7d9d960cd640002768787b, title 'feat(moments): add GeodesicShrinkageCovariance estimator'. Commit diff includes new file _geodesic_shrinkage_covariance.py.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.0",
+    "https://api.github.com/repos/skfolio/skfolio/pulls/259",
+    "https://api.github.com/repos/skfolio/skfolio/commits/89a8eddd34a0192b9c7d9d960cd640002768787b"
+   ]
+  },
+  {
+   "name": "skfolio v1.4.0 plot_composition_treemap + exception-message hardening",
+   "claim": "v1.4.0 (2026-09-26) adds plot_composition_treemap and hardens exception-message tests.",
+   "verdict": "supported",
+   "note": "Release v1.4.0 body (published_at 2026-09-26T10:51:38Z, same day as research) reads 'Add plot_composition_treemap (#248...)' under Features, and under Testing 'Pin the expected message on every pytest.raises (#357)' plus '#354 cover untested branches of utils/tools.py' -- matches 'hardens exception-message tests' closely.",
+   "sources": [
+    "https://github.com/skfolio/skfolio/releases/tag/v1.4.0"
+   ]
+  },
+  {
+   "name": "winners_upstream note: \"two releases have since shipped (v1.3.0, v1.4.0 same day)\" past the v1.2.9 pin",
+   "claim": "Upstream has shipped only v1.3.0 and v1.4.0 since the v1.2.9 pin -- 'two releases ahead of the packet's own comparison point'.",
+   "verdict": "refuted",
+   "note": "The live release list shows SIX releases between the v1.2.9 pin (2026-09-19) and today, not two: v1.3.0 (09-20), v1.3.1 (09-23), v1.3.2 (09-24), v1.3.3 (09-25), v1.3.4 (09-25), v1.4.0 (09-26). The note and candidate fit text both name only the first and last, silently skipping four patch releases. Those skipped releases are not cosmetic: v1.3.1 fixes a plotting crash (#330), v1.3.2 'Preserve sample weights across multi-period updates' (#338), v1.3.3 'Make value_at_risk consistent at integer tail sizes' (#343), v1.3.4 'Compute evar in stable log-sum-exp form' (#359) -- risk-measure correctness fixes directly inside this layer's scope, which the note's conclusion ('neither new release touches the layer's real gaps') never examined.",
+   "sources": [
+    "https://api.github.com/repos/skfolio/skfolio/releases",
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.2",
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.3",
+    "https://github.com/skfolio/skfolio/releases/tag/v1.3.4"
+   ]
+  },
+  {
+   "name": "skfolio WalkForward pin commit c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+   "claim": "\"the layer's own WalkForward cross-validator evidence pins to source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee\", corresponding to v1.2.9.",
+   "verdict": "supported",
+   "note": "gh api confirms this commit exists, dated 2026-09-19T14:45:36Z with message 'v1.2.9 [skip ci] ... Automatically generated by python-semantic-release' (3s before the v1.2.9 release timestamp) -- it is the v1.2.9 tag commit. The commit's own diff only touches CHANGELOG.md/pyproject.toml, but this repo's own existing receipt (read directly) shows the established convention is a git-show-at-commit pin, not a diff-at-commit pin: blueprints/us-equities/research-evaluation/receipt.json already cites 'git show c99fcf71349e2df4a7a1033ee85ca2e9ced9abee:src/skfolio/model_selection/_walk_forward.py' and hashes it, and repo's contents API confirms _walk_forward.py exists under src/skfolio/model_selection/. Claim is accurate under the project's own established pin convention.",
+   "sources": [
+    "https://api.github.com/repos/skfolio/skfolio/commits/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+    "blueprints/us-equities/research-evaluation/receipt.json (local checkout, lines 36, 1765, 1797)",
+    "blueprints/us-equities/research-evaluation/README.md (local checkout, line 146)",
+    "https://api.github.com/repos/skfolio/skfolio/contents/src/skfolio/model_selection"
+   ]
+  },
+  {
+   "name": "PyPI skfolio version/date",
+   "claim": "PyPI version 1.4.0 uploaded 2026-09-26T10:51:50Z.",
+   "verdict": "supported",
+   "note": "https://pypi.org/pypi/skfolio/json info.version=1.4.0; url file upload_time_iso_8601 = 2026-09-26T10:51:50.197567Z (sdist) and :52Z (wheel) -- exact match.",
+   "sources": [
+    "https://pypi.org/pypi/skfolio/json"
+   ]
+  },
+  {
+   "name": "EdgarTools repo identity, license, archived status",
+   "claim": "Repo exists at github.com/dgunning/edgartools; MIT; not archived.",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, archived=false. PyPI classifiers also list 'License :: OSI Approved :: MIT License'.",
+   "sources": [
+    "https://api.github.com/repos/dgunning/edgartools",
+    "https://pypi.org/pypi/edgartools/json"
+   ]
+  },
+  {
+   "name": "EdgarTools maintenance snapshot (stars/issues/pushed)",
+   "claim": "\"2,749 stars, 27 open issues, pushed 2026-09-26\" -- actively maintained, releasing every few days.",
+   "verdict": "supported",
+   "note": "Live values match exactly: stargazers_count=2749, open_issues_count=27, pushed_at=2026-09-26T13:11:28Z. Release cadence check: v5.47.0 through v5.58.0 land 1-6 days apart on average, consistent with 'every few days'.",
+   "sources": [
+    "https://api.github.com/repos/dgunning/edgartools",
+    "https://api.github.com/repos/dgunning/edgartools/releases"
+   ]
+  },
+  {
+   "name": "EdgarTools pin commit abe44344... = v5.58.0",
+   "claim": "Pinned source abe44344c56cf4bfb5443e0debca7e39342f6e7a at v5.58.0, released 2026-09-11.",
+   "verdict": "supported",
+   "note": "git/refs/tags/v5.58.0 resolves to object.sha = abe44344c56cf4bfb5443e0debca7e39342f6e7a exactly; that commit's own message is 'chore(release): 5.58.0 (#1322)' dated 2026-09-11T15:33:03Z (release published_at 2026-09-11T15:41:47Z). Exact match.",
+   "sources": [
+    "https://api.github.com/repos/dgunning/edgartools/git/refs/tags/v5.58.0",
+    "https://api.github.com/repos/dgunning/edgartools/commits/abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+   ]
+  },
+  {
+   "name": "EdgarTools v5.59.0/v5.59.1 fix 13F holdings (GH #1337) and 10-K Item 7 breadcrumb regression",
+   "claim": "Both releases (2026-09-26) fix a 10-K Item 7 breadcrumb mis-open regression and a bug where edgar_read() returns no 13F holdings section for any filing (GH #1337).",
+   "verdict": "supported",
+   "note": "v5.59.1 release body, read directly, states under Fixed: '`edgar_read` returned no holdings section for any 13F-HR ... (GH #1337)' and 'ExxonMobil's 10-K Item 7 opened on a \"Table of Contents\" breadcrumb again in 5.59.0'. Issue #1337 (closed) title: 'edgar_read: 13F holdings section always returns None'. v5.59.0 body confirms it shipped the original TOC/Item-7 breadcrumb-stripping change that 5.59.1 then had to patch. Both releases published_at 2026-09-26 (11:14Z and 13:11Z).",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.1",
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.0",
+    "https://api.github.com/repos/dgunning/edgartools/issues/1337"
+   ]
+  },
+  {
+   "name": "winners_upstream note: \"v5.57.0 through v5.59.1 (three releases past the pin, all within the last 15 days)\"",
+   "claim": "Upstream shipped v5.57.0 through v5.59.1 as three releases past the v5.58.0 pin, all within the last 15 days.",
+   "verdict": "refuted",
+   "note": "v5.57.0 published_at = 2026-09-08T14:48:20Z, which is BEFORE the pin v5.58.0 (2026-09-11T15:41:47Z) -- it is not 'past the pin' at all, and it is 18 days before the 2026-09-26 research date, not within 15. Only v5.59.0 and v5.59.1 (both 09-26) postdate the pin: that is 2 releases past the pin, not 3. The note's own release-count and time-window arithmetic is wrong even though the underlying bug-fix claims (13F holdings, breadcrumb regression) are independently correct.",
+   "sources": [
+    "https://api.github.com/repos/dgunning/edgartools/releases"
+   ]
+  },
+  {
+   "name": "PyPI edgartools version/date",
+   "claim": "PyPI version 5.59.1 uploaded 2026-09-26T13:10:55Z.",
+   "verdict": "supported",
+   "note": "pypi.org/pypi/edgartools/json info.version=5.59.1; upload_time_iso_8601 = 2026-09-26T13:10:55.926749Z (sdist) and :57Z (wheel) -- exact match.",
+   "sources": [
+    "https://pypi.org/pypi/edgartools/json"
+   ]
+  },
+  {
+   "name": "Kronos repo identity, license, maintenance snapshot",
+   "claim": "MIT-licensed, 39,465 stars, pushed 2026-04-13, not archived.",
+   "verdict": "supported",
+   "note": "gh api repos/shiyu-coder/Kronos returns license.spdx_id=MIT, stargazers_count=39465, pushed_at=2026-04-13T12:38:49Z, archived=false -- exact match on every figure.",
+   "sources": [
+    "https://api.github.com/repos/shiyu-coder/Kronos"
+   ]
+  },
+  {
+   "name": "Kronos paper identity (arXiv:2508.02739)",
+   "claim": "Paper 'Kronos: A Foundation Model for the Language of Financial Markets', trained on 12B+ K-line records from 45 exchanges, submitted 2025-08-02.",
+   "verdict": "supported",
+   "note": "Opened the arXiv abstract page directly: title matches exactly, authors Yu Shi, Zongliang Fu, Shuo Chen, Bohan Zhao, Wei Xu, Changshui Zhang, Jian Li; abstract frames it as a 'unified, scalable pre-training framework tailored to financial K-line modeling'; submission date 2025-08-02.",
+   "sources": [
+    "https://arxiv.org/abs/2508.02739"
+   ]
+  },
+  {
+   "name": "Kronos self-reported metrics (93%/87%/9%/22%)",
+   "claim": "93% RankIC improvement over the leading TSFM, 87% over the best non-pretrained baseline, 9% lower volatility-forecast MAE, 22% generative-fidelity improvement -- self-reported, not independently reproduced.",
+   "verdict": "supported",
+   "note": "Abstract, read directly, states exactly these four figures: 93% RankIC improvement over leading TSFM baseline, 87% over best non-pre-trained baseline, 9% lower MAE on volatility forecasting, 22% improvement in generative fidelity. Framing as self-reported/unreproduced is accurate -- these are the paper's own claimed numbers, no independent benchmark exists in this checkout.",
+   "sources": [
+    "https://arxiv.org/abs/2508.02739"
+   ]
+  },
+  {
+   "name": "Kronos AAAI 2026 acceptance",
+   "claim": "'Secondary source stating AAAI 2026 acceptance; not confirmed directly on the arXiv listing itself' -- the candidate treats this as unconfirmed.",
+   "verdict": "supported",
+   "note": "Upgraded beyond the candidate's own hedge: opened AAAI's own proceedings host directly (not the secondary blog the candidate cited) and confirmed publication -- title, full author list and abstract match exactly; venue 'Proceedings of the AAAI Conference on Artificial Intelligence', Vol. 40 No. 30 (AAAI-26 Technical Tracks), pages 25366-25373, DOI 10.1609/aaai.v40i30.39730, published 2026-03-14. This is a primary AAAI source, not a secondary blog, so the underlying acceptance claim is confirmed, more strongly than the candidate itself established.",
+   "sources": [
+    "https://ojs.aaai.org/index.php/AAAI/article/view/39730",
+    "https://doi.org/10.1609/aaai.v40i30.39730"
+   ]
+  },
+  {
+   "name": "AlphaGen repo identity: no license, stars, pushed date",
+   "claim": "1,242 stars, pushed 2026-06-04; no GitHub Release objects; no SPDX-detected license (license field null via GitHub API).",
+   "verdict": "supported",
+   "note": "gh api repos/ICT-FinD-Lab/alphagen: stargazers_count=1242, pushed_at=2026-06-04T05:54:38Z, license=null -- exact match. Releases endpoint returns an empty list (0 releases). Root contents listing (fetched directly) confirms no LICENSE/LICENSE.txt/COPYING file exists in the repo at all -- not merely an SPDX-detection miss.",
+   "sources": [
+    "https://api.github.com/repos/ICT-FinD-Lab/alphagen",
+    "https://api.github.com/repos/ICT-FinD-Lab/alphagen/releases",
+    "https://api.github.com/repos/ICT-FinD-Lab/alphagen/contents/"
+   ]
+  },
+  {
+   "name": "AlphaGen canonical location: RL-MLDM/alphagen redirects to ICT-FinD-Lab/alphagen",
+   "claim": "GitHub API resolves the older org path RL-MLDM/alphagen to the same repository now under ICT-FinD-Lab/alphagen.",
+   "verdict": "supported",
+   "note": "curl to api.github.com/repos/RL-MLDM/alphagen returns HTTP 301 with redirect_url pointing at repositories/510600247; following it via gh api repos/RL-MLDM/alphagen returns full_name=ICT-FinD-Lab/alphagen -- confirms same canonical repository.",
+   "sources": [
+    "https://api.github.com/repos/RL-MLDM/alphagen"
+   ]
+  },
+  {
+   "name": "AlphaGen capability: RL-based formulaic alpha generation",
+   "claim": "Reinforcement-learning generator of sets of formulaic (predictive) alpha stock factors -- automated rather than manual factor discovery.",
+   "verdict": "supported",
+   "note": "README, fetched directly, opens with 'Automatic formulaic alpha generation with reinforcement learning' and states the repo is the code for 'Generating Synergistic Formulaic Alpha Collections via Reinforcement Learning', accepted at KDD 2023 (Applied Data Science track), published on ACM DL (doi.org/10.1145/3580305.3599831). Candidate's evidence_level of 'metadata' understates what is one click away: this is a peer-reviewed, published paper, not just a starred repo.",
+   "sources": [
+    "https://raw.githubusercontent.com/ICT-FinD-Lab/alphagen/master/README.md",
+    "https://dl.acm.org/doi/10.1145/3580305.3599831"
+   ]
+  },
+  {
+   "name": "Riskfolio-Lib repo identity and maintenance snapshot",
+   "claim": "BSD-3-Clause; 4,516 stars; 17 open issues; not archived; pushed 2026-09-24 (2 days before research).",
+   "verdict": "supported",
+   "note": "gh api repos/dcajasn/Riskfolio-Lib: license.spdx_id=BSD-3-Clause, stargazers_count=4516, open_issues_count=17, archived=false, pushed_at=2026-09-24T05:23:00Z -- exact match; 2026-09-26 minus 2026-09-24 = 2 days, matches claim precisely.",
+   "sources": [
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib"
+   ]
+  },
+  {
+   "name": "Riskfolio-Lib ships via PyPI tags only, no GitHub Releases; PyPI 7.3.0 date",
+   "claim": "Does not use GitHub Releases objects (ships via PyPI tags only); PyPI version 7.3.0 uploaded 2026-05-31T07:11:19Z.",
+   "verdict": "supported",
+   "note": "gh api repos/dcajasn/Riskfolio-Lib/releases returns an empty array (length 0), confirming no Release objects despite an active repo. pypi.org/pypi/Riskfolio-Lib/json: info.version=7.3.0, license='BSD (3-clause)'; first url upload_time_iso_8601=2026-05-31T07:11:19.001687Z -- exact match (26 platform wheels uploaded in that same batch).",
+   "sources": [
+    "https://api.github.com/repos/dcajasn/Riskfolio-Lib/releases",
+    "https://pypi.org/pypi/Riskfolio-Lib/json"
+   ]
+  },
+  {
+   "name": "Riskfolio-Lib catalog citation (repository-index.md line 142)",
+   "claim": "catalogs/us-equities/repository-index.md line 142 lists dcajasn/riskfolio-lib as 'Beyond stars', engines-strategies alternative.",
+   "verdict": "supported",
+   "note": "grep -n on the local checkout confirms line 142 exactly: '| [dcajasn/riskfolio-lib](https://github.com/dcajasn/riskfolio-lib) | Beyond stars | [engines-strategies: alternative](engines-strategies.json) |...'. engines-strategies.json id=riskfolio-lib, decision='alternative', already pinned at commit 632a9e48fbaf2b9f8e83864a492332364b6ed32c with its own README/LICENSE.txt/pyproject.toml/Portfolio.py source refs.",
+   "sources": [
+    "catalogs/us-equities/repository-index.md:142 (local checkout)",
+    "catalogs/us-equities/engines-strategies.json (local checkout, lines 684-723)"
+   ]
+  },
+  {
+   "name": "alphalens-reloaded repo identity and maintenance snapshot",
+   "claim": "Apache-2.0; 657 stars; pushed 2025-12-15 (~9.4 months before research date, inside the 12-month window but slowing).",
+   "verdict": "supported",
+   "note": "gh api repos/stefan-jansen/alphalens-reloaded: license.spdx_id=Apache-2.0, stargazers_count=657, pushed_at=2025-12-15T04:03:16Z -- exact match. 2025-12-15 to 2026-09-26 is ~9.37 months, matching '~9.4 months' and correctly inside the 12-month maintenance window.",
+   "sources": [
+    "https://api.github.com/repos/stefan-jansen/alphalens-reloaded"
+   ]
+  },
+  {
+   "name": "PyPI alphalens-reloaded version/date",
+   "claim": "Last PyPI upload (0.4.6) is 2025-06-02, over 15 months old.",
+   "verdict": "supported",
+   "note": "pypi.org/pypi/alphalens-reloaded/json: info.version=0.4.6, license text is Apache-2.0 boilerplate; upload_time_iso_8601=2025-06-02T02:15:14.827514Z -- exact match. 2025-06-02 to 2026-09-26 is ~15.8 months, matching 'over 15 months old'.",
+   "sources": [
+    "https://pypi.org/pypi/alphalens-reloaded/json"
+   ]
+  },
+  {
+   "name": "quantopian/alphalens predecessor staleness",
+   "claim": "Original quantopian/alphalens pushed 2024-02-12 -- over 2.5 years stale.",
+   "verdict": "supported",
+   "note": "gh api repos/quantopian/alphalens: pushed_at=2024-02-12T06:44:22Z -- exact match. 2024-02-12 to 2026-09-26 is ~2 years 7.5 months, i.e. over 2.5 years, confirmed stale/unmaintained by the 12-month rule.",
+   "sources": [
+    "https://api.github.com/repos/quantopian/alphalens"
+   ]
+  },
+  {
+   "name": "AlphaForge repo identity: no license, stars, pushed date, no Release",
+   "claim": "430 stars, pushed 2024-09-01 (~25 months before research), no SPDX-detected license, no tagged GitHub Release.",
+   "verdict": "supported",
+   "note": "gh api repos/DulyHao/AlphaForge: stargazers_count=430, pushed_at=2024-09-01T07:50:47Z, license=null -- exact match (2024-09-01 to 2026-09-26 = ~24.8 months, rounds to 'about 25 months'). Releases endpoint returns 0. Root contents listing (fetched directly) confirms no LICENSE file exists in the repo tree.",
+   "sources": [
+    "https://api.github.com/repos/DulyHao/AlphaForge",
+    "https://api.github.com/repos/DulyHao/AlphaForge/releases",
+    "https://api.github.com/repos/DulyHao/AlphaForge/contents/"
+   ]
+  },
+  {
+   "name": "AlphaForge paper identity and AAAI 2025 acceptance (arXiv:2406.18394)",
+   "claim": "AAAI 2025 paper, two-stage generative-predictive + dynamic-combination alpha mining; submitted 2024-06-26, latest v5 2024-12-12.",
+   "verdict": "supported",
+   "note": "Opened the arXiv abstract page directly: title 'AlphaForge: A Framework to Mine and Dynamically Combine Formulaic Alpha Factors'; v1 submitted 2024-06-26, latest v5 2024-12-12 -- exact match; comments explicitly say 'Accepted by AAAI2025'. No GitHub link appears on the abstract page itself (consistent with the repo being found separately via github_search).",
+   "sources": [
+    "https://arxiv.org/abs/2406.18394"
+   ]
+  },
+  {
+   "name": "FactorMiner paper identity (arXiv:2602.14670)",
+   "claim": "'FactorMiner: A Self-Evolving Agent with Skills and Experience Memory for Financial Alpha Discovery', authors Yanlong Wang, Jian Xu, Hongkang Zhang, Shao-Lun Huang, Danny Dongning Sun, Xiao-Ping Zhang; submitted 2026-02-16, v2 2026-08-19.",
+   "verdict": "supported",
+   "note": "Opened the arXiv abstract page directly: title and all six author names match exactly; v1 submission date 2026-02-16, latest revision v2 2026-08-19 -- exact match on both dates.",
+   "sources": [
+    "https://arxiv.org/abs/2602.14670"
+   ]
+  },
+  {
+   "name": "FactorMiner: no public code repository found via search",
+   "claim": "No public code repository was found via search as of 2026-09-26; currently a research signal, not an installable tool.",
+   "verdict": "supported",
+   "note": "Independent WebSearch for the paper title plus 'github code repository' surfaced the arXiv page, an alphaXiv mirror, an emergentmind.com topic page and a Medium explainer -- no GitHub/code-hosting link among them. New fact the candidate missed: the paper is not just an arXiv preprint but has since been peer-reviewed and published at KDD 2026 (Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining, DOI 10.1145/3770855.3818978, 2026-08-08) -- stronger provenance than the candidate's own sources show, but still no code repository surfaced anywhere.",
+   "sources": [
+    "https://arxiv.org/abs/2602.14670",
+    "https://doi.org/10.1145/3770855.3818978"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "skfolio",
+   "url": "https://github.com/skfolio/skfolio",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Current winner. Upstream is healthier than the packet recorded: the open_gap flagged pin 1.2.9 behind v1.3.0, but two releases have since shipped (v1.3.0, v1.4.0 same day). None of the new features (GeodesicShrinkageCovariance, treemap plot) close the layer's real gaps (no portfolio P&L/dividend/fee reconciliation, purge/embargo defaulted to zero, only ETF-sample evidence) -- those are evaluation-design gaps, not upstream-version gaps. Re-pin to 1.4.0 is a routine bump, not an overturn trigger by itself."
+  },
+  {
+   "name": "EdgarTools",
+   "url": "https://github.com/dgunning/edgartools",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Current winner. Upstream is 3 patch releases ahead of the pin (v5.58.0 -> v5.59.0 -> v5.59.1) and one of those releases fixes a genuine parsing bug (13F holdings extraction) that would matter for any catalyst/filing-based factor research reusing this library -- worth re-pinning. This does not touch the layer's actual open gaps: the EdgarTools acquisition evidence remains a bounded 5-header, one-day sample and does not establish a historical as-known filing corpus."
+  },
+  {
+   "name": "Qlib (Microsoft)",
+   "url": "https://github.com/microsoft/qlib",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Strong general-purpose factor/ML research platform, but adopting it does not resolve this layer's core blocker (no point-in-time, licensed US-equity universe). Flag: judge Qlib's 'maintained' status by commit activity, not by its release tag -- the tag/PyPI version is stale by the 12-month rule even though the source is not. Any use would still need the same causal-data and independent-reconciliation qualification the overturn_when clause requires."
+  },
+  {
+   "name": "alphalens-reloaded",
+   "url": "https://github.com/stefan-jansen/alphalens-reloaded",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Directly on-topic for factor evaluation (IC, quantile returns, turnover) and complements skfolio's WalkForward evidence with the standard factor-tear-sheet workflow the layer currently lacks. Marginally maintained by the 12-month rule -- worth re-checking in another 3 months before treating it as a settled dependency."
+  },
+  {
+   "name": "mlfinlab (Hudson & Thames)",
+   "url": "https://github.com/hudson-and-thames/mlfinlab",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Historically influential and still worth reading as a reference for labeling/feature techniques, but by this task's own rules it must be flagged unmaintained (no commit in ~3 years) with an unclear license and no live open-source PyPI distribution. Not fit for direct adoption; any of its techniques used here should be reimplemented or sourced from a maintained fork, not installed as-is."
+  },
+  {
+   "name": "Riskfolio-Lib",
+   "url": "https://github.com/dcajasn/Riskfolio-Lib",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Already tracked in this repo's own catalog as a 'Beyond stars' alternative (repository-index.md, engines-strategies.json). A legitimate head-to-head comparator to the skfolio winner for the portfolio/risk half of this layer; no comparison between the two has been executed here, so this stays a candidate for the overturn_when comparison step, not a replacement."
+  },
+  {
+   "name": "PyPortfolioOpt",
+   "url": "https://github.com/PyPortfolio/PyPortfolioOpt",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Lighter-weight alternative to skfolio for pure allocation without skfolio's WalkForward/cross-validation machinery. Worth a note purely for the org transfer (old robertmartin8 URL now redirects) so any future pin records the current canonical location."
+  },
+  {
+   "name": "tsfresh",
+   "url": "https://github.com/blue-yonder/tsfresh",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Fits the 'feature-extraction' scope term the packet's open_gaps explicitly names as untested (candidate group including c9/c10/c12). No native execution exists here; would need to be run against a real point-in-time panel before any promotion, per overturn_when's frozen-inputs requirement."
+  },
+  {
+   "name": "statsmodels",
+   "url": "https://github.com/statsmodels/statsmodels",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Foundational dependency rather than a standalone 'winner' candidate; already implicitly required by most of the other candidates in this list (skfolio, alphalens-reloaded, riskfolio-lib all depend on it or its ecosystem). Worth tracking its own version/maintenance independently since a break here would cascade."
+  },
+  {
+   "name": "AlphaGen",
+   "url": "https://github.com/ICT-FinD-Lab/alphagen",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The strongest awesome-list-sourced example of automated (rather than hand-crafted) factor mining for this layer, and a good complement to skfolio's evaluation-only role. The missing license is a hard blocker for adoption until resolved -- flag before any integration work, independent of maintenance status."
+  },
+  {
+   "name": "Kronos (financial K-line foundation model)",
+   "url": "https://github.com/shiyu-coder/Kronos",
+   "modalities": [
+    "star",
+    "paper",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly relevant as a domain-specific alternative/complement to the already-adopted general-purpose timesfm (google-research/timesfm) forecasting model: if Kronos's self-reported gains over 'the leading TSFM' replicate independently on this stack's data, it is a credible challenger for any forecasting sub-step of factor research. Evidence here is paper-level (source_review of the arXiv listing) plus repo metadata -- no native_execution exists; the packet is correct that this remains untested, not failed, and any promotion needs the same independent, cost-aware evaluation the layer's overturn_when clause requires."
+  },
+  {
+   "name": "AlphaForge",
+   "url": "https://github.com/DulyHao/AlphaForge",
+   "modalities": [
+    "paper",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Genuinely new-to-this-packet find (not in any of the supplied starred/awesome-list inputs) representing the dynamic-combination branch of automated alpha mining, distinct from AlphaGen's pure-generation approach. Must be flagged unmaintained by this task's 12-month rule despite being a real, peer-reviewed (AAAI 2025) result with working code -- a clean example of a credible paper-with-code that is nonetheless stale as a dependency; usable as a reference implementation to reimplement from, not as a live install."
+  },
+  {
+   "name": "deepdow",
+   "url": "https://github.com/jankrepl/deepdow",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Conceptually interesting differentiable-allocation approach that would complement skfolio's evaluation-only role, but confirmed unmaintained -- do not adopt as a live dependency without first checking for an actively maintained fork."
+  },
+  {
+   "name": "Spectre",
+   "url": "https://github.com/Heerozh/spectre",
+   "modalities": [
+    "awesome",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The awesome-quant entry undersells how stale this is: last real release tag is nearly 7 years old and the repo itself has had no commits in almost a year and a half. Flagged unmaintained; the GPL-3.0 license is a second, independent reason to deprioritize it even if activity resumed."
+  },
+  {
+   "name": "FactorMiner",
+   "url": "https://arxiv.org/abs/2602.14670",
+   "modalities": [
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The clearest 'beyond stars and awesome lists' find for this layer: none of the supplied starred repos or awesome-list entries surfaced this or the adjacent 2026 LLM-agent alpha-mining wave (AlphaLogics arXiv:2603.20247, AQuA arXiv:2608.12841, Alpha-R1 arXiv:2512.23515, AlphaMemo arXiv:2606.20625, XAlpha arXiv:2607.08332 -- found via the same search but not independently read here, so not listed as separate candidates). Currently a research signal, not an installable tool: no code repository is available, so it cannot be adopted or even source-reviewed at the code level yet. Track for a future code release before treating it as more than a direction-of-travel indicator."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-live.md"
+  }
+ ]
+}

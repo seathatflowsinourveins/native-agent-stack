@@ -1,0 +1,4 @@
+sent SIGTERM then SIGHUP: the handlers ran in the order ['SIGHUP', 'SIGTERM']
+sent SIGHUP then SIGTERM: the handlers ran in the order ['SIGHUP', 'SIGTERM']
+sent SIGTERM then SIGINT: the handlers ran in the order ['SIGINT', 'SIGTERM']
+the handlers ran in ascending signal number in every case: True

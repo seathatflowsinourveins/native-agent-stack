@@ -38,7 +38,9 @@ cover. Each test below names the drift it stops:
   and runs `gh release verify-asset`;
 - docs/harness-defaults.md (the manifest's ``harness_defaults``) keeps the upstream-verification
   section that AGENTS.md links to, and its anti-pattern log is a table with the five named columns
-  and a YYYY-MM-DD date in every row (added 2026-09-26, so a correction reaches later sessions).
+  and a YYYY-MM-DD date in every row (added 2026-09-26, so a correction reaches later sessions);
+- bootstrap.md step 4a names exactly the servers adoption/mcp/claude-user.json registers (added
+  2026-09-30, when the template gained four servers while the step still named two).
 
 The markers name the release they were written against, so they stay true in every later
 checkout: at a newer release they are history, and a re-pin needs no documentation edit for
@@ -858,6 +860,32 @@ class UpstreamVerificationSectionTests(unittest.TestCase):
                        good.replace("| c | d |\n", "| c | d |\n\n| 2026-09-26 | e | f | g | h |\n")):
             with self.subTest(mutant=mutant):
                 self.assertEqual(len(self.log_errors(mutant)), 1)
+
+
+class ClaudeMcpStepTests(unittest.TestCase):
+    """bootstrap.md step 4a names the servers of adoption/mcp/claude-user.json in the parenthesis after its link, so a
+    new host knows what the MCP sub-step registers (and what to install first)."""
+
+    TEMPLATE = ROOT / "adoption/mcp/claude-user.json"
+    PAGE = ROOT / "adoption/bootstrap.md"
+    LINK_THEN_LIST = re.compile(r"\[`adoption/mcp/claude-user\.json`\]\(mcp/claude-user\.json\)\s*\(([^)]*)\)")
+
+    @classmethod
+    def named(cls, text: str) -> list[set[str]]:
+        """The backticked names of each parenthesis that follows a link to the template."""
+        return [set(re.findall(r"`([^`]+)`", match)) for match in cls.LINK_THEN_LIST.findall(text)]
+
+    def test_step_4a_names_every_registered_server(self):
+        registered = set(json.loads(self.TEMPLATE.read_text(encoding="utf-8"))["mcpServers"])
+        lists = self.named(self.PAGE.read_text(encoding="utf-8"))
+        self.assertTrue(lists, "no server list follows a link to the MCP template")
+        self.assertEqual(lists, [registered] * len(lists))
+
+    def test_the_check_reads_the_list_after_the_link(self):
+        text = "for each entry in\n  [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`a`\n  over http; `b` over stdio)"
+        self.assertEqual(self.named(text), [{"a", "b"}])
+        self.assertEqual(self.named(text.replace("(`a`", "(`c`")), [{"c", "b"}])
+        self.assertEqual(self.named("no link here (`a`)"), [])
 
 
 if __name__ == "__main__":

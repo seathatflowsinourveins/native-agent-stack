@@ -852,8 +852,9 @@ class TerminalRecords(unittest.TestCase):
         m.route = dated_actions
         m.fail = [(lambda path, p: path == "/v1/corporate-actions" and p["end"] == terminal_date,
                    "timeout", 100)]
-        reqs = plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", enum_date),
-                                         plan.terminal_actions_request(terminal_date)]
+        enum_reqs = plan.assets_requests() + [plan.corporate_actions_request("2016-01-01", enum_date),
+                                              plan.terminal_actions_request(terminal_date)]
+        reqs = list(enum_reqs)
         for day in cal.range("2020-04-01", enum_date):
             reqs.extend(plan.screen_requests(cal, day, ["MOVR"]))
         live = Store()
@@ -877,14 +878,15 @@ class TerminalRecords(unittest.TestCase):
             quotes.append(book(cal, cal.offset(t, 5), "15:55", 10.0, 10.02))
         ctx = {"cal": cal, "fees": costs.Fees(FEES, cal=cal), "cells": CELLS}
         store = holdout.HoldoutStore([], live, cal)
-        try:
-            spec = holdout._spec_factory(ctx, "2020-01-02", "2020-12-31", frozenset(), frozenset(),
-                                         ("H1-D-b_lane-low",), terminal_date)(store)
-            tr = resolve(ev, "b_lane", spec.ctx("read"), store, {"MOVR": quotes})
-        except holdout.HoldoutRefused:
-            return
-        self.assertEqual(tr["status"], "void",
-                         f"exhausted terminal_actions booked {tr.get('exit')} with cash={tr.get('cash')}")
+        spec_for = holdout._spec_factory(ctx, "2020-01-02", "2020-12-31", frozenset(), frozenset(),
+                                         ("H1-D-b_lane-low",), terminal_date)
+        # Exhaustion leaves the planner at the enumeration and terminal requests, never per-event requests.
+        planned = holdout._planner(spec_for, "plan", enum_date, terminal_date)(store)
+        self.assertEqual([r["key"] for r in planned], [r["key"] for r in enum_reqs])
+        with self.assertRaisesRegex(holdout.HoldoutRefused,
+                                    "^terminal_actions acquisition is incomplete: terminal records are unknown$"):
+            spec = spec_for(store)
+            resolve(ev, "b_lane", spec.ctx("read"), store, {"MOVR": quotes})
 
     def test_exhausted_terminal_merger_request_below_one_percent_refuses_booking(self):
         self._exhausted_terminal_trade("cash_merger")

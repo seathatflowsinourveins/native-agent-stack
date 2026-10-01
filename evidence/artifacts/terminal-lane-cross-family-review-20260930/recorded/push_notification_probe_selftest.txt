@@ -32,16 +32,18 @@ PASS a SIGTERM in the work is latched, the work carries on, the directory is rem
 PASS a SIGHUP in the work is latched, the work carries on, the directory is removed and the previous handlers return
 PASS a SIGINT in the work is latched, the work carries on, the directory is removed and the previous handlers return
 PASS a SIGTERM then SIGINT (the first is kept) in the work is latched, the work carries on, the directory is removed and the previous handlers return
+PASS an inherited SIG_IGN stays: the latch is not installed for a signal the parent ignored: an ignored SIGHUP: work result 7, latched None, disposition inside the work [<Handlers.SIG_IGN: 1>], after 1
+PASS typing stops at a latched signal and sends no Enter: a stop after five keystrokes: Enter sent False, 5 keystrokes sent, Enter among them False; no stop: Enter sent True, 4 writes
 PASS exit status: an observed tool call and no BEL passes: expected 0, got 0
 PASS exit status: a hooks-disabled control with a dialog and no BEL passes: expected 0, got 0
 PASS exit status: a hooks-disabled control that saw a BEL fails: expected 1, got 1
 PASS exit status: a control whose dialog never opened fails: expected 2, got 2
 PASS exit status: a run whose tool call was never observed fails: expected 2, got 2
-PASS end to end, one SIGTERM: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
-PASS end to end, two SIGTERMs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
-PASS end to end, two SIGINTs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 130 (expected 130), private directory left False, stand-in client still alive False
-PASS end to end, SIGTERM then SIGINT: the first signal decides the exit status: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
-PASS end to end, a SIGTERM at every line of the resource lifecycle: 120 lines swept, the client was running at 14 of them, 0 problems
+PASS end to end, one SIGTERM: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, two SIGTERMs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, two SIGINTs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -2 (expected -2), private directory left False, stand-in client still alive False
+PASS end to end, SIGTERM then SIGINT: the first signal is the one that ends the probe: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, a SIGTERM at each line a dry run reaches: 123 lines swept of the 186 lines with code in main, with_private_dir and measure (50 of them up to the spawn guard), the client was running at 17 of them, 0 problems
 PASS end to end, the measurement's exit status: 2 when the dialog never opened, 1 for a control that saw a BEL, 0 for a quiet one: the dialog never opened: exit 2 (expected 2); a hooks-disabled control saw a BEL: exit 1 (expected 1); a quiet hooks-disabled control: exit 0 (expected 0)
-PASS end to end, negative control: a client that never starts is rejected by a signal case: stand-in client ran False with signal mask None, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
-PASS end to end, negative control: a client that exits at once is rejected by the sweep: 120 lines swept, the client was running at 0 of them, 1 problems | the client was running when the signal fired at only 0 lines (at least 10 expected): the sweep did not exercise the client's lifetime
+PASS end to end, negative control: a client that never starts is rejected by a signal case: stand-in client ran False with signal mask None, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, negative control: a client that exits at once is rejected by the sweep: 123 lines swept of the 186 lines with code in main, with_private_dir and measure (50 of them up to the spawn guard), the client was running at 0 of them, 1 problems | the client was running when the signal fired at only 0 lines (at least 10 expected): the sweep did not exercise the client's lifetime

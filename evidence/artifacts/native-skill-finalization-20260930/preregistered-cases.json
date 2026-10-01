@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "kind": "preregistered_native_skill_evaluation",
+  "frozen_at_utc": "2026-09-30 05:46:35 UTC",
+  "scope": "Ten focused writing-for-agents cases in both native clients; four client-specific search-first executions; one matched Claude all-skills-disabled writing baseline. 25 planned fresh executions, one repetition per arm.",
+  "sources": [
+    {
+      "url": "https://developers.openai.com/blog/eval-skills",
+      "use": "Define success first; trace + outcome checks; explicit, implicit and adjacent negative; minimum ten focused prompts."
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md",
+      "use": "Same-prompt with/without-skill baseline and difficult near-miss trigger cases."
+    },
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    }
+  ],
+  "client_controls": {
+    "codex": {
+      "version": "0.159.2",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "ultra",
+      "native_options": [
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s read-only",
+        "-c approval_policy=\"never\""
+      ],
+      "skills": "Current selected global skills and existing client configuration; no replacement root or global mutation."
+    },
+    "claude": {
+      "version": "2.1.285",
+      "model": "opus",
+      "effort": "max",
+      "native_options": [
+        "-p",
+        "--output-format stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--permission-mode dontAsk",
+        "--disallowed-tools Write Edit NotebookEdit Agent"
+      ],
+      "skills": "Current selected global skills and existing client configuration; search-first remains name-only."
+    }
+  },
+  "baseline": {
+    "case_id": "w02_implicit_agents",
+    "client": "claude",
+    "same_prompt": true,
+    "native_change": "--disable-slash-commands",
+    "scope": "Disables all skills and commands for the session; this is not a selected-skill-only ablation.",
+    "verification": "Installed help states 'Disable all skills'. Inspect startup's advertised skills and absence of selected skill invocation or full instruction read.",
+    "limitations": [
+      "One run per arm cannot establish variance or causal improvement.",
+      "Existing project instructions and hooks remain enabled in both arms.",
+      "Other skill or source lookup differences are recorded rather than equated."
+    ]
+  },
+  "activation_grade": "Positive: actual native Skill invocation or successful full SKILL.md read in trace; a name mention is insufficient. Negative: no invocation or full selected SKILL.md read. File-read hash must match frozen selected source. Report truncated reads and blocked invocation separately.",
+  "outcome_grade": "Human review against each frozen concrete check plus deterministic JSON/string/word limits where applicable; report every check and final returned answer. These are integration observations, not upstream tests.",
+  "efficiency_grade": "Per-run native usage, duration, tool/command counts, errors, and outer exit retained separately. Cached tokens remain a subset; cumulative and nested counters are not summed.",
+  "failure_policy": "Retain every attempt and native denial/error. No prompt revision after freeze; preflight repair may change an invocation control only if recorded as a separate deviation. Missing native sign-in/quota is a limit, not a passed activation.",
+  "cases": [
+    {
+      "id": "w01_explicit_agents",
+      "skill": "writing-for-agents",
+      "kind": "explicit_positive",
+      "should_activate": true,
+      "prompt": "Condense this AGENTS.md instruction for agent use: 'Whenever you change application code, read docs/testing.md. For application-code changes, use docs/testing.md to run the checks required there. A change is complete only after every required check passes.' Return a replacement paragraph of at most 45 words and one sentence explaining the change; make no file changes.",
+      "native_prefix": {
+        "codex": "$writing-for-agents\n",
+        "claude": "/writing-for-agents "
+      },
+      "outcome_checks": [
+        "Replacement preserves the application-code trigger.",
+        "docs/testing.md occurs once in the replacement paragraph.",
+        "Completion requires every required check to pass.",
+        "Replacement paragraph is at most 45 words."
+      ]
+    },
+    {
+      "id": "w02_implicit_agents",
+      "skill": "writing-for-agents",
+      "kind": "implicit_positive",
+      "should_activate": true,
+      "prompt": "Draft a replacement AGENTS.md paragraph for this repo instruction: 'Always read docs/testing.md and docs/release.md. Follow docs/testing.md for testing; when you change executable code, run the tests in package.json. Before shipping a release, review docs/release.md and run its release checks. Be thorough. Follow docs/testing.md.' Keep the code-testing and release-preparation duties, remove unnecessary always-loaded material, and make each reference conditional on its relevant branch. Return the replacement paragraph and one sentence explaining the change; make no file changes.",
+      "outcome_checks": [
+        "Executable-code changes condition reading docs/testing.md and running current package.json tests.",
+        "Release preparation conditions reading docs/release.md and completing its release checks.",
+        "Each document reference appears once in the replacement paragraph.",
+        "The vague standalone 'Be thorough' instruction is removed.",
+        "No commands absent from the supplied task are invented."
+      ]
+    },
+    {
+      "id": "w03_implicit_claude",
+      "skill": "writing-for-agents",
+      "kind": "implicit_positive",
+      "should_activate": true,
+      "prompt": "Condense this CLAUDE.md instruction for agent use: 'The npm scripts define build and test commands. Run npm test as the test command; npm run build is the build command. If the scripts change, remember to update this paragraph. Before you finish changing executable code, run the repository's current test and build scripts and confirm both pass.' Return a replacement of at most 55 words and one sentence explaining what you removed; make no file changes.",
+      "outcome_checks": [
+        "Executable-code changes require the current test and build scripts and confirmation both pass.",
+        "The replacement refers to the package script source rather than caching npm test and npm run build.",
+        "Replacement paragraph is at most 55 words.",
+        "No additional installation or release actions are introduced."
+      ]
+    },
+    {
+      "id": "w04_conditional_pointer",
+      "skill": "writing-for-agents",
+      "kind": "contextual_positive",
+      "should_activate": true,
+      "prompt": "Write one line for AGENTS.md that tells an agent when to read docs/migration.md. That document covers exactly two distinct cases: adding a new migration and changing the migration runner. The line should name both triggers and the reference once. Return only the line; make no file changes.",
+      "outcome_checks": [
+        "The line names adding a new migration and changing the migration runner as separate triggers.",
+        "docs/migration.md occurs exactly once.",
+        "Reading the document is conditional on those triggers.",
+        "The output is one instruction line."
+      ]
+    },
+    {
+      "id": "w05_completion_branches",
+      "skill": "writing-for-agents",
+      "kind": "difficult_positive",
+      "should_activate": true,
+      "prompt": "Rewrite this AGENTS.md section for agent use in at most 90 words: 'Read the entire deploy guide for every task. For a documentation-only edit, make sure it looks good. For a change to the deployment scripts, do testing. The deploy guide is docs/deploy.md; it contains the native deployment-script validation procedure. Documentation-only changes are complete when links in the changed sections resolve and examples match the existing commands. Deployment-script changes are complete when every check in the guide's validation procedure passes.' Return the replacement section; make no file changes.",
+      "outcome_checks": [
+        "Documentation-only completion requires changed-section links to resolve and examples to match existing commands.",
+        "Deployment-script changes condition reading docs/deploy.md and require every validation-procedure check to pass.",
+        "The entire deploy guide is not required for every task.",
+        "Output is at most 90 words and introduces no deployment execution."
+      ]
+    },
+    {
+      "id": "w06_human_readme",
+      "skill": "writing-for-agents",
+      "kind": "adjacent_negative",
+      "should_activate": false,
+      "prompt": "Polish this README paragraph for human contributors without changing the facts: 'Our automation agents read AGENTS.md. The guide for people is CONTRIBUTING.md. You can search the docs from the website.' Return only the polished paragraph; make no file changes.",
+      "outcome_checks": [
+        "The paragraph preserves that automation agents read AGENTS.md, people use CONTRIBUTING.md, and documentation search is on the website.",
+        "The output remains human-facing prose without new automated-agent duties."
+      ]
+    },
+    {
+      "id": "w07_human_newsletter",
+      "skill": "writing-for-agents",
+      "kind": "difficult_adjacent_negative",
+      "should_activate": false,
+      "prompt": "Write a two-sentence human newsletter blurb explaining that AGENTS.md and CLAUDE.md are filenames developers may encounter. Keep it descriptive, without instructions for an automated agent. Return only the blurb; make no file changes.",
+      "outcome_checks": [
+        "Exactly two sentences explain the filenames descriptively.",
+        "The output remains human-facing and does not create automated-agent workflow instructions."
+      ]
+    },
+    {
+      "id": "w08_human_support",
+      "skill": "writing-for-agents",
+      "kind": "difficult_adjacent_negative",
+      "should_activate": false,
+      "prompt": "A teammate asked why the terminal says 'No CLAUDE.md found.' Explain in two sentences what the filename refers to and why that message alone does not prove a build failure. This is a human support reply. Return only the reply; make no file changes.",
+      "outcome_checks": [
+        "Exactly two sentences identify CLAUDE.md as agent/project guidance.",
+        "The reply states that missing guidance alone does not establish a build failure.",
+        "No file creation, installation, or workflow rewrite is requested by the answer."
+      ]
+    },
+    {
+      "id": "w09_human_copyedit",
+      "skill": "writing-for-agents",
+      "kind": "adjacent_negative",
+      "should_activate": false,
+      "prompt": "Copy-edit the following sentence for a human style guide while preserving its meaning: 'Writing for agents and people need clear instructions.' Return only the corrected sentence; make no file changes.",
+      "outcome_checks": [
+        "The corrected sentence preserves the intended meaning and corrects subject/verb agreement.",
+        "The output is only one sentence."
+      ]
+    },
+    {
+      "id": "w10_markdown_lookup",
+      "skill": "writing-for-agents",
+      "kind": "adjacent_negative",
+      "should_activate": false,
+      "prompt": "In the Markdown string `[Agent handbook](docs/agents.md)`, identify the link text and relative URL. Return a JSON object with exactly `text` and `url`; make no file changes.",
+      "outcome_checks": [
+        "The output parses as JSON with exactly text and url.",
+        "text equals Agent handbook; url equals docs/agents.md."
+      ]
+    },
+    {
+      "id": "s01_implicit_csv",
+      "skill": "search-first",
+      "kind": "implicit_positive",
+      "clients": [
+        "codex"
+      ],
+      "should_activate": true,
+      "prompt": "I'm about to add a small Python CSV reader to a project. Rows may include a comma inside quoted fields. Recommend the maintained existing component and the API calls we should reuse, with one primary-source link and a short reason. We only need a recommendation in this run; return it in chat and make no file changes.",
+      "outcome_checks": [
+        "Recommend Python's maintained standard-library csv module.",
+        "Identify csv.reader or csv.DictReader rather than splitting lines on commas.",
+        "Account for quoted commas and newline='' when opening files.",
+        "Include an official Python documentation source and make no install/code change."
+      ]
+    },
+    {
+      "id": "s02_explicit_csv",
+      "skill": "search-first",
+      "kind": "explicit_positive",
+      "clients": [
+        "claude"
+      ],
+      "should_activate": true,
+      "native_prefix": {
+        "claude": "/search-first "
+      },
+      "prompt": "I'm about to add a small Python CSV reader to a project. Rows may include a comma inside quoted fields. Recommend the maintained existing component and the API calls we should reuse, with one primary-source link and a short reason. We only need a recommendation in this run; return it in chat and make no file changes.",
+      "outcome_checks": [
+        "Recommend Python's maintained standard-library csv module.",
+        "Identify csv.reader or csv.DictReader rather than splitting lines on commas.",
+        "Account for quoted commas and newline='' when opening files.",
+        "Include an official Python documentation source and make no install/code change."
+      ]
+    },
+    {
+      "id": "s03_adjacent_copyedit",
+      "skill": "search-first",
+      "kind": "adjacent_negative",
+      "clients": [
+        "codex",
+        "claude"
+      ],
+      "should_activate": false,
+      "prompt": "For a human onboarding page, correct the grammar in 'Search first, then writes the utility.' Return only the corrected sentence; make no file changes.",
+      "outcome_checks": [
+        "The output is exactly: Search first, then write the utility."
+      ]
+    }
+  ]
+}

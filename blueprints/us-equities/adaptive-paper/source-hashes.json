@@ -52,7 +52,7 @@
   "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
   "tests/test_adaptive_paper_recovery.py": "6da67e1b83d887cbaaeaf289434a595dacc79517a6b74b61e2adf622f84462cb",
   "tests/test_adaptive_paper_runner.py": "29c4c48a8103cadb7906719d7145a9b14192b7d35486bb9eaa934faad5eac0b7",
-  "tests/test_adaptive_paper_safety.py": "68449ba3b2d4164c3c2c45c4c08cf7c51b171fce43e1ce0a0cedf08f32149235",
+  "tests/test_adaptive_paper_safety.py": "3e957ff5c005dcb497e81b95560f4ee45080cbaa8c11e3c602b15eb26191700b",
   "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",
   "tests/test_adaptive_paper_sessions.py": "1e8b33ec8b496807468067112f5b7f0a2a6d6ce897ac7412605678b94984fc6a",
   "tests/test_adaptive_paper_strategies.py": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",

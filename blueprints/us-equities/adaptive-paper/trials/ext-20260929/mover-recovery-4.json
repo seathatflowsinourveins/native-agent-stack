@@ -1,0 +1,51 @@
+{
+  "adoption_scope": {
+    "adopted": 10,
+    "skipped_terminal_unsubscribed": 29,
+    "subscribed_symbols": 3
+  },
+  "broker_positions_last_observed": [
+    {
+      "qty": "24",
+      "symbol": "BEX"
+    },
+    {
+      "qty": "68",
+      "symbol": "IOVA"
+    }
+  ],
+  "buy_submissions": 0,
+  "cancel_attempt_client_ids": [],
+  "errors": [
+    "SubmissionNotSent"
+  ],
+  "evidence_class": "PAPER",
+  "exit_attempt_client_ids": [
+    "rec-ext-20260929-4-0000001",
+    "rec-ext-20260929-4-0000002"
+  ],
+  "flat": false,
+  "kind": "mover_recovery_receipt",
+  "mode": "official_sdk_recovery",
+  "native_engine_resumed": false,
+  "order_deadline_seconds": 120.0,
+  "positions": [
+    {
+      "qty": "68",
+      "symbol": "IOVA"
+    }
+  ],
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": {
+    "cash_delta_usd": "-1971.27",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 2,
+    "positions_match": true
+  },
+  "stale_symbols": [],
+  "status": "needs_attention",
+  "trial_id": "ext-20260929-4",
+  "unresolved_orders": [],
+  "unsellable_positions": []
+}

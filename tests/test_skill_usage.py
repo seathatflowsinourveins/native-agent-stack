@@ -573,6 +573,10 @@ class BuildReportPruneLogic(unittest.TestCase):
 
 class RenderTextAndCli(unittest.TestCase):
     def setUp(self):
+        # skill_lock_path() prefers any non-empty XDG_STATE_HOME over --home, as skills 1.7.0 does (the
+        # lock-path tests above), so a caller's XDG_STATE_HOME would hide fake-home's lock and every age.
+        self.enterContext(mock.patch.dict(os.environ))
+        os.environ.pop("XDG_STATE_HOME", None)
         self.manifest_path = FIXTURES / "manifest.json"
         self.home = FIXTURES / "fake-home"
         self.claude_file = FIXTURES / "skill-doctor-sample.json"

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-01T06:50:46Z",
-  "meaning": "Recorded checkpoint adding bounded local Codex daemon, scoped cross-family memory and native helper recovery to preserved foundation, paper and simulation records. Automatic managed Codex push and cold git seeding remain held; linked receipts retain their own dates and scopes. Emitter freshness is separate from task acceptance.",
+  "recorded_at_utc": "2026-10-01T03:10:02Z",
+  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
@@ -14,8 +14,8 @@
       "kind": "lane",
       "id": "paper",
       "title": "Alpaca paper accounts 1 and 2",
-      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
+      "state": "09-29 mechanics-only / acct 2 pre 3 of 3 passed -2.05 USD / acct 1 rth 5 of 6 passed -115.94 USD then halted / acct 2 ext 3 of 4 passed IOVA 68 held (PR 559)",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"
     },
     {
       "kind": "lane",
@@ -26,62 +26,6 @@
     }
   ],
   "gates": [
-    {
-      "kind": "gate",
-      "id": "hindsight-live-page-freshness-20261001",
-      "title": "Live Hindsight knowledge-page freshness",
-      "state": "five pages stale / one unchanged-route native manual recovery failed at 300s wall limit / automatic refresh paused / retention and retrieval evidence separate",
-      "evidence_ref": "evidence/artifacts/hindsight-live-page-recovery-20261001/receipt.json"
-    },
-    {
-      "kind": "gate",
-      "id": "codex-native-daemon-queue-20261001",
-      "title": "Codex native daemon and cross-session queue",
-      "state": "0.159.3 native idle / busy / reconnect delivery passed in owned thread / no shared restart",
-      "evidence_ref": "evidence/receipts/codex-01593-native-queue-20261001.json"
-    },
-    {
-      "kind": "gate",
-      "id": "codex-hindsight-capture-20261001",
-      "title": "Codex automatic Hindsight capture and recollection",
-      "state": "headless and daemon paths passed / captured synthetic facts survived recovery / seed and pages separate",
-      "evidence_ref": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
-    },
-    {
-      "kind": "gate",
-      "id": "managed-cross-client-20261001",
-      "title": "Managed Codex and Claude messaging",
-      "state": "local engine transport and restart passed / automatic Codex PTY submit held / native alternative lacks selected-client parity",
-      "evidence_ref": "recipes/seamless-local-production.md"
-    },
-    {
-      "kind": "gate",
-      "id": "hindsight-native-cross-family-20261001",
-      "title": "Native cross-family memory retrieval",
-      "state": "Claude synthetic fact recalled by native Codex / first 300s timeout retained / mapped owned folders only",
-      "evidence_ref": "evidence/receipts/hindsight-cross-family-native-recall-20261001.json"
-    },
-    {
-      "kind": "gate",
-      "id": "hindsight-native-cold-seed-20261001",
-      "title": "Native automatic git-history bootstrap",
-      "state": "corrected attempt unfinished after 25min / exact parent and child cancelled / API recovery passed / autoSeed held",
-      "evidence_ref": "evidence/artifacts/hindsight-native-cap-repair-20261001/receipt.json"
-    },
-    {
-      "kind": "gate",
-      "id": "native-helper-recovery-20261001",
-      "title": "Native memory helper lifecycle",
-      "state": "default oneshot cleanup failure reproduced / corrected fresh and repeat start passed / native fixture stopped / host reboot untested",
-      "evidence_ref": "evidence/receipts/seamless-native-helper-recovery-20261001.json"
-    },
-    {
-      "kind": "gate",
-      "id": "hindsight-qualification-cleanup-20261001",
-      "title": "Disposable memory qualification cleanup",
-      "state": "eight owned documents deleted and independently absent / six others preserved / native background work retained / cached page history separate",
-      "evidence_ref": "evidence/artifacts/hindsight-native-qualification-cleanup-20261001/receipt.json"
-    },
     {
       "kind": "gate",
       "id": "memory-scheduled-learning",

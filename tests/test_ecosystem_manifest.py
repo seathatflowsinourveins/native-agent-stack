@@ -1497,7 +1497,10 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
   panel_hidden: (byId["convergence"] || {}).hidden,
   rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
   summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
-  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null}));
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null,
+  architecture_tab_hidden: (byId["tab-architecture"] || {}).hidden, architecture_panel_hidden: (byId["architecture"] || {}).hidden,
+  architecture_edition: byId["architecture-edition"] ? byId["architecture-edition"].textContent : null,
+  architecture: byId["architecture-topic"] ? byId["architecture-topic"].textContent : null}));
 '''
 
     @staticmethod
@@ -1615,6 +1618,524 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertEqual(convergence["overall"], real["summary"]["convergence"]["overall"])
         self.assertEqual([(row["catalog"], row["layer_id"]) for row in convergence["layers"]],
                          [(row["catalog"], row["layer_id"]) for row in real["rows"]])
+
+    # The dated new-WSL architecture edition (the "Final architecture" tab).
+    ARCHITECTURE = "catalogs/foundation/new-wsl-architecture-20261001.json"
+    ARCHITECTURE_SOURCE = "docs/decisions/edition-fixture.md"
+    ARCHITECTURE_VERDICTS = ("closed", "selection_of_record_open", "provisional", "comparison_required",
+                             "new_host_required", "no_selection")
+    ARCHITECTURE_CLASSES = ("upstream_test", "upstream_example_or_native_operation", "local_integration_check",
+                            "synthetic_fixture", "independent_observation", "structural_validation", "source_review",
+                            "none_recorded")
+    CLOSE_ONLY_WHEN = ["Selected choice, alternatives and evidence", "Frozen candidate set",
+                       "Comparisons and target-host checks", "Second independent review", "Dated closure record"]
+
+    def architecture_winner(self, **fields):
+        source = {"source_path": self.ARCHITECTURE_SOURCE}
+        return {"component_id": "search", "repository": "https://github.com/example/search", "pin": "1.0",
+                "pin_source": "manifests/stack.json:1",
+                "install": {"command": "search install", "kind": "repo_recipe", **source},
+                "acceptance": {"command": "search --self-test", "evidence_class": "upstream_test", **source},
+                "upstream_currency": {"latest_release": "v1.1 (2026-09-30)", "checked_at": "2026-10-01T05:00Z",
+                                      "pin_is_latest": "no", "url": "https://github.com/example/search/releases"},
+                **fields}
+
+    def architecture_row(self, layer_id="native-clients", catalog="foundation", **fields):
+        source = {"source_path": self.ARCHITECTURE_SOURCE}
+        return {"layer_id": layer_id, "catalog": catalog, "title": "Title " + layer_id,
+                "winners": [self.architecture_winner()], "verdict": "selection_of_record_open",
+                "closure": {"c1": "met", "c2": "partial", "c3": "unmet", "c4": "unmet", "c5": "partial",
+                            "missing": "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; "
+                                       "c5: no closure record"},
+                "reasons": [{"text": "Recorded verdict winner", **source}],
+                "evidence_class": "upstream_test",
+                "alternatives": [{"name": "Other client", "verdict": "refuted on fit", **source}],
+                "new_host_steps": ["Install the pinned client", "Sign in natively"],
+                "gates": [{"text": "Native sign-in on the new distro", "kind": "user_side", **source}],
+                "owner_lane": "foundation", "notes": "", **fields}
+
+    def architecture_edition(self):
+        pending = {"path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"}
+        # The five closure texts joined in order with newlines, no trailing newline.
+        texts_sha256 = hashlib.sha256("\n".join(self.CLOSE_ONLY_WHEN).encode()).hexdigest()
+        return {"schema_version": 1, "kind": "new_wsl_architecture_edition",
+                "edition": {"date_utc": "2026-10-01", "base_commit": "c" * 40, "scope": "Fixture edition",
+                            "close_only_when_sha256": texts_sha256,
+                            "verdict_rules": ["A layer is closed only when all five close_only_when items hold."],
+                            "verdict_values": {value: "Meaning of " + value for value in self.ARCHITECTURE_VERDICTS},
+                            "evidence_classes": {value: "Label of " + value for value in self.ARCHITECTURE_CLASSES},
+                            "sources": [{"source_path": self.ARCHITECTURE_SOURCE}]},
+                "rows": [self.architecture_row(),
+                         self.architecture_row("backtesting-engine", "us-equities", verdict="no_selection",
+                                               winners=[], evidence_class="none_recorded",
+                                               closure={**{item: "unknown" for item in ("c1", "c2", "c3", "c4", "c5")},
+                                                        "missing": "; ".join(item + ": assessment pending" for item
+                                                                             in ("c1", "c2", "c3", "c4", "c5"))}),
+                         self.architecture_row("cross:credential-practice", "cross",
+                                               reasons=[{"text": "Recipe lands with its pull request",
+                                                         "pending_source": pending}],
+                                               gates=[{"text": "Upstream fix pending", "kind": "upstream",
+                                                       "url": "https://github.com/example/search/issues/7"}])]}
+
+    def write_architecture(self, edition, close_only_when=None, foundation_layers=("native-clients",)):
+        self.write("catalogs/foundation/manifest.json", {"layers": [
+            {"id": layer, "title": layer.replace("-", " ").capitalize()} for layer in foundation_layers]})
+        self.write("catalogs/landscape/research-state.json", {
+            "saturation": {"close_only_when": self.CLOSE_ONLY_WHEN if close_only_when is None else close_only_when},
+            "layers": [{"catalog": "foundation", "layer_id": "native-clients", "status": "on_requirement_change"},
+                       {"catalog": "us-equities", "layer_id": "backtesting-engine", "status": "comparison_required"},
+                       {"catalog": "us-equities", "layer_id": "execution-broker", "status": "comparison_required"}]})
+        self.write(self.ARCHITECTURE_SOURCE, "# Fixture edition record\n")
+        self.write(self.ARCHITECTURE, edition)
+
+    def test_architecture_edition_validates_and_joins_pins_sources_and_closure_items(self):
+        self.write_architecture(self.architecture_edition())
+        page, _ = self.build()
+        data = json.loads(page.data)
+        architecture = data["architecture"]
+        self.assertEqual([(row["catalog"], row["layer_id"], row["verdict"]) for row in architecture["rows"]], [
+            ("foundation", "native-clients", "selection_of_record_open"),
+            ("us-equities", "backtesting-engine", "no_selection"),
+            ("cross", "cross:credential-practice", "selection_of_record_open")])
+        self.assertEqual([row["research_status"] for row in architecture["rows"]],
+                         ["on_requirement_change", "comparison_required", None])
+        # A catalog layer without a row is listed as a gap, never silently dropped.
+        self.assertEqual(architecture["missing_layers"], ["us-equities/execution-broker"])
+        self.assertEqual([(item["id"], item["text"]) for item in architecture["edition"]["closure_items"]],
+                         list(zip(("c1", "c2", "c3", "c4", "c5"), self.CLOSE_ONLY_WHEN)))
+        winner = architecture["rows"][0]["winners"][0]
+        self.assertEqual((winner["label"], winner["pin"]), ("search", "1.0"))
+        self.assertTrue(winner["pin_source"]["url"].endswith("/blob/main/manifests/stack.json#L1"))
+        # The edition's sources are newer than the immutable base: they resolve at the publication ref.
+        self.assertTrue(winner["install"]["source"]["url"].endswith("/blob/main/" + self.ARCHITECTURE_SOURCE))
+        self.assertTrue(architecture["url"].endswith("/blob/main/" + self.ARCHITECTURE))
+        self.assertEqual(architecture["rows"][2]["reasons"][0]["source"], {
+            "kind": "pending", "path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654",
+            "url": "https://github.com/example/public-stack/pull/569"})
+        self.assertEqual(architecture["rows"][2]["gates"][0]["source"],
+                         {"kind": "url", "url": "https://github.com/example/search/issues/7"})
+        hashed = {row["path"] for row in data["inputs"]}
+        self.assertLessEqual({self.ARCHITECTURE, self.ARCHITECTURE_SOURCE, "catalogs/foundation/manifest.json",
+                              "catalogs/landscape/research-state.json"}, hashed)
+        # A pending source whose file is absent is linked through its pull request and hashes nothing.
+        self.assertFalse((self.root / "docs/pending-recipe.md").exists())
+        self.assertNotIn("docs/pending-recipe.md", hashed)
+        # Once the file exists it landed after this edition's base: hashed and linked like a source_path, and the
+        # build passes, so a later merge of that pull request never breaks main.
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        page, _ = self.build()
+        data = json.loads(page.data)
+        landed = data["architecture"]["rows"][2]["reasons"][0]["source"]
+        self.assertEqual({key: value for key, value in landed.items() if key != "url"}, {
+            "kind": "landed", "path": "docs/pending-recipe.md", "pull_request": 569, "commit": "eabe7654"})
+        self.assertTrue(landed["url"].endswith("/blob/main/docs/pending-recipe.md"))
+        self.assertIn("docs/pending-recipe.md", {row["path"] for row in data["inputs"]})
+
+    def test_architecture_tab_is_hidden_without_the_edition(self):
+        self.use_real_template()
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["architecture"])
+        self.assertIn("hidden", page.elements["tab-architecture"])
+        self.assertEqual(page.elements["tab-architecture"]["aria-controls"], "architecture")
+        self.assertEqual(page.elements["architecture"]["role"], "tabpanel")
+        self.write_architecture(self.architecture_edition())
+        page, _ = self.build()
+        self.assertIsNotNone(json.loads(page.data)["architecture"])
+        self.assertEqual(len(page.scripts), 2)
+
+    def test_architecture_edition_change_changes_the_check_digest(self):
+        edition = self.architecture_edition()
+        self.write_architecture(edition)
+
+        def reword_a_reason():
+            edition["rows"][0]["reasons"][0]["text"] = "Recorded verdict winner, reworded"
+            self.write(self.ARCHITECTURE, edition)
+        self.assert_check_digest_changes(reword_a_reason)
+
+    ARCHITECTURE_HOSTILE = '</script><script src="https://invalid.example/steal.js"></script>'
+
+    def write_hostile_architecture(self):
+        hostile = self.ARCHITECTURE_HOSTILE
+        edition = self.architecture_edition()
+        row = edition["rows"][0]
+        row["title"] = row["notes"] = row["reasons"][0]["text"] = hostile
+        row["new_host_steps"] = [hostile]
+        self.write_architecture(edition)
+        return hostile
+
+    def test_architecture_text_is_inert_public_data(self):
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        embedded = json.loads(page.data)["architecture"]["rows"][0]
+        self.assertEqual((embedded["title"], embedded["notes"], embedded["reasons"][0]["text"],
+                          embedded["new_host_steps"]), (hostile, hostile, hostile, [hostile]))
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_hostile_architecture_text_as_text(self):
+        """The renderer writes text nodes only: the harness elements have no markup parser, so a renderer that
+        wrote the string as markup would lose it from textContent and this test would fail."""
+        self.use_real_template()
+        hostile = self.write_hostile_architecture()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        table = observed["architecture"]
+        for expected in (hostile + "foundation/native-clients", hostile + " (" + self.ARCHITECTURE_SOURCE + ") ↗",
+                         "Notes: " + hostile, "New-host steps, in order" + hostile + "Gates"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, table)
+        self.assertEqual(table.count(hostile), 4)
+
+    def test_architecture_edition_rejects_each_invalid_contract(self):
+        def winner(edition):
+            return edition["rows"][0]["winners"][0]
+
+        def reason(edition):
+            return edition["rows"][0]["reasons"][0]
+        cases = (
+            (lambda e: e.update(schema_version=2), "unsupported architecture edition schema"),
+            (lambda e: e.update(kind="other"), "architecture edition kind must be new_wsl_architecture_edition"),
+            (lambda e: e["edition"].pop("base_commit"), "architecture edition needs exactly its date, base commit"),
+            (lambda e: e["edition"].update(close_only_when_sha256="0" * 63),
+             "architecture edition needs exactly its date, base commit"),
+            (lambda e: e["edition"]["verdict_values"].pop("closed"),
+             "architecture edition must define every value of verdict_values"),
+            (lambda e: e.update(rows=[]), "architecture rows must be a non-empty list"),
+            (lambda e: e["rows"][0].update(winner={}), "architecture row has an unknown field"),
+            (lambda e: e["rows"][0].update(layer_id="unknown-layer"),
+             "architecture layer_id must be a known catalog layer or a cross: id"),
+            (lambda e: e["rows"][0].update(catalog="us-equities"), "architecture row catalog must match its layer"),
+            (lambda e: e["rows"][0].update(title=" "), "architecture row needs its title"),
+            (lambda e: e["rows"][0].pop("owner_lane"), "architecture row needs its owner_lane"),
+            (lambda e: e["rows"][0].update(notes=None), "architecture row notes must be text"),
+            (lambda e: e["rows"][0].update(verdict="done"), "unknown architecture verdict"),
+            (lambda e: e["rows"][0].update(evidence_class="anecdote"), "unknown architecture evidence class"),
+            (lambda e: e["rows"][0]["closure"].pop("c5"), "architecture closure needs c1..c5"),
+            (lambda e: e["rows"][0].update(verdict="closed"),
+             "a closed architecture verdict requires all five closure items met"),
+            (lambda e: e["rows"][0]["closure"].update(missing=" "), "an open architecture row must name what is missing"),
+            (lambda e: e["rows"][0].update(verdict="no_selection"),
+             "a no_selection architecture row carries no winners, and every other row has one"),
+            (lambda e: winner(e).update(name="search"), "architecture winner needs exactly one of component_id or name"),
+            (lambda e: winner(e).update(component_id="unlisted"),
+             "architecture winner component_id must be a manifests/stack.json component"),
+            (lambda e: winner(e).update(role=" "),
+             "architecture winner role must be non-empty text of at most 120 characters"),
+            (lambda e: winner(e).update(role="r" * 121),
+             "architecture winner role must be non-empty text of at most 120 characters"),
+            (lambda e: (winner(e).pop("component_id"), winner(e).update(name="ripgrep", pin=" ")),
+             "architecture winner needs its name and pin"),
+            (lambda e: winner(e).update(repository="http://github.com/example/search"),
+             "architecture winner repository must be a public HTTPS URL"),
+            (lambda e: winner(e).update(pin_source="manifests/absent.json:1"),
+             "architecture winner pin_source must be a repository file with an optional line range"),
+            (lambda e: winner(e).update(pin_source="manifests/stack.json:2"),
+             "architecture winner pin_source line range must fall inside the file"),
+            (lambda e: winner(e)["install"].update(kind="curl"),
+             "architecture install needs a known kind and a command unless none is recorded"),
+            (lambda e: winner(e)["acceptance"].update(command=""),
+             "architecture acceptance needs its evidence class and a command unless none is recorded"),
+            (lambda e: winner(e)["upstream_currency"].pop("checked_at"),
+             "architecture upstream currency needs latest_release, checked_at and pin_is_latest"),
+            (lambda e: winner(e)["upstream_currency"].update(url="javascript:alert(document.domain)"),
+             "architecture upstream currency url must be a public HTTPS URL"),
+            (lambda e: winner(e)["install"].pop("source_path"),
+             "architecture search install needs exactly one of source_path, pending_source or url"),
+            (lambda e: reason(e).update(url="https://github.com/example/search"),
+             "architecture reason needs exactly one of source_path, pending_source or url"),
+            (lambda e: reason(e).update(source_path="docs/absent.md"),
+             "architecture reason source_path must be a repository file"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(
+                pending_source={"path": "docs/pending-recipe.md", "pull_request": "569"})),
+             "architecture reason pending_source needs a path, a pull request number and an optional commit"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(url="https://127.0.0.1/record")),
+             "architecture reason url must be a public HTTPS URL"),
+            (lambda e: reason(e).update(source_path="manifests/evidence.json"),
+             "architecture citations cannot use the generated page or the evidence manifest"),
+            (lambda e: e["rows"][0].update(reasons=[]), "architecture row needs reasons with their text"),
+            (lambda e: e["rows"][0].update(alternatives=[{"name": "Other client"}]),
+             "architecture alternatives need their name and verdict"),
+            (lambda e: e["rows"][0].update(new_host_steps=[]), "architecture row needs ordered new-host steps"),
+            (lambda e: e["rows"][0]["gates"][0].update(kind="defect"),
+             "architecture gates need their text and a known kind (user_side, upstream or lane)"),
+            (lambda e: e["rows"].append(e["rows"][0]), "architecture layer_id must be unique"),
+            # The reverse direction of each "if and only if" rule.
+            (lambda e: e["rows"][0]["closure"].update(c2="met", c3="met", c4="met", c5="met", missing=""),
+             "a closed architecture verdict requires all five closure items met"),
+            (lambda e: e["rows"][0].update(winners=[]),
+             "a no_selection architecture row carries no winners, and every other row has one"),
+            (lambda e: e["rows"][0].update(verdict="closed", closure={
+                **{item: "met" for item in ("c1", "c2", "c3", "c4", "c5")}, "missing": "c1: nothing"}),
+             "an open architecture row must name what is missing, and a closed row nothing"),
+            # recipes/search.md has five lines, so :5-3 fails on its order, not on the file's bounds.
+            (lambda e: winner(e).update(pin_source="recipes/search.md:5-3"),
+             "architecture winner pin_source line range must fall inside the file"),
+            (lambda e: e["rows"][2].update(catalog="foundation"), "architecture row catalog must match its layer"),
+            (lambda e: winner(e)["install"].update(kind="none_recorded"),
+             "architecture install needs a known kind and a command unless none is recorded"),
+            # A path escape at each architecture call site.
+            (lambda e: reason(e).update(source_path="../outside.md"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: winner(e).update(pin_source="../manifests/stack.json:1"),
+             "source path must be canonical and confined to the repository"),
+            (lambda e: (reason(e).pop("source_path"), reason(e).update(
+                pending_source={"path": "../pending-recipe.md", "pull_request": 569})),
+             "source path must be canonical and confined to the repository"),
+        )
+        for mutate, message in cases:
+            with self.subTest(message=message):
+                edition = self.architecture_edition()
+                mutate(edition)
+                self.write_architecture(edition)
+                result = self.run_generator("--check")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(message, result.stdout)
+        with self.subTest(message="close_only_when"):
+            self.write_architecture(self.architecture_edition(), close_only_when=self.CLOSE_ONLY_WHEN[:4])
+            result = self.run_generator("--check")
+            self.assertNotEqual(result.returncode, 0, result.stdout)
+            self.assertIn("architecture closure items must be the five close_only_when items of the research state",
+                          result.stdout)
+
+    def test_architecture_closure_texts_are_bound_by_their_hash(self):
+        """The edition records the sha256 of the five close_only_when texts it was written against, so a reworded or
+        reordered research state fails the build instead of showing each row's states beside other texts."""
+        message = ("architecture edition close_only_when_sha256 must be the sha256 of the research state's five "
+                   "close_only_when texts")
+        self.write_architecture(self.architecture_edition())
+        result = self.run_generator("--check")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        texts = self.CLOSE_ONLY_WHEN
+        for name, changed in (("reworded", [texts[0] + ", reworded", *texts[1:]]),
+                              ("reordered", [texts[1], texts[0], *texts[2:]])):
+            with self.subTest(case=name):
+                self.write_architecture(self.architecture_edition(), close_only_when=changed)
+                result = self.run_generator("--check")
+                self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertIn(message, result.stdout)
+
+    def assert_architecture_cases(self, cases):
+        """Each case mutates a fresh fixture edition; None expects a passing --check, a string that failure."""
+        for name, mutate, message in cases:
+            with self.subTest(case=name):
+                edition = self.architecture_edition()
+                mutate(edition)
+                self.write_architecture(edition)
+                result = self.run_generator("--check")
+                if message is None:
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(message, result.stdout)
+
+    def test_a_none_recorded_acceptance_may_name_the_check_to_run(self):
+        """A check that is prescribed but has no recorded run keeps its command; every other class needs one."""
+        def prescribed(edition):
+            edition["rows"][0]["winners"][0]["acceptance"].update(command="rg --version", evidence_class="none_recorded")
+            edition["rows"][0]["evidence_class"] = "none_recorded"
+        self.assert_architecture_cases((
+            ("a prescribed check without a recorded run", prescribed, None),
+            ("a recorded class without a command",
+             lambda e: e["rows"][0]["winners"][0]["acceptance"].update(command=" "),
+             "architecture acceptance needs its evidence class and a command unless none is recorded")))
+
+    def recorded_winner(self, evidence_class):
+        """A second, name-keyed winner whose acceptance carries the given class."""
+        winner = self.architecture_winner(name="ripgrep", pin="14.1.1", acceptance={
+            "command": "" if evidence_class == "none_recorded" else "rg --version",
+            "evidence_class": evidence_class, "source_path": self.ARCHITECTURE_SOURCE})
+        winner.pop("component_id")
+        return winner
+
+    def test_architecture_pin_drift_passes_and_is_listed(self):
+        """A dated edition keeps the pin it recorded: a later stack move passes the build, the winner carries the
+        stack's version and --check lists it; a component_id outside the stack still fails (rejects test)."""
+        self.write_architecture(self.architecture_edition())
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [])
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        self.assertEqual(self.check_report()["architecture_pin_drift"], [
+            {"row": "foundation/native-clients", "component_id": "search", "edition_pin": "1.0", "stack_pin": "1.1"},
+            {"row": "cross/cross:credential-practice", "component_id": "search", "edition_pin": "1.0",
+             "stack_pin": "1.1"}])
+        page, _ = self.build()
+        winner = json.loads(page.data)["architecture"]["rows"][0]["winners"][0]
+        self.assertEqual((winner["pin"], winner["pin_drift"]), ("1.0", "1.1"))
+
+    def test_architecture_layer_identity_is_the_catalog_and_layer_id_pair(self):
+        """The two catalogs may share a layer id; each (catalog, layer id) pair is its own layer."""
+        shared = ("native-clients", "backtesting-engine")
+        edition = self.architecture_edition()
+        edition["rows"].append(self.architecture_row("backtesting-engine", "foundation"))
+        self.write_architecture(edition, foundation_layers=shared)
+        page, _ = self.build()
+        architecture = json.loads(page.data)["architecture"]
+        identities = [(row["catalog"], row["layer_id"], row["research_status"]) for row in architecture["rows"]]
+        self.assertEqual(identities[1::2], [("us-equities", "backtesting-engine", "comparison_required"),
+                                            ("foundation", "backtesting-engine", None)])
+        self.assertEqual(architecture["missing_layers"], ["us-equities/execution-broker"])
+        # The us-equities row does not cover the foundation layer of the same id.
+        self.write_architecture(self.architecture_edition(), foundation_layers=shared)
+        page, _ = self.build()
+        self.assertEqual(json.loads(page.data)["architecture"]["missing_layers"],
+                         ["foundation/backtesting-engine", "us-equities/execution-broker"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_renders_architecture_roles_pin_drift_and_landed_sources(self):
+        self.use_real_template()
+        edition = self.architecture_edition()
+        edition["rows"][0]["winners"][0]["role"] = "selected destination engine"
+        self.write_architecture(edition)
+        self.write("docs/pending-recipe.md", "# Landed recipe\n")
+        self.stack["components"][0]["version"] = "1.1"
+        self.save()
+        _, text = self.build()
+        observed = self.run_page(text, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        drift = "Pin drift: the stack now records 1.1; this edition recorded 1.0."
+        for expected in ("search ↗ · selected destination engine1.0" + drift,
+                         "search · selected destination engine · 1.0Pin of record: manifests/stack.json:1 ↗" + drift,
+                         "Recipe lands with its pull request (docs/pending-recipe.md · landed after this edition's base "
+                         "(pull request #569)) ↗"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, observed["architecture"])
+
+    def test_architecture_row_class_is_the_floor_its_winners_reach(self):
+        """No order is defined among the six policy classes, so the build enforces what it can: a row with a
+        none_recorded winner is none_recorded, and otherwise its class is one that a winner's acceptance carries."""
+        floor = "architecture row evidence class must be none_recorded when any winner's acceptance is none_recorded"
+        carried = "architecture row evidence class must be one that at least one winner's acceptance carries"
+
+        def with_second(evidence_class, row_class):
+            def mutate(edition):
+                edition["rows"][0]["winners"].append(self.recorded_winner(evidence_class))
+                edition["rows"][0]["evidence_class"] = row_class
+            return mutate
+        self.assert_architecture_cases((
+            ("a none_recorded winner under a recorded row class", with_second("none_recorded", "upstream_test"), floor),
+            ("a row class no winner carries", lambda e: e["rows"][0].update(evidence_class="local_integration_check"),
+             carried),
+            ("a none_recorded winner under a none_recorded row", with_second("none_recorded", "none_recorded"), None),
+            ("a row class one of two winners carries",
+             with_second("local_integration_check", "local_integration_check"), None),
+            ("a row without winners keeps its owner's class",
+             lambda e: e["rows"][1].update(evidence_class="local_integration_check"), None)))
+
+    def test_architecture_missing_names_exactly_the_open_items(self):
+        """`missing` is one "cN: ..." segment per item that is not met (segments separated by "; cN:"), none for a
+        met item; a trailing sentence without a cN: prefix belongs to the last segment."""
+        message = "architecture closure missing must name each item that is not met in its own cN: segment"
+
+        def missing(text):
+            return lambda edition: edition["rows"][0]["closure"].update(missing=text)
+        named = "c2: candidate set not frozen; c3: no new-distro run; c4: no second review; c5: no closure record"
+        self.assert_architecture_cases((
+            ("open items without a segment", missing("c2: candidate set not frozen"), message),
+            ("free text only", missing("TBD"), message),
+            ("free text before the segments", missing("TBD; " + named), message),
+            ("a met item with a segment", missing("c1: already met; " + named), message),
+            ("an open item named twice", missing(named + "; c5: and again"), message),
+            ("a trailing sentence without a prefix", missing(named + "; the owner re-reads this row next edition."),
+             None)))
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_architecture_tab(self):
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        # No edition: the tab stays hidden and #architecture falls back to the overview.
+        self.assertEqual((observed["architecture_tab_hidden"], observed["architecture_panel_hidden"]), (True, True))
+        self.assertEqual(observed["architecture"], "")
+
+        edition = self.architecture_edition()
+        self.write_architecture(edition)
+        _, with_edition = self.build()
+        observed = self.run_page(with_edition, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual((observed["architecture_tab_hidden"], observed["architecture_panel_hidden"]), (False, False))
+        head, table = observed["architecture_edition"], observed["architecture"]
+        for expected in ("Edition 2026-10-01 · base commit " + "c" * 40, "Fixture edition",
+                         "Closed: 0 of 3 rows. No layer is closed in this edition: none meets all five closure items",
+                         "Verdicts: no selection 1 · selection of record open 2",
+                         "Catalog layers without a row in this edition: us-equities/execution-broker",
+                         "Verdict rulesA layer is closed only when all five close_only_when items hold.",
+                         "c5Dated closure record", "selection of record openMeaning of selection_of_record_open"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, head)
+        for expected in ("Foundation layers", "US-equities layers", "Cross-cutting rows",
+                         "LayerWinners (pin)VerdictEvidence classReasonsInstall on the new distro",
+                         "Title native-clientsfoundation/native-clientsResearch state: on requirement change",
+                         "search ↗1.0", "Meaning of selection_of_record_openLabel of upstream_test",
+                         "Recorded verdict winner (" + self.ARCHITECTURE_SOURCE + ") ↗",
+                         "Recipe lands with its pull request (docs/pending-recipe.md · pull request #569 at eabe7654, "
+                         "not on main at this edition's base) ↗",
+                         "search · repo recipesearch install", "No selection of record",
+                         "c2 · partialFrozen candidate set", "Missing: c2: candidate set not frozen; c3: no new-distro run",
+                         "Pin of record: manifests/stack.json:1 ↗", "Acceptance (Label of upstream_test)search --self-test",
+                         "Upstream: v1.1 (2026-09-30) · pin is latest: no · checked 2026-10-01T05:00Z ↗",
+                         "Other client · refuted on fit · " + self.ARCHITECTURE_SOURCE + " ↗",
+                         "Install the pinned clientSign in natively",
+                         "user side gate: Native sign-in on the new distro", "upstream gate: Upstream fix pending",
+                         "Gate source: https://github.com/example/search/issues/7 ↗",
+                         "Missing: c1: assessment pending; c2: assessment pending", "Owner lane: foundation"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, table)
+
+        # One row meeting all five items, closed: the count comes from the data and the "none" sentence goes away.
+        edition["rows"][0].update(verdict="closed", closure={**{item: "met" for item in ("c1", "c2", "c3", "c4", "c5")},
+                                                              "missing": ""})
+        self.write_architecture(edition)
+        _, with_closed = self.build()
+        observed = self.run_page(with_closed, tab="architecture")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertIn("Closed: 1 of 3 rows.", observed["architecture_edition"])
+        self.assertNotIn("No layer is closed", observed["architecture_edition"])
+        self.assertIn("Nothing missing: all five closure items hold.", observed["architecture"])
+
+    @unittest.skipUnless(shutil.which("git"), "Tracked-file check needs git")
+    def test_the_repository_architecture_edition_validates_and_cites_tracked_files(self):
+        """The real edition, not the fixture: the generator's own validation passes and every file the edition
+        cites (and the generator hashes) is tracked by git in this checkout. A catalog layer without a row is
+        listed on the page, not a failure, so this test does not require every layer to have a row."""
+        sys.path.insert(0, str(ROOT / "scripts"))
+        try:
+            import build_ecosystem
+            from catalog_decisions import load
+        finally:
+            sys.path.remove(str(ROOT / "scripts"))
+        hashed = set()
+
+        def read(path):
+            hashed.add(path)
+            return load(ROOT, path)
+        architecture = build_ecosystem.build_architecture(
+            ROOT, "https://github.com/example/public-stack", read(build_ecosystem.STACK), read, hashed.add,
+            lambda path: "https://github.com/example/public-stack/blob/main/" + path, set())
+        self.assertIsNotNone(architecture)
+        tracked = set(subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True,
+                                     check=True).stdout.decode().split("\0"))
+        self.assertGreater(len(hashed), 3)
+        self.assertEqual(sorted(hashed - tracked), [])
+
+    def test_the_repository_architecture_record_keeps_the_acceptance_invariant(self):
+        """The record states the rule every winner's acceptance class follows and the dated review that corrected
+        the edition. The build cannot read prose, so this test keeps a later edit from dropping either silently."""
+        record = (ROOT / "docs/decisions/2026-10-01-new-wsl-architecture-edition.md").read_text(encoding="utf-8")
+        record = " ".join(record.split())
+        for sentence in (
+                "A winner's acceptance class describes a run that the cited source, or one file that source links, "
+                "shows was run on a host and what it returned.",
+                "A check that is only prescribed, planned, not run or failed is `none_recorded`.",
+                "A version print is metadata, not an acceptance.",
+                "An independent review on 2026-10-01 found 32 of the 119 winner acceptance classes overstated, 13 "
+                "commands that were only version or status prints and 6 entries it could not settle"):
+            with self.subTest(sentence=sentence[:50]):
+                self.assertIn(sentence, record)
 
 
 if __name__ == "__main__":

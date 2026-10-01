@@ -1,0 +1,3 @@
+<!-- native-agent-stack:decision-routing:begin (adoption/templates/codex.AGENTS.template.md; edit outside these markers) -->
+Bound discovery to task-filtered names, descriptions and source locators; load only selected tool schemas. For maintained decisions, and before describing deployed architecture after compaction/resume, query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema. Check relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify current canonical sources.
+<!-- native-agent-stack:decision-routing:end -->

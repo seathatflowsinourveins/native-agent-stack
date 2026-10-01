@@ -144,6 +144,11 @@ covers this reporter's own internal tokenizer-count invocation used while
 comparing `toon` output; it does not change what `"toon"`'s own `env node`
 shebang above resolves at run time.
 
+`systemctl --user show-environment` (above) is for your own terminal: the
+agent command guard refuses it, because it prints every value the manager
+holds. From an agent session, check what a user unit's `PATH` resolves with
+`systemd-run --user --pipe --wait --quiet /bin/sh -c 'command -v node && node --version'`.
+
 The timer's four fixed local times a day (03:15, 10:15, 16:15, 22:15) never
 land inside the Sat/Sun 05:00-09:00 quiet window on any on-schedule fire
 (checked with `systemd-analyze calendar`), and `systemd-analyze --user verify`
