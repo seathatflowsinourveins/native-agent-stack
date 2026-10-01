@@ -611,6 +611,11 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.broker = port
             return port
 
+        def fake_checkpoint(key, secret, *, after, before_request, **kwargs):
+            for _ in range(3):
+                before_request("read")
+            return {"account": self.observation([])["account"], "fees": []}
+
         args = [command, "--env-file", str(Path(root) / "unused.env"), "--output", str(out),
                 "--state-root", str(Path(root) / "state")]
         if command == "paper":
@@ -621,6 +626,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         try:
             with patch.object(mover_runner, "credentials", return_value=("key", "secret")), \
                  patch.object(transport, "preflight", lambda key, secret, symbols, **kw: self.observation(symbols)), \
+                 patch.object(transport, "fee_checkpoint", fake_checkpoint), \
                  patch.object(transport, "AlpacaPaperTransport", fake_transport), \
                  patch.object(mover_runner, "load_scan",
                               lambda raw, settings, *, now: real_load_scan(raw, settings, now=SCAN_TIME + 20)), \

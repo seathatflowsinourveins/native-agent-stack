@@ -10845,8 +10845,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-mover.md",
-      "sha256": "bdea9283cabf8a3202f01359109d463a78cb2735a199e0f93baf05486152d31a",
-      "bytes": 21164
+      "sha256": "a74574de8726cae6aef8caed2f041c13acbd13832a916e1d7c4a8527b7944e03",
+      "bytes": 21829
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
@@ -10865,13 +10865,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
-      "sha256": "cea19e941f514591c410b28d71909b8f240678074f7c5627b1609ccc74d03e38",
-      "bytes": 25821
+      "sha256": "c3966d55a867612e50fe3cd0d841060b3d8944ae77ad39fb4a050bc0def0bba2",
+      "bytes": 37314
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
-      "sha256": "7b7837cd6866ef36271887edf261c0ab1862e04b49ff2dcbb2e3e74262fa6e23",
-      "bytes": 17640
+      "sha256": "5a4e4a1aa7bd58e6b906604e2ab1c635cbf0417613b5c94546e6e2af968bb86e",
+      "bytes": 19095
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README.md",
@@ -10990,8 +10990,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_runner.py",
-      "sha256": "03f9107e40feaaefc6e896db3e20d246139f8ef8b02e1a7d7da79199e62bb7f5",
-      "bytes": 61848
+      "sha256": "aaa2e70202e011993c6827cda808155ef7737d752073245ceded55fd8b1eb5d7",
+      "bytes": 65768
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/mover_simulation.py",
@@ -11160,13 +11160,13 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4",
-      "bytes": 150357
+      "sha256": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+      "bytes": 153832
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357",
-      "bytes": 83006
+      "sha256": "f43def730273be28dbb2b4a791dff31ca7e3f661735eb45e35ebccb75c4d0285",
+      "bytes": 88369
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -11185,8 +11185,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "f0fb64b0a3700f9fa7e2b14910c035dec66addf17e4bd12467b10d4f07e1e180",
-      "bytes": 6969
+      "sha256": "c9b6f5f8f39fe6595fa13c054420e1e96633038e895495f9a4a5d6b5da0ab93a",
+      "bytes": 7076
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -11200,8 +11200,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9",
-      "bytes": 83300
+      "sha256": "8d1222f7b8e90cf2af0cd6efb88eb70704cf900c480a097e86576a8382435b16",
+      "bytes": 92936
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -45489,6 +45489,11 @@
       "bytes": 25425
     },
     {
+      "path": "tests/test_adaptive_paper_fees.py",
+      "sha256": "9a181eb3d2e20ff34ac6551022bf252d51688ab3014162ca696a37b45bdc5221",
+      "bytes": 78129
+    },
+    {
       "path": "tests/test_adaptive_paper_financing.py",
       "sha256": "8d9f1f21f9d53c9ed120281409bdcb97b8c9ddacc615d0cdfa392cfcf111fa90",
       "bytes": 8708
@@ -45515,8 +45520,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_mover_native.py",
-      "sha256": "2c176fb4e25827fe6b5c0a7ef1277769cd402bf33b28a31ed5c2c7a6da8c3220",
-      "bytes": 54865
+      "sha256": "2cf17ed5dd956d18b973fcdcf0ea1412dee8eec7040d29fa1d2e28781b7c16fa",
+      "bytes": 55169
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
@@ -45550,8 +45555,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "e4914d1755fb70c23688cb118dc482ea95c15e57ebb3a081813f8083a385b396",
-      "bytes": 106024
+      "sha256": "7d75e7ae89dc048cd62628fcfd666ff18eaf3daedbed836b0a451ddaf7a45f87",
+      "bytes": 106177
     },
     {
       "path": "tests/test_adjudicate.py",
