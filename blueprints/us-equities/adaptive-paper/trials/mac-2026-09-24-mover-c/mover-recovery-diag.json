@@ -1,0 +1,54 @@
+{
+  "adoption_scope": {
+    "adopted": 13,
+    "skipped_terminal_unsubscribed": 2,
+    "subscribed_symbols": 5
+  },
+  "broker_positions_last_observed": null,
+  "buy_submissions": 0,
+  "cancel_attempt_client_ids": [],
+  "errors": [
+    "TransportError"
+  ],
+  "evidence_class": "PAPER",
+  "exit_attempt_client_ids": [],
+  "flat": false,
+  "kind": "mover_recovery_receipt",
+  "mode": "official_sdk_recovery",
+  "native_engine_resumed": false,
+  "order_deadline_seconds": 120.0,
+  "positions": [
+    {
+      "qty": "37",
+      "symbol": "APUS"
+    },
+    {
+      "qty": "6",
+      "symbol": "SRZN"
+    },
+    {
+      "qty": "13",
+      "symbol": "GRML"
+    },
+    {
+      "qty": "67",
+      "symbol": "PFSA"
+    }
+  ],
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": null,
+  "status": "needs_attention",
+  "trial_id": "mover-mac-20260924c",
+  "unresolved_orders": [
+    {
+      "client_id": "mvr-mover-mac-20260924c-0000005",
+      "filled_qty": "0",
+      "qty": "13",
+      "side": "sell",
+      "status": "reserved",
+      "submit_attempted": true,
+      "symbol": "GRML"
+    }
+  ],
+  "unsellable_positions": []
+}
