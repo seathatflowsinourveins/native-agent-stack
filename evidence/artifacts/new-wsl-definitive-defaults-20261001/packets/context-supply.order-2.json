@@ -1,0 +1,182 @@
+{
+ "slot_id": "context-supply",
+ "layer_id": "token-efficiency",
+ "title": "Context and usage efficiency",
+ "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+ "slot_question": "ccusage is settled as the provider-usage meter. Which single context-supply option does the new host install for Claude Code and Codex sessions?",
+ "a_deciding_comparison_would_measure": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "The requirement's own metric is complete provider usage and cost per solved task at equal task success, not a tool's own artifact-reduction estimate.",
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "This project's own run on an upstream harness (Harbor v0.23.0, built-in claude_code agent; 288 trials on 36 SWE-bench Verified tasks; one repetition per arm and task; Sonnet 5.5 at medium effort; short single-session tasks, no subagents; list-price cost estimate). Whole-task cost against the no-tool base: Headroom 0.39.1 0.983, RTK 1.027 and Serena 1.063, all inconclusive (their intervals include 1, as the A/A control's does); Context Mode, jcodemunch and the full stack +30% to +39% (intervals above 1). Complete provider tokens, paired on tasks both arms solved: Headroom 0.867 (0.775 to 0.971); RTK 0.955 (0.847 to 1.078); Context Mode +18%; jcodemunch +41%. sqz did not run. The arm wrappers and analysis script are local integration code; the prompt cache was not controlled per trial."
+ ],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "ccusage [C06]",
+    "first_round_status": "selected",
+    "note": "Measures provider usage. It reads the local usage logs that Claude Code and Codex write and reports input, output, cache-creation and cache-read tokens separately (daily, session or JSON). These counts stay apart from any compressor's own artifact estimate.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/ccusage/ccusage/blob/main/apps/ccusage/README.md",
+      "shows": "Documented (lines 57-85, 168-193): `npx ccusage@latest`. It reports per source for Claude Code (`ccusage claude daily`) and Codex (`ccusage codex daily`) among 18 sources. It 'Tracks and displays cache creation and cache read tokens separately' and supports --json, --offline and --breakdown. README states MIT."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: latest release v20.0.26 (2026-09-27). Since 2026-07-03: 11 releases and 830 default-branch commits. In the last 90 days: 149 issues closed and 190 PRs merged. 3 issues open. Head 3fcb94baee has CI rollup SUCCESS."
+     },
+     {
+      "url": "https://registry.npmjs.org/ccusage",
+      "shows": "Observed: npm latest is 20.0.26, published 2026-09-27T16:27Z, with 10 versions published since 2026-07-03."
+     },
+     {
+      "url": "https://arxiv.org/html/2607.12161",
+      "shows": "Documented (v5, 12 Aug 2026), on why a separate provider-usage meter is needed: tool-output reduction did not reliably predict billed cost, and prompt-cache traffic made up most input-side cost."
+     }
+    ]
+   },
+   {
+    "about": "RTK [C04]",
+    "first_round_status": "selected",
+    "note": "Compresses shell output for the context window. A PreToolUse hook rewrites Bash commands for Claude Code and Codex. On failure or truncation RTK saves the full original output, which `rtk recall` retrieves; `rtk proxy` passes output through raw. `rtk gain` reports artifact reductions as bytes/4 estimates and states explicitly that these are not bill savings.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/rtk-ai/rtk/blob/develop/README.md",
+      "shows": "Documented (lines 66-72): 'RTK cuts up to 90% of the bash output your agent reads. That is what RTK measures, and it is not the same as cutting your bill'. Token counts are 'estimated as bytes / 4'. Lines 487-498: retriever mode 'sqlite' is the default, and 'When a command fails, RTK saves the full unfiltered output so the LLM can recall it' (rtk recall <id>). Line 395: the built-in Read/Grep/Glob tools bypass the hook. Line 460: Codex is integrated through `rtk init -g --codex` (PreToolUse updatedInput plus AGENTS.md). Lines 518-521: telemetry is disabled by default and opt-in."
+     },
+     {
+      "url": "https://arxiv.org/html/2607.12161",
+      "shows": "Documented (v5, 12 Aug 2026; Table 8): RTK v0.44.1 against stock Claude Code 2.1.201 over 712 paired runs. Billed cost changed by -2.7% (CI -5.6 to -0.1) and success by -0.2 pp (CI -2.9 to +1.9)."
+     },
+     {
+      "url": "https://blog.jetbrains.com/ai/2026/07/rtk-claude-code-token-savings/",
+      "shows": "Documented (July 2026): rtk v0.43.0 on Claude Code 2.1.201 with claude-sonnet-5, SkillsBench 86 tasks, 425 billed trials. Median cost per task was +7.6% at low effort (p=0.004) and +0.1% at high effort (p=0.99). Task quality was unchanged in both arms. The hook rewrote 33-50% of Bash calls."
+     },
+     {
+      "url": "https://github.com/daseinlabs/code-compression-bench",
+      "shows": "Documented (run 2026-07-04; 100 SWE-bench Verified tasks; headless Claude Code with claude-sonnet-4-6): RTK solved 54/100 against a baseline of 57/100. Total cost +13%, input tokens +16%."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: v0.50.0 released 2026-09-24. Since 2026-07-03: 871 commits and at least 100 releases, mostly dev rc prereleases. In 90 days: 515 issues closed and 178 PRs merged; 862 issues and 699 PRs open. v0.50.0 assets include rtk-x86_64-unknown-linux-musl.tar.gz and rtk-aarch64-apple-darwin.tar.gz. License Apache-2.0."
+     }
+    ]
+   },
+   {
+    "about": "Context Mode",
+    "first_round_status": "not selected",
+    "note": "Capability fit is high: sandboxed ctx_execute, an FTS5 store of full outputs retrievable by search, ctx_stats, Claude Code plugin hooks, Codex MCP plus hooks, and no telemetry per its README. However, its only published numbers are self-reported byte reductions (README Benchmarks, e.g. 315 KB to 5.4 KB), with no task-success or provider-usage measurement. It has no GitHub or npm release since v1.0.169 on 2026-06-29, although it has 143 default-branch commits since 2026-07-03. It merged 0 PRs in 90 days, with 150 open. Evidence does not separate it from sqz or current Headroom (see deciding comparison)."
+   },
+   {
+    "about": "Headroom",
+    "first_round_status": "not selected",
+    "note": "Broadest capability: proxy and MCP compression with reversible CCR, a wrap command for Claude Code and Codex, and savings labelled estimated or measured with a holdout. It is also the most active repo (v0.39.1; 1,181 PRs merged in 90 days). Independent end-to-end runs on Claude Code measured +48.4% billed cost (CI +42.3 to +55.0; v0.27.0, arXiv 2607.12161v5, 712 runs) and +44% total cost (code-compression-bench, July 2026), attributed to cache-write churn. A Codex replication measured -12.49% reconstructed cost but +238.52% wall time. The current v0.39.x has no published measurement. The anonymous beacon is on by default, and `headroom wrap` also registers Serena in ~/.claude.json."
+   },
+   {
+    "about": "sqz",
+    "first_round_status": "not selected",
+    "note": "Byte-exact recovery (`sqz expand`), FTS5 recall, cost and regret accounting, and zero telemetry all fit the requirement. However, there is no independent end-to-end evaluation. Codex integration is only AGENTS.md guidance plus MCP, with no hook. It overlaps RTK's shell-output role, and maintenance activity is small (11 issues closed and 3 PRs merged in 90 days). Should run in the deciding comparison."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "Every observed-now fact holds. The arXiv Table 8 figures and the code-compression-bench figures match exactly.",
+    "After review: ccusage is settled as the provider-usage meter. RTK remains a provisional pick for the context-supply slot until the head-to-head runs.",
+    "The judge wrote that Context Mode 'has 143 default-branch commits since 2026-07-03'. The count is correct, but all 143 are github-actions[bot] commits titled 'ci: update install stats', with zero human commits. Together with the last npm and GitHub release (1.0.169 on 2026-06-29, 94 days ago) and 0 PRs merged since 2026-07-03, the code is unchanged in the window. It still passes criterion 4 literally, but in substance it fails currency. This strengthens the judge's decision not to select it; the phrase misstated the project's maintenance.",
+    "ccusage is settled. It documents separate cache-creation and cache-read token counts for both Claude Code and Codex. It is very active with green CI and 3 open issues, and the alternative, agent-console, was created 2026-09-20T17:55:58Z, with latest release v0.4.1 published 2026-09-27 (observed via GraphQL).",
+    "The supply slot is not settled. RTK's fit rests on documented recoverable originals (rtk recall) and honest labeling that artifact estimates are not bill savings. None of the three independent measurements shows a provider-usage benefit: -2.7% [-5.6, -0.1] on Sonnet; Opus replications at -2.9% [-18.8, +9.3] and +2.5% [-6.1, +12.0], both crossing zero; +13% total cost with 54 vs 57 tasks solved in a single vendor-run SWE-bench Verified run; and +0.1% (p=0.99) at high effort on SkillsBench, where JetBrains writes 'at no point did rtk save anything'. sqz has no independent evaluation. The evidence therefore cannot separate RTK from sqz.",
+    "code-compression-bench also reports arms outside this packet below baseline: Parsec -39%, Caveman -19%, Fermat -22% and Woz -13% total cost. They are not candidates here, but a future landscape refresh should look at them.",
+    "No reasoning from popularity or current use appears in the judgment."
+   ],
+   "checked_facts": [
+    {
+     "claim": "ccusage: v20.0.26 published 2026-09-27T16:26Z; 139 releases; 830 commits since 2026-07-03; HEAD 3fcb94baee SUCCESS; 3 open issues; 149 issues closed and 190 PRs merged since 2026-07-03",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "ccusage README: npx ccusage@latest (L57); 'ccusage claude daily' and 'ccusage codex daily' (L66-67); 'Tracks and displays cache creation and cache read tokens separately' (L188); --offline (L189); --breakdown (L177)",
+     "url": "https://github.com/ccusage/ccusage/blob/main/apps/ccusage/README.md",
+     "holds": true
+    },
+    {
+     "claim": "RTK: v0.50.0 published 2026-09-24; default branch develop; 871 commits since 2026-07-03; 377 releases, the recent ones dev-0.51.0 rc prereleases; 862 open issues and 699 open PRs; 515 issues closed and 178 PRs merged since 2026-07-03",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "RTK README (develop): 'it is not the same as cutting your bill by 90%' (L68); token counts estimated as bytes / 4 (L72); install.sh (L95); rtk init -g --codex (L133, L460); built-in Read/Grep/Glob bypass the hook (L395); [retriever] config and 'rtk recall' (L487, L495); telemetry disabled by default and opt-in (L520)",
+     "url": "https://github.com/rtk-ai/rtk/blob/develop/README.md",
+     "holds": true
+    },
+    {
+     "claim": "arXiv 2607.12161 Table 8 (712 runs per arm, 103 tasks): RTK v0.44.1 cost change -2.7% [-5.6, -0.1] and success change -0.2 pp [-2.9, +1.9]; Headroom v0.27.0 +48.4% [+42.3, +55.0]. Appendix C Opus replication: RTK -2.9% [-18.8, +9.3] on Opus 4.8 and +2.5% [-6.1, +12.0] on Opus 5",
+     "url": "https://arxiv.org/html/2607.12161",
+     "holds": true
+    },
+    {
+     "claim": "code-compression-bench (run 2026-07-04; 100 SWE-bench Verified tasks; claude-sonnet-4-6): baseline 57/100 at $147.30; RTK 54/100 with total cost +13% and input +16%; Headroom 58/100 at +44%",
+     "url": "https://github.com/daseinlabs/code-compression-bench",
+     "holds": true
+    },
+    {
+     "claim": "JetBrains trial: Harbor 0.18, Claude Code 2.1.201, claude-sonnet-5, 86 of 87 SkillsBench tasks, rtk v0.43.0, 425 billed trials; at high effort the median paired cost change was +0.1% (p=0.99). The low-effort +7.6% figure was not re-read",
+     "url": "https://blog.jetbrains.com/ai/2026/07/rtk-claude-code-token-savings/",
+     "holds": true
+    },
+    {
+     "claim": "Context Mode: no GitHub or npm release after v1.0.169; npm dist-tag latest 1.0.169 published 2026-06-29T18:18:27Z; 0 PRs merged since 2026-07-03",
+     "url": "https://registry.npmjs.org/context-mode",
+     "holds": true
+    },
+    {
+     "claim": "Context Mode has 143 default-branch commits since 2026-07-03 (true as a count, but all 143 are github-actions[bot] 'ci: update install stats' commits with zero human commits, so the count does not show maintenance)",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Claude Token Efficient exclusion: last commit 2026-06-16T03:07Z; 0 commits since 2026-07-03; no releases",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "agent-console (judge's reason for preferring ccusage): created 2026-09-20T17:55:58Z; latest release v0.4.1 published 2026-09-27; last default-branch commit 2026-09-28",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "Run on the new WSL2 host as paired, randomized trials with k >= 3 per task, separately for Claude Code and for Codex. Arms: (1) a no-layer baseline; (2) RTK v0.50.x; (3) sqz v1.9.x; (4) Headroom v0.39.x. Headroom stays in because the +48.4% and +44% cost results measured v0.27.0 and a July build, not the current version. Context Mode 1.0.169 runs only as a frozen control unless human development resumes. Take complete provider usage per run from ccusage (input, output, cache creation, cache read) and keep it separate from each tool's own artifact estimate (rtk gain, headroom savings, sqz stats). Count recall, expand and retrieve calls, failed attempts and wall time. Decide on cost per solved task at equal success."
+  },
+  "evidence_gaps": [
+   "No independent end-to-end evaluation was found for Context Mode, sqz, current Headroom v0.39.1 or current RTK v0.50.0. The cited studies used RTK v0.43.0 and v0.44.1, and Headroom v0.27.0 or a July 2026 build.",
+   "The three RTK studies disagree on cost: -2.7% (CI -5.6 to -0.1); +7.6% at low effort but +0.1% at high effort; and +13% in a single run. All three found task quality unchanged.",
+   "Headroom's effect depends on the harness: +48.4% billed cost on Claude Code versus -12.49% reconstructed cost on Codex (40 pairs, wall time +238.52%). Codex evidence for RTK, Context Mode and sqz is absent.",
+   "code-compression-bench is run by a vendor whose own arm is included. It reports one run per arm with no confidence intervals. The JetBrains full runs were k=1.",
+   "ccusage counts come from local client logs. Reconciliation against provider-billed invoices was not verified.",
+   "agent-console's conformance-suite claims were not verified."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F4",
+   "name": "sqz",
+   "repository": "https://github.com/ojuschugh1/sqz"
+  },
+  {
+   "key": "F3",
+   "name": "rtk-ai/rtk",
+   "repository": "https://github.com/rtk-ai/rtk"
+  },
+  {
+   "key": "F1",
+   "name": "Headroom",
+   "repository": "https://github.com/headroomlabs-ai/headroom"
+  },
+  {
+   "key": "F2",
+   "name": "No context-supply layer: the usage meter only",
+   "repository": "",
+   "installs_nothing_extra": true
+  }
+ ]
+}
