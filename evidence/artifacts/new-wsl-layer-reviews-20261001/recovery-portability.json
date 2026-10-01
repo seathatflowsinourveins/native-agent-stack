@@ -15,7 +15,7 @@
     "no_unresolved_material_gap": false,
     "remaining_gaps": [
       "Independent host/key/application-data restore, client rebinding and actual-data atomicity remain outside the existing scoped receipts.",
-      "New Ubuntu26.04.1 locks/runtime selection and WSL export/import recovery have not been executed."
+      "Selected Ubuntu24.04.5 locks/runtime selection and WSL export/import recovery have not been executed; Ubuntu26.04.1 remains a queued comparison candidate."
     ]
   },
   "selected_repositories": [

@@ -30,9 +30,43 @@
     "stderr_bytes": 0
   },
   "owner_response": {
-    "file": "claude-owner-response.md",
+    "file": "claude-owner-response.initial.md",
     "bytes": 7942,
-    "sha256": "67bc29073df02d5a5c6d0e4bb94f4b0ec67fc24145f7fe70d116579cb03ef1d2"
+    "sha256": "67bc29073df02d5a5c6d0e4bb94f4b0ec67fc24145f7fe70d116579cb03ef1d2",
+    "snapshot_verification": "The append-only designated response retained this exact 7942-byte prefix; it was preserved as an immutable private original-output snapshot and its hash rechecked."
+  },
+  "owner_packet_acknowledgement": {
+    "received_at": "2026-10-01T08:53:00Z",
+    "private_original": {
+      "file": "claude-owner-response.md",
+      "bytes": 19469,
+      "sha256": "5eb9344f23daaba37507e532ffc18550d9ad2dd2f06362b1cf041e3744a813a5"
+    },
+    "reviewed_packet": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/575",
+    "reviewed_head": "bbee2a8e03ff80bb85b3908b289b690a205cceb2",
+    "owner_report": "The owner reports reading all 20 foundation review verdicts, corrections, remaining gaps and install commands and referencing them in architecture PR574. Hindsight page/cold-seed holds and automatic Codex PTY submission hold remain gates; no layer was closed.",
+    "accepted_followup_requests": [
+      "Use the selected Ubuntu 24.04.5 image; 26.04.1 remains a queued comparison candidate.",
+      "Bind each upstream-documented install command to its exact source document and line, alongside the repository's pinned recipe.",
+      "Obtain the trading lane acknowledgement of the shared crosswalk on PR575 through the existing owner protocol before any merge."
+    ],
+    "upstream_assessment": {
+      "pending_source_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/573",
+      "reported_head": "5adcc3a4",
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+      "reported_sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22",
+      "independent_observation": {
+        "observed_head": "7e6cd883fd3c4ec423cd03b6fb57e73cab11c964",
+        "command": "rtk proxy git show 7e6cd883fd3c4ec423cd03b6fb57e73cab11c964:evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+        "exit_code": 0,
+        "returned_bytes": 615461,
+        "sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22",
+        "assessments": 20,
+        "source_repository_revision": "3361b342aa6a8e4ec8fac8d3d980bfc4e7020f4a"
+      },
+      "status": "Exact-byte branch artifact independently recovered; its hash matches the designated owner's report. It declares model-authored source review, not acceptance evidence. Per-layer reconciliation against the newer review packet remains open."
+    },
+    "limitations": "This response acknowledges the review packet. It is neither a shared-lane merge acknowledgement nor target-host acceptance."
   },
   "native_usage": {
     "input_tokens": 6,
@@ -80,6 +114,29 @@
       "https://docs.docker.com/engine/security/rootless/",
       "evidence/receipts/seamless-local-runtime-20261001.json at 3e6617d1ee73da9aef619cc277c624ac74e07326"
     ]
+  },
+  "published_packet_handoff": {
+    "pull_request": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/575",
+    "reviewed_head": "bbee2a8e03ff80bb85b3908b289b690a205cceb2",
+    "native_execution_exit_code": 0,
+    "result_subtype": "success",
+    "native_send_message_tool_result": {"success": true, "submission": "queued", "recipient_acceptance": "not inferred"},
+    "private_original_output": {
+      "file": "claude-packet-handoff.stdout.json",
+      "bytes": 66771,
+      "sha256": "f49f4e4739518f2a1b7b47dabf2a24a4864ab17d8f3b6a56af5ad11e291d3ec7"
+    },
+    "native_usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 68953,
+      "cache_read_input_tokens": 123251,
+      "output_tokens": 7109,
+      "thinking_tokens_subset_of_output": 5349,
+      "native_estimated_cost_usd": 0.7184782,
+      "invoice_cost": null,
+      "counting": "Completed native call only; no addition of iteration snapshots, cache subdivisions or thinking subset."
+    },
+    "boundary": "Substantive packet submission and shared-lane review request; no merge or full saturation acceptance."
   },
   "role_correction": {
     "initial_researcher_delivery": false,

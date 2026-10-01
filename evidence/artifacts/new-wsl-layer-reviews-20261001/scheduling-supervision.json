@@ -14,7 +14,7 @@
     "independent_review_performed": true,
     "no_unresolved_material_gap": false,
     "remaining_gaps": [
-      "Ubuntu 26.04.1 systemd package pin and user-session behavior have not been observed on the new distro.",
+      "The selected Ubuntu 24.04.5 systemd package pin and user-session behavior have not been observed on the new distro; Ubuntu 26.04.1 is a queued comparison candidate.",
       "WSL process shutdown, distro termination, Windows reboot and external provider/application effects are distinct unexecuted acceptance boundaries."
     ]
   },
@@ -93,7 +93,7 @@
   "corrections": [
     {
       "claim": "Linux service supervision also proves persistent WSL availability",
-      "correction": "Microsoft explicitly says systemd services do not keep WSL alive; distro shutdown and Windows reboot require separate observations. Historical Ubuntu package 255.4 is not the Ubuntu 26.04.1 package pin",
+      "correction": "Microsoft explicitly says systemd services do not keep WSL alive; distro shutdown and Windows reboot require separate observations. Historical Ubuntu package 255.4 does not establish the package pin in the selected Ubuntu 24.04.5 image or in the queued Ubuntu 26.04.1 comparison image",
       "deciding_source": "https://learn.microsoft.com/en-us/windows/wsl/systemd"
     },
     {

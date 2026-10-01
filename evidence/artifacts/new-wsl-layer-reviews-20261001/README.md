@@ -29,6 +29,44 @@ A completed JSON file does not close its layer. The five closure criteria in
 `catalogs/landscape/research-state.json` still govern selection and lifecycle
 acceptance, with target-host checks collected later on the new distro.
 
+The integrated source packet now contains all **32 layer reviews**: 20 foundation
+and 12 US-equities. Their 114 selected-component records and 341 alternative records
+are rows, not unique repositories. All 32 retain a material gap; none is closed.
+The [independent Astra review](architecture-independent-review-scope.json) accepts
+the mapping and evidence boundaries conditionally, with installation and target
+acceptance still open.
+
+Install commands retain both the generic upstream instruction and the local
+version/checksum specialization. The [harness and memory bindings](upstream-install-document-bindings.json)
+and [context bindings](context-install-bindings-followup.json) resolve original
+document lines and preserve unsupported attributions. Trading reviews carry
+their own bindings. Template commands and source metadata are not execution.
+The [operations bindings](operations-install-bindings-followup.json) supply 31
+field mappings across 30 components, retaining local lockfile recipes separately
+from generic upstream instructions and exact package/edition selectors.
+The owner's pending selected-distro recipe is Ubuntu 24.04.5; Ubuntu 26.04.1 remains a comparison
+candidate. Per-skill refs and Python versus TypeScript SDK packages remain separate.
+
+The [memory candidate follow-up](durable-memory-candidate-followup.json) and
+[messaging follow-up](cross-client-messaging-candidate-followup.json) keep actual
+capture ownership, scoped retrieval, native queue submission, mailbox reminders
+and PTY delivery distinct. The unchanged ai-memory 2.5.2 shell suite passed 137
+tests, and OpenViking 0.4.22's native plugin suite passed 167, independently reproduced
+in each case. Their fixture boundaries do not establish real-client semantic
+quality, provider parity or restored-copy acceptance.
+
+The [retained native smoke attempt](landscape-smoke-attempt.json) records a successful
+launch followed by a saved Workflow abort and incomplete native child usage.
+It does not count as a completed sweep. The [persistent-caller retry](persistent-caller-repair.json)
+is tracked separately, with the original failure and inputs preserved.
+
+The [selection-gap adjudication](selection-gap-convergence-followup.json) recommends
+scoped research and supply-chain compositions for owner reconciliation. It corrects
+the Alphalens Tox command and distinguishes Grype's automation pin from the missing
+stack-manifest entry. The secret-scanner comparison remains open. The
+[publication check](publication-validation.json) preserves a registration race and
+the actual successful sequential correction.
+
 ## Continuing waves
 
 1. Freeze the source/candidate set and a decision-changing capability question.

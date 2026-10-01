@@ -35,7 +35,7 @@
     "semantic_quality": "not measured",
     "new_host_execution": "none",
     "production_upgrade": "none",
-    "independent_rerun": "pending"
+    "independent_rerun": "Astra/max reran the exact unchanged suite at the same commit: exit 0, returned 137 passed, 0 failed, empty stderr. Retained in durable-memory-candidate-followup.json#/independent_native_rerun."
   },
   "additional_native_check": {
     "command": "rtk cargo nextest --version",

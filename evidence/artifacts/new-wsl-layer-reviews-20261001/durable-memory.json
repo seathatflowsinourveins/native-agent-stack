@@ -8,6 +8,7 @@
     "model": "gpt-6.1-sol",
     "effort": "ultra",
     "family": "Codex",
+    "model_basis": "Repository coordinator policy; this source review does not claim an independently exposed provider response model identifier or native token usage for the coordinator.",
     "independent_source_research": "Astra/max stack-researcher; consequential cross-client memory composition"
   },
   "verdict": "corrected",
@@ -16,7 +17,7 @@
     "no_unresolved_material_gap": false,
     "remaining_gaps": [
       "No matched representative semantic-quality comparison establishes a superior writer across the named candidates.",
-      "Basic Memory, Letta Code, Cognee, OpenViking and Supermemory require a second tagged-source capability pass beyond release metadata.",
+      "Candidate source coverage was extended by an Astra/max nine-candidate follow-up; native quality, one-writer, scope negatives and restored-copy acceptance remain open.",
       "ai-memory latest-candidate external capture ownership still requires native client lifecycle and compatibility review; the unchanged 2.5.2 POSIX hook suite passed, but Rust/full gates were not executed.",
       "Hindsight knowledge-page freshness and cold Git seeding have preserved failed existing-host attempts.",
       "New-host project/worktree isolation, restart, restore and capture/recall acceptance remain unknown."
@@ -28,8 +29,8 @@
       "repository": "https://github.com/akitaonrails/ai-memory",
       "pin_of_record": "2.4.1",
       "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "pin_source": "manifests/stack.json#/components/id=ai-memory",
-      "selection_source": "catalogs/foundation/manifest.json#/layers/id=durable-memory",
+      "pin_source": "manifests/stack.json:94",
+      "selection_source": "catalogs/foundation/manifest.json:83",
       "role": "One scoped cross-client memory store of record",
       "installed_client_observation": {
         "command": "rtk ai-memory --version",
@@ -57,18 +58,31 @@
       },
       "native_install": {
         "commands": [
-          "cargo install --locked --git https://github.com/akitaonrails/ai-memory --tag v2.5.1",
+          "cargo build --release --workspace"
+        ],
+        "sources": [
+          "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1545-L1561"
+        ],
+        "upstream_document_binding": {
+          "document": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1558",
+          "original_command": "cargo build --release --workspace",
+          "applies_to": "Retained 2.4.1 source checkout at 433a19f3d54dea287571b1423591db2a89965fa9",
+          "specialization": "Checkout binding is required; the command alone does not select a version."
+        },
+        "status": "Upstream-documented retained-source build; not run. The source explicitly states that cargo install ai-memory from crates.io is unavailable."
+      },
+      "intermediate_candidate_install_review": {
+        "candidate": "2.5.1",
+        "command": "cargo build --release --workspace",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/695805eb881fd25f6bea67a9d0ff05b9adeaab44/docs/install.md#L1661",
+        "integration_command_shapes_observed": [
           "ai-memory install-mcp --client codex --apply",
           "ai-memory install-mcp --client claude-code --apply",
           "ai-memory install-hooks --agent codex --apply",
           "ai-memory install-hooks --agent claude-code --apply"
         ],
-        "sources": [
-          "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.1",
-          "https://github.com/akitaonrails/ai-memory/blob/v2.5.1/docs/external-lifecycle.md",
-          "Installed ai-memory 2.4.2 install-hooks --help, exit 0; installation was not invoked"
-        ],
-        "status": "supported command shapes; candidate installation is not claimed"
+        "integration_basis": "Existing PATH client 2.4.2 help checks; these are command shapes, not executed candidate installation or literal 2.5.1 upstream recipes. The tagged Codex example at docs/install.md:813-824 is a Docker remote-server example.",
+        "status": "Intermediate candidate source review only. Latest candidate 2.5.2 requires its own complete installation and lifecycle qualification."
       },
       "native_acceptance": {
         "commands": ["cargo tf", "cargo t -E 'test(/external_capture/)'", "sh tests/hooks/test_lib.sh"],
@@ -115,13 +129,26 @@
     {"repository": "https://github.com/MemTensor/MemOS", "candidate": "2.0.34", "status": "conditional", "source": "https://github.com/MemTensor/MemOS/blob/v2.0.34/README.md", "reason": "Native cross-client hooks exist, but the cloud coding plugin's local-backend parity remains unqualified."},
     {"repository": "https://github.com/getzep/graphiti", "candidate": "0.30.2", "status": "specialist", "source": "https://github.com/getzep/graphiti/tree/v0.30.2", "reason": "Temporal knowledge-graph MCP is complementary; Zep managed service and deprecated community server are different products."},
     {"repository": "https://github.com/letta-ai/letta", "candidate": "0.16.8", "status": "architecture alternative", "source": "https://github.com/letta-ai/letta/tree/0.16.8", "reason": "Stateful agent runtime is distinct from a drop-in native-client memory writer."},
-    {"repository": "https://github.com/basicmachines-co/basic-memory", "candidate": "0.23.2", "status": "source pass required", "release_source": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"},
-    {"repository": "https://github.com/letta-ai/letta-code", "candidate": "0.34.1", "status": "source pass required", "release_source": "https://github.com/letta-ai/letta-code/releases/tag/v0.34.1"},
-    {"repository": "https://github.com/topoteretes/cognee", "candidate": "1.6.2", "status": "source pass required", "release_source": "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"},
-    {"repository": "https://github.com/volcengine/OpenViking", "candidate": "0.4.22", "status": "source pass required", "release_source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22"},
-    {"repository": "https://github.com/supermemoryai/supermemory", "candidate": "server-v0.0.8", "status": "source pass required", "release_source": "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"}
+    {"repository": "https://github.com/basicmachines-co/basic-memory", "candidate": "0.23.2", "status": "retain non-adoption; narrow ranking-path comparison", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/0", "release_source": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"},
+    {"repository": "https://github.com/letta-ai/letta-code", "candidate": "0.34.1", "status": "alternate harness; not a proven independent native-client memory capture layer", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/1", "release_source": "https://github.com/letta-ai/letta-code/releases/tag/v0.34.1"},
+    {"repository": "https://github.com/topoteretes/cognee", "candidate": "1.6.2 core; stock plugins bootstrap 1.6.1", "status": "genuine conditional native challenger", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/2", "release_source": "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"},
+    {"repository": "https://github.com/volcengine/OpenViking", "candidate": "0.4.22", "status": "genuine conditional native challenger", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/3", "release_source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22"},
+    {"repository": "https://github.com/supermemoryai/supermemory", "candidate": "server-v0.0.8 plus separately pinned native clients", "status": "conditional local/native composition; independent MCP route unresolved", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/4", "release_source": "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"},
+    {"repository": "https://github.com/rohitg00/agentmemory", "candidate": "0.9.29; iii-engine 0.11.2", "status": "retained targeted trial", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/5"},
+    {"repository": "https://github.com/vshulcz/deja-vu", "candidate": "0.21.4", "status": "retained targeted native-history retrieval trial", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/6"},
+    {"repository": "https://github.com/tigerless-labs/agent-memory", "candidate": "243868db5027dde92a9fd0d1b76721b135792304", "status": "keep-but-compare", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/7"},
+    {"repository": "https://github.com/langchain-ai/langmem", "candidate": "0.0.30 at 9d033b47d9ce53e37e92c92241b0496c0278932e", "status": "not_adopted_confirmed for this fixed native lifecycle contract", "source_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates/8"}
   ],
   "anti_pattern_log": [
+    {
+      "mistake": "The selected ai-memory 2.4.1 row carried a version-specialized cargo git-install command for candidate 2.5.1 without an exact upstream document binding.",
+      "correction": "Bind the retained pin to its documented source build, and keep intermediate candidate build and installed-client integration shapes separate. Do not attribute an undocumented specialization to upstream.",
+      "verification_path": [
+        "Original 433a19f3d54dea287571b1423591db2a89965fa9 docs/install.md:1545-1561, including the crates.io name conflict and source build at line1558",
+        "Original 695805eb881fd25f6bea67a9d0ff05b9adeaab44 docs/install.md:1648-1661, with source build at line1661",
+        "Direct original-source reads checked by the coordinator; no installation performed"
+      ]
+    },
     {
       "mistake": "A progress update called all 20 foundation reviews committed when only the 19 worker reviews had been committed and the coordinator's memory review remained a draft.",
       "correction": "Nineteen committed worker reviews plus one coordinator draft comprise the current 20-layer pass; focused memory follow-up remains open.",
@@ -165,13 +192,13 @@
     "unchanged_upstream_tests_this_wave": "2.5.2 POSIX hook suite: 137 passed, 0 failed, exit 0; evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-upstream-hooks.json. Rust and full native gates remain unexecuted.",
     "new_host_execution": "not executed; the replacement distro does not exist"
   },
-  "failed_access": [],
+  "failed_access": ["Recovered guessed-path failures and unreturned latest-release endpoints are retained in durable-memory-candidate-followup.json."],
   "omissions": [
-    "Five named competitors still need tagged-source capability review; release metadata only has been checked.",
-    "The dated 2026-09-26 and 2026-09-29 convergence sets also name rohitg00/agentmemory, vshulcz/deja-vu, tigerless-labs/agent-memory and langchain-ai/langmem. Their deciding facts/fit votes and source revisions must be folded into the frozen set before candidate coverage can close. Existing refuted alternatives may retain their original deciding evidence where inputs still match."
+    "The nine previously pending candidate capability reviews are now retained in durable-memory-candidate-followup.json, including recovered September 26/29 votes. No new live-provider, native-client restore or representative-quality comparisons were performed.",
+    "Other earlier refuted alternatives retain their original deciding evidence where inputs still match; some stored historical vote explanations are truncated and were not reconstructed."
   ],
   "next_wave": [
-    "Complete the five remaining native integration/capture/restore source reviews and fold in the four later-wave candidates, including maintained package/repository identity and retained refutation reasons.",
+    "Use the nine-candidate follow-up's explicit native comparison queue: resolve Cognee's bootstrap/core mismatch, Supermemory's independent MCP route, OpenViking's scope/snapshot/index behavior and Tigerless's model/effort preservation before replacement-writer acceptance.",
     "Inspect 2.5.1 native external-capture tests and compare their contract with the one-writer composition before any adoption.",
     "Preregister a supported native matched-corpus comparison covering short sessions, same-name repositories, worktrees, contradiction, deletion, freshness, restart and restore; retain quality failures and complete usage.",
     "Qualify Hindsight page freshness only after a native operation completes and independent metadata confirms freshness. Preserve the backend deadline and paused state."

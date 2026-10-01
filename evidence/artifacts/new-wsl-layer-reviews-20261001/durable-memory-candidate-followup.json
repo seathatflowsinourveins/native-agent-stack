@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "kind": "independent_source_review_followup",
+  "reviewed_layer": "durable-memory",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model": "gpt-6-astra", "effort": "max", "role": "stack-researcher", "family": "Codex"},
+  "escalation": {
+    "trigger": "Consequential cross-client memory composition and conflicting native-integration evidence",
+    "acceptance": "Accept the source distinctions and independent POSIX fixture result; promote no replacement memory writer."
+  },
+  "fixed_contract": ["Native Codex and Claude capture/recall", "Short sessions", "Same-name repository and worktree isolation", "One capture owner", "Recoverable installation and restore", "Representative semantic quality with complete usage"],
+  "candidates": [
+    {
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "version": "0.23.2",
+      "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+      "package": "basic-memory",
+      "verdict": "Retain prior non-adoption; conditional ranking-path comparison",
+      "deciding_facts": "The inspected shipped manifests register SessionStart and PreCompact, with no Stop entry. Lifecycle envelopes enter a local inbox and do not automatically become graph notes. Graph checkpointing relies on compaction or deliberate skills/opt-in capture. The reviewed tag pins FastMCP 4.0.0b1, including its Codex launcher; earlier main-branch stable-dependency findings have different inputs.",
+      "sources": [
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/claude-code/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/hooks.json",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/pyproject.toml",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/session_start.py"
+      ],
+      "native_install": "uv tool install basic-memory==0.23.2; native marketplace/plugin installation from the pinned checkout",
+      "native_tests": ["just package-check-claude-code", "just package-check-codex"],
+      "command_source": "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile",
+      "remaining_gaps": ["Default automatic short-session graph capture", "Native scope negatives and restored-copy behavior", "Matched ranking-path quality"]
+    },
+    {
+      "repository": "https://github.com/letta-ai/letta-code",
+      "version": "0.34.1",
+      "commit": "9ef9a0bee79a1b9e92bdc3f67a75e986d7287ce9",
+      "package": "@letta-ai/letta-code",
+      "verdict": "Alternate stateful harness; does not establish drop-in memory capture from independent native clients",
+      "deciding_facts": "Own memory blocks, MemFS and agent lifecycle are a separate runtime. The tagged README removes AgentFile export/import and related flags; memory/transcript export is distinct from those retired recovery assumptions.",
+      "sources": ["https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md"],
+      "native_install": "npm install -g @letta-ai/letta-code@0.34.1",
+      "native_tests": ["bun run test:update-chain:manual"],
+      "command_source": "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json",
+      "test_boundary": "The declared updater smoke tests its own lifecycle, not external-client memory capture.",
+      "reopen_on": "A changed runtime requirement or supported independent native-client capture integration"
+    },
+    {
+      "repository": "https://github.com/topoteretes/cognee",
+      "version": "1.6.2",
+      "commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+      "integration_repository": "https://github.com/topoteretes/cognee-integrations",
+      "integration_commit": "7538e97223770d445dcaacefc0b8737530e82a72",
+      "verdict": "Genuine conditional native challenger",
+      "deciding_facts": "Both plugins provide recall and automatic capture, including Stop/SessionEnd. Shared identity/datasets support cross-client access. Automatic project node sets use a canonical-path hash. Both inspected plugin bootstraps install core 1.6.1; stock installation does not establish 1.6.2 acceptance.",
+      "sources": [
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/README.md",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/plugins/cognee/scripts/session-start.py#L121"
+      ],
+      "native_install": "Official Claude/Codex marketplace plugins from the pinned cognee-integrations checkout; current managed bootstrap selects core 1.6.1",
+      "native_tests": ["uv sync --dev", "uv run pytest tests/ -v"],
+      "test_working_directory": "integrations/tests",
+      "command_source": "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md",
+      "test_boundary": "Default subprocess/mock checks and separately enabled live-provider checks are different evidence classes.",
+      "remaining_gaps": ["Resolve bootstrap/core version mismatch", "Shared-recall node sets and explicit tag scope", "Matched quality and restore"]
+    },
+    {
+      "repository": "https://github.com/volcengine/OpenViking",
+      "version": "0.4.22",
+      "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+      "package": "openviking",
+      "verdict": "Genuine conditional native challenger",
+      "deciding_facts": "Both integrations document automatic recall/capture. Codex captures completed turns on Stop and commits on SessionEnd/PreCompact, with orphan-session recovery. Peer identity defaults to normalized Git origin, falling back to repository path, intentionally sharing worktrees/clones. Snapshot restore versions files; historical ACLs/vector indexes are not restored and asynchronous index rebuild may be required.",
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/agent-integrations/04-codex.md",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/guides/15-snapshot.md"
+      ],
+      "native_install": "Native marketplace plugin openviking-memory@openviking from the pinned checkout",
+      "native_tests": ["node --test scripts/*.test.mjs"],
+      "test_working_directory": "examples/codex-memory-plugin",
+      "command_source": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md",
+      "later_unchanged_upstream_test": "Root ran the declared Node suite at the same pin: exit 0, 167 passed, 0 failed, 0 skipped. Original output and fixture boundaries are retained in openviking-0422-upstream-plugin-tests.json; real native-client/server/provider and restore acceptance remain open.",
+      "remaining_gaps": ["Short-session commit and orphan recovery", "Scope negatives for intentional clone/worktree sharing", "Snapshot/index/ACL boundaries", "Matched representative quality"]
+    },
+    {
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "version": "server-v0.0.8",
+      "commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+      "native_clients": [
+        {"repository": "https://github.com/supermemoryai/codex-supermemory", "package": "codex-supermemory", "version": "1.0.19", "commit": "9c0b043490851bce90787d8a35443a274e7525bd"},
+        {"repository": "https://github.com/supermemoryai/claude-supermemory", "package": "supermemory", "version": "0.1.8", "commit": "915aba1b8056ddb3630fa833973032ba6b788fdb"}
+      ],
+      "verdict": "Conditional local/native composition; do not categorize as managed-only",
+      "deciding_facts": "Official local-server installation and separate native clients exist. The clients document remote-hash project containers and completed-turn capture. The Codex MCP proxy defaults independently to the hosted MCP route; changing only the memory API URL does not make the whole composition local.",
+      "sources": [
+        "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+        "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+      ],
+      "native_install": ["npx supermemory local", "npx codex-supermemory@1.0.19 install", "Native Claude marketplace plugin supermemory"],
+      "native_tests": "Both native client repositories declare npm test; no server-native test recipe is inferred from the missing guessed package path.",
+      "remaining_gaps": ["Pin local-server executable separately from source/client pins", "Supported local MCP endpoint/override", "Scope negatives, one-writer ownership, quality and restore"]
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "version": "0.9.29",
+      "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "package": "@agentmemory/agentmemory",
+      "engine_version": "iii-engine 0.11.2",
+      "verdict": "Retain targeted trial and existing matched retrieval evidence",
+      "deciding_facts": "Native both-client hooks, export/import, deletion and audit exist. Historical D2 used benchmark ingestion; its comparison cannot establish shipped-hook D2h behavior or a reranker-enabled C4 result.",
+      "sources": ["https://github.com/rohitg00/agentmemory/blob/v0.9.29/README.md", "catalogs/sota-convergence/manifest-20260929.json"],
+      "native_install": ["npx @agentmemory/agentmemory@0.9.29", "agentmemory connect <agent>"],
+      "native_tests": ["npm test", "npm run test:integration"],
+      "command_source": "https://github.com/rohitg00/agentmemory/blob/v0.9.29/package.json",
+      "test_boundary": "npm test excludes integration tests; the integration entrypoint requires running services.",
+      "remaining_gaps": ["Shipped-hook D2h ingestion", "Current scope negatives and restored-copy behavior", "Matched C4 comparison"]
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "version": "0.21.4",
+      "commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+      "package": "@vshulcz/deja-vu wrapper; native Go executable deja",
+      "verdict": "Retain targeted native transcript-retrieval trial",
+      "deciding_facts": "Indexes native histories and offers both-client integration, persistent forget exclusions and idempotent export/import. This is a different capture representation from an automatic semantic distiller. Its reported session-level hit/evidence-recall scores use a different metric from recall_all@5.",
+      "sources": ["https://github.com/vshulcz/deja-vu/blob/v0.21.4/README.md", "catalogs/sota-convergence/manifest-20260929.json"],
+      "native_install": ["go install github.com/vshulcz/deja-vu/cmd/deja@v0.21.4", "deja install --auto"],
+      "native_tests": ["make build test lint", "deja bench"],
+      "command_source": "https://github.com/vshulcz/deja-vu/blob/v0.21.4/Makefile",
+      "remaining_gaps": ["Same-name/worktree routing", "Short-session indexing latency", "Restored forget exclusions", "Separately scored matched retrieval arm"]
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "commit": "243868db5027dde92a9fd0d1b76721b135792304",
+      "workspace_version": "0.1.0",
+      "package": "Install the source workspace, not a similarly named unrelated PyPI distribution",
+      "verdict": "Retain keep-but-compare",
+      "deciding_facts": "Native mem setup installs Codex/Claude hooks. Stop/SessionEnd distillation invokes the host CLI. Raw traces, provenance, proposal review and rebuildable indexes are distinct surfaces; native sign-in reuse does not mean zero model usage or verified model/effort parity.",
+      "sources": ["https://github.com/tigerless-labs/agent-memory/blob/243868db5027dde92a9fd0d1b76721b135792304/README.md"],
+      "native_install": ["uv sync --all-packages", "mem setup --host claude-code", "mem setup --host codex"],
+      "native_tests": ["uv run pytest -q"],
+      "command_source": "https://github.com/tigerless-labs/agent-memory/blob/243868db5027dde92a9fd0d1b76721b135792304/.github/workflows/ci.yml",
+      "remaining_gaps": ["Host model/effort preservation and complete usage", "Automatic project isolation", "Complete recovery", "Matched representative quality"]
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "version": "0.0.30",
+      "commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+      "package": "langmem",
+      "verdict": "Retain not_adopted_confirmed for the fixed native-client lifecycle contract",
+      "deciding_facts": "The inspected revision offers programmable memory primitives and application/LangGraph integration. The requested supported native-client capture lifecycle was not found in those inspected sources.",
+      "sources": ["https://github.com/langchain-ai/langmem/blob/9d033b47d9ce53e37e92c92241b0496c0278932e/README.md"],
+      "native_install": "pip install langmem==0.0.30",
+      "native_tests": ["make doctest"],
+      "command_source": "https://github.com/langchain-ai/langmem/blob/9d033b47d9ce53e37e92c92241b0496c0278932e/Makefile",
+      "test_boundary": "Application/provider doctests do not establish native-client acceptance.",
+      "reopen_on": "A maintained native integration or changed application/runtime requirement"
+    }
+  ],
+  "historical_vote_reconciliation": {
+    "sources": ["catalogs/sota-convergence/manifest-20260926.json", "catalogs/sota-convergence/manifest-20260929.json"],
+    "basic_memory": "Facts survived; Opus rejected the fit and Astra narrowly supported ranking-path comparison. The recorded refuted_targeted_candidate disposition remains; Markdown inspectability is not unique.",
+    "rohit_and_deja": "September 26 refutations included a missing Astra vote; completed September 29 votes retained targeted candidates. Missing review is not a demonstrated capability failure.",
+    "tigerless": "keep_but_compare",
+    "langmem": "not_adopted_confirmed",
+    "matched_retrieval_reference": {
+      "questions": 470,
+      "historical_platform": "macOS",
+      "metric": "recall_all@5",
+      "D2": 0.821,
+      "C3": 0.570,
+      "BM25": 0.747,
+      "boundary": "Recovered descriptive evidence, not a new run. C3 reranker was off and D2 used benchmark ingestion. C4 and shipped-hook D2h remain material comparisons."
+    }
+  },
+  "independent_native_rerun": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+    "command": "sh tests/hooks/test_lib.sh",
+    "returned_output": "137 passed, 0 failed",
+    "stderr": "",
+    "exit_code": 0,
+    "evidence_class": "Unchanged upstream POSIX fixture execution; no provider/native-client lifecycle/semantic-quality acceptance",
+    "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/tests/hooks/test_lib.sh"
+  },
+  "failed_access_and_omissions": [
+    "Several guessed paths returned 404 and were recovered through repository trees.",
+    "supermemory/apps/server/package.json was not found at the server tag; no server-native test command was inferred from it.",
+    "Latest-release endpoints returned 404 for Tigerless, LangMem and Cognee integrations; exact commits were reviewed instead.",
+    "Some historical vote explanations are truncated in the stored manifests; no missing text was reconstructed."
+  ],
+  "next_wave": [
+    "Retain the preregistered C3/C4/D2/D2h comparison; score Deja's native-history representation separately.",
+    "Qualify OpenViking short-session commit and snapshot/index recovery using its native tests and supported lifecycle.",
+    "Resolve Cognee bootstrap/core pin mismatch before candidate installation.",
+    "Resolve Supermemory's independent local MCP route and server executable pin before local-only acceptance.",
+    "Qualify Tigerless host-model/effort preservation and project isolation.",
+    "Use a narrow Basic Memory ranking/capture-contract comparison; Letta/LangMem reopen only upon a matching native integration or changed runtime requirement."
+  ],
+  "no_unresolved_material_gap": false,
+  "new_host_acceptance": "unknown",
+  "closure": "Nine pending candidate source reviews complete; representative quality, one-writer, scope and recovery gates remain open."
+}

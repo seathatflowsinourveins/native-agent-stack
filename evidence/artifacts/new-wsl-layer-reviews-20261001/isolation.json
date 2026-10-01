@@ -33,8 +33,9 @@
   "omissions": [
     "No distro/sysctl/AppArmor/container install or escape/resource trial; Quadlet service scope belongs to runtime lane."
   ],
+  "source_followup": "evidence/artifacts/new-wsl-layer-reviews-20261001/isolation-failure-controls-followup.json",
   "next_wave": [
-    "Inspect 0.0.77-to-0.0.78 failure-observability diff and bound Ubuntu 26.04 namespace plus one network condition."
+    "The tagged 0.0.77-to-0.0.78 failure-observability review is complete. Qualify 0.0.78's unchanged native negative controls on the actual selected replacement-distro image, retaining namespace refusals, shell-specific results and skips; Ubuntu 26.04 remains a separate comparison candidate."
   ],
   "reopen_on": [
     "Enforcement/exit regression, changed WSL/AppArmor prerequisite or a newly required stronger boundary."
