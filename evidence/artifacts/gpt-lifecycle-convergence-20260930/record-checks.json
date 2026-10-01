@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "class": "offline_artifact_check",
+  "first_attempt": {"exit_code": 1, "record": "convergence-first.json.failed", "returned_output": "{\"records\": [{\"errors\": [\"record.observations[6].evidence_class: unsupported value\"], \"observations\": 8, \"path\": \"evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json\", \"valid\": false}], \"valid\": false}"},
+  "correction": "The PR evidence-table label source_review is not a convergence-schema enum. A refused file lookup uses discovery; the source supports pinned_source_review for completed immutable-source reviews.",
+  "verification_source": "blueprints/convergence-practice/contract.schema.json:77",
+  "repaired_attempt": {"exit_code":0,"returned_output":"{\"records\": [{\"errors\": [], \"observations\": 8, \"path\": \"evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json\", \"valid\": true}], \"valid\": true}\n"},
+  "limit": "This checker verifies declared consistency and hashes, not truth or a native model run. The original draft remains as intentionally invalid historical evidence and is not registered as an accepted convergence record."
+}

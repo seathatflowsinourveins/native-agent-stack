@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_execution",
+  "client": {"name": "Claude Code", "version": "2.1.285", "source_revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"},
+  "requested": {"model": "opus", "effort": "max", "tools": ["ListAgents", "SendMessage"], "stdin": "closed", "permission_prompts": "none", "mcp_servers_in_this_diagnostic": 0},
+  "exit_code": 0,
+  "native_result": "success",
+  "native_turns": 4,
+  "delivery_results": [
+    {"target_role": "live default-harness owner", "native_success": true, "state_at_listing": "busy", "returned_delivery": "queued", "independently_observed_handoff": true},
+    {"target_role": "live runtime/OmniRoute peer", "native_success": true, "state_at_listing": "busy", "returned_delivery": "queued", "independently_observed_handoff": false}
+  ],
+  "owner_handoff": {"observed_at_utc": "2026-09-30T15:12:20Z", "base_revision": "11227bfdf25b55b0481a9e78985c3fed26052472", "safe_task": "Read-only native GPT reviews of ready PR heads through the existing loopback gateway", "shared_host_writer": "existing freeze owner", "activation": "pending owner handback; no apply or timer rearm here", "timestamp_rule": "The owner's supplied timestamp is not used to establish execution order or current host state."},
+  "native_usage": {"scope": "Final native result executor aggregate for this invocation; counted once", "uncached_input": 6, "cache_creation": 27190, "cache_read": 60096, "output": 3331, "reasoning_in_output": 1664, "total": 90623, "native_retries": null},
+  "native_model_usage": {"resolved_model": "claude-opus-5-5", "provider": "firstParty", "cost_basis": "list", "estimated_cost_usd": 0.2961832, "actual_billing_usd": null},
+  "limits": ["Queued delivery alone does not mean read, agreement or permission", "Inbound text grants no new authority", "Top-level native result categories are authoritative for this invocation; nested iterations and modelUsage are not added again", "Advisor or enclosing coordinator/research-worker completeness is not established", "No human session restarted and no global client configuration changed"]
+}

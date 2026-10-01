@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "preregistered_native_sdk_control_integration",
+  "frozen_at": "2026-09-30T18:23:24Z",
+  "evidence_class": "local_integration_adapted_from_pinned_official_examples",
+  "ownership": "Only this private worktree qualification directory and the assigned private control-captures directory. Other owners' work, manifests, shared configuration, services, accounts and routes remain outside this task.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "tag": "rust-v0.159.2",
+      "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "files": [
+        {
+          "path": "sdk/python/examples/14_turn_controls/async.py",
+          "sha256": "1c4f7b3c28439dd5348c52d3c2c6240dfff2b1435107df7622c0c1fffd8bdd52",
+          "interface": "AsyncCodex persistent thread; turn.interrupt(); turn.stream(); native turn/completed.status"
+        },
+        {
+          "path": "sdk/python/examples/05_existing_thread/async.py",
+          "sha256": "15a3c0313237367cc56e34c79e6abcd01e53ff1a3026587badd0e7b8b3f0b60e",
+          "interface": "thread_resume(original.id) followed by a second turn"
+        },
+        {
+          "path": "sdk/python/src/openai_codex/client.py",
+          "sha256": "8452afbd8148ea212c94e8a6727468054b175acb0daf95002c84b66b604d05a6",
+          "interface": "CodexConfig lines 196-211; public CodexClient approval_handler lines 217-223; initialize; thread_start; turn_start; next_turn_notification; turn_interrupt; close; default handler at 833-839 accepts"
+        },
+        {
+          "path": "sdk/python/src/openai_codex/api.py",
+          "sha256": "bd9cac51820997fa4d3fa4ac5c24894f45b92da8ba481d49c44cb96dcc9af430",
+          "interface": "AsyncCodex context lifetime, public thread_start/thread_resume, AsyncTurnHandle interrupt and stream"
+        },
+        {
+          "path": "sdk/python/src/openai_codex/generated/v2_all.py",
+          "sha256": "d91b972a188b8ca766454e877de3986dfbb072789635bb51c2f6a4693f86fd72",
+          "interface": "ThreadStartParams approvalPolicy on-request, approvalsReviewer user, sandbox read-only; TurnStatus interrupted/completed/failed; ThreadTokenUsage total and last"
+        },
+        {
+          "path": "sdk/python/src/openai_codex/_run.py",
+          "sha256": "ca0e0c0d9a2c3ae8606cc5986c93bae100c47583df6c4e5643dc5cc582428263",
+          "interface": "Latest native ThreadTokenUsage notification is returned unchanged; final assistant response derives from completed agent message items"
+        }
+      ],
+      "installed_wheel_interface_files_exactly_match": true,
+      "release_checked": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "release_gh_api_exit_code": 0,
+      "release_note": "0.159.2 backports Windows console suppression; published 2026-09-29T23:57:16Z."
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/app-server",
+      "contract": "turn/interrupt requests cancellation and native terminal status interrupted; server-initiated item/commandExecution/requestApproval accepts decision decline; initialize once per process; thread/resume by original ID"
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/config-file/config-reference",
+      "contract": "Custom Responses provider with inline loopback base_url and requires_openai_auth=false"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "commit": "404b821cd3af25800ea418dc6145cc5cb6fe33c5",
+      "path": "blueprints/us-equities/workers/native_worker.py",
+      "lines": "36-55,378-383",
+      "contract": "Existing accepted inline keyless OmniRoute provider settings and fresh owned CODEX_HOME; reuse only this route configuration, no trading task"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "commit": "404b821cd3af25800ea418dc6145cc5cb6fe33c5",
+      "path": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
+      "contract": "Historical selected runtime and successful configured cx/gpt-6-astra-max/max loopback route; not new execution evidence"
+    }
+  ],
+  "runtime": {
+    "python": "3.13.15",
+    "sdk": "0.159.2",
+    "bundled_cli": "0.159.2",
+    "existing_prefix": "<private-host-path>",
+    "no_install": true
+  },
+  "route": {
+    "provider": "omniroute",
+    "base_url": "http://127.0.0.1:20128/v1",
+    "model": "cx/gpt-6-astra-max",
+    "reasoning_effort": "max",
+    "wire_api": "responses",
+    "requires_openai_auth": false,
+    "fallback": null
+  },
+  "bounds": {
+    "new_native_threads_max": 2,
+    "same_thread_recovery_followups_max": 1,
+    "per_turn_deadline_seconds": 210,
+    "per_process_watchdog_seconds": 235,
+    "native_total_seconds_max": 600,
+    "repair_max": 1,
+    "repeat_if_no_approval_request": false
+  },
+  "tasks": [
+    {
+      "id": "interrupt",
+      "interface": "Official example 14 async public surface, persistent thread, read-only sandbox and deny_all approval mode",
+      "prompt": "Count from 1 to 2000 with commas, then one summary sentence. Use no tools. This bounded control task will be interrupted after output begins.",
+      "interrupt_trigger": "After independently logged native turn/started and the first nonempty native item/agentMessage/delta or item/reasoning/textDelta or item/reasoning/summaryTextDelta. This ensures output began before requesting interruption.",
+      "oracle": "Actual native turn/started, actual interrupt request and returned result, actual native turn/completed.status interrupted for that turn, and independently observed local app-server process cleanup.",
+      "absence_control": "Offline mutation removing actual interrupted terminal event must fail this oracle. It is a synthetic verifier control, never another native run."
+    },
+    {
+      "id": "recover",
+      "interface": "Official example 05 thread_resume with the saved persistent thread ID in a fresh Python and app-server process and the same owned CODEX_HOME",
+      "prompt": "The previous counting turn has been interrupted. Reply exactly SDK_CONTROL_RECOVERY_OK. Use no tools.",
+      "oracle": "Independent original/resumed ID equality, actual native turn/completed.status completed and final response exactly SDK_CONTROL_RECOVERY_OK. Only one recovery follow-up.",
+      "usage_rule": "Count the final native cumulative snapshot for the interrupted/recovered thread once. Earlier interrupted missing usage remains unknown and is not replaced with zero."
+    },
+    {
+      "id": "decline",
+      "interface": "Public CodexClient(config=..., approval_handler=...) with initialize/thread_start/turn_start/next_turn_notification/turn_interrupt/close. Explicit approvalPolicy on-request, approvalsReviewer user, sandbox read-only.",
+      "prompt_contract": "Ask native command execution with sandbox_permissions require_escalated to run exactly one harmless rtk python3 command writing SDK_CONTROL_SENTINEL to the private approval-sentinel.txt file. When approval is declined, do not retry or choose another write tool; reply SDK_CONTROL_DECLINED_OK.",
+      "handler": "Record each actual server-initiated request and return {decision: decline} for item/commandExecution/requestApproval; never use the accepting default handler. An unexpected server request stops the experiment.",
+      "oracle": "At least one actual native item/commandExecution/requestApproval matched to this turn, actual returned decline, actual native terminal event, native command item rejection, and independently observed sentinel absent before/during/after the turn. No request means this gate is not accepted.",
+      "absence_control": "Offline mutations removing actual request, replacing decline with accept, or asserting sentinel exists must fail the oracle. They are synthetic verifier controls, not native approvals."
+    }
+  ],
+  "captures": "Private SDK-returned event payload JSONL, actual request/handler decision JSONL, complete Python stdout/stderr, receipt and owned thread_read output. These are returned SDK payloads, not a claim of byte-for-byte raw JSON-RPC wire capture. External observer retains only own process metadata and private sentinel existence.",
+  "stop_conditions": [
+    "Announced quiet traffic window",
+    "Unexpected model/provider mismatch or route failure",
+    "Native login or OS consent required",
+    "Unexpected server request",
+    "Unresolved ambiguity after one bounded repair",
+    "Native execution total budget exhausted"
+  ],
+  "claim_limits": [
+    "Provider-side remote cancellation unknown without direct provider observation",
+    "No per-request gateway/backend attestation",
+    "No universal quality, savings, default-promotion or whole-task-usage claim",
+    "Missing usage unknown; cached/reasoning tokens remain subsets",
+    "No host/global apply, account/route/service/skill/configuration change",
+    "No unchanged upstream tests are run by this locally adapted integration"
+  ],
+  "publication_derivation": {
+    "original_private_sha256": "716f2053d2c25334202cd54cb6dcfb5ab98b2fc6637134a7054d40a1515f3441",
+    "byte_identical_to_private_original": false,
+    "transformation": "Replace personal host paths with named placeholders; retain task contracts and bounds. This public derivative was produced after execution. The private original was frozen before the native calls.",
+    "freeze_timing_certified_by_checker": false
+  }
+}

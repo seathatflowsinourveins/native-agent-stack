@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "evidence_class": "independent_original_capture_source_and_oracle_audit",
+  "scope": "Read-only deterministic checks of the retained native SDK controls; no repeated native/provider calls",
+  "dispatch": {
+    "role": "stack-verifier",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential native interruption and approval-effect acceptance require original events, not requested controls or an empty observer set.",
+    "acceptance": "Confirmed actual interrupted terminal, fresh-process same-thread recovery and actual native approval decline; retained first-PID, interrupted-usage, remote-cancellation and backend gaps."
+  },
+  "primary_source": "openai/codex@ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python/src/openai_codex/client.py:701,864",
+  "candidate_receipt_sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592",
+  "audits": [
+    {"result": "NATIVE_EVENT_AUDIT_PASS", "exit_code": 0, "checks": 42, "passed": 42},
+    {"result": "COMMAND_AND_ORIGINAL_SOURCE_AUDIT_PASS", "exit_code": 0},
+    {"result": "PROCESS_OBSERVATION_AUDIT_PASS_WITH_FIRST_INTERRUPT_GAP", "exit_code": 0},
+    {"result": "USAGE_AUDIT_PASS", "exit_code": 0},
+    {"result": "ORIGINAL_SUMMARY_AND_PUBLIC_SCOPE_AUDIT_PASS", "exit_code": 0}
+  ],
+  "confirmed": [
+    "Original SDK event6 has a nonempty reasoning delta; event7 has matching interrupted terminal, with interrupt response afterward retained.",
+    "Original and resumed native IDs equal; recovery has a different process and turn, exact recovery marker and completed terminal.",
+    "Approval request matches native thread, turn, item and sentinel command inside the shell wrapper; original command event is declined and turn terminates completed.",
+    "Sentinel absent before/after/currently and in all157 decline samples at0.1-second intervals.",
+    "Recovery and decline each witnessed one owned native child alive then gone; recorded identities remain absent.",
+    "All13 private capture hashes, unchanged executed source4acd74e and private plan716f2053 match; both observer versions and six upstream source blobs match.",
+    "Four in-memory negative controls reject altered/missing evidence; these are synthetic and not native runs."
+  ],
+  "usage": {
+    "scope": "Latest native cumulative snapshot counted once per distinct thread; cached and reasoning are subsets",
+    "interrupt": null,
+    "recovery_total": 12638,
+    "decline_total": 27157,
+    "earlier_decline_snapshot_added": false,
+    "complete_provider_or_task_total": null
+  },
+  "original_native_and_sampler_exit_codes": {"interrupt": [0,0], "recover": [0,0], "decline": [0,0]},
+  "retained_verifier_failures": [
+    {"operation": "context-mode private file access", "outcome": "refused", "native_command_exit": null, "correction": "Leave confinement intact; use separately authorized bounded native checks of explicitly owned captures."},
+    {"operation": "Persisted-history and unwrapped-command audit queries", "outcome": "initial queries failed", "exit_codes": null, "correction": "The persisted capture omits this declined command item, and the request shell-quotes its command. Audit the original SDK event and decoded native wrapper instead."}
+  ],
+  "limits": [
+    "The first interrupted observer witnessed zero PIDs in163samples; its PID lifecycle is independently unverified.",
+    "Interrupted provider usage, remote cancellation, backend identity and enclosing verifier/coordinator usage remain unknown.",
+    "The integration copy and separately sanitized public plan were not independently read by this verifier; the coordinator verifies their copy/sanitization hashes separately.",
+    "Five deterministic audits are native read-only analysis of original evidence, not unchanged upstream tests or additional model calls.",
+    "Failed audit-query exit codes were not supplied in the handback and remain unknown; no success is inferred for them."
+  ]
+}

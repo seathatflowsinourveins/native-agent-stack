@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_hosted_repository_checks",
+  "scope": "Linux and Mac repository validation after repairing the owned dashboard row; integration tests and fixtures, not model runs",
+  "repository": "seathatflowsinourveins/native-agent-stack",
+  "head": "5e2bbc0c0707e61eb72f03aca0932d790a10e31e",
+  "run_id": 36752423673,
+  "job_id": 110014120207,
+  "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36752423673/job/110014120207",
+  "native_observation": {
+    "command": "gh run view 36752423673 --json status,conclusion,jobs",
+    "exit_code": 0,
+    "run_status": "completed",
+    "run_conclusion": "success",
+    "job_status": "completed",
+    "job_conclusion": "success"
+  },
+  "original_log_capture": {
+    "command": "gh run view 36752423673 --job 110014120207 --log",
+    "exit_code": 0,
+    "bytes": 391994,
+    "sha256": "7961bb414320174ccad2d837dfe39e98dc33ce2ee6892520502d62eb8690c731",
+    "location": "private task captures; no raw CI log committed"
+  },
+  "returned_test_footer": [
+    "Ran 8623 tests in 1205.890s",
+    "OK (skipped=806)"
+  ],
+  "returned_integrity_output": {
+    "components": 69,
+    "hashed_files": 8541,
+    "profiles": 4,
+    "receipts": 176,
+    "status": "passed"
+  },
+  "other_gates_at_observation": {
+    "native_gitleaks": "success",
+    "native_betterleaks": "success",
+    "sota_sources": "success",
+    "osv_scanner": "failure in unchanged dependency-owner locks",
+    "mac_validation": "queued",
+    "mac_adoption_bootstrap": "queued"
+  },
+  "later_mac_observation": {
+    "run_id": 36752423652,
+    "job_id": 110014121860,
+    "job_conclusion": "success",
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36752423652/job/110014121860",
+    "job_log_capture": {
+      "command": "gh api --allow-escape-sequences repos/seathatflowsinourveins/native-agent-stack/actions/jobs/110014121860/logs",
+      "exit_code": 0,
+      "bytes": 271329,
+      "sha256": "959b3df1300fad5f5cf40fcb855782f67c5cc85759b1af13c72e14b80b18b6ea",
+      "returned_full_suite_exit": 0
+    },
+    "bounded_module_footer": ["Ran 472 tests in 116.550s", "OK (skipped=29)"],
+    "full_suite_artifact": {
+      "id": 11117713104,
+      "name": "adoption-bootstrap-full-suite-macos-36752423652-1",
+      "native_download_exit": 0,
+      "original_log_bytes": 1601848,
+      "original_log_sha256": "ff63b600ae3cc061a831e2e7685f47c435417e1f26bfba56923d2e3cf0e491ec",
+      "returned_footer": ["Ran 8623 tests in 1424.872s", "OK (skipped=1116)"]
+    },
+    "retained_failed_log_fetch": {
+      "exit_code": 1,
+      "returned_error": "the response contains terminal escape sequences; pass --allow-escape-sequences to output it anyway",
+      "correction": "Installed gh api help confirms the flag. Capture original bytes into a private file, without displaying terminal control sequences."
+    },
+    "limits": "Mac fixture/integration execution is distinct from native model qualification or operator host application. Other queued jobs do not invalidate this completed job or imply the whole bootstrap workflow has completed."
+  },
+  "limits": [
+    "The retained earlier failed suites remain in dashboard-ci-repair.json; a later pass does not replace them.",
+    "CI head is explicit. Later commit changes require their own hosted status, even where source inputs are unchanged.",
+    "Skipped tests retain their native status. These repository tests do not qualify provider execution, the inactive example workflow or this host's future B1 application.",
+    "The dependency owner retains OSV repair; no vulnerability ignore or lock rewrite was added here."
+  ]
+}

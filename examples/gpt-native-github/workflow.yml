@@ -1,0 +1,106 @@
+name: Native GPT frozen task
+
+# Copy to .github/workflows/ only after qualifying the endpoint and runner.
+# Source: openai/codex-action v1.12, 86365089eb2b84e0a8fb0717b304f8bdcb13b20e.
+on:
+  workflow_dispatch:
+    inputs:
+      task_kind:
+        description: Frozen task profile
+        type: choice
+        options: [pr-review, research-convergence]
+        required: true
+      objective:
+        description: One bounded research question or PR review focus
+        type: string
+        required: true
+      head_sha:
+        description: Full immutable repository commit to inspect
+        type: string
+        required: true
+      base_sha:
+        description: Full immutable comparison or corpus-base commit
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-gpt-${{ github.workflow }}-${{ inputs.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    name: Inspect one frozen GPT task
+    if: vars.GPT_NATIVE_ACTION_ENABLED == 'true' && vars.RESPONSES_ENDPOINT != '' && vars.CODEX_REQUEST_MODEL != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TASK_KIND: ${{ inputs.task_kind }}
+      TASK_OBJECTIVE: ${{ inputs.objective }}
+      TASK_HEAD_SHA: ${{ inputs.head_sha }}
+      TASK_BASE_SHA: ${{ inputs.base_sha }}
+      TASK_REQUEST_MODEL: ${{ vars.CODEX_REQUEST_MODEL }}
+      TASK_CONTROL_DIR: ${{ github.workspace }}/controls/examples/gpt-native-github
+    steps:
+      - name: Require immutable inputs
+        shell: bash
+        run: |
+          if [[ ! "$TASK_HEAD_SHA" =~ ^[0-9a-f]{40}$ || ! "$TASK_BASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            printf '%s\n' 'head_sha and base_sha must be full lowercase commit hashes.' >&2
+            exit 2
+          fi
+
+      - name: Check out the dispatch revision's task controls
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: controls
+          persist-credentials: false
+
+      - name: Check out the frozen repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.head_sha }}
+          path: subject
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install the pinned command-output layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          task_rtk_dir="$RUNNER_TEMP/native-gpt-rtk"
+          mkdir -p "$task_rtk_dir"
+          curl -fsSL https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz -o "$task_rtk_dir/rtk.tar.gz"
+          printf '%s  %s\n' bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89 "$task_rtk_dir/rtk.tar.gz" | sha256sum --check --strict
+          tar -xzf "$task_rtk_dir/rtk.tar.gz" -C "$task_rtk_dir"
+          "$task_rtk_dir/rtk" --version
+          printf '%s\n' "$task_rtk_dir" >> "$GITHUB_PATH"
+
+      - name: Inspect the frozen task
+        id: codex
+        uses: openai/codex-action@86365089eb2b84e0a8fb0717b304f8bdcb13b20e # v1.12
+        with:
+          codex-version: '0.159.2'
+          model: ${{ vars.CODEX_REQUEST_MODEL }}
+          effort: max
+          responses-api-endpoint: ${{ vars.RESPONSES_ENDPOINT }}
+          openai-api-key: ${{ secrets.RESPONSES_BEARER_KEY }}
+          codex-home: ${{ runner.temp }}/codex-${{ github.run_id }}-${{ github.run_attempt }}
+          working-directory: ${{ github.workspace }}/subject
+          prompt-file: ${{ github.workspace }}/controls/examples/gpt-native-github/task.md
+          output-schema-file: ${{ github.workspace }}/controls/examples/gpt-native-github/result.schema.json
+          output-file: ${{ runner.temp }}/codex-result.json
+          safety-strategy: read-only
+          codex-args: '["--ephemeral"]'
+
+      - name: Retain the bounded result
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: native-gpt-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/codex-result.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "evidence_class": "model_task_execution",
+  "status": "completed_with_source_verified_review_finding",
+  "client": {"name": "Codex CLI", "version": "0.159.2", "source_revision": "ff6aec96948b70d94983af2641a6b67c94faeff5", "source_file": "codex-rs/exec/src/cli.rs", "source_sha256": "6abb86feb8fac2a192b34a617634527d0747b6d7fa09ee4827c0dc95abbe2f75"},
+  "requested": {"model": "cx/gpt-6-astra", "effort": "max", "wire_api": "responses", "gateway": "existing loopback OmniRoute lane", "sandbox": "read-only", "stdin": "closed", "ephemeral": true},
+  "returned_backend_model": null,
+  "effective_effort": null,
+  "live_search_forwarding": null,
+  "architecture_trigger": "Consequential cross-family PR review and the area's explicitly requested Astra/Max review standard",
+  "execution": {"native_invocations": 1, "started_at_utc": "2026-09-30T15:26:49.836393Z", "finished_at_utc": "2026-09-30T15:31:58.035019Z", "exit_code": 0, "terminal_event": "turn.completed", "elapsed_seconds": 308.199, "timed_out": false},
+  "private_originals": {"published": false, "stdout_sha256": "82e651a6b0e7ec54485228a21f768cfb968e9f0353d7015b734e9d7770f7230b", "stderr_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721", "last_message_sha256": "58d3d36b1acd60e0aa8fd01820f29ea6c33904add81e84aad15cfa61baa14471"},
+  "native_usage": {"scope": "Latest completed invocation aggregate, counted once; cached input and reasoning output are subsets", "input_tokens": 1001388, "cached_input_tokens": 863488, "cache_write_input_tokens": 0, "uncached_input_tokens": 137900, "output_tokens": 8679, "reasoning_output_tokens": 2681, "total_tokens": 1010067, "native_retries": null, "actual_billing_usd": null},
+  "reviews": [
+    {"pr": 540, "head": "c8f934c6d854e33efd16c75e6e9bfe5170151f1c", "merge_base": "11227bfdf25b55b0481a9e78985c3fed26052472", "diff_sha256": "4eb5983cfdc9d7a7692e0444984d68e714e039587caca9a8f877682faf5da807", "verdict": "Accept within independent-head review limits", "findings": []},
+    {"pr": 542, "head": "75702dfee5ab885eb746c734208db7e3b61bbc80", "merge_base": "11227bfdf25b55b0481a9e78985c3fed26052472", "diff_sha256": "abaefdbc56466803a8a4df7d452cc33631a9473408243485c69e8cbba76034d4", "verdict": "Needs the owner-planned platform-default repair", "findings": [{"severity": "P2", "path": "adoption/templates/codex.config.template.toml", "line": 5, "also_line": 27, "issue": "Shared template applies Sol defaults to Mac while its 0.155.1 pin and platform guide defer that qualification.", "fix": "Use platform-aware defaults or gate the render, preserving the prior Mac default until qualified.", "independent_check": {"exit_code": 0, "macos_pin": "0.155.1", "rendered_coordinator": "gpt-6.1-sol", "rendered_generic_child": "gpt-6.1-sol", "writes": 0, "class": "synthetic in-memory render through exact-head repository source"}, "mac_client_execution": false}]}
+  ],
+  "source_integrity": {"frozen_heads_unchanged": true, "source_hashes_unchanged": true},
+  "embedded_failures": {"native_invocation_failures": 0, "source_command_failures": 6, "retained_in_private_stdout": true, "examples": [{"command": "python3 -m unittest tests.test_task_model_routing", "exit_code": 1, "reason": "Read-only sandbox refused a temporary fixture directory; later direct script check completed."}, {"command": "initial in-memory render fixture", "exit_code": 1, "reason": "Equal synthetic home/project substitutions duplicated hook-state TOML keys; distinct fixture values passed."}], "counting_rule": "These inner attempts are already included in the single native invocation usage; do not add provider usage again."},
+  "limits": ["Configured route does not attest backend identity or effective effort", "Native reviewer DNS failures prevented independent original-source checks for some effort/role precedence claims", "Focused local integration checks are not upstream acceptance or a Mac model run", "PR heads were reviewed separately; their joint integration was not executed", "PR 540's pending/unbound Sol condition must be restated when D4 defaults integrate", "No model-quality comparison or whole-workflow token savings"]
+}

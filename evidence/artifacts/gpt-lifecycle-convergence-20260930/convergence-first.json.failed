@@ -1,0 +1,413 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Finish a source-backed native GPT GitHub task lane without overlapping live host/SDK owners, preserve token/capability boundaries, and make a portable official-Action workflow reviewable.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/openai/codex-action/tree/86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "revision": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-code/tree/ec44ca97dc86c33d934c8d55b24959aabf076871",
+      "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"
+    },
+    {
+      "url": "https://github.com/rtk-ai/rtk/tree/1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+      "revision": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed Search First/OpenAI Docs/skill discovery and bounded primary-source framework research.",
+    "Live Claude ownership handoff selected safe read-only PR reviews; SDK/roster/host activation remain with existing owners."
+  ],
+  "license_and_compatibility": "Codex/Action Apache-2.0; selected RTK upstream release binary retained as a dependency, not committed. Action unchanged tests ran on Node24.21.0/pnpm10.33.0 in Linux/WSL; source CI Node22 is a recorded deviation. Hosted runner and provider compatibility remain unqualified.",
+  "baseline_and_candidate": {
+    "baseline": "Existing source-pinned native stack and task-specific qualified recipes; no new baseline model invocation.",
+    "candidate": "One bounded native OmniRoute PR review plus supported official-Action portable example and corrected token handoff."
+  },
+  "frozen_inputs": {
+    "base_revision": "11227bfdf25b55b0481a9e78985c3fed26052472",
+    "tasks": [
+      "peer-ownership",
+      "action-qualification",
+      "workflow-audit",
+      "native-pr-review",
+      "independent-verification"
+    ],
+    "roles": [
+      "coordinator",
+      "peer-native-client",
+      "upstream-worker",
+      "review-native-client",
+      "verifier"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/source-sha256-before.json",
+        "sha256": "69d50afa398a6a3da0166c89cc5c23e4f3a752e910436bcef0f35034c5ca1f12"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/plan.json",
+        "sha256": "a42b7b6975d1d18873bde5c41b7818bf85100428d5043478e95379e9f1c385c1"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/plan.json",
+        "sha256": "a42b7b6975d1d18873bde5c41b7818bf85100428d5043478e95379e9f1c385c1"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Accept only the named task after actual terminal results, supported immutable source/inputs, retained failures and independent artifact/source/oracle checks. PR rejection can be a correct review outcome; review completion is not PR acceptance.",
+    "usage_rule": "Count authoritative native aggregates once, retain cache/reasoning subset semantics, preserve unknown retries/outer role coverage; claim no token savings."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64 WSL2; this host only",
+    "tools": [
+      {
+        "name": "Codex CLI",
+        "version": "0.159.2"
+      },
+      {
+        "name": "Claude Code",
+        "version": "2.1.285"
+      },
+      {
+        "name": "Node",
+        "version": "24.21.0"
+      },
+      {
+        "name": "pnpm",
+        "version": "10.33.0"
+      },
+      {
+        "name": "RTK",
+        "version": "0.50.0"
+      },
+      {
+        "name": "zizmor",
+        "version": "1.30.1"
+      }
+    ],
+    "isolation": "Owned integration and read-only review worktrees, scoped upstream tools/logs; no global configuration, native account or human-session changes."
+  },
+  "commands": [
+    "claude -p <owned ownership prompt> --model opus --effort max --tools ListAgents,SendMessage --allowedTools ListAgents,SendMessage --permission-prompts none --strict-mcp-config --mcp-config <empty servers> --output-format json",
+    "rtk pnpm --version",
+    "pnpm test",
+    "rtk zizmor --offline --no-config --strict-collection --no-ignores --persona pedantic --no-progress examples/gpt-native-github/workflow.yml",
+    "codex exec -s read-only -m cx/gpt-6-astra -c model_reasoning_effort=max <inline existing Responses provider> --ephemeral --json -o <owned result> <frozen two-PR review prompt>; stdin closed",
+    "ctx_execute_file <owned private diagnostic receipt>",
+    "Independent native source/digest checks and exact frozen-head in-memory render; recorded commands in independent-verification.json"
+  ],
+  "observations": [
+    {
+      "id": "peer-owner-handoff",
+      "task": "peer-ownership",
+      "role": "peer-native-client",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/peer-coordination.json",
+          "sha256": "fb82485a6df35215dcadec6348d1b62072432c57063da7e101676380ca4e76bd"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 27190,
+        "cache_read": 60096,
+        "output": 3331,
+        "reasoning_in_output": 1664,
+        "total": 90623,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "pnpm-not-on-host-path",
+      "task": "action-qualification",
+      "role": "upstream-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "failed",
+      "exit_code": 127,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/workflow-checks.json",
+          "sha256": "0f8434b1a121a61add07bcc40ff1f4d14f7e5c3bf560111b9f1a7aeee1de495a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "unchanged-action-suite",
+      "task": "action-qualification",
+      "role": "upstream-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/action-upstream.json",
+          "sha256": "898bbb25757d162810c3b4fcd57e174e01c9390c7279dfa77a776a463e2f3af4"
+        },
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/independent-verification.json",
+          "sha256": "5351cef3934d69ac745268f45ec44d8217a2b8de3792e7ae5f6f59e95ba21c69"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "workflow-unnamed-job",
+      "task": "workflow-audit",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "failed",
+      "exit_code": 11,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/workflow-checks.json",
+          "sha256": "0f8434b1a121a61add07bcc40ff1f4d14f7e5c3bf560111b9f1a7aeee1de495a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "workflow-final-offline-audit",
+      "task": "workflow-audit",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/workflow-checks.json",
+          "sha256": "0f8434b1a121a61add07bcc40ff1f4d14f7e5c3bf560111b9f1a7aeee1de495a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "native-frozen-pr-review",
+      "task": "native-pr-review",
+      "role": "review-native-client",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "model_task_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-review.json",
+          "sha256": "0f42cc6c89b005ca9464c7984917c4a2237b6c2bf00a3d71b43f810a9d09eead"
+        },
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/independent-verification.json",
+          "sha256": "5351cef3934d69ac745268f45ec44d8217a2b8de3792e7ae5f6f59e95ba21c69"
+        }
+      ],
+      "usage": {
+        "uncached_input": 137900,
+        "cache_creation": 0,
+        "cache_read": 863488,
+        "output": 8679,
+        "reasoning_in_output": 2681,
+        "total": 1010067,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "confined-file-reader-refusal",
+      "task": "independent-verification",
+      "role": "verifier",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "source_review",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/independent-verification.json",
+          "sha256": "5351cef3934d69ac745268f45ec44d8217a2b8de3792e7ae5f6f59e95ba21c69"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "independent-native-checks",
+      "task": "independent-verification",
+      "role": "verifier",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "bounded_native_gpt_task_lane_this_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/independent-verification.json",
+          "sha256": "5351cef3934d69ac745268f45ec44d8217a2b8de3792e7ae5f6f59e95ba21c69"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "pnpm-not-on-host-path",
+      "reason": "pnpm was absent; use the upstream-pinned version in an owned prefix."
+    },
+    {
+      "run_id": "workflow-unnamed-job",
+      "reason": "Strict audit found an unnamed job; name repair retained and same native audit passed."
+    },
+    {
+      "run_id": "confined-file-reader-refusal",
+      "reason": "Context-mode confined its file reader; no alternate context-mode bypass or permission change. Authorized native source/check tools verified the owned artifacts."
+    }
+  ],
+  "limitations": [
+    "Usage excludes enclosing coordinator, research/production/verification agents and preparation; retry completeness is unknown. No matched baseline or savings claim.",
+    "Owner diagnostic acceptance was already specified in its original private prompt; the consolidated plan followed that diagnostic and preceded the bounded review/upstream acceptance stages. The checker does not certify freeze timing.",
+    "All four selected Action qualification commands passed, with 143 tests passed and one prerequisite skip. Its fixtures are not provider or hosted-job acceptance.",
+    "Six inner source-command failures remain inside the native review capture and are already included in its once-only usage; upstream discovery404 and YAML-import failures are retained in companion receipts.",
+    "One offline analyzer suppression remains reported; online audits were not run.",
+    "Configured route and requested effort do not attest backend identity or effective effort.",
+    "SDK fresh-process resume/tool evidence remains separate branch evidence; live cancel/reconnect, declined approval, per-request gateway identity and whole-roster quality remain open.",
+    "Host activation requires the designated owner's merge/handback; no timers rearmed, second host qualified, workflow activated, gateway exposed, or strategy/broker gate advanced."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "bounded_native_gpt_task_lane_this_host",
+    "qualification_run_ids": [
+      "peer-owner-handoff",
+      "unchanged-action-suite",
+      "workflow-final-offline-audit",
+      "native-frozen-pr-review",
+      "independent-native-checks"
+    ]
+  },
+  "rollback": "Remove only this isolated portable example/integration artifacts and owned diagnostics; preserve all live native accounts, human sessions, global settings and other-owner branches.",
+  "next_decision_changing_test": "After owner handback, qualify selected SDK task-role recovery/approval semantics and intended hosted runner/provider/schema behavior with independently observed quality and complete attempt scope before broader promotion.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

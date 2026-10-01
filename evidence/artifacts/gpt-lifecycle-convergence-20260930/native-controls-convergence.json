@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Qualify actual terminal interruption, fresh-process same-thread recovery and an actually declined approval through the existing native SDK route. Prior runtime evidence had only requested interruption and configured deny_all.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/404b821cd3af25800ea418dc6145cc5cb6fe33c5",
+      "revision": "404b821cd3af25800ea418dc6145cc5cb6fe33c5"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed SDK/client, immutable examples14/05 and public approval handler, installed-version release and official app-server docs.",
+    "Read-only current PR551 source review identified narrow missing controls; no repeat of its qualified task/skill/cache runs."
+  ],
+  "license_and_compatibility": "Official Codex SDK Apache-2.0; existing Python3.13.15/SDK+CLI0.159.2 reused. Independent observer uses Linux procfs and the kernel documented per-thread children ABI; no Mac/native-provider portability claim.",
+  "baseline_and_candidate": {
+    "baseline": "Retained task/resume/deadline-request evidence, no new baseline model run.",
+    "candidate": "Two actual task threads and one same-thread recovery using native SDK interfaces, with original returned events and separate effect/process observation."
+  },
+  "frozen_inputs": {
+    "base_revision": "5e2bbc0c0707e61eb72f03aca0932d790a10e31e",
+    "tasks": [
+      "interrupt",
+      "recover",
+      "decline"
+    ],
+    "roles": [
+      "native-sdk-worker",
+      "independent-observer",
+      "verifier"
+    ],
+    "sources": [
+      {
+        "path": "examples/gpt-native-controls/native_controls.py",
+        "sha256": "4acd74e5301710eff1bb789d04005695d5ff69607c5b788e6f3e9997aabf701d"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-plan.json",
+        "sha256": "c2764f57933981f7a4bd0bfc382595979573ef7df8d6410e5d2f31dcb26d927d"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-plan.json",
+        "sha256": "c2764f57933981f7a4bd0bfc382595979573ef7df8d6410e5d2f31dcb26d927d"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Private original plan716f2053d2c25334202cd54cb6dcfb5ab98b2fc6637134a7054d40a1515f3441 froze exact task contracts/bounds. Require native model delta then interrupted terminal, same-thread fresh-process recovery, actual approval request/decline/native declined item and independent sentinel absence. Public input is a post-run sanitized derivative, not original frozen bytes.",
+    "usage_rule": "Count latest native cumulative snapshot once per thread; cached/reasoning are subsets; missing interrupted/provider/outer-role usage stays unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64 WSL2; this host only",
+    "tools": [
+      {
+        "name": "Python",
+        "version": "3.13.15"
+      },
+      {
+        "name": "Codex SDK",
+        "version": "0.159.2"
+      },
+      {
+        "name": "Codex CLI",
+        "version": "0.159.2"
+      }
+    ],
+    "isolation": "Existing SDK prefix, fresh owned native home and minimal private task cwd; no native accounts, services, routes or host/global apply."
+  },
+  "commands": [
+    "rtk timeout --signal=INT --kill-after=5s 235s rtk env PYTHONDONTWRITEBYTECODE=1 <existing-sdk-python> examples/gpt-native-controls/native_controls.py <mode> --captures <owned-private-captures> --codex-bin <bundled-native-codex> --plan <private-plan> --deadline 210",
+    "Concurrent independent observe_controls.py sampler; original commands/exits retained privately, not replayed after process exit."
+  ],
+  "observations": [
+    {
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "native_sdk_controls_linux_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json",
+          "sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592"
+        }
+      ],
+      "id": "actual-interrupted-terminal",
+      "task": "interrupt",
+      "role": "native-sdk-worker",
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "native_sdk_controls_linux_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json",
+          "sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592"
+        }
+      ],
+      "id": "fresh-process-same-thread-recovery",
+      "task": "recover",
+      "role": "native-sdk-worker",
+      "usage": {
+        "uncached_input": 213,
+        "cache_creation": 0,
+        "cache_read": 12416,
+        "output": 9,
+        "reasoning_in_output": 0,
+        "total": 12638,
+        "native_retries": null
+      }
+    },
+    {
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "native_sdk_controls_linux_host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json",
+          "sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592"
+        }
+      ],
+      "id": "actual-declined-command-and-absent-sentinel",
+      "task": "decline",
+      "role": "native-sdk-worker",
+      "usage": {
+        "uncached_input": 5481,
+        "cache_creation": 0,
+        "cache_read": 21504,
+        "output": 172,
+        "reasoning_in_output": 39,
+        "total": 27157,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "first-interruption-observer",
+      "task": "interrupt",
+      "role": "independent-observer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "native_sdk_controls_linux_host",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls.json",
+          "sha256": "6970d4912ceb7326be437209d36428cf0878c8dceb2b68f7b73ce9d3b1216592"
+        },
+        {
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/observer-before-thread-repair.py",
+          "sha256": "bedc306fcd5bc0f7414a6911fee7a661abcf7dd12c8ff415d96cfe54e51b1260"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "first-interruption-observer",
+      "reason": "Observer returned0 with zero witnessed child IDs because async SDK spawn ran in another thread. First PID lifecycle remains unobserved; original observer source/hash retained. One observer-only repair, no additional interruption."
+    }
+  ],
+  "limitations": [
+    "Private original plan preserved; public sanitized derivative created after execution. Validator checks consistency and hashes, not freeze timing or truth.",
+    "Native source unchanged across all three executions; only separate observer repaired.",
+    "First interrupted PID lifecycle and usage unobserved; remote provider cancellation/backend identity unknown.",
+    "Captured SDK-returned payloads/stderr are not complete byte-for-byte JSON-RPC/provider wire capture.",
+    "Separate oracle mutation controls are synthetic, not extra native runs. No unchanged upstream suite executed here.",
+    "This record excludes enclosing coordinator/verifier/preparation usage and has no complete usage, cost or quality comparison.",
+    "Host B1/U6 ownership and inactive hosted workflow remain independent gates."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "native_sdk_controls_linux_host",
+    "qualification_run_ids": [
+      "actual-interrupted-terminal",
+      "fresh-process-same-thread-recovery",
+      "actual-declined-command-and-absent-sentinel"
+    ]
+  },
+  "rollback": "Remove only owned experiment artifacts/private state; preserve working accounts, global configs and other-owner integrations.",
+  "next_decision_changing_test": "Qualify independent provider cancellation/backend identity and intended hosted endpoint/schema execution after owner-controlled host acceptance, only for a concrete task.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

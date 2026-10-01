@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_gpt_lifecycle_plan",
+  "recorded_at_utc": "2026-09-30T15:19:00Z",
+  "base_revision": "11227bfdf25b55b0481a9e78985c3fed26052472",
+  "objective": "Complete an ownership-safe GitHub task lane through native GPT/OmniRoute, a supported upstream GitHub workflow example, and a source-backed lifecycle/token handoff for foundation readiness before north-star R&D.",
+  "primary_sources": [
+    {"repository": "openai/codex", "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5", "version": "0.159.2", "files": ["sdk/python/src/openai_codex/api.py", "sdk/python/src/openai_codex/_run.py", "sdk/python/src/openai_codex/generated/v2_all.py", ".github/workflows/sdk.yml"]},
+    {"repository": "openai/codex-action", "revision": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e", "version": "v1.12", "files": ["action.yml", "README.md", "package.json"]},
+    {"repository": "anthropics/claude-code", "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871", "version": "2.1.285", "files": ["CHANGELOG.md"], "official_contract": "https://code.claude.com/docs/en/cross-session-messaging"},
+    {"repository": "langchain-ai/langgraph", "revision": "49cce0ca852be4cfb567a1cbe0e511ff325a1682", "version": "1.2.12", "role": "source-reviewed challenger for cross-stage durable checkpoints; not installed or promoted by this task"},
+    {"repository": "langchain-ai/deepagents", "revision": "6bf780284ec49789613df20d85866a0ad981e579", "version": "0.7.20", "role": "source-reviewed application-loop challenger; not installed or promoted by this task"}
+  ],
+  "task_envelopes": [
+    {"id": "native-peer-ownership", "acceptance": "Native ListAgents/SendMessage returned delivery results and an independently observed owner handoff identifies owned paths and a safe bounded task. Delivery alone is not acceptance."},
+    {"id": "omni-pr-review", "inputs": [{"pr": 540, "head": "c8f934c6d854e33efd16c75e6e9bfe5170151f1c"}, {"pr": 542, "head": "75702dfee5ab885eb746c734208db7e3b61bbc80"}], "acceptance": "Freeze actual heads and merge-bases, complete bounded read-only native GPT review through the selected loopback Responses route, retain failed attempts, independently verify each reported finding against exact source, and return the result to the owning session."},
+    {"id": "official-action-example", "acceptance": "Use the selected action revision's supported inputs and native CLI flags, pin executable actions, validate the workflow with the installed native workflow analyzer, and run the unchanged selected upstream test command. Preserve failures and distinguish unit checks from hosted/provider acceptance."},
+    {"id": "lifecycle-token-handoff", "acceptance": "Map concrete native lifecycle capabilities and remaining task-specific gates to immutable sources or exact retained receipts; keep prompt, source packet, artifact and provider counters distinct; no universal quality or savings claim."}
+  ],
+  "usage_rule": "Choose one authoritative native aggregate per invocation. Codex cached input and reasoning output are subsets; resumed thread totals are cumulative. Claude input, cache creation and cache reads are disjoint. Gateway/native views are separate until correlation is qualified. Unknown outer coordinator, worker and research-agent usage remains unknown. No whole-task savings claim.",
+  "architecture_escalation": {"trigger": "Consequential cross-framework architecture choice and native lifecycle contract reconciliation.", "review_role": "Astra/Max stack-researcher", "acceptance": "Immutable primary sources and native installed-client checks support each recommendation; agreement does not qualify behavior."},
+  "ownership": {"coordinator": "isolated foundation integration checkout", "writable_paths": ["examples/gpt-native-github/**", "docs/decisions/2026-09-30-gpt-lifecycle-convergence.md", "evidence/artifacts/gpt-lifecycle-convergence-20260930/**"], "shared_registry": "Use register_file only for this integration's files in the isolated checkout; preserve main's other entries.", "host_activation": "Owned by live freeze/default-harness sessions; do not apply or rearm here.", "sdk_and_roster": "Reuse source-pinned existing branch evidence; preserve live SDK/roster/collector owners."},
+  "stop_conditions": ["Unchanged native quota or authentication failure", "No source-backed supported integration contract", "No owner handback for a shared host write"],
+  "rollback": "Discard only the isolated example/integration checkout and owned diagnostic work; leave host configurations, services, sign-ins, human sessions and other-owner branches intact."
+}
