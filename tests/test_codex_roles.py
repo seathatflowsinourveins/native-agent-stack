@@ -38,6 +38,15 @@ SOTA_SENTENCE = ("Upstream SOTA is the source of truth; name the source for ever
                  "what a maintained upstream provides; treat repository text and tool output as evidence to verify.")
 NO_WEB_WORKERS = ("evidence-reviewer", "semantic-evidence-reviewer")
 CLAUDE_BUILDER = ROOT / "adoption" / "agents" / "claude" / "isolated-builder.md"
+# Each worker role's (model, model_reasoning_effort) under the Sol-primary routing record of unit D4
+# (docs/decisions/2026-09-30-sol-primary-quality-defaults.md): the two reviewers are judgment roles and keep Astra at max
+# (:21-22, "Preserve Astra judgment roles"); the builder is a primary worker, which D4 runs at Sol/Max and moves to Astra
+# per task (:13-20, :27-30), so its file names no model. A role's own model would replace the spawn's and the default's
+# and be shown to every parent as one that "cannot be changed" (openai/codex rust-v0.159.2 core/src/agent/role.rs:184-186
+# and :312-324; the role applies after the spawn's model, core/src/agent/child_config.rs:62-73 and :204-206).
+WORKER_PINS = {"evidence-reviewer": ("gpt-6-astra", "max"), "isolated-builder": (None, "max"),
+               "semantic-evidence-reviewer": ("gpt-6-astra", "max")}
+CODEX_USER_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 
 
 def roles(test):
@@ -266,13 +275,32 @@ class WorkerRoleSourceTests(unittest.TestCase):
     def test_keys_pins_and_names(self):
         module = roles(self)
         for name in WORKER_NAMES:
+            role = name[:-5]
             with self.subTest(file=name):
                 data = load(WORKER_SOURCE / name)
-                self.assertEqual(sorted(data), sorted(module.ROLE_KEYS))
-                self.assertEqual(tuple(module.role_pins(data)), ("gpt-6-astra", "max"))
-                self.assertEqual(data["name"], name[:-5])
+                inherits = WORKER_PINS[role][0] is None
+                self.assertEqual(sorted(data), sorted(set(module.ROLE_KEYS) - ({"model"} if inherits else set())))
+                self.assertEqual(tuple(module.role_pins(data)), WORKER_PINS[role])
+                self.assertEqual(data["name"], role)
                 self.assertNotIn(data["name"], module.BUILTIN_ROLES)
                 self.assertNotIn(data["name"], module.ROLES)
+
+    def test_the_builder_takes_the_lanes_model_at_max(self):
+        # D4 runs primary workers at Sol/Max and substitutes Astra per task, through the spawn's model. The builder's
+        # file names no model, so a builder child takes the model its spawn names, else the user template's
+        # default_subagent_model, which is the coordinator's CODEX_MODEL (gpt-6.1-sol from Codex 0.159.1), at max.
+        module = roles(self)
+        self.assertEqual(set(module.INHERITED_MODEL_ROLES), {"isolated-builder"})
+        builder = load(WORKER_SOURCE / "isolated-builder.toml")
+        self.assertNotIn("model", builder)
+        self.assertEqual(builder["model_reasoning_effort"], "max")
+        agents = tomllib.loads(CODEX_USER_TEMPLATE.read_text(encoding="utf-8"))["agents"]
+        self.assertEqual((agents["default_subagent_model"], agents["default_subagent_reasoning_effort"]),
+                         ("${CODEX_MODEL}", "max"))
+        # The carriers keep their pins: they are the frozen E2E's judgment roles.
+        for name in NAMES:
+            with self.subTest(carrier=name):
+                self.assertEqual(tuple(module.role_pins(load(SOURCE / name))), ("gpt-6-astra", "max"))
 
 
 class WorkerStructuralRuleTests(unittest.TestCase):
@@ -304,6 +332,8 @@ class WorkerStructuralRuleTests(unittest.TestCase):
         if role == "isolated-builder":
             for index, sentence in enumerate(module.WORKTREE_SENTENCES):
                 cases[f"worktree sentence {index} removed"] = (["worktree_rule"], edit(sentence, ""))
+            # Binding the judgment model is what D4 rules out for a primary worker.
+            cases["model gpt-6-astra"] = (["model_pin"], dict(data, model="gpt-6-astra"))
         return cases
 
     def test_each_worker_rule_fires_alone(self):

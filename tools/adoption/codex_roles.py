@@ -62,6 +62,11 @@ ROLE_KEYS = frozenset({"name", "description", "model", "model_reasoning_effort",
 BUILTIN_ROLES = frozenset({"default", "explorer", "worker"})
 ROLE_MODEL = "gpt-6-astra"
 ROLE_EFFORT = "max"
+# Roles whose file names no model. The Sol-primary routing record (docs/decisions/2026-09-30-sol-primary-quality-
+# defaults.md:13-20,27-30) runs primary workers at Sol/Max and moves one to Astra per task through the spawn's model; a
+# role's own model would replace both, since the role applies after the spawn's model and the default_subagent_model
+# (openai/codex rust-v0.159.2 core/src/agent/child_config.rs:62-73,204-206; core/src/agent/role.rs:184-186).
+INHERITED_MODEL_ROLES = frozenset({"isolated-builder"})
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
@@ -275,8 +280,14 @@ def f4_block() -> str:
     return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
 
 
+def required_keys(role: str) -> frozenset:
+    """The keys a role file must carry: the five, less `model` for a role that takes its model from the spawn."""
+    return ROLE_KEYS - {"model"} if role in INHERITED_MODEL_ROLES else ROLE_KEYS
+
+
 def _rule_keys(role, stem, data):
-    return set(data) != ROLE_KEYS
+    keys = set(data)
+    return not keys <= ROLE_KEYS or not required_keys(role) <= keys
 
 
 def _rule_name_stem(role, stem, data):
@@ -298,6 +309,8 @@ def _rule_description_denylist(role, stem, data):
 
 
 def _rule_model_pin(role, stem, data):
+    if role in INHERITED_MODEL_ROLES:
+        return "model" in data
     return data.get("model") != ROLE_MODEL
 
 
@@ -355,7 +368,8 @@ RULES = (
     ("keys", ALL_ROLES,
      "codex-rs/core/src/agent/role.rs:36-48 (AgentRoleOverrides, the applied set) and "
      "codex-rs/agent-roles/src/agent_role_config.rs:20-28 (RawAgentRoleFileToml, deny_unknown_fields): a role "
-     "file carries exactly the five keys, since every other key is unapplied or would change tool bindings",
+     "file carries only the five keys, since every other key is unapplied or would change tool bindings, and each "
+     "of them but the model of a role in INHERITED_MODEL_ROLES",
      _rule_keys),
     ("name_stem", ALL_ROLES,
      "agent_role_config.rs:73-88 (the name field, not the file name, names the role); the stem equals the name so "
@@ -375,14 +389,16 @@ RULES = (
      "every parent in every arm",
      _rule_description_denylist),
     ("model_pin", ALL_ROLES,
-     "preregistration.json /tasks (every family codex task is gpt-6-astra at max) and "
-     "adoption/templates/codex.stack-worker.config.toml:12; for the worker roles, "
-     "docs/decisions/2026-09-27-model-currency.md (Codex judgment row: gpt-6-astra at max)",
+     "preregistration.json /tasks (every family codex task is gpt-6-astra at max); for the two worker reviewers, "
+     "docs/decisions/2026-09-27-model-currency.md (Codex judgment row: gpt-6-astra at max) and "
+     "docs/decisions/2026-09-30-sol-primary-quality-defaults.md:21-22 (Astra judgment roles are preserved); the "
+     "builder, a primary worker, names no model (INHERITED_MODEL_ROLES: the same record's :13-20 and :27-30)",
      _rule_model_pin),
     ("effort_pin", ALL_ROLES,
      "preregistration.json /tasks; codex-rs/protocol/src/openai_models.rs:59-72 (ReasoningEffort::Max) and "
      "adoption/templates/codex.stack-worker.config.toml:17; for the worker roles, "
-     "docs/decisions/2026-09-27-model-currency.md",
+     "docs/decisions/2026-09-27-model-currency.md and docs/decisions/2026-09-30-sol-primary-quality-defaults.md:13-20 "
+     "(Sol/Max primary workers, Astra/Max judgment)",
      _rule_effort_pin),
     ("f4_block", ALL_ROLES,
      "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.50.0 "

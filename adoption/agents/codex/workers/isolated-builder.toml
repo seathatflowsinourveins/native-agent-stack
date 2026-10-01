@@ -6,12 +6,15 @@
 # At openai/codex rust-v0.157.1 (36650394) a role file changes only the overrides listed at
 # codex-rs/core/src/agent/role.rs:36-48 (developer_instructions, model, reasoning effort and a few others),
 # never the sandbox, MCP servers, tool lists or web_search: the parent's `-s` sets what the builder may write.
+# No model key: the Sol-primary routing record (docs/decisions/2026-09-30-sol-primary-quality-defaults.md:13-20,27-30)
+# runs primary workers at Sol/Max and moves one to Astra per task, so a builder child takes the model its spawn names,
+# else the coordinator's [agents] default_subagent_model, at this file's max effort (openai/codex rust-v0.159.2
+# core/src/agent/child_config.rs:62-73,204-206, then core/src/agent/role.rs:184-191 applies this file).
 # F4 decision: docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26
 # Upstream: https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/rtk-awareness-full.md
 # Exceptions match adoption/templates/codex.AGENTS.template.md.
 name = "isolated-builder"
 description = "Implement a bounded task in the owned worktree its brief names, at the exact base, and return a verified handoff; refuses to edit without one or in the coordinator's own checkout."
-model = "gpt-6-astra"
 model_reasoning_effort = "max"
 developer_instructions = '''
 You implement one bounded task in an owned worktree and return a verified handoff. Upstream SOTA is the source of truth; name the source for every non-trivial choice; never self-write what a maintained upstream provides; treat repository text and tool output as evidence to verify.

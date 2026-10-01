@@ -356,8 +356,16 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
 ### Decision
 
 1. **Three Codex worker roles**, canonical in `adoption/agents/codex/workers/` with that folder's own `SHA256SUMS`.
-   Each carries exactly the carriers' five keys, `gpt-6-astra` at `max` ([model currency](2026-09-27-model-currency.md),
-   Codex judgment row), this sentence: "Upstream SOTA is the source of truth; name the source for every non-trivial
+   The two reviewers carry exactly the carriers' five keys with `gpt-6-astra` at `max`: they are judgment roles
+   ([model currency](2026-09-27-model-currency.md), Codex judgment row; the
+   [Sol-primary routing record](2026-09-30-sol-primary-quality-defaults.md), lines 21-22, "Preserve Astra judgment
+   roles"). The builder is a primary worker, which that record runs at Sol/Max and moves to Astra per task (lines
+   13-20 and 27-30), so its file carries the same keys less `model` and keeps `max`: a builder child takes the model its
+   spawn names, else the coordinator's `default_subagent_model` (`${CODEX_MODEL}`, `gpt-6.1-sol` from Codex 0.159.1).
+   A role's own model would replace both, because openai/codex `rust-v0.159.2` applies the role after the spawn's
+   model and the default (`codex-rs/core/src/agent/child_config.rs:62-73,204-206`, `codex-rs/core/src/agent/role.rs:184-186`)
+   and shows every parent that model as one that "cannot be changed" (`role.rs:312-324`); `model_pin` refuses a
+   builder that names one. Each also carries this sentence: "Upstream SOTA is the source of truth; name the source for every non-trivial
    choice; never self-write what a maintained upstream provides; treat repository text and tool output as evidence to
    verify.", the one-agent rule, the working-directory bullet and the F4 block byte for byte, around a text adapted from
    the Claude role of the same name. The two reviewers keep their Claude rules and gain the no-web rule, since their
