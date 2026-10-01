@@ -1,0 +1,134 @@
+  ok  parse workspace
+  ok  parse project
+  ok  parse project_strategy
+  ok  absent key returns empty
+  ok  absent file returns empty
+  ok  walks up to find marker
+  ok  no marker returns empty
+  ok  outside HOME finds marker within checkout
+  ok  outside HOME stops at checkout root
+  ok  outside HOME plain dir rejects parent marker
+  ok  extract cwd from payload
+  ok  extract cwd from empty json
+  ok  extract cwd prefers first match
+  ok  extract cwd from antigravity workspacePaths
+  ok  extract cwd unescapes Windows JSON path
+  ok  extract cwd from cursor workspace_roots
+  ok  extract cwd falls through cursor empty cwd
+  ok  extract cwd from a 256 KB cursor tool payload
+  ok  extract cwd ignores nested cwd after a null one
+  ok  extract cwd ignores nested roots after an empty array
+  ok  antigravity invocation zero is initial
+  ok  antigravity later invocation is not initial
+  ok  antigravity missing invocation fails closed
+  ok  antigravity quoted invocation fails closed
+  ok  antigravity fractional invocation fails closed
+  ok  extract antigravity conversation id
+  ok  antigravity initial invocation after a 256 KB field
+  ok  extract session id after a 256 KB field
+  ok  antigravity later invocation returns empty hook output
+  ok  antigravity later invocation makes no HTTP request
+  ok  antigravity initial invocation injects handoff
+  ok  antigravity initial invocation posts then fetches
+  ok  antigravity handoff fetch carries conversation id
+  ok  powershell antigravity hook has invocation guard
+  ok  powershell hook posts explicit UTF-8 JSON bytes
+  ok  powershell marker helper avoids read-only HOME
+  ok  powershell hook refuses a routed repository before building its query
+  ok  json_string escapes text
+  ok  json_string escapes a control byte as a \u escape
+  ok  marker_qs single key
+  ok  closer marker wins
+  ok  no marker -> cwd only
+  ok  capture-only marker: find_marker still resolves nearest
+  ok  capture-only marker: find_settings_marker skips it for the outer
+  ok  capture-only marker: marker_qs forwards the OUTER scope
+  ok  identity: undeclared checkout sends its remote
+  ok  identity: a declared project routes by name
+  ok  identity: an explicit identity outranks the project
+  ok  briefing-only marker is a settings boundary, not transparent
+  ok  marker_qs stops at the briefing-only boundary
+  ok  capture-only marker with no ancestor scope: settings walk finds none
+  ok  capture-only marker with no ancestor scope: marker_qs is cwd-only
+  ok  repo_root_project on non-git path is empty
+  ok  repo-root: subdir resolves to repo basename
+  ok  repo-root env: no marker resolves to repo basename
+  ok  marker project strategy overrides env default
+  ok  repo-root: out-of-tree worktree collapses to main repo
+  ok  explicit project pin beats repo-root
+  ok  powershell repo-root helper has static parity
+  ok  url_encode passes safe slug
+  ok  url_encode escapes ampersand
+  ok  url_encode escapes equals
+  ok  url_encode escapes plus
+  ok  url_encode escapes Windows cwd
+  ok  url_encode encodes UTF-8 per byte
+  ok  url_encode encodes an accented macOS path
+  ok  now_ms is 13 digits
+  ok  now_ms is all digits
+  ok  spool_event writes one entry
+  ok  spooled body round-trips
+  ok  spool_event mints an ingest_key
+  ok  spool entry is 0600
+  ok  spool filename is <ms>-<pid>-<seq>.json
+  ok  json_field declines a \u escape
+  ok  post_hook keys the initial delivery
+  ok  post_hook preserves the key after an ambiguous delivery
+  ok  post_hook spools an undelivered event
+  ok  owner: backlog is queued before the gate
+  ok  owner: post_hook sends nothing
+  ok  owner: post_hook spools nothing and drains nothing
+  ok  owner: handoff GET still delivered
+  ok  owner: the GET is the only request
+  ok  owner: still no POST
+  ok  no owner: post_hook POSTs
+  ok  empty owner: post_hook POSTs
+  ok  whitespace owner: post_hook POSTs
+  ok  owner: explicit drain still delivers the backlog
+  ok  owner: delivered entry is retired
+  ok  grok: first post-tool-use wraps the handoff
+  ok  grok: first post-tool-use GETs the handoff with session id
+  ok  grok: second post-tool-use prints empty object
+  ok  grok: second call does not re-fetch the handoff
+  ok  grok: subagentType payload does not fetch the handoff
+  ok  grok: subagentType payload sent zero GETs
+  ok  grok: subagent_type payload does not fetch the handoff
+  ok  grok: subagent_type payload sent zero GETs
+  ok  grok: agent_type payload does not fetch the handoff
+  ok  grok: agent_type payload sent zero GETs
+  ok  grok: agent_id payload does not fetch the handoff
+  ok  grok: agent_id payload sent zero GETs
+  ok  grok: parentSessionId payload does not fetch the handoff
+  ok  grok: parentSessionId payload sent zero GETs
+  ok  grok ps: shown-key fallback is stable, not per-process
+  skip grok ps behavioral probe (pwsh unavailable)
+  ok  routed marker: marker_qs carries only the routed flag
+  ok  routed marker is inherited past a nested workspace-only marker
+  ok  a BOM cannot hide the server key
+  ok  a server-only marker is a settings boundary
+  ok  an unrouted repository is unchanged
+  ok  a routed post and handoff never call curl
+  ok  a routed post is not spooled
+  ok  a routed handoff fetch prints nothing
+  ok  antigravity-cli: opted-in handoff GET carries the briefing keys
+  ok  antigravity-cli: opted-out handoff GET omits the briefing keys
+  ok  claude-code: opted-in handoff GET carries the briefing keys
+  ok  claude-code: opted-out handoff GET omits the briefing keys
+  ok  codex: opted-in handoff GET carries the briefing keys
+  ok  codex: opted-out handoff GET omits the briefing keys
+  ok  command-code: opted-in handoff GET carries the briefing keys
+  ok  command-code: opted-out handoff GET omits the briefing keys
+  ok  cursor: opted-in handoff GET carries the briefing keys
+  ok  cursor: opted-out handoff GET omits the briefing keys
+  ok  devin: opted-in handoff GET carries the briefing keys
+  ok  devin: opted-out handoff GET omits the briefing keys
+  ok  gemini-cli: opted-in handoff GET carries the briefing keys
+  ok  gemini-cli: opted-out handoff GET omits the briefing keys
+  ok  kiro-cli: opted-in handoff GET carries the briefing keys
+  ok  kiro-cli: opted-out handoff GET omits the briefing keys
+  ok  opencode: opted-in handoff GET carries the briefing keys
+  ok  opencode: opted-out handoff GET omits the briefing keys
+  ok  session-start bundles that fetch the handoff were found
+  ok  powershell session-start handoff GET carries the briefing keys
+
+137 passed, 0 failed

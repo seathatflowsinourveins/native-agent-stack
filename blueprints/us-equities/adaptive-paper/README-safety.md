@@ -80,7 +80,8 @@ limit-order mechanism guarantees a flat finish.
   was first observed on the paper endpoint in the 2026-09-24 14:39Z native-fault
   run (`native-faults/receipt-20260924t143905.json`, C04: submit 422, then lookup
   404), and again in the 18:58Z run that day (`native-faults/receipt-20260924t185811.json`)
-  and the 2026-09-25 18:25Z run (`native-faults/receipt.json`). The same body
+  and the 2026-09-25 18:25Z run (`native-faults/receipt-20260925t182513.json`; the current
+  `native-faults/receipt.json` is the 2026-10-01 14:38Z run on engine dca821cc). The same body
   under any other status still stays ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
   limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
   otherwise). Any other 422, including "client_order_id must be unique", stays

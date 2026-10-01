@@ -1,0 +1,2612 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "evaluation-experiments",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Installed Inspect identity/help is not an evaluation run; task-matched retry, abstention and complete usage remain unexecuted.",
+      "ARB positive-only upstream baseline and authored local public-doc fixture are not an untouched financial benchmark or no-answer calibration.",
+      "No matched same-task/corpus/scorer comparison with Inspect/MLflow/Promptfoo/Phoenix/MTEB exists; unreported provider/GPU usage remains unknown.",
+      "No new WSL distribution exists. Historical receipts and current client identity do not constitute new-host installation, recovery, provider, GPU or broker acceptance.",
+      "This is one bounded source wave within the authorized overall convergence research. Identity/release metadata and listed source review do not establish saturation or measured superiority of every candidate."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "repository_of_record": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "pin_of_record": "v0.2.1; native receipt b487f3866cc13dd971819cb902517a6a50282404; card README snapshot 07014c986f3deadb1548c62b32c0ffbe6a81465d",
+      "pin_source": "blueprints/convergence-practice/arb-trace2code/receipt.json:32; catalogs/us-equities/foundation-memory.json:1297",
+      "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+      "source_pinned_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+        "repository_endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.2.1",
+        "latest_release_published_at": "2026-07-26T01:08:48Z",
+        "latest_release_url": "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/eyuansu62/agent-retrieval-bench/releases/tags/v0.2.1",
+          "exit_code": 0,
+          "tag": "v0.2.1",
+          "prerelease": false,
+          "url": "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+        }
+      },
+      "verdict": "Retain exact-tag offline retrieval baseline. Historical tests/positive-only samples do not qualify no-answer calibration, financial retrieval or provider/GPU acceptance.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+          "sha256": "8747df425ba8ee6810dbc2ec07c7a5b584c868f5f808a853c8e9a87525218761",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/pyproject.toml",
+          "sha256": "05889ec96609b4d5b557ac21b9894a3d308930dbe7d8d11deb130abdc9d2e317",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/LICENSE",
+          "sha256": "f821747bf0011218a8d18a6030b3343384a2c68478e643e26e057732fc89aa31",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "src/agent_retrieval_bench/cli.py",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/src/agent_retrieval_bench/cli.py",
+          "sha256": "6214b053c7799e7f654c39e871207624748588eaecc9379e57333c27b95ab58a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/test_corpus_baseline.py",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/tests/test_corpus_baseline.py",
+          "sha256": "2b69d15ffb1f8c87ba5293f42cc6dc472ef067fdf0296c537c5f45de88ca8134",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+          "sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install -e .",
+        "source": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Native source installation at exact v0.2.1 checkout; unexecuted here",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+          "upstream_document_line": 95,
+          "upstream_document_line_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L95",
+          "upstream_documented_command": "pip install -e .",
+          "source_sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4",
+          "native_gh_exit_code": 0
+        },
+        "recipe_pin_binding": {
+          "pin_source": "blueprints/convergence-practice/arb-trace2code/receipt.json:32; catalogs/us-equities/foundation-memory.json:1297",
+          "recorded_source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+          "command_in_record": "rtk python -m pip install -e .",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest -q tests/test_corpus_baseline.py",
+        "source": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/tests/test_corpus_baseline.py",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Native exact-tag unchanged file; set supported PYTHONPATH=src environment; not local financial fixture"
+      },
+      "evidence_class": "historical_unchanged_upstream_tests_and_offline_execution",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+            "sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "pyproject.toml",
+            "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/pyproject.toml",
+            "sha256": "05889ec96609b4d5b557ac21b9894a3d308930dbe7d8d11deb130abdc9d2e317",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "tests/test_corpus_baseline.py",
+            "source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/tests/test_corpus_baseline.py",
+            "sha256": "2b69d15ffb1f8c87ba5293f42cc6dc472ef067fdf0296c537c5f45de88ca8134",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      },
+      "component_id": "foundation-agent-retrieval-bench",
+      "selection_scope": "Retain exact-tag offline retrieval baseline. Historical tests/positive-only samples do not qualify no-answer calibration, financial retrieval or provider/GPU acceptance."
+    },
+    {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "repository_of_record": "https://github.com/ukgovernmentbeis/inspect_ai",
+      "pin_of_record": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "pin_source": "catalogs/us-equities/agents-operations.json:1290",
+      "source_commit": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "source_pinned_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "repository_endpoint": "https://api.github.com/repos/ukgovernmentbeis/inspect_ai",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/ukgovernmentbeis/inspect_ai/releases/latest",
+        "latest_release_exit_code": 1,
+        "latest_release_tag": null,
+        "latest_release_published_at": null,
+        "latest_release_url": null,
+        "upgrade_accepted": false,
+        "scope_note": "Latest-release API 404; PyPI inspect-ai 0.3.273; installed CLI 0.3.266."
+      },
+      "verdict": "Provisional typed eval/log/retry route; installed identity/help now observed, but no evaluation/provider run or new-host installation acceptance occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+          "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/pyproject.toml",
+          "sha256": "ce5713f4a354c3d2fd3b01f08e247a06b240a21eda481581b3cd270c867c1d2b",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/Makefile",
+          "sha256": "5af9ec1c6ac93667e4b111a1cddeddff68f86bdd6e59265893e9706fc984851d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/LICENSE",
+          "sha256": "c593c2afc81388521eaeb03f0d1a4b01bc3e5147ed9cb16c1f129e5be353b6af",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/test_retry.py",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/tests/test_retry.py",
+          "sha256": "666d499a59bcaae132ea4deda217c28699abcfd46571465baeb5c150615c9eb3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/.github/workflows/test.yml",
+          "sha256": "cd8537b3e941aaffa435df97da7120f1f359a448f7a931b24a71b5fb1c4db816",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "docs/index.qmd",
+          "source_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/docs/index.qmd",
+          "sha256": "67a471ec48954df891839cd0806a97c205d36fe30eb5e6c8c3563f303f6ad56a",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install inspect-ai==0.3.266",
+        "source": "https://inspect.aisi.org.uk/",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native package route; exact recorded version explicit; no installation here",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/docs/index.qmd",
+          "upstream_document_line": 38,
+          "upstream_document_line_url": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/docs/index.qmd#L38",
+          "upstream_documented_command": "pip install inspect-ai",
+          "source_sha256": "67a471ec48954df891839cd0806a97c205d36fe30eb5e6c8c3563f303f6ad56a",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:1290",
+          "recorded_source_commit": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+          "command_in_record": "rtk python -m pip install inspect-ai==0.3.266",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests/test_retry.py",
+        "source": "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/tests/test_retry.py",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Unchanged mock retry tests, not a provider evaluation"
+      },
+      "evidence_class": "source_review_and_current_cli_identity",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "component_id": "inspect-ai",
+      "selection_scope": "Provisional typed eval/log/retry route; installed identity/help now observed, but no evaluation/provider run or new-host installation acceptance occurred."
+    },
+    {
+      "repository": "https://github.com/mlflow/mlflow",
+      "repository_of_record": "https://github.com/mlflow/mlflow",
+      "pin_of_record": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "pin_source": "catalogs/us-equities/data-research.json:789",
+      "source_commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "source_pinned_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/mlflow/mlflow",
+        "repository_endpoint": "https://api.github.com/repos/mlflow/mlflow",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/mlflow/mlflow/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v3.16.1",
+        "latest_release_published_at": "2026-09-17T02:40:08Z",
+        "latest_release_url": "https://github.com/mlflow/mlflow/releases/tag/v3.16.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/mlflow/mlflow/releases/tags/v3.16.1",
+          "exit_code": 0,
+          "tag": "v3.16.1",
+          "prerelease": false,
+          "url": "https://github.com/mlflow/mlflow/releases/tag/v3.16.1"
+        }
+      },
+      "verdict": "Provisional experiment/dataset lineage. Unchanged tracking tests are sourced; no task-matched financial evaluation, provider judge or recovery run occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+          "sha256": "3a00e5bbeeeb6246915d0c937f9ecedf8a44a7ff4b81f76eff88f26c3b00b73a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/pyproject.toml",
+          "sha256": "6f6bd609097586866bea935575c18820c880cf9c3e57bc28569787669af0e0a6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/CONTRIBUTING.md",
+          "sha256": "829d6082823fa8bb69a855b659a74af5e993b458782fac516424416ee07c5478",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/LICENSE.txt",
+          "sha256": "6395355de6f391afff35996a30fb41b189b4991a4cb54993ace35ab69a0bfa28",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/master.yml",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/.github/workflows/master.yml",
+          "sha256": "8a6e21fcc1fcbd2023fb279e93cdaa7c46507451f8d30c945e32d09a8ea677b4",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/tracking/test_tracking.py",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/tests/tracking/test_tracking.py",
+          "sha256": "e2efe9dacb32e9b3ef0858479df2d31babeed4be5ecc9bb79f457fe6617d8c84",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "docs/docs/classic-ml/getting-started/quickstart.mdx",
+          "source_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/docs/docs/classic-ml/getting-started/quickstart.mdx",
+          "sha256": "65bd00ff34e6254cea62515e8e80624f3520e663efdaa8524d7a3691f9e64562",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install mlflow==3.16.1",
+        "source": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native package route; exact recorded version explicit; no installation here",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/docs/docs/classic-ml/getting-started/quickstart.mdx",
+          "upstream_document_line": 31,
+          "upstream_document_line_url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/docs/docs/classic-ml/getting-started/quickstart.mdx#L31",
+          "upstream_documented_command": "pip install mlflow",
+          "source_sha256": "65bd00ff34e6254cea62515e8e80624f3520e663efdaa8524d7a3691f9e64562",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:789",
+          "recorded_source_commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+          "command_in_record": "rtk python -m pip install mlflow==3.16.1",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk pytest tests/tracking/test_tracking.py",
+        "source": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/CONTRIBUTING.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Development/test prerequisites required; no provider judges"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "component_id": "data-mlflow",
+      "selection_scope": "Provisional experiment/dataset lineage. Unchanged tracking tests are sourced; no task-matched financial evaluation, provider judge or recovery run occurred."
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Codex",
+      "repository": "https://github.com/openai/codex",
+      "repository_of_record": "https://github.com/openai/codex",
+      "pin_of_record": "0.159.2",
+      "pin_source": "catalogs/us-equities/convergence-program/foundation.json:481",
+      "source_commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "source_pinned_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/openai/codex",
+        "repository_endpoint": "https://api.github.com/repos/openai/codex",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/openai/codex/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "rust-v0.159.3",
+        "latest_release_published_at": "2026-09-30T22:57:34Z",
+        "latest_release_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain native research-client context under foundation routing. Source/client identity is separate from provider runs and financial data/strategy qualification.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/README.md",
+          "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/package.json",
+          "sha256": "0d0a78ff2f703abad442de6e99e127076ad40f85912692a82ec21d968944b368",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/LICENSE",
+          "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/rust-ci.yml",
+          "source_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/.github/workflows/rust-ci.yml",
+          "sha256": "9bb6d1e103e35932fa81c0187f0577e8e19b8e0d04d78614f7071e04813bd3fd",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "justfile",
+          "source_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/justfile",
+          "sha256": "69006391c914824d51d49ac7b1ec45caabb6df6a636fb59277fdbe02daf17d36",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk npm install -g @openai/codex",
+        "source": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/README.md#L42",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/README.md",
+          "upstream_document_line": 42,
+          "upstream_document_line_url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/README.md#L42",
+          "upstream_documented_command": "npm install -g @openai/codex",
+          "source_sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/convergence-program/foundation.json:481",
+          "recorded_source_commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "command_in_record": "rtk npm install -g @openai/codex",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk just test",
+        "source": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/justfile",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Native source nextest path; no model calls"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Claude Code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "repository_of_record": "https://github.com/anthropics/claude-code",
+      "pin_of_record": "2.1.284",
+      "pin_source": "manifests/stack.json:103",
+      "source_commit": "8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+      "source_pinned_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/anthropics/claude-code",
+        "repository_endpoint": "https://api.github.com/repos/anthropics/claude-code",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v2.1.286",
+        "latest_release_published_at": "2026-09-30T19:10:13Z",
+        "latest_release_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain native research-client context under foundation routing. Public issue/changelog source is not proprietary implementation tests; no model run occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md",
+          "sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.md",
+          "source_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/LICENSE.md",
+          "sha256": "728158fd1037143fad6907e8fa34804177e598b7326519503fe83cafdef849e6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CHANGELOG.md",
+          "source_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/CHANGELOG.md",
+          "sha256": "0db7f71e8634f804828733a58e2387754a56e52b9e656238419469bdeac2426a",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk brew install --cask claude-code",
+        "source": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md#L28",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md",
+          "upstream_document_line": 28,
+          "upstream_document_line_url": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md#L28",
+          "upstream_documented_command": "brew install --cask claude-code",
+          "source_sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:103",
+          "recorded_source_commit": "8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+          "command_in_record": "rtk brew install --cask claude-code",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": [
+          "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md"
+        ],
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Public issue/changelog repository is not proprietary native implementation tests"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "repository_of_record": "https://github.com/dagucloud/dagu",
+      "pin_of_record": "2.16.6",
+      "pin_source": "manifests/stack.json:1338",
+      "source_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "source_pinned_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/dagucloud/dagu",
+        "repository_endpoint": "https://api.github.com/repos/dagucloud/dagu",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/dagucloud/dagu/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v2.18.1",
+        "latest_release_published_at": "2026-09-29T15:24:51Z",
+        "latest_release_url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/dagucloud/dagu/releases/tags/v2.16.6",
+          "exit_code": 0,
+          "tag": "v2.16.6",
+          "prerelease": false,
+          "url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6"
+        }
+      },
+      "verdict": "Retain bounded workflow supervision with historical native success/failure/cancel scopes. Current version identity is distinct from provider/broker/recovery acceptance.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+          "sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/go.mod",
+          "sha256": "35b0f8189d25a0cac4f27a81e6f7ba6e41d65fb66ddaecf1a0a44b072c1fb586",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/Makefile",
+          "sha256": "9d5f356610f91f32096459193337fec853876495add242934c73b21eaedd823e",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/LICENSE",
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "scripts/installer.sh",
+          "source_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/scripts/installer.sh",
+          "sha256": "76791741497b3962b48e6275138a82ac32df57f21f83f75e03a9dc6548de2ed4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk bash scripts/installer.sh --version v2.16.6",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/scripts/installer.sh",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/scripts/installer.sh",
+          "upstream_document_line": 109,
+          "upstream_document_line_url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/scripts/installer.sh#L109",
+          "upstream_documented_command": "--version <tag>",
+          "source_sha256": "76791741497b3962b48e6275138a82ac32df57f21f83f75e03a9dc6548de2ed4",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_native_installer_option"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1338",
+          "recorded_source_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+          "command_in_record": "rtk bash scripts/installer.sh --version v2.16.6",
+          "scope": "Pinned upstream installer implements --version <tag>. The exact v2.16.6 argument binds the recorded release; future selected-profile installer options must be frozen before execution."
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L1026",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/README.md",
+            "sha256": "b67467f0c5c3e63219783b811b2beaa0510f9afd5db923c5834fd6489094d4e1",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "Makefile",
+            "source_url": "https://github.com/dagucloud/dagu/blob/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/Makefile",
+            "sha256": "e988a8b1e8ce387c34868bd73a3616254b8ccaa4591497cb1d3b57cf1aef4896",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      }
+    },
+    {
+      "name": "OpenTelemetry Collector contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "repository_of_record": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin_of_record": "0.161.0",
+      "pin_source": "manifests/stack.json:1085",
+      "source_commit": "3f8455d8038a985398861171e5310bc9b4e988b2",
+      "source_pinned_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+        "repository_endpoint": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.162.0",
+        "latest_release_published_at": "2026-09-29T10:11:33Z",
+        "latest_release_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain telemetry context; source tests do not establish that all financial/provider/recovery events were observed.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/README.md",
+          "sha256": "b99baaf263c2e2194880c2900524c09270c267f6a8b3ee699ecee66cc1dc5fdf",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/go.mod",
+          "sha256": "216905f71cbf358382ee5518ac6542004abaf4756263cb58b37fb1a0b10eb4fc",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/Makefile",
+          "sha256": "7de4e102f6b5d50a0a3c466f671dd40effc2368cd67eaecea06cf430ce1c3d7f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/build-and-test.yml",
+          "source_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/.github/workflows/build-and-test.yml",
+          "sha256": "df9d719164dd4b6a0a8cbbf973d38e0a4af59197989edf80c7db5939b63cd798",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/README.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make gotest GROUP=\"${MATRIX_GROUP}\"",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/3f8455d8038a985398861171e5310bc9b4e988b2/.github/workflows/build-and-test.yml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Freeze a supported CI group before execution"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "repository_of_record": "https://github.com/prometheus/prometheus",
+      "pin_of_record": "3.15.0",
+      "pin_source": "manifests/stack.json:1146",
+      "source_commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "source_pinned_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/prometheus/prometheus",
+        "repository_endpoint": "https://api.github.com/repos/prometheus/prometheus",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/prometheus/prometheus/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v3.15.0",
+        "latest_release_published_at": "2026-09-25T08:56:22Z",
+        "latest_release_url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain metrics context; native tests do not measure financial data truth or strategy performance.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md",
+          "sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/go.mod",
+          "sha256": "94e39d68d3abd10168c4b1944a63356a1d9a467ddeceee46aea75fc14e4381d1",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/Makefile",
+          "sha256": "0e430c9e0870a217f34f69e776a9ef2899d9968e4388f85b9e050265ed3753b7",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk go install github.com/prometheus/prometheus/cmd/...",
+        "source": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md#L84",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md",
+          "upstream_document_line": 84,
+          "upstream_document_line_url": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md#L84",
+          "upstream_documented_command": "go install github.com/prometheus/prometheus/cmd/...",
+          "source_sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1146",
+          "recorded_source_commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "command_in_record": "rtk go install github.com/prometheus/prometheus/cmd/...",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/Makefile#L177",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Loki",
+      "repository": "https://github.com/grafana/loki",
+      "repository_of_record": "https://github.com/grafana/loki",
+      "pin_of_record": "3.7.8",
+      "pin_source": "manifests/stack.json:1184",
+      "source_commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "source_pinned_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/grafana/loki",
+        "repository_endpoint": "https://api.github.com/repos/grafana/loki",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/grafana/loki/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v3.7.8",
+        "latest_release_published_at": "2026-09-17T15:51:10Z",
+        "latest_release_url": "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain log observation context; log ingestion is separate from original-source provenance and usage/correctness acceptance.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md",
+          "sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/go.mod",
+          "sha256": "94d723802c6d25fb1a0ded9c05c7f0b28033b1ae21c0431f00b2fbc800263a59",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/Makefile",
+          "sha256": "38b020ac2791318005310734854922c802f36968e5530b3e8b7d2749d04721de",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/LICENSE",
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/Makefile#L378",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "repository_of_record": "https://github.com/grafana/grafana",
+      "pin_of_record": "13.2.2",
+      "pin_source": "manifests/stack.json:1217",
+      "source_commit": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "source_pinned_url": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/grafana/grafana",
+        "repository_endpoint": "https://api.github.com/repos/grafana/grafana",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/grafana/grafana/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v13.2.3",
+        "latest_release_published_at": "2026-09-29T09:02:18Z",
+        "latest_release_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain observation context under the foundation lane; Viewer/operator authentication is distinct and no current service acceptance occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+          "sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/package.json",
+          "sha256": "647be57bf3bf8264b4b4174facd503c9d678e02c42eb5ad6fb86288ed0a3b1dc",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/Makefile",
+          "sha256": "d7719b60a946eac3516764e74fa5933852b72894319bd2b13295ac2840906472",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/LICENSE",
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk yarn run test",
+        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/package.json",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_script; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Restic",
+      "repository": "https://github.com/restic/restic",
+      "repository_of_record": "https://github.com/restic/restic",
+      "pin_of_record": "0.19.1",
+      "pin_source": "manifests/stack.json:1310",
+      "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "source_pinned_url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/restic/restic",
+        "repository_endpoint": "https://api.github.com/repos/restic/restic",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/restic/restic/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.19.1",
+        "latest_release_published_at": "2026-07-05T08:13:33Z",
+        "latest_release_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain backup/recovery context; native tests are separate from a verified task-specific financial snapshot restore.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md",
+          "sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.mod",
+          "sha256": "d166913ed4897cf69069ef5be090b2d79a857fc28328bb950e12655b5a54f176",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/Makefile",
+          "sha256": "308dc7fa5136f323440d274eb58e5980a36bf46b78c4b118c61afd9ca72cf4cc",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/LICENSE",
+          "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/Makefile#L11",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Temporal",
+      "repository": "https://github.com/temporalio/temporal",
+      "repository_of_record": "https://github.com/temporalio/temporal",
+      "pin_of_record": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
+      "pin_source": "catalogs/us-equities/agents-operations.json:327",
+      "source_commit": "d94e34a1ebba5410a2e7d07119a76896909591aa",
+      "source_pinned_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/temporalio/temporal",
+        "repository_endpoint": "https://api.github.com/repos/temporalio/temporal",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/temporalio/temporal/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v1.32.0",
+        "latest_release_published_at": "2026-09-11T16:10:29Z",
+        "latest_release_url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional durable-workflow challenger; native source tests are not a measured bounded Dagu recovery/cost crossover.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/README.md",
+          "sha256": "269838d3de5da90d4c2c0b45bf7fc745b384a5a05c0932582e923638e8994189",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/go.mod",
+          "sha256": "378593fe585665b952ba1265b10cd8f896342d4c3a2bbd0df67ce80ca6d14d13",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/Makefile",
+          "sha256": "8c586101991c119f76b0e1cfbcfd382edb0999f8ae19d15a75a45bfb82c13f5b",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/LICENSE",
+          "sha256": "6aab9afd99ceb1dcaf6a0d91386b46baef9bce17ae4006044e0f231e31430b69",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk brew install temporal",
+        "source": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/README.md#L38",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/README.md",
+          "upstream_document_line": 38,
+          "upstream_document_line_url": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/README.md#L38",
+          "upstream_documented_command": "brew install temporal",
+          "source_sha256": "269838d3de5da90d4c2c0b45bf7fc745b384a5a05c0932582e923638e8994189",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:327",
+          "recorded_source_commit": "d94e34a1ebba5410a2e7d07119a76896909591aa",
+          "command_in_record": "rtk brew install temporal",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/temporalio/temporal/blob/d94e34a1ebba5410a2e7d07119a76896909591aa/Makefile#L558",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Prefect",
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "repository_of_record": "https://github.com/prefecthq/prefect",
+      "pin_of_record": "3.8.6",
+      "pin_source": "catalogs/us-equities/agents-operations.json:370",
+      "source_commit": "33de4078a0f1d5efb6e4170ccb8fcc482e073155",
+      "source_pinned_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/PrefectHQ/prefect",
+        "repository_endpoint": "https://api.github.com/repos/prefecthq/prefect",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/prefecthq/prefect/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "3.8.7",
+        "latest_release_published_at": "2026-09-26T23:41:44Z",
+        "latest_release_url": "https://github.com/PrefectHQ/prefect/releases/tag/3.8.7",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional workflow challenger; matched frozen cancellation/retry/result completeness is required before changing Dagu.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/README.md",
+          "sha256": "755a4de39a3959a2ca1c9c897dedb591217c3c38a11c026abb948333ca9e4077",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/pyproject.toml",
+          "sha256": "29d348c3bb117122f508f0ff9623a05ca6770439a7ba15097738566b5465f123",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/LICENSE",
+          "sha256": "302c6c9fca2c024cdfc4a0b8082fdd2dc52453c0d92e4ca2859f261acdc08774",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install -U prefect",
+        "source": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/README.md#L68",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/README.md",
+          "upstream_document_line": 68,
+          "upstream_document_line_url": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/README.md#L68",
+          "upstream_documented_command": "pip install -U prefect",
+          "source_sha256": "755a4de39a3959a2ca1c9c897dedb591217c3c38a11c026abb948333ca9e4077",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:370",
+          "recorded_source_commit": "33de4078a0f1d5efb6e4170ccb8fcc482e073155",
+          "command_in_record": "rtk pip install -U prefect",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/prefecthq/prefect/blob/33de4078a0f1d5efb6e4170ccb8fcc482e073155/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Dagster",
+      "repository": "https://github.com/dagster-io/dagster",
+      "repository_of_record": "https://github.com/dagster-io/dagster",
+      "pin_of_record": "1.13.23",
+      "pin_source": "catalogs/us-equities/agents-operations.json:411",
+      "source_commit": "562b676b3fd76d24cb18f27eb663a92ee59d08c6",
+      "source_pinned_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/dagster-io/dagster",
+        "repository_endpoint": "https://api.github.com/repos/dagster-io/dagster",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/dagster-io/dagster/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "1.13.24",
+        "latest_release_published_at": "2026-09-21T23:53:17Z",
+        "latest_release_url": "https://github.com/dagster-io/dagster/releases/tag/1.13.24",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional data orchestration; no matching frozen failure/recovery or data-truth comparison occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md",
+          "sha256": "c67be78a0355a34b38964ba3e64fa615604e175afbc00bef4506afd4bf0a0b34",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/pyproject.toml",
+          "sha256": "edb9d2914bcb435e5681d1894bb853e7b1454cf6fe611919784cabe76014e6a6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/LICENSE",
+          "sha256": "e25b0c5be442bdf543e3f179ef0ae6a5edef5f5c70524fce00a2a657f5d3ed9d",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk uv add dagster dagster-webserver dagster-dg-cli",
+        "source": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md#L84",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md",
+          "upstream_document_line": 84,
+          "upstream_document_line_url": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md#L84",
+          "upstream_documented_command": "uv add dagster dagster-webserver dagster-dg-cli",
+          "source_sha256": "c67be78a0355a34b38964ba3e64fa615604e175afbc00bef4506afd4bf0a0b34",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:411",
+          "recorded_source_commit": "562b676b3fd76d24cb18f27eb663a92ee59d08c6",
+          "command_in_record": "rtk uv add dagster dagster-webserver dagster-dg-cli",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "https://github.com/dagster-io/dagster/blob/562b676b3fd76d24cb18f27eb663a92ee59d08c6/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No applicable executable native test target established in the listed files; no claim that the full upstream project lacks tests"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "LangGraph",
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "repository_of_record": "https://github.com/langchain-ai/langgraph",
+      "pin_of_record": "langgraph 1.2.11; separately released langgraph SDK0.4.4",
+      "pin_source": "catalogs/us-equities/agents-operations.json:242",
+      "source_commit": "644815f9e5bc52ad8f7a5227a456227e9c3e639b",
+      "source_pinned_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/langchain-ai/langgraph",
+        "repository_endpoint": "https://api.github.com/repos/langchain-ai/langgraph",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/langchain-ai/langgraph/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "cli==0.4.32.dev0",
+        "latest_release_published_at": "2026-09-23T23:26:51Z",
+        "latest_release_url": "https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.32.dev0",
+        "upgrade_accepted": false,
+        "scope_note": "Latest release names CLI, not recorded LangGraph core."
+      },
+      "verdict": "Conditional agent graph/state framework. CLI and core releases differ; a fixed durable-results/recovery comparison is required.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/README.md",
+          "sha256": "3a13e257af1216962d53d72414a7f44ac1fc5cea34d994bdff60ea2a3b045933",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/Makefile",
+          "sha256": "e5174a1c5c8c1b844ac7ebe5391dea5186e636ac28408c7aa85a317ba948a754",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/LICENSE",
+          "sha256": "d9bb52f2e3540d60ff50d8f0f5b6ba649b7fd346948c4c3d086c8afb120763c7",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install -U langgraph",
+        "source": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/README.md#L27",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/README.md",
+          "upstream_document_line": 27,
+          "upstream_document_line_url": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/README.md#L27",
+          "upstream_documented_command": "pip install -U langgraph",
+          "source_sha256": "3a13e257af1216962d53d72414a7f44ac1fc5cea34d994bdff60ea2a3b045933",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:242",
+          "recorded_source_commit": "644815f9e5bc52ad8f7a5227a456227e9c3e639b",
+          "command_in_record": "rtk pip install -U langgraph",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/langchain-ai/langgraph/blob/644815f9e5bc52ad8f7a5227a456227e9c3e639b/Makefile#L62",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "DeerFlow",
+      "repository": "https://github.com/bytedance/deer-flow",
+      "repository_of_record": "https://github.com/bytedance/deer-flow",
+      "pin_of_record": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+      "pin_source": "catalogs/us-equities/agents-operations.json:198",
+      "source_commit": "42334f26d7025d905678f9075b079fc65f9beaf9",
+      "source_pinned_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/bytedance/deer-flow",
+        "repository_endpoint": "https://api.github.com/repos/bytedance/deer-flow",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/bytedance/deer-flow/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v2.1.0",
+        "latest_release_published_at": "2026-09-24T10:40:44Z",
+        "latest_release_url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional research harness; install and blocking-I/O test commands are sourced, but live tests require providers and no matched durable-results crossover is measured.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md",
+          "sha256": "fa306f5a400e9744c1c0c05d33addd8a935d011b38ad1da303333710de58fac9",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/Makefile",
+          "sha256": "fe2cb2532b45fdc4616d2f8da56f25cb60c170e0c743071284ee71be98a50206",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/LICENSE",
+          "sha256": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk make install",
+        "source": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md",
+          "upstream_document_line": 403,
+          "upstream_document_line_url": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md#L403",
+          "upstream_documented_command": "make install",
+          "source_sha256": "fa306f5a400e9744c1c0c05d33addd8a935d011b38ad1da303333710de58fac9",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:198",
+          "recorded_source_commit": "42334f26d7025d905678f9075b079fc65f9beaf9",
+          "command_in_record": "rtk make install",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test-blocking-io",
+        "source": "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Run from backend; live/provider tests excluded"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "OmniRoute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "repository_of_record": "https://github.com/diegosouzapw/omniroute",
+      "pin_of_record": "3.8.50",
+      "pin_source": "manifests/stack.json:1905",
+      "source_commit": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "source_pinned_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/diegosouzapw/OmniRoute",
+        "repository_endpoint": "https://api.github.com/repos/diegosouzapw/omniroute",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/diegosouzapw/omniroute/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v3.8.51",
+        "latest_release_published_at": "2026-09-30T01:41:50Z",
+        "latest_release_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional model routing; npm/source tests do not qualify provider routes or authorize model calls.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+          "sha256": "7bf6286968cba1d7d2970aff2aa7119dc962db772369b89371b9e83ab003d33f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json",
+          "sha256": "7ae294ce3c9af215fcedf89d81f6ebe2028ac257f4762e0f7e63e855ec446253",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/Makefile",
+          "sha256": "d6e4b61703e19a4491cf9d8a8f150936954df7e1daa05770543ff530e2b8131d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/LICENSE",
+          "sha256": "5f3caa52b2c2ce5dfb40c85404a370d23b6dc3e26a1447d17dc7e56f773b91de",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk npm install -g omniroute",
+        "source": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md#L939",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+          "upstream_document_line": 939,
+          "upstream_document_line_url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md#L939",
+          "upstream_documented_command": "npm install -g omniroute",
+          "source_sha256": "7bf6286968cba1d7d2970aff2aa7119dc962db772369b89371b9e83ab003d33f",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1905",
+          "recorded_source_commit": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+          "command_in_record": "rtk npm install -g omniroute",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk npm run test",
+        "source": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_script; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "FreeLLMAPI",
+      "repository": "https://github.com/tashfeenahmed/freellmapi",
+      "repository_of_record": "https://github.com/tashfeenahmed/freellmapi",
+      "pin_of_record": "v0.11.0",
+      "pin_source": "catalogs/us-equities/agents-operations.json:155",
+      "source_commit": "955e9cf6413314d461d8130f695a81b8c5f246fe",
+      "source_pinned_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/tashfeenahmed/freellmapi",
+        "repository_endpoint": "https://api.github.com/repos/tashfeenahmed/freellmapi",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/tashfeenahmed/freellmapi/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.13.3",
+        "latest_release_published_at": "2026-09-30T14:49:20Z",
+        "latest_release_url": "https://github.com/tashfeenahmed/freellmapi/releases/tag/v0.13.3",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional model proxy; source/npm tests do not qualify provider usage or replace native client identity.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/README.md",
+          "sha256": "a22eb63d0a46a9d81015a8b80c1261dfc9fd1cc1efad665fbc8b0b27f49f35a1",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/package.json",
+          "sha256": "d3121c43f3c5eabb4fd0a7a2efc2e46586232b628fbd2f333626e8c7ab94c631",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/CONTRIBUTING.md",
+          "sha256": "c94d8b0eb9e94e307c73ee5c78573c0f0023063da9775b1dac6be25bdebe9bea",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/LICENSE",
+          "sha256": "d32d45dfea4847f158db264ae8afb67f1a390e4f28cf18bf088a564f44c7f0b9",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk npm install",
+        "source": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/CONTRIBUTING.md#L8",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/CONTRIBUTING.md",
+          "upstream_document_line": 8,
+          "upstream_document_line_url": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/CONTRIBUTING.md#L8",
+          "upstream_documented_command": "npm install",
+          "source_sha256": "c94d8b0eb9e94e307c73ee5c78573c0f0023063da9775b1dac6be25bdebe9bea",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:155",
+          "recorded_source_commit": "955e9cf6413314d461d8130f695a81b8c5f246fe",
+          "command_in_record": "rtk npm install",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk npm run test",
+        "source": "https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/package.json",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_script; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "OpenAI Agents SDK",
+      "repository": "https://github.com/openai/openai-agents-python",
+      "repository_of_record": "https://github.com/openai/openai-agents-python",
+      "pin_of_record": "v0.22.3",
+      "pin_source": "catalogs/us-equities/agents-operations.json:1614",
+      "source_commit": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "source_pinned_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/openai/openai-agents-python",
+        "repository_endpoint": "https://api.github.com/repos/openai/openai-agents-python",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/openai/openai-agents-python/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.22.3",
+        "latest_release_published_at": "2026-09-17T22:19:05Z",
+        "latest_release_url": "https://github.com/openai/openai-agents-python/releases/tag/v0.22.3",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional SDK; source tests do not replace native client identities or deterministic financial logic.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/README.md",
+          "sha256": "00bf6db68509e0211c6564b43e2daaf0ca48e0163111d70c1f0b48a9952b5b24",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/pyproject.toml",
+          "sha256": "299fbdfa6e1ec6f837f291f70dbb952b64e1d6135844dd3e4c0231f46eaa3614",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/Makefile",
+          "sha256": "44e198032ff5fc48985d7d229622bf78c268f9a72b6bf4dee3067d9d6a90ec16",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/LICENSE",
+          "sha256": "13df7812ca53ecaae1cb4a868844bb598373047ae1d580e4debfbef1dd5b6915",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install openai-agents",
+        "source": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/README.md#L34",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/README.md",
+          "upstream_document_line": 34,
+          "upstream_document_line_url": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/README.md#L34",
+          "upstream_documented_command": "pip install openai-agents",
+          "source_sha256": "00bf6db68509e0211c6564b43e2daaf0ca48e0163111d70c1f0b48a9952b5b24",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:1614",
+          "recorded_source_commit": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+          "command_in_record": "rtk pip install openai-agents",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/openai/openai-agents-python/blob/fdf21db62c303a3db54b0dfbee82de2141fa2799/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "vLLM",
+      "repository": "https://github.com/vllm-project/vllm",
+      "repository_of_record": "https://github.com/vllm-project/vllm",
+      "pin_of_record": "0.30.0",
+      "pin_source": "manifests/stack.json:1053",
+      "source_commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "source_pinned_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/vllm-project/vllm",
+        "repository_endpoint": "https://api.github.com/repos/vllm-project/vllm",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/vllm-project/vllm/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.30.0",
+        "latest_release_published_at": "2026-09-22T05:20:54Z",
+        "latest_release_url": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional local inference/serving; no GPU, weights or model acceptance occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md",
+          "sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/pyproject.toml",
+          "sha256": "4bb0d205e791be6258dd37b361961ada79092f452b41e471724204facbad72fe",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/CONTRIBUTING.md",
+          "sha256": "b09acfaae68d14983004d2dbcba46b7c911b9518f09bc03a0d240ab24cab9c5c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk uv pip install vllm",
+        "source": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md#L69",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md",
+          "upstream_document_line": 69,
+          "upstream_document_line_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md#L69",
+          "upstream_documented_command": "uv pip install vllm",
+          "source_sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1053",
+          "recorded_source_commit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "command_in_record": "rtk uv pip install vllm",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No applicable executable native test target established in the listed files; no claim that the full upstream project lacks tests"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Deep Agents",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "repository_of_record": "https://github.com/langchain-ai/deepagents",
+      "pin_of_record": "not recorded; source reviewed at c9926b1a96d204309d0b211701b288ce3bb4244b",
+      "pin_source": "catalogs/landscape/candidate-quality-review.json:146",
+      "source_commit": "c9926b1a96d204309d0b211701b288ce3bb4244b",
+      "source_pinned_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/langchain-ai/deepagents",
+        "repository_endpoint": "https://api.github.com/repos/langchain-ai/deepagents",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/langchain-ai/deepagents/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "deepagents==0.7.21",
+        "latest_release_published_at": "2026-09-30T19:28:24Z",
+        "latest_release_url": "https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.21",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional research SDK with offline targets; no task-matched completed-results/provider comparison occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md",
+          "sha256": "569c79f865abd0d677a71e83ba5c3b971318146a4421e3851a0e25ee2d3b1146",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/LICENSE",
+          "sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "libs/deepagents/Makefile",
+          "source_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/libs/deepagents/Makefile",
+          "sha256": "4406a7320f0b6dc46ba836c584a5a4c60038fcbffe76eda9f61d7068590b8095",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/_test.yml",
+          "source_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/.github/workflows/_test.yml",
+          "sha256": "f7ab3552746418008ddadf22bfa153548dac2e0eb59cf5f61b0d2a084547c83d",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk uv add deepagents",
+        "source": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md#L52",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md",
+          "upstream_document_line": 52,
+          "upstream_document_line_url": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/README.md#L52",
+          "upstream_documented_command": "uv add deepagents",
+          "source_sha256": "569c79f865abd0d677a71e83ba5c3b971318146a4421e3851a0e25ee2d3b1146",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/landscape/candidate-quality-review.json:146",
+          "recorded_source_commit": "c9926b1a96d204309d0b211701b288ce3bb4244b",
+          "command_in_record": "rtk uv add deepagents",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/langchain-ai/deepagents/blob/c9926b1a96d204309d0b211701b288ce3bb4244b/libs/deepagents/Makefile#L19",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance",
+        "working_directory_in_upstream_checkout": "libs/deepagents"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "OpenHands SDK",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "repository_of_record": "https://github.com/openhands/software-agent-sdk",
+      "pin_of_record": "not recorded; source reviewed at 9bc452ebf6b0093c531f25394c5ba5e9817ff910",
+      "pin_source": "catalogs/landscape/candidate-quality-review.json:202",
+      "source_commit": "9bc452ebf6b0093c531f25394c5ba5e9817ff910",
+      "source_pinned_url": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/OpenHands/software-agent-sdk",
+        "repository_endpoint": "https://api.github.com/repos/openhands/software-agent-sdk",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/openhands/software-agent-sdk/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v1.50.1",
+        "latest_release_published_at": "2026-09-30T19:31:33Z",
+        "latest_release_url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional SDK; unit tests do not establish financial task results or native subscription/account equivalence.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md",
+          "sha256": "95094c9745c7cc58136d4eaa1688fb6038aafefec2be05344293f6df7e55dbf8",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/pyproject.toml",
+          "sha256": "0ae2f96342f14a2ac65afaf0b60c41378f10e6503a25716e2a8b271a0b067bc0",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/Makefile",
+          "sha256": "f9a6fcc8a1699118a8ba648a81445d6512b7a67736fc2252b6a6fb5e324275aa",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/LICENSE",
+          "sha256": "14a9b631c658eee682c6c2973525fbdf808c3457176bc47513052c559cc5ce86",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/README.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/openhands/software-agent-sdk/blob/9bc452ebf6b0093c531f25394c5ba5e9817ff910/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "OpenHands Agent Canvas",
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "repository_of_record": "https://github.com/openhands/openhands",
+      "pin_of_record": "not recorded; source reviewed at 2f8539de2fafbde5226c7e41c0d0aa7bea2533fa",
+      "pin_source": "catalogs/landscape/candidate-quality-review.json:260",
+      "source_commit": "2f8539de2fafbde5226c7e41c0d0aa7bea2533fa",
+      "source_pinned_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/OpenHands/OpenHands",
+        "repository_endpoint": "https://api.github.com/repos/openhands/openhands",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/openhands/openhands/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v1.24.0",
+        "latest_release_published_at": "2026-09-25T15:09:26Z",
+        "latest_release_url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.24.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional Agent Canvas application; frontend npm tests are separate from financial workflow/model acceptance.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md",
+          "sha256": "1b783460b1ec68ee4eb0a9de28b97b97cb2a128bcc524d2ab0340ba32143659c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/package.json",
+          "sha256": "9cc0835480c640f4935a430e3671032b84897e9d5631933fcca85cc52f4eee23",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/LICENSE",
+          "sha256": "e1d1fa9f3a8d7bef24449d488fcd8f00f8f272cac297bb9bed161eb6175b876a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "source_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/.github/workflows/ci.yml",
+          "sha256": "810f859ccb636fc354c542ac06a4e94bdb36bf52dea7871e83951ddbc5c9e6b3",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk npm install -g @openhands/agent-canvas",
+        "source": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md#L71",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md",
+          "upstream_document_line": 71,
+          "upstream_document_line_url": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/README.md#L71",
+          "upstream_documented_command": "npm install -g @openhands/agent-canvas",
+          "source_sha256": "1b783460b1ec68ee4eb0a9de28b97b97cb2a128bcc524d2ab0340ba32143659c",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/landscape/candidate-quality-review.json:260",
+          "recorded_source_commit": "2f8539de2fafbde5226c7e41c0d0aa7bea2533fa",
+          "command_in_record": "rtk npm install -g @openhands/agent-canvas",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk npm run test",
+        "source": "https://github.com/openhands/openhands/blob/2f8539de2fafbde5226c7e41c0d0aa7bea2533fa/package.json",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_script; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Microsoft Agent Framework",
+      "repository": "https://github.com/microsoft/agent-framework",
+      "repository_of_record": "https://github.com/microsoft/agent-framework",
+      "pin_of_record": "not recorded; source reviewed at 98a982a147212424d766ed993e6ecda13abe5faf",
+      "pin_source": "catalogs/landscape/candidate-quality-review.json:318",
+      "source_commit": "98a982a147212424d766ed993e6ecda13abe5faf",
+      "source_pinned_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/microsoft/agent-framework",
+        "repository_endpoint": "https://api.github.com/repos/microsoft/agent-framework",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/microsoft/agent-framework/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "python-1.19.0",
+        "latest_release_published_at": "2026-09-18T09:14:28Z",
+        "latest_release_url": "https://github.com/microsoft/agent-framework/releases/tag/python-1.19.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional workflow SDK; official non-integration tests are sourced, while provider-configured integration tests remain unexecuted.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/README.md",
+          "sha256": "4a628aa224c014ff326587cc543a4991e483e11723a226f6fcdb22664224c58a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/CONTRIBUTING.md",
+          "sha256": "9f58481a87741ef971c017900a8df283f94b1ae97a5388fc007d09f36cf8f312",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/python-merge-tests.yml",
+          "source_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/.github/workflows/python-merge-tests.yml",
+          "sha256": "758eac53e0d814e5bc6fec0e5ceba23aeaa6dbe91b91ec62b4b558af30adfb06",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install agent-framework",
+        "source": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/README.md#L83",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/README.md",
+          "upstream_document_line": 83,
+          "upstream_document_line_url": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/README.md#L83",
+          "upstream_documented_command": "pip install agent-framework",
+          "source_sha256": "4a628aa224c014ff326587cc543a4991e483e11723a226f6fcdb22664224c58a",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/landscape/candidate-quality-review.json:318",
+          "recorded_source_commit": "98a982a147212424d766ed993e6ecda13abe5faf",
+          "command_in_record": "rtk pip install agent-framework",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk uv run poe test -A -m \"not integration\"",
+        "source": "https://github.com/microsoft/agent-framework/blob/98a982a147212424d766ed993e6ecda13abe5faf/CONTRIBUTING.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Run from python; official non-integration path"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-river",
+      "repository": "https://github.com/online-ml/river",
+      "repository_of_record": "https://github.com/online-ml/river",
+      "pin_of_record": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+      "pin_source": "catalogs/us-equities/data-research.json:1313",
+      "source_commit": "64285b9dd6c606804753235fe992bcf25b9856ee",
+      "source_pinned_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/online-ml/river",
+        "repository_endpoint": "https://api.github.com/repos/online-ml/river",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/online-ml/river/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "0.26.1",
+        "latest_release_published_at": "2026-08-21T15:25:35Z",
+        "latest_release_url": "https://github.com/online-ml/river/releases/tag/0.26.1",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional online-learning/drift route; declared labels/event order and economic comparison are still required.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+          "sha256": "bd2997b2e2a67a910ec2011430a650692743233abfaeb23cf7c3d4faff5566a5",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/pyproject.toml",
+          "sha256": "95eb61c5871b01fb6498dd32303ac88ce3eed9d64be43234ce682e9a4534125d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/Makefile",
+          "sha256": "0868f8d55f028c863ab7137e011120963ef98062a744ea5acc4faef49a0f47c3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/LICENSE",
+          "sha256": "e87f2c8f1ba611702af10cba745e6ceb773d32310135ed55aa2722c55dd0d077",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install river",
+        "source": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md#L101",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+          "upstream_document_line": 101,
+          "upstream_document_line_url": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md#L101",
+          "upstream_documented_command": "pip install river",
+          "source_sha256": "bd2997b2e2a67a910ec2011430a650692743233abfaeb23cf7c3d4faff5566a5",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:1313",
+          "recorded_source_commit": "64285b9dd6c606804753235fe992bcf25b9856ee",
+          "command_in_record": "rtk pip install river",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No applicable executable native test target established in the listed files; no claim that the full upstream project lacks tests"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "foundation-mteb",
+      "repository": "https://github.com/embeddings-benchmark/mteb",
+      "repository_of_record": "https://github.com/embeddings-benchmark/mteb",
+      "pin_of_record": "2.21.0",
+      "pin_source": "catalogs/us-equities/foundation-memory.json:1222",
+      "source_commit": "8ecdd976aad52ee9d5718772065438ec60ed388a",
+      "source_pinned_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/embeddings-benchmark/mteb",
+        "repository_endpoint": "https://api.github.com/repos/embeddings-benchmark/mteb",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/embeddings-benchmark/mteb/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "2.21.10",
+        "latest_release_published_at": "2026-09-29T21:16:12Z",
+        "latest_release_url": "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.10",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional embedding benchmark; public benchmark identity is separate from local financial relevance, numeric accuracy and task cost.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+          "sha256": "7d4d66862ca3fd92d8c1949aca25d684362ee9aa40462d046bdfde5d9e86729a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/pyproject.toml",
+          "sha256": "aa8d4efe72c3771b3f2eb05b2b445e7da1dc90a6d4d8c502ab2d1e542c8e294a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/Makefile",
+          "sha256": "74321d5226e6f72905ad0b350e14716660cf82f14eb502c971837796e8f735ce",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install mteb",
+        "source": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md#L40",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+          "upstream_document_line": 40,
+          "upstream_document_line_url": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md#L40",
+          "upstream_documented_command": "pip install mteb",
+          "source_sha256": "7d4d66862ca3fd92d8c1949aca25d684362ee9aa40462d046bdfde5d9e86729a",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/foundation-memory.json:1222",
+          "recorded_source_commit": "8ecdd976aad52ee9d5718772065438ec60ed388a",
+          "command_in_record": "rtk pip install mteb",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/Makefile#L22",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "repository_of_record": "https://github.com/arize-ai/phoenix",
+      "pin_of_record": "arize-phoenix-v20.14.0",
+      "pin_source": "catalogs/us-equities/agents-operations.json:1248",
+      "source_commit": "26eef4d0409423d00052b37ae6e20bc57035fddc",
+      "source_pinned_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/Arize-ai/phoenix",
+        "repository_endpoint": "https://api.github.com/repos/arize-ai/phoenix",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/arize-ai/phoenix/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "@arizeai/phoenix-mcp@4.3.15",
+        "latest_release_published_at": "2026-09-30T23:35:39Z",
+        "latest_release_url": "https://github.com/Arize-ai/phoenix/releases/tag/%40arizeai/phoenix-mcp%404.3.15",
+        "upgrade_accepted": false,
+        "scope_note": "Latest release names phoenix-mcp, not recorded arize-phoenix core 20.14.0."
+      },
+      "verdict": "Conditional evaluation/trace layer with ELv2 core source. Latest release names another MCP artifact; no matched evaluator, provider judge or recovery test occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/README.md",
+          "sha256": "96d0f6ffbdd0a7d8103837e55c2a927fd7f76caae420dfa5e38bcd24bed1c631",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/pyproject.toml",
+          "sha256": "f9c8aca724d4f0dc73daf08a7bea9427e94ef0ff5cdf79655f3f4ebadec904fd",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/Makefile",
+          "sha256": "e6773bca956a282fcb9d2d4d93c61b4e24f64f5d4367a08c8ce1af1f3e418ca7",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/LICENSE",
+          "sha256": "1c5916f5112e30e92f291002bb02cf4f4851c9d1dbdf3360f9f745b7de2d775f",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install arize-phoenix",
+        "source": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/README.md#L86",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/README.md",
+          "upstream_document_line": 86,
+          "upstream_document_line_url": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/README.md#L86",
+          "upstream_documented_command": "pip install arize-phoenix",
+          "source_sha256": "96d0f6ffbdd0a7d8103837e55c2a927fd7f76caae420dfa5e38bcd24bed1c631",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/agents-operations.json:1248",
+          "recorded_source_commit": "26eef4d0409423d00052b37ae6e20bc57035fddc",
+          "command_in_record": "rtk pip install arize-phoenix",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/arize-ai/phoenix/blob/26eef4d0409423d00052b37ae6e20bc57035fddc/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "repository_of_record": "https://github.com/promptfoo/promptfoo",
+      "pin_of_record": "0.123.1",
+      "pin_source": "manifests/stack.json:701",
+      "source_commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "source_pinned_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/promptfoo/promptfoo",
+        "repository_endpoint": "https://api.github.com/repos/promptfoo/promptfoo",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/promptfoo/promptfoo/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "0.123.1",
+        "latest_release_published_at": "2026-09-18T01:07:54Z",
+        "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+        "upgrade_accepted": false
+      },
+      "verdict": "Retain bounded foundation evaluation comparison context; local examples are not a matched financial evaluation with Inspect/MLflow.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+          "sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/package.json",
+          "sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/CONTRIBUTING.md",
+          "sha256": "5d4d9f23dc55742ba5c9b4f200ca55de580964eb74da4aa7a423802ef88f580d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/LICENSE",
+          "sha256": "bf813686553f451e1b833fbd827488aee49b60b189626915bf3108d10b754e44",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk npm install -g promptfoo",
+        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md#L31",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+          "upstream_document_line": 31,
+          "upstream_document_line_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md#L31",
+          "upstream_documented_command": "npm install -g promptfoo",
+          "source_sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:701",
+          "recorded_source_commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+          "command_in_record": "rtk npm install -g promptfoo",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk npm run test",
+        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/package.json",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_script; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    }
+  ],
+  "corrections": [
+    {
+      "prior_claim_or_scope": "There is no installed Inspect client evidence",
+      "correction": "rtk inspect --version returned 0.3.266 with exit 0; rtk inspect eval-retry --help returned exit 0. This establishes current CLI identity/help only, without an evaluation/provider run or new-host install acceptance.",
+      "deciding_source": [
+        "native observation recorded in current_native_capability_observations",
+        "https://github.com/ukgovernmentbeis/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/tests/test_retry.py",
+        "https://inspect.aisi.org.uk/eval-logs.html"
+      ],
+      "acceptance_scope": "Current native identity/help; evaluation acceptance remains unknown"
+    },
+    {
+      "prior_claim_or_scope": "ARB card README snapshot is exact native v0.2.1 execution source",
+      "correction": "Card snapshot is 07014c986f3deadb1548c62b32c0ffbe6a81465d. Exact tag and native receipt use b487f3866cc13dd971819cb902517a6a50282404. Preserve both scopes; only the latter is the unchanged-test source.",
+      "deciding_source": [
+        "blueprints/convergence-practice/arb-trace2code/receipt.json",
+        "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/tests/test_corpus_baseline.py",
+        "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md"
+      ],
+      "acceptance_scope": "Source correction only; no existing catalog choice or host adoption changed"
+    },
+    {
+      "prior_claim_or_scope": "Latest GitHub release labels establish all core package versions",
+      "correction": "Phoenix latest names phoenix-mcp and LangGraph latest names CLI. Inspect release endpoint returns 404 but PyPI reports 0.3.273. Scope artifact/package identity before upgrades.",
+      "deciding_source": [
+        "https://api.github.com/repos/arize-ai/phoenix/releases/latest",
+        "https://api.github.com/repos/langchain-ai/langgraph/releases/latest",
+        "https://pypi.org/pypi/inspect-ai/json"
+      ],
+      "acceptance_scope": "Source correction only; no existing catalog choice or host adoption changed"
+    }
+  ],
+  "evidence_assessment": [
+    {
+      "path": "blueprints/convergence-practice/arb-trace2code/receipt.json",
+      "sha256": "78a11243a78b3829e2bb6359a356a1b412a0d2211119b1b83b37d992af477855",
+      "evidence_class": "historical_unchanged_upstream_tests_and_offline_baseline",
+      "finding": "Exact v0.2.1 b487 source; retained pytest exit 0, 15 passed in 0.15s, no skips/failures, Darwin arm64. Positive-only offline lexical/BM25 baseline: 101 samples, paired 82/101 outcome. No provider/no-answer calibration. Not rerun here.",
+      "rerun_in_this_wave": false,
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "path": "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
+      "sha256": "3887a25ad35c3b36af6e34ad2307a043fd1918e91a14f890e0e6cc230c6be6ba",
+      "evidence_class": "project_authored_fixture_using_native_arb_apis",
+      "finding": "24 queries/15 public documents: 20 positive/four no-gold. BM25 MRR 0.9666666666666666/recall@1 0.95, lexical MRR 0.9/recall 0.8. Local authored fixture is not an untouched financial benchmark or universal retrieval result.",
+      "rerun_in_this_wave": false,
+      "new_host_acceptance": "unknown"
+    }
+  ],
+  "failed_access": [
+    {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "operation": "native gh api releases/latest",
+      "command": "rtk gh api repos/ukgovernmentbeis/inspect_ai/releases/latest",
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n",
+      "impact": "Repository/exact source succeeded. Endpoint failure does not establish no releases, packages or capability."
+    }
+  ],
+  "omissions": [
+    {
+      "scope": "Candidate coverage",
+      "finding": "Every named candidate/alternative/winner has repository identity, exact source resolution and listed file review. Inherited group candidates remain comparison context.",
+      "named_repository_count": 28
+    },
+    {
+      "scope": "Installed capability",
+      "finding": "Only bounded Inspect 0.3.266/Dagu 2.16.6 identity and Inspect retry help were retained now. Component-isolated environments/new host were not audited; not found in one PATH/interpreter is not absent host-wide."
+    },
+    {
+      "scope": "Native acceptance",
+      "finding": "Install/test commands are unexecuted prospective upstream entrypoints. Historical returned native results remain dated/scoped; repository validation only establishes declared structural consistency."
+    },
+    {
+      "scope": "Financial/provider/GPU/broker",
+      "finding": "No market data/weights downloaded, provider evaluation, GPU run, broker session/orders, sign-in or credential reads performed. Missing availability, universe and provider/GPU usage remain unknown."
+    },
+    {
+      "scope": "Bounded upstream command documentation",
+      "candidates": [
+        {
+          "repository": "https://github.com/anthropics/claude-code",
+          "native_install_command_established": true,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/grafana/loki",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/grafana/grafana",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/restic/restic",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/dagster-io/dagster",
+          "native_install_command_established": true,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/vllm-project/vllm",
+          "native_install_command_established": true,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/OpenHands/software-agent-sdk",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/online-ml/river",
+          "native_install_command_established": true,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        }
+      ]
+    }
+  ],
+  "next_wave": [
+    "Freeze a single task/corpus with source hashes, positive/no-answer cases, exact scorers, retry behavior and usage schema. Run unchanged ARB/retry/tracking tests separately from local evaluation. Inspect retry requires a reconstructible decorated task.",
+    "Compare one decision-relevant evaluator/retriever arm on identical inputs (Inspect versus retained ARB/Promptfoo control, MLflow for lineage). Retain failures, unchanged native output and independently observed complete results; provider/GPU and new-host adoption remain separate."
+  ],
+  "reopen_on": [
+    "Same frozen task has independently observed evaluator/retriever quality-cost or recovery crossover.",
+    "Retry fails task reconstruction, loses results or misreports usage.",
+    "Positive-only fixtures or identity/version checks are presented as financial/provider acceptance."
+  ],
+  "new_host_acceptance": "unknown",
+  "review_scope": {
+    "named_repository_count": 28,
+    "all_named_repository_identity_checks_exit_zero": true,
+    "all_named_recorded_source_resolutions_exit_zero": true,
+    "exact_source_files_reviewed_for_named_repositories": 117,
+    "source_review_depth": "Only listed immutable files and release metadata; breadth is not full implementation review or measured candidate superiority",
+    "research_wave": "One bounded primary-source wave; no saturation/full C4 closure",
+    "runtime_target": "catalogs/us-equities/runtime-target.json; NautilusTrader 2.0.0rc5/IBKR plus separate Alpaca adapter",
+    "catalog_choices_changed": false
+  },
+  "current_native_capability_observations": [
+    {
+      "argv": [
+        "rtk",
+        "inspect",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "0.3.266\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rtk",
+        "dagu",
+        "version"
+      ],
+      "exit_code": 0,
+      "stdout": "2.16.6\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rtk",
+        "inspect",
+        "eval-retry",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Usage: inspect eval-retry [OPTIONS] LOG_FILES...\n\n  Retry failed evaluation(s).\n\n  Monitor a running eval from another shell with `inspect ctl` (see `inspect\n  ctl --help`).\n\nOptions:\n  --json                          Emit machine-readable launch output as JSON\n                                  lines on stdout (implies --display none): a\n                                  'launch' record printed once the control-\n                                  channel server is bound — reporting run_id,\n                                  pid, log_dir, and the control socket path\n                                  ('control' is null when the server is\n                                  disabled or failed to bind, so its presence\n                                  guarantees `inspect ctl` is usable) — and a\n                                  'done' record with each retried task's log\n                                  location and status when the retry finishes.\n                                  Each retried log file runs as its own eval,\n                                  so a multi-file retry emits one 'launch'\n                                  record per file (sequentially — each\n                                  supersedes the previous), and the 'done'\n                                  record carries the last launch's run_id. To\n                                  launch in the background instead, use\n                                  --detach (which implies --json and hands off\n                                  on the first launch record).\n  --detach / --no-detach          Run the eval in the background: prints the\n                                  launch record (implies --json) once the\n                                  control endpoint is bound, then returns,\n                                  leaving the eval running detached from the\n                                  terminal (the detached process's output goes\n                                  to a file reported as 'output_file' in the\n                                  launch record). While it runs, monitor with\n                                  `inspect ctl task list` and cancel with\n                                  `inspect ctl task cancel`. The process exits\n                                  when the eval finishes, leaving a 'done'\n                                  record — overall success plus each task's\n                                  status and log_location — as the output\n                                  file's last line; a process that exited\n                                  without one died mid-run, with diagnostics\n                                  in the same file. Pass --ctl-server=keep to\n                                  instead keep the process alive (and\n                                  queryable via `inspect ctl`) after the eval\n                                  finishes, until `inspect ctl process\n                                  release`.\n  --max-samples INTEGER           Maximum number of samples to run in parallel\n                                  (default is running all samples in parallel)\n  --max-tasks INTEGER             Maximum number of tasks to run in parallel\n                                  (default is 1 for eval and 10 for eval-set)\n  --max-subprocesses INTEGER      Maximum number of subprocesses to run in\n                                  parallel (default is the number of\n                                  processors available to the eval)\n  --max-sandboxes INTEGER         Maximum number of sandboxes (per-provider)\n                                  to run in parallel.\n  --no-sandbox-cleanup            Do not cleanup sandbox environments after\n                                  task completes\n  --sandbox-prebuilt              Treat sandbox images as prebuilt (skip\n                                  builds and fail at startup when an image is\n                                  missing)\n  --fail-on-error FLOAT           Threshold of sample errors to tolerage (by\n                                  default, evals fail when any error occurs).\n                                  Value between 0 to 1 to set a proportion;\n                                  value greater than 1 to set a count.\n  --no-fail-on-error              Do not fail the eval if errors occur within\n                                  samples (instead, continue running other\n                                  samples)\n  --continue-on-fail              Do not immediately fail the eval if the\n                                  error threshold is exceeded (instead,\n                                  continue running other samples until the\n                                  eval completes, and then possibly fail the\n                                  eval).\n  --retry-on-error TEXT           Retry samples if they encounter errors (by\n                                  default, no retries occur). Specify --retry-\n                                  on-error to retry a single time, or specify\n                                  e.g. `--retry-on-error=3` to retry multiple\n                                  times.\n  --score-on-error                Score samples that error rather than failing\n                                  the eval mid-run. Errors still count toward\n                                  the --fail-on-error threshold for marking\n                                  the log as 'error'. Only fires after retries\n                                  (if any) are exhausted.\n  --no-log-samples                Do not include samples in the log file.\n  --no-log-realtime               Do not log events in realtime (affects live\n                                  viewing of samples in inspect view)\n  --log-images / --no-log-images  Retain inline image and other media bytes in\n                                  the log file. This option does not control\n                                  media fetching.\n  --log-model-api / --no-log-model-api\n                                  Log raw model api requests and responses.\n                                  Note that error requests/responses are\n                                  always logged.\n  --log-refusals / --no-log-refusals\n                                  Log warnings for model refusals.\n  --log-buffer INTEGER            Number of samples to buffer before writing\n                                  log file. If not specified, an appropriate\n                                  default for the format and filesystem is\n                                  chosen (10 for most all cases, 100 for JSON\n                                  logs on remote filesystems).\n  --log-shared TEXT               Sync sample events to log directory so that\n                                  users on other systems can see log updates\n                                  in realtime (defaults to no syncing). If\n                                  enabled will sync every 10 seconds (or pass\n                                  a value to sync every `n` seconds).\n  --no-score                      Do not score model output (use the inspect\n                                  score command to score output later)\n  --no-score-display              Do not display scoring metrics in realtime.\n  --acp-server TEXT               Override the original eval's Agent Client\n                                  Protocol server. Bare flag enables a default\n                                  AF_UNIX socket; pass an integer to bind a\n                                  TCP loopback port; pass `host:port` to bind\n                                  on a specific interface (e.g.\n                                  `0.0.0.0:4444`); pass a filesystem path for\n                                  a custom UNIX socket; pass `false` to\n                                  disable. Omit to replay whatever transport\n                                  the original log used.\n  --ctl-server TEXT               Control-channel server for the retried\n                                  eval's process (default: enabled). Pass\n                                  `false` to disable it; pass `keep` to keep\n                                  the process running after the retried eval\n                                  finishes so external clients (the `inspect\n                                  ctl` CLI, scripted agents) can still query\n                                  its state. Run `inspect ctl process release`\n                                  to release. Observe the run from another\n                                  shell with `inspect ctl task list`.\n  --max-connections INTEGER       Maximum number of concurrent connections to\n                                  Model API (defaults to 10)\n  --adaptive-connections TEXT     Adaptive concurrency for Model API\n                                  connections, automatically scaling between\n                                  bounds based on rate-limit feedback\n                                  (default: enabled, with min=10, start=20,\n                                  max=100). Pass `false` to opt out, an\n                                  integer N for a custom max (e.g. `200`), or\n                                  bounds as `min-max` (e.g. `4-80`) or `min-\n                                  start-max` (e.g. `4-20-80`). Explicit\n                                  `--max-connections` and `--batch` take\n                                  precedence.\n  --max-retries INTEGER           Maximum number of times to retry model API\n                                  requests (defaults to unlimited)\n  --timeout INTEGER               Model API request timeout in seconds\n                                  (defaults to no timeout)\n  --attempt-timeout INTEGER       Timeout (in seconds) for any given attempt\n                                  (if exceeded, will abandon attempt and retry\n                                  according to max_retries).\n  --stream-idle-timeout INTEGER   Timeout (in seconds) on silence within a\n                                  streaming response (if a streaming attempt\n                                  delivers no chunk for this long, will\n                                  abandon attempt and retry according to\n                                  max_retries). Setting it requests streaming;\n                                  it has no effect on calls that do not\n                                  stream.\n  --log-level-transcript [debug|trace|http|info|warning|error|critical|notset]\n                                  Set the log level of the transcript\n                                  (defaults to 'info')\n  --checkpoint TEXT               Periodically checkpoint sample state so the\n                                  eval can be resumed via `inspect eval\n                                  retry`. Specify --checkpoint for the default\n                                  (every 500k tokens),\n                                  --checkpoint=token:N{k,m,b} /\n                                  time:N{s,m,h,d} / turn:N / manual for a\n                                  shorthand trigger, or pass a YAML/JSON file\n                                  path for a full CheckpointConfig. For resume\n                                  to find checkpoint files, pass the same\n                                  `--checkpoint` value used on the original\n                                  eval.\n  --incomplete-action [retry|error]\n                                  Disposition applied when recovering a\n                                  crashed log, for samples that were in\n                                  progress at crash: 'retry' (default) re-runs\n                                  them; 'error' resolves them as operator\n                                  terminations — if that leaves every expected\n                                  sample final, the recovered log finalizes\n                                  with status 'success' and is not re-run.\n  --incomplete-max FLOAT RANGE    Safety threshold for --incomplete-action\n                                  error (count if >= 1, or proportion of\n                                  expected samples if strictly less than 1):\n                                  when more than this many samples are in\n                                  progress, fall back to the default recover-\n                                  and-retry behavior. Has no effect (a warning\n                                  is logged) with --incomplete-action retry.\n                                  [x>=0]\n  --log-level [debug|trace|http|info|warning|error|critical|notset]\n                                  Set the log level (defaults to 'warning')\n  --log-dir TEXT                  Directory for log files.\n  --display [full|conversation|rich|plain|log|none]\n                                  Set the display type (defaults to 'full')\n  --traceback-locals              Include values of local variables in\n                                  tracebacks (note that this can leak private\n                                  data e.g. API keys so should typically only\n                                  be enabled for targeted debugging).\n  --env TEXT                      Define an environment variable e.g. --env\n                                  NAME=value (--env can be specified multiple\n                                  times)\n  --debug                         Wait to attach debugger\n  --debug-port INTEGER            Port number for debugger\n  --debug-errors                  Raise task errors (rather than logging them)\n                                  so they can be debugged.\n  --help                          Show this message and exit.\n\nScanner Options:\n  --scanner TEXT               Scanner(s) to apply after each sample. Pass a\n                               YAML/JSON config file (ScannerConfig schema), a\n                               Python file with @scanner functions (use\n                               file.py@func to pick one), or a registry\n                               reference (pkg/name).\n  --scanner-arg TEXT           One or more scanner arguments (e.g. --scanner-\n                               arg key=value).\n  --scans TEXT                 Location to write scan results to (defaults to\n                               <log-dir>/scans/).\n  --scan-name TEXT             Scan name written to _scan.json (defaults to\n                               \"eval_set\").\n  --scan-tags TEXT             Comma-separated tags written to the scan spec.\n  --scan-metadata TEXT         Metadata written to the scan spec (e.g. --scan-\n                               metadata key=value).\n  -F, --scan-filter TEXT       SQL WHERE clause(s) applied per-sample to skip\n                               transcripts that don't match (e.g. -F \"error =\n                               ''\").\n  --scan-model TEXT            Model used by scanners' get_model() (overrides\n                               the eval model).\n  --scan-model-base-url TEXT   Base URL for the scanner-side model API.\n  --scan-model-arg TEXT        One or more scanner-side model arguments (e.g.\n                               --scan-model-arg key=value).\n  --scan-model-config TEXT     YAML or JSON config file with scanner-side\n                               model arguments.\n  --scan-model-role TEXT       Named scanner-side model role with model name\n                               or YAML/JSON config (e.g. --scan-model-role\n                               grader=mockllm/model). Bind multiple models to\n                               a role with a comma-separated list of names or\n                               a YAML/JSON list of configs.\n  --scan-generate-config TEXT  YAML or JSON config file with GenerateConfig\n                               for scanner model calls.\n",
+      "stderr": ""
+    }
+  ],
+  "new_host_image_target": {
+    "image_of_record": "Ubuntu 24.04.5 LTS",
+    "source": "Coordinator instruction referencing PR #569",
+    "candidate_only": "Ubuntu 26.04.1 LTS",
+    "acceptance": "unknown; no new distribution exists"
+  }
+}

@@ -2068,7 +2068,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             with self.subTest(expected=expected[:60]):
                 self.assertIn(expected, head)
         for expected in ("Foundation layers", "US-equities layers", "Cross-cutting rows",
-                         "LayerWinners (pin)VerdictEvidence classReasonsInstall on the new distro",
+                         "LayerSource host's selection (pin)VerdictEvidence classReasonsInstall on the new distro",
                          "Title native-clientsfoundation/native-clientsResearch state: on requirement change",
                          "search ↗1.0", "Meaning of selection_of_record_openLabel of upstream_test",
                          "Recorded verdict winner (" + self.ARCHITECTURE_SOURCE + ") ↗",

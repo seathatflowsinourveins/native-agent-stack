@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "kind": "source_review_followup",
+  "checked_at": "2026-10-01T09:35:00Z",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "layers": ["native-clients", "workers", "mcp-surfaces"],
+  "reviewer": {
+    "role": "bounded source reviewer",
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "basis": "Explicit worker dispatch; not a separately observed provider response model ID."
+  },
+  "decision": "Retain native Codex queues and Claude native messaging. Agent Mail is a persistent-mailbox comparison candidate. No inspected maintained adapter has qualified automatic cross-client submission to the selected Codex shared-daemon receiver.",
+  "installed_client_checks": {
+    "codex": {"version": "0.159.3", "version_exit_code": 0, "help_exit_code": 0},
+    "claude": {"version": "2.1.286", "version_exit_code": 0, "help_exit_code": 0},
+    "agent_mail": "am and mcp-agent-mail not found on PATH; not an upstream capability absence claim.",
+    "releases": [
+      "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+      "https://github.com/anthropics/claude-code/releases/tag/v2.1.286"
+    ],
+    "scope": "Existing-host commands observed by the reviewer; no new host or cross-family provider acceptance."
+  },
+  "paths": [
+    {
+      "id": "codex-native-queue",
+      "pin": "rust-v0.159.3",
+      "contract": "thread/queue/add schedules input when the owned receiver becomes idle. A busy receiver processes a later turn. Exact-name lookup rejects ambiguity and uses cwd=None; worktree scope therefore needs the owned native thread binding. Repeating the CLI call creates another client message ID, rather than proving deduplication.",
+      "sources": [
+        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/session_queue_commands.rs",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/named_session_lookup.rs",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-client/Cargo.toml"
+      ]
+    },
+    {
+      "id": "claude-native-messaging",
+      "pin": "2.1.286",
+      "contract": "ListAgents/SendMessage deliver to native Claude peers between tool calls and start a turn for idle recipients when the session and role expose these tools. Research-role tool restrictions must be checked independently of lead-session capability.",
+      "sources": [
+        "https://code.claude.com/docs/en/cross-session-messaging",
+        "https://code.claude.com/docs/en/sub-agents"
+      ],
+      "existing_native_observation": "cooperation.json retains actual native SendMessage returned success and the designated owner's response. Neither proves automatic Codex-to-Claude bridging."
+    },
+    {
+      "id": "python-agent-mail",
+      "repository": "https://github.com/Dicklesworthstone/mcp_agent_mail",
+      "reviewed_source": "3fad5ec672869f81d2ca0a4c525dde004ac96f45",
+      "source_package_version": "0.3.4",
+      "latest_release": "v0.3.2",
+      "release_commit": "32783f6848bd63c425c4b5004cee3350016635fb",
+      "contract": "The Codex PostToolUse hook checks an unread count without message bodies and injects a fetch_inbox reminder. The reminder can recur after 120 seconds until consumed. Tool-boundary polling does not activate an idle native turn or establish one model submission.",
+      "sources": [
+        "https://github.com/Dicklesworthstone/mcp_agent_mail/blob/3fad5ec672869f81d2ca0a4c525dde004ac96f45/scripts/hooks/check_inbox.sh",
+        "https://github.com/Dicklesworthstone/mcp_agent_mail/blob/3fad5ec672869f81d2ca0a4c525dde004ac96f45/pyproject.toml",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/core/src/tools/hook_names.rs"
+      ],
+      "adoption": "Conditional comparison; no install or capture/receiver acceptance."
+    },
+    {
+      "id": "rust-agent-mail",
+      "repository": "https://github.com/Dicklesworthstone/mcp_agent_mail_rust",
+      "latest_release": "v0.3.36",
+      "release_commit": "071e1c85d06b6247bbddab11cc8139b38cc885bf",
+      "reviewed_current_head": "d52e20a55960e2d3e24f278861e2bb3e5d235510",
+      "current_head_commits_ahead_of_release": 436,
+      "contract": "The tagged setup adds HTTP MCP to Codex and hooks to Claude. Project-scoped adjective+noun mailbox identities and self-asserted program/model metadata do not bind native threads. Persisted, signal-file-written and acknowledged delivery receipts do not mean the model submitted a turn.",
+      "sources": [
+        "https://github.com/Dicklesworthstone/mcp_agent_mail_rust/blob/071e1c85d06b6247bbddab11cc8139b38cc885bf/crates/mcp-agent-mail-core/src/setup.rs",
+        "https://github.com/Dicklesworthstone/mcp_agent_mail_rust/blob/071e1c85d06b6247bbddab11cc8139b38cc885bf/crates/mcp-agent-mail-tools/src/identity.rs",
+        "https://github.com/Dicklesworthstone/mcp_agent_mail_rust/blob/071e1c85d06b6247bbddab11cc8139b38cc885bf/crates/mcp-agent-mail-tools/src/messaging.rs#L4233",
+        "https://github.com/Dicklesworthstone/mcp_agent_mail_rust/blob/v0.3.36/README.md#testing"
+      ],
+      "native_acceptance_commands": ["cargo test --workspace", "am e2e run --project . tools_messaging crash_restart"],
+      "native_acceptance_status": "Not run. Source-supported mailbox/crash-recovery suites do not test selected-client model parity. test_idempotency.sh concerns installer idempotency; message idempotency instead needs the explicit messaging key.",
+      "adoption": "Conditional comparison; distinct maintained Python and Rust repositories, no redirect-based replacement claim."
+    },
+    {
+      "id": "relay-sdk-codex",
+      "repository": "https://github.com/AgentWorkforce/relay",
+      "pin": "v13.0.0",
+      "adapter_version": "@ai-sdk/harness-codex@1.0.40",
+      "codex_sdk_version": "0.144.5",
+      "contract": "The adapter invokes Codex SDK exec, defaults web search off and advertises low/medium/high reasoning effort. It does not establish the selected shared-daemon Sol/max or Sol/ultra receiver contract. Relay's generic app_server runtime dispatches OpenCode.",
+      "sources": [
+        "https://github.com/AgentWorkforce/relay/blob/v13.0.0/packages/harnesses/src/ai-sdk/adapter-registry.ts",
+        "https://unpkg.com/@ai-sdk/harness-codex@1.0.40/dist/bridge/index.mjs",
+        "https://github.com/openai/codex/blob/rust-v0.144.5/sdk/typescript/src/exec.ts",
+        "https://github.com/AgentWorkforce/relay/blob/v13.0.0/crates/broker/src/runtime/app_server.rs#L133"
+      ],
+      "adoption": "Automatic PTY submission remains held by existing-host-gates.json; transport and restart receipts do not close it."
+    },
+    {
+      "id": "relay-proposed-native-queue-injector",
+      "source_pr": "https://github.com/AgentWorkforce/relay/pull/1864",
+      "head": "8bed1dd99f7ecfd5770346b80b190aa5efa002ee",
+      "status": "closed, unmerged",
+      "contract": "The proposed Codex injector calls the native queue and adds a persisted delivery barrier. Its Claude side reads peer-token session records. This is unmerged comparison evidence, not a supported installed bridge or the native Claude SendMessage contract.",
+      "source": "https://github.com/AgentWorkforce/relay/blob/8bed1dd99f7ecfd5770346b80b190aa5efa002ee/packages/cli/src/lib/coding-session-injector.ts"
+    }
+  ],
+  "failed_access": ["A guessed Rust E2E runner URL returned 404; the authoritative native runner and README testing entry were subsequently located."],
+  "next_native_comparison": "On isolated owned receivers, separate Python tool-boundary reminder injection, mailbox fetch and model acknowledgement in idle/busy states; qualify Rust's unchanged persistence/restart suites separately. Preserve native model, effort, tools, thread binding, retry semantics and scope.",
+  "closure": {
+    "no_unresolved_material_gap": false,
+    "automatic_cross_client_submission": "held",
+    "new_host_acceptance": "unknown",
+    "reopen_on": "A maintained native queue adapter or upstream merged integration with unchanged native acceptance, receiver identity, deduplication and lifecycle evidence."
+  },
+  "limitations": "Read-only source follow-up. No bridge was written, no software installed, no credentials/inbox/private conversations read and no provider trial performed."
+}
