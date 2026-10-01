@@ -14850,8 +14850,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "3b34d1f3cca112a052b19990b89bd04b163b77abf2041f220ac5682edb9a88c5",
-      "bytes": 473278
+      "sha256": "3a269190055b12b581e24846a157f3691578727f304d2f9f1fe0cccdbc77aa73",
+      "bytes": 474603
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -47330,8 +47330,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "b94074db6f2556fb987f50fb83ca1b8e70886759319ba70dff3a149d1b3351e1",
-      "bytes": 235342
+      "sha256": "993339d425a502b1bfe5d461141c166582cf2c2cb47c71881ff1e5ee73000662",
+      "bytes": 241330
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -48030,8 +48030,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "5f717e8a67ab9b8c05476a59704a614e352df88283315e623847a5d796167074",
-      "bytes": 77924
+      "sha256": "07e51eef220819eb4f9d98fd706ad6969849f67e2057bb4f90267bab6f055fc6",
+      "bytes": 79308
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -48040,8 +48040,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
-      "sha256": "2fe58244ddcadc7a4e66e97f21b34938e6840d140d77ad8053310264b84dcfbd",
-      "bytes": 26504
+      "sha256": "ebb642db53e4ee1e53cb0a568ffa4468c843de95e670509f39fe29091388eee8",
+      "bytes": 32425
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_call.sh",
