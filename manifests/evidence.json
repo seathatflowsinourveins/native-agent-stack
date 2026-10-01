@@ -3829,6 +3829,22 @@
         "Evidence classes differ: the unit, mutation and suite runs were made by the coordinator on the final head outside any sandbox; the reviews are read-only cross-family reads, not proofs."
       ],
       "path": "evidence/receipts/canary-proof-verification-20261001.json"
+    },
+    {
+      "id": "nextjs-1638-qualification-20261001",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nextjs"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-10-01, the application-delivery recipe was qualified at Next.js 16.3.8 (tag v16.3.8, commit b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6, released 2026-09-30T16:13:46Z), whose release notes list seven security advisories, the most severe GHSA-cjq9-62q9-8jv4 (high: server-side request forgery in Image Optimization). The two-file patch (package.json and pnpm-lock.yaml, sha256 570ac44d237b6641a5087fe57b079aaf61dcb781b6496a721b0224dd17ea60d0) changes next, @next/env and the eight @next/swc-* lock entries, every other lock entry byte-identical. With Node v24.21.0 and pnpm 12.4.2 the frozen install, the peer check, the typecheck and the production build each exited 0 (recorded at 16:07:49Z), after a first frozen install at 12:13Z exited 1 with ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION for the ten packages published on 2026-09-30; no exclusion or policy change was made.",
+      "limitations": [
+        "Bounded recipe checks only: make verify with its PostgreSQL, API and browser stages was not run, so the 2026-09-20 receipts still qualify 16.3.5, not 16.3.6 or 16.3.8.",
+        "The pnpm store, node_modules and build cache were warm from the earlier attempt; no cold-store install is claimed.",
+        "This recipe's exposure to the seven advisories was not established; the move removes the vulnerable versions from its lock.",
+        "Labels 15 to 17 are the version prints of Node and pnpm and a git diff check; they are metadata, not acceptance.",
+        "No new-host install ran: that is unit U10 on the new distribution. Provider usage of the builder is unknown."
+      ],
+      "path": "evidence/receipts/nextjs-1638-qualification-20261001.json"
     }
   ],
   "files": [
@@ -4449,8 +4465,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "da5a9228eea023b01388752e034cc6251e5e30b77d6755d64de84de725394bb0",
-      "bytes": 10005
+      "sha256": "3a51743060848994b4da16076c7b4f0464507bf37c3cd40e1995fec8ae44e8bb",
+      "bytes": 10611
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -4543,14 +4559,24 @@
       "bytes": 792
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/package.752714a.json",
+      "sha256": "adc11906a06213750da8eb351ee5a6289720b2cdb2ffc6723025e1624270c31d",
+      "bytes": 792
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
       "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b",
       "bytes": 32972
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.752714a.yaml",
+      "sha256": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
+      "bytes": 32972
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "9e830d6a5f61110d5e1549a359966bcbd26dff4d6ca4ebd6c5504c1dda1dace7",
-      "bytes": 7675
+      "sha256": "845b07ff640a7108d5f604d951be424ac2f8df4ae7944fede225379b6b56a05a",
+      "bytes": 11694
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
@@ -4589,7 +4615,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/package.json",
-      "sha256": "adc11906a06213750da8eb351ee5a6289720b2cdb2ffc6723025e1624270c31d",
+      "sha256": "8cacbaa315ccf2f87edf2579ee303842bef88a672bae95bd544eee6237435335",
       "bytes": 792
     },
     {
@@ -4599,7 +4625,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
-      "sha256": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
+      "sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
       "bytes": 32972
     },
     {
@@ -9585,8 +9611,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "2ad534497a379f5629bb950bcd21a0219cad321dc7be05b4275a8d52b7ac3a98",
-      "bytes": 482774
+      "sha256": "3eea8aecc2617e9e073e7ba4026f70c1fb72613db1aa47a93faa76321b82b9ea",
+      "bytes": 482973
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14935,7 +14961,7 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "11bb805b364a93d5bdafcc70e0e0bb14136561bf695fc88ebf155ae4f17b7044",
+      "sha256": "ad12f1093b71dd922ac8e8a7de7e4b774ce99aaedc0e378786288f01fe5a6fee",
       "bytes": 249102
     },
     {
@@ -45729,6 +45755,11 @@
       "bytes": 867
     },
     {
+      "path": "evidence/receipts/nextjs-1638-qualification-20261001.json",
+      "sha256": "39c447fa3a7a2cadfddd4381c58f2c843d7df0035abea38b346bf067fb4b64c0",
+      "bytes": 9846
+    },
+    {
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "7f5422e2b4d7c60801b48d735619689802b3b353199e149c2667c586cc90cf5d",
       "bytes": 24695
@@ -46260,8 +46291,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "5cafbe8aae1895fb41a4920039231f3c8a0d91b641db67b4e21f2f88e8d4e36b",
-      "bytes": 99473
+      "sha256": "b8bedf66f627c68411774f08781bcee4a05c92266810a4d82bfeda9d8882dddc",
+      "bytes": 99692
     },
     {
       "path": "observability/README.md",

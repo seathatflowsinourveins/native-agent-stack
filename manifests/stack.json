@@ -1712,10 +1712,10 @@
     {
       "id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.6",
+      "version": "16.3.8",
       "license": "MIT",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+      "source_pin": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
       "commands": [
         "pnpm typecheck",
         "pnpm build",
@@ -1723,15 +1723,16 @@
       ],
       "evidence_ids": [
         "native-application-delivery-20260920",
-        "wsl-application-20260920"
+        "wsl-application-20260920",
+        "nextjs-1638-qualification-20261001"
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://registry.npmjs.org/next/16.3.6",
-        "https://github.com/vercel/next.js/releases/tag/v16.3.6",
-        "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j"
+        "https://registry.npmjs.org/next/16.3.8",
+        "https://github.com/vercel/next.js/releases/tag/v16.3.8",
+        "https://github.com/vercel/next.js/security/advisories/GHSA-cjq9-62q9-8jv4"
       ],
-      "freshness": "Primary-source checked September 25, 2026: 16.3.6 (tag commit a758ffc, not a prerelease) fixes the critical GHSA-vcvr-r3jv-pc5j next/og ImageResponse RCE, an urgent fix outside the 7-day cooldown. The application-delivery lock moved from 16.3.5 (history/recipe-revisions.json); its locked install, typecheck and production build pass at 16.3.6. The listed receipts ran 16.3.5 and do not qualify 16.3.6."
+      "freshness": "Primary-source checked October 1, 2026: 16.3.8 (tag commit b0fad0d, not a prerelease, published 2026-09-30) fixes the seven advisories its release notes list, the most severe the high GHSA-cjq9-62q9-8jv4 (server-side request forgery in Image Optimization). The application-delivery lock moved from 16.3.6 after pnpm's release-age window (history/recipe-revisions.json; evidence/receipts/nextjs-1638-qualification-20261001.json): its locked install, peer check, typecheck and production build pass at 16.3.8. The listed receipts ran 16.3.5 and do not qualify 16.3.6 or 16.3.8."
     },
     {
       "id": "react",
