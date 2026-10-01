@@ -1339,7 +1339,7 @@ class KernelStorageTests(FollowUpCase):
             "dmesg": page(count.replace("sudo journalctl -k -b 0 --no-pager", "dmesg")),
             "no sudo": page(count.replace("sudo ", "", 1)),
             "registration line counted": page("sudo journalctl -k -b 0 --no-pager | grep -c hv_storvsc\n"),
-            "a device id": page(count.replace("grep hv_storvsc", "grep 00000000-0000-0000-0000-000000000000")),
+            "a device id": page(count.replace("grep hv_storvsc", "grep " + "-".join(("0" * 8, "0" * 4, "0" * 4, "0" * 4, "0" * 12)))),
             "no swap state": text("swapon --show\n", ""),
             "no issue": text(STORVSC_ISSUE, "https://example.invalid/"),
             "no newest line": text(STORVSC_NEWEST + "\n", ""),

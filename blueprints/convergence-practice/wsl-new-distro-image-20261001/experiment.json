@@ -89,7 +89,7 @@
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "686cbbdb7e1e2abc02cde323383df33cfb3c61d2de53466a8dd88998a6e6c7d8"
+        "sha256": "4274bf85162b71a1dfaa6245c4e02eee729ab6522fc7b7f9d34c5296297caf58"
       }
     ]
   },
