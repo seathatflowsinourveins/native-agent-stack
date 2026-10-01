@@ -1,7 +1,8 @@
 # U11: merit-neutral selection rules (design for review, 2026-10-01)
 
-Status: proposed, revision 3: the repair round over the two reviews of revision 1 and the final wording repair after
-the second reads of revision 2 (see Review history).
+Status: proposed, revision 4: the repair round over the two reviews of revision 1, the wording repair after the
+second reads of revision 2, and the last qualifier and clarifications after the delta-reads of revision 3 (see Review
+history).
 Nothing in this record is implemented, and no prompt, verdict or acceptance record changes with it. Owner of the files
 and of the implementing pull requests: the foundation lane's coordinator (session `sota-default-harness-setup`).
 
@@ -42,9 +43,10 @@ advantage that the repositories' quality does not:
 6. **Evidence and prose lean to the incumbent.** Native runs exist mostly for what the source host installed, and its
    receipts and records name its selection; v1 measures the leak as `prose_exposed` (`scripts/landscape.py`).
 7. **Which layers get a comparison follows the same shape.** The layer statuses are maintained by hand
-   (`scripts/landscape.py` checks only the value set), and the `next_action` texts of the `on_requirement_change` layers
-   in `catalogs/landscape/research-state.json` say to compare only against a concrete gap or need, the same shape as the
-   v1 fit bar.
+   (`scripts/landscape.py` checks only the value set). In `catalogs/landscape/research-state.json` the `next_action`
+   texts of six `on_requirement_change` layers (native-clients, web-research, ci-supply-chain, agent-sdks, mcp-surfaces,
+   secrets-credentials) say to compare only against a concrete gap or need, the same shape as the v1 fit bar; isolation,
+   code-navigation and semantic-rag call for a comparison unconditionally.
 
 ## Design
 
@@ -97,8 +99,9 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
   selection-bearing prose reduced as `lane_packets.py` already reduces packet prose, and every candidate gets the same
   bundle types and reading budget. The incumbent's records still name it, and `prose_exposed` still measures that.
 - Where a model judgment affects a deciding score or the selection, adoption information is withheld along that whole
-  path: its inputs, the prose it can open and its aggregation. A material exposure that cannot be resolved leaves the
-  layer's merit `undetermined`. An objective fixed oracle, a frozen task set scored by tests or exact checks, can support
+  path: its inputs, the prose it can open and its aggregation. An exposure is material when `prose_exposed` is true for
+  any file of the judges' bundle after reduction; a material exposure that cannot be resolved leaves the layer's merit
+  `undetermined`. An objective fixed oracle, a frozen task set scored by tests or exact checks, can support
   a selection independently of exposed narrative, and the record states which deciding evidence came from an oracle
   and which from judgments. Consistency is not accuracy: judges who saw the incumbent's records and prefer it in every
   order and family are still biased (Zheng et al. 2023, section 3.4: high consistency may not imply high accuracy).
@@ -112,11 +115,11 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
 - Order: each lane gets its own candidate-order seed, and a winner that depends on the order is recorded
   `undetermined`. Pairwise judgments run in both orders and count a win only when the same candidate is preferred in both,
   otherwise a tie (Zheng et al. 2023, section 3.4); scored judgments average both orders (Wang et al. 2023, section 3.2);
-  three judgments vote by a function declared in the preregistration, max voting (the majority label) for binary
-  judgments and average pooling for scores (Verga et al. 2024, section 3.1, where the panel spans three model families);
-  the tooling routes two families today (Claude and Codex), so the three judgments come from those two under different
-  seeds until a third family has a route, which the record then names; a missing judgment is pending, and no majority
-  is `undetermined`. These controls apply to every model judgment in this design, including D's.
+  judgments vote by a function declared in the preregistration, max voting (the majority label) for binary judgments and
+  average pooling for scores (Verga et al. 2024, section 3.1, where the panel spans three model families). The tooling
+  routes two families today (Claude and Codex), so each family gives two judgments under different seeds, and a result
+  stands only when both families' own majorities agree, as B requires for exclusions; otherwise it is `undetermined`.
+  When a third family has a route, the record names it. A missing judgment is pending. These controls apply to every model judgment in this design, including D's.
 - The selection of record carries no precedence in selection, ties or arm order. What installs before a comparison is
   set in D.
 
@@ -126,7 +129,10 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
   (a preregistered cost or footprint tie-break, both arms behind a selector, or no selection). The choice among those is
   the owners' and the user's; a silent default to the incumbent is not an option.
 - The arm set is a preregistered function of a closed list of inputs: the field's members and their requirement-fit
-  evidence, the budget and a seed; adoption, installed state and receipt counts are not among them. For example, a cheap
+  evidence, the budget and a seed; adoption, installed state and receipt counts are not among them. The same blind
+  screen produces the requirement-fit evidence for every member, known members included, before the function runs, so
+  no member enters with evidence that only its history gave it. The decision rule's effect threshold applies to every
+  pair of arms, and no pair names the selection of record as the reference. For example, a cheap
   screen on a shared task subset, then the full comparison on the members that pass it. A member that fails the screen
   is `undetermined`, not compared-and-lost, unless the screen itself meets the decision rule's power. Members that are
   not run are `undetermined`, never excluded. A comparison decides only among the arms it ran and records a disposition
@@ -136,11 +142,16 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
   merit is decided only among the compared arms.
 - Run order and time windows are counterbalanced across arms. No arm gets the source host's wiring beyond the
   upstream-documented integration, or every arm gets the same.
-- What installs on the new distribution: a layer that needs a comparison installs its arms fresh. A layer whose
-  comparison has not run, or whose field still holds a pending member, installs its selection of record provisionally,
-  labeled as not a merit result, with the pending set recorded and a reopening trigger (the comparison's first receipt,
-  or the pending set's resolution). The preregistration also names what a no-selection outcome installs: both arms
-  behind a selector, or neither, with the layer's function left to the clients' built-in tools.
+- What installs on the new distribution, in this order:
+  - A layer that needs a comparison installs its arms fresh for the window in which its preregistered comparison runs.
+    Before that comparison any installation of the incumbent is one isolated comparison arm with no operational or
+    default precedence (program decision 5, which names a provisional default install of the recorded selection as its
+    overturn); a label alone does not satisfy this.
+  - Every other layer, and a layer past the re-vote cutoff, installs its selection of record provisionally (program
+    decision 3), labeled as not a merit result, with its pending set recorded and a reopening trigger: a `credible`
+    challenger after the re-vote moves it to `comparison_required` (F).
+  - The preregistration names what a no-selection outcome installs: both arms behind a selector, or neither, with the
+    layer's function left to the clients' built-in tools.
 - Tasks come from the layer's real workload. A named external benchmark is allowed with a recorded reason; unless that
   reason shows it represents the workload, its run is a pilot, not the deciding comparison.
 - Each arm runs fresh at its current release on the target host, installed by its upstream commands. Program decision 5
@@ -158,8 +169,9 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
 and evidence refs stay sealed. A requirement text that names a candidate is reduced in sweep inputs as `lane_packets.py`
 (`reduce_prose`) already reduces verdict-packet prose, or rewritten as capabilities; a name that is a user pin or a fixture
 (LEAN as the parity oracle) is recorded as that. Four trading layers name NautilusTrader and LEAN in their requirement
-(research-factors-ml, backtesting-engine, execution-broker, portfolio-risk); none of the twenty foundation layers names a
-candidate. The trading lane owner's answer on the pinned destination, verbatim:
+(research-factors-ml, backtesting-engine, execution-broker, portfolio-risk); by a name or repository-slug match, none of
+the twenty foundation layers names a candidate. The trading lane owner's answer on the pinned destination, sent to this
+record's owner by cross-session message at about 17:35Z on 2026-10-01, verbatim:
 
 > The destination is a requirement of its layer, not a selection that a comparison can change. The user selected
 > NautilusTrader with the IBKR destination and a separate Alpaca adapter path (AGENTS.md, north star;
@@ -174,7 +186,9 @@ candidate. The trading lane owner's answer on the pinned destination, verbatim:
 > observability) follows the merit rule like any other selection.
 
 The rule this design takes from it: a requirement the user pinned stays out of every tooling decision; comparisons that
-involve it still run, and a result that favours another candidate is reported to the user as a decision.
+involve it still run, and a result that favours another candidate is reported to the user as a decision. This carve-out
+rests on the trading lane owner's reading of AGENTS.md; decision 5 does not mention the pin. Overturn: the user says the
+merit rule governs the pinned destination too.
 
 **F. Re-triage.** After the field, the version 2 screens and the re-vote, the layers are triaged again: a layer with a
 `credible` challenger in its field becomes `comparison_required`. This is a landing condition of the implementation.
@@ -196,8 +210,11 @@ Screens and field: `tools/sota-convergence/landscape-sweep/templates.json` (disc
 (new pinned hashes). Verdicts: `tools/sota-convergence/lane_packets.py` (seal `adopted`, per-lane seeds),
 `tools/sota-convergence/lane-prompt.md`, `tools/sota-convergence/record_verdicts.py`, `scripts/landscape.py`
 (`WINNER_EVIDENCE_CLASSES` for version 2), `tools/sota-convergence/blind_checkout.py`, the lane contract in
-`tools/sota-convergence/README.md`, and their tests. Each lands with failing tests first, the Gate A owner's script check
-and the trading lane owner's acknowledgement, because the tooling covers the trading rows.
+`tools/sota-convergence/README.md`, and their tests. Receipts: a comparison receipt schema with per-arm results and the
+preregistration's hash and time, checked by `scripts/validate.py` (`RECEIPT_KINDS`), `scripts/validate_catalogs.py` and
+`scripts/validate_foundation.py`, with failing tests first: a receipt whose preregistration postdates its first trial, or
+whose per-arm results contradict the lane's winner, is rejected. Each lands with failing tests first, the Gate A owner's
+script check and the trading lane owner's acknowledgement, because the tooling covers the trading rows.
 
 ## What stays untouched
 
@@ -230,7 +247,15 @@ hashes of sweeps already started; every acceptance contract and receipt. No cand
   revision 1 boundaries; four paths remained (the validator recomputes the decision rule, now C; the provisional install
   for layers with pending members, now C and D; requirement texts that name a candidate, now E; three judgments from two
   routed families, now C) with residual rules (now A, B, C and D) and two corrections (Why 3 and Why 7). The trading lane
-  owner answered E's question (now quoted in E). This is revision 3, the final wording repair before implementation.
+  owner answered E's question (now quoted in E). Revision 3 was the wording repair.
+- Delta-reads of revision 3 (`2440cf8f08770942a38a03c3281934ab02279472`, sha256
+  `1cd4da1f90f093ce3ea32dae0f03f3d8f986cfad9780bc01bcbaa7627470efa0`). The Codex catalog lane: C's blinding, R1, R3, R4, the
+  trading requirement and the earlier bounds pass; one qualifier repaired in D: before a comparison, an incumbent install
+  on a comparison layer is an isolated arm with no default precedence, as decision 5 requires. The Gate A owner: no new
+  path where adoption decides eligibility, burden, order or a tie; six clarifications applied (the receipt schema in the
+  files list, D's install order, two judgments per family with agreeing majorities, the same blind screen for every
+  member's requirement-fit evidence and no reference pair, E's carve-out overturn and the answer's source, the exposure
+  measure and Why 7's six layers). This is revision 4.
 
 ## Review question
 
