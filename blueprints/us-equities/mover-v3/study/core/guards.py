@@ -98,8 +98,12 @@ def running_tree(repo, study_path: str = STUDY_PATH) -> str:
         raise Refused(f"the study tree holds ignored files that are not bytecode caches: {planted[:5]}")
     masked = _masked_index_entries(repo, study_path)
     if masked:
-        raise Refused(f"the study tree holds index entries that hide a file's changes from git status: {masked[:5]}; "
-                      "a run executes a committed tree only")
+        # the independent verification of ace56485 (C7): with core.ignoreStat=true every file git checks out is marked
+        # assume-unchanged, so a bit need not hide a change; the refusal stays, and the message says how to clear it
+        raise Refused(f"the index marks study files assume-unchanged or skip-worktree, so git status does not check "
+                      f"them and the run cannot verify them: {masked[:5]}; clear the bits (git update-index "
+                      "--no-assume-unchanged or --no-skip-worktree on those files) and, if core.ignoreStat is true, "
+                      "unset it, or git marks every file it checks out assume-unchanged again")
     tree = git(repo, "rev-parse", f"HEAD:{study_path}")
     unverified = _unverified_files(repo, tree, study_path)
     if unverified:

@@ -78,6 +78,32 @@ class RunningTreeContent(unittest.TestCase):
                     with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} ({flag})")):
                         guards.running_tree(repo)
 
+    def test_running_tree_refuses_a_checkout_made_under_core_ignore_stat_and_says_how_to_clear_it(self):
+        """With core.ignoreStat=true git marks every file it checks out assume-unchanged (git-config(1)), so in a fresh
+        clone made with it every study file is masked although each holds HEAD's bytes. The refusal stays, by design:
+        git status does not check those files, and the run cannot verify them through it. The message says that the
+        index marks them and how to clear the bits; at ace56485 it said that they hide a change, which misled for this
+        case (the independent verification of ace56485, C7). Unsetting core.ignoreStat alone leaves the bits; clearing
+        them lets the same files run."""
+        with self.study_repo() as (repo, tmp):
+            sh(tmp, "clone", "-q", "-c", "core.ignoreStat=true", str(repo), "clone")
+            clone = tmp / "clone"
+            tree, files = sh(clone, "rev-parse", f"HEAD:{STUDY_PATH}"), sh(clone, "ls-files", "--", STUDY_PATH).split()
+            self.assertEqual(sh(clone, "ls-files", "-v", "--", STUDY_PATH).splitlines(), [f"h {f}" for f in files])
+            self.assertEqual((status(clone), guards._unverified_files(clone, tree, STUDY_PATH)), ("", []))
+            with self.assertRaises(guards.Refused) as refused:
+                guards.running_tree(clone)
+            for part in ("the index marks study files assume-unchanged or skip-worktree",
+                         "so git status does not check them and the run cannot verify them", f"{TRANSPORT} (assume",
+                         "clear the bits (git update-index --no-assume-unchanged or --no-skip-worktree",
+                         "if core.ignoreStat is true, unset it"):
+                self.assertIn(part, str(refused.exception))
+            sh(clone, "config", "--unset", "core.ignoreStat")
+            with self.assertRaisesRegex(guards.Refused, "^the index marks study files"):
+                guards.running_tree(clone)
+            sh(clone, "update-index", "--no-assume-unchanged", "--", *files)
+            self.assertEqual(guards.running_tree(clone), tree)
+
     def test_running_tree_compares_every_tracked_file_with_its_blob_when_the_flag_refusal_is_bypassed(self):
         """The content check alone: with the index-flag refusal bypassed, a flagged file that changed, was deleted or
         was replaced by a link to the same bytes is still refused, because the working file's own bytes are hashed."""
@@ -95,19 +121,32 @@ class RunningTreeContent(unittest.TestCase):
                         guards.running_tree(repo)
 
     def test_running_tree_refuses_a_change_that_a_clean_filter_hides(self):
-        """Only the content check can refuse this one: no index flag is set, and git status reports nothing because a
-        clean filter (set in the repository's own configuration and .git/info/attributes, neither of them tracked)
-        gives the committed bytes back for the edited file. git hash-object --no-filters hashes the file itself."""
+        """Only the content check can refuse this one, and only because it hashes with --no-filters: no index flag is
+        set, and git status reports nothing because a clean filter (set in the repository's own configuration and
+        .git/info/attributes, neither of them tracked) gives the committed bytes back for the edited file. The
+        attribute is a basename pattern, which git applies both to the repository-relative path git status checks and
+        to the absolute path running_tree gives git hash-object --stdin-paths, so without --no-filters that call would
+        hash the committed bytes as well. At ace56485 the pattern was the anchored repository-relative path, which git
+        does not apply to an absolute path: the filter never reached the content check, and removing --no-filters
+        passed this test (the independent verification of ace56485, C7)."""
         from tests import fixture_repo as FR
         with self.study_repo() as (repo, tmp):
             committed = FR.write(tmp / "transport-committed.py", (repo / TRANSPORT).read_bytes())
             sh(repo, "config", "filter.committed.clean", f"cat {shlex.quote(str(committed))}")
-            FR.write(repo / ".git" / "info" / "attributes", f"{TRANSPORT} filter=committed\n")
+            FR.write(repo / ".git" / "info" / "attributes", f"{Path(TRANSPORT).name} filter=committed\n")
             (repo / TRANSPORT).write_text("HOST = 'changed'\n")      # the committed length: git compares content
             self.assertEqual(len("HOST = 'changed'\n"), len(committed.read_bytes()))
             self.assertEqual(status(repo), "")
             self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"H {TRANSPORT}")
-            self.assertEqual(sh(repo, "hash-object", TRANSPORT), sh(repo, "rev-parse", f"HEAD:{TRANSPORT}"))
+            blob = sh(repo, "rev-parse", f"HEAD:{TRANSPORT}")
+            self.assertEqual(sh(repo, "hash-object", TRANSPORT), blob)
+
+            def hashed(*options):
+                """git hash-object given the file as running_tree gives it: an absolute path, one per line."""
+                return subprocess.run(["git", "-C", str(repo), "hash-object", *options, "--stdin-paths"],
+                                      input=f"{Path(repo).resolve() / TRANSPORT}\n", capture_output=True, text=True,
+                                      check=True).stdout.strip()
+            self.assertEqual((hashed() == blob, hashed("--no-filters") == blob), (True, False))
             with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} differs from HEAD's blob")):
                 guards.running_tree(repo)
 
