@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 266,
+    "api_commands": 271,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 249,
+    "selected_component_api_commands": 254,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -634,8 +634,8 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.159.2",
-      "selected_source_pin": null,
+      "selected_version": "0.159.3",
+      "selected_source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
       "checks": [
         {
           "endpoint": "repos/openai/codex",
@@ -668,33 +668,80 @@
           "ended_at": "2026-09-30T05:30:30.637968+00:00",
           "stdout_sha256": "a2989731ee00f5dbbc04f0c089592aad70c0f90d226308111c93eb4ce3e8497e",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.925253+00:00",
+          "ended_at": "2026-10-01T14:06:21.462594+00:00",
+          "stdout_sha256": "e2f700c49c476105acf68be3ebbfd321057d5c147a8674bd2dec6ce709f2b791",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.925520+00:00",
+          "ended_at": "2026-10-01T14:06:21.486658+00:00",
+          "stdout_sha256": "2135b8ae7f801e728b487d62cd5a0d03a3107c4c775e348a53cb4a2f45c3682a",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/tags/rust-v0.159.3",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.926038+00:00",
+          "ended_at": "2026-10-01T14:06:21.399440+00:00",
+          "stdout_sha256": "2135b8ae7f801e728b487d62cd5a0d03a3107c4c775e348a53cb4a2f45c3682a",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/rust-v0.159.3",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.926594+00:00",
+          "ended_at": "2026-10-01T14:06:21.291844+00:00",
+          "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/01fc69f4026735edfdf6789820549727a4867b11",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:21.292613+00:00",
+          "ended_at": "2026-10-01T14:06:21.679064+00:00",
+          "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/openai/codex",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-30T04:49:08Z",
+      "pushed_at": "2026-10-01T13:58:06Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "rust-v0.159.2",
-        "published_at": "2026-09-29T23:57:16Z",
-        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "tag_name": "rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "rust-v0.159.2",
-        "sha": "ff6aec96948b70d94983af2641a6b67c94faeff5",
-        "html_url": "https://github.com/openai/codex/commit/ff6aec96948b70d94983af2641a6b67c94faeff5",
-        "committed_at": "2026-09-29T22:57:04Z"
+        "ref": "rust-v0.159.3",
+        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
+        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
+        "committed_at": "2026-09-30T21:46:21Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/openai/codex",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "01fc69f4026735edfdf6789820549727a4867b11",
+        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
+        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
+        "committed_at": "2026-09-30T21:46:21Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "codex-for-claude",

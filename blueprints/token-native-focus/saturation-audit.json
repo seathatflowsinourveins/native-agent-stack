@@ -1913,7 +1913,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.2",
+      "version": "0.159.3",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2098,6 +2098,16 @@
           {
             "id": "codex-01592-qualification-20260930",
             "path": "evidence/receipts/codex-01592-qualification-20260930.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01593-native-queue-20261001",
+            "path": "evidence/receipts/codex-01593-native-queue-20261001.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01593-hindsight-native-memory-20261001",
+            "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
             "kind": "native_cli_e2e"
           }
         ],

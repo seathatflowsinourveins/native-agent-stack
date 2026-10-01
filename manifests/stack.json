@@ -294,7 +294,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.2",
+      "version": "0.159.3",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -336,14 +336,18 @@
         "portable-claude-native-qualification-20260921",
         "claude-repository-evidence-20260921",
         "codex-01571-qualification-20260926",
-        "codex-01592-qualification-20260930"
+        "codex-01592-qualification-20260930",
+        "codex-01593-native-queue-20261001",
+        "codex-01593-hindsight-native-memory-20261001"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/scripts/install/install.sh",
+        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-daemon/README.md"
       ],
-      "source_pin": null,
-      "freshness": "0.159.2 serves bin/codex on the NativeStack WSL2 host since 2026-09-30T03:22Z, when a peer pointed the launcher at tools/codex-0.159.2; the 2026-09-30 qualification receipt verified that prefix byte for byte against the npm and GitHub release artifacts and compared the CLI surface, the exec --json source and the host's 0.159.2 rollouts with 0.157.1 in a no-network sandbox, with no live model call (the Gate A owner's rehearsals cover live behaviour). Automatic start of the self-updating app-server daemon stays off (daemon_auto_start false in adoption/templates/codex.config.template.toml; the feature is still stable and on by default at 0.159.2). tools/adoption/apply_codex_lane.py pins 0.159.2 with the Linux pin, and its opt-in integration tests passed 10 of 10 against the prefix's native binary. 0.157.1 and 0.155.1 stay installed for rollback, the landscape winner pin stays until a new verdict wave, and the macOS pin stays 0.155.1 until its own qualification, which the shared Codex template's gpt-6.1-sol default now also waits for (that model is not in the bundled catalogs before 0.159.1)."
+      "source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
+      "freshness": "Linux 0.159.3 is selected after the official rust-v0.159.3 installer staged the complete native package and the 2026-10-01 receipts qualified native queue delivery while idle and busy, receiver reconnect, and synthetic Hindsight hook capture and native recollection through both headless and shared-daemon sessions. These are scoped native client operations with independent observations, not upstream test-suite execution or a whole-memory-backend readiness claim. On the qualified host, daemon_auto_start is enabled, the native daemon is pinned to 0.159.3 and its automatic updater is disabled; the shared portable template still sets daemon_auto_start false, so daemon adoption on other hosts remains opt-in. The Linux npm wrapper download matches its registry integrity, but its signature and attestation were not verified in this promotion. tools/adoption/apply_codex_lane.py tracks the Linux version pin. Historical receipts and rollback installations remain available; the independent landscape selection is unchanged, and macOS remains pinned to 0.155.1 pending its own qualification."
     },
     {
       "id": "codex-for-claude",
