@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30 (it takes its two host paths as arguments; the returned outputs mask them as <scratch-relock> and <worktree>). It needs the
+# uv 0.12.17 binary, a CPython 3.13 and network access (PyPI), and is documentation of what ran, not a supported tool.
+# The recipe's install-container.sh sequence (blueprints/runtime-workers/openhands/install-container.sh) run on the host in a scratch venv (UV_NO_CONFIG=1 as there), on the new lock,
+# with no model request: the same uv commands and the same import-check line (install-container.sh:21, verbatim), then one more line that asserts litellm 1.93.2 and prints the
+# versions the relock changed. usage: install_check_litellm.sh <scratch-relock> <worktree>; the exit status is 1 when any step fails.
+set -uo pipefail
+rc=0
+step() { echo "$1 exit: $2"; [ "$2" -eq 0 ] || rc=1; }
+R=$1; W=$2; OH=$W/blueprints/runtime-workers/openhands; V=$R/u3/venv
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never UV_NO_CONFIG=1
+rm -rf "$V"
+echo "[$(date -u +%FT%TZ)] uv venv"; uv venv --python 3.13 "$V" 2>&1 | tail -1; step "venv" "${PIPESTATUS[0]}"
+uv pip install --python "$V/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$OH/build-requirements.lock" 2>&1 | tail -2; step "build-requirements install" "${PIPESTATUS[0]}"
+uv pip install --python "$V/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$OH/requirements.lock" 2>&1 | tail -2; step "runtime lock install" "${PIPESTATUS[0]}"
+uv pip check --python "$V/bin/python" 2>&1 | tail -2; step "uv pip check" "${PIPESTATUS[0]}"
+"$V/bin/python" -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.49.6"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print("SDK/tools 1.49.6 imports passed; no model request")' 2>&1 | tail -2; step "sdk import" "${PIPESTATUS[0]}"
+"$V/bin/python" -c 'import importlib.metadata as m; import litellm; assert m.version("litellm") == "1.93.2"; print("litellm", m.version("litellm"), "| urllib3", m.version("urllib3"), "| pyjwt", m.version("pyjwt"), "| oauthlib", m.version("oauthlib"), "| anyio", m.version("anyio"), "| click", m.version("click"), "| pypdf", m.version("pypdf"), "| soupsieve", m.version("soupsieve"))' 2>&1 | tail -2; step "litellm import" "${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] done, status $rc"
+exit $rc

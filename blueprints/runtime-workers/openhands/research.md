@@ -442,6 +442,62 @@ for a non-object JWKS); the only caller of that client outside PyJWT in the venv
 
 Overturn condition: OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.
 
+## Runtime lock litellm relock (2026-09-30)
+
+requirements.lock moved from litellm 1.93.0 to 1.93.2 and nothing else changed (the litellm requirement line; 4 hash lines removed and
+7 added), SHA256 e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1, previously 1d11bae34f09. OSV published
+GHSA-3cv6-jpf6-8222 (CVE-2026-84377, "LiteLLM: Authenticated SSRF and provider-credential exfiltration via unvalidated request-body
+routing parameters", CVSS 3.1 6.5) at 2026-09-30T21:11:25Z for litellm 1.93.0 and 1.93.1; 1.93.2 is the first release of the 1.93 line
+without it. The scan workflow then concluded failure in every run that the returned outputs list after that time (pull-request heads and main's
+own push runs; section J), and the one log read shows the required osv-scanner job failing on this finding. Record: [osv-openhands-litellm-relock-20260930.json](../../../evidence/receipts/osv-openhands-litellm-relock-20260930.json);
+returned outputs: [evidence/relock-2026-09-30-litellm.txt](evidence/relock-2026-09-30-litellm.txt).
+
+The method is the urllib3 one above plus a seventh version-pinned upgrade and a two-line edit of the extracted workspace. Upstream's
+pyproject.toml pins `litellm==1.93.0` (line 19) and caps litellm at `exclude-newer-package` 2026-07-20T00:00:00Z (line 8), so
+`--upgrade-package litellm==1.93.2` alone is unsatisfiable there. The edit sets the cap to 2026-08-10T00:00:00Z (about 22 hours after the
+last file of 1.93.2 was uploaded, 2026-08-09T02:17:49Z) and the pin to `litellm==1.93.2`. It lives only in the scratch extraction:
+upstream's own lock, and the image built from it, still pin 1.93.0 (returned outputs, section C).
+
+    sed -i -e 's/litellm = "2026-07-20T00:00:00Z"/litellm = "2026-08-10T00:00:00Z"/' \
+      -e 's/"litellm==1\.93\.0"/"litellm==1.93.2"/' pyproject.toml
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 \
+      --upgrade-package litellm==1.93.2
+
+The control (the same six upgrades on the unedited workspace) reproduces the previous lock byte for byte, and the new lock differs from
+it in the litellm entry only (returned outputs, sections B and E). Each of the seven litellm hashes is the sha256 of a file of litellm
+1.93.2 on PyPI (section I). The recipe's hashed install, `uv pip check` and the SDK import check pass on the new lock (section D), and
+the workflow's ordinary OSV-Scanner 2.6.0 scan exits 1 with this one finding on the old tree, and both scans exit 0 on the new one (section F). The advisory concerns the LiteLLM
+proxy; the recipe runs none and no installed package outside litellm references `litellm.proxy` (section H, a search by syntax tree
+and context only). Upstream changed 34 files between v1.93.0 and v1.93.2, none under the paths the recipe cites or calls: the file R7 above and
+`worker.py` cite (`litellm/llms/openai/responses/transformation.py`) has the same blob id at both tags, so those v1.93.0 citations
+still describe the locked release (section C). The carried-forward oauthlib review holds: oauthlib 3.3.1 and everything that imports it
+are unchanged, and no file of litellm 1.93.2 mentions oauthlib (section I).
+
+Two independent reviews (Opus, and GPT-6.1 Sol at effort max through the packaged Codex lane, in two lenses) read the first head of this
+change; their findings and dispositions are in the receipt's `independent_review` and the review files beside the returned outputs. One
+finding concerned the guard, not the lock: the coverage test accepted a receipt of the previous digest as the evidence of a grant, and no
+test compared `pins.json`'s digests with the lock files. `tests/test_openhands_lock_binding.py` now requires the receipt of every
+grant to record the lock's path and the granted sha256 and `pins.json` to record the digests of both lock files, and section L of the
+returned outputs shows it failing on each single-defect copy.
+
+- **A relock, not an ignore.** A fixed release exists and is outside the 7-day window, and OSV-Scanner 2.6.0 matches an ignore by id in
+  every lock of an invocation, so an ignore would be repo-wide. No newer line (1.94.3, 1.95.1, 1.96.2) was evaluated: 1.93.2 is the
+  smallest change and stays on the line upstream's workspace pins.
+- **The joint relock in #518** starts from this lock and keeps `--upgrade-package litellm==1.93.2` and the two workspace edits. They can
+  go only when `source_archive` and the 1.49.6 wheels are re-pinned to an SDK whose own `uv.lock` carries litellm 1.93.2 or later: the
+  pinned archive's pins 1.93.0 for good (section C), and #518 does not re-pin it.
+- **Open pull requests on the same files** (section K): #535 replaces this lock and `pins.json` with a candidate built from another
+  SDK archive (litellm 1.93.2 at its head) and conflicts with this change in `pins.json`, `requirements.lock`, `manifests/evidence.json`
+  and the coverage test; #551 and #555 conflict only in `manifests/evidence.json`. Each rebases onto this change's merge.
+- **Not covered.** The image's server binary (upstream's uv.lock, litellm 1.93.0; grype cannot see inside its PyInstaller archive) and
+  the grader venv keep their own litellm; the inventory does not scan the grader venv. No OpenHands task ran with the relocked venv.
+
+Overturn conditions: (a) OSV lists an advisory for litellm 1.93.2 that only a later release fixes; (b) an OpenHands run of the recipe
+fails with litellm 1.93.2 and passes with 1.93.0; (c) upstream's workspace publishes a lock with litellm 1.93.2 or later (the next
+relock then follows that lock instead of the two-line edit).
+
 ## Takeover phase 1 corrections (2026-09-28)
 
 These are offline repairs on the round-3 head 45d40f6c. The network and
