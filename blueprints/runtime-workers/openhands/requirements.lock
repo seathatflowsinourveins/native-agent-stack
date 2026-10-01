@@ -305,11 +305,14 @@ keyring==25.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
 libtmux==0.53.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:024b7ae6a12aae55358e8feb914c8632b3ab9bd61c0987c53559643c6a58ee4f \
     --hash=sha256:1d19af4cea0c19543954d7e7317c7025c0739b029cccbe3b843212fae238f1bd
-litellm==1.93.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
-    --hash=sha256:0784172435de48f66ef7ad89d421604db1ad0db1321ef7f39dbcfe6b20111417 \
-    --hash=sha256:140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec \
-    --hash=sha256:98c15e84d32e922a821c105308bf9ddae8700de9ed396530bee2cbb1cacf4cbb \
-    --hash=sha256:cd70ccd4ba3ef1a395535c287bce72d30c7d937ecca4290c0db37a00738f7ada
+litellm==1.93.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:6f6a5e3907f0a1c9d8ff8d71a6cbac8a592e47a40da3f97167074947b5ba7d11 \
+    --hash=sha256:712c9387419d7b06a10df59973f5e530592d61b2314102b0fa3142f3743f9a9e \
+    --hash=sha256:ae75a61c9abc827aa3131b7e640c952367a450830bb7c531b426b4ec2bb45f85 \
+    --hash=sha256:c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd \
+    --hash=sha256:cacf35cf703b12c54516fc6464a3e08c6dbb1dcfb97239e1f629294fe36a1cba \
+    --hash=sha256:d8684629be3f7b5f8e2b6e5fe5ea27ff957c63a8d525d81c1460d8436e2e1857 \
+    --hash=sha256:dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692
 lmnr==0.7.60 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:35076b302a8f4349824deb08f79d1c7e4c2486b5a14704c0e6efee9879942096 \
     --hash=sha256:efec73de28eb8b66bcda6aaab7db0bda8247a26f982e63295a754412bee607f0

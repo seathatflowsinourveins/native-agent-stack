@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30 (it takes its one host path as an argument; the returned outputs mask it as <litellm-src>). It needs git and network access
+# (https://github.com/BerriAI/litellm), and is documentation of what ran, not a supported tool.
+# What changed in upstream litellm between the locked release v1.93.0 and the relocked v1.93.2, and whether the source the recipe cites (research.md R7, worker.py response_correlation,
+# README.md) is among it. A blobless, depth-1 fetch of the two release tags; the diff fetches only the blobs of the changed files. usage: upstream_diff.sh <litellm-src>
+set -u
+D=$1
+rm -rf "$D"; mkdir -p "$D"; cd "$D" || exit 2
+git init -q . && git remote add origin https://github.com/BerriAI/litellm.git && git config remote.origin.promisor true && git config remote.origin.partialclonefilter blob:none
+git fetch -q --depth 1 --filter=blob:none origin tag v1.93.0 tag v1.93.2
+echo "v1.93.0 -> $(git rev-parse 'v1.93.0^{commit}')   v1.93.2 -> $(git rev-parse 'v1.93.2^{commit}')"
+echo "--- git diff --stat v1.93.0 v1.93.2"
+git diff --stat v1.93.0 v1.93.2 | cut -c1-160
+echo "--- the paths the recipe cites or calls (litellm/llms/openai, litellm/responses, litellm/main.py, litellm/router.py, litellm/types, litellm/utils.py): files changed between the tags (nothing is listed if none)"
+git diff --stat v1.93.0 v1.93.2 -- litellm/llms/openai litellm/responses litellm/main.py litellm/router.py litellm/types litellm/utils.py
+echo "--- the file research.md R7 cites (litellm/llms/openai/responses/transformation.py), blob id at each tag"
+git rev-parse v1.93.0:litellm/llms/openai/responses/transformation.py v1.93.2:litellm/llms/openai/responses/transformation.py
+echo "--- the two changed library files outside litellm/proxy, the tests and the provider-specific modules"
+git diff v1.93.0 v1.93.2 -- litellm/caching/dual_cache.py litellm/litellm_core_utils/url_utils.py | cut -c1-200

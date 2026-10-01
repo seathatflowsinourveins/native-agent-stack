@@ -1,0 +1,267 @@
+{
+ "verdict": "changes-needed",
+ "summary": "The security relock reproduces: both lock digests match, only the litellm entry changes, all release hashes match PyPI, the hashed installation passes, and the pinned scanner returns before 1/0 and after 0/0. The remaining defects concern verification scripts that report successful exit codes on failing inputs, claims broader than their retained evidence, and publication hygiene. Reviewer handling correction: a scratch copy retained the checkout's Git metadata pointer, so a scratch ref update temporarily changed the original HEAD. I restored 6741c554219e and verified a clean working tree and matching manifest bindings; tracked file contents were unchanged.",
+ "findings": [
+  {
+   "severity": "medium",
+   "file": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.builder.sh.txt",
+   "line": 81,
+   "claim": "The published verification scripts can report exit 0 when the verification fails.",
+   "evidence": "In a private copy, I introduced a unittest import failure and ran the exact section J pipeline. It returned 0 and the published run() recorder printed 'RuntimeError: review injected test failure' followed by 'exit: 0'. Running the same pipeline with bash -o pipefail returned 1. Additional negative controls showed the same problem elsewhere: relock.sh.txt returned 0 after 'requirements.lock.repro ... requirements.lock differ: char 25750, line 309'; install-check.sh.txt returned 0 with uv failures of 42 and an SDK import failure of 127; hash-check.py.txt returned 0 for an all-zero digest while printing 'NO FILE OF THIS RELEASE HAS THIS SHA256'.",
+   "failure_scenario": "A test regression, mismatching reproduced lock, failed installation, or invalid release hash is supplied to these checks. Their recorded or process-level exit status remains successful, so an exit-code consumer cannot distinguish the wrong result from successful verification.",
+   "fix": "Capture the unittest status before trimming its output and record that status. Preserve unexpected failures through the relock and installation scripts, explicitly handling expected diagnostic diff exits. Make the hash checker exit nonzero for unmatched digests. Re-run the negative controls and update the published script hashes and byte counts.",
+   "tested": true
+  },
+  {
+   "severity": "medium",
+   "file": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+   "line": 4,
+   "claim": "The claim that this advisory blocked every head since 22:10Z exceeds the recorded CI evidence.",
+   "evidence": "The purpose states: 'The required osv-scanner check has failed on the lock for every head since 22:10Z, main's own push runs included, so no pull request could merge.' Line 9 describes reading 'one CI job log', and line 30 explicitly names the other records 'main_push_runs_logs_not_read'. A command checking the returned-outputs file found no gh run view command and none of the reported CI run IDs, job ID, head SHA, or job time interval. Section F supports a local reproduction on base 29458b43, not an exhaustive historical CI assertion. research.md:451 repeats the universal claim.",
+   "failure_scenario": "A reader treats one reported PR job, two workflow-level failure conclusions, and a local base scan as proof that every intervening head failed for this advisory and that 22:10Z was the first affected check.",
+   "fix": "Limit the narrative to the reported PR job and independently reproduced base failure. Identify the main workflow conclusions as unverified for cause, and remove the 'every head', 'first', and universal merge-blockage assertions unless corresponding primary CI evidence is retained.",
+   "tested": true
+  },
+  {
+   "severity": "medium",
+   "file": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+   "line": 99,
+   "claim": "Reading the pinned archive and one main commit does not establish that no fixed upstream lock exists anywhere.",
+   "evidence": "The receipt concludes 'no upstream lock with litellm 1.93.2 or later exists to adopt'. The published sdk-main.sh.txt:10 fetches only 'refs/heads/main' at depth 1. My independent fetch confirmed main fad63774459171b08f889b12fd3b4d6346168c3e and its litellm 1.93.0 pin; the pinned fcc102a archive also pins 1.93.0. Neither input surveys other published upstream revisions or release refs.",
+   "failure_scenario": "A maintainer acts on an exhaustive upstream-availability claim, although the evidence excludes all upstream refs except the inspected main commit and pinned archive.",
+   "fix": "Replace the assertion with 'the pinned SDK archive and inspected main commit still pin litellm 1.93.0; no fixed lock was found in those inputs'. Retain the named commits and observation time.",
+   "tested": true
+  },
+  {
+   "severity": "low",
+   "file": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+   "line": 8,
+   "claim": "The added public evidence exposes private session names and owner aliases.",
+   "evidence": "The hygiene scan found receipt line 8 publishing 'bc, <previous owner session>', 'session <merge-train owner session>', and 'session <Gate A owner session>'. Line 179 repeats the owner alias. Both added ordinary scanner outputs also retain 'owner: <previous owner>, session <previous owner session>' at lines 52 and 55. These are actual coordination identifiers, unlike the generic path placeholders and path-detection regexes.",
+   "failure_scenario": "Publishing the receipt and scanner outputs exposes local coordination identifiers in a portable engineering reference.",
+   "fix": "Replace session names and personal aliases with role descriptions in the receipt and sanitize them in the retained scanner outputs. Keep public issue references and technical evidence, then refresh manifest digests and byte counts.",
+   "tested": true
+  },
+  {
+   "severity": "low",
+   "file": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+   "line": 7,
+   "claim": "The recorded observation end precedes completion of the included test run.",
+   "evidence": "observed_until_utc is '2026-09-30T23:04:45Z'. The returned outputs at line 468 timestamp the start of section J at that same second, and line 470 records 'Ran 233 tests in 12.800s'. The builder header explicitly says command timestamps are start times. Calculating the lower bound gives test completion at 2026-09-30T23:04:57.800Z, after the stated observation end.",
+   "failure_scenario": "A reader uses observed_until_utc as the end of the receipt's evidence collection, although its included tests had not completed at that time.",
+   "fix": "Capture the end timestamp after the final command finishes and use it for observed_until_utc. Keep any separate release-window or scanner observation timestamp explicitly scoped to that observation.",
+   "tested": true
+  },
+  {
+   "severity": "low",
+   "file": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+   "line": 11,
+   "claim": "The September 28 image scan predates OSV ingestion, not publication of the advisory.",
+   "evidence": "Line 11 says the '2026-09-28 grype record of that image predates the advisory'. The same receipt at line 64 records NVD publication on 2026-09-02T18:21:28Z. The primary vendor advisory page, fetched on 2026-09-30, says it was published August 26, 2026: https://github.com/BerriAI/litellm/security/advisories/GHSA-3cv6-jpf6-8222. The independently fetched OSV record confirms September 30 as its publication time: https://api.osv.dev/v1/vulns/GHSA-3cv6-jpf6-8222.",
+   "failure_scenario": "A reader attributes the image scan's lack of this finding to the advisory not yet existing, although the vendor advisory and NVD record already existed.",
+   "fix": "Say that the image scan predates the OSV record's September 30 publication. Preserve the limitation that image reachability and a fresh image scan remain unmeasured.",
+   "tested": true
+  },
+  {
+   "severity": "low",
+   "file": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-advisories.py.txt",
+   "line": 3,
+   "claim": "The script claims to query the other upgraded PyPI pins but only queries litellm.",
+   "evidence": "The docstring promises query results for litellm 'and for the other PyPI pins of the relocked lock that changed in the 2026-09-30 relocks'. Executing 'python3 -B ...osv-advisories.py.txt' produced exactly three query lines, for litellm 1.93.0, 1.93.1, and 1.93.2. The request at lines 27–31 hard-codes package name litellm and has no loop over other packages.",
+   "failure_scenario": "A reader credits section A with independent package queries for the other upgraded dependencies, although those queries were not performed by this script.",
+   "fix": "Remove the promise about other PyPI pins from the docstring. The separate full-inventory scanner evidence can remain the evidence for those packages.",
+   "tested": true
+  }
+ ],
+ "claims_checked": [
+  {
+   "claim": "The base and new locks have the stated SHA256 digests, line counts, and hash-line counts.",
+   "result": "confirmed",
+   "source": "Independent byte hashing and counting: base 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c, 1133 lines, 797 hash lines; head e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1, 1136 lines, 800 hash lines. Matches returned outputs B, E, and G."
+  },
+  {
+   "claim": "Only the litellm requirement entry changes, with four hashes removed and seven added.",
+   "result": "confirmed",
+   "source": "Base/head diff reports 8 added and 5 deleted lines. Removing the litellm blocks leaves byte-identical files; all other requirements, markers, hashes, and wheel entries are unchanged."
+  },
+  {
+   "claim": "Both the control and new lock reproduce byte for byte from the pinned SDK archive.",
+   "result": "confirmed",
+   "source": "Independent execution of the published relock script with uv 0.12.17 reproduced both complete digests and printed both byte-equality success messages. Matches returned outputs B."
+  },
+  {
+   "claim": "Every old and new litellm lock hash belongs to a file of its corresponding PyPI release.",
+   "result": "confirmed",
+   "source": "Four of four old hashes and seven of seven new hashes matched https://pypi.org/pypi/litellm/1.93.0/json and https://pypi.org/pypi/litellm/1.93.2/json, fetched 2026-09-30. Matches section I."
+  },
+  {
+   "claim": "The returned PyPI filenames, upload times, hashes, and yanked flags are accurate for all three releases.",
+   "result": "confirmed",
+   "source": "Compared all 11 files of 1.93.0, 16 files of 1.93.1, and 36 files of 1.93.2 against their primary PyPI JSON responses. No mismatches. Release 1.93.2 spans 2026-08-09T02:16:21.033158Z to 2026-08-09T02:17:49.646197Z; none is yanked."
+  },
+  {
+   "claim": "The OSV advisory metadata, affected ranges, fixed releases, and publication times match the primary record.",
+   "result": "confirmed",
+   "source": "https://api.osv.dev/v1/vulns/GHSA-3cv6-jpf6-8222, fetched 2026-09-30: published 2026-09-30T21:11:25Z, modified 2026-09-30T21:15:08.145507777Z, alias CVE-2026-84377, MODERATE, CWE-918, and the recorded CVSS vector. The 1.93 range introduces 1.93.0 and fixes 1.93.2, listing 1.93.0 and 1.93.1. All nine fixed-release values and listed-version counts match section A."
+  },
+  {
+   "claim": "OSV queries return this advisory for 1.93.0 and 1.93.1, and no advisories for 1.93.2.",
+   "result": "confirmed",
+   "source": "Independent POST requests to https://api.osv.dev/v1/query and execution of the published advisory script on 2026-09-30 returned exactly the recorded results."
+  },
+  {
+   "claim": "1.93.2 is the first fixed release of the 1.93 line and is outside the seven-day release window.",
+   "result": "confirmed",
+   "source": "Primary OSV affected range and PyPI upload times. The latest upload is more than 52 days before the receipt's release-choice observation time. Newer-line compatibility is explicitly not claimed."
+  },
+  {
+   "claim": "The pinned SDK archive, root uv.lock digest, and cited pyproject.toml lines match the receipt.",
+   "result": "confirmed",
+   "source": "Fetched https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/fcc102a697874d54a357e36004e02c95040dbdc0. Archive SHA256 is 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8. Root uv.lock SHA256 is d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910. Root pyproject lines 8 and 19 and SDK pyproject line 18 match; uv.lock lines 2174–2175 pin litellm 1.93.0."
+  },
+  {
+   "claim": "The inspected SDK main commit still pins litellm 1.93.0 with the recorded cap.",
+   "result": "confirmed",
+   "source": "Independent Git fetch of https://github.com/OpenHands/software-agent-sdk.git refs/heads/main returned fad63774459171b08f889b12fd3b4d6346168c3e, committed 2026-09-30T19:53:31-03:00. Its pyproject lines 8 and 19 and uv.lock lines 2160–2161 match section C."
+  },
+  {
+   "claim": "No fixed upstream workspace lock exists anywhere to adopt.",
+   "result": "unverifiable",
+   "source": "Only the pinned archive and named main commit were inspected. Other published upstream revisions and release refs were not surveyed; the receipt's exhaustive assertion exceeds those inputs."
+  },
+  {
+   "claim": "uv 0.12.17 supports the two options with the recorded meanings.",
+   "result": "confirmed",
+   "source": "Installed 'uv --version' returned 0.12.17. 'uv lock --help' confirmed --upgrade-package allows upgrades ignoring existing output pins, and --exclude-newer-package limits artifacts by upload date. Matches section C."
+  },
+  {
+   "claim": "The upstream LiteLLM tags, diff counts, and unchanged cited paths are accurate.",
+   "result": "confirmed",
+   "source": "Independent Git fetch from https://github.com/BerriAI/litellm.git: v1.93.0 is 052b5a2169d8d3082e1d66e69f200a72b0c1e274; v1.93.2 is cd1bd0f4b8af865f8d05fbd938392fdd4703babc. Diff: 34 files, 2341 insertions, 430 deletions. No differences in the six enumerated recipe paths. Both R7 transformation.py blobs are d107ca7a0d749b401edbf901990384cab1a67f1a."
+  },
+  {
+   "claim": "The hashed installation, uv pip check, installed versions, and SDK imports pass.",
+   "result": "confirmed",
+   "source": "Independent scratch installation using the published script: every recorded installation/import step exited 0, uv pip check reported 178 compatible packages, and all eight printed package versions matched section D. The actual install-container.sh import command also exited 0."
+  },
+  {
+   "claim": "Omitting an explicit FileEditorTool import from the published check leaves that tool unchecked.",
+   "result": "contradicted",
+   "source": "Rejected review hypothesis: the installed openhands.tools package imports FileEditorTool in __init__.py:23. Injecting a FileEditorTool import failure made both the published and actual recipe import commands fail with exit 1."
+  },
+  {
+   "claim": "The scanner binary identity and workflow inventory counts match the receipt.",
+   "result": "confirmed",
+   "source": "Downloaded https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 and verified ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108. Its version output matches OSV-Scanner 2.6.0, scalibr 0.5.2, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6, and build time. Inventory splits into 48 ordinary and one frozen entry."
+  },
+  {
+   "claim": "The workflow-equivalent scans return before 1/0 with one finding and after 0/0.",
+   "result": "confirmed",
+   "source": "Independent runs of the checksum-verified scanner over the exact inventory lists and configurations: base ordinary 1, base frozen 0, head ordinary 0, head frozen 0. The base table contains exactly GHSA-3cv6-jpf6-8222 on litellm 1.93.0, fixed in 1.93.2, in the OpenHands lock; CVSS 6.5 and severity counts match section F."
+  },
+  {
+   "claim": "All four retained scanner-output digests match the returned outputs and manifest.",
+   "result": "confirmed",
+   "source": "Independent SHA256 calculations matched 8df9f616... and 3c615cbf... before, and 738fcfa6... and af98a404... after. All four byte counts also match manifests/evidence.json."
+  },
+  {
+   "claim": "The historical CI run IDs, job ID, head SHA, timestamps, first failure, and universal outage narrative are independently supported.",
+   "result": "unverifiable",
+   "source": "Those historical identifiers and times are absent from the retained returned outputs. I did not access authenticated GitHub job logs or sign-in state. Local base/head scans confirm the lock's behavior, but not the historical CI assertions."
+  },
+  {
+   "claim": "IGNORE_ALLOWED_LOCKS is rebound to the new digest and receipt without adding an advisory ignore.",
+   "result": "confirmed",
+   "source": "tests/test_osv_lockfile_coverage.py:67–70 matches the independently computed new digest and existing receipt path. Configuration files are unchanged by this PR; the coverage tests pass."
+  },
+  {
+   "claim": "The carried-forward oauthlib review's unchanged-package premise and new LiteLLM text-search premise hold.",
+   "result": "confirmed",
+   "source": "All bytes outside the litellm lock entry are unchanged. The upstream tag diff contains zero oauthlib mentions. The hash-verified CPython 3.13 manylinux wheel, SHA256 dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692, contains 3113 litellm files and zero oauthlib mentions. The review remains static, as documented."
+  },
+  {
+   "claim": "The unit-test count and skips are reproducible.",
+   "result": "confirmed",
+   "source": "Independent direct unittest run passed 233 tests with two skips. My initial TMPDIR inside the scratch checkout caused 11 expected outside-checkout validation errors; moving TMPDIR outside that checkout corrected the harness and produced exit 0. The historical 12.800-second duration is recorded in section J, not asserted as a repeatable duration."
+  },
+  {
+   "claim": "The published evidence checks reliably fail for incorrect inputs.",
+   "result": "contradicted",
+   "source": "Negative controls demonstrated successful exit codes for failed tests, a mismatching lock, failed uv installation steps, and an invalid PyPI hash. See the verification-script finding."
+  },
+  {
+   "claim": "The recorded observation interval contains all included command completions.",
+   "result": "contradicted",
+   "source": "Section J starts at 23:04:45Z and records a 12.800-second run; completion necessarily follows observed_until_utc=23:04:45Z."
+  },
+  {
+   "claim": "The September 28 Grype record predates publication of the advisory.",
+   "result": "contradicted",
+   "source": "Primary vendor page records August 26 publication, and the primary OSV record carries NVD publication on September 2. September 28 predates only the September 30 OSV publication."
+  },
+  {
+   "claim": "The OAuth/PyJWT joint relock's earliest timestamp and ignore expiry are consistent with recorded package dates.",
+   "result": "confirmed",
+   "source": "Primary PyPI JSON fetched 2026-09-30: latest oauthlib 4.0.0 upload 2026-09-28T06:01:18.770551Z; latest PyJWT 2.15.1 upload 2026-09-28T18:40:42.598678Z. Adding seven days supports the rounded earliest joint timestamp 2026-10-05T18:40:43Z. Both configured OAuth ignores expire 2026-10-13."
+  },
+  {
+   "claim": "Issue ownership, the October 8 due date, peer authorization, and published independent-review dispositions are current.",
+   "result": "unverifiable",
+   "source": "These require peer/session history or live issue/PR evidence outside the retained outputs. I did not read private state or authenticate to obtain it."
+  },
+  {
+   "claim": "All 18 changed evidence files outside the manifest have correct manifest registrations.",
+   "result": "confirmed",
+   "source": "Final check at restored head 6741c554219eb7c1669b37d1c08881bc81083e62 found 19 changed paths and zero missing, incorrect-hash, or incorrect-byte-count bindings among the other 18."
+  },
+  {
+   "claim": "The added publication files contain no private coordination identifiers.",
+   "result": "contradicted",
+   "source": "The hygiene scan found session names and owner aliases in the new receipt and both ordinary scanner outputs. No credential values or concrete home paths were identified in the reviewed additions."
+  },
+  {
+   "claim": "The advisory script queries the other upgraded PyPI packages.",
+   "result": "contradicted",
+   "source": "Executing the published script produced only the three litellm query lines; its source hard-codes litellm."
+  },
+  {
+   "claim": "The record establishes runtime non-reachability, image remediation, grader remediation, or a successful OpenHands task.",
+   "result": "unverifiable",
+   "source": "These are explicitly outside the change's evidence class and limitations. No image rescan, grader inspection, runtime trace, model request, or OpenHands task was performed in this review."
+  }
+ ],
+ "commands_run": [
+  "rtk git -C <checkout> diff --stat 29458b43 HEAD",
+  "rtk git -C <checkout> diff 29458b43 HEAD -- <OpenHands pins, requirements.lock, research.md, coverage test>",
+  "rtk git -C <checkout> diff 29458b43 HEAD -- manifests/evidence.json",
+  "rtk rg --files -g AGENTS.md -g '*osv*' -g '*evidence*' <checkout>",
+  "rtk cat <checkout>/AGENTS.md",
+  "rtk cat ~/.agents/skills/security-audit/SKILL.md",
+  "rtk nl -ba <receipt and returned-output paths>",
+  "ctx_execute: rtk python3 -B - (read numbered scripts and cited repository lines)",
+  "Web search for GHSA-3cv6-jpf6-8222, litellm 1.93.2, and uv option documentation",
+  "ctx_fetch_and_index: vendor GitHub advisory and official uv CLI reference",
+  "ctx_execute: rtk python3 -B - (GET OSV record and PyPI JSON for litellm 1.93.0, 1.93.1, 1.93.2; compare recorded release facts)",
+  "ctx_execute: rtk python3 -B - (hash/count base and head locks; compare all bytes outside litellm; verify scanner-output digests and manifest bindings)",
+  "ctx_execute: rtk python3 -B - (fetch and hash pinned SDK archive; inspect pyproject.toml and uv.lock in memory)",
+  "ctx_execute: rtk uv --version; rtk uv lock --help",
+  "ctx_execute: private scratch copies; rtk python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_runtime_worker_openhands, first with internal TMPDIR and then with external TMPDIR",
+  "ctx_execute: scratch Git init/fetch of BerriAI/litellm v1.93.0 and v1.93.2; rtk proxy git diff --numstat; cited-path diff; R7 blob comparisons; oauthlib search",
+  "ctx_execute: scratch Git init/fetch of OpenHands/software-agent-sdk refs/heads/main; inspect commit time, pyproject.toml, and uv.lock",
+  "ctx_execute: rtk bash <copy>/.../relock-2026-09-30-litellm.relock.sh.txt <scratch> <copy>",
+  "ctx_execute: rtk osv-scanner --version (exit 127); fetch and checksum-verify the workflow-pinned v2.6.0 binary",
+  "ctx_execute: pinned osv-scanner scan source --config <ordinary or frozen config> --no-resolve <exact inventory arguments>, for base and head",
+  "ctx_execute: fault-injected section J pipeline, with and without bash -o pipefail; execute the published run() recorder",
+  "ctx_execute: rtk bash <copy>/.../relock-2026-09-30-litellm.install-check.sh.txt <scratch> <copy>; run the actual recipe import command with scratch Python -B",
+  "ctx_execute: compare published and actual recipe imports after injecting a FileEditorTool import failure",
+  "ctx_execute: failing uv shim; invalid-hash input to python3 -B ...hash-check.py.txt; mismatching target lock input to ...relock.sh.txt",
+  "ctx_execute: rtk python3 -B ...osv-advisories.py.txt; summarize actual query lines",
+  "ctx_execute: POST OSV version queries; GET oauthlib 4.0.0 and PyJWT 2.15.1 PyPI JSON; calculate cooldown timestamps",
+  "ctx_execute: fetch and hash the locked CPython 3.13 LiteLLM wheel; search all litellm files for oauthlib",
+  "ctx_execute: inspect retained CI identifiers, observation timestamps, ignore expiries, and publication identifiers",
+  "rtk git -C <checkout> status --short; rtk git -C <checkout> rev-parse HEAD 29458b43 (detected unintended shared-HEAD update)",
+  "ctx_execute: rtk git -C <checkout> update-ref HEAD 6741c554219e 29458b43 (restore accidental scratch ref update)",
+  "Final verification: restored HEAD, empty working-tree status, 19 changed paths, and zero manifest binding errors",
+  "All private scratch copies and review-created artifacts were removed with rtk rm -rf after their checks"
+ ]
+}
