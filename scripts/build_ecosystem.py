@@ -629,7 +629,9 @@ def architecture_row(row, known_layers, stack_versions, cite, pin_source):
                 "architecture install needs a known kind and a command unless none is recorded")
         require(isinstance(acceptance, dict) and acceptance.get("evidence_class") in ARCHITECTURE_EVIDENCE_CLASSES
                 and isinstance(acceptance.get("command"), str)
-                and bool(acceptance["command"].strip()) == (acceptance["evidence_class"] != "none_recorded"),
+                # A none_recorded acceptance may still name the check to run on the new host: no run of it is
+                # recorded. Every other class needs its command.
+                and (bool(acceptance["command"].strip()) or acceptance["evidence_class"] == "none_recorded"),
                 "architecture acceptance needs its evidence class and a command unless none is recorded")
         require(isinstance(currency, dict) and set(currency) <= {"latest_release", "checked_at", "pin_is_latest", "url"}
                 and currency.get("pin_is_latest") in ARCHITECTURE_CURRENCY

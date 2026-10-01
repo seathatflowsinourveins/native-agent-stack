@@ -1931,6 +1931,17 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                     self.assertNotEqual(result.returncode, 0, result.stdout)
                     self.assertIn(message, result.stdout)
 
+    def test_a_none_recorded_acceptance_may_name_the_check_to_run(self):
+        """A check that is prescribed but has no recorded run keeps its command; every other class needs one."""
+        def prescribed(edition):
+            edition["rows"][0]["winners"][0]["acceptance"].update(command="rg --version", evidence_class="none_recorded")
+            edition["rows"][0]["evidence_class"] = "none_recorded"
+        self.assert_architecture_cases((
+            ("a prescribed check without a recorded run", prescribed, None),
+            ("a recorded class without a command",
+             lambda e: e["rows"][0]["winners"][0]["acceptance"].update(command=" "),
+             "architecture acceptance needs its evidence class and a command unless none is recorded")))
+
     def recorded_winner(self, evidence_class):
         """A second, name-keyed winner whose acceptance carries the given class."""
         winner = self.architecture_winner(name="ripgrep", pin="14.1.1", acceptance={
