@@ -1,4 +1,6 @@
-# Accepted dependency versions from the 2026-09-19 native Syft inventory.
+# Baseline dependency versions from the 2026-09-19 native Syft inventory.
+# Codex SDK and its bundled CLI upgraded together on 2026-09-30; acceptance
+# of this artifact is separate from the historical inventory and receipts.
 # Resolver constraints, not an installable dependency lock. See README.md.
 alpaca-py==0.44.0
 annotated-types==0.8.0
@@ -16,8 +18,8 @@ korean-lunar-calendar==0.4.0
 msgpack==1.2.2
 numpy==2.5.3
 openai==3.16.2
-openai-codex==0.154.0
-openai-codex-cli-bin==0.154.0
+openai-codex==0.159.2
+openai-codex-cli-bin==0.159.2
 packaging==26.3
 pandas==3.0.6
 pydantic==2.13.5
