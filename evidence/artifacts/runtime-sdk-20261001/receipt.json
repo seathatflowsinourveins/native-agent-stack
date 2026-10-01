@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "kind": "native-sdk-route-lifecycle-qualification",
+  "evidence_class": "local native installation and protocol integration; failed live provider request",
+  "checked_at": "2026-10-01",
+  "status": "local_and_native_account_checks_passed_accepted_gateway_held",
+  "scope": "Candidate coupled SDK/CLI 0.159.3 qualification; not new-host or model-quality acceptance.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "ref": "rust-v0.159.3",
+      "commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "paths": [
+        "sdk/python",
+        "codex-rs/models-manager/models.json",
+        ".github/workflows/python-sdk-build.yml"
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex/0.159.3/json"
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex-cli-bin/0.159.3/json"
+    },
+    {
+      "repository": "astral-sh/uv",
+      "ref": "0.12.17",
+      "url": "https://docs.astral.sh/uv/pip/compile/#adding-constraints"
+    }
+  ],
+  "installation": {
+    "python": "3.13.15",
+    "platform": "Linux x86_64 glibc",
+    "uv": "0.12.17",
+    "sdk": "0.159.3",
+    "bundled_cli": "0.159.3",
+    "selected_native_cli": "0.159.3",
+    "isolated_prefix": true,
+    "shared_environment_modified": false,
+    "lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+    "lock_sha256": "9e215b2c85823b33b881ae1ff38a2c666ebd46d75d34568f5e8747d350f8ef74",
+    "distribution_count": 36,
+    "artifact_hash_count": 867,
+    "commands": [
+      {
+        "label": "sdk-native-venv",
+        "native_exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "51f1ef47e7129c55e4c6a6bb1ab2c7a733f71d0c1a3dc47ed419e593839d8374"
+      },
+      {
+        "label": "sdk-native-sync",
+        "native_exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "30d63751f36834752f1a189a87ff249cd6e66118cdedcf9f2e63d6c087df7c46"
+      },
+      {
+        "label": "sdk-native-check",
+        "native_exit": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "2a0a07d8775530d94e5373789cb53d8b684add6e18b6408fc85759bb78a284cf"
+      },
+      {
+        "label": "sdk-native-inventory",
+        "native_exit": 0,
+        "stdout_sha256": "7e5b2bab040c19cd8eaa912c55a8afc16a569cb0dc90f1ee76953d2dcbc04b78",
+        "stderr_sha256": "46a66d15e21be2884980e62ab2ea9728ba1024ab592d3bc382a9827c7309447d"
+      },
+      {
+        "label": "sdk-upstream-supported-pydoc",
+        "native_exit": 0,
+        "stdout_sha256": "07600a5df160a105c5f3d4db34f06b82b7ded7029766eba69a326724a16672b8",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "local_protocol": {
+    "sdk_version": "0.159.3",
+    "bundled_cli_distribution": "0.159.3",
+    "native_binary_version": "codex-cli 0.159.3",
+    "native_image_matches_isolated_bundled_binary": true,
+    "per_call_private_native_state": true,
+    "initial_private_state_entries": 0,
+    "saved_thread_count": 0,
+    "native_model_turns_submitted": 0,
+    "child_returncode_after_close": 0,
+    "child_alive_after_close": false
+  },
+  "live_attempt": {
+    "native_exit": 1,
+    "model_inference_submitted": true,
+    "requested_base_model": "gpt-6.1-sol",
+    "requested_native_model": "cx/gpt-6.1-sol-max",
+    "requested_provider": "omniroute",
+    "requested_effort": "max",
+    "observed_configured_model": "cx/gpt-6.1-sol-max",
+    "observed_configured_provider": "omniroute",
+    "observed_backend_model": null,
+    "observed_effort": null,
+    "status": "failed_native_http429",
+    "usage_status": "unavailable_after_provider_failure",
+    "usage": null,
+    "caller_turn_submissions": 1,
+    "native_internal_retry_request_count": null,
+    "caller_additional_turns_or_retries": 0
+  },
+  "native_account_observation": {
+    "status": "native_turn_completed_local_postreturn_classifier_failed",
+    "provider": "openai",
+    "configured_model": "gpt-6.1-sol",
+    "requested_effort": "max",
+    "observed_backend_model": null,
+    "observed_backend_effort": null,
+    "marker_exact_match": true,
+    "returned_item_types": [
+      "userMessage",
+      "reasoning",
+      "agentMessage"
+    ],
+    "tool_items_after_exact_native_schema_review": [],
+    "original_wrapper_native_exit": 1,
+    "correction": "The wrapper treated native userMessage input as a tool after the unchanged worker returned a completed marker turn. Original result and exit1 remain unchanged; no additional provider request.",
+    "usage_scope": "One returned native total; last and total match; reasoning is an output subset.",
+    "usage": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 0,
+      "inputTokens": 19424,
+      "outputTokens": 51,
+      "reasoningOutputTokens": 37,
+      "totalTokens": 19475
+    },
+    "native_result_sha256": "949ad950d6e23e44cd4903472bf4ee63f4174b1f5c7aeeed5c5ccbd53185fb98",
+    "correction_sha256": "379939f1fa0b729aa050ec85c3a2806cadbc89d039d4c53ec5d50eb014d5be3e",
+    "sources": [
+      "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/generated/v2_all.py#L9783",
+      "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/_run.py#L103"
+    ]
+  },
+  "retained_evidence": {
+    "input_manifest_sha256": "6256d3d3b94cc766bba4dc00ca20c2330162c6927405b2311f08712dc293b749",
+    "native_canary_result_sha256": "b64fc0029c25a60e0cca93a80f8ffbcbfae67192497bcf02fe933bd7cd9c91e4",
+    "historical_receipt": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
+    "historical_receipt_sha256": "4e3be5cffa768e37b0b1867fef503d519a5cfa102506d1bfe3086f664812e745"
+  },
+  "unchanged_upstream_checks": [],
+  "limits": [
+    "Local commands and protocol checks are integration evidence, not an unchanged upstream test suite.",
+    "Gateway attempt: one caller turn was submitted. Provider execution/admission, backend effort and native usage were not returned.",
+    "HTTP 429 is observed; its cause is unknown. Account quota is an unsupported inference.",
+    "No additional gateway caller retry or turn. Its native internal retry count is unknown. The separate native-account canary is recorded above.",
+    "Historical 2026-09-30 acceptance remains unchanged. The failed gateway attempt does not establish acceptance on that route; native-account completion is a separate observation."
+  ]
+}
