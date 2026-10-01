@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T07:38:10Z",
+  "recorded_at_utc": "2026-10-01T03:10:02Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -14,8 +14,8 @@
       "kind": "lane",
       "id": "paper",
       "title": "Alpaca paper accounts 1 and 2",
-      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
+      "state": "09-29 mechanics-only / acct 2 pre 3 of 3 passed -2.05 USD / acct 1 rth 5 of 6 passed -115.94 USD then halted / acct 2 ext 3 of 4 passed IOVA 68 held (PR 559)",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"
     },
     {
       "kind": "lane",
